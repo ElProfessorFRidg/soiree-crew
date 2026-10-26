@@ -1,0 +1,76 @@
+import { createContext, useContext, useMemo, type ReactNode } from "react";
+import type { UiLanguage } from "@crew/units";
+import { en } from "./en";
+import { fr } from "./fr";
+import type { MessageKey, Messages, PluralForms, PluralKey } from "./types";
+
+export type { MessageKey, PluralKey } from "./types";
+
+const catalogs: Record<UiLanguage, Messages> = { fr, en };
+const localeTags: Record<UiLanguage, string> = { fr: "fr-FR", en: "en-US" };
+
+type Params = Record<string, string | number>;
+
+function lookup(messages: Messages, key: string): unknown {
+  let node: unknown = messages;
+  for (const part of key.split(".")) {
+    node = (node as Record<string, unknown> | undefined)?.[part];
+  }
+  return node;
+}
+
+function interpolate(template: string, params: Params | undefined, format: (n: number) => string): string {
+  if (!params) return template;
+  return template.replace(/\{(\w+)\}/g, (match, name: string) => {
+    const value = params[name];
+    if (value === undefined) return match;
+    return typeof value === "number" ? format(value) : value;
+  });
+}
+
+export interface Translator {
+  language: UiLanguage;
+  locale: string;
+  t: (key: MessageKey, params?: Params) => string;
+  plural: (key: PluralKey, count: number, params?: Params) => string;
+  number: (value: number, digits?: number) => string;
+}
+
+export function createTranslator(language: UiLanguage): Translator {
+  const messages = catalogs[language];
+  const locale = localeTags[language];
+  const rules = new Intl.PluralRules(locale);
+  const integer = new Intl.NumberFormat(locale);
+  const number = (value: number, digits = 0) =>
+    new Intl.NumberFormat(locale, { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
+  const formatParam = (n: number) => integer.format(n);
+
+  return {
+    language,
+    locale,
+    number,
+    t(key, params) {
+      const value = lookup(messages, key);
+      // A missing key is a build-time error through MessageKey; at runtime show the key, never a blank.
+      return typeof value === "string" ? interpolate(value, params, formatParam) : key;
+    },
+    plural(key, count, params) {
+      const forms = lookup(messages, key) as PluralForms | undefined;
+      if (!forms) return key;
+      const category = rules.select(count);
+      const template = category === "one" ? forms.one : forms.other;
+      return interpolate(template, { count, ...params }, formatParam);
+    },
+  };
+}
+
+const I18nContext = createContext<Translator>(createTranslator("fr"));
+
+export function I18nProvider({ language, children }: { language: UiLanguage; children: ReactNode }) {
+  const translator = useMemo(() => createTranslator(language), [language]);
+  return <I18nContext.Provider value={translator}>{children}</I18nContext.Provider>;
+}
+
+export function useT(): Translator {
+  return useContext(I18nContext);
+}

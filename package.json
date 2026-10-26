@@ -1,0 +1,15 @@
+{
+  "name": "soiree-crew",
+  "private": true,
+  "packageManager": "pnpm@10.33.4",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "pnpm -r --parallel typecheck",
+    "lint:slop": "node tools/slop-lint/index.mjs",
+    "check": "pnpm typecheck && pnpm test && pnpm lint:slop"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.3",
+    "vitest": "^3.2.4"
+  }
+}

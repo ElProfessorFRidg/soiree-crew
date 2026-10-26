@@ -1,0 +1,68 @@
+import type { BacUnit } from "./bac";
+import { COUNTRIES, countryRules, FALLBACK_COUNTRY, type DriverCategory, type UnitSystem } from "./countries";
+
+export type UiLanguage = "fr" | "en";
+export const UI_LANGUAGES: readonly UiLanguage[] = ["fr", "en"];
+
+/**
+ * Server-side settings (PREF-01). Language, legal country and units are
+ * independent (PREF-04): nothing below is inferred from the language alone.
+ */
+export interface UserPreferences {
+  language: UiLanguage;
+  legalCountry: string;
+  driverCategory: DriverCategory;
+  unitSystem: UnitSystem;
+  bacUnit: BacUnit;
+  currency: string;
+  hourCycle: "h12" | "h23";
+  /** Hour (0 to 23, local) when "tonight" ends: 2 am on Sunday counts as Saturday night (QOL-02). */
+  dayBoundaryHour: number;
+}
+
+export interface DeviceLocale {
+  /** BCP 47 tags in the phone's order of preference. */
+  languageTags: readonly string[];
+  /** Region the phone is set to, ISO 3166-1. May differ from the language's region. */
+  region: string | null;
+  uses24HourClock: boolean | null;
+}
+
+function pickLanguage(tags: readonly string[]): UiLanguage {
+  for (const tag of tags) {
+    const base = tag.toLowerCase().split(/[-_]/)[0];
+    if (base === "fr" || base === "en") return base;
+  }
+  return "en";
+}
+
+/** Smart defaults on first launch, from the device settings only (PREF-02). */
+export function defaultPreferences(device: DeviceLocale): UserPreferences {
+  const tagRegion = device.languageTags[0]?.split(/[-_]/)[1]?.toUpperCase();
+  const region = device.region?.toUpperCase() ?? tagRegion ?? FALLBACK_COUNTRY;
+  const legalCountry = COUNTRIES[region] ? region : FALLBACK_COUNTRY;
+  const rules = countryRules(legalCountry);
+  const twelveHourRegions = new Set(["US", "CA", "AU", "NZ"]);
+  const hourCycle =
+    device.uses24HourClock === null ? (twelveHourRegions.has(region) ? "h12" : "h23") : device.uses24HourClock ? "h23" : "h12";
+
+  return {
+    language: pickLanguage(device.languageTags),
+    legalCountry,
+    driverCategory: "standard",
+    unitSystem: rules.unitSystem,
+    bacUnit: rules.bacUnits[0] ?? "g_per_l_blood",
+    currency: rules.currency,
+    hourCycle,
+    dayBoundaryHour: 6,
+  };
+}
+
+/**
+ * Start of the night a timestamp belongs to (QOL-02), as local wall-clock
+ * midnight-shifted by the day boundary. `offsetMinutes` is the local UTC offset.
+ */
+export function nightKey(at: number, offsetMinutes: number, dayBoundaryHour: number): string {
+  const local = new Date(at + offsetMinutes * 60_000 - dayBoundaryHour * 3_600_000);
+  return local.toISOString().slice(0, 10);
+}

@@ -2,7 +2,7 @@
 
 Every ID of `PROMPT.md`, its priority, the prototype board that shows it, and its status.
 
-Status values: `todo`, `spec`, `build`, `review`, `polish`, `done` (definition of done in `PROMPT.md`), `retired` (decision recorded), `proposed` (added from a phase 0 recon report, not yet accepted by the orchestrator; it joins the normal chain once accepted).
+Status values: `todo`, `build` (first version in the code, not reviewed yet), `spec`, `build`, `review`, `polish`, `done` (definition of done in `PROMPT.md`), `retired` (decision recorded), `proposed` (added from a phase 0 recon report, not yet accepted by the orchestrator; it joins the normal chain once accepted).
 Board `Backstage` means the ID has no screen in the prototype ("Coulisses" in `Main.dc.html`). For `proposed` IDs the nearest board is given in brackets.
 
 Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summary. Changes to existing IDs, renumbered collisions and the design gaps found by Recon-Design A, B and C are at the end of this file. Narrative summary of every report: `RESEARCH.md`.
@@ -12,10 +12,10 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | O-01 | P0 | Arrivee.dc.html | todo | Sign up / sign in with email and Google (first name and username kept separate). Add Sign in with Apple (requi... |
-| O-02 | P0 | Arrivee.dc.html | todo | 18+ age gate on first launch. |
+| O-02 | P0 | Arrivee.dc.html | build | 18+ age gate on first launch. |
 | O-03 | P1 | Arrivee.dc.html | todo | Onboarding where the user picks their notifications. |
-| O-04 | P0 | Arrivee.dc.html | todo | Profile for the BAC model: weight, sex (check what the model really needs; S2M dropped height because the calc... |
-| O-05 | P0 | Arrivee.dc.html | todo | Country (legal limit) + novice / probationary driver mode. |
+| O-04 | P0 | Arrivee.dc.html | build | Profile for the BAC model: weight, sex (check what the model really needs; S2M dropped height because the calc... |
+| O-05 | P0 | Arrivee.dc.html | build | Country (legal limit) + novice / probationary driver mode. |
 | O-06 | P2 | Reglages.dc.html | todo | Change password and email from settings. |
 | O-07 | P1 | Reglages.dc.html | todo | In-app account deletion: states exactly what will be erased, confirms when done. |
 | O-08 | P1 | Arrivee.dc.html | todo | Privacy policy readable without an account; analytics consent revocable at any time. |
@@ -30,15 +30,15 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| O-15 | P0 | Soiree.dc.html | todo | Live BAC in mg/L of breath and g/L of blood, plus the units used in each supported country (see <localization>). |
-| O-16 | P0 | Soiree.dc.html | todo | Trend: rising / falling + estimated peak (value and time). |
-| O-17 | P0 | Soiree.dc.html | todo | "Back to zero" timer, reliable even at high levels (above 1.5 mg/L). |
-| O-18 | P0 | Soiree.dc.html | todo | Driving status and timer: under / over the legal limit, at least 22 countries with automatic thresholds (watch... |
-| O-19 | P0 | Soiree.dc.html | todo | Permanent notice next to the BAC: indicative estimate, not a certified breathalyser, never drive based on it a... |
-| O-20 | P0 | Soiree.dc.html | todo | Quick adds (beer 25 / 33 / 50 cl, wine, shot, cocktail...) with custom-drawn glass icons. |
+| O-15 | P0 | Soiree.dc.html | build | Live BAC in mg/L of breath and g/L of blood, plus the units used in each supported country (see <localization>). |
+| O-16 | P0 | Soiree.dc.html | build | Trend: rising / falling + estimated peak (value and time). |
+| O-17 | P0 | Soiree.dc.html | build | "Back to zero" timer, reliable even at high levels (above 1.5 mg/L). |
+| O-18 | P0 | Soiree.dc.html | build | Driving status and timer: under / over the legal limit, at least 22 countries with automatic thresholds (watch... |
+| O-19 | P0 | Soiree.dc.html | build | Permanent notice next to the BAC: indicative estimate, not a certified breathalyser, never drive based on it a... |
+| O-20 | P0 | Soiree.dc.html | build | Quick adds (beer 25 / 33 / 50 cl, wine, shot, cocktail...) with custom-drawn glass icons. |
 | O-21 | P0 | Soiree.dc.html | todo | Custom drinks: create, long-press to edit / move / remove, custom order, synced across devices, personal presets. |
-| O-22 | P0 | Soiree.dc.html | todo | Drink time adjustable to the minute (forgotten drink); a drink "in the future" never counts in the calculation. |
-| O-23 | P0 | Soiree.dc.html | todo | Grouped history (e.g. 5x Beer 50 cl) that expands to each drink's exact time, delete one at a time, edit with ... |
+| O-22 | P0 | Soiree.dc.html | build | Drink time adjustable to the minute (forgotten drink); a drink "in the future" never counts in the calculation. |
+| O-23 | P0 | Soiree.dc.html | build | Grouped history (e.g. 5x Beer 50 cl) that expands to each drink's exact time, delete one at a time, edit with ... |
 | O-24 | P0 | Soiree.dc.html | todo | BAC curve: Day / Week / Month / Total / Average (7-day moving average), zoom, pan, a trace that truly follows ... |
 | O-25 | P1 | Soiree.dc.html | todo | Personal limits drawn on the curve. |
 | O-26 | P0 | Soiree.dc.html | todo | Set a limit / goal before going out + alerts when getting close, without spam. |
@@ -46,7 +46,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-28 | P1 | Soiree.dc.html | todo | Stats in grams of pure alcohol (this month, total, average). |
 | O-29 | P0 | Soiree.dc.html | todo | Friends' avatars on the graph + curve comparison between friends. |
 | O-30 | P1 | Soiree.dc.html | todo | Share: styled visual with photo / selfie (front or back camera) + stats + curve. |
-| O-31 | P0 | Etats.dc.html | todo | Offline: a drink added without network is kept and sent when the network returns, never counted twice; the app... |
+| O-31 | P0 | Etats.dc.html | build | Offline: a drink added without network is kept and sent when the network returns, never counted twice; the app... |
 | O-32 | P0 | JeuxCartes.dc.html | todo | Small floating button in every game to add a drink without leaving the game. |
 | O-85 | P1 | Backstage (near Soiree.dc.html) | proposed | Food input for the BAC model ("ate / light meal / empty stomach", per evening or per drink, changeable mid-party) feeding absorption and elimination within Recon-BAC bounds. Merges app.md O-85 and bac.md BAC-FOOD-01. Source: app.md §5, bac.md §5. |
 | O-86 | P1 | Backstage (near Soiree.dc.html) | proposed | "How this is estimated" sheet one tap from the BAC: inputs used, standard-drink equivalent per country, model limits, why it differs from a breathalyser. Source: app.md §5. |
@@ -154,7 +154,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| HUB-01 | P0 | Soiree.dc.html | todo | Party screen, opened automatically during a party. Shows, without pointless scrolling: my BAC and trend, add a... |
+| HUB-01 | P0 | Soiree.dc.html | build | Party screen, opened automatically during a party. Shows, without pointless scrolling: my BAC and trend, add a... |
 | HUB-02 | P0 | Systeme.dc.html | todo | iOS Live Activity / Dynamic Island and a persistent Android notification during the party: BAC, back-to-zero, ... |
 | HUB-03 | P0 | Systeme.dc.html | todo | Lock-screen widgets (BAC, next water, who is out tonight). |
 | HUB-04 | P2 | Systeme.dc.html | todo | Smartwatch: BAC, add drink and water from the wrist. |
@@ -164,11 +164,11 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | PREF-01 | P0 | Reglages.dc.html | todo | Settings live on the server: every preference is stored in the database (`UserPreferences`), synced across dev... |
-| PREF-02 | P0 | Arrivee.dc.html | todo | Smart defaults on first launch, from the device language and region (no location permission needed for this): ... |
+| PREF-02 | P0 | Arrivee.dc.html | build | Smart defaults on first launch, from the device language and region (no location permission needed for this): ... |
 | PREF-03 | P0 | Reglages.dc.html | todo | Settings page where all of it can be changed by hand: language, country for the legal limit, novice driver mod... |
-| PREF-04 | P0 | Arrivee.dc.html | todo | Language, region and units are independent settings. A French speaker living in the US can have French UI, US ... |
+| PREF-04 | P0 | Arrivee.dc.html | build | Language, region and units are independent settings. A French speaker living in the US can have French UI, US ... |
 | PREF-05 | P1 | Reglages.dc.html | todo | Travel: when the phone's region or time zone changes (a trip abroad), the app suggests switching the legal-lim... |
-| PREF-06 | P0 | Backstage | todo | Canonical storage: the database stores one unit per quantity (ml, grams of ethanol, kg, g/L of blood, UTC time... |
+| PREF-06 | P0 | Backstage | build | Canonical storage: the database stores one unit per quantity (ml, grams of ethanol, kg, g/L of blood, UTC time... |
 
 ## Radar: who is out, and when
 
@@ -227,7 +227,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | N-25 | P0 | Securite.dc.html | todo | "Home safe": status (O-82) + end-of-night check-in; the crew sees who has not confirmed yet. |
 | N-26 | P0 | Securite.dc.html | todo | Designated driver per party: visible badge, reminder if they log a drink. |
 | N-27 | P0 | Securite.dc.html | todo | Who goes home with whom, walking each other home, shortcuts to ride-hailing / taxis / night transport. |
-| N-28 | P0 | Securite.dc.html | todo | Discreet SOS button: alert to the crew with location (if allowed), shortcuts to 112 and local emergency number... |
+| N-28 | P0 | Securite.dc.html | build | Discreet SOS button: alert to the crew with location (if allowed), shortcuts to 112 and local emergency number... |
 | N-29 | P0 | Soirees.dc.html | todo | Gentle alert when a member has given no sign of life for X minutes during a party (extension of O-37). |
 | N-36 | P0 | Backstage (near Securite.dc.html) | proposed | "Not feeling well" status, private to the crew in the party: the crew is told quietly, nearest members first, one tap to SOS (N-28); clears when the user says they are fine or confirms home safe (N-25). Source: app.md §2.3 E, §3 decision 4, §5. |
 
@@ -246,8 +246,8 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| QOL-01 | P0 | Soiree.dc.html | todo | "Same again": one tap re-logs the last drink (same size, same price, same venue), also from the widget, the no... |
-| QOL-02 | P0 | Soiree.dc.html | todo | A night belongs to the evening it started: a configurable day boundary (default 6 am) for stats, recaps, "toni... |
+| QOL-01 | P0 | Soiree.dc.html | build | "Same again": one tap re-logs the last drink (same size, same price, same venue), also from the widget, the no... |
+| QOL-02 | P0 | Soiree.dc.html | build | A night belongs to the evening it started: a configurable day boundary (default 6 am) for stats, recaps, "toni... |
 | QOL-03 | P0 | Systeme.dc.html | todo | Actionable notifications: answer "On my way" / "Not tonight" to "who's in?", add a drink, confirm a round or a... |
 | QOL-04 | P0 | Systeme.dc.html | todo | System shortcuts for a drunk thumb: Siri / App Intents and Android App Actions ("Hey Siri, add a beer"), iPhon... |
 | QOL-05 | P0 | Systeme.dc.html | todo | Deep links and universal links for every party, venue, profile, crew invite, recap and game card. Links pasted... |
@@ -257,7 +257,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-09 | P0 | Etats.dc.html | todo | Photos: compressed before upload, background upload with progress and retry, HEIC accepted, location metadata ... |
 | QOL-10 | P0 | Soirees.dc.html | todo | Dying battery: when a member's battery drops under 10% during a party, the crew sees "low battery" next to the... |
 | QOL-11 | P0 | Etats.dc.html | todo | Names that work: long names, emojis in names, two "Lucas" in one crew disambiguated automatically, initials av... |
-| QOL-12 | P0 | Etats.dc.html | todo | Correct plurals and formats everywhere ("1 verre", "2 verres", decimal comma in French), relative times ("5 mi... |
+| QOL-12 | P0 | Etats.dc.html | build | Correct plurals and formats everywhere ("1 verre", "2 verres", decimal comma in French), relative times ("5 mi... |
 | QOL-13 | P0 | Etats.dc.html | todo | Only destructive actions ask for confirmation, and the confirm button names the action ("Delete the party", ne... |
 | QOL-14 | P0 | Backstage | todo | Navigation without traps: Android back and iOS swipe-back work everywhere, sheets close with a swipe, the app ... |
 | QOL-15 | P1 | Arrivee.dc.html | todo | Try before signing up: games and the Bar work without an account; sign-up is asked only when the user needs a ... |
@@ -300,10 +300,10 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| ADP-01 | P0 | ModeBourre.dc.html | todo | Level engine: computed from the estimated BAC (O-15), with hysteresis so it never flickers between two levels,... |
-| ADP-02 | P0 | ModeBourre.dc.html | todo | Party screen at level 2 (variant of HUB-01). |
-| ADP-03 | P0 | ModeBourre.dc.html | todo | Party screen at level 3 (variant of HUB-01). |
-| ADP-04 | P0 | Soiree.dc.html | todo | "Heavy fingers" ergonomics: giant targets, no essential action behind a long-press, a precise swipe or a small... |
+| ADP-01 | P0 | ModeBourre.dc.html | build | Level engine: computed from the estimated BAC (O-15), with hysteresis so it never flickers between two levels,... |
+| ADP-02 | P0 | ModeBourre.dc.html | build | Party screen at level 2 (variant of HUB-01). |
+| ADP-03 | P0 | ModeBourre.dc.html | build | Party screen at level 3 (variant of HUB-01). |
+| ADP-04 | P0 | Soiree.dc.html | build | "Heavy fingers" ergonomics: giant targets, no essential action behind a long-press, a precise swipe or a small... |
 | ADP-05 | P0 | Soiree.dc.html | todo | Forgiving input: fuzzy search that tolerates typos, suggestions, voice input (see AI-01). |
 | ADP-06 | P0 | ModeBourre.dc.html | todo | "Next-morning vault": above a threshold, sensitive actions are locked or queued for confirmation the next day ... |
 | ADP-07 | P0 | ModeBourre.dc.html | todo | Legibility: text size, maximum contrast, readable under strobe or very low light, no disorienting motion (effe... |
@@ -317,7 +317,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 |---|---|---|---|---|
 | MOT-01 | P0 | Backstage | todo | Motion system in `MOTION.md`, written before any screen: duration tokens, springs and curves, choreography rul... |
 | MOT-02 | P0 | Backstage | todo | Living background within our art direction (no radial halo or generic aurora, see <anti_slop>): it breathes an... |
-| MOT-03 | P0 | Soiree.dc.html | todo | Adding a drink: glass filling up, bubbles, BAC digits rolling to the new value, dedicated haptic. It is the mo... |
+| MOT-03 | P0 | Soiree.dc.html | build | Adding a drink: glass filling up, bubbles, BAC digits rolling to the new value, dedicated haptic. It is the mo... |
 | MOT-04 | P0 | Soiree.dc.html | todo | Curve: the trace draws itself, smooth colour change when crossing a threshold, clearly marked peak point (no d... |
 | MOT-05 | P0 | Backstage | todo | Screen transitions: shared elements (a friend's avatar flies from the list to their profile, a game card grows... |
 | MOT-06 | P0 | JeuxCartes.dc.html | todo | Card games: dealing, 3D flip, swipe, drawing, a card that trembles before a penalty. |
@@ -450,7 +450,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | SLOP-01 | P0 | Backstage | todo | `VOICE.md` (a FR voice and an EN voice, examples to do / not to do for every type of text, linked to <glossary... |
 | SLOP-02 | P0 | Backstage | todo | Anti-slop review per ID: a subagent rereads copy, screenshots and code against `SLOP.md` with one question: "d... |
 | SLOP-03 | P0 | Backstage | todo | Pass on every text in every language: a translation that reads machine-made counts as a defect; each language ... |
-| SLOP-04 | P0 | Backstage | todo | Automated CI lint on every localisation file: em and en dashes, blacklisted words, "successfully" / "avec succ... |
+| SLOP-04 | P0 | Backstage | build | Automated CI lint on every localisation file: em and en dashes, blacklisted words, "successfully" / "avec succ... |
 | SLOP-05 | P0 | Backstage | todo | Fresh-eyes test: a screenshot or a text pasted into a blank model session with the question "which AI tool mad... |
 | SLOP-06 | P1 | Backstage | todo | Crew panel: before each release, the friends read the copy and the cards. Anything that "sounds like AI" or "d... |
 | SLOP-07 | P0 | Backstage | todo | Fresh context: subagents writing copy start a new session with `VOICE.md` + `SLOP.md`, because long contexts m... |
@@ -464,13 +464,13 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| SYNC-01 | P0 | Etats.dc.html | todo | Optimistic updates for every user action (add a drink, check in, react, vote, RSVP, change a setting, add an e... |
-| SYNC-02 | P0 | Etats.dc.html | todo | Pending is not success. Optimistic items carry an internal "pending" state until the server answers. Outcomes ... |
-| SYNC-03 | P0 | Etats.dc.html | todo | Reconciliation: on success, the optimistic item is replaced by the server's version (server IDs, server-comput... |
+| SYNC-01 | P0 | Etats.dc.html | build | Optimistic updates for every user action (add a drink, check in, react, vote, RSVP, change a setting, add an e... |
+| SYNC-02 | P0 | Etats.dc.html | build | Pending is not success. Optimistic items carry an internal "pending" state until the server answers. Outcomes ... |
+| SYNC-03 | P0 | Etats.dc.html | build | Reconciliation: on success, the optimistic item is replaced by the server's version (server IDs, server-comput... |
 | SYNC-04 | P0 | Etats.dc.html | todo | Error types, each with its own behaviour: |
 | SYNC-05 | P0 | Etats.dc.html | todo | The client state is a cache of the server. On reconnection and every time the app returns to the foreground, i... |
-| SYNC-06 | P0 | Etats.dc.html | todo | Offline queue: queued mutations survive the app being killed, keep their order, are idempotent, and go through... |
-| SYNC-07 | P0 | Etats.dc.html | todo | One feedback system for the whole app (toasts, inline errors, banners): success shows no toast unless it bring... |
+| SYNC-06 | P0 | Etats.dc.html | build | Offline queue: queued mutations survive the app being killed, keep their order, are idempotent, and go through... |
+| SYNC-07 | P0 | Etats.dc.html | build | One feedback system for the whole app (toasts, inline errors, banners): success shows no toast unless it bring... |
 | SYNC-08 | P0 | Backstage | todo | Tests for every mutation: success, rejection, timeout, duplicate send, offline then rejected, app killed mid-r... |
 
 ## Security and privacy

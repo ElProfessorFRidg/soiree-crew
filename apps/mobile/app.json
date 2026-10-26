@@ -1,0 +1,64 @@
+{
+  "expo": {
+    "name": "Soirée Crew",
+    "slug": "soiree-crew",
+    "scheme": "soireecrew",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#1E2624",
+    "ios": {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "supportsTablet": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": []
+      }
+    },
+    "android": {
+      "package": "app.soireecrew.mobile",
+      "adaptiveIcon": {
+        "backgroundColor": "#1E2624",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-localization",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Archivo-Numeral.ttf",
+            "./assets/fonts/Archivo-Title.ttf",
+            "./assets/fonts/Archivo-Heading.ttf",
+            "./assets/fonts/Archivo-Body.ttf",
+            "./assets/fonts/Archivo-Medium.ttf",
+            "./assets/fonts/Archivo-Semibold.ttf",
+            "./assets/fonts/Archivo-Tag.ttf",
+            "./assets/fonts/Archivo-Bold.ttf"
+          ]
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#1E2624",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 120
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
