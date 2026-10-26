@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>États de l'app, le serveur décide</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+.bd{display:flex;gap:56px;padding:72px 56px 56px;align-items:flex-start;background:#CDD3CE;font-family:'Archivo',system-ui,sans-serif;color:#1E2624}
+.pw{display:flex;flex-direction:column;gap:14px;flex:none}
+.cap{font-size:16px;font-weight:700;color:#26302D;padding-left:10px;font-stretch:90%}
+.ph{width:390px;height:844px;border-radius:46px;background:#1E2624;color:#F1EEE6;position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 0 9px #0F1413,0 28px 50px rgba(15,20,19,.28);font-family:'Archivo',system-ui,sans-serif}
+.ph.lt{background:#EEF0EA;color:#1E2624}
+.sc{flex:1;min-height:0;overflow-y:auto;padding:58px 20px 22px;display:flex;flex-direction:column;gap:16px;scrollbar-width:none}
+.sc::-webkit-scrollbar{display:none}
+.h1{margin:0;font-size:32px;line-height:1.04;font-weight:800;font-stretch:76%}
+.h2{margin:0;font-size:22px;line-height:1.12;font-weight:750;font-stretch:82%}
+.h3{margin:0;font-size:16px;line-height:1.25;font-weight:700}
+.p{margin:0;font-size:15px;line-height:1.45}
+.s{margin:0;font-size:13px;line-height:1.4;color:#AEB7B2}
+.lt .s{color:#4F5A55}
+.num{font-weight:900;font-stretch:62%;line-height:.86;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.amb{color:#F4B33D}.red{color:#FF7A66}.wat{color:#8CCBEA}.mint{color:#9BD8A8}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 18px;border-radius:14px;border:0;background:#F4B33D;color:#1E2624;font:700 16px 'Archivo',sans-serif;text-decoration:none;cursor:pointer;transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn.g{background:#34403C;color:#F1EEE6}
+.btn.o{background:transparent;color:inherit;box-shadow:inset 0 0 0 1.5px #56635F}
+.btn.d{background:#FF7A66;color:#1E2624}
+.btn.w2{background:#8CCBEA;color:#1E2624}
+.btn.sm{min-height:40px;font-size:14px;border-radius:12px;padding:0 14px}
+.btn.full{width:100%}
+.btn[disabled]{opacity:.4;cursor:default}
+.lt .btn.g{background:#DCE1DA;color:#1E2624}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 14px;border-radius:999px;border:0;background:#34403C;color:#F1EEE6;font:600 14px 'Archivo',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none}
+.chip.on{background:#F1EEE6;color:#1E2624}
+.lt .chip{background:#DCE1DA;color:#1E2624}.lt .chip.on{background:#1E2624;color:#EEF0EA}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.hs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -20px;padding:0 20px;flex:none}
+.hs::-webkit-scrollbar{display:none}
+.row{display:flex;align-items:center;gap:12px;min-height:54px;padding:8px 0;border-bottom:1px solid #34403C;color:inherit;text-decoration:none}
+.lt .row{border-color:#D3D8D2}
+.g1{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.lbl{font-size:13px;font-weight:700;color:#AEB7B2;margin:6px 0 0}
+.lt .lbl{color:#4F5A55}
+.sw{width:52px;height:32px;border-radius:999px;border:0;background:#46534F;position:relative;cursor:pointer;flex:none;transition:background .2s}
+.sw::after{content:'';position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#F1EEE6;transition:transform .22s cubic-bezier(.3,.7,.3,1)}
+.sw.on{background:#F4B33D}.sw.on::after{transform:translateX(20px)}
+.seg{display:flex;background:#2C3734;border-radius:12px;padding:3px;gap:3px;flex:none}
+.seg button{flex:1;min-height:38px;border:0;border-radius:9px;background:transparent;color:#C9D0CC;font:600 13px 'Archivo',sans-serif;cursor:pointer;padding:0 6px}
+.seg button.on{background:#F1EEE6;color:#1E2624}
+.lt .seg{background:#DCE1DA}.lt .seg button{color:#3A4440}.lt .seg button.on{background:#1E2624;color:#EEF0EA}
+.av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#1E2624;flex:none}
+.a1{background:#F4B33D}.a2{background:#9BD8A8}.a3{background:#8CCBEA}.a4{background:#F2C6A0}.a5{background:#D6C8F2}.a6{background:#FF9C8A}.a7{background:#E8E3D2}
+.tag{display:inline-flex;align-items:center;gap:4px;min-height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:650;background:#34403C;color:#E3E7E4;white-space:nowrap}
+.tag.amb{background:#4A3E22;color:#F8CE7A}.tag.red{background:#4E2C27;color:#FFB3A6}.tag.wat{background:#24404D;color:#B8E0F3}.tag.mint{background:#2A4632;color:#BFE9C8}
+.lt .tag{background:#DCE1DA;color:#1E2624}
+.tab{display:flex;justify-content:space-around;padding:10px 6px 30px;border-top:1px solid #34403C;background:#1E2624;flex:none}
+.tab a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:650;color:#97A19C;text-decoration:none;min-width:60px;min-height:44px;justify-content:center}
+.tab a.on{color:#F4B33D}
+.ic{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ib{width:44px;height:44px;border-radius:12px;border:0;background:#2C3734;color:#F1EEE6;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;flex:none}
+.lt .ib{background:#DCE1DA;color:#1E2624}
+.pan{background:#28322F;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.lt .pan{background:#FFFFFF}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#28322F;border-radius:26px 26px 0 0;padding:12px 20px 34px;display:flex;flex-direction:column;gap:14px;box-shadow:0 -14px 40px rgba(0,0,0,.4);animation:sup .32s cubic-bezier(.2,.8,.2,1)}
+.dim{position:absolute;inset:0;background:rgba(10,14,13,.55)}
+.grab{width:40px;height:5px;border-radius:3px;background:#56635F;align-self:center}
+.toast{position:absolute;left:14px;right:14px;bottom:100px;background:#F1EEE6;color:#1E2624;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:650;animation:tin .28s cubic-bezier(.2,.8,.2,1);z-index:5}
+.toast.err{background:#FF7A66}
+.toast .btn{min-height:36px;font-size:13px;padding:0 12px;background:#1E2624;color:#F1EEE6}
+.inp{min-height:52px;border-radius:14px;border:1.5px solid #3D4A46;background:#232D2A;color:#F1EEE6;padding:0 14px;font:500 16px 'Archivo',sans-serif;width:100%}
+.lt .inp{background:#fff;border-color:#C8CEC8;color:#1E2624}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:700;color:#AEB7B2}
+.bar{height:8px;border-radius:4px;background:#34403C;overflow:hidden;flex:none}
+.bar i{display:block;height:100%;background:#F4B33D;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.lt .bar{background:#DCE1DA}
+.dis{font-size:12px;line-height:1.35;color:#AEB7B2}
+.dot{width:8px;height:8px;border-radius:50%;background:#9BD8A8;flex:none}
+.dot.live{animation:live 1.6s ease-in-out infinite}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:12px;border-radius:16px;background:#2C3734;border:0;color:#F1EEE6;font:600 14px 'Archivo',sans-serif;text-align:left;cursor:pointer;min-height:76px}
+.tile.on{background:#F1EEE6;color:#1E2624}
+.card3d{perspective:900px}
+.flip{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.3,.7,.2,1);transform-style:preserve-3d}
+.flip.on{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;display:flex;flex-direction:column;justify-content:space-between;padding:22px}
+.face.b{transform:rotateY(180deg)}
+.fab{position:absolute;right:16px;bottom:118px;width:56px;height:56px;border-radius:50%;border:0;background:#F4B33D;color:#1E2624;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.35);cursor:pointer;z-index:4}
+.pop1{animation:pop1 .35s cubic-bezier(.2,.8,.2,1)}.pop2{animation:pop2 .35s cubic-bezier(.2,.8,.2,1)}
+.shk{animation:shake .25s linear infinite}
+.drop{animation:drop .7s cubic-bezier(.2,.9,.25,1.2)}
+.wash{position:absolute;border-radius:50%;animation:wash 1s ease-out forwards;pointer-events:none}
+.rip{position:absolute;border-radius:50%;border:3px solid #F4B33D;animation:rip 1s ease-out infinite;pointer-events:none}
+.conf{position:absolute;width:8px;height:14px;border-radius:2px;animation:fall 1.8s cubic-bezier(.3,.6,.4,1) forwards;pointer-events:none}
+.rise{transform-origin:bottom;animation:rise .8s cubic-bezier(.2,.8,.2,1) both}
+.fadein{animation:tin .35s cubic-bezier(.2,.8,.2,1) both}
+.skel{background:linear-gradient(90deg,#2C3734 0%,#36433F 50%,#2C3734 100%);background-size:200% 100%;animation:skel 1.4s linear infinite;border-radius:10px}
+@keyframes tin{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+@keyframes sup{from{transform:translateY(100%)}to{transform:none}}
+@keyframes pop1{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes pop2{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translate(0,0)}25%{transform:translate(-3px,1px) rotate(-2deg)}50%{transform:translate(3px,-1px) rotate(2deg)}75%{transform:translate(-2px,2px)}}
+@keyframes drop{0%{transform:translateY(-70px) scale(1.5);opacity:0}70%{transform:translateY(4px) scale(1);opacity:1}100%{transform:none}}
+@keyframes wash{from{transform:scale(.2);opacity:.85}to{transform:scale(4);opacity:0}}
+@keyframes rip{from{transform:scale(.5);opacity:.9}to{transform:scale(2.2);opacity:0}}
+@keyframes fall{from{transform:translateY(-30px) rotate(0)}to{transform:translateY(520px) rotate(600deg)}}
+@keyframes live{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes rise{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes skel{from{background-position:200% 0}to{background-position:-200% 0}}
+@keyframes boom{0%{transform:scale(.4);opacity:1}100%{transform:scale(3);opacity:0}}
+@keyframes fill{from{height:0}}
+@keyframes bub{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-60px);opacity:0}}
+@keyframes clinkL{0%{transform:translateX(0) rotate(0)}45%{transform:translateX(52px) rotate(12deg)}55%{transform:translateX(46px) rotate(8deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes clinkR{0%{transform:translateX(0) rotate(0)}45%{transform:translateX(-52px) rotate(-12deg)}55%{transform:translateX(-46px) rotate(-8deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes slidein{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+</style>
+</helmet>
+<div class="bd" style="width: 2732px; height: 1010px">
+<div class="pw"><div class="cap">Affiché direct, confirmé par le serveur</div><div class="ph">
+<div class="sc" style="position: relative">
+<h1 class="h1">Le serveur tranche</h1>
+<p class="lbl">Réponse simulée du serveur</p>
+<div class="seg"><sc-for list="{{modes}}" as="m" hint-placeholder-count="4"><button class="{{m.on}}" onClick="{{m.pick}}">{{m.l}}</button></sc-for></div>
+<p class="s">{{modeNote}}</p>
+<sc-for list="{{items}}" as="it" hint-placeholder-count="3">
+<div class="row" style="opacity: {{it.op}}; transform: translateX({{it.x}}px); transition: transform .35s, opacity .35s"><span class="{{it.ic}}"><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l-1.2 16H8.2L7 4zM7.4 9h9.2"></path></svg></span><div class="g1"><span class="p">{{it.n}}</span><span class="s">{{it.t}}</span></div><span class="tag {{it.tc}}">{{it.st}}</span></div>
+</sc-for>
+<button class="btn full" onClick="{{add}}"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg> Ajouter une pinte</button>
+<p class="s">Les points, couronnes et dépassements attendent la réponse du serveur avant de s'animer.</p>
+</div>
+<sc-if value="{{err}}" hint-placeholder-val="{{ false }}"><div class="toast err" style="bottom: 40px"><span style="flex: 1">Pinte refusée : la soirée est fermée depuis 6 h.</span><button class="btn" onClick="{{closeErr}}">OK</button></div></sc-if>
+<sc-if value="{{slowErr}}" hint-placeholder-val="{{ false }}"><div class="toast err" style="bottom: 40px"><span style="flex: 1">Le serveur ne répond pas. On réessaie tout seuls.</span><button class="btn" onClick="{{closeErr}}">OK</button></div></sc-if>
+</div></div>
+<div class="pw"><div class="cap">Hors ligne et conflits</div><div class="ph">
+<div class="sc">
+<div class="pan" style="flex-direction: row; align-items: center"><span><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18M8.5 16.5a5 5 0 0 1 7 0M12 20h.01M5 12.5a10 10 0 0 1 4-2.4M19 12.5a10 10 0 0 0-3-2.1"></path></svg></span><div class="g1"><span class="h3">Pas de réseau</span><span class="s">3 actions partiront dès que tu captes</span></div></div>
+<div class="row"><span class="g1 p">Pinte, 23 h 41</span><span class="tag"><svg class="ic" style="width: 12px; height: 12px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 1 0 18a9 9 0 1 1 0-18zM12 7v5l3 2"></path></svg> en attente</span></div>
+<div class="row"><span class="g1 p">Check-in au Zinc</span><span class="tag"><svg class="ic" style="width: 12px; height: 12px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 1 0 18a9 9 0 1 1 0-18zM12 7v5l3 2"></path></svg> en attente</span></div>
+<div class="row"><span class="g1 p">Vote pour Jade</span><span class="tag"><svg class="ic" style="width: 12px; height: 12px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 1 0 18a9 9 0 1 1 0-18zM12 7v5l3 2"></path></svg> en attente</span></div>
+<p class="s">Ton taux continue d'être calculé sur le téléphone en attendant.</p>
+<p class="lbl">Au retour du réseau</p>
+<div class="pan" style="background: #4E2C27"><span class="h3" style="color: #FFD3CB">2 actions n'ont pas pu être enregistrées</span>
+<span class="s" style="color: #F3B9AE">Check-in au Zinc : trop loin du bar au moment de l'envoi.</span>
+<span class="s" style="color: #F3B9AE">Vote pour Jade : la partie était terminée.</span>
+<span class="s" style="color: #F3B9AE">La pinte, elle, est bien comptée.</span></div>
+<div class="pan"><span class="h3">Jade a modifié la dépense entre-temps</span><span class="s">Sa version est gardée : 24 € au lieu de 21 €. Tu peux la modifier à nouveau.</span><button class="btn sm g" style="align-self: flex-start">Voir la dépense</button></div>
+</div>
+</div></div>
+<div class="pw"><div class="cap">Chargements et écrans vides</div><div class="ph">
+<div class="sc">
+<div class="top"><h1 class="h1">Chargement</h1><button class="chip" onClick="{{reload}}"><svg class="ic" style="width: 14px; height: 14px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6L4 11l5 5M4 11h10a5 5 0 0 1 0 10h-3"></path></svg> Recharger</button></div>
+<sc-if value="{{loading}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 10px"><div class="skel" style="height: 54px"></div><div class="skel" style="height: 54px"></div><div class="skel" style="height: 54px; width: 70%"></div></div>
+</sc-if>
+<sc-if value="{{loaded}}" hint-placeholder-val="{{ false }}">
+<div class="fadein"><div class="row"><span class="g1 p">Samedi au Zinc</span><span class="s">6 présents</span></div><div class="row"><span class="g1 p">Anniv de Jade</span><span class="s">jeudi</span></div></div>
+</sc-if>
+<div class="pan" style="flex-direction: row; align-items: center"><span class="amb"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg></span><span class="g1 s">Brouillon d'avis sur Le Zinc retrouvé.</span><button class="btn sm g">Reprendre</button></div>
+<p class="lbl">Envoi de photos</p>
+<div class="pan"><div class="top"><span class="p">4 photos vers l'album</span><span class="s">{{up}} %</span></div><div class="bar"><i style="width: {{up}}%"></i></div><span class="s">Compressées et sans position GPS. Ça continue si tu quittes l'app.</span></div>
+<p class="lbl">Écran vide</p>
+<div class="pan" style="align-items: center; text-align: center; padding: 26px"><span class="amb"><svg class="ic" style="width: 40px; height: 40px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"></path></svg></span><span class="h3">Pas encore de soirée</span><span class="s">Lance la première, le crew sera prévenu.</span><button class="btn sm">Créer une soirée</button></div>
+</div>
+</div></div>
+<div class="pw"><div class="cap">Confirmations, noms, formats</div><div class="ph">
+<div class="sc" style="position: relative">
+<h1 class="h1">Les détails</h1>
+<button class="btn d full" onClick="{{askDel}}"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13"></path></svg> Supprimer la soirée</button>
+<p class="lbl">Deux Lucas dans le crew</p>
+<div class="row"><div class="av a3">LB</div><div class="g1"><span class="p">Lucas B.</span><span class="s">Même couleur partout</span></div></div>
+<div class="row"><div class="av a6">LM</div><div class="g1"><span class="p">Lucas M.</span><span class="s">Surnom du crew : « Le Pilote »</span></div></div>
+<div class="row"><div class="av a5">I</div><div class="g1"><span class="p">Inès 🌙 de la Fontaine-Saint-Martin</span><span class="s">Les noms longs passent à la ligne</span></div></div>
+<p class="lbl">Accords et formats</p>
+<div class="row"><span class="g1 p">{{n1}}</span><button class="btn sm g" onClick="{{inc}}">+1</button></div>
+<button class="row" style="all: unset; display: flex; align-items: center; gap: 12px; min-height: 54px; cursor: pointer" onClick="{{toggleTime}}"><span class="g1 p">Dernier verre</span><span class="s">{{timeTxt}}</span></button>
+<div class="row"><span class="g1 p">Dépense</span><span class="s">1 234,50 €</span></div>
+</div>
+<sc-if value="{{del}}" hint-placeholder-val="{{ false }}"><div class="dim"></div><div class="sheet"><div class="grab"></div><span class="h2">Supprimer « Samedi au Zinc » ?</span><p class="p">Les verres, le récap et l'album de cette soirée disparaissent pour les 6 participants.</p><div class="grid2"><button class="btn g" onClick="{{closeDel}}">Garder</button><button class="btn d" onClick="{{closeDel}}">Supprimer la soirée</button></div></div></sc-if>
+</div></div>
+<div class="pw"><div class="cap">Recherche</div><div class="ph">
+<div class="sc">
+<div style="position: relative"><span style="position: absolute; left: 14px; top: 15px; color: #AEB7B2"><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4a7 7 0 1 1 0 14a7 7 0 1 1 0-14zM20 20l-4-4"></path></svg></span><input class="inp" style="padding-left: 44px" value="{{q}}" onInput="{{onQ}}" placeholder="Bars, amis, boissons, jeux" aria-label="Recherche"></div>
+<sc-if value="{{noQ}}" hint-placeholder-val="{{ false }}"><div class="fadein"><p class="lbl">Récent</p><div class="chips"><button class="chip" onClick="{{q1}}">le zinc</button><button class="chip" onClick="{{q2}}">pintte</button><button class="chip" onClick="{{q3}}">jade</button></div></div></sc-if>
+<sc-if value="{{fixed}}" hint-placeholder-val="{{ false }}"><p class="s">Résultats pour « {{fixTo}} »</p></sc-if>
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="3">
+<p class="lbl">{{g.l}}</p>
+<sc-for list="{{g.items}}" as="it" hint-placeholder-count="2"><div class="row fadein"><span class="g1 p">{{it}}</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div></sc-for>
+</sc-for>
+</div>
+</div></div>
+<div class="pw"><div class="cap">Tentative de triche visible</div><div class="ph">
+<div class="sc">
+<div style="display: flex; align-items: center; gap: 14px"><div class="av a3" style="width: 64px; height: 64px; font-size: 24px">M</div><div><h1 class="h1">Malik</h1><sc-if value="{{flag}}" hint-placeholder-val="{{ true }}"><span class="tag red"><svg class="ic" style="width: 14px; height: 14px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"></path></svg> A tenté de tricher, 7 j</span></sc-if></div></div>
+<div class="pan" style="background: #4E2C27"><span class="h3" style="color: #FFD3CB">Check-in refusé à La Capsule</span><span class="s" style="color: #F3B9AE">Samedi 1 h 03. Position simulée, personne du crew à côté. 0 point.</span></div>
+<p class="s">Le crew a reçu une notif. La ligne apparaît aussi dans le fil et sur la page du bar.</p>
+<sc-if value="{{flag}}" hint-placeholder-val="{{ true }}"><div class="pan"><span class="h3">Tu es admin des Quais</span><span class="s">Si c'est une erreur (GPS de voiture, accessoire), tu peux annuler.</span><button class="btn sm g" style="align-self: flex-start" onClick="{{clear}}">C'était une erreur</button></div></sc-if>
+<sc-if value="{{cleared}}" hint-placeholder-val="{{ false }}"><p class="p fadein">Annulé par toi. Le check-in est validé et Malik récupère ses points.</p></sc-if>
+</div>
+</div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2732,"height":1010}}'>
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state={mode:0,items:[{id:1,n:'Pinte',t:'22 h 18',st:'ok'},{id:2,n:'Pinte',t:'22 h 51',st:'ok'}],err:false,slowErr:false,loading:true,up:12,del:false,n:1,abs:false,q:'',flag:true}; }
+  componentDidMount(){ this.lt=setTimeout(()=>this.setState({loading:false}),1800); this.ui=setInterval(()=>this.setState({up:this.state.up>=100?12:this.state.up+4}),300); }
+  componentWillUnmount(){ clearTimeout(this.lt); clearInterval(this.ui); (this.tt||[]).forEach(clearTimeout); }
+  later(fn,ms){ this.tt=this.tt||[]; this.tt.push(setTimeout(fn,ms)); }
+  renderVals(){
+    const s=this.state;
+    const notes=['Le serveur valide. La pinte passe d\'« envoi » à « enregistrée ».','Le serveur refuse. La pinte disparaît et la raison s\'affiche.','Le serveur tarde. « Envoi » reste affiché, l\'app réessaie, puis prévient.','Pas de réseau. La pinte attend dans la file et part au retour du réseau.'];
+    const upd=(id,patch)=>this.setState({items:this.state.items.map(x=>x.id===id?{...x,...patch}:x)});
+    const add=()=>{ const id=Date.now(), now=new Date(), t=now.getHours()+' h '+String(now.getMinutes()).padStart(2,'0');
+      this.setState({items:[...s.items,{id,n:'Pinte',t,st:s.mode===3?'queue':'pending'}],err:false,slowErr:false});
+      if(s.mode===0) this.later(()=>upd(id,{st:'ok'}),900);
+      if(s.mode===1) this.later(()=>{ upd(id,{st:'gone'}); this.setState({err:true}); this.later(()=>this.setState({items:this.state.items.filter(x=>x.id!==id)}),400); },900);
+      if(s.mode===2) this.later(()=>{ upd(id,{st:'slow'}); this.later(()=>this.setState({slowErr:true}),1800); },1400); };
+    const stl={ok:['enregistrée','mint','mint'],pending:['envoi','',''],slow:['envoi, nouvel essai','amb',''],queue:['en attente du réseau','',''],gone:['refusée','red','red']};
+    const fixes={pintte:'pinte',zinkc:'zinc',jdae:'jade'};
+    const q=s.q.trim().toLowerCase(), fix=fixes[q]||q;
+    const data={Lieux:['Le Zinc','La Capsule','Quai 12'],Amis:['Jade','Malik','Inès'],Boissons:['Pinte 50 cl','Pinte UK 568 ml','Spritz'],Jeux:['La Roulette','La Bombe']};
+    const groups=q?Object.entries(data).map(([l,arr])=>({l,items:arr.filter(x=>x.toLowerCase().includes(fix))})).filter(g=>g.items.length):[];
+    return {
+      modes:['OK','Refus','Lent','Hors ligne'].map((l,i)=>({l,on:s.mode===i?'on':'',pick:()=>this.setState({mode:i})})), modeNote:notes[s.mode],
+      items:s.items.map(x=>({n:x.n,t:x.t,st:stl[x.st][0],tc:stl[x.st][1],ic:stl[x.st][2],op:x.st==='gone'?0:x.st==='pending'||x.st==='queue'||x.st==='slow'?.7:1,x:x.st==='gone'?-60:0})),
+      add, err:s.err, slowErr:s.slowErr, closeErr:()=>this.setState({err:false,slowErr:false}),
+      loading:s.loading, loaded:!s.loading, reload:()=>{ clearTimeout(this.lt); this.setState({loading:true}); this.lt=setTimeout(()=>this.setState({loading:false}),1800); }, up:String(s.up),
+      del:s.del, askDel:()=>this.setState({del:true}), closeDel:()=>this.setState({del:false}),
+      n1:s.n+(s.n>1?' verres':' verre'), inc:()=>this.setState({n:s.n+1}),
+      timeTxt:s.abs?'samedi, 22 h 47':'il y a 5 min', toggleTime:()=>this.setState({abs:!s.abs}),
+      q:s.q, onQ:(e)=>this.setState({q:e.target.value}), noQ:!q, fixed:!!q&&fix!==q, fixTo:fix, groups,
+      q1:()=>this.setState({q:'le zinc'}), q2:()=>this.setState({q:'pintte'}), q3:()=>this.setState({q:'jade'}),
+      flag:s.flag, cleared:!s.flag, clear:()=>this.setState({flag:false})
+    };
+  }
+}
+</script>
+</body>
+</html>

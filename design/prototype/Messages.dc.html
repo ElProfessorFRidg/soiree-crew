@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Messagerie chiffrée de bout en bout</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+.bd{display:flex;gap:56px;padding:72px 56px 56px;align-items:flex-start;background:#CDD3CE;font-family:'Archivo',system-ui,sans-serif;color:#1E2624}
+.pw{display:flex;flex-direction:column;gap:14px;flex:none}
+.cap{font-size:16px;font-weight:700;color:#26302D;padding-left:10px;font-stretch:90%}
+.ph{width:390px;height:844px;border-radius:46px;background:#1E2624;color:#F1EEE6;position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 0 9px #0F1413,0 28px 50px rgba(15,20,19,.28);font-family:'Archivo',system-ui,sans-serif}
+.ph.lt{background:#EEF0EA;color:#1E2624}
+.sc{flex:1;min-height:0;overflow-y:auto;padding:58px 20px 22px;display:flex;flex-direction:column;gap:16px;scrollbar-width:none}
+.sc::-webkit-scrollbar{display:none}
+.h1{margin:0;font-size:32px;line-height:1.04;font-weight:800;font-stretch:76%}
+.h2{margin:0;font-size:22px;line-height:1.12;font-weight:750;font-stretch:82%}
+.h3{margin:0;font-size:16px;line-height:1.25;font-weight:700}
+.p{margin:0;font-size:15px;line-height:1.45}
+.s{margin:0;font-size:13px;line-height:1.4;color:#AEB7B2}
+.lt .s{color:#4F5A55}
+.num{font-weight:900;font-stretch:62%;line-height:.86;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.amb{color:#F4B33D}.red{color:#FF7A66}.wat{color:#8CCBEA}.mint{color:#9BD8A8}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 18px;border-radius:14px;border:0;background:#F4B33D;color:#1E2624;font:700 16px 'Archivo',sans-serif;text-decoration:none;cursor:pointer;transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn.g{background:#34403C;color:#F1EEE6}
+.btn.o{background:transparent;color:inherit;box-shadow:inset 0 0 0 1.5px #56635F}
+.btn.d{background:#FF7A66;color:#1E2624}
+.btn.w2{background:#8CCBEA;color:#1E2624}
+.btn.sm{min-height:40px;font-size:14px;border-radius:12px;padding:0 14px}
+.btn.full{width:100%}
+.btn[disabled]{opacity:.4;cursor:default}
+.lt .btn.g{background:#DCE1DA;color:#1E2624}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 14px;border-radius:999px;border:0;background:#34403C;color:#F1EEE6;font:600 14px 'Archivo',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none}
+.chip.on{background:#F1EEE6;color:#1E2624}
+.lt .chip{background:#DCE1DA;color:#1E2624}.lt .chip.on{background:#1E2624;color:#EEF0EA}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.hs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -20px;padding:0 20px;flex:none}
+.hs::-webkit-scrollbar{display:none}
+.row{display:flex;align-items:center;gap:12px;min-height:54px;padding:8px 0;border-bottom:1px solid #34403C;color:inherit;text-decoration:none}
+.lt .row{border-color:#D3D8D2}
+.g1{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.lbl{font-size:13px;font-weight:700;color:#AEB7B2;margin:6px 0 0}
+.lt .lbl{color:#4F5A55}
+.sw{width:52px;height:32px;border-radius:999px;border:0;background:#46534F;position:relative;cursor:pointer;flex:none;transition:background .2s}
+.sw::after{content:'';position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#F1EEE6;transition:transform .22s cubic-bezier(.3,.7,.3,1)}
+.sw.on{background:#F4B33D}.sw.on::after{transform:translateX(20px)}
+.seg{display:flex;background:#2C3734;border-radius:12px;padding:3px;gap:3px;flex:none}
+.seg button{flex:1;min-height:38px;border:0;border-radius:9px;background:transparent;color:#C9D0CC;font:600 13px 'Archivo',sans-serif;cursor:pointer;padding:0 6px}
+.seg button.on{background:#F1EEE6;color:#1E2624}
+.lt .seg{background:#DCE1DA}.lt .seg button{color:#3A4440}.lt .seg button.on{background:#1E2624;color:#EEF0EA}
+.av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#1E2624;flex:none}
+.a1{background:#F4B33D}.a2{background:#9BD8A8}.a3{background:#8CCBEA}.a4{background:#F2C6A0}.a5{background:#D6C8F2}.a6{background:#FF9C8A}.a7{background:#E8E3D2}
+.tag{display:inline-flex;align-items:center;gap:4px;min-height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:650;background:#34403C;color:#E3E7E4;white-space:nowrap}
+.tag.amb{background:#4A3E22;color:#F8CE7A}.tag.red{background:#4E2C27;color:#FFB3A6}.tag.wat{background:#24404D;color:#B8E0F3}.tag.mint{background:#2A4632;color:#BFE9C8}
+.lt .tag{background:#DCE1DA;color:#1E2624}
+.tab{display:flex;justify-content:space-around;padding:10px 6px 30px;border-top:1px solid #34403C;background:#1E2624;flex:none}
+.tab a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:650;color:#97A19C;text-decoration:none;min-width:60px;min-height:44px;justify-content:center}
+.tab a.on{color:#F4B33D}
+.ic{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ib{width:44px;height:44px;border-radius:12px;border:0;background:#2C3734;color:#F1EEE6;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;flex:none}
+.lt .ib{background:#DCE1DA;color:#1E2624}
+.pan{background:#28322F;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.lt .pan{background:#FFFFFF}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#28322F;border-radius:26px 26px 0 0;padding:12px 20px 34px;display:flex;flex-direction:column;gap:14px;box-shadow:0 -14px 40px rgba(0,0,0,.4);animation:sup .32s cubic-bezier(.2,.8,.2,1)}
+.dim{position:absolute;inset:0;background:rgba(10,14,13,.55)}
+.grab{width:40px;height:5px;border-radius:3px;background:#56635F;align-self:center}
+.toast{position:absolute;left:14px;right:14px;bottom:100px;background:#F1EEE6;color:#1E2624;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:650;animation:tin .28s cubic-bezier(.2,.8,.2,1);z-index:5}
+.toast.err{background:#FF7A66}
+.toast .btn{min-height:36px;font-size:13px;padding:0 12px;background:#1E2624;color:#F1EEE6}
+.inp{min-height:52px;border-radius:14px;border:1.5px solid #3D4A46;background:#232D2A;color:#F1EEE6;padding:0 14px;font:500 16px 'Archivo',sans-serif;width:100%}
+.lt .inp{background:#fff;border-color:#C8CEC8;color:#1E2624}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:700;color:#AEB7B2}
+.bar{height:8px;border-radius:4px;background:#34403C;overflow:hidden;flex:none}
+.bar i{display:block;height:100%;background:#F4B33D;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.lt .bar{background:#DCE1DA}
+.dis{font-size:12px;line-height:1.35;color:#AEB7B2}
+.dot{width:8px;height:8px;border-radius:50%;background:#9BD8A8;flex:none}
+.dot.live{animation:live 1.6s ease-in-out infinite}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:12px;border-radius:16px;background:#2C3734;border:0;color:#F1EEE6;font:600 14px 'Archivo',sans-serif;text-align:left;cursor:pointer;min-height:76px}
+.tile.on{background:#F1EEE6;color:#1E2624}
+.card3d{perspective:900px}
+.flip{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.3,.7,.2,1);transform-style:preserve-3d}
+.flip.on{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;display:flex;flex-direction:column;justify-content:space-between;padding:22px}
+.face.b{transform:rotateY(180deg)}
+.fab{position:absolute;right:16px;bottom:118px;width:56px;height:56px;border-radius:50%;border:0;background:#F4B33D;color:#1E2624;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.35);cursor:pointer;z-index:4}
+.pop1{animation:pop1 .35s cubic-bezier(.2,.8,.2,1)}.pop2{animation:pop2 .35s cubic-bezier(.2,.8,.2,1)}
+.shk{animation:shake .25s linear infinite}
+.drop{animation:drop .7s cubic-bezier(.2,.9,.25,1.2)}
+.wash{position:absolute;border-radius:50%;animation:wash 1s ease-out forwards;pointer-events:none}
+.rip{position:absolute;border-radius:50%;border:3px solid #F4B33D;animation:rip 1s ease-out infinite;pointer-events:none}
+.conf{position:absolute;width:8px;height:14px;border-radius:2px;animation:fall 1.8s cubic-bezier(.3,.6,.4,1) forwards;pointer-events:none}
+.rise{transform-origin:bottom;animation:rise .8s cubic-bezier(.2,.8,.2,1) both}
+.fadein{animation:tin .35s cubic-bezier(.2,.8,.2,1) both}
+.skel{background:linear-gradient(90deg,#2C3734 0%,#36433F 50%,#2C3734 100%);background-size:200% 100%;animation:skel 1.4s linear infinite;border-radius:10px}
+@keyframes tin{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+@keyframes sup{from{transform:translateY(100%)}to{transform:none}}
+@keyframes pop1{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes pop2{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translate(0,0)}25%{transform:translate(-3px,1px) rotate(-2deg)}50%{transform:translate(3px,-1px) rotate(2deg)}75%{transform:translate(-2px,2px)}}
+@keyframes drop{0%{transform:translateY(-70px) scale(1.5);opacity:0}70%{transform:translateY(4px) scale(1);opacity:1}100%{transform:none}}
+@keyframes wash{from{transform:scale(.2);opacity:.85}to{transform:scale(4);opacity:0}}
+@keyframes rip{from{transform:scale(.5);opacity:.9}to{transform:scale(2.2);opacity:0}}
+@keyframes fall{from{transform:translateY(-30px) rotate(0)}to{transform:translateY(520px) rotate(600deg)}}
+@keyframes live{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes rise{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes skel{from{background-position:200% 0}to{background-position:-200% 0}}
+@keyframes boom{0%{transform:scale(.4);opacity:1}100%{transform:scale(3);opacity:0}}
+@keyframes fill{from{height:0}}
+@keyframes bub{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-60px);opacity:0}}
+@keyframes clinkL{0%{transform:translateX(0) rotate(0)}45%{transform:translateX(52px) rotate(12deg)}55%{transform:translateX(46px) rotate(8deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes clinkR{0%{transform:translateX(0) rotate(0)}45%{transform:translateX(-52px) rotate(-12deg)}55%{transform:translateX(-46px) rotate(-8deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes slidein{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+</style>
+</helmet>
+<div class="bd" style="width: 1840px; height: 1010px">
+<div class="pw"><div class="cap">Discussions</div><div class="ph">
+<div class="sc">
+<h1 class="h1">Discussions</h1>
+<div style="position: relative"><span style="position: absolute; left: 14px; top: 15px; color: #AEB7B2"><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4a7 7 0 1 1 0 14a7 7 0 1 1 0-14zM20 20l-4-4"></path></svg></span><input class="inp" style="padding-left: 44px" placeholder="Chercher dans tes messages" aria-label="Chercher"></div>
+<p class="s">La recherche se fait sur ton téléphone. Le serveur ne peut pas lire tes messages.</p>
+<a class="row" href="#conv"><div class="av a1" style="border-radius: 12px">LQ</div><div class="g1"><span class="h3">Les Quais</span><span class="s">Jade : quelqu'un a vu mes clés ?</span></div><div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px"><span class="s">2 h 41</span><span class="tag amb">3</span></div></a>
+<a class="row" href="#conv"><div class="av a2" style="border-radius: 12px">SZ</div><div class="g1"><span class="h3">Samedi au Zinc</span><span class="s">Archivée après le récap</span></div><span class="s">dim.</span></a>
+<a class="row" href="#conv"><div class="av a2">J</div><div class="g1"><span class="h3">Jade</span><span class="s">Message vocal, 0:12</span></div><span class="s">hier</span></a>
+<a class="row" href="#conv"><div class="av a7">N</div><div class="g1"><span class="h3">Nora</span><span class="s">Demande acceptée, dites bonjour</span></div><span class="s">hier</span></a>
+<div class="row"><span class="amb"><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 1 0 18a9 9 0 1 1 0-18zM12 7v5l3 2"></path></svg></span><div class="g1"><span class="h3">1 message retenu</span><span class="s">Pour Camille, à confirmer ce matin</span></div><a class="btn sm g" href="#sauvegarde">Voir</a></div>
+</div>
+<nav class="tab" aria-label="Navigation principale"><a href="Soiree.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l-1.2 16H8.2L7 4zM7.4 9h9.2"></path></svg><span>Soirée</span></a><a href="Radar.dc.html" class="on"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 1 1 0-7zM2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.6a3.4 3.4 0 0 1 0 6.8M18 14.8c2 .6 3.2 2.5 3.5 5.2"></path></svg><span>Crew</span></a><a href="Jeux.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8.5 8.5h.01M15.5 15.5h.01M15.5 8.5h.01M8.5 15.5h.01M12 12h.01"></path></svg><span>Jeux</span></a><a href="Bars.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21zM12 7.5a2 2 0 1 1 0 4a2 2 0 1 1 0-4z"></path></svg><span>Bars</span></a><a href="Profil.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a4 4 0 1 1 0 8a4 4 0 1 1 0-8zM4 21c1-4 4.2-6 8-6s7 2 8 6"></path></svg><span>Moi</span></a></nav>
+</div></div>
+<div class="pw"><div class="cap">Conversation</div><div class="ph">
+<div style="padding: 54px 16px 10px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #34403C">
+<a class="ib" href="#" aria-label="Retour"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<div class="g1"><span class="h3">Les Quais</span><span class="s"><svg class="ic" style="width: 12px; height: 12px" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3"></path></svg> Chiffré de bout en bout, messages éphémères 24 h</span></div>
+<a class="ib" href="#infos" aria-label="Infos"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h.01M12 12h.01M19 12h.01"></path></svg></a>
+</div>
+<div class="sc" style="padding-top: 12px; gap: 10px">
+<div style="align-self: flex-start; max-width: 270px; background: #2C3734; border-radius: 18px 18px 18px 4px; padding: 10px 12px"><span class="s" style="color: #9BD8A8; font-weight: 700">Jade</span><p class="p">quelqu'un a vu mes clés ?</p></div>
+<div style="align-self: flex-start; max-width: 270px; background: #2C3734; border-radius: 18px 18px 18px 4px; padding: 6px"><div style="height: 150px; border-radius: 12px; background: #46534F; display: flex; align-items: center; justify-content: center; color: #8E9893"><svg class="ic" style="width: 40px; height: 40px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4"></path></svg></div><p class="s" style="padding: 6px 6px 2px">Photo chiffrée sur ton téléphone avant l'envoi</p></div>
+<div style="align-self: flex-end; max-width: 270px; background: #F4B33D; color: #1E2624; border-radius: 18px 18px 4px 18px; padding: 10px 12px"><div style="border-left: 3px solid #1E2624; padding-left: 8px; margin-bottom: 6px; font-size: 13px; opacity: .75">Jade : quelqu'un a vu mes clés ?</div><p class="p">@Malik les avait dans sa poche</p></div>
+<div style="align-self: flex-end; display: flex; gap: 4px"><span class="tag">😂 2</span><span class="tag">🔑 1</span></div>
+<div style="align-self: flex-start; max-width: 270px; background: #2C3734; border-radius: 18px 18px 18px 4px; padding: 10px 12px; display: flex; align-items: center; gap: 10px"><span class="amb"><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zM5 11a7 7 0 0 0 14 0M12 18v3"></path></svg></span><div class="bar" style="width: 140px"><i style="width: 40%"></i></div><span class="s">0:12</span></div>
+<sc-for list="{{mine}}" as="m" hint-placeholder-count="0">
+<div style="align-self: flex-end; max-width: 270px; background: #F4B33D; color: #1E2624; border-radius: 18px 18px 4px 18px; padding: 10px 12px" class="fadein"><p class="p">{{m.t}}</p><span style="font-size: 11px; display: flex; justify-content: flex-end; align-items: center; gap: 4px">{{m.st}}</span></div>
+</sc-for>
+<p class="s" style="align-self: flex-start">Malik écrit...</p>
+</div>
+<div style="padding: 10px 14px 30px; display: flex; gap: 8px; border-top: 1px solid #34403C">
+<input class="inp" placeholder="Message" value="{{draft}}" onInput="{{onDraft}}" aria-label="Message">
+<button class="btn" style="width: 52px; padding: 0" onClick="{{send}}" aria-label="Envoyer"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l16-8-6 16-2.5-6.5z"></path></svg></button>
+<button class="btn g" style="width: 52px; padding: 0" aria-label="Message vocal"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zM5 11a7 7 0 0 0 14 0M12 18v3"></path></svg></button>
+</div>
+</div></div>
+<div class="pw"><div class="cap">Infos et clé de sécurité</div><div class="ph">
+<div class="sc" id="infos">
+<a class="ib" href="#" aria-label="Retour"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<h1 class="h1">Jade</h1>
+<div class="pan" style="flex-direction: row; align-items: center; background: #4A3E22"><span class="amb"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 14a4 4 0 1 1 0-8a4 4 0 0 1 0 8zM11.5 10H21M17.5 10v3M20.5 10v3"></path></svg></span><span class="g1 s" style="color: #F8E3B4">La clé de Jade a changé. Nouveau téléphone, sûrement. Vérifiez ensemble si vous voulez être sûrs.</span></div>
+<div class="pan" style="align-items: center">
+<div style="width: 140px; height: 140px; border-radius: 12px; background: #F1EEE6; color: #1E2624; display: flex; align-items: center; justify-content: center"><svg class="ic" style="width: 110px; height: 110px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 18h2v2h-2zM14 18h2M18 14h2"></path></svg></div>
+<p class="num" style="font-size: 22px; letter-spacing: 2px; text-align: center">37129 04881 55302<br>91846 20375 66418</p>
+<button class="btn sm {{verCls}}" onClick="{{verify}}">{{verTxt}}</button>
+</div>
+<p class="lbl">Messages éphémères</p>
+<div class="seg"><sc-for list="{{eph}}" as="e" hint-placeholder-count="4"><button class="{{e.on}}" onClick="{{e.pick}}">{{e.l}}</button></sc-for></div>
+<div class="row"><span class="g1 p">Accusés de lecture</span><button class="sw {{readCls}}" aria-label="Accusés de lecture" onClick="{{toggleRead}}"></button></div>
+<div class="row"><span class="g1 p">Indicateur d'écriture</span><button class="sw {{typeCls}}" aria-label="Indicateur d'écriture" onClick="{{toggleType}}"></button></div>
+<button class="btn o full" onClick="{{openReport}}"><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"></path></svg> Signaler un message</button>
+</div>
+<sc-if value="{{report}}" hint-placeholder-val="{{ false }}"><div class="dim"></div><div class="sheet"><div class="grab"></div><span class="h2">Signaler ce message</span><p class="p">Ton téléphone déchiffre ce message et les 3 autour, puis les envoie à la modération. Personne d'autre ne les voit.</p><div class="grid2"><button class="btn g" onClick="{{closeReport}}">Annuler</button><button class="btn d" onClick="{{closeReport}}">Signaler</button></div></div></sc-if>
+</div></div>
+<div class="pw"><div class="cap">Sauvegarde et messages retenus</div><div class="ph">
+<div class="sc" id="sauvegarde">
+<h1 class="h1">Tes messages, ta clé</h1>
+<div class="pan">
+<span class="h3">Sauvegarde chiffrée</span>
+<p class="s">Protégée par une phrase que toi seul connais. On ne peut pas la retrouver pour toi.</p>
+<div style="background: #1E2624; border-radius: 12px; padding: 12px; font-weight: 700; letter-spacing: .5px">{{phrase}}</div>
+<div class="grid2"><button class="btn sm g" onClick="{{reveal}}">{{revealTxt}}</button><button class="btn sm">Je l'ai notée</button></div>
+</div>
+<div class="pan" style="background: #4E2C27"><span class="h3" style="color: #FFD3CB">Sans cette phrase</span><span class="s" style="color: #F3B9AE">Ton historique ne reviendra pas sur un nouveau téléphone.</span></div>
+<p class="lbl">Retenu cette nuit</p>
+<sc-for list="{{held}}" as="h" hint-placeholder-count="1">
+<div class="pan fadein"><div class="top"><span class="h3">Pour Camille, 3 h 12</span><span class="tag">niveau 2</span></div><p class="p">« t'es réveillée ? »</p>
+<div class="grid2"><button class="btn sm g" onClick="{{h.del}}">Supprimer</button><button class="btn sm" onClick="{{h.del}}">Envoyer quand même</button></div></div>
+</sc-for>
+<sc-if value="{{heldEmpty}}" hint-placeholder-val="{{ false }}"><p class="s">Rien en attente. Tu nous remercieras plus tard.</p></sc-if>
+</div>
+</div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1840,"height":1010}}'>
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state={draft:'',mine:[],ver:false,eph:2,read:true,typ:true,report:false,rev:false,held:true}; }
+  componentWillUnmount(){ (this.ts||[]).forEach(clearTimeout); }
+  renderVals(){
+    const s=this.state;
+    return {
+      draft:s.draft, onDraft:(e)=>this.setState({draft:e.target.value}),
+      send:()=>{ const t=s.draft.trim(); if(!t) return; const id=Date.now(); this.setState({mine:[...s.mine,{id,t,st:'envoi'}],draft:''});
+        this.ts=this.ts||[]; this.ts.push(setTimeout(()=>this.setState({mine:this.state.mine.map(m=>m.id===id?{...m,st:'envoyé ✓'}:m)}),900)); },
+      mine:s.mine,
+      verCls:s.ver?'g':'', verTxt:s.ver?'Vérifié avec Jade':'Marquer comme vérifié', verify:()=>this.setState({ver:!s.ver}),
+      eph:['Non','1 h','24 h','7 j'].map((l,i)=>({l,on:s.eph===i?'on':'',pick:()=>this.setState({eph:i})})),
+      readCls:s.read?'on':'', typeCls:s.typ?'on':'', toggleRead:()=>this.setState({read:!s.read}), toggleType:()=>this.setState({typ:!s.typ}),
+      report:s.report, openReport:()=>this.setState({report:true}), closeReport:()=>this.setState({report:false}),
+      phrase:s.rev?'zinc tonnerre capsule orage pinte velours':'•••• •••• •••• •••• •••• ••••', revealTxt:s.rev?'Cacher':'Afficher', reveal:()=>this.setState({rev:!s.rev}),
+      held:s.held?[{del:()=>this.setState({held:false})}]:[], heldEmpty:!s.held
+    };
+  }
+}
+</script>
+</body>
+</html>

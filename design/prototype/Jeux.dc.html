@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Les jeux, catalogue et réglages</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+.bd{display:flex;gap:56px;padding:72px 56px 56px;align-items:flex-start;background:#CDD3CE;font-family:'Archivo',system-ui,sans-serif;color:#1E2624}
+.pw{display:flex;flex-direction:column;gap:14px;flex:none}
+.cap{font-size:16px;font-weight:700;color:#26302D;padding-left:10px;font-stretch:90%}
+.ph{width:390px;height:844px;border-radius:46px;background:#1E2624;color:#F1EEE6;position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 0 9px #0F1413,0 28px 50px rgba(15,20,19,.28);font-family:'Archivo',system-ui,sans-serif}
+.ph.lt{background:#EEF0EA;color:#1E2624}
+.sc{flex:1;min-height:0;overflow-y:auto;padding:58px 20px 22px;display:flex;flex-direction:column;gap:16px;scrollbar-width:none}
+.sc::-webkit-scrollbar{display:none}
+.h1{margin:0;font-size:32px;line-height:1.04;font-weight:800;font-stretch:76%}
+.h2{margin:0;font-size:22px;line-height:1.12;font-weight:750;font-stretch:82%}
+.h3{margin:0;font-size:16px;line-height:1.25;font-weight:700}
+.p{margin:0;font-size:15px;line-height:1.45}
+.s{margin:0;font-size:13px;line-height:1.4;color:#AEB7B2}
+.lt .s{color:#4F5A55}
+.num{font-weight:900;font-stretch:62%;line-height:.86;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.amb{color:#F4B33D}.red{color:#FF7A66}.wat{color:#8CCBEA}.mint{color:#9BD8A8}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 18px;border-radius:14px;border:0;background:#F4B33D;color:#1E2624;font:700 16px 'Archivo',sans-serif;text-decoration:none;cursor:pointer;transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn.g{background:#34403C;color:#F1EEE6}
+.btn.o{background:transparent;color:inherit;box-shadow:inset 0 0 0 1.5px #56635F}
+.btn.d{background:#FF7A66;color:#1E2624}
+.btn.w2{background:#8CCBEA;color:#1E2624}
+.btn.sm{min-height:40px;font-size:14px;border-radius:12px;padding:0 14px}
+.btn.full{width:100%}
+.btn[disabled]{opacity:.4;cursor:default}
+.lt .btn.g{background:#DCE1DA;color:#1E2624}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 14px;border-radius:999px;border:0;background:#34403C;color:#F1EEE6;font:600 14px 'Archivo',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none}
+.chip.on{background:#F1EEE6;color:#1E2624}
+.lt .chip{background:#DCE1DA;color:#1E2624}.lt .chip.on{background:#1E2624;color:#EEF0EA}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.hs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -20px;padding:0 20px;flex:none}
+.hs::-webkit-scrollbar{display:none}
+.row{display:flex;align-items:center;gap:12px;min-height:54px;padding:8px 0;border-bottom:1px solid #34403C;color:inherit;text-decoration:none}
+.lt .row{border-color:#D3D8D2}
+.g1{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.lbl{font-size:13px;font-weight:700;color:#AEB7B2;margin:6px 0 0}
+.lt .lbl{color:#4F5A55}
+.sw{width:52px;height:32px;border-radius:999px;border:0;background:#46534F;position:relative;cursor:pointer;flex:none;transition:background .2s}
+.sw::after{content:'';position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#F1EEE6;transition:transform .22s cubic-bezier(.3,.7,.3,1)}
+.sw.on{background:#F4B33D}.sw.on::after{transform:translateX(20px)}
+.seg{display:flex;background:#2C3734;border-radius:12px;padding:3px;gap:3px;flex:none}
+.seg button{flex:1;min-height:38px;border:0;border-radius:9px;background:transparent;color:#C9D0CC;font:600 13px 'Archivo',sans-serif;cursor:pointer;padding:0 6px}
+.seg button.on{background:#F1EEE6;color:#1E2624}
+.lt .seg{background:#DCE1DA}.lt .seg button{color:#3A4440}.lt .seg button.on{background:#1E2624;color:#EEF0EA}
+.av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#1E2624;flex:none}
+.a1{background:#F4B33D}.a2{background:#9BD8A8}.a3{background:#8CCBEA}.a4{background:#F2C6A0}.a5{background:#D6C8F2}.a6{background:#FF9C8A}.a7{background:#E8E3D2}
+.tag{display:inline-flex;align-items:center;gap:4px;min-height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:650;background:#34403C;color:#E3E7E4;white-space:nowrap}
+.tag.amb{background:#4A3E22;color:#F8CE7A}.tag.red{background:#4E2C27;color:#FFB3A6}.tag.wat{background:#24404D;color:#B8E0F3}.tag.mint{background:#2A4632;color:#BFE9C8}
+.lt .tag{background:#DCE1DA;color:#1E2624}
+.tab{display:flex;justify-content:space-around;padding:10px 6px 30px;border-top:1px solid #34403C;background:#1E2624;flex:none}
+.tab a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:650;color:#97A19C;text-decoration:none;min-width:60px;min-height:44px;justify-content:center}
+.tab a.on{color:#F4B33D}
+.ic{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ib{width:44px;height:44px;border-radius:12px;border:0;background:#2C3734;color:#F1EEE6;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;flex:none}
+.lt .ib{background:#DCE1DA;color:#1E2624}
+.pan{background:#28322F;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.lt .pan{background:#FFFFFF}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#28322F;border-radius:26px 26px 0 0;padding:12px 20px 34px;display:flex;flex-direction:column;gap:14px;box-shadow:0 -14px 40px rgba(0,0,0,.4);animation:sup .32s cubic-bezier(.2,.8,.2,1)}
+.dim{position:absolute;inset:0;background:rgba(10,14,13,.55)}
+.grab{width:40px;height:5px;border-radius:3px;background:#56635F;align-self:center}
+.toast{position:absolute;left:14px;right:14px;bottom:100px;background:#F1EEE6;color:#1E2624;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:650;animation:tin .28s cubic-bezier(.2,.8,.2,1);z-index:5}
+.toast.err{background:#FF7A66}
+.toast .btn{min-height:36px;font-size:13px;padding:0 12px;background:#1E2624;color:#F1EEE6}
+.inp{min-height:52px;border-radius:14px;border:1.5px solid #3D4A46;background:#232D2A;color:#F1EEE6;padding:0 14px;font:500 16px 'Archivo',sans-serif;width:100%}
+.lt .inp{background:#fff;border-color:#C8CEC8;color:#1E2624}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:700;color:#AEB7B2}
+.bar{height:8px;border-radius:4px;background:#34403C;overflow:hidden;flex:none}
+.bar i{display:block;height:100%;background:#F4B33D;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.lt .bar{background:#DCE1DA}
+.dis{font-size:12px;line-height:1.35;color:#AEB7B2}
+.dot{width:8px;height:8px;border-radius:50%;background:#9BD8A8;flex:none}
+.dot.live{animation:live 1.6s ease-in-out infinite}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:12px;border-radius:16px;background:#2C3734;border:0;color:#F1EEE6;font:600 14px 'Archivo',sans-serif;text-align:left;cursor:pointer;min-height:76px}
+.tile.on{background:#F1EEE6;color:#1E2624}
+.card3d{perspective:900px}
+.flip{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.3,.7,.2,1);transform-style:preserve-3d}
+.flip.on{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;display:flex;flex-direction:column;justify-content:space-between;padding:22px}
+.face.b{transform:rotateY(180deg)}
+.fab{position:absolute;right:16px;bottom:118px;width:56px;height:56px;border-radius:50%;border:0;background:#F4B33D;color:#1E2624;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.35);cursor:pointer;z-index:4}
+.pop1{animation:pop1 .35s cubic-bezier(.2,.8,.2,1)}.pop2{animation:pop2 .35s cubic-bezier(.2,.8,.2,1)}
+.shk{animation:shake .25s linear infinite}
+.drop{animation:drop .7s cubic-bezier(.2,.9,.25,1.2)}
+.wash{position:absolute;border-radius:50%;animation:wash 1s ease-out forwards;pointer-events:none}
+.rip{position:absolute;border-radius:50%;border:3px solid #F4B33D;animation:rip 1s ease-out infinite;pointer-events:none}
+.conf{position:absolute;width:8px;height:14px;border-radius:2px;animation:fall 1.8s cubic-bezier(.3,.6,.4,1) forwards;pointer-events:none}
+.rise{transform-origin:bottom;animation:rise .8s cubic-bezier(.2,.8,.2,1) both}
+.fadein{animation:tin .35s cubic-bezier(.2,.8,.2,1) both}
+.skel{background:linear-gradient(90deg,#2C3734 0%,#36433F 50%,#2C3734 100%);background-size:200% 100%;animation:skel 1.4s linear infinite;border-radius:10px}
+@keyframes tin{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+@keyframes sup{from{transform:translateY(100%)}to{transform:none}}
+@keyframes pop1{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes pop2{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translate(0,0)}25%{transform:translate(-3px,1px) rotate(-2deg)}50%{transform:translate(3px,-1px) rotate(2deg)}75%{transform:translate(-2px,2px)}}
+@keyframes drop{0%{transform:translateY(-70px) scale(1.5);opacity:0}70%{transform:translateY(4px) scale(1);opacity:1}100%{transform:none}}
+@keyframes wash{from{transform:scale(.2);opacity:.85}to{transform:scale(4);opacity:0}}
+@keyframes rip{from{transform:scale(.5);opacity:.9}to{transform:scale(2.2);opacity:0}}
+@keyframes fall{from{transform:translateY(-30px) rotate(0)}to{transform:translateY(520px) rotate(600deg)}}
+@keyframes live{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes rise{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes skel{from{background-position:200% 0}to{background-position:-200% 0}}
+@keyframes boom{0%{transform:scale(.4);opacity:1}100%{transform:scale(3);opacity:0}}
+@keyframes fill{from{height:0}}
+@keyframes bub{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-60px);opacity:0}}
+@keyframes clinkL{0%{transform:translateX(0) rotate(0)}45%{transform:translateX(52px) rotate(12deg)}55%{transform:translateX(46px) rotate(8deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes clinkR{0%{transform:translateX(0) rotate(0)}45%{transform:translateX(-52px) rotate(-12deg)}55%{transform:translateX(-46px) rotate(-8deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes slidein{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+</style>
+</helmet>
+<div class="bd" style="width: 1840px; height: 1010px">
+<div class="pw"><div class="cap">Catalogue des jeux</div><div class="ph">
+<div class="sc">
+<div class="top"><h1 class="h1">Jeux</h1><span class="s">{{pos}}</span></div>
+<div class="seg"><sc-for list="{{modes}}" as="m" hint-placeholder-count="3"><button class="{{m.on}}" onClick="{{m.pick}}">{{m.l}}</button></sc-for></div>
+<div class="fadein" style="border-radius: 26px; background: {{g.bg}}; color: #1E2624; height: 380px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden">
+<div class="top"><span style="display: flex; gap: 6px; flex-wrap: wrap"><sc-for list="{{g.tags}}" as="t" hint-placeholder-count="3"><span class="tag" style="background: rgba(30,38,36,.14); color: #1E2624">{{t}}</span></sc-for></span>
+<sc-if value="{{g.locked}}" hint-placeholder-val="{{ false }}"><span class="tag" style="background: #1E2624"><svg class="ic" style="width: 14px; height: 14px" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3"></path></svg> 4 amis</span></sc-if></div>
+<span style="position: absolute; right: -20px; top: 60px; opacity: .18"><svg class="ic" style="width: 220px; height: 220px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8.5 8.5h.01M15.5 15.5h.01M15.5 8.5h.01M8.5 15.5h.01M12 12h.01"></path></svg></span>
+<div><p class="num" style="font-size: 64px; letter-spacing: -1px">{{g.n}}</p><p class="p" style="margin-top: 8px">{{g.d}}</p></div>
+<div class="top"><span class="h3">{{g.t}}, {{g.p}}</span><span class="tag" style="background: #1E2624; color: #F1EEE6">{{g.ph}}</span></div>
+</div>
+<div class="top"><button class="ib" aria-label="Jeu précédent" onClick="{{prev}}"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
+<div style="display: flex; gap: 5px"><sc-for list="{{dots}}" as="d" hint-placeholder-count="15"><span style="width: {{d.w}}px; height: 6px; border-radius: 3px; background: {{d.c}}; transition: width .25s"></span></sc-for></div>
+<button class="ib" aria-label="Jeu suivant" onClick="{{next}}"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button></div>
+<a class="btn full" href="{{g.href}}"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8.5 8.5h.01M15.5 15.5h.01M15.5 8.5h.01M8.5 15.5h.01M12 12h.01"></path></svg> Jouer</a>
+<div class="pan" style="flex-direction: row; align-items: center"><span class="amb"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c1 3 4 5 4 9a4 4 0 0 1-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 0-8z"></path></svg></span><span class="g1 s">Défi du soir : le perdant de la prochaine partie choisit la musique pendant 30 min.</span></div>
+</div>
+<nav class="tab" aria-label="Navigation principale"><a href="Soiree.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l-1.2 16H8.2L7 4zM7.4 9h9.2"></path></svg><span>Soirée</span></a><a href="Radar.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 1 1 0-7zM2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.6a3.4 3.4 0 0 1 0 6.8M18 14.8c2 .6 3.2 2.5 3.5 5.2"></path></svg><span>Crew</span></a><a href="Jeux.dc.html" class="on"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8.5 8.5h.01M15.5 15.5h.01M15.5 8.5h.01M8.5 15.5h.01M12 12h.01"></path></svg><span>Jeux</span></a><a href="Bars.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21zM12 7.5a2 2 0 1 1 0 4a2 2 0 1 1 0-4z"></path></svg><span>Bars</span></a><a href="Profil.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a4 4 0 1 1 0 8a4 4 0 1 1 0-8zM4 21c1-4 4.2-6 8-6s7 2 8 6"></path></svg><span>Moi</span></a></nav>
+</div></div>
+<div class="pw"><div class="cap">Fiche du jeu</div><div class="ph">
+<div class="sc">
+<div class="top"><a class="ib" href="#" aria-label="Retour"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a><span class="h3">Le Grand Paquet</span><span style="width: 44px"></span></div>
+<div class="seg"><sc-for list="{{levels}}" as="l" hint-placeholder-count="3"><button class="{{l.on}}" onClick="{{l.pick}}">{{l.l}}</button></sc-for></div>
+<div class="pan fadein" style="min-height: 150px; justify-content: space-between; background: #F1EEE6; color: #1E2624">
+<span class="s" style="color: #4F5A55">Règle {{ruleN}} sur 3</span><span class="p" style="font-size: 18px; font-weight: 650">{{rule}}</span>
+<div class="top"><span class="s" style="color: #4F5A55">Le bouton ? les remontre en partie.</span><button class="btn sm" style="background: #1E2624; color: #F1EEE6" onClick="{{nextRule}}">Suivante</button></div>
+</div>
+<p class="lbl">Joueurs, dans l'ordre</p>
+<sc-for list="{{players}}" as="p" hint-placeholder-count="4">
+<div class="row"><span class="s"><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"></path></svg></span><div class="av {{p.a}}" style="width: 32px; height: 32px; font-size: 12px">{{p.i}}</div><span class="g1 p">{{p.n}}</span><sc-if value="{{p.guest}}" hint-placeholder-val="{{ false }}"><span class="tag">sans compte</span></sc-if></div>
+</sc-for>
+<div style="display: flex; gap: 8px"><input class="inp" placeholder="Prénom" value="{{newP}}" onInput="{{onP}}" aria-label="Ajouter un joueur"><button class="btn" onClick="{{addP}}" aria-label="Ajouter"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button></div>
+<div class="top"><span class="p">Minuteur par manche</span><div class="seg" style="width: 190px"><sc-for list="{{timers}}" as="t" hint-placeholder-count="3"><button class="{{t.on}}" onClick="{{t.pick}}">{{t.l}}</button></sc-for></div></div>
+<div class="top"><div class="g1"><span class="p">Ajouter les cartes du crew</span><span class="s">12 cartes validées par l'admin</span></div><button class="sw {{crewCls}}" aria-label="Cartes du crew" onClick="{{toggleCrew}}"></button></div>
+<a class="btn full" href="JeuxCartes.dc.html">Lancer, {{playersN}} joueurs</a>
+</div>
+</div></div>
+<div class="pw"><div class="cap">Cartes du crew</div><div class="ph">
+<div class="sc">
+<h1 class="h1">Cartes du crew</h1>
+<div style="display: flex; gap: 8px"><input class="inp" placeholder="Je n'ai jamais..." value="{{draft}}" onInput="{{onDraft}}" aria-label="Nouvelle carte"><button class="btn" onClick="{{submit}}" aria-label="Proposer"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l16-8-6 16-2.5-6.5z"></path></svg></button></div>
+<button class="btn g full" onClick="{{gen}}">Proposer des cartes à partir de nos blagues (IA)</button>
+<p class="lbl">À valider par l'admin</p>
+<sc-for list="{{queue}}" as="q" hint-placeholder-count="3">
+<div class="pan fadein"><div class="top"><span class="tag {{q.tc}}">{{q.src}}</span><span class="s">{{q.game}}</span></div><p class="p">{{q.t}}</p>
+<div class="grid2"><button class="btn sm g" onClick="{{q.no}}">Refuser</button><button class="btn sm" onClick="{{q.ok}}">Valider</button></div></div>
+</sc-for>
+<sc-if value="{{empty}}" hint-placeholder-val="{{ false }}"><p class="s">Tout est traité.</p></sc-if>
+<p class="s">{{approved}} cartes validées dans le paquet du crew.</p>
+</div>
+</div></div>
+<div class="pw"><div class="cap">Panthéon</div><div class="ph">
+<div class="sc">
+<h1 class="h1">Panthéon</h1>
+<sc-for list="{{records}}" as="r" hint-placeholder-count="5">
+<div class="row"><span class="amb"><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M9 20h6"></path></svg></span><div class="g1"><span class="p">{{r.g}}</span><span class="s">{{r.r}}</span></div><div class="av {{r.a}}" style="width: 32px; height: 32px; font-size: 12px">{{r.i}}</div></div>
+</sc-for>
+<p class="lbl">Dernière partie</p>
+<div class="pan" style="background: #F4B33D; color: #1E2624"><span class="s" style="color: #3A3010">La Roulette, samedi 22 h 30</span><span class="h2">Malik perd 3 manches sur 5</span><span class="p">Record du crew égalé.</span><button class="btn sm" style="background: #1E2624; color: #F1EEE6; align-self: flex-start"><svg class="ic" style="width: 16px; height: 16px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 14v6h14v-6"></path></svg> Partager</button></div>
+</div>
+<nav class="tab" aria-label="Navigation principale"><a href="Soiree.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l-1.2 16H8.2L7 4zM7.4 9h9.2"></path></svg><span>Soirée</span></a><a href="Radar.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 1 1 0-7zM2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.6a3.4 3.4 0 0 1 0 6.8M18 14.8c2 .6 3.2 2.5 3.5 5.2"></path></svg><span>Crew</span></a><a href="Jeux.dc.html" class="on"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8.5 8.5h.01M15.5 15.5h.01M15.5 8.5h.01M8.5 15.5h.01M12 12h.01"></path></svg><span>Jeux</span></a><a href="Bars.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21zM12 7.5a2 2 0 1 1 0 4a2 2 0 1 1 0-4z"></path></svg><span>Bars</span></a><a href="Profil.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a4 4 0 1 1 0 8a4 4 0 1 1 0-8zM4 21c1-4 4.2-6 8-6s7 2 8 6"></path></svg><span>Moi</span></a></nav>
+</div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1840,"height":1010}}'>
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state={i:0,mode:0,level:0,rule:0,players:[['Hugo','H','a1',false],['Jade','J','a2',false],['Malik','M','a3',false],['Léon','L','a7',true]],newP:'',timer:1,crew:true,draft:'',approved:12,
+    queue:[{t:'Je n\'ai jamais raté le dernier bus exprès.',src:'Inès',tc:'',game:'Je n\'ai jamais'},{t:'Qui de nous deux finit toujours chez Jade ?',src:'Malik',tc:'',game:'Qui de nous deux'}]}; }
+  renderVals(){
+    const s=this.state;
+    const G=[['Le Grand Paquet','Un paquet qui mélange défis, règles et votes. Fini quand la dernière carte tombe.','10 à 20 min','2 à 16','Un téléphone',['Groupe','Défis'],'#F4B33D','JeuxCartes.dc.html'],
+      ['L\'Autoroute','Cinq péages, une douane au 2e. Parie plus haut ou plus bas.','10 à 30 min','2 à 10','Un téléphone',['Stratégie','Bluff'],'#9BD8A8','JeuxCartes.dc.html'],
+      ['Face-à-face','Deux joueurs, deux cartes, le plus faible boit.','5 min','2','Un téléphone',['Duel'],'#FF9C8A','JeuxCartes.dc.html'],
+      ['Qui a ?','Une question, tout le monde désigne quelqu\'un.','10 min','3 à 12','Un téléphone',['Groupe','Vote'],'#8CCBEA','JeuxCartes.dc.html'],
+      ['La Bombe','Une catégorie, un mot chacun, et ça peut sauter à tout moment.','5 à 15 min','3 à 12','Un téléphone',['Réflexe'],'#FF9C8A','JeuxAction.dc.html'],
+      ['La Roulette','Elle tourne, elle ralentit, elle choisit.','5 min','2 à 12','Un téléphone',['Hasard'],'#D6C8F2','JeuxAction.dc.html'],
+      ['Je n\'ai jamais','Les classiques et ceux du crew.','10 à 30 min','3 à 16','Un téléphone',['Groupe','Aveux'],'#F2C6A0','JeuxCartes.dc.html'],
+      ['Qui de nous deux ?','Deux potes face au groupe, le groupe tranche.','10 min','4 à 12','Un téléphone',['Vote'],'#9BD8A8','JeuxCartes.dc.html'],
+      ['Action ou vérité','Trois niveaux, du gentil au très gênant.','15 à 40 min','2 à 12','Un téléphone',['Défis'],'#F4B33D','JeuxCartes.dc.html'],
+      ['Les Mines','Une grille, quelques pièges. À toi de deviner où.','5 min','2 à 8','Un téléphone',['Hasard'],'#8CCBEA','JeuxAction.dc.html'],
+      ['Le Doigt','Tout le monde pose un doigt, le téléphone en garde un.','1 min','2 à 8','Un téléphone',['Réflexe'],'#E8E3D2','JeuxAction.dc.html'],
+      ['L\'Imposteur','Un mot secret, un intrus. Discutez, votez.','10 à 20 min','4 à 12','Un téléphone',['Bluff'],'#D6C8F2','JeuxAction.dc.html'],
+      ['Agent double','Deux infiltrés avec un autre mot. 5 joueurs minimum.','15 min','5 à 12','Un téléphone',['Bluff'],'#FF9C8A','JeuxAction.dc.html'],
+      ['Dessine vite','Un dessine, les autres devinent sur leur téléphone.','10 à 20 min','3 à 8','Plusieurs téléphones',['En ligne'],'#9BD8A8','JeuxAction.dc.html'],
+      ['Ça grimpe','La courbe monte. Descends avant le crash.','5 min','2 à 10','Un téléphone',['Nerfs'],'#F4B33D','JeuxAction.dc.html']];
+    const list=G.map((g,k)=>({g,k})).filter(o=>s.mode===0?true:s.mode===1?o.g[4]==='Un téléphone':o.g[4]!=='Un téléphone');
+    const cur=list[Math.min(s.i,list.length-1)].g, ci=Math.min(s.i,list.length-1);
+    const rules=['Chacun pioche à son tour. La carte dit quoi faire.','Une carte Règle reste active jusqu\'à la prochaine carte Règle.','Une carte Vote : tout le monde désigne quelqu\'un en même temps.'];
+    const props=[{t:'Qui de nous deux a déjà dormi au Zinc ?',src:'IA, d\'après vos phrases cultes',tc:'amb',game:'Qui de nous deux'},{t:'Je n\'ai jamais piloté sans permis (Malik)',src:'IA, d\'après vos phrases cultes',tc:'amb',game:'Je n\'ai jamais'}];
+    const rm=(i,ok)=>this.setState({queue:s.queue.filter((_,j)=>j!==i),approved:s.approved+(ok?1:0)});
+    return {
+      modes:['Tous','Un téléphone','Plusieurs'].map((l,k)=>({l,on:s.mode===k?'on':'',pick:()=>this.setState({mode:k,i:0})})),
+      g:{n:cur[0],d:cur[1],t:cur[2],p:cur[3]+' joueurs',ph:cur[4],tags:cur[5],bg:cur[6],href:cur[7],locked:cur[0]==='Agent double'},
+      pos:(ci+1)+' sur '+list.length, prev:()=>this.setState({i:(ci-1+list.length)%list.length}), next:()=>this.setState({i:(ci+1)%list.length}),
+      dots:list.map((_,k)=>({w:k===ci?18:6,c:k===ci?'#F4B33D':'#46534F'})),
+      levels:['Normal','Difficile','Extrême'].map((l,k)=>({l,on:s.level===k?'on':'',pick:()=>this.setState({level:k})})),
+      rule:rules[s.rule], ruleN:String(s.rule+1), nextRule:()=>this.setState({rule:(s.rule+1)%3}),
+      players:s.players.map(([n,i,a,guest])=>({n,i,a,guest})), playersN:String(s.players.length),
+      newP:s.newP, onP:(e)=>this.setState({newP:e.target.value}), addP:()=>{ if(!s.newP.trim()) return; this.setState({players:[...s.players,[s.newP.trim(),s.newP.trim()[0].toUpperCase(),'a7',true]],newP:''}); },
+      timers:['Off','30 s','60 s'].map((l,k)=>({l,on:s.timer===k?'on':'',pick:()=>this.setState({timer:k})})),
+      crewCls:s.crew?'on':'', toggleCrew:()=>this.setState({crew:!s.crew}),
+      draft:s.draft, onDraft:(e)=>this.setState({draft:e.target.value}),
+      submit:()=>{ if(!s.draft.trim()) return; this.setState({queue:[{t:s.draft.trim(),src:'Toi',tc:'',game:'Je n\'ai jamais'},...s.queue],draft:''}); },
+      gen:()=>this.setState({queue:[...props,...s.queue]}),
+      queue:s.queue.map((q,i)=>({...q,ok:()=>rm(i,true),no:()=>rm(i,false)})), empty:s.queue.length===0, approved:String(s.approved),
+      records:[['La Roulette','3 défaites d\'affilée','M','a3'],['La Bombe','Survit 9 manches','I','a5'],['Dessine vite','Trouvé en 4 s','J','a2'],['Ça grimpe','Sorti à × 7,4','H','a1'],['Les Mines','0 piège en 12 cases','T','a4']].map(([g,r,i,a])=>({g,r,i,a}))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Les bars, qui domine quoi</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+.bd{display:flex;gap:56px;padding:72px 56px 56px;align-items:flex-start;background:#CDD3CE;font-family:'Archivo',system-ui,sans-serif;color:#1E2624}
+.pw{display:flex;flex-direction:column;gap:14px;flex:none}
+.cap{font-size:16px;font-weight:700;color:#26302D;padding-left:10px;font-stretch:90%}
+.ph{width:390px;height:844px;border-radius:46px;background:#1E2624;color:#F1EEE6;position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 0 9px #0F1413,0 28px 50px rgba(15,20,19,.28);font-family:'Archivo',system-ui,sans-serif}
+.ph.lt{background:#EEF0EA;color:#1E2624}
+.sc{flex:1;min-height:0;overflow-y:auto;padding:58px 20px 22px;display:flex;flex-direction:column;gap:16px;scrollbar-width:none}
+.sc::-webkit-scrollbar{display:none}
+.h1{margin:0;font-size:32px;line-height:1.04;font-weight:800;font-stretch:76%}
+.h2{margin:0;font-size:22px;line-height:1.12;font-weight:750;font-stretch:82%}
+.h3{margin:0;font-size:16px;line-height:1.25;font-weight:700}
+.p{margin:0;font-size:15px;line-height:1.45}
+.s{margin:0;font-size:13px;line-height:1.4;color:#AEB7B2}
+.lt .s{color:#4F5A55}
+.num{font-weight:900;font-stretch:62%;line-height:.86;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.amb{color:#F4B33D}.red{color:#FF7A66}.wat{color:#8CCBEA}.mint{color:#9BD8A8}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 18px;border-radius:14px;border:0;background:#F4B33D;color:#1E2624;font:700 16px 'Archivo',sans-serif;text-decoration:none;cursor:pointer;transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn.g{background:#34403C;color:#F1EEE6}
+.btn.o{background:transparent;color:inherit;box-shadow:inset 0 0 0 1.5px #56635F}
+.btn.d{background:#FF7A66;color:#1E2624}
+.btn.w2{background:#8CCBEA;color:#1E2624}
+.btn.sm{min-height:40px;font-size:14px;border-radius:12px;padding:0 14px}
+.btn.full{width:100%}
+.btn[disabled]{opacity:.4;cursor:default}
+.lt .btn.g{background:#DCE1DA;color:#1E2624}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 14px;border-radius:999px;border:0;background:#34403C;color:#F1EEE6;font:600 14px 'Archivo',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none}
+.chip.on{background:#F1EEE6;color:#1E2624}
+.lt .chip{background:#DCE1DA;color:#1E2624}.lt .chip.on{background:#1E2624;color:#EEF0EA}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.hs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -20px;padding:0 20px;flex:none}
+.hs::-webkit-scrollbar{display:none}
+.row{display:flex;align-items:center;gap:12px;min-height:54px;padding:8px 0;border-bottom:1px solid #34403C;color:inherit;text-decoration:none}
+.lt .row{border-color:#D3D8D2}
+.g1{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.lbl{font-size:13px;font-weight:700;color:#AEB7B2;margin:6px 0 0}
+.lt .lbl{color:#4F5A55}
+.sw{width:52px;height:32px;border-radius:999px;border:0;background:#46534F;position:relative;cursor:pointer;flex:none;transition:background .2s}
+.sw::after{content:'';position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#F1EEE6;transition:transform .22s cubic-bezier(.3,.7,.3,1)}
+.sw.on{background:#F4B33D}.sw.on::after{transform:translateX(20px)}
+.seg{display:flex;background:#2C3734;border-radius:12px;padding:3px;gap:3px;flex:none}
+.seg button{flex:1;min-height:38px;border:0;border-radius:9px;background:transparent;color:#C9D0CC;font:600 13px 'Archivo',sans-serif;cursor:pointer;padding:0 6px}
+.seg button.on{background:#F1EEE6;color:#1E2624}
+.lt .seg{background:#DCE1DA}.lt .seg button{color:#3A4440}.lt .seg button.on{background:#1E2624;color:#EEF0EA}
+.av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#1E2624;flex:none}
+.a1{background:#F4B33D}.a2{background:#9BD8A8}.a3{background:#8CCBEA}.a4{background:#F2C6A0}.a5{background:#D6C8F2}.a6{background:#FF9C8A}.a7{background:#E8E3D2}
+.tag{display:inline-flex;align-items:center;gap:4px;min-height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:650;background:#34403C;color:#E3E7E4;white-space:nowrap}
+.tag.amb{background:#4A3E22;color:#F8CE7A}.tag.red{background:#4E2C27;color:#FFB3A6}.tag.wat{background:#24404D;color:#B8E0F3}.tag.mint{background:#2A4632;color:#BFE9C8}
+.lt .tag{background:#DCE1DA;color:#1E2624}
+.tab{display:flex;justify-content:space-around;padding:10px 6px 30px;border-top:1px solid #34403C;background:#1E2624;flex:none}
+.tab a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:650;color:#97A19C;text-decoration:none;min-width:60px;min-height:44px;justify-content:center}
+.tab a.on{color:#F4B33D}
+.ic{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ib{width:44px;height:44px;border-radius:12px;border:0;background:#2C3734;color:#F1EEE6;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;flex:none}
+.lt .ib{background:#DCE1DA;color:#1E2624}
+.pan{background:#28322F;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.lt .pan{background:#FFFFFF}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#28322F;border-radius:26px 26px 0 0;padding:12px 20px 34px;display:flex;flex-direction:column;gap:14px;box-shadow:0 -14px 40px rgba(0,0,0,.4);animation:sup .32s cubic-bezier(.2,.8,.2,1)}
+.dim{position:absolute;inset:0;background:rgba(10,14,13,.55)}
+.grab{width:40px;height:5px;border-radius:3px;background:#56635F;align-self:center}
+.toast{position:absolute;left:14px;right:14px;bottom:100px;background:#F1EEE6;color:#1E2624;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:650;animation:tin .28s cubic-bezier(.2,.8,.2,1);z-index:5}
+.toast.err{background:#FF7A66}
+.toast .btn{min-height:36px;font-size:13px;padding:0 12px;background:#1E2624;color:#F1EEE6}
+.inp{min-height:52px;border-radius:14px;border:1.5px solid #3D4A46;background:#232D2A;color:#F1EEE6;padding:0 14px;font:500 16px 'Archivo',sans-serif;width:100%}
+.lt .inp{background:#fff;border-color:#C8CEC8;color:#1E2624}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:700;color:#AEB7B2}
+.bar{height:8px;border-radius:4px;background:#34403C;overflow:hidden;flex:none}
+.bar i{display:block;height:100%;background:#F4B33D;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.lt .bar{background:#DCE1DA}
+.dis{font-size:12px;line-height:1.35;color:#AEB7B2}
+.dot{width:8px;height:8px;border-radius:50%;background:#9BD8A8;flex:none}
+.dot.live{animation:live 1.6s ease-in-out infinite}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:12px;border-radius:16px;background:#2C3734;border:0;color:#F1EEE6;font:600 14px 'Archivo',sans-serif;text-align:left;cursor:pointer;min-height:76px}
+.tile.on{background:#F1EEE6;color:#1E2624}
+.card3d{perspective:900px}
+.flip{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.3,.7,.2,1);transform-style:preserve-3d}
+.flip.on{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;display:flex;flex-direction:column;justify-content:space-between;padding:22px}
+.face.b{transform:rotateY(180deg)}
+.fab{position:absolute;right:16px;bottom:118px;width:56px;height:56px;border-radius:50%;border:0;background:#F4B33D;color:#1E2624;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.35);cursor:pointer;z-index:4}
+.pop1{animation:pop1 .35s cubic-bezier(.2,.8,.2,1)}.pop2{animation:pop2 .35s cubic-bezier(.2,.8,.2,1)}
+.shk{animation:shake .25s linear infinite}
+.drop{animation:drop .7s cubic-bezier(.2,.9,.25,1.2)}
+.wash{position:absolute;border-radius:50%;animation:wash 1s ease-out forwards;pointer-events:none}
+.rip{position:absolute;border-radius:50%;border:3px solid #F4B33D;animation:rip 1s ease-out infinite;pointer-events:none}
+.conf{position:absolute;width:8px;height:14px;border-radius:2px;animation:fall 1.8s cubic-bezier(.3,.6,.4,1) forwards;pointer-events:none}
+.rise{transform-origin:bottom;animation:rise .8s cubic-bezier(.2,.8,.2,1) both}
+.fadein{animation:tin .35s cubic-bezier(.2,.8,.2,1) both}
+.skel{background:linear-gradient(90deg,#2C3734 0%,#36433F 50%,#2C3734 100%);background-size:200% 100%;animation:skel 1.4s linear infinite;border-radius:10px}
+@keyframes tin{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+@keyframes sup{from{transform:translateY(100%)}to{transform:none}}
+@keyframes pop1{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes pop2{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translate(0,0)}25%{transform:translate(-3px,1px) rotate(-2deg)}50%{transform:translate(3px,-1px) rotate(2deg)}75%{transform:translate(-2px,2px)}}
+@keyframes drop{0%{transform:translateY(-70px) scale(1.5);opacity:0}70%{transform:translateY(4px) scale(1);opacity:1}100%{transform:none}}
+@keyframes wash{from{transform:scale(.2);opacity:.85}to{transform:scale(4);opacity:0}}
+@keyframes rip{from{transform:scale(.5);opacity:.9}to{transform:scale(2.2);opacity:0}}
+@keyframes fall{from{transform:translateY(-30px) rotate(0)}to{transform:translateY(520px) rotate(600deg)}}
+@keyframes live{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes rise{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes skel{from{background-position:200% 0}to{background-position:-200% 0}}
+@keyframes boom{0%{transform:scale(.4);opacity:1}100%{transform:scale(3);opacity:0}}
+@keyframes fill{from{height:0}}
+@keyframes bub{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-60px);opacity:0}}
+@keyframes clinkL{0%{transform:translateX(0) rotate(0)}45%{transform:translateX(52px) rotate(12deg)}55%{transform:translateX(46px) rotate(8deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes clinkR{0%{transform:translateX(0) rotate(0)}45%{transform:translateX(-52px) rotate(-12deg)}55%{transform:translateX(-46px) rotate(-8deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes slidein{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+</style>
+</helmet>
+<div class="bd" style="width: 2732px; height: 1010px">
+<div class="pw"><div class="cap">Carte des bars</div><div class="ph">
+<div style="position: absolute; inset: 0; background: #26302D">
+<svg viewBox="0 0 390 844" style="width: 100%; height: 100%" aria-hidden="true"><path d="M-10 250 L400 210 M-10 470 L400 560 M110 -10 L150 860 M290 -10 L260 860 M-10 680 L400 380" stroke="#34403C" stroke-width="18" fill="none"></path><path d="M30 300 C120 330 200 280 400 320" stroke="#2B4650" stroke-width="30" fill="none"></path></svg>
+</div>
+<div class="sc" style="position: relative; padding-bottom: 0; gap: 10px">
+<div class="seg" style="background: rgba(30,38,36,.92)"><sc-for list="{{scopes}}" as="o" hint-placeholder-count="3"><button class="{{o.on}}" onClick="{{o.pick}}">{{o.l}}</button></sc-for></div>
+<div class="hs"><sc-for list="{{filters}}" as="f" hint-placeholder-count="6"><button class="chip {{f.on}}" onClick="{{f.t}}">{{f.l}}</button></sc-for></div>
+</div>
+<sc-for list="{{pins}}" as="p" hint-placeholder-count="6">
+<button style="all: unset; cursor: pointer; position: absolute; left: {{p.x}}px; top: {{p.y}}px; display: flex; flex-direction: column; align-items: center; gap: 2px; opacity: {{p.op}}" onClick="{{p.pick}}" aria-label="{{p.n}}">
+<sc-if value="{{p.crown}}" hint-placeholder-val="{{ true }}"><span style="color: {{p.col}}"><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 10H5z"></path></svg></span></sc-if>
+<span style="width: {{p.sz}}px; height: {{p.sz}}px; border-radius: 50%; background: {{p.col}}; border: {{p.bd}}; color: #1E2624; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; box-shadow: 0 0 0 4px #1E2624">{{p.i}}</span>
+<span class="tag" style="font-size: 11px">{{p.n}}</span>
+</button>
+</sc-for>
+<div class="sheet" style="animation: none; padding-bottom: 110px">
+<div class="grab"></div>
+<div class="top"><div><span class="h2">{{sel.n}}</span><p class="s">{{sel.d}}</p></div><span class="tag {{sel.bc}}">{{sel.busy}}</span></div>
+<div class="top"><div style="display: flex; align-items: center; gap: 8px"><span class="amb"><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 10H5z"></path></svg></span><span class="p">{{sel.boss}}</span></div><a class="btn sm" href="#le-zinc">Voir</a></div>
+</div>
+<div style="position: absolute; left: 0; right: 0; bottom: 0"><nav class="tab" aria-label="Navigation principale"><a href="Soiree.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l-1.2 16H8.2L7 4zM7.4 9h9.2"></path></svg><span>Soirée</span></a><a href="Radar.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 1 1 0-7zM2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.6a3.4 3.4 0 0 1 0 6.8M18 14.8c2 .6 3.2 2.5 3.5 5.2"></path></svg><span>Crew</span></a><a href="Jeux.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8.5 8.5h.01M15.5 15.5h.01M15.5 8.5h.01M8.5 15.5h.01M12 12h.01"></path></svg><span>Jeux</span></a><a href="Bars.dc.html" class="on"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21zM12 7.5a2 2 0 1 1 0 4a2 2 0 1 1 0-4z"></path></svg><span>Bars</span></a><a href="Profil.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a4 4 0 1 1 0 8a4 4 0 1 1 0-8zM4 21c1-4 4.2-6 8-6s7 2 8 6"></path></svg><span>Moi</span></a></nav></div>
+</div></div>
+<div class="pw"><div class="cap">Page d'un bar</div><div class="ph">
+<div class="sc" id="le-zinc">
+<div class="top"><a class="ib" href="#" aria-label="Retour"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a><div style="display: flex; gap: 8px"><button class="ib" aria-label="Enregistrer"><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path></svg></button><button class="ib" aria-label="Signaler"><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"></path></svg></button></div></div>
+<div><h1 class="h1" style="font-size: 40px">Le Zinc</h1><p class="s">Bar, ouvert jusqu'à 2 h. Happy hour 18 h à 20 h. Page gérée par l'établissement.</p></div>
+<div class="chips"><span class="tag">Rock</span><span class="tag">Terrasse</span><span class="tag mint">18+ strict</span><span class="tag">Carte demandée souvent</span></div>
+<div class="grid2"><a class="btn" href="#check-in"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21zM12 7.5a2 2 0 1 1 0 4a2 2 0 1 1 0-4z"></path></svg> Check-in</a><button class="btn g"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 15l1.5-5h11L19 15M4 15h16v3.5H4zM7.5 18.5v1.5M16.5 18.5v1.5"></path></svg> Y aller</button></div>
+<div class="pan">
+<div class="top"><div style="display: flex; align-items: center; gap: 10px"><span class="amb"><svg class="ic" style="width: 26px; height: 26px" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 10H5z"></path></svg></span><div><span class="h3">Inès, boss du mois</span><p class="s">18 points. Toi : 16.</p></div></div><span class="s">J-5</span></div>
+<div class="row"><span class="num" style="font-size: 20px; width: 24px">2</span><div class="av a1" style="width: 30px; height: 30px; font-size: 12px">H</div><span class="g1 p">Toi</span><span class="s">16</span></div>
+<div class="row" style="border: 0"><span class="num" style="font-size: 20px; width: 24px">3</span><div class="av a3" style="width: 30px; height: 30px; font-size: 12px">M</div><span class="g1 p">Malik</span><span class="s">11</span></div>
+<p class="s">Points au check-in, au temps passé, aux soirées organisées et aux jeux gagnés ici. Jamais aux verres.</p>
+</div>
+<p class="lbl">Prix relevés par les gens</p>
+<div class="grid3">
+<div class="pan" style="padding: 10px; gap: 0"><span class="s">Pinte</span><span class="num" style="font-size: 26px">6,50 €</span></div>
+<div class="pan" style="padding: 10px; gap: 0"><span class="s">Demi</span><span class="num" style="font-size: 26px">3,80 €</span></div>
+<div class="pan" style="padding: 10px; gap: 0"><span class="s">Shot</span><span class="num" style="font-size: 26px">3 €</span></div>
+</div>
+<p class="s">Pinte passée de 6 € à 6,50 € il y a 3 jours.</p>
+<p class="lbl">Ça se remplit quand</p>
+<div style="display: flex; align-items: flex-end; gap: 6px; height: 70px"><sc-for list="{{busyDays}}" as="d" hint-placeholder-count="7"><div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px"><div class="rise" style="width: 100%; height: {{d.h}}px; background: {{d.c}}; border-radius: 6px 6px 2px 2px"></div><span class="s" style="font-size: 11px">{{d.l}}</span></div></sc-for></div>
+<p class="s">D'après les check-ins de 214 personnes. Ce soir : blindé.</p>
+<div class="top"><span class="h3">Avis vérifiés</span><span class="s">4,3 sur 5, 128 avis</span></div>
+<div class="pan"><div class="top"><span class="h3">Un habitué</span><span class="amb"><svg class="ic" style="width: 16px; height: 16px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path></svg><svg class="ic" style="width: 16px; height: 16px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path></svg><svg class="ic" style="width: 16px; height: 16px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path></svg><svg class="ic" style="width: 16px; height: 16px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path></svg></span></div><p class="p">Bonne pinte, musique trop forte après minuit. Le videur demande la carte.</p><span class="s">Visite du 7 juin</span></div>
+<div class="pan"><span class="tag amb">Jeudi 19</span><span class="h3">DJ set rock</span><span class="s">3 potes y vont, 41 personnes de l'app</span></div>
+<p class="lbl">Les habitués</p>
+<div class="row"><div class="av a7">N</div><div class="g1"><span class="p">@nora.ln</span><span class="s">Légende du Zinc, saison de mai</span></div><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+<a class="btn o full" href="#avis"><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg> Donner mon avis</a>
+</div>
+</div></div>
+<div class="pw"><div class="cap">Check-in et prise de bar</div><div class="ph">
+<div class="sc" id="check-in" style="position: relative">
+<h1 class="h1">Check-in au Zinc</h1>
+<div class="seg"><button class="{{mOk}}" onClick="{{setOk}}">Vrai check-in</button><button class="{{mFake}}" onClick="{{setFake}}">Faux GPS</button></div>
+<div class="pan">
+<sc-for list="{{checks}}" as="c" hint-placeholder-count="4">
+<div class="top fadein"><span class="p">{{c.l}}</span><span class="{{c.cls}}">{{c.sym}}</span></div>
+</sc-for>
+</div>
+<sc-if value="{{idle}}" hint-placeholder-val="{{ true }}"><button class="btn full" onClick="{{run}}"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21zM12 7.5a2 2 0 1 1 0 4a2 2 0 1 1 0-4z"></path></svg> Faire le check-in</button></sc-if>
+<sc-if value="{{won}}" hint-placeholder-val="{{ false }}">
+<div style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 24px 0; overflow: hidden">
+<span class="wash" style="width: 120px; height: 120px; background: #F4B33D; top: 40px"></span>
+<span class="amb drop"><svg class="ic" style="width: 64px; height: 64px" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 10H5z"></path></svg></span>
+<div class="av a1 pop1" style="width: 84px; height: 84px; font-size: 32px">H</div>
+<span class="h2" style="text-align: center">Le Zinc est à toi</span>
+<span class="s" style="text-align: center">Tu passes devant Inès, 19 points contre 18. Elle vient d'être prévenue.</span>
+</div>
+</sc-if>
+<sc-if value="{{caught}}" hint-placeholder-val="{{ false }}">
+<div class="pan fadein" style="background: #4E2C27">
+<span class="h3" style="color: #FFD3CB">Check-in refusé : position simulée</span>
+<p class="s" style="color: #F3B9AE">Aucun point. Le crew voit « tentative de triche » sur ton profil pendant 7 jours. Un admin peut l'annuler si c'est une erreur.</p>
+<span class="tag red"><svg class="ic" style="width: 14px; height: 14px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"></path></svg> Tricheur du week-end</span>
+</div>
+</sc-if>
+<sc-if value="{{done}}" hint-placeholder-val="{{ false }}"><button class="btn g full" onClick="{{reset}}">Recommencer</button></sc-if>
+<p class="s" style="margin-top: auto">Le serveur décide. Position, cohérence du trajet, potes présents et intégrité du téléphone sont croisés.</p>
+</div>
+</div></div>
+<div class="pw"><div class="cap">On va où ?</div><div class="ph">
+<div class="sc">
+<h1 class="h1">On va où ?</h1>
+<div class="chips"><span class="chip on">Ouvert</span><span class="chip on">Happy hour en cours</span><span class="chip">Moins de 6 €</span><span class="chip">À 10 min</span></div>
+<div style="position: relative; width: 300px; height: 300px; align-self: center; margin: 10px 0">
+<div style="position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(#F4B33D 0 90deg, #9BD8A8 90deg 180deg, #8CCBEA 180deg 270deg, #D6C8F2 270deg 360deg); transform: rotate({{rot}}deg); transition: transform 3.2s cubic-bezier(.12,.75,.18,1)">
+<span style="position: absolute; left: 172px; top: 70px; transform: rotate(45deg); font-weight: 800; color: #1E2624">Le Zinc</span>
+<span style="position: absolute; left: 170px; top: 200px; transform: rotate(135deg); font-weight: 800; color: #1E2624">La Capsule</span>
+<span style="position: absolute; left: 40px; top: 200px; transform: rotate(225deg); font-weight: 800; color: #1E2624">Quai 12</span>
+<span style="position: absolute; left: 34px; top: 70px; transform: rotate(315deg); font-weight: 800; color: #1E2624">Chez Odette</span>
+</div>
+<span style="position: absolute; left: 50%; top: -14px; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 22px solid #F1EEE6"></span>
+</div>
+<p class="h2" style="text-align: center">{{wheelTxt}}</p>
+<div class="grid2"><button class="btn" onClick="{{spin}}">Tourner</button><button class="btn g">Faire voter</button></div>
+</div>
+</div></div>
+<div class="pw"><div class="cap">Écrire un avis</div><div class="ph">
+<div class="sc" id="avis">
+<div class="top"><a class="ib" href="#" aria-label="Retour"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a><span class="tag mint"><svg class="ic" style="width: 14px; height: 14px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg> Visite vérifiée samedi</span></div>
+<h1 class="h1">Le Zinc</h1>
+<sc-for list="{{crit}}" as="c" hint-placeholder-count="6">
+<div class="top"><span class="p">{{c.l}}</span><div style="display: flex; gap: 2px"><sc-for list="{{c.stars}}" as="st" hint-placeholder-count="5"><button style="all: unset; cursor: pointer; color: {{st.col}}" onClick="{{st.pick}}" aria-label="{{st.lab}}"><svg class="ic" style="width: 24px; height: 24px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path></svg></button></sc-for></div></div>
+</sc-for>
+<div class="field"><label for="rv">Ton avis</label><textarea id="rv" class="inp" style="min-height: 84px; padding: 12px" placeholder="Ce qui vaut le coup, ce qui coince"></textarea></div>
+<p class="s">Parle du lieu, pas des gens : pas de noms.</p>
+<p class="lbl">La carte d'identité à l'entrée</p>
+<div class="seg"><sc-for list="{{door}}" as="d" hint-placeholder-count="3"><button class="{{d.on}}" onClick="{{d.pick}}">{{d.l}}</button></sc-for></div>
+<p class="lbl">Qui voit cet avis</p>
+<div class="seg"><sc-for list="{{aud}}" as="a" hint-placeholder-count="4"><button class="{{a.on}}" onClick="{{a.pick}}">{{a.l}}</button></sc-for></div>
+<p class="s">{{audTxt}}</p>
+<button class="btn full">Publier</button>
+</div>
+</div></div>
+<div class="pw"><div class="cap">Saison et titres</div><div class="ph">
+<div class="sc">
+<h1 class="h1">Saison de juin</h1>
+<p class="s">Se termine dans 5 jours. Les points repartent de zéro le 1er.</p>
+<div class="grid3">
+<div class="pan" style="padding: 12px; gap: 0"><span class="num amb" style="font-size: 40px">3</span><span class="s">bars à toi</span></div>
+<div class="pan" style="padding: 12px; gap: 0"><span class="num" style="font-size: 40px">14</span><span class="s">visités</span></div>
+<div class="pan" style="padding: 12px; gap: 0"><span class="num" style="font-size: 40px">5</span><span class="s">à conquérir</span></div>
+</div>
+<div class="pan" style="flex-direction: row; align-items: center; background: #4E2C27"><span class="red"><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l10 18H2L12 3zM12 10v5M12 18h.01"></path></svg></span><span class="g1 p" style="color: #FFD3CB">Malik est à 2 points de te prendre La Capsule.</span></div>
+<p class="lbl">Tes titres</p>
+<div class="chips"><span class="tag amb"><svg class="ic" style="width: 14px; height: 14px" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 10H5z"></path></svg> Maire du Zinc</span><span class="tag">Explorateur</span><span class="tag">Nomade</span><span class="tag">Conquérant, mai</span></div>
+<p class="lbl">Crews</p>
+<div class="row"><span class="g1 p">Les Quais tiennent 6 bars</span><span class="s">1er du quartier</span></div>
+<div class="row"><span class="g1 p">Crew des Halles tient La Capsule</span><span class="s">2e</span></div>
+<p class="lbl">À tester</p>
+<div class="row"><span class="g1 p">Chez Odette</span><span class="tag">jamais visité</span></div>
+<p class="lbl">Confidentialité</p>
+<div class="row"><div class="g1"><span class="p">Participer au jeu des bars</span><span class="s">Seuls tes check-ins comptent, jamais ta position en continu</span></div><button class="sw {{playCls}}" aria-label="Participer" onClick="{{togglePlay}}"></button></div>
+<div class="row"><div class="g1"><span class="p">Check-in privé par défaut</span><span class="s">Invisible et sans points</span></div><button class="sw {{privCls}}" aria-label="Check-in privé" onClick="{{togglePriv}}"></button></div>
+</div>
+</div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2732,"height":1010}}'>
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state={scope:0,f:{open:true,hh:false,friends:false,adult:true,terr:false,cheap:false},sel:0,mode:'ok',step:-1,rot:0,spins:0,cr:{0:4,1:3,2:3,3:4,4:2,5:5},door:1,aud:0,play:true,priv:false}; }
+  componentWillUnmount(){ clearTimeout(this.t); }
+  renderVals(){
+    const s=this.state;
+    const venues=[['Le Zinc','I','#D6C8F2',150,330,true,'Bar rock, 400 m','Inès','Blindé ce soir','red'],['La Capsule','H','#F4B33D',230,250,true,'Bière artisanale, 800 m','Toi','Animé','amb'],['Quai 12','J','#9BD8A8',70,470,true,'Bar à quiz, 1,1 km','Jade','Calme','mint'],['Chez Odette','?','#56635F',270,520,false,'Bar à vin, jamais visité','Personne','Trop peu de check-ins','']];
+    const chk=s.mode==='ok'?[['Position cohérente','ok'],['Position non simulée','ok'],['Jade est là aussi (Bluetooth)','ok'],['Téléphone intègre','ok']]:[['Position cohérente','ko'],['Position non simulée','ko'],['Personne du crew à proximité','ko'],['Téléphone intègre','wait']];
+    const sym={ok:'✓',ko:'✗',wait:'?'}, cls={ok:'mint h3',ko:'red h3',wait:'s h3'};
+    const shown=s.step<0?[]:chk.slice(0,s.step+1);
+    const done=s.step>=3;
+    const crits=['Prix','Ambiance','Musique','Service','Attente','Sentiment de sécurité'];
+    const audL=['Public','Anonyme','Amis','Moi'], audT=['Avec ton pseudo, sur la page du bar et ton profil.','Signé « un habitué », compte dans la note du bar.','Seuls tes amis le voient, sur la page du bar et ton profil.','Juste pour toi, comme un carnet.'];
+    const busy=[20,28,26,46,64,70,30];
+    const fl=[['open','Ouvert'],['hh','Happy hour'],['friends','Mes potes'],['adult','18+ strict'],['terr','Terrasse'],['cheap','Pinte < 6 €']];
+    const run=()=>{ clearTimeout(this.t); this.setState({step:0}); const tick=()=>{ this.t=setTimeout(()=>{ if(this.state.step<3){ this.setState({step:this.state.step+1}); tick(); } },650); }; tick(); };
+    const w=['Le Zinc','Chez Odette','Quai 12','La Capsule'];
+    const idx=((4-Math.floor(((s.rot%360)+360)%360/90))%4);
+    return {
+      scopes:['Mon crew','Tout le monde','Crews'].map((l,i)=>({l,on:s.scope===i?'on':'',pick:()=>this.setState({scope:i})})),
+      filters:fl.map(([k,l])=>({l,on:s.f[k]?'on':'',t:()=>this.setState({f:{...s.f,[k]:!s.f[k]}})})),
+      pins:venues.map((v,i)=>({n:v[0],i:v[1],col:v[2],x:v[3],y:v[4],crown:v[5],sz:s.sel===i?46:38,bd:s.sel===i?'3px solid #F1EEE6':'0',op:v[5]?1:.75,pick:()=>this.setState({sel:i})})),
+      sel:{n:venues[s.sel][0],d:venues[s.sel][6],boss:'Boss : '+venues[s.sel][7],busy:venues[s.sel][8],bc:venues[s.sel][9]},
+      busyDays:['lun','mar','mer','jeu','ven','sam','dim'].map((l,i)=>({l,h:busy[i],c:i===5?'#F4B33D':'#46534F'})),
+      mOk:s.mode==='ok'?'on':'', mFake:s.mode==='fake'?'on':'', setOk:()=>this.setState({mode:'ok',step:-1}), setFake:()=>this.setState({mode:'fake',step:-1}),
+      checks:shown.map(([l,r])=>({l,sym:sym[r],cls:cls[r]})), idle:s.step<0, run, done, won:done&&s.mode==='ok', caught:done&&s.mode==='fake', reset:()=>this.setState({step:-1}),
+      rot:s.rot, spin:()=>this.setState({rot:s.rot+1440+Math.floor(Math.random()*360),spins:s.spins+1}), wheelTxt:s.spins?'Ce soir : '+w[idx]:'Tourne pour choisir',
+      crit:crits.map((l,ci)=>({l,stars:[1,2,3,4,5].map(n=>({lab:l+' '+n+' sur 5',col:n<=s.cr[ci]?'#F4B33D':'#56635F',pick:()=>this.setState({cr:{...s.cr,[ci]:n}})}))})),
+      door:['Toujours','Parfois','Jamais'].map((l,i)=>({l,on:s.door===i?'on':'',pick:()=>this.setState({door:i})})),
+      aud:audL.map((l,i)=>({l,on:s.aud===i?'on':'',pick:()=>this.setState({aud:i})})), audTxt:audT[s.aud],
+      playCls:s.play?'on':'', privCls:s.priv?'on':'', togglePlay:()=>this.setState({play:!s.play}), togglePriv:()=>this.setState({priv:!s.priv})
+    };
+  }
+}
+</script>
+</body>
+</html>

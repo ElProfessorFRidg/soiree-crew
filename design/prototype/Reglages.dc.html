@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Réglages</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+.bd{display:flex;gap:56px;padding:72px 56px 56px;align-items:flex-start;background:#CDD3CE;font-family:'Archivo',system-ui,sans-serif;color:#1E2624}
+.pw{display:flex;flex-direction:column;gap:14px;flex:none}
+.cap{font-size:16px;font-weight:700;color:#26302D;padding-left:10px;font-stretch:90%}
+.ph{width:390px;height:844px;border-radius:46px;background:#1E2624;color:#F1EEE6;position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 0 9px #0F1413,0 28px 50px rgba(15,20,19,.28);font-family:'Archivo',system-ui,sans-serif}
+.ph.lt{background:#EEF0EA;color:#1E2624}
+.sc{flex:1;min-height:0;overflow-y:auto;padding:58px 20px 22px;display:flex;flex-direction:column;gap:16px;scrollbar-width:none}
+.sc::-webkit-scrollbar{display:none}
+.h1{margin:0;font-size:32px;line-height:1.04;font-weight:800;font-stretch:76%}
+.h2{margin:0;font-size:22px;line-height:1.12;font-weight:750;font-stretch:82%}
+.h3{margin:0;font-size:16px;line-height:1.25;font-weight:700}
+.p{margin:0;font-size:15px;line-height:1.45}
+.s{margin:0;font-size:13px;line-height:1.4;color:#AEB7B2}
+.lt .s{color:#4F5A55}
+.num{font-weight:900;font-stretch:62%;line-height:.86;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.amb{color:#F4B33D}.red{color:#FF7A66}.wat{color:#8CCBEA}.mint{color:#9BD8A8}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 18px;border-radius:14px;border:0;background:#F4B33D;color:#1E2624;font:700 16px 'Archivo',sans-serif;text-decoration:none;cursor:pointer;transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn.g{background:#34403C;color:#F1EEE6}
+.btn.o{background:transparent;color:inherit;box-shadow:inset 0 0 0 1.5px #56635F}
+.btn.d{background:#FF7A66;color:#1E2624}
+.btn.w2{background:#8CCBEA;color:#1E2624}
+.btn.sm{min-height:40px;font-size:14px;border-radius:12px;padding:0 14px}
+.btn.full{width:100%}
+.btn[disabled]{opacity:.4;cursor:default}
+.lt .btn.g{background:#DCE1DA;color:#1E2624}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 14px;border-radius:999px;border:0;background:#34403C;color:#F1EEE6;font:600 14px 'Archivo',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none}
+.chip.on{background:#F1EEE6;color:#1E2624}
+.lt .chip{background:#DCE1DA;color:#1E2624}.lt .chip.on{background:#1E2624;color:#EEF0EA}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.hs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -20px;padding:0 20px;flex:none}
+.hs::-webkit-scrollbar{display:none}
+.row{display:flex;align-items:center;gap:12px;min-height:54px;padding:8px 0;border-bottom:1px solid #34403C;color:inherit;text-decoration:none}
+.lt .row{border-color:#D3D8D2}
+.g1{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.lbl{font-size:13px;font-weight:700;color:#AEB7B2;margin:6px 0 0}
+.lt .lbl{color:#4F5A55}
+.sw{width:52px;height:32px;border-radius:999px;border:0;background:#46534F;position:relative;cursor:pointer;flex:none;transition:background .2s}
+.sw::after{content:'';position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#F1EEE6;transition:transform .22s cubic-bezier(.3,.7,.3,1)}
+.sw.on{background:#F4B33D}.sw.on::after{transform:translateX(20px)}
+.seg{display:flex;background:#2C3734;border-radius:12px;padding:3px;gap:3px;flex:none}
+.seg button{flex:1;min-height:38px;border:0;border-radius:9px;background:transparent;color:#C9D0CC;font:600 13px 'Archivo',sans-serif;cursor:pointer;padding:0 6px}
+.seg button.on{background:#F1EEE6;color:#1E2624}
+.lt .seg{background:#DCE1DA}.lt .seg button{color:#3A4440}.lt .seg button.on{background:#1E2624;color:#EEF0EA}
+.av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#1E2624;flex:none}
+.a1{background:#F4B33D}.a2{background:#9BD8A8}.a3{background:#8CCBEA}.a4{background:#F2C6A0}.a5{background:#D6C8F2}.a6{background:#FF9C8A}.a7{background:#E8E3D2}
+.tag{display:inline-flex;align-items:center;gap:4px;min-height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:650;background:#34403C;color:#E3E7E4;white-space:nowrap}
+.tag.amb{background:#4A3E22;color:#F8CE7A}.tag.red{background:#4E2C27;color:#FFB3A6}.tag.wat{background:#24404D;color:#B8E0F3}.tag.mint{background:#2A4632;color:#BFE9C8}
+.lt .tag{background:#DCE1DA;color:#1E2624}
+.tab{display:flex;justify-content:space-around;padding:10px 6px 30px;border-top:1px solid #34403C;background:#1E2624;flex:none}
+.tab a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:650;color:#97A19C;text-decoration:none;min-width:60px;min-height:44px;justify-content:center}
+.tab a.on{color:#F4B33D}
+.ic{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ib{width:44px;height:44px;border-radius:12px;border:0;background:#2C3734;color:#F1EEE6;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;flex:none}
+.lt .ib{background:#DCE1DA;color:#1E2624}
+.pan{background:#28322F;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.lt .pan{background:#FFFFFF}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#28322F;border-radius:26px 26px 0 0;padding:12px 20px 34px;display:flex;flex-direction:column;gap:14px;box-shadow:0 -14px 40px rgba(0,0,0,.4);animation:sup .32s cubic-bezier(.2,.8,.2,1)}
+.dim{position:absolute;inset:0;background:rgba(10,14,13,.55)}
+.grab{width:40px;height:5px;border-radius:3px;background:#56635F;align-self:center}
+.toast{position:absolute;left:14px;right:14px;bottom:100px;background:#F1EEE6;color:#1E2624;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:650;animation:tin .28s cubic-bezier(.2,.8,.2,1);z-index:5}
+.toast.err{background:#FF7A66}
+.toast .btn{min-height:36px;font-size:13px;padding:0 12px;background:#1E2624;color:#F1EEE6}
+.inp{min-height:52px;border-radius:14px;border:1.5px solid #3D4A46;background:#232D2A;color:#F1EEE6;padding:0 14px;font:500 16px 'Archivo',sans-serif;width:100%}
+.lt .inp{background:#fff;border-color:#C8CEC8;color:#1E2624}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:700;color:#AEB7B2}
+.bar{height:8px;border-radius:4px;background:#34403C;overflow:hidden;flex:none}
+.bar i{display:block;height:100%;background:#F4B33D;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.lt .bar{background:#DCE1DA}
+.dis{font-size:12px;line-height:1.35;color:#AEB7B2}
+.dot{width:8px;height:8px;border-radius:50%;background:#9BD8A8;flex:none}
+.dot.live{animation:live 1.6s ease-in-out infinite}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:12px;border-radius:16px;background:#2C3734;border:0;color:#F1EEE6;font:600 14px 'Archivo',sans-serif;text-align:left;cursor:pointer;min-height:76px}
+.tile.on{background:#F1EEE6;color:#1E2624}
+.card3d{perspective:900px}
+.flip{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.3,.7,.2,1);transform-style:preserve-3d}
+.flip.on{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;display:flex;flex-direction:column;justify-content:space-between;padding:22px}
+.face.b{transform:rotateY(180deg)}
+.fab{position:absolute;right:16px;bottom:118px;width:56px;height:56px;border-radius:50%;border:0;background:#F4B33D;color:#1E2624;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.35);cursor:pointer;z-index:4}
+.pop1{animation:pop1 .35s cubic-bezier(.2,.8,.2,1)}.pop2{animation:pop2 .35s cubic-bezier(.2,.8,.2,1)}
+.shk{animation:shake .25s linear infinite}
+.drop{animation:drop .7s cubic-bezier(.2,.9,.25,1.2)}
+.wash{position:absolute;border-radius:50%;animation:wash 1s ease-out forwards;pointer-events:none}
+.rip{position:absolute;border-radius:50%;border:3px solid #F4B33D;animation:rip 1s ease-out infinite;pointer-events:none}
+.conf{position:absolute;width:8px;height:14px;border-radius:2px;animation:fall 1.8s cubic-bezier(.3,.6,.4,1) forwards;pointer-events:none}
+.rise{transform-origin:bottom;animation:rise .8s cubic-bezier(.2,.8,.2,1) both}
+.fadein{animation:tin .35s cubic-bezier(.2,.8,.2,1) both}
+.skel{background:linear-gradient(90deg,#2C3734 0%,#36433F 50%,#2C3734 100%);background-size:200% 100%;animation:skel 1.4s linear infinite;border-radius:10px}
+@keyframes tin{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+@keyframes sup{from{transform:translateY(100%)}to{transform:none}}
+@keyframes pop1{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes pop2{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translate(0,0)}25%{transform:translate(-3px,1px) rotate(-2deg)}50%{transform:translate(3px,-1px) rotate(2deg)}75%{transform:translate(-2px,2px)}}
+@keyframes drop{0%{transform:translateY(-70px) scale(1.5);opacity:0}70%{transform:translateY(4px) scale(1);opacity:1}100%{transform:none}}
+@keyframes wash{from{transform:scale(.2);opacity:.85}to{transform:scale(4);opacity:0}}
+@keyframes rip{from{transform:scale(.5);opacity:.9}to{transform:scale(2.2);opacity:0}}
+@keyframes fall{from{transform:translateY(-30px) rotate(0)}to{transform:translateY(520px) rotate(600deg)}}
+@keyframes live{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes rise{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes skel{from{background-position:200% 0}to{background-position:-200% 0}}
+@keyframes boom{0%{transform:scale(.4);opacity:1}100%{transform:scale(3);opacity:0}}
+@keyframes fill{from{height:0}}
+@keyframes bub{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-60px);opacity:0}}
+@keyframes clinkL{0%{transform:translateX(0) rotate(0)}45%{transform:translateX(52px) rotate(12deg)}55%{transform:translateX(46px) rotate(8deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes clinkR{0%{transform:translateX(0) rotate(0)}45%{transform:translateX(-52px) rotate(-12deg)}55%{transform:translateX(-46px) rotate(-8deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes slidein{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+</style>
+</helmet>
+<div class="bd" style="width: 2286px; height: 1010px">
+<div class="pw"><div class="cap">Réglages</div><div class="ph">
+<div class="sc">
+<h1 class="h1">Réglages</h1>
+<div class="pan" style="flex-direction: row; align-items: center; background: #24404D"><span class="wat"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"></path></svg></span><div class="g1"><span class="h3" style="color: #D6EEF8">Nouvelle version disponible</span><span class="s" style="color: #B8E0F3">Corrige le partage de récap</span></div><button class="btn sm w2">Mettre à jour</button></div>
+<a class="row" href="#langue"><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a4 4 0 1 1 0 8a4 4 0 1 1 0-8zM4 21c1-4 4.2-6 8-6s7 2 8 6"></path></svg><span class="g1 p">Langue, région et unités</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+<a class="row" href="#notifs"><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0"></path></svg><span class="g1 p">Notifications</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+<a class="row" href="#secu"><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"></path></svg><span class="g1 p">Sécurité et données</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+<a class="row" href="#confid"><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12zM12 9.5a2.5 2.5 0 1 1 0 5a2.5 2.5 0 1 1 0-5z"></path></svg><span class="g1 p">Confidentialité et apparence</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+<a class="row" href="ModeBourre.dc.html"><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l-1.2 16H8.2L7 4zM7.4 9h9.2"></path></svg><span class="g1 p">Mode soirée et garde-fous</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+<a class="row" href="Profil.dc.html"><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 1 1 0-7zM2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.6a3.4 3.4 0 0 1 0 6.8M18 14.8c2 .6 3.2 2.5 3.5 5.2"></path></svg><span class="g1 p">Profil et visibilité</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+<a class="row" href="#"><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"></path></svg><span class="g1 p">Signaler un problème ou un contenu</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+<a class="row" href="#"><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3"></path></svg><span class="g1 p">Politique de confidentialité</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+<button style="all: unset; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 18px" onClick="{{tapLogo}}" aria-label="À propos">
+<span class="{{eggCls}}" style="width: 56px; height: 56px; border-radius: 18px; background: #F4B33D; color: #1E2624; display: flex; align-items: center; justify-content: center"><svg class="ic" style="width: 30px; height: 30px" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l-1.2 16H8.2L7 4zM7.4 9h9.2"></path></svg></span>
+<span class="s">[Nom de l'app] 1.0.0</span>
+</button>
+<sc-if value="{{egg}}" hint-placeholder-val="{{ false }}"><p class="p fadein" style="text-align: center">T'as trouvé le bar secret. Une icône dorée t'attend.</p></sc-if>
+</div>
+<nav class="tab" aria-label="Navigation principale"><a href="Soiree.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l-1.2 16H8.2L7 4zM7.4 9h9.2"></path></svg><span>Soirée</span></a><a href="Radar.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 1 1 0-7zM2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.6a3.4 3.4 0 0 1 0 6.8M18 14.8c2 .6 3.2 2.5 3.5 5.2"></path></svg><span>Crew</span></a><a href="Jeux.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8.5 8.5h.01M15.5 15.5h.01M15.5 8.5h.01M8.5 15.5h.01M12 12h.01"></path></svg><span>Jeux</span></a><a href="Bars.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21zM12 7.5a2 2 0 1 1 0 4a2 2 0 1 1 0-4z"></path></svg><span>Bars</span></a><a href="Profil.dc.html" class="on"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a4 4 0 1 1 0 8a4 4 0 1 1 0-8zM4 21c1-4 4.2-6 8-6s7 2 8 6"></path></svg><span>Moi</span></a></nav>
+</div></div>
+<div class="pw"><div class="cap">Langue, région et unités</div><div class="ph">
+<div class="sc" id="langue">
+<a class="ib" href="#" aria-label="Retour"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<h1 class="h1">Langue, région, unités</h1>
+<sc-if value="{{travel}}" hint-placeholder-val="{{ true }}"><div class="pan fadein" style="background: #4A3E22"><span class="h3" style="color: #F8E3B4">T'es en Belgique ?</span><span class="s" style="color: #E8D3A4">Passer sur la limite belge (0,5 g/L) et garder tes unités ?</span><div class="grid2"><button class="btn sm" onClick="{{acceptTravel}}">Passer</button><button class="btn sm g" onClick="{{dismissTravel}}">Non merci</button></div></div></sc-if>
+<p class="lbl">Langue de l'app</p>
+<div class="chips"><sc-for list="{{langs}}" as="l" hint-placeholder-count="7"><button class="chip {{l.on}}" onClick="{{l.pick}}">{{l.l}}</button></sc-for></div>
+<div class="row"><div class="g1"><span class="p">Pays pour la limite légale</span><span class="s">{{limitTxt}}</span></div><span class="s">{{country}}</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+<p class="lbl">Unités</p>
+<div class="seg"><sc-for list="{{systems}}" as="u" hint-placeholder-count="3"><button class="{{u.on}}" onClick="{{u.pick}}">{{u.l}}</button></sc-for></div>
+<div class="pan" style="gap: 6px"><div class="top"><span class="s">Une pinte</span><span class="h3">{{pint}}</span></div><div class="top"><span class="s">Verre standard</span><span class="h3">{{std}}</span></div><div class="top"><span class="s">Ton poids</span><span class="h3">{{weight}}</span></div></div>
+<p class="lbl">Taux affiché</p>
+<div class="seg"><sc-for list="{{bacUnits}}" as="b" hint-placeholder-count="4"><button class="{{b.on}}" onClick="{{b.pick}}">{{b.l}}</button></sc-for></div>
+<p class="s">Exemple : {{bacEx}}</p>
+<div class="row"><span class="g1 p">Format de l'heure</span><span class="s">Comme le téléphone (24 h)</span></div>
+<div class="row"><span class="g1 p">Monnaie</span><span class="s">Euro</span></div>
+<p class="s">Enregistré sur ton compte : tes autres appareils suivent.</p>
+</div>
+</div></div>
+<div class="pw"><div class="cap">Notifications</div><div class="ph">
+<div class="sc" id="notifs">
+<a class="ib" href="#" aria-label="Retour"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<h1 class="h1">Notifications</h1>
+<sc-for list="{{notifs}}" as="n" hint-placeholder-count="8"><div class="row"><div class="g1"><span class="p">{{n.l}}</span><span class="s">{{n.d}}</span></div><button class="sw {{n.cls}}" aria-label="{{n.l}}" onClick="{{n.t}}"></button></div></sc-for>
+<div class="pan">
+<div class="top"><span class="h3">Heures calmes</span><button class="sw {{quietCls}}" aria-label="Heures calmes" onClick="{{toggleQuiet}}"></button></div>
+<span class="s">De 2 h à 11 h. Un SOS passe toujours.</span>
+</div>
+<div class="row"><div class="g1"><span class="p">Résumé du crew</span><span class="s">Un seul message par soirée au lieu d'un par événement</span></div><button class="sw on" aria-label="Résumé"></button></div>
+</div>
+</div></div>
+<div class="pw"><div class="cap">Sécurité et données</div><div class="ph">
+<div class="sc" id="secu">
+<a class="ib" href="#" aria-label="Retour"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<h1 class="h1">Sécurité et données</h1>
+<div class="row"><svg class="ic" style="width: 20px; height: 20px" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 14a4 4 0 1 1 0-8a4 4 0 0 1 0 8zM11.5 10H21M17.5 10v3M20.5 10v3"></path></svg><div class="g1"><span class="p">Clés d'accès</span><span class="s">iPhone de Hugo, ajoutée en février</span></div><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+<div class="row"><div class="g1"><span class="p">Validation en deux étapes</span><span class="s">Code à chaque nouvel appareil</span></div><button class="sw {{tfaCls}}" aria-label="Validation en deux étapes" onClick="{{toggleTfa}}"></button></div>
+<div class="row"><span class="g1 p">Changer d'e-mail</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+<p class="lbl">Connecté sur</p>
+<sc-for list="{{sessions}}" as="se" hint-placeholder-count="3"><div class="row fadein"><div class="g1"><span class="p">{{se.n}}</span><span class="s">{{se.d}}</span></div><sc-if value="{{se.other}}" hint-placeholder-val="{{ true }}"><button class="btn sm g" onClick="{{se.out}}">Déconnecter</button></sc-if></div></sc-for>
+<div class="row"><div class="g1"><span class="p">Comptes sur ce téléphone</span><span class="s">Chaque compte garde ses données à part</span></div><span class="s">1</span></div>
+<p class="lbl">Tes données</p>
+<div class="row"><span class="g1 p">Exporter (CSV ou JSON)</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+<div class="row"><span class="g1 p">Retirer mon accord pour les données de santé</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+<button class="btn d full" onClick="{{askDelete}}">Supprimer mon compte</button>
+</div>
+<sc-if value="{{del}}" hint-placeholder-val="{{ false }}"><div class="dim"></div><div class="sheet"><div class="grab"></div><span class="h2">Supprimer ton compte ?</span>
+<p class="p">On efface ton profil, tes verres et ton taux, tes check-ins, tes avis signés, tes photos et tes messages. Les cagnottes gardent les montants, sans ton nom. Les sauvegardes sont purgées sous 30 jours.</p>
+<div class="grid2"><button class="btn g" onClick="{{cancelDelete}}">Garder mon compte</button><button class="btn d" onClick="{{cancelDelete}}">Supprimer mon compte</button></div></div></sc-if>
+</div></div>
+<div class="pw"><div class="cap">Confidentialité et apparence</div><div class="ph">
+<div class="sc" id="confid">
+<a class="ib" href="#" aria-label="Retour"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<h1 class="h1">Confidentialité et apparence</h1>
+<sc-for list="{{priv}}" as="p" hint-placeholder-count="4"><div class="row"><div class="g1"><span class="p">{{p.l}}</span><span class="s">{{p.d}}</span></div><button class="sw {{p.cls}}" aria-label="{{p.l}}" onClick="{{p.t}}"></button></div></sc-for>
+<p class="lbl">Thème</p>
+<div class="seg"><sc-for list="{{themes}}" as="t" hint-placeholder-count="3"><button class="{{t.on}}" onClick="{{t.pick}}">{{t.l}}</button></sc-for></div>
+<sc-for list="{{look}}" as="p" hint-placeholder-count="3"><div class="row"><div class="g1"><span class="p">{{p.l}}</span><span class="s">{{p.d}}</span></div><button class="sw {{p.cls}}" aria-label="{{p.l}}" onClick="{{p.t}}"></button></div></sc-for>
+<a class="row" href="Profil.dc.html#carte"><span class="g1 p">Icône de l'app</span><span class="s">Ambre</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+<div class="row"><span class="g1 p">Stickers du crew pour iMessage et WhatsApp</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+</div>
+</div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2286,"height":1010}}'>
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state={taps:0,travel:true,country:'France',lang:0,sys:0,bac:0,
+    n:{a:true,b:true,c:true,d:true,e:true,f:false,g:true,h:true},quiet:true,tfa:true,sessions:[['iPhone de Hugo','Ce téléphone',false],['iPad','Vu hier à 18 h',true],['Chrome sur PC','Vu il y a 9 jours',true]],del:false,
+    p:{lb:true,ter:true,loc:true,st:false},theme:0,l:{snd:false,eco:true,data:false}}; }
+  renderVals(){
+    const s=this.state;
+    const langs=['Français','English','Español','Italiano','Deutsch','Português','Русский'];
+    const sys=[['Métrique','50 cl','10 g d\'alcool','72 kg'],['US','16 fl oz','14 g (US)','159 lb'],['UK','568 ml (pint)','8 g (unit)','11 st 5']];
+    const bacU=[['g/L','0,58 g/L de sang'],['mg/L','0,29 mg/L d\'air'],['‰','0,58 ‰'],['%','0,058 %']];
+    const nd=[['a','Qui sort ce soir','Quand un pote lance une sortie'],['b','Invitations','Soirées, demandes d\'ami'],['c','Le crew en soirée','Arrivées, départs'],['d','Dépassements','Classement et prises de bar'],['e','Rappels d\'eau','Pendant tes soirées'],['f','Prix qui changent','Dans tes bars favoris'],['g','Récap prêt','Le lendemain à 11 h'],['h','Messages','Contenu jamais affiché sur l\'écran verrouillé']];
+    const pd=[['lb','Classement des verres','Tu apparais dans celui du crew'],['ter','Jeu des bars','Tes check-ins comptent pour les boss'],['loc','Position pendant les soirées','Seulement si tu l\'actives, jamais gardée'],['st','Statistiques d\'usage','Anonymes']];
+    const ld=[['snd','Sons','Versé, tchin, couronne. Coupés en mode silencieux'],['eco','Économie d\'énergie','Moins d\'animations quand la batterie est basse'],['data','Économie de données','Photos en qualité réduite sur réseau mobile']];
+    return {
+      tapLogo:()=>this.setState({taps:s.taps+1}), egg:s.taps>=10, eggCls:s.taps>=10?'pop1':'',
+      travel:s.travel, acceptTravel:()=>this.setState({travel:false,country:'Belgique'}), dismissTravel:()=>this.setState({travel:false}),
+      country:s.country, limitTxt:s.country==='France'?'0,5 g/L, 0,2 en jeune permis':'0,5 g/L, 0,2 pour les conducteurs pro',
+      langs:langs.map((l,i)=>({l,on:s.lang===i?'on':'',pick:()=>this.setState({lang:i})})),
+      systems:sys.map((u,i)=>({l:u[0],on:s.sys===i?'on':'',pick:()=>this.setState({sys:i})})), pint:sys[s.sys][1], std:sys[s.sys][2], weight:sys[s.sys][3],
+      bacUnits:bacU.map((b,i)=>({l:b[0],on:s.bac===i?'on':'',pick:()=>this.setState({bac:i})})), bacEx:bacU[s.bac][1],
+      notifs:nd.map(([k,l,d])=>({l,d,cls:s.n[k]?'on':'',t:()=>this.setState({n:{...s.n,[k]:!s.n[k]}})})),
+      quietCls:s.quiet?'on':'', toggleQuiet:()=>this.setState({quiet:!s.quiet}),
+      tfaCls:s.tfa?'on':'', toggleTfa:()=>this.setState({tfa:!s.tfa}),
+      sessions:s.sessions.map(([n,d,other],i)=>({n,d,other,out:()=>this.setState({sessions:s.sessions.filter((_,j)=>j!==i)})})),
+      del:s.del, askDelete:()=>this.setState({del:true}), cancelDelete:()=>this.setState({del:false}),
+      priv:pd.map(([k,l,d])=>({l,d,cls:s.p[k]?'on':'',t:()=>this.setState({p:{...s.p,[k]:!s.p[k]}})})),
+      themes:['Auto','Sombre','Clair'].map((l,i)=>({l,on:s.theme===i?'on':'',pick:()=>this.setState({theme:i})})),
+      look:ld.map(([k,l,d])=>({l,d,cls:s.l[k]?'on':'',t:()=>this.setState({l:{...s.l,[k]:!s.l[k]}})}))
+    };
+  }
+}
+</script>
+</body>
+</html>

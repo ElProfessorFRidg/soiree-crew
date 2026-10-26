@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Arrivée et inscription</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+.bd{display:flex;gap:56px;padding:72px 56px 56px;align-items:flex-start;background:#CDD3CE;font-family:'Archivo',system-ui,sans-serif;color:#1E2624}
+.pw{display:flex;flex-direction:column;gap:14px;flex:none}
+.cap{font-size:16px;font-weight:700;color:#26302D;padding-left:10px;font-stretch:90%}
+.ph{width:390px;height:844px;border-radius:46px;background:#1E2624;color:#F1EEE6;position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 0 9px #0F1413,0 28px 50px rgba(15,20,19,.28);font-family:'Archivo',system-ui,sans-serif}
+.ph.lt{background:#EEF0EA;color:#1E2624}
+.sc{flex:1;min-height:0;overflow-y:auto;padding:58px 20px 22px;display:flex;flex-direction:column;gap:16px;scrollbar-width:none}
+.sc::-webkit-scrollbar{display:none}
+.h1{margin:0;font-size:32px;line-height:1.04;font-weight:800;font-stretch:76%}
+.h2{margin:0;font-size:22px;line-height:1.12;font-weight:750;font-stretch:82%}
+.h3{margin:0;font-size:16px;line-height:1.25;font-weight:700}
+.p{margin:0;font-size:15px;line-height:1.45}
+.s{margin:0;font-size:13px;line-height:1.4;color:#AEB7B2}
+.lt .s{color:#4F5A55}
+.num{font-weight:900;font-stretch:62%;line-height:.86;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.amb{color:#F4B33D}.red{color:#FF7A66}.wat{color:#8CCBEA}.mint{color:#9BD8A8}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 18px;border-radius:14px;border:0;background:#F4B33D;color:#1E2624;font:700 16px 'Archivo',sans-serif;text-decoration:none;cursor:pointer;transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn.g{background:#34403C;color:#F1EEE6}
+.btn.o{background:transparent;color:inherit;box-shadow:inset 0 0 0 1.5px #56635F}
+.btn.d{background:#FF7A66;color:#1E2624}
+.btn.w2{background:#8CCBEA;color:#1E2624}
+.btn.sm{min-height:40px;font-size:14px;border-radius:12px;padding:0 14px}
+.btn.full{width:100%}
+.btn[disabled]{opacity:.4;cursor:default}
+.lt .btn.g{background:#DCE1DA;color:#1E2624}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 14px;border-radius:999px;border:0;background:#34403C;color:#F1EEE6;font:600 14px 'Archivo',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none}
+.chip.on{background:#F1EEE6;color:#1E2624}
+.lt .chip{background:#DCE1DA;color:#1E2624}.lt .chip.on{background:#1E2624;color:#EEF0EA}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.hs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -20px;padding:0 20px;flex:none}
+.hs::-webkit-scrollbar{display:none}
+.row{display:flex;align-items:center;gap:12px;min-height:54px;padding:8px 0;border-bottom:1px solid #34403C;color:inherit;text-decoration:none}
+.lt .row{border-color:#D3D8D2}
+.g1{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.lbl{font-size:13px;font-weight:700;color:#AEB7B2;margin:6px 0 0}
+.lt .lbl{color:#4F5A55}
+.sw{width:52px;height:32px;border-radius:999px;border:0;background:#46534F;position:relative;cursor:pointer;flex:none;transition:background .2s}
+.sw::after{content:'';position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#F1EEE6;transition:transform .22s cubic-bezier(.3,.7,.3,1)}
+.sw.on{background:#F4B33D}.sw.on::after{transform:translateX(20px)}
+.seg{display:flex;background:#2C3734;border-radius:12px;padding:3px;gap:3px;flex:none}
+.seg button{flex:1;min-height:38px;border:0;border-radius:9px;background:transparent;color:#C9D0CC;font:600 13px 'Archivo',sans-serif;cursor:pointer;padding:0 6px}
+.seg button.on{background:#F1EEE6;color:#1E2624}
+.lt .seg{background:#DCE1DA}.lt .seg button{color:#3A4440}.lt .seg button.on{background:#1E2624;color:#EEF0EA}
+.av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#1E2624;flex:none}
+.a1{background:#F4B33D}.a2{background:#9BD8A8}.a3{background:#8CCBEA}.a4{background:#F2C6A0}.a5{background:#D6C8F2}.a6{background:#FF9C8A}.a7{background:#E8E3D2}
+.tag{display:inline-flex;align-items:center;gap:4px;min-height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:650;background:#34403C;color:#E3E7E4;white-space:nowrap}
+.tag.amb{background:#4A3E22;color:#F8CE7A}.tag.red{background:#4E2C27;color:#FFB3A6}.tag.wat{background:#24404D;color:#B8E0F3}.tag.mint{background:#2A4632;color:#BFE9C8}
+.lt .tag{background:#DCE1DA;color:#1E2624}
+.tab{display:flex;justify-content:space-around;padding:10px 6px 30px;border-top:1px solid #34403C;background:#1E2624;flex:none}
+.tab a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:650;color:#97A19C;text-decoration:none;min-width:60px;min-height:44px;justify-content:center}
+.tab a.on{color:#F4B33D}
+.ic{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ib{width:44px;height:44px;border-radius:12px;border:0;background:#2C3734;color:#F1EEE6;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;flex:none}
+.lt .ib{background:#DCE1DA;color:#1E2624}
+.pan{background:#28322F;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.lt .pan{background:#FFFFFF}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#28322F;border-radius:26px 26px 0 0;padding:12px 20px 34px;display:flex;flex-direction:column;gap:14px;box-shadow:0 -14px 40px rgba(0,0,0,.4);animation:sup .32s cubic-bezier(.2,.8,.2,1)}
+.dim{position:absolute;inset:0;background:rgba(10,14,13,.55)}
+.grab{width:40px;height:5px;border-radius:3px;background:#56635F;align-self:center}
+.toast{position:absolute;left:14px;right:14px;bottom:100px;background:#F1EEE6;color:#1E2624;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:650;animation:tin .28s cubic-bezier(.2,.8,.2,1);z-index:5}
+.toast.err{background:#FF7A66}
+.toast .btn{min-height:36px;font-size:13px;padding:0 12px;background:#1E2624;color:#F1EEE6}
+.inp{min-height:52px;border-radius:14px;border:1.5px solid #3D4A46;background:#232D2A;color:#F1EEE6;padding:0 14px;font:500 16px 'Archivo',sans-serif;width:100%}
+.lt .inp{background:#fff;border-color:#C8CEC8;color:#1E2624}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:700;color:#AEB7B2}
+.bar{height:8px;border-radius:4px;background:#34403C;overflow:hidden;flex:none}
+.bar i{display:block;height:100%;background:#F4B33D;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.lt .bar{background:#DCE1DA}
+.dis{font-size:12px;line-height:1.35;color:#AEB7B2}
+.dot{width:8px;height:8px;border-radius:50%;background:#9BD8A8;flex:none}
+.dot.live{animation:live 1.6s ease-in-out infinite}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:12px;border-radius:16px;background:#2C3734;border:0;color:#F1EEE6;font:600 14px 'Archivo',sans-serif;text-align:left;cursor:pointer;min-height:76px}
+.tile.on{background:#F1EEE6;color:#1E2624}
+.card3d{perspective:900px}
+.flip{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.3,.7,.2,1);transform-style:preserve-3d}
+.flip.on{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;display:flex;flex-direction:column;justify-content:space-between;padding:22px}
+.face.b{transform:rotateY(180deg)}
+.fab{position:absolute;right:16px;bottom:118px;width:56px;height:56px;border-radius:50%;border:0;background:#F4B33D;color:#1E2624;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.35);cursor:pointer;z-index:4}
+.pop1{animation:pop1 .35s cubic-bezier(.2,.8,.2,1)}.pop2{animation:pop2 .35s cubic-bezier(.2,.8,.2,1)}
+.shk{animation:shake .25s linear infinite}
+.drop{animation:drop .7s cubic-bezier(.2,.9,.25,1.2)}
+.wash{position:absolute;border-radius:50%;animation:wash 1s ease-out forwards;pointer-events:none}
+.rip{position:absolute;border-radius:50%;border:3px solid #F4B33D;animation:rip 1s ease-out infinite;pointer-events:none}
+.conf{position:absolute;width:8px;height:14px;border-radius:2px;animation:fall 1.8s cubic-bezier(.3,.6,.4,1) forwards;pointer-events:none}
+.rise{transform-origin:bottom;animation:rise .8s cubic-bezier(.2,.8,.2,1) both}
+.fadein{animation:tin .35s cubic-bezier(.2,.8,.2,1) both}
+.skel{background:linear-gradient(90deg,#2C3734 0%,#36433F 50%,#2C3734 100%);background-size:200% 100%;animation:skel 1.4s linear infinite;border-radius:10px}
+@keyframes tin{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+@keyframes sup{from{transform:translateY(100%)}to{transform:none}}
+@keyframes pop1{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes pop2{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translate(0,0)}25%{transform:translate(-3px,1px) rotate(-2deg)}50%{transform:translate(3px,-1px) rotate(2deg)}75%{transform:translate(-2px,2px)}}
+@keyframes drop{0%{transform:translateY(-70px) scale(1.5);opacity:0}70%{transform:translateY(4px) scale(1);opacity:1}100%{transform:none}}
+@keyframes wash{from{transform:scale(.2);opacity:.85}to{transform:scale(4);opacity:0}}
+@keyframes rip{from{transform:scale(.5);opacity:.9}to{transform:scale(2.2);opacity:0}}
+@keyframes fall{from{transform:translateY(-30px) rotate(0)}to{transform:translateY(520px) rotate(600deg)}}
+@keyframes live{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes rise{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes skel{from{background-position:200% 0}to{background-position:-200% 0}}
+@keyframes boom{0%{transform:scale(.4);opacity:1}100%{transform:scale(3);opacity:0}}
+@keyframes fill{from{height:0}}
+@keyframes bub{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-60px);opacity:0}}
+@keyframes clinkL{0%{transform:translateX(0) rotate(0)}45%{transform:translateX(52px) rotate(12deg)}55%{transform:translateX(46px) rotate(8deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes clinkR{0%{transform:translateX(0) rotate(0)}45%{transform:translateX(-52px) rotate(-12deg)}55%{transform:translateX(-46px) rotate(-8deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes slidein{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+</style>
+</helmet>
+<div class="bd" style="width: 3624px; height: 1010px">
+<div class="pw"><div class="cap">1. Âge</div><div class="ph">
+<div class="sc" style="justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 14px; margin-top: 48px">
+<p class="s">[Nom de l'app]</p>
+<h1 class="h1" style="font-size: 46px">Tu as 18 ans ou plus ?</h1>
+<p class="p">L'app parle d'alcool, de taux et de soirées. Elle est réservée aux majeurs.</p>
+</div>
+<sc-if value="{{ageNo}}" hint-placeholder-val="{{ false }}"><div class="pan fadein"><p class="h3">Reviens le jour de tes 18 ans.</p><p class="s">L'app ne s'ouvre pas avant.</p></div></sc-if>
+<sc-if value="{{ageOk}}" hint-placeholder-val="{{ false }}"><div class="pan fadein" style="flex-direction: row; align-items: center"><span class="mint"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span><p class="h3">C'est noté.</p></div></sc-if>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<button class="btn full" onClick="{{ageYes}}">Oui, j'ai 18 ans ou plus</button>
+<button class="btn o full" onClick="{{ageNoFn}}">Non</button>
+</div>
+</div>
+</div></div>
+<div class="pw"><div class="cap">2. Bienvenue</div><div class="ph">
+<div class="sc" style="justify-content: space-between">
+<div style="margin-top: 56px; display: flex; flex-direction: column; gap: 18px">
+<div style="width: 84px; height: 84px; border-radius: 26px; background: #F4B33D; color: #1E2624; display: flex; align-items: center; justify-content: center"><svg class="ic" style="width: 44px; height: 44px" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l-1.2 16H8.2L7 4zM7.4 9h9.2"></path></svg></div>
+<h1 class="h1" style="font-size: 44px">Qui sort ce soir, où, et qui paie la prochaine.</h1>
+<p class="p">Ton taux en direct, les jeux, les bars du crew et les comptes entre potes.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<button class="btn full">Créer un compte</button>
+<button class="btn g full">Jouer sans compte</button>
+<p class="s" style="text-align: center">Les jeux et le Bar marchent sans compte. Le crew et les soirées en demandent un.</p>
+<button class="btn o full">J'ai déjà un compte</button>
+</div>
+</div>
+</div></div>
+<div class="pw"><div class="cap">3. Connexion</div><div class="ph">
+<div class="sc">
+<a class="ib" href="#" aria-label="Retour"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<h1 class="h1">Crée ton compte</h1>
+<p class="s">Pas de mot de passe à retenir.</p>
+<div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px">
+<button class="btn full" style="background: #F1EEE6">Continuer avec Apple</button>
+<button class="btn g full">Continuer avec Google</button>
+<button class="btn g full"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 14a4 4 0 1 1 0-8a4 4 0 0 1 0 8zM11.5 10H21M17.5 10v3M20.5 10v3"></path></svg> Utiliser une clé d'accès</button>
+<button class="btn o full"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 0 0-5.6-5.6l-1 1M14 10a4 4 0 0 0-5.6 0l-3 3a4 4 0 0 0 5.6 5.6l1-1"></path></svg> Recevoir un lien par e-mail</button>
+</div>
+<p class="s" style="margin-top: auto">En continuant, tu acceptes les conditions d'utilisation. La politique de confidentialité se lit sans compte.</p>
+</div>
+</div></div>
+<div class="pw"><div class="cap">4. Profil</div><div class="ph">
+<div class="sc">
+<sc-if value="{{draft}}" hint-placeholder-val="{{ true }}"><div class="pan" style="flex-direction: row; align-items: center"><span class="amb"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg></span><p class="s" style="flex: 1">Brouillon retrouvé. Tu reprends où tu t'étais arrêté.</p><button class="ib" style="width: 36px; height: 36px" aria-label="Fermer" onClick="{{closeDraft}}"><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div></sc-if>
+<h1 class="h1">On fait connaissance</h1>
+<div class="field"><label for="fn">Prénom</label><input id="fn" class="inp" autocomplete="given-name" value="Hugo" readonly="readonly"></div>
+<div class="field"><label for="ps">Pseudo</label><div style="position: relative"><input id="ps" class="inp" autocomplete="username" value="@hugo.dlb" readonly="readonly"><span class="tag mint" style="position: absolute; right: 12px; top: 14px">Libre</span></div></div>
+<div class="field"><label for="em">E-mail</label><input id="em" class="inp" type="email" inputmode="email" autocomplete="email" value="hugo@exemple.fr" readonly="readonly"></div>
+<p class="lbl">Pour estimer ton taux</p>
+<div class="top"><span class="p">Poids</span>
+<div style="display: flex; align-items: center; gap: 10px">
+<button class="ib" aria-label="Moins" onClick="{{wMinus}}"><span style="font-size: 26px; font-weight: 700; line-height: 1">−</span></button>
+<span class="num {{wp}}" style="font-size: 38px; min-width: 86px; text-align: center">{{w}} kg</span>
+<button class="ib" aria-label="Plus" onClick="{{wPlus}}"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+</div></div>
+<sc-if value="{{wMsg}}" hint-placeholder-val="{{ false }}"><p class="s red">Entre 35 et 250 kg.</p></sc-if>
+<div class="seg"><button class="{{sexF}}" onClick="{{setF}}">Femme</button><button class="{{sexH}}" onClick="{{setH}}">Homme</button></div>
+<p class="s">Sert seulement au calcul du taux. Personne d'autre ne le voit.</p>
+<button class="btn full" style="margin-top: auto">Continuer</button>
+</div>
+</div></div>
+<div class="pw"><div class="cap">5. Réglages détectés</div><div class="ph">
+<div class="sc">
+<h1 class="h1">Réglé pour la France</h1>
+<p class="s">D'après la langue et la région de ton téléphone. Langue, pays et unités se changent séparément.</p>
+<div>
+<div class="row"><div class="g1"><span class="p">Langue</span></div><span class="s">Français</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+<div class="row"><div class="g1"><span class="p">Pays pour la limite légale</span><span class="s">0,5 g/L de sang</span></div><span class="s">France</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+<div class="row"><div class="g1"><span class="p">Jeune permis</span><span class="s">Limite à 0,2 g/L</span></div><button class="sw {{novCls}}" aria-label="Jeune permis" onClick="{{toggleNov}}"></button></div>
+<div class="row"><div class="g1"><span class="p">Unités</span></div><span class="s">cl, kg</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+<div class="row"><div class="g1"><span class="p">Taux affiché</span></div><span class="s">g/L de sang</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+<div class="row"><div class="g1"><span class="p">Verre standard</span></div><span class="s">10 g d'alcool</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+<div class="row"><div class="g1"><span class="p">Monnaie et heure</span></div><span class="s">€, 24 h</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+<div class="row"><div class="g1"><span class="p">Numéros d'urgence</span></div><span class="s">112, 15</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+</div>
+<button class="btn full" style="margin-top: auto">C'est bon</button>
+</div>
+</div></div>
+<div class="pw"><div class="cap">6. Notifications</div><div class="ph">
+<div class="sc">
+<h1 class="h1">Ce qui peut te réveiller</h1>
+<p class="s">Le reste attend que tu ouvres l'app.</p>
+<div>
+<sc-for list="{{notifs}}" as="n" hint-placeholder-count="6">
+<div class="row"><div class="g1"><span class="p">{{n.l}}</span><span class="s">{{n.d}}</span></div><button class="sw {{n.cls}}" aria-label="{{n.l}}" onClick="{{n.t}}"></button></div>
+</sc-for>
+<div class="row"><div class="g1"><span class="p">Heures calmes</span><span class="s">Rien entre 2 h et 11 h, sauf un SOS</span></div><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+</div>
+<button class="btn full" style="margin-top: auto">Continuer</button>
+</div>
+</div></div>
+<div class="pw"><div class="cap">7. Consentements</div><div class="ph">
+<div class="sc">
+<h1 class="h1">Tes données, ton accord</h1>
+<div class="pan">
+<div class="top"><span class="h3">Verres et taux</span><button class="sw {{healthCls}}" aria-label="Accepter le stockage des verres et du taux" onClick="{{toggleHealth}}"></button></div>
+<p class="s">Ça compte comme des données de santé. On les garde chiffrées, en Europe, seulement si tu dis oui. Sans ça, l'app ne peut pas calculer ton taux.</p>
+</div>
+<div class="pan">
+<div class="top"><span class="h3">Statistiques d'usage</span><button class="sw {{statsCls}}" aria-label="Statistiques d'usage" onClick="{{toggleStats}}"></button></div>
+<p class="s">Anonymes, pour savoir quels écrans servent. Facultatif.</p>
+</div>
+<a class="row" href="#"><span class="g1 p">Lire la politique de confidentialité</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+<p class="s">Tu peux retirer ton accord quand tu veux dans Réglages.</p>
+<button class="btn full" style="margin-top: auto" disabled="{{noHealth}}">Continuer</button>
+</div>
+</div></div>
+<div class="pw"><div class="cap">8. Ton crew</div><div class="ph">
+<div class="sc">
+<h1 class="h1">Ton crew</h1>
+<div class="seg"><button class="{{cCreate}}" onClick="{{modeCreate}}">Créer</button><button class="{{cJoin}}" onClick="{{modeJoin}}">Rejoindre</button></div>
+<sc-if value="{{isCreate}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 14px" class="fadein">
+<div class="field"><label for="cn">Nom du crew</label><input id="cn" class="inp" placeholder="Les Quais" value="{{crew}}" onInput="{{onCrew}}"></div>
+<div class="pan" style="flex-direction: row; align-items: center; gap: 14px">
+<div style="width: 92px; height: 92px; border-radius: 12px; background: #F1EEE6; color: #1E2624; display: flex; align-items: center; justify-content: center; flex: none"><svg class="ic" style="width: 64px; height: 64px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 18h2v2h-2zM14 18h2M18 14h2"></path></svg></div>
+<div class="g1"><span class="h3">{{crewShown}}</span><span class="s">Fais scanner ce QR ou envoie le lien.</span><button class="chip" style="margin-top: 6px"><svg class="ic" style="width: 16px; height: 16px" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 0 0-5.6-5.6l-1 1M14 10a4 4 0 0 0-5.6 0l-3 3a4 4 0 0 0 5.6 5.6l1-1"></path></svg> Copier le lien</button></div>
+</div>
+<p class="s">Le lien ouvre l'app si elle est installée, sinon une page d'invitation.</p>
+</div>
+</sc-if>
+<sc-if value="{{isJoin}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 12px" class="fadein">
+<button class="btn g full"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 18h2v2h-2zM14 18h2M18 14h2"></path></svg> Scanner un QR</button>
+<div class="field"><label for="lk">Ou colle un lien d'invitation</label><input id="lk" class="inp" placeholder="lien.app/c/..."></div>
+</div>
+</sc-if>
+<button class="btn full" style="margin-top: auto">Terminer</button>
+</div>
+</div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":3624,"height":1010}}'>
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state={age:null,w:72,wp:'pop1',wMsg:false,sex:'h',nov:false,health:false,stats:false,mode:'c',crew:'',draft:true,
+    n:{sort:true,inv:true,crew:true,eau:true,recap:true,bars:false}}; }
+  setW(d){ const v=this.state.w+d; if(v<35||v>250){ this.setState({wMsg:true}); return; }
+    this.setState({w:v,wMsg:false,wp:this.state.wp==='pop1'?'pop2':'pop1'}); }
+  renderVals(){
+    const s=this.state;
+    const defs=[['sort','Qui sort ce soir','Quand un pote lance une sortie'],['inv','Invitations','Soirées et demandes d\'ami'],['crew','Le crew en soirée','Arrivées, départs, dépassements'],['eau','Rappels d\'eau','Pendant tes soirées'],['recap','Récap prêt','Le lendemain, à une heure correcte'],['bars','Prises de bar','Quand on te pique un bar']];
+    return {
+      ageNo:s.age==='no', ageOk:s.age==='ok', ageYes:()=>this.setState({age:'ok'}), ageNoFn:()=>this.setState({age:'no'}),
+      draft:s.draft, closeDraft:()=>this.setState({draft:false}),
+      w:s.w, wp:s.wp, wMsg:s.wMsg, wMinus:()=>this.setW(-1), wPlus:()=>this.setW(1),
+      sexF:s.sex==='f'?'on':'', sexH:s.sex==='h'?'on':'', setF:()=>this.setState({sex:'f'}), setH:()=>this.setState({sex:'h'}),
+      novCls:s.nov?'on':'', toggleNov:()=>this.setState({nov:!s.nov}),
+      notifs:defs.map(([k,l,d])=>({l,d,cls:s.n[k]?'on':'',t:()=>this.setState({n:{...s.n,[k]:!s.n[k]}})})),
+      healthCls:s.health?'on':'', statsCls:s.stats?'on':'', noHealth:!s.health,
+      toggleHealth:()=>this.setState({health:!s.health}), toggleStats:()=>this.setState({stats:!s.stats}),
+      cCreate:s.mode==='c'?'on':'', cJoin:s.mode==='j'?'on':'', isCreate:s.mode==='c', isJoin:s.mode==='j',
+      modeCreate:()=>this.setState({mode:'c'}), modeJoin:()=>this.setState({mode:'j'}),
+      crew:s.crew, crewShown:s.crew||'Les Quais', onCrew:(e)=>this.setState({crew:e.target.value})
+    };
+  }
+}
+</script>
+</body>
+</html>

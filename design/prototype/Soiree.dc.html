@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Soirée en cours</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+.bd{display:flex;gap:56px;padding:72px 56px 56px;align-items:flex-start;background:#CDD3CE;font-family:'Archivo',system-ui,sans-serif;color:#1E2624}
+.pw{display:flex;flex-direction:column;gap:14px;flex:none}
+.cap{font-size:16px;font-weight:700;color:#26302D;padding-left:10px;font-stretch:90%}
+.ph{width:390px;height:844px;border-radius:46px;background:#1E2624;color:#F1EEE6;position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 0 9px #0F1413,0 28px 50px rgba(15,20,19,.28);font-family:'Archivo',system-ui,sans-serif}
+.ph.lt{background:#EEF0EA;color:#1E2624}
+.sc{flex:1;min-height:0;overflow-y:auto;padding:58px 20px 22px;display:flex;flex-direction:column;gap:16px;scrollbar-width:none}
+.sc::-webkit-scrollbar{display:none}
+.h1{margin:0;font-size:32px;line-height:1.04;font-weight:800;font-stretch:76%}
+.h2{margin:0;font-size:22px;line-height:1.12;font-weight:750;font-stretch:82%}
+.h3{margin:0;font-size:16px;line-height:1.25;font-weight:700}
+.p{margin:0;font-size:15px;line-height:1.45}
+.s{margin:0;font-size:13px;line-height:1.4;color:#AEB7B2}
+.lt .s{color:#4F5A55}
+.num{font-weight:900;font-stretch:62%;line-height:.86;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.amb{color:#F4B33D}.red{color:#FF7A66}.wat{color:#8CCBEA}.mint{color:#9BD8A8}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 18px;border-radius:14px;border:0;background:#F4B33D;color:#1E2624;font:700 16px 'Archivo',sans-serif;text-decoration:none;cursor:pointer;transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn.g{background:#34403C;color:#F1EEE6}
+.btn.o{background:transparent;color:inherit;box-shadow:inset 0 0 0 1.5px #56635F}
+.btn.d{background:#FF7A66;color:#1E2624}
+.btn.w2{background:#8CCBEA;color:#1E2624}
+.btn.sm{min-height:40px;font-size:14px;border-radius:12px;padding:0 14px}
+.btn.full{width:100%}
+.btn[disabled]{opacity:.4;cursor:default}
+.lt .btn.g{background:#DCE1DA;color:#1E2624}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 14px;border-radius:999px;border:0;background:#34403C;color:#F1EEE6;font:600 14px 'Archivo',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none}
+.chip.on{background:#F1EEE6;color:#1E2624}
+.lt .chip{background:#DCE1DA;color:#1E2624}.lt .chip.on{background:#1E2624;color:#EEF0EA}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.hs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -20px;padding:0 20px;flex:none}
+.hs::-webkit-scrollbar{display:none}
+.row{display:flex;align-items:center;gap:12px;min-height:54px;padding:8px 0;border-bottom:1px solid #34403C;color:inherit;text-decoration:none}
+.lt .row{border-color:#D3D8D2}
+.g1{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.lbl{font-size:13px;font-weight:700;color:#AEB7B2;margin:6px 0 0}
+.lt .lbl{color:#4F5A55}
+.sw{width:52px;height:32px;border-radius:999px;border:0;background:#46534F;position:relative;cursor:pointer;flex:none;transition:background .2s}
+.sw::after{content:'';position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#F1EEE6;transition:transform .22s cubic-bezier(.3,.7,.3,1)}
+.sw.on{background:#F4B33D}.sw.on::after{transform:translateX(20px)}
+.seg{display:flex;background:#2C3734;border-radius:12px;padding:3px;gap:3px;flex:none}
+.seg button{flex:1;min-height:38px;border:0;border-radius:9px;background:transparent;color:#C9D0CC;font:600 13px 'Archivo',sans-serif;cursor:pointer;padding:0 6px}
+.seg button.on{background:#F1EEE6;color:#1E2624}
+.lt .seg{background:#DCE1DA}.lt .seg button{color:#3A4440}.lt .seg button.on{background:#1E2624;color:#EEF0EA}
+.av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#1E2624;flex:none}
+.a1{background:#F4B33D}.a2{background:#9BD8A8}.a3{background:#8CCBEA}.a4{background:#F2C6A0}.a5{background:#D6C8F2}.a6{background:#FF9C8A}.a7{background:#E8E3D2}
+.tag{display:inline-flex;align-items:center;gap:4px;min-height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:650;background:#34403C;color:#E3E7E4;white-space:nowrap}
+.tag.amb{background:#4A3E22;color:#F8CE7A}.tag.red{background:#4E2C27;color:#FFB3A6}.tag.wat{background:#24404D;color:#B8E0F3}.tag.mint{background:#2A4632;color:#BFE9C8}
+.lt .tag{background:#DCE1DA;color:#1E2624}
+.tab{display:flex;justify-content:space-around;padding:10px 6px 30px;border-top:1px solid #34403C;background:#1E2624;flex:none}
+.tab a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:650;color:#97A19C;text-decoration:none;min-width:60px;min-height:44px;justify-content:center}
+.tab a.on{color:#F4B33D}
+.ic{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ib{width:44px;height:44px;border-radius:12px;border:0;background:#2C3734;color:#F1EEE6;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;flex:none}
+.lt .ib{background:#DCE1DA;color:#1E2624}
+.pan{background:#28322F;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.lt .pan{background:#FFFFFF}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#28322F;border-radius:26px 26px 0 0;padding:12px 20px 34px;display:flex;flex-direction:column;gap:14px;box-shadow:0 -14px 40px rgba(0,0,0,.4);animation:sup .32s cubic-bezier(.2,.8,.2,1)}
+.dim{position:absolute;inset:0;background:rgba(10,14,13,.55)}
+.grab{width:40px;height:5px;border-radius:3px;background:#56635F;align-self:center}
+.toast{position:absolute;left:14px;right:14px;bottom:100px;background:#F1EEE6;color:#1E2624;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:650;animation:tin .28s cubic-bezier(.2,.8,.2,1);z-index:5}
+.toast.err{background:#FF7A66}
+.toast .btn{min-height:36px;font-size:13px;padding:0 12px;background:#1E2624;color:#F1EEE6}
+.inp{min-height:52px;border-radius:14px;border:1.5px solid #3D4A46;background:#232D2A;color:#F1EEE6;padding:0 14px;font:500 16px 'Archivo',sans-serif;width:100%}
+.lt .inp{background:#fff;border-color:#C8CEC8;color:#1E2624}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:700;color:#AEB7B2}
+.bar{height:8px;border-radius:4px;background:#34403C;overflow:hidden;flex:none}
+.bar i{display:block;height:100%;background:#F4B33D;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.lt .bar{background:#DCE1DA}
+.dis{font-size:12px;line-height:1.35;color:#AEB7B2}
+.dot{width:8px;height:8px;border-radius:50%;background:#9BD8A8;flex:none}
+.dot.live{animation:live 1.6s ease-in-out infinite}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:12px;border-radius:16px;background:#2C3734;border:0;color:#F1EEE6;font:600 14px 'Archivo',sans-serif;text-align:left;cursor:pointer;min-height:76px}
+.tile.on{background:#F1EEE6;color:#1E2624}
+.card3d{perspective:900px}
+.flip{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.3,.7,.2,1);transform-style:preserve-3d}
+.flip.on{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;display:flex;flex-direction:column;justify-content:space-between;padding:22px}
+.face.b{transform:rotateY(180deg)}
+.fab{position:absolute;right:16px;bottom:118px;width:56px;height:56px;border-radius:50%;border:0;background:#F4B33D;color:#1E2624;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.35);cursor:pointer;z-index:4}
+.pop1{animation:pop1 .35s cubic-bezier(.2,.8,.2,1)}.pop2{animation:pop2 .35s cubic-bezier(.2,.8,.2,1)}
+.shk{animation:shake .25s linear infinite}
+.drop{animation:drop .7s cubic-bezier(.2,.9,.25,1.2)}
+.wash{position:absolute;border-radius:50%;animation:wash 1s ease-out forwards;pointer-events:none}
+.rip{position:absolute;border-radius:50%;border:3px solid #F4B33D;animation:rip 1s ease-out infinite;pointer-events:none}
+.conf{position:absolute;width:8px;height:14px;border-radius:2px;animation:fall 1.8s cubic-bezier(.3,.6,.4,1) forwards;pointer-events:none}
+.rise{transform-origin:bottom;animation:rise .8s cubic-bezier(.2,.8,.2,1) both}
+.fadein{animation:tin .35s cubic-bezier(.2,.8,.2,1) both}
+.skel{background:linear-gradient(90deg,#2C3734 0%,#36433F 50%,#2C3734 100%);background-size:200% 100%;animation:skel 1.4s linear infinite;border-radius:10px}
+@keyframes tin{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+@keyframes sup{from{transform:translateY(100%)}to{transform:none}}
+@keyframes pop1{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes pop2{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translate(0,0)}25%{transform:translate(-3px,1px) rotate(-2deg)}50%{transform:translate(3px,-1px) rotate(2deg)}75%{transform:translate(-2px,2px)}}
+@keyframes drop{0%{transform:translateY(-70px) scale(1.5);opacity:0}70%{transform:translateY(4px) scale(1);opacity:1}100%{transform:none}}
+@keyframes wash{from{transform:scale(.2);opacity:.85}to{transform:scale(4);opacity:0}}
+@keyframes rip{from{transform:scale(.5);opacity:.9}to{transform:scale(2.2);opacity:0}}
+@keyframes fall{from{transform:translateY(-30px) rotate(0)}to{transform:translateY(520px) rotate(600deg)}}
+@keyframes live{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes rise{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes skel{from{background-position:200% 0}to{background-position:-200% 0}}
+@keyframes boom{0%{transform:scale(.4);opacity:1}100%{transform:scale(3);opacity:0}}
+@keyframes fill{from{height:0}}
+@keyframes bub{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-60px);opacity:0}}
+@keyframes clinkL{0%{transform:translateX(0) rotate(0)}45%{transform:translateX(52px) rotate(12deg)}55%{transform:translateX(46px) rotate(8deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes clinkR{0%{transform:translateX(0) rotate(0)}45%{transform:translateX(-52px) rotate(-12deg)}55%{transform:translateX(-46px) rotate(-8deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes slidein{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+</style>
+</helmet>
+<div class="bd" style="width: 2732px; height: 1010px">
+<div class="pw"><div class="cap">Écran Soirée (niveau 0)</div><div class="ph">
+<div class="sc" style="gap: 14px">
+<div class="top">
+<div><p class="s">{{greet}}</p><p class="h3"><span class="dot live" style="display: inline-block; margin-right: 6px"></span>Samedi au Zinc</p></div>
+<a class="ib" href="Messages.dc.html" aria-label="Discussions"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"></path></svg></a>
+</div>
+<button style="all: unset; cursor: pointer; display: flex; align-items: flex-end; gap: 12px" onClick="{{cycleUnit}}" aria-label="Changer d'unité">
+<span class="num amb {{rollCls}}" style="font-size: 124px">{{bacTxt}}</span>
+<span style="padding-bottom: 14px; display: flex; flex-direction: column; gap: 4px"><span class="h3">{{unitTxt}}</span><span class="s">{{unitAlt}}</span></span>
+</button>
+<p class="p">{{trend}}</p>
+<div class="grid2">
+<div class="pan" style="gap: 2px"><span class="s">Retour à 0</span><span class="num" style="font-size: 34px">{{zero}}</span></div>
+<div class="pan" style="gap: 2px"><span class="s">Volant</span><span class="num {{driveCls}}" style="font-size: 34px">{{drive}}</span></div>
+</div>
+<p class="dis">Estimation, pas un éthylotest. Ne prends jamais le volant sur cette base.</p>
+<div style="display: flex; gap: 10px; align-items: stretch">
+<button class="btn" style="flex: 1; min-height: 64px; font-size: 18px; position: relative; overflow: hidden" onClick="{{addPint}}">
+<span style="position: absolute; left: 0; right: 0; bottom: 0; height: {{fillH}}%; background: #E09A20; transition: height .7s cubic-bezier(.2,.8,.2,1)"></span>
+<span style="position: relative; display: flex; align-items: center; gap: 8px"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg> Encore une pinte</span>
+</button>
+<a class="btn g" href="#" style="width: 64px; padding: 0" aria-label="Autre verre"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l-1.2 16H8.2L7 4zM7.4 9h9.2"></path></svg></a>
+<button class="btn w2 {{wp}}" style="width: 64px; padding: 0" aria-label="Verre d'eau" onClick="{{addWater}}"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"></path></svg></button>
+</div>
+<div class="top"><span class="s">{{drinksTxt}}, {{waterTxt}}</span>
+<sc-if value="{{pending}}" hint-placeholder-val="{{ false }}"><span class="tag"><svg class="ic" style="width: 14px; height: 14px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 1 0 18a9 9 0 1 1 0-18zM12 7v5l3 2"></path></svg> Envoi</span></sc-if>
+<sc-if value="{{confirmed}}" hint-placeholder-val="{{ false }}"><span class="tag mint fadein"><svg class="ic" style="width: 14px; height: 14px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg> Enregistré</span></sc-if>
+</div>
+<p class="lbl">Le crew ce soir</p>
+<div class="hs">
+<sc-for list="{{crew}}" as="c" hint-placeholder-count="5">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 66px">
+<div class="av {{c.a}}">{{c.i}}</div><span style="font-size: 13px; font-weight: 700">{{c.n}}</span><span class="s" style="font-size: 12px">{{c.v}}</span>
+<sc-if value="{{c.hasTag}}" hint-placeholder-val="{{ false }}"><span class="tag {{c.tc}}" style="font-size: 11px">{{c.t}}</span></sc-if>
+</div>
+</sc-for>
+</div>
+<a class="row" href="Bars.dc.html"><span class="amb"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 10H5z"></path></svg></span><div class="g1"><span class="h3">Au Zinc</span><span class="s">Boss du mois : Inès. Tu es à 2 check-ins.</span></div><span class="chip">Check-in</span></a>
+<a class="row" href="Classements.dc.html"><span><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M9 20h6"></path></svg></span><div class="g1"><span class="h3">Classement de la soirée</span><span class="s">1. Malik 7, 2. toi {{drinks}}, 3. Jade 5</span></div><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+<div class="grid4">
+<a class="tile" href="Jeux.dc.html" style="text-decoration: none"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8.5 8.5h.01M15.5 15.5h.01M15.5 8.5h.01M8.5 15.5h.01M12 12h.01"></path></svg>Jeux</a>
+<a class="tile" href="Argent.dc.html" style="text-decoration: none"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 6.5A6 6 0 0 0 7 11v2a6 6 0 0 0 10 4.5M4 10h9M4 14h9"></path></svg>Tournée</a>
+<a class="tile" href="Securite.dc.html" style="text-decoration: none"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"></path></svg>Je rentre</a>
+<a class="tile" href="Securite.dc.html" style="text-decoration: none; background: #4E2C27; color: #FFB3A6"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l10 18H2L12 3zM12 10v5M12 18h.01"></path></svg>SOS</a>
+</div>
+<div class="pan" style="flex-direction: row; align-items: center"><span class="amb"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8.5 8.5h.01M15.5 15.5h.01M15.5 8.5h.01M8.5 15.5h.01M12 12h.01"></path></svg></span><p class="s" style="flex: 1">Défi du soir : commander ta prochaine pinte avec l'accent belge.</p></div>
+</div>
+<sc-if value="{{undo}}" hint-placeholder-val="{{ false }}"><div class="toast"><span style="flex: 1">Pinte ajoutée à {{hour}}</span><button class="btn" onClick="{{doUndo}}"><svg class="ic" style="width: 16px; height: 16px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6L4 11l5 5M4 11h10a5 5 0 0 1 0 10h-3"></path></svg> Annuler</button></div></sc-if>
+<nav class="tab" aria-label="Navigation principale"><a href="Soiree.dc.html" class="on"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l-1.2 16H8.2L7 4zM7.4 9h9.2"></path></svg><span>Soirée</span></a><a href="Radar.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 1 1 0-7zM2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.6a3.4 3.4 0 0 1 0 6.8M18 14.8c2 .6 3.2 2.5 3.5 5.2"></path></svg><span>Crew</span></a><a href="Jeux.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8.5 8.5h.01M15.5 15.5h.01M15.5 8.5h.01M8.5 15.5h.01M12 12h.01"></path></svg><span>Jeux</span></a><a href="Bars.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21zM12 7.5a2 2 0 1 1 0 4a2 2 0 1 1 0-4z"></path></svg><span>Bars</span></a><a href="Profil.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a4 4 0 1 1 0 8a4 4 0 1 1 0-8zM4 21c1-4 4.2-6 8-6s7 2 8 6"></path></svg><span>Moi</span></a></nav>
+</div></div>
+<div class="pw"><div class="cap">Ajouter un verre</div><div class="ph">
+<div class="sc" style="opacity: .35"><p class="h3">Samedi au Zinc</p><span class="num amb" style="font-size: 110px">{{bacTxt}}</span></div>
+<div class="dim"></div>
+<div class="sheet" style="top: 70px; overflow-y: auto">
+<div class="grab"></div>
+<div class="top"><h2 class="h2">Ajouter</h2><button class="ib" aria-label="Fermer"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<div class="pan" style="flex-direction: row; align-items: center; background: #1E2624"><span class="amb"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zM5 11a7 7 0 0 0 14 0M12 18v3"></path></svg></span><span class="s" style="flex: 1">« Deux pintes et un shot au Zinc, c'est moi qui paie »</span></div>
+<div class="chips"><span class="tag amb">2 × Pinte 50 cl</span><span class="tag amb">1 × Shot 3 cl</span><span class="tag">Au Zinc</span><span class="tag">Tournée payée par toi</span></div>
+<div class="grid4">
+<sc-for list="{{quick}}" as="q" hint-placeholder-count="8">
+<button class="tile {{q.on}}" style="min-height: 72px; align-items: center; text-align: center; font-size: 12px; padding: 8px 4px" onClick="{{q.pick}}">{{q.l}}<span class="s" style="font-size: 11px">{{q.d}}</span></button>
+</sc-for>
+</div>
+<p class="lbl">Mes boissons</p>
+<div style="position: relative">
+<div class="row"><div class="g1"><span class="p">Triple 33 cl</span><span class="s">8,4 %</span></div><span class="s">Appui long</span></div>
+<div class="row"><div class="g1"><span class="p">Spritz maison</span><span class="s">11 %, 20 cl</span></div></div>
+<div class="pan fadein" style="position: absolute; right: 0; top: 40px; background: #3A4643; padding: 6px; gap: 0; width: 170px; box-shadow: 0 10px 30px rgba(0,0,0,.4)">
+<button class="chip" style="background: transparent"><svg class="ic" style="width: 16px; height: 16px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg> Modifier</button>
+<button class="chip" style="background: transparent"><svg class="ic" style="width: 16px; height: 16px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"></path></svg> Déplacer</button>
+<button class="chip" style="background: transparent; color: #FFB3A6"><svg class="ic" style="width: 16px; height: 16px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13"></path></svg> Retirer</button>
+</div>
+</div>
+<div class="top"><span class="p">Bu à</span><div style="display: flex; align-items: center; gap: 8px">
+<button class="ib" aria-label="Une minute plus tôt" onClick="{{tMinus}}"><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
+<span class="num" style="font-size: 30px; min-width: 96px; text-align: center">{{tTxt}}</span>
+<button class="ib" aria-label="Une minute plus tard" onClick="{{tPlus}}"><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button></div></div>
+<sc-if value="{{tMax}}" hint-placeholder-val="{{ false }}"><p class="s">Pas d'heure dans le futur : un verre pas encore bu ne compte pas.</p></sc-if>
+<div class="top"><div class="g1"><span class="p">Photo du verre</span><span class="s">Un verre en photo compte au classement</span></div><button class="sw {{photoCls}}" aria-label="Photo du verre" onClick="{{togglePhoto}}"></button></div>
+<button class="btn full">Ajouter {{pickedTxt}}</button>
+</div>
+</div></div>
+<div class="pw"><div class="cap">Historique de la soirée</div><div class="ph">
+<div class="sc">
+<div class="top"><a class="ib" href="#" aria-label="Retour"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a><span class="tag">Samedi, jusqu'à 6 h</span></div>
+<h1 class="h1">Ce que t'as bu</h1>
+<p class="s">Une soirée compte jusqu'à 6 h du matin. Ton verre de 2 h est sur samedi.</p>
+<div class="row" style="border: 0"><div class="g1"><span class="h3">{{histN}} × Pinte 50 cl</span><span class="s">Touche pour replier</span></div><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"></path></svg></div>
+<div style="display: flex; flex-direction: column; gap: 6px; padding-left: 12px">
+<sc-for list="{{hist}}" as="h" hint-placeholder-count="4">
+<div style="position: relative; overflow: hidden; border-radius: 12px">
+<div style="position: absolute; right: 0; top: 0; bottom: 0; display: flex"><button class="btn sm g" style="border-radius: 0; height: 100%">Modifier</button><button class="btn sm d" style="border-radius: 0; height: 100%" onClick="{{h.del}}">Supprimer</button></div>
+<div style="background: #28322F; padding: 12px 14px; display: flex; align-items: center; gap: 10px; transform: translateX({{h.x}}px); transition: transform .3s" class="fadein"><span class="num" style="font-size: 22px">{{h.t}}</span><span class="g1 s">{{h.w}}</span><sc-if value="{{h.v}}" hint-placeholder-val="{{ true }}"><span class="tag mint">vérifié</span></sc-if></div>
+</div>
+</sc-for>
+</div>
+<div class="row"><div class="g1"><span class="h3">2 × Shot 3 cl</span><span class="s">23 h 12, 23 h 13</span></div><span class="tag">non vérifié</span></div>
+<div class="row"><div class="g1"><span class="h3">3 × Eau</span><span class="s">Bien joué</span></div><span class="wat"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"></path></svg></span></div>
+<p class="s">Glisse un verre vers la gauche pour le modifier ou le supprimer.</p>
+</div>
+<sc-if value="{{delToast}}" hint-placeholder-val="{{ false }}"><div class="toast" style="bottom: 30px"><span style="flex: 1">Verre retiré</span><button class="btn" onClick="{{undoDel}}">Annuler</button></div></sc-if>
+</div></div>
+<div class="pw"><div class="cap">Courbe</div><div class="ph">
+<div class="sc">
+<div class="top"><h1 class="h1">Ta courbe</h1><button class="chip {{cmpOn}}" onClick="{{toggleCmp}}"><svg class="ic" style="width: 16px; height: 16px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 1 1 0-7zM2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.6a3.4 3.4 0 0 1 0 6.8M18 14.8c2 .6 3.2 2.5 3.5 5.2"></path></svg> Comparer</button></div>
+<div class="seg"><sc-for list="{{periods}}" as="p" hint-placeholder-count="5"><button class="{{p.on}}" onClick="{{p.pick}}">{{p.l}}</button></sc-for></div>
+<div style="position: relative; background: #28322F; border-radius: 18px; padding: 12px 8px 8px">
+<svg viewBox="0 0 340 210" style="width: 100%; display: block" role="img" aria-label="Courbe d'alcoolémie">
+<defs><linearGradient id="thr" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#9BD8A8"></stop><stop offset=".35" stop-color="#9BD8A8"></stop><stop offset=".45" stop-color="#F4B33D"></stop><stop offset=".7" stop-color="#F4B33D"></stop><stop offset=".8" stop-color="#FF7A66"></stop></linearGradient></defs>
+<line x1="0" x2="340" y1="122" y2="122" stroke="#FF7A66" stroke-dasharray="5 5" stroke-width="1.5"></line>
+<text x="336" y="116" fill="#FFB3A6" font-size="11" text-anchor="end">limite légale</text>
+<line x1="0" x2="340" y1="88" y2="88" stroke="#F4B33D" stroke-dasharray="2 4" stroke-width="1.5"></line>
+<text x="336" y="82" fill="#F8CE7A" font-size="11" text-anchor="end">ta limite</text>
+<sc-if value="{{cmp}}" hint-placeholder-val="{{ false }}"><polyline points="{{cmpPts}}" fill="none" stroke="#8CCBEA" stroke-width="2" opacity=".7" class="fadein"></polyline><circle cx="300" cy="{{cmpEnd}}" r="9" fill="#8CCBEA"></circle><text x="300" y="{{cmpEndT}}" font-size="9" font-weight="800" text-anchor="middle" fill="#1E2624">J</text></sc-if>
+<polyline points="{{pts}}" fill="none" stroke="url(#thr)" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
+<line x1="{{scrubX}}" x2="{{scrubX}}" y1="0" y2="200" stroke="#F1EEE6" stroke-width="1"></line>
+</svg>
+<input type="range" min="0" max="100" value="{{scrub}}" onInput="{{onScrub}}" aria-label="Moment de la soirée" style="width: 100%; accent-color: #F4B33D">
+<div class="top"><span class="s">{{scrubTime}}</span><span class="h3 amb">{{scrubVal}}</span></div>
+</div>
+<div class="chips"><span class="chip on">Tout</span><span class="chip">Au Zinc</span><span class="chip">Bière</span><span class="chip">Avec Jade</span></div>
+<div class="grid3">
+<div class="pan" style="padding: 12px; gap: 2px"><span class="s">Ce mois</span><span class="num" style="font-size: 28px">214 g</span></div>
+<div class="pan" style="padding: 12px; gap: 2px"><span class="s">Total</span><span class="num" style="font-size: 28px">1 870 g</span></div>
+<div class="pan" style="padding: 12px; gap: 2px"><span class="s">Moyenne</span><span class="num" style="font-size: 28px">62 g</span></div>
+</div>
+<p class="s">En grammes d'alcool pur. Moyenne sur 7 jours glissants.</p>
+</div>
+<nav class="tab" aria-label="Navigation principale"><a href="Soiree.dc.html" class="on"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l-1.2 16H8.2L7 4zM7.4 9h9.2"></path></svg><span>Soirée</span></a><a href="Radar.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 1 1 0-7zM2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.6a3.4 3.4 0 0 1 0 6.8M18 14.8c2 .6 3.2 2.5 3.5 5.2"></path></svg><span>Crew</span></a><a href="Jeux.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8.5 8.5h.01M15.5 15.5h.01M15.5 8.5h.01M8.5 15.5h.01M12 12h.01"></path></svg><span>Jeux</span></a><a href="Bars.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21zM12 7.5a2 2 0 1 1 0 4a2 2 0 1 1 0-4z"></path></svg><span>Bars</span></a><a href="Profil.dc.html" class=""><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a4 4 0 1 1 0 8a4 4 0 1 1 0-8zM4 21c1-4 4.2-6 8-6s7 2 8 6"></path></svg><span>Moi</span></a></nav>
+</div></div>
+<div class="pw"><div class="cap">Limite, eau et volant</div><div class="ph">
+<div class="sc">
+<a class="ib" href="#" aria-label="Retour"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<h1 class="h1">Avant de sortir</h1>
+<div class="pan">
+<div class="top"><span class="h3">Ma limite ce soir</span><span class="num amb" style="font-size: 34px">{{limTxt}}</span></div>
+<input type="range" min="2" max="15" value="{{lim}}" onInput="{{onLim}}" aria-label="Limite" style="width: 100%; accent-color: #F4B33D">
+<div class="top"><span class="s">Me prévenir quand j'approche</span><button class="sw {{warnCls}}" aria-label="Alerte" onClick="{{toggleWarn}}"></button></div>
+</div>
+<div class="pan">
+<span class="h3">Rappel d'eau</span>
+<div class="seg"><sc-for list="{{waterOpts}}" as="o" hint-placeholder-count="4"><button class="{{o.on}}" onClick="{{o.pick}}">{{o.l}}</button></sc-for></div>
+</div>
+<div class="pan">
+<span class="h3">Volant</span>
+<div class="row"><div class="g1"><span class="p">Pays</span></div><span class="s">France</span><svg class="ic" style="width: 18px; height: 18px" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+<div class="row"><div class="g1"><span class="p">Jeune permis</span><span class="s">0,2 g/L au lieu de 0,5</span></div><button class="sw {{novCls}}" aria-label="Jeune permis" onClick="{{toggleNov}}"></button></div>
+<div class="row" style="border: 0"><div class="g1"><span class="p">Sous la limite à</span></div><span class="h3 amb">{{driveAt}}</span></div>
+</div>
+<p class="dis">Estimation, pas un éthylotest. Ne prends jamais le volant sur cette base.</p>
+</div>
+</div></div>
+<div class="pw"><div class="cap">Partager ma soirée</div><div class="ph">
+<div style="position: absolute; inset: 0; background: #3A4643; display: flex; align-items: center; justify-content: center; color: #56635F"><svg class="ic" style="width: 180px; height: 180px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a4 4 0 1 1 0 8a4 4 0 1 1 0-8zM4 21c1-4 4.2-6 8-6s7 2 8 6"></path></svg></div>
+<div class="sc" style="position: relative; justify-content: space-between">
+<div class="top"><button class="ib" aria-label="Fermer"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button><button class="chip" onClick="{{flipCam}}"><svg class="ic" style="width: 16px; height: 16px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4zM12 10.5a3 3 0 1 1 0 6a3 3 0 1 1 0-6z"></path></svg> {{camTxt}}</button></div>
+<div class="pan" style="background: rgba(30,38,36,.92)">
+<div class="top"><span class="h3">Samedi au Zinc</span><span class="s">6 potes</span></div>
+<div style="display: flex; align-items: flex-end; gap: 16px"><span class="num amb" style="font-size: 64px">0,74</span><span class="s" style="padding-bottom: 8px">pic en g/L, 6 verres, 3 eaux</span></div>
+<svg viewBox="0 0 300 60" style="width: 100%" aria-hidden="true"><polyline points="0,58 40,50 80,40 120,30 160,18 200,14 240,24 300,40" fill="none" stroke="#F4B33D" stroke-width="3"></polyline></svg>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<div class="grid4">
+<button class="tile" style="align-items: center; font-size: 12px"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 14v6h14v-6"></path></svg>Story Insta</button>
+<button class="tile" style="align-items: center; font-size: 12px"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 14v6h14v-6"></path></svg>Snapchat</button>
+<button class="tile" style="align-items: center; font-size: 12px"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 14v6h14v-6"></path></svg>TikTok</button>
+<button class="tile" style="align-items: center; font-size: 12px"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 14v6h14v-6"></path></svg>WhatsApp</button>
+</div>
+<button class="btn g full"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h.01M12 12h.01M19 12h.01"></path></svg> Autres apps</button>
+</div>
+</div>
+</div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2732,"height":1010}}'>
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state={bac:0.42,shown:0.42,unit:0,drinks:6,water:2,pending:false,confirmed:false,undo:false,fill:0,wp:'pop1',roll:'pop1',
+    pick:2,t:22*60+47,photo:false,hist:[{t:'21 h 04',w:'Au Zinc',v:true,x:0},{t:'21 h 40',w:'Au Zinc',v:true,x:-150},{t:'22 h 18',w:'Au Zinc',v:false,x:0},{t:'22 h 51',w:'La Capsule',v:true,x:0}],
+    delToast:false,lastDel:null,period:0,cmp:false,scrub:62,lim:8,warn:true,wOpt:1,nov:false,cam:0}; }
+  componentWillUnmount(){ clearTimeout(this.t1); clearTimeout(this.t2); clearInterval(this.iv); }
+  fmt(v){ return v.toFixed(2).replace('.',','); }
+  animateTo(target){ clearInterval(this.iv); const start=this.state.shown, steps=14; let i=0;
+    this.iv=setInterval(()=>{ i++; const v=start+(target-start)*(i/steps); this.setState({shown:v}); if(i>=steps) clearInterval(this.iv); },45); }
+  add(){ if(this.state.pending) return; clearTimeout(this.t2);
+    this.setState({pending:true,confirmed:false,fill:100});
+    this.t1=setTimeout(()=>{ const nb=this.state.bac+0.16; this.setState({pending:false,confirmed:true,bac:nb,drinks:this.state.drinks+1,undo:true,fill:0,roll:this.state.roll==='pop1'?'pop2':'pop1'}); this.animateTo(nb);
+      this.t2=setTimeout(()=>this.setState({undo:false,confirmed:false}),5000); },900); }
+  hhmm(m){ const h=Math.floor(m/60)%24, mm=m%60; return h+' h '+String(mm).padStart(2,'0'); }
+  renderVals(){
+    const s=this.state, b=s.shown, h=new Date().getHours();
+    const greet=h<5?'Encore debout ?':h<11?'Bien dormi ?':h<17?'Rien de prévu ce soir ?':h<21?'L\'apéro commence.':'Ça commence à chauffer.';
+    const units=[['g/L','de sang','soit '+(b/2).toFixed(2).replace('.',',')+' mg/L d\'air'],['mg/L','d\'air expiré','soit '+this.fmt(b)+' g/L de sang']];
+    const u=units[s.unit];
+    const zeroH=b/0.15, overH=Math.max(0,(b-(s.nov?0.2:0.5))/0.15);
+    const dur=(x)=>Math.floor(x)+' h '+String(Math.round((x%1)*60)).padStart(2,'0');
+    const quickDefs=[['Demi','25 cl'],['Bière','33 cl'],['Pinte','50 cl'],['Vin','12 cl'],['Shot','3 cl'],['Cocktail','20 cl'],['Cidre','33 cl'],['Soft','sans alcool']];
+    const periods=['Jour','Semaine','Mois','Total','Moyenne'];
+    const sets=[[0,0,.05,.1,.2,.32,.42,.5,.58,.62,.55,.45,.33,.2,.1,0],[.1,.3,.2,0,0,.5,.8,.3,0,.1,.6,.7,.2,0,0,.1],[.3,.5,.4,.6,.2,.7,.5,.3,.6,.4,.5,.7,.3,.5,.4,.6],[.2,.3,.25,.35,.3,.4,.33,.38,.36,.42,.4,.45,.41,.44,.43,.46],[.32,.33,.31,.34,.36,.35,.37,.36,.38,.37,.39,.38,.4,.39,.41,.4]];
+    const data=sets[s.period], y=(v)=>200-v*200, x=(i)=>i*(340/(data.length-1));
+    const pts=data.map((v,i)=>x(i).toFixed(0)+','+y(v).toFixed(0)).join(' ');
+    const cmpData=data.map((v,i)=>Math.max(0,v*0.8+((i%3)-1)*.04));
+    const idx=Math.round(s.scrub/100*(data.length-1));
+    const lims=[.2,.5,.8,1];
+    return {
+      greet, bacTxt:this.fmt(s.unit?b/2:b), unitTxt:u[0], unitAlt:u[2], cycleUnit:()=>this.setState({unit:1-s.unit}), rollCls:s.roll,
+      trend:'Ça monte. Pic estimé à '+this.fmt(b+0.2)+' g/L vers 23 h 40.',
+      zero:dur(zeroH), drive:overH>0?dur(overH):'OK', driveCls:overH>0?'red':'mint',
+      addPint:()=>this.add(), fillH:s.fill, pending:s.pending, confirmed:s.confirmed, undo:s.undo, hour:this.hhmm(s.t),
+      doUndo:()=>{ clearTimeout(this.t2); const nb=s.bac-0.16; this.setState({undo:false,confirmed:false,bac:nb,drinks:s.drinks-1}); this.animateTo(nb); },
+      addWater:()=>this.setState({water:s.water+1,wp:s.wp==='pop1'?'pop2':'pop1'}), wp:s.wp,
+      drinks:s.drinks, drinksTxt:s.drinks+(s.drinks>1?' verres':' verre'), waterTxt:s.water+(s.water>1?' eaux':' eau'),
+      crew:[{i:'M',n:'Malik',a:'a3',v:'0,81',t:'batterie 6 %',tc:'red',hasTag:true},{i:'J',n:'Jade',a:'a2',v:'0,55',t:'',hasTag:false},{i:'I',n:'Inès',a:'a5',v:'0,48',t:'',hasTag:false},{i:'T',n:'Théo',a:'a4',v:'0,00',t:'SAM',tc:'wat',hasTag:true},{i:'S',n:'Sami',a:'a6',v:'0,62',t:'rentré',tc:'mint',hasTag:true}],
+      quick:quickDefs.map((q,i)=>({l:q[0],d:q[1],on:s.pick===i?'on':'',pick:()=>this.setState({pick:i})})), pickedTxt:quickDefs[s.pick][0].toLowerCase(),
+      tTxt:this.hhmm(s.t), tMax:s.t>=22*60+50, tMinus:()=>this.setState({t:s.t-1}), tPlus:()=>this.setState({t:Math.min(22*60+50,s.t+1)}),
+      photoCls:s.photo?'on':'', togglePhoto:()=>this.setState({photo:!s.photo}),
+      histN:s.hist.length, hist:s.hist.map((it,i)=>({...it,del:()=>{ const nh=s.hist.filter((_,j)=>j!==i); this.setState({hist:nh,delToast:true,lastDel:{it:{...it,x:0},i}}); }})),
+      delToast:s.delToast, undoDel:()=>{ const nh=s.hist.slice(); nh.splice(s.lastDel.i,0,s.lastDel.it); this.setState({hist:nh,delToast:false}); },
+      periods:periods.map((l,i)=>({l,on:s.period===i?'on':'',pick:()=>this.setState({period:i})})),
+      pts, cmp:s.cmp, cmpOn:s.cmp?'on':'', toggleCmp:()=>this.setState({cmp:!s.cmp}),
+      cmpPts:cmpData.map((v,i)=>x(i).toFixed(0)+','+y(v).toFixed(0)).join(' '), cmpEnd:y(cmpData[13]).toFixed(0), cmpEndT:(y(cmpData[13])+3).toFixed(0),
+      scrub:s.scrub, scrubX:(s.scrub/100*340).toFixed(0), onScrub:(e)=>this.setState({scrub:+e.target.value}),
+      scrubTime:s.period===0?this.hhmm(20*60+Math.round(s.scrub/100*480)):'Point '+(idx+1), scrubVal:this.fmt(data[idx])+' g/L',
+      lim:s.lim, limTxt:(s.lim/10).toFixed(1).replace('.',',')+' g/L', onLim:(e)=>this.setState({lim:+e.target.value}),
+      warnCls:s.warn?'on':'', toggleWarn:()=>this.setState({warn:!s.warn}),
+      waterOpts:['30 min','45 min','1 h','Off'].map((l,i)=>({l,on:s.wOpt===i?'on':'',pick:()=>this.setState({wOpt:i})})),
+      novCls:s.nov?'on':'', toggleNov:()=>this.setState({nov:!s.nov}), driveAt:s.nov?'5 h 20':'3 h 05',
+      camTxt:s.cam?'Caméra arrière':'Caméra avant', flipCam:()=>this.setState({cam:1-s.cam})
+    };
+  }
+}
+</script>
+</body>
+</html>

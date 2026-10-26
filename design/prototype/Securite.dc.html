@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Rentrer en sécurité</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+.bd{display:flex;gap:56px;padding:72px 56px 56px;align-items:flex-start;background:#CDD3CE;font-family:'Archivo',system-ui,sans-serif;color:#1E2624}
+.pw{display:flex;flex-direction:column;gap:14px;flex:none}
+.cap{font-size:16px;font-weight:700;color:#26302D;padding-left:10px;font-stretch:90%}
+.ph{width:390px;height:844px;border-radius:46px;background:#1E2624;color:#F1EEE6;position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 0 9px #0F1413,0 28px 50px rgba(15,20,19,.28);font-family:'Archivo',system-ui,sans-serif}
+.ph.lt{background:#EEF0EA;color:#1E2624}
+.sc{flex:1;min-height:0;overflow-y:auto;padding:58px 20px 22px;display:flex;flex-direction:column;gap:16px;scrollbar-width:none}
+.sc::-webkit-scrollbar{display:none}
+.h1{margin:0;font-size:32px;line-height:1.04;font-weight:800;font-stretch:76%}
+.h2{margin:0;font-size:22px;line-height:1.12;font-weight:750;font-stretch:82%}
+.h3{margin:0;font-size:16px;line-height:1.25;font-weight:700}
+.p{margin:0;font-size:15px;line-height:1.45}
+.s{margin:0;font-size:13px;line-height:1.4;color:#AEB7B2}
+.lt .s{color:#4F5A55}
+.num{font-weight:900;font-stretch:62%;line-height:.86;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.amb{color:#F4B33D}.red{color:#FF7A66}.wat{color:#8CCBEA}.mint{color:#9BD8A8}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 18px;border-radius:14px;border:0;background:#F4B33D;color:#1E2624;font:700 16px 'Archivo',sans-serif;text-decoration:none;cursor:pointer;transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn.g{background:#34403C;color:#F1EEE6}
+.btn.o{background:transparent;color:inherit;box-shadow:inset 0 0 0 1.5px #56635F}
+.btn.d{background:#FF7A66;color:#1E2624}
+.btn.w2{background:#8CCBEA;color:#1E2624}
+.btn.sm{min-height:40px;font-size:14px;border-radius:12px;padding:0 14px}
+.btn.full{width:100%}
+.btn[disabled]{opacity:.4;cursor:default}
+.lt .btn.g{background:#DCE1DA;color:#1E2624}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 14px;border-radius:999px;border:0;background:#34403C;color:#F1EEE6;font:600 14px 'Archivo',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none}
+.chip.on{background:#F1EEE6;color:#1E2624}
+.lt .chip{background:#DCE1DA;color:#1E2624}.lt .chip.on{background:#1E2624;color:#EEF0EA}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.hs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -20px;padding:0 20px;flex:none}
+.hs::-webkit-scrollbar{display:none}
+.row{display:flex;align-items:center;gap:12px;min-height:54px;padding:8px 0;border-bottom:1px solid #34403C;color:inherit;text-decoration:none}
+.lt .row{border-color:#D3D8D2}
+.g1{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.lbl{font-size:13px;font-weight:700;color:#AEB7B2;margin:6px 0 0}
+.lt .lbl{color:#4F5A55}
+.sw{width:52px;height:32px;border-radius:999px;border:0;background:#46534F;position:relative;cursor:pointer;flex:none;transition:background .2s}
+.sw::after{content:'';position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#F1EEE6;transition:transform .22s cubic-bezier(.3,.7,.3,1)}
+.sw.on{background:#F4B33D}.sw.on::after{transform:translateX(20px)}
+.seg{display:flex;background:#2C3734;border-radius:12px;padding:3px;gap:3px;flex:none}
+.seg button{flex:1;min-height:38px;border:0;border-radius:9px;background:transparent;color:#C9D0CC;font:600 13px 'Archivo',sans-serif;cursor:pointer;padding:0 6px}
+.seg button.on{background:#F1EEE6;color:#1E2624}
+.lt .seg{background:#DCE1DA}.lt .seg button{color:#3A4440}.lt .seg button.on{background:#1E2624;color:#EEF0EA}
+.av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#1E2624;flex:none}
+.a1{background:#F4B33D}.a2{background:#9BD8A8}.a3{background:#8CCBEA}.a4{background:#F2C6A0}.a5{background:#D6C8F2}.a6{background:#FF9C8A}.a7{background:#E8E3D2}
+.tag{display:inline-flex;align-items:center;gap:4px;min-height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:650;background:#34403C;color:#E3E7E4;white-space:nowrap}
+.tag.amb{background:#4A3E22;color:#F8CE7A}.tag.red{background:#4E2C27;color:#FFB3A6}.tag.wat{background:#24404D;color:#B8E0F3}.tag.mint{background:#2A4632;color:#BFE9C8}
+.lt .tag{background:#DCE1DA;color:#1E2624}
+.tab{display:flex;justify-content:space-around;padding:10px 6px 30px;border-top:1px solid #34403C;background:#1E2624;flex:none}
+.tab a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:650;color:#97A19C;text-decoration:none;min-width:60px;min-height:44px;justify-content:center}
+.tab a.on{color:#F4B33D}
+.ic{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ib{width:44px;height:44px;border-radius:12px;border:0;background:#2C3734;color:#F1EEE6;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;flex:none}
+.lt .ib{background:#DCE1DA;color:#1E2624}
+.pan{background:#28322F;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.lt .pan{background:#FFFFFF}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#28322F;border-radius:26px 26px 0 0;padding:12px 20px 34px;display:flex;flex-direction:column;gap:14px;box-shadow:0 -14px 40px rgba(0,0,0,.4);animation:sup .32s cubic-bezier(.2,.8,.2,1)}
+.dim{position:absolute;inset:0;background:rgba(10,14,13,.55)}
+.grab{width:40px;height:5px;border-radius:3px;background:#56635F;align-self:center}
+.toast{position:absolute;left:14px;right:14px;bottom:100px;background:#F1EEE6;color:#1E2624;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:650;animation:tin .28s cubic-bezier(.2,.8,.2,1);z-index:5}
+.toast.err{background:#FF7A66}
+.toast .btn{min-height:36px;font-size:13px;padding:0 12px;background:#1E2624;color:#F1EEE6}
+.inp{min-height:52px;border-radius:14px;border:1.5px solid #3D4A46;background:#232D2A;color:#F1EEE6;padding:0 14px;font:500 16px 'Archivo',sans-serif;width:100%}
+.lt .inp{background:#fff;border-color:#C8CEC8;color:#1E2624}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:700;color:#AEB7B2}
+.bar{height:8px;border-radius:4px;background:#34403C;overflow:hidden;flex:none}
+.bar i{display:block;height:100%;background:#F4B33D;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.lt .bar{background:#DCE1DA}
+.dis{font-size:12px;line-height:1.35;color:#AEB7B2}
+.dot{width:8px;height:8px;border-radius:50%;background:#9BD8A8;flex:none}
+.dot.live{animation:live 1.6s ease-in-out infinite}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:12px;border-radius:16px;background:#2C3734;border:0;color:#F1EEE6;font:600 14px 'Archivo',sans-serif;text-align:left;cursor:pointer;min-height:76px}
+.tile.on{background:#F1EEE6;color:#1E2624}
+.card3d{perspective:900px}
+.flip{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.3,.7,.2,1);transform-style:preserve-3d}
+.flip.on{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;display:flex;flex-direction:column;justify-content:space-between;padding:22px}
+.face.b{transform:rotateY(180deg)}
+.fab{position:absolute;right:16px;bottom:118px;width:56px;height:56px;border-radius:50%;border:0;background:#F4B33D;color:#1E2624;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.35);cursor:pointer;z-index:4}
+.pop1{animation:pop1 .35s cubic-bezier(.2,.8,.2,1)}.pop2{animation:pop2 .35s cubic-bezier(.2,.8,.2,1)}
+.shk{animation:shake .25s linear infinite}
+.drop{animation:drop .7s cubic-bezier(.2,.9,.25,1.2)}
+.wash{position:absolute;border-radius:50%;animation:wash 1s ease-out forwards;pointer-events:none}
+.rip{position:absolute;border-radius:50%;border:3px solid #F4B33D;animation:rip 1s ease-out infinite;pointer-events:none}
+.conf{position:absolute;width:8px;height:14px;border-radius:2px;animation:fall 1.8s cubic-bezier(.3,.6,.4,1) forwards;pointer-events:none}
+.rise{transform-origin:bottom;animation:rise .8s cubic-bezier(.2,.8,.2,1) both}
+.fadein{animation:tin .35s cubic-bezier(.2,.8,.2,1) both}
+.skel{background:linear-gradient(90deg,#2C3734 0%,#36433F 50%,#2C3734 100%);background-size:200% 100%;animation:skel 1.4s linear infinite;border-radius:10px}
+@keyframes tin{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+@keyframes sup{from{transform:translateY(100%)}to{transform:none}}
+@keyframes pop1{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes pop2{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translate(0,0)}25%{transform:translate(-3px,1px) rotate(-2deg)}50%{transform:translate(3px,-1px) rotate(2deg)}75%{transform:translate(-2px,2px)}}
+@keyframes drop{0%{transform:translateY(-70px) scale(1.5);opacity:0}70%{transform:translateY(4px) scale(1);opacity:1}100%{transform:none}}
+@keyframes wash{from{transform:scale(.2);opacity:.85}to{transform:scale(4);opacity:0}}
+@keyframes rip{from{transform:scale(.5);opacity:.9}to{transform:scale(2.2);opacity:0}}
+@keyframes fall{from{transform:translateY(-30px) rotate(0)}to{transform:translateY(520px) rotate(600deg)}}
+@keyframes live{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes rise{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes skel{from{background-position:200% 0}to{background-position:-200% 0}}
+@keyframes boom{0%{transform:scale(.4);opacity:1}100%{transform:scale(3);opacity:0}}
+@keyframes fill{from{height:0}}
+@keyframes bub{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-60px);opacity:0}}
+@keyframes clinkL{0%{transform:translateX(0) rotate(0)}45%{transform:translateX(52px) rotate(12deg)}55%{transform:translateX(46px) rotate(8deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes clinkR{0%{transform:translateX(0) rotate(0)}45%{transform:translateX(-52px) rotate(-12deg)}55%{transform:translateX(-46px) rotate(-8deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes slidein{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+</style>
+</helmet>
+<div class="bd" style="width: 1840px; height: 1010px">
+<div class="pw"><div class="cap">Bien rentré ?</div><div class="ph">
+<div class="sc">
+<a class="ib" href="Soiree.dc.html" aria-label="Retour"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<h1 class="h1">Tout le monde est rentré ?</h1>
+<sc-for list="{{home}}" as="p" hint-placeholder-count="5">
+<div class="row"><div class="av {{p.a}}">{{p.i}}</div><div class="g1"><span class="h3">{{p.n}}</span><span class="s">{{p.st}}</span></div>
+<sc-if value="{{p.ok}}" hint-placeholder-val="{{ true }}"><span class="mint"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span></sc-if>
+<sc-if value="{{p.ko}}" hint-placeholder-val="{{ false }}"><button class="btn sm g"><svg class="ic" style="width: 16px; height: 16px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"></path></svg> Appeler</button></sc-if>
+</div>
+</sc-for>
+<button class="btn full {{meCls}}" style="margin-top: auto; min-height: 64px; font-size: 18px" onClick="{{toggleMe}}">{{meTxt}}</button>
+</div>
+</div></div>
+<div class="pw"><div class="cap">Le retour</div><div class="ph">
+<div class="sc">
+<h1 class="h1">Le retour</h1>
+<div class="pan"><div class="top"><span class="h3">SAM de la soirée</span><span class="tag wat"><svg class="ic" style="width: 14px; height: 14px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 15l1.5-5h11L19 15M4 15h16v3.5H4zM7.5 18.5v1.5M16.5 18.5v1.5"></path></svg> Théo</span></div><p class="s">0 verre. S'il en ajoute un, il reçoit un rappel et le crew aussi.</p></div>
+<p class="lbl">Qui rentre avec qui</p>
+<div class="row"><div style="display: flex"><div class="av a1">H</div><div class="av a2" style="margin-left: -10px">J</div></div><div class="g1"><span class="p">Hugo et Jade</span><span class="s">À pied, 12 min</span></div></div>
+<div class="row"><div style="display: flex"><div class="av a3">M</div><div class="av a5" style="margin-left: -10px">I</div><div class="av a4" style="margin-left: -10px">T</div></div><div class="g1"><span class="p">Avec Théo</span><span class="s">En voiture</span></div></div>
+<div class="row"><div class="av a6">S</div><div class="g1"><span class="p">Sami, seul</span><span class="s">Proposer de le raccompagner</span></div><button class="btn sm g">Proposer</button></div>
+<p class="lbl">Rentrer avec</p>
+<div class="chips"><sc-for list="{{rides}}" as="r" hint-placeholder-count="4"><button class="chip {{r.on}}" onClick="{{r.pick}}">{{r.l}}</button></sc-for></div>
+<p class="s">{{rideTxt}}</p>
+<div class="pan" style="flex-direction: row; align-items: center"><span class="amb"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v13H5zM5 11h14M8 17v3M16 17v3M8 14h.01M16 14h.01"></path></svg></span><div class="g1"><span class="h3">Dernier bus de nuit à 1 h 12</span><span class="s">Arrêt à 4 min à pied</span></div></div>
+</div>
+</div></div>
+<div class="pw"><div class="cap">SOS</div><div class="ph">
+<div class="sc" style="align-items: center; text-align: center">
+<a class="ib" href="Soiree.dc.html" aria-label="Retour" style="align-self: flex-start"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<h1 class="h1" style="margin-top: 20px">{{sosTitle}}</h1>
+<p class="s" style="max-width: 280px">{{sosSub}}</p>
+<button style="all: unset; cursor: pointer; width: 220px; height: 220px; border-radius: 50%; margin: 30px 0; position: relative; display: flex; align-items: center; justify-content: center; background: conic-gradient(#FF7A66 {{sosDeg}}deg, #4E2C27 0deg)" onPointerDown="{{down}}" onPointerUp="{{up}}" onPointerLeave="{{up}}" aria-label="Maintenir pour alerter">
+<span style="width: 180px; height: 180px; border-radius: 50%; background: #1E2624; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #FF7A66"><span class="num" style="font-size: 52px">SOS</span><span class="s">{{sosHint}}</span></span>
+</button>
+<div style="width: 100%; display: flex; flex-direction: column; gap: 8px">
+<button class="btn g full"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"></path></svg> Appeler le 112</button>
+<button class="btn g full"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"></path></svg> Appeler le 15 (Samu)</button>
+<button class="btn g full"><svg class="ic" style="width: 22px; height: 22px" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"></path></svg> Appeler Maman</button>
+</div>
+<p class="s">L'alerte envoie ta position au crew, si tu l'as autorisée.</p>
+</div>
+</div></div>
+<div class="pw"><div class="cap">Trinquer</div><div class="ph">
+<div class="sc" style="align-items: center; text-align: center">
+<h1 class="h1" style="margin-top: 24px">Tchin</h1>
+<p class="s">Approche ton téléphone de celui de Jade.</p>
+<div style="display: flex; gap: 40px; margin: 70px 0 30px; position: relative">
+<div style="width: 96px; height: 170px; border-radius: 20px; background: #34403C; display: flex; align-items: center; justify-content: center; color: #F4B33D; animation: {{animL}}"><svg class="ic" style="width: 48px; height: 48px" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l-1.2 16H8.2L7 4zM7.4 9h9.2"></path></svg></div>
+<div style="width: 96px; height: 170px; border-radius: 20px; background: #34403C; display: flex; align-items: center; justify-content: center; color: #9BD8A8; animation: {{animR}}"><svg class="ic" style="width: 48px; height: 48px" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l-1.2 16H8.2L7 4zM7.4 9h9.2"></path></svg></div>
+<sc-if value="{{clinked}}" hint-placeholder-val="{{ false }}"><span class="num amb pop1" style="position: absolute; left: 50%; top: -40px; transform: translateX(-50%); font-size: 44px">Tchin !</span></sc-if>
+</div>
+<button class="btn full" onClick="{{clink}}">Trinquer</button>
+<sc-if value="{{clinked}}" hint-placeholder-val="{{ false }}"><p class="s fadein">Vous êtes bien ensemble : ça compte pour vos check-ins et vos verres.</p></sc-if>
+</div>
+</div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1840,"height":1010}}'>
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state={me:false,ride:1,sos:0,sent:false,clink:false,k:0}; }
+  componentWillUnmount(){ clearInterval(this.iv); clearTimeout(this.to); }
+  renderVals(){
+    const s=this.state;
+    const rides=['Uber','Bolt','Taxi','À pied'];
+    return {
+      home:[['J','Jade','a2','Rentrée à 2 h 10',true],['T','Théo','a4','Rentré à 2 h 35',true],['I','Inès','a5','Rentrée à 2 h 40',true],['S','Sami','a6','Pas encore confirmé',false],['H','Toi','a1',s.me?'Rentré à l\'instant':'Pas encore confirmé',s.me]].map(([i,n,a,st,ok])=>({i,n,a,st,ok,ko:!ok&&n!=='Toi'})),
+      meCls:s.me?'g':'', meTxt:s.me?'C\'est noté, bonne nuit':'Je suis bien rentré', toggleMe:()=>this.setState({me:!s.me}),
+      rides:rides.map((l,i)=>({l,on:s.ride===i?'on':'',pick:()=>this.setState({ride:i})})), rideTxt:'Choix gardé pour la prochaine fois : '+rides[s.ride]+'.',
+      sosDeg:Math.round(s.sos*3.6), sosTitle:s.sent?'Alerte envoyée':'Besoin d\'aide ?', sosSub:s.sent?'Jade, Malik et Théo ont ta position. Jade a vu l\'alerte.':'Maintiens le bouton 2 secondes. Ça évite les appuis dans la poche.',
+      sosHint:s.sent?'envoyé':'maintenir',
+      down:()=>{ if(s.sent){ this.setState({sent:false,sos:0}); return; } clearInterval(this.iv); this.iv=setInterval(()=>{ const v=this.state.sos+5; if(v>=100){ clearInterval(this.iv); this.setState({sos:100,sent:true}); } else this.setState({sos:v}); },100); },
+      up:()=>{ clearInterval(this.iv); if(!this.state.sent) this.setState({sos:0}); },
+      animL:s.clink?'clinkL .7s cubic-bezier(.3,.7,.3,1)':'none', animR:s.clink?'clinkR .7s cubic-bezier(.3,.7,.3,1)':'none', clinked:s.clink,
+      clink:()=>{ clearTimeout(this.to); this.setState({clink:false}); this.to=setTimeout(()=>this.setState({clink:true}),30); }
+    };
+  }
+}
+</script>
+</body>
+</html>
