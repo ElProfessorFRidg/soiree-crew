@@ -216,5 +216,3 @@ No vetted game-design skill exists. Each game agent researches rules itself (`<m
 | vercel-react-native-skills | installed (vercel-labs/agent-skills) | 1.0.0 | MIT | already available | Overlaps swm and callstack; pick one primary RN skill to avoid conflicting advice |
 | react-native (installed) | `~/.claude/skills/react-native` | installed | n/a | already available | Older generic RN guide; superseded by swm + callstack |
 | getsentry sentry-react-native-sdk | github.com/getsentry/sentry-for-ai | skills-legacy path, 2026-10-23 | MIT | guide only | Crash reporting without personal data (observability standard) |
-</content>
-</invoke>

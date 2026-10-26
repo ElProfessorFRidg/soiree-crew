@@ -160,5 +160,3 @@ All read on 2026-10-26. Repo metadata (licence, stars, HEAD commit) from the Git
 - https://github.com/VoltAgent/awesome-agent-skills
 - https://www.asd-ste100.org (referenced by humanizer-en-asd-ste100)
 - Official docs listed in `SKILLS.md` (Apple HIG, ActivityKit, WidgetKit, CLLocationSourceInformation, Material 3, Glance, Location.isMock, Play Integrity, FormatJS, i18next, Lingui, MessageFormat 2, CLDR, WCAG 2.2, React Native accessibility): cited as guides, URLs recorded, content not re-verified in this report.
-</content>
-</invoke>
