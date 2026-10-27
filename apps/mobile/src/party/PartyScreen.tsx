@@ -32,7 +32,7 @@ import { VaultPrompt } from "@/vault/VaultPrompt";
 import { setPartyStatus, useLiveParty, type PartyMood } from "@/server/crewData";
 import { useSession } from "@/server/session";
 import { useLevelNow } from "@/state/levelNow";
-import { openRide, RIDE_APPS } from "./rides";
+import { openRide, openTransit, RIDE_APPS } from "./rides";
 import { BubbleField } from "./BubbleField";
 import { UnwellBanner } from "./UnwellBanner";
 import { useVenueData } from "@/server/venueData";
@@ -687,6 +687,9 @@ function LevelThree(props: LevelProps) {
         variant="secondary"
         onPress={() => void openRide(ride).catch(offline)}
       />
+      {new Date().getHours() < 6 ? (
+        <Button label={i18n.t("goingHome.lastTransit")} icon="bus" height={64} variant="secondary" onPress={() => void openTransit().catch(offline)} />
+      ) : null}
       {mine && mine.homeSafeAt === null ? (
         <Button label={i18n.t("live.imHome")} icon="home" iconSize={30} fontSize={24} height={104} onPress={markHome} />
       ) : null}

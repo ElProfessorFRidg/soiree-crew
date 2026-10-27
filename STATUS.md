@@ -5,13 +5,14 @@ Generated from FEATURES.md on 2026-10-27 by `pnpm status`. Edit FEATURES.md, not
 | Status | Count |
 |---|---|
 | Built | 291 |
-| Partly built | 3 |
-| To do | 9 |
+| Partly built | 4 |
+| To do | 8 |
 | Proposed (not in the brief yet) | 6 |
 | Total | 309 |
 
 ## Partly built
 
+- **QOL-22** (P2, Everyday polish): Last ride home: after midnight, the last night bus / metro departures near the venue on the Party screen, when
 - **QOL-27** (P0, Everyday polish): Discreet lock screen: by default lock screen, Live Activity, widget and notifications show no BAC figure or drink count (level icon and time to zero only); numb
 - **QOL-29** (P0, Everyday polish): Invite survives the install: a friend who installs from an invite link lands in the right crew or party (Play Install Referrer; invite code plus system Paste bu
 - **MSG-11** (P1, Messaging): Linking a new device: QR scan from an existing device, "new device linked" notice to the owner's other devices, plain warning that history does not follow witho
@@ -22,7 +23,6 @@ Generated from FEATURES.md on 2026-10-27 by `pnpm status`. Edit FEATURES.md, not
 - **HUB-03** (P0, Party hub): Lock-screen widgets (BAC, next water, who is out tonight).
 - **HUB-04** (P2, Party hub): Smartwatch: BAC, add drink and water from the wrist.
 - **QOL-06** (P0, Everyday polish): Native sharing: recap and story cards go straight to Instagram Stories, Snapchat (Creative Kit), TikTok and Wh
-- **QOL-22** (P2, Everyday polish): Last ride home: after midnight, the last night bus / metro departures near the venue on the Party screen, when
 - **JOY-01** (P1, Delight): Cheers: bring two phones together (Bluetooth LE / NFC) and both screens play a clink with sound and haptic. It
 - **JOY-10** (P2, Delight): Sticker packs (iMessage / WhatsApp) made from crew avatars and moments.
 - **MOT-11** (P1, Motion): Animated widgets and Live Activity, within each OS's limits.

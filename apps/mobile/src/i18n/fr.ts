@@ -677,6 +677,7 @@ export const fr = {
     transit: "Transports",
     rideWith: "Commander avec {app}",
     rideHint: "L'app choisie est gardée pour la prochaine fois.",
+    lastTransit: "Dernier bus ou métro",
   },
   whereTo: {
     title: "On va où ?",

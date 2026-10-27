@@ -18,3 +18,11 @@ export async function openRide(app: (typeof RIDE_APPS)[number]): Promise<void> {
 }
 
 export type RideApp = (typeof RIDE_APPS)[number];
+
+/**
+ * QOL-22, until GTFS feeds are wired in: the maps app's public-transport directions from here,
+ * where the next night bus or metro and the last departures are listed.
+ */
+export async function openTransit(): Promise<void> {
+  await Linking.openURL("https://www.google.com/maps/dir/?api=1&travelmode=transit");
+}

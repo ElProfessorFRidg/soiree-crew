@@ -270,7 +270,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-19 | P1 | Argent.dc.html | build | Long-press copies what people copy (IBAN, codes, addresses), with a haptic and a short inline "Copied". |
 | QOL-20 | P1 | Recap.dc.html | build | Next-morning mode: the morning after, the app opens on a calm, dark, low-contrast screen with the recap, who o... |
 | QOL-21 | P1 | Radar.dc.html | build | Calendar and birthdays: parties added to the phone calendar in one tap; a crew member's birthday reminds the o... |
-| QOL-22 | P2 | Securite.dc.html | todo | Last ride home: after midnight, the last night bus / metro departures near the venue on the Party screen, when... |
+| QOL-22 | P2 | Securite.dc.html | partial | Last ride home: after midnight, the last night bus / metro departures near the venue on the Party screen, when... |
 | QOL-23 | P1 | Etats.dc.html | build | Search that helps: recent searches, typo tolerance (ADP-05), suggestions before typing, results grouped (venue... |
 | QOL-24 | P1 | Reglages.dc.html | build | Respect the phone: Low Power Mode lowers refresh rates and effects, a data-saver option for photos, light and ... |
 | QOL-25 | P0 | Backstage (near Systeme.dc.html) | proposed | Native fast path: every out-of-app action (widget, Live Activity / Live Update, notification action, Siri / Shortcut, Control, Quick Settings tile, launcher shortcut) is written natively to a shared queue with an idempotency key and sent natively within seconds, even with the app killed; the app reconciles on launch. Source: polish.md §1, §2.4 R1, §5. |

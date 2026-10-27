@@ -677,6 +677,7 @@ export const de: Messages = {
     transit: "Öffis",
     rideWith: "Mit {app} bestellen",
     rideHint: "Die gewählte App merken wir uns fürs nächste Mal.",
+    lastTransit: "Letzter Bus oder U-Bahn",
   },
   whereTo: {
     title: "Wohin?",

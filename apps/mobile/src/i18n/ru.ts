@@ -693,6 +693,7 @@ export const ru: Messages = {
     transit: "Общественный транспорт",
     rideWith: "Заказать через {app}",
     rideHint: "Выбранное приложение запомнится на следующий раз.",
+    lastTransit: "Последний автобус или метро",
   },
   whereTo: {
     title: "Куда идём?",

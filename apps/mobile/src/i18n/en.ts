@@ -679,6 +679,7 @@ export const en: Messages = {
     transit: "Public transport",
     rideWith: "Book with {app}",
     rideHint: "The app you pick is kept for next time.",
+    lastTransit: "Last bus or metro",
   },
   whereTo: {
     title: "Where to?",

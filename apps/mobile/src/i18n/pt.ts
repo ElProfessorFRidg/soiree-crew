@@ -678,6 +678,7 @@ export const pt: Messages = {
     transit: "Transportes",
     rideWith: "Pedir com {app}",
     rideHint: "A app que escolheres fica guardada para a próxima vez.",
+    lastTransit: "Último autocarro ou metro",
   },
   whereTo: {
     title: "Para onde vamos?",
