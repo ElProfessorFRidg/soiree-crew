@@ -6,6 +6,7 @@ import { AC_CONFIG, verifyDrinks } from "../anticheat";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { crewTimeZone, currentSeason } from "../territory";
 import { nightOf, offsetMinutes } from "../time";
+import { CREW_KINDS } from "../schemas";
 
 const DAY_MS = 86_400_000;
 
@@ -276,8 +277,14 @@ export function leaderboardRoutes(app: FastifyInstance, ctx: Context): void {
         timeZone: z.string().min(3).max(60).optional(),
         aiEnabled: z.boolean().optional(),
         publicName: z.boolean().optional(),
+        kind: z.enum(CREW_KINDS).optional(),
+        open: z.boolean().optional(),
+        description: z.string().trim().max(200).optional(),
       })
       .parse(request.body);
+    if (input.kind !== undefined) await ctx.db.query("update crews set kind = $2 where id = $1", [request.params.id, input.kind]);
+    if (input.open !== undefined) await ctx.db.query("update crews set open = $2 where id = $1", [request.params.id, input.open]);
+    if (input.description !== undefined) await ctx.db.query("update crews set description = $2 where id = $1", [request.params.id, input.description]);
     if (input.publicName !== undefined) await ctx.db.query("update crews set public_name = $2 where id = $1", [request.params.id, input.publicName]);
     if (input.aiEnabled !== undefined) await ctx.db.query("update crews set ai_enabled = $2 where id = $1", [request.params.id, input.aiEnabled]);
     if (input.leaderboardEnabled !== undefined) {

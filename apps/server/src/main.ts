@@ -14,6 +14,7 @@ import { LiveHub } from "./live";
 //   UPLOAD_DIR    album photos, chat files and backups (default ./data/uploads; /data/uploads in the image)
 //   TRUST_PROXY   "1" (one proxy hop, e.g. Coolify's Traefik) or "true"; unset when exposed directly
 //   AI_PROVIDER, ANTHROPIC_API_KEY, AI_MODEL   optional, ADR 0004
+//   SERVER_NAME, SERVER_DESCRIPTION, PUBLIC_SERVER=true   how the server presents itself (GET /v1/info)
 //   OPERATOR_USERNAMES   comma-separated usernames who review venue claims (COM-11)
 //   SEASON_VARIANTS   optional JSON, {"2026-12": "games"} (TER-12)
 
@@ -44,6 +45,7 @@ const app = await buildApp(
     hashSecret: createHash("sha256").update(`fix-hash:${dataKey}`).digest("hex"),
     uploadDir: process.env.UPLOAD_DIR ?? "./data/uploads",
     ai: aiProvider(),
+    serverInfo: { name: process.env.SERVER_NAME ?? "", description: process.env.SERVER_DESCRIPTION ?? "", public: process.env.PUBLIC_SERVER === "true" },
     operators: (process.env.OPERATOR_USERNAMES ?? "").split(",").map((u) => u.trim().toLowerCase()).filter(Boolean),
   },
   { logger: true, trustProxy: trustProxy(process.env.TRUST_PROXY) },

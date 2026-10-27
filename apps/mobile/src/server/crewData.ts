@@ -13,9 +13,17 @@ export interface CrewMember {
   role: "admin" | "member";
 }
 
+export const CREW_KINDS = ["friends", "school", "family", "work", "sport", "other"] as const;
+export type CrewKind = (typeof CREW_KINDS)[number];
+
 export interface Crew {
   id: string;
   name: string;
+  /** Friends, school, family...: one person is often in several. */
+  kind?: CrewKind;
+  /** Listed on the server, joinable without an invite. */
+  open?: boolean;
+  description?: string;
   role: "admin" | "member";
   leaderboardEnabled: boolean;
   /** <ai_features>: opt-in per crew, off by default. */
@@ -119,8 +127,8 @@ export async function refreshLiveParty(partyId: string): Promise<void> {
   useCrewData.setState((state) => ({ live: { ...state.live, [partyId]: { ...data, fetchedAt: Date.now() } } }));
 }
 
-export async function createCrew(name: string): Promise<string> {
-  const { crew } = await api<{ crew: { id: string } }>("/v1/crews", { method: "POST", body: { name } });
+export async function createCrew(name: string, kind: CrewKind = "friends"): Promise<string> {
+  const { crew } = await api<{ crew: { id: string } }>("/v1/crews", { method: "POST", body: { name, kind } });
   await refreshCrews();
   return crew.id;
 }
@@ -226,4 +234,26 @@ export async function setCrewLeaderboard(crewId: string, leaderboardEnabled: boo
     patch(!leaderboardEnabled);
     throw error;
   }
+}
+
+export interface OpenCrew {
+  id: string;
+  name: string;
+  kind: CrewKind;
+  description: string;
+  members: number;
+}
+
+/** Open crews on this server, by name, that I am not in yet. */
+export const fetchOpenCrews = (q: string) => api<{ crews: OpenCrew[] }>(`/v1/crews/open?q=${encodeURIComponent(q)}`);
+
+export async function joinOpenCrew(crewId: string): Promise<void> {
+  await api(`/v1/crews/${crewId}/join`, { method: "POST" });
+  await refreshCrews();
+}
+
+/** Admin only: what the crew is, and whether anyone on the server may join it. */
+export async function updateCrew(crewId: string, change: { kind?: CrewKind; open?: boolean; description?: string }): Promise<void> {
+  await api(`/v1/crews/${crewId}/settings`, { method: "PATCH", body: change });
+  useCrewData.setState((state) => ({ crews: state.crews.map((c) => (c.id === crewId ? { ...c, ...change } : c)) }));
 }

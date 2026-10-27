@@ -13,13 +13,13 @@ import { flyHero, HeroSource } from "@/motion/hero";
 import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
 import { ApiError } from "@/server/api";
-import { acceptInvite, createCrew, createInvite, leaveCrew, refreshCrews, refreshParties, respondToParty, useCrewData, type Crew, type Party } from "@/server/crewData";
+import { acceptInvite, createCrew, createInvite, CREW_KINDS, fetchOpenCrews, joinOpenCrew, leaveCrew, refreshCrews, refreshParties, respondToParty, useCrewData, type Crew, type CrewKind, type OpenCrew, type Party } from "@/server/crewData";
 import { useSession } from "@/server/session";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
 import { Button, IconButton } from "@/ui/Button";
-import { Panel, Row, Segmented, Tag } from "@/ui/controls";
+import { Chip, Panel, Row, Segmented, Tag } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
@@ -111,10 +111,12 @@ function CrewCard({ crew }: { crew: Crew }) {
       <View style={styles.crewHead}>
         <View style={styles.flex}>
           <Text variant="h2">{crew.name}</Text>
-          <Text variant="small">{i18n.plural("crew.members", crew.members.length)}</Text>
+          <Text variant="small">{`${i18n.t(`crew.kinds.${crew.kind ?? "friends"}`)}, ${i18n.plural("crew.members", crew.members.length)}`}</Text>
         </View>
+        {crew.open ? <Tag tone="ok" label={i18n.t("crew.openTag")} /> : null}
         {crew.role === "admin" ? <Tag label={i18n.t("crew.admin")} /> : null}
       </View>
+
       <View style={styles.members}>
         {crew.members.map((member) => (
           <ScalePressable
@@ -208,6 +210,10 @@ export default function CrewScreen() {
   const parties = useCrewData((state) => state.parties);
   const hourCycle = useAppStore((state) => state.preferences.hourCycle);
   const [crewName, setCrewName, clearCrewName] = useDraft("crew:name");
+  const [crewKind, setCrewKind] = useState<CrewKind>("friends");
+  // Several crews: the radar shows one at a time, picked here.
+  const [radarCrew, setRadarCrew] = useState<string | null>(null);
+  const radarId = crews.find((c) => c.id === radarCrew)?.id ?? crews[0]?.id;
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState<"create" | "join" | null>(null);
   const pendingInvite = usePendingInvite((state) => state.invite);
@@ -251,7 +257,14 @@ export default function CrewScreen() {
       onRefresh={() => Promise.all([refreshCrews(), refreshParties(), ...crews.map((c) => refreshRadar(c.id))])}
     >
       <SosBanner />
-      {crews[0] ? <RadarSection crewId={crews[0].id} /> : null}
+      {crews.length > 1 ? (
+        <View style={styles.kinds}>
+          {crews.map((c) => (
+            <Chip key={c.id} label={c.name} selected={c.id === radarId} onPress={() => setRadarCrew(c.id)} />
+          ))}
+        </View>
+      ) : null}
+      {radarId ? <RadarSection crewId={radarId} /> : null}
       {invitations.length ? (
         <>
           <Text variant="label">{i18n.t("crew.invitations")}</Text>
@@ -323,6 +336,11 @@ export default function CrewScreen() {
 
       <Panel>
         <Field label={i18n.t("crew.newCrew")} placeholder={i18n.t("crew.crewName")} value={crewName} onChangeText={setCrewName} maxLength={40} />
+        <View style={styles.kinds}>
+          {CREW_KINDS.map((k) => (
+            <Chip key={k} label={i18n.t(`crew.kinds.${k}`)} selected={crewKind === k} onPress={() => setCrewKind(k)} />
+          ))}
+        </View>
         <Button
           label={i18n.t("crew.create")}
           variant="secondary"
@@ -331,7 +349,7 @@ export default function CrewScreen() {
           loading={busy === "create"}
           onPress={() => {
             setBusy("create");
-            createCrew(crewName.trim())
+            createCrew(crewName.trim(), crewKind)
               .then(() => {
                 haptic.confirmed();
                 clearCrewName();
@@ -341,11 +359,60 @@ export default function CrewScreen() {
           }}
         />
       </Panel>
+      <OpenCrews />
     </Screen>
   );
 }
 
+/** Open crews on this server (a student union, a club): join without an invite. */
+function OpenCrews() {
+  const i18n = useT();
+  const [q, setQ] = useState("");
+  const [list, setList] = useState<OpenCrew[] | null>(null);
+  useEffect(() => {
+    const id = setTimeout(() => {
+      void fetchOpenCrews(q.trim())
+        .then((r) => setList(r.crews))
+        .catch(() => setList(null));
+    }, 300);
+    return () => clearTimeout(id);
+  }, [q]);
+  // Shown only where there is something to join: a private server keeps the tab as it was.
+  if (!list || (!list.length && !q)) return null;
+  return (
+    <Panel>
+      <Text variant="label">{i18n.t("crew.openTitle")}</Text>
+      <Field label={i18n.t("crew.openSearch")} value={q} onChangeText={setQ} maxLength={40} />
+      {list.length === 0 ? <Text variant="small">{i18n.t("crew.openNone")}</Text> : null}
+      {list.map((c, index) => (
+        <Row
+          key={c.id}
+          title={c.name}
+          subtitle={[i18n.t(`crew.kinds.${c.kind}`), i18n.plural("crew.members", c.members), c.description].filter(Boolean).join(", ")}
+          trailing={
+            <Button
+              label={i18n.t("crew.join")}
+              variant="secondary"
+              height={40}
+              onPress={() =>
+                void joinOpenCrew(c.id)
+                  .then(() => {
+                    haptic.confirmed();
+                    setList((l) => l?.filter((x) => x.id !== c.id) ?? null);
+                  })
+                  .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+              }
+            />
+          }
+          last={index === list.length - 1}
+        />
+      ))}
+    </Panel>
+  );
+}
+
 const styles = StyleSheet.create({
+  kinds: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   headerActions: { flexDirection: "row", gap: 8 },
   flex: { flex: 1 },
   crewHead: { flexDirection: "row", alignItems: "center", gap: 12 },

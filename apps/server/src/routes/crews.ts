@@ -1,22 +1,25 @@
 import type { FastifyInstance } from "fastify";
+import { z } from "zod";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { newCode, newId } from "../crypto";
 import { crewSchema } from "../schemas";
 import { invitePage, pickLanguage } from "../invitePage";
+import { RateLimiter } from "../ratelimit";
 
 const INVITE_TTL_MS = 7 * 24 * 3_600_000;
 
 export function crewRoutes(app: FastifyInstance, ctx: Context): void {
+  const joins = new RateLimiter(20, 60 * 60_000, ctx.now);
   app.post("/v1/crews", async (request, reply) => {
     const user = requireUser(request);
     const input = crewSchema.parse(request.body);
     const id = newId();
     const now = ctx.now();
     await ctx.db.transaction(async (tx) => {
-      await tx.query("insert into crews (id, name, created_by, created_at) values ($1, $2, $3, $4)", [id, input.name, user.id, now]);
+      await tx.query("insert into crews (id, name, created_by, created_at, kind) values ($1, $2, $3, $4, $5)", [id, input.name, user.id, now, input.kind]);
       await tx.query("insert into crew_members (crew_id, user_id, role, joined_at) values ($1, $2, 'admin', $3)", [id, user.id, now]);
     });
-    return reply.status(201).send({ crew: { id, name: input.name, role: "admin" } });
+    return reply.status(201).send({ crew: { id, name: input.name, role: "admin", kind: input.kind } });
   });
 
   /** My crews and their members. Members see each other's display name and username only (SEC-01). */
@@ -29,10 +32,13 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
       leaderboard_enabled: boolean;
       ai_enabled: boolean;
       public_name: boolean;
+      kind: string;
+      open: boolean;
+      description: string;
       leaderboard_opt_out: boolean;
       territory_opt_out: boolean;
     }>(
-      `select c.id, c.name, m.role, c.leaderboard_enabled, c.ai_enabled, c.public_name, m.leaderboard_opt_out, m.territory_opt_out
+      `select c.id, c.name, m.role, c.leaderboard_enabled, c.ai_enabled, c.public_name, c.kind, c.open, c.description, m.leaderboard_opt_out, m.territory_opt_out
        from crews c join crew_members m on m.crew_id = c.id where m.user_id = $1 order by c.created_at`,
       [user.id],
     );
@@ -53,6 +59,9 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
         aiEnabled: crew.ai_enabled,
         aiAvailable: Boolean(ctx.ai) && crew.ai_enabled,
         publicName: crew.public_name,
+        kind: crew.kind,
+        open: crew.open,
+        description: crew.description,
         // My own participation (RANK-08, TER-07): only ever sent to me.
         me: { leaderboardOptOut: crew.leaderboard_opt_out, territoryOptOut: crew.territory_opt_out },
         members: members
@@ -104,6 +113,32 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
       .header("content-type", "text/html; charset=utf-8")
       .header("cache-control", "no-store")
       .send(invitePage(language, valid ? { code, crewName: row.name, members: row.members, serverUrl: ctx.publicUrl } : null));
+  });
+
+  /** Open crews on this server that I am not in yet, by name. Members are not listed, only how many. */
+  app.get<{ Querystring: { q?: string } }>("/v1/crews/open", async (request) => {
+    const user = requireUser(request);
+    const q = z.string().trim().max(40).parse(request.query.q ?? "");
+    const rows = await ctx.db.query<{ id: string; name: string; kind: string; description: string; members: number }>(
+      `select c.id, c.name, c.kind, c.description, (select count(*)::int from crew_members m where m.crew_id = c.id) as members
+       from crews c where c.open and not exists (select 1 from crew_members m where m.crew_id = c.id and m.user_id = $1)
+         and ($2 = '' or c.name ilike '%' || $2 || '%')
+       order by members desc, c.created_at limit 30`,
+      [user.id, q],
+    );
+    return { crews: rows };
+  });
+
+  /** Joining an open crew needs no invite; a closed one answers 404, like any id I may not see. */
+  app.post<{ Params: { id: string } }>("/v1/crews/:id/join", async (request) => {
+    const user = requireUser(request);
+    joins.check(user.id);
+    const crew = (await ctx.db.query<{ open: boolean }>("select open from crews where id = $1", [z.string().uuid().parse(request.params.id)]))[0];
+    if (!crew?.open) throw new HttpError(404, "not_found");
+    await ctx.db.query("insert into crew_members (crew_id, user_id, role, joined_at) values ($1, $2, 'member', $3) on conflict do nothing", [request.params.id, user.id, ctx.now()]);
+    const members = await ctx.db.query<{ user_id: string }>("select user_id from crew_members where crew_id = $1", [request.params.id]);
+    ctx.live.notify(members.map((m) => m.user_id), { type: "crew.changed", crewId: request.params.id });
+    return { crewId: request.params.id };
   });
 
   app.post<{ Params: { code: string } }>("/v1/invites/:code/accept", async (request) => {

@@ -49,6 +49,7 @@ jobs:
         env:
           BUILD_NUMBER: ${{ github.run_number }}
           CREW_SERVER_URL: ${{ vars.CREW_SERVER_URL }}
+          CREW_PUBLIC_SERVERS: ${{ vars.CREW_PUBLIC_SERVERS }}
         run: npx expo prebuild --platform ios --clean
       - name: Build the app without signing
         working-directory: apps/mobile/ios
@@ -101,6 +102,7 @@ jobs:
         env:
           BUILD_NUMBER: ${{ github.run_number }}
           CREW_SERVER_URL: ${{ vars.CREW_SERVER_URL }}
+          CREW_PUBLIC_SERVERS: ${{ vars.CREW_PUBLIC_SERVERS }}
         run: npx expo prebuild --platform android --clean
       - name: Build the APK
         working-directory: apps/mobile/android

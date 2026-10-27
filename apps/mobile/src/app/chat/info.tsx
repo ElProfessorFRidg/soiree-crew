@@ -78,11 +78,10 @@ export default function ConversationInfoScreen() {
           void setDisappearing(id, seconds).catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }));
         }}
       />
-      <Text variant="small">{i18n.t("chat.disappearingNote")}</Text>
 
       <View>
-        <Row title={i18n.t("chat.readReceipts")} subtitle={i18n.t("chat.readReceiptsNote")} trailing={<Switch value={meta.settings.readReceipts} onValueChange={(v) => setting("readReceipts", v)} accessibilityLabel={i18n.t("chat.readReceipts")} />} />
-        <Row title={i18n.t("chat.typingSwitch")} subtitle={i18n.t("chat.typingNote")} trailing={<Switch value={meta.settings.typing} onValueChange={(v) => setting("typing", v)} accessibilityLabel={i18n.t("chat.typingSwitch")} />} last />
+        <Row title={i18n.t("chat.readReceipts")} trailing={<Switch value={meta.settings.readReceipts} onValueChange={(v) => setting("readReceipts", v)} accessibilityLabel={i18n.t("chat.readReceipts")} />} />
+        <Row title={i18n.t("chat.typingSwitch")} trailing={<Switch value={meta.settings.typing} onValueChange={(v) => setting("typing", v)} accessibilityLabel={i18n.t("chat.typingSwitch")} />} last />
       </View>
 
       <Panel>

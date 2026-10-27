@@ -6,7 +6,8 @@
     "test": "vitest run",
     "typecheck": "pnpm -r --parallel typecheck",
     "lint:slop": "node tools/slop-lint/index.mjs",
-    "check": "pnpm typecheck && pnpm test && pnpm lint:slop"
+    "check": "pnpm typecheck && pnpm test && pnpm lint:slop",
+    "status": "node tools/status/status.mjs"
   },
   "devDependencies": {
     "typescript": "~6.0.3",

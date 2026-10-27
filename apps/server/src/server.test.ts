@@ -267,3 +267,26 @@ describe("crews, parties and the live dashboard", () => {
     expect(crews.crews[0]!.members.map((m) => m.username)).toEqual(["malik"]);
   });
 });
+
+describe("several crews per person, open crews, server info", () => {
+  it("keeps a kind per crew, lists open crews to others and lets them join without an invite", async () => {
+    const jade = await account("jade");
+    const noor = await account("noor");
+    const fac = (await app.inject({ method: "POST", url: "/v1/crews", headers: jade.auth, payload: { name: "BDE Info", kind: "school" } })).json() as { crew: { id: string } };
+    await app.inject({ method: "POST", url: "/v1/crews", headers: jade.auth, payload: { name: "Famille" , kind: "family" } });
+    const mine = (await app.inject({ method: "GET", url: "/v1/crews", headers: jade.auth })).json() as { crews: { name: string; kind: string }[] };
+    expect(mine.crews.map((c) => c.kind)).toEqual(["school", "family"]);
+
+    expect(((await app.inject({ method: "GET", url: "/v1/crews/open", headers: noor.auth })).json() as { crews: unknown[] }).crews).toHaveLength(0);
+    expect((await app.inject({ method: "POST", url: `/v1/crews/${fac.crew.id}/join`, headers: noor.auth })).statusCode).toBe(404);
+    await app.inject({ method: "PATCH", url: `/v1/crews/${fac.crew.id}/settings`, headers: jade.auth, payload: { open: true, description: "Les soirées de la promo" } });
+    const open = (await app.inject({ method: "GET", url: "/v1/crews/open?q=bde", headers: noor.auth })).json() as { crews: { id: string; members: number; description: string }[] };
+    expect(open.crews).toHaveLength(1);
+    expect(open.crews[0]!.members).toBe(1);
+    expect((await app.inject({ method: "POST", url: `/v1/crews/${fac.crew.id}/join`, headers: noor.auth })).statusCode).toBe(200);
+    expect(((await app.inject({ method: "GET", url: "/v1/crews", headers: noor.auth })).json() as { crews: unknown[] }).crews).toHaveLength(1);
+
+    const info = (await app.inject({ method: "GET", url: "/v1/info" })).json() as { name: string; openCrews: number };
+    expect(info.openCrews).toBe(1);
+  });
+});

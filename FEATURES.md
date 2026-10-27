@@ -219,6 +219,9 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | N-23 | P1 | Recap.dc.html | build | "Quote of the night": legendary lines, voted by the crew. |
 | N-24 | P1 | Jeux.dc.html | build | Hall of fame for games and game records. |
 | N-37 | P1 | Backstage (near Recap.dc.html) | build | Consent for exports outside the crew: before a recap story, photo strip or result card leaves the app, the people shown can opt out, and the export shows only the exporter's own curve and figures plus crew totals. Renumbered from design-b N-36. Source: design-b.md §2.9 item 7, §3 decision 6, §5. |
+| N-38 | P1 | Crew tab | build | Several crews per person with a kind (friends, school, family, work, sport, other); the radar shows the crew picked at the top. |
+| N-39 | P1 | Crew tab | build | Open crews: an admin lists the crew on the server and anyone signed in there joins without an invite; the crew tab searches them. |
+| N-40 | P1 | Connect screen | build | Public servers: a server presents itself (GET /v1/info: name, description, public); builds list known public servers to pick from instead of typing an address. |
 
 ## Crew safety
 

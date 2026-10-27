@@ -59,9 +59,11 @@ function Photo({ media }: { media: ChatMedia }) {
           <Icon name="image" size={40} color={theme.textMuted} />
         </View>
       )}
-      <Text variant="small" style={styles.caption}>
-        {failed ? i18n.t("chat.mediaGone") : i18n.t("chat.photoNote")}
-      </Text>
+      {failed ? (
+        <Text variant="small" style={styles.caption}>
+          {i18n.t("chat.mediaGone")}
+        </Text>
+      ) : null}
     </View>
   );
 }
@@ -90,9 +92,11 @@ function VideoClip({ media }: { media: ChatMedia }) {
         <Icon name="x:play" size={40} color={theme.text} />
         <Text variant="small">{state === "loading" ? i18n.t("common.sending") : clip(media.durationMs ?? 0)}</Text>
       </ScalePressable>
-      <Text variant="small" style={styles.caption}>
-        {state === "failed" ? i18n.t("chat.mediaGone") : i18n.t("chat.videoNote")}
-      </Text>
+      {state === "failed" ? (
+        <Text variant="small" style={styles.caption}>
+          {i18n.t("chat.mediaGone")}
+        </Text>
+      ) : null}
     </View>
   );
 }

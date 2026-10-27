@@ -15,6 +15,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       buildNumber: build,
       releasesApi: "https://api.github.com/repos/ElProfessorFRidg/soiree-crew/releases/latest",
       defaultServerUrl: process.env.CREW_SERVER_URL || null,
+      // Other public servers to offer, comma-separated (CREW_PUBLIC_SERVERS).
+      publicServers: (process.env.CREW_PUBLIC_SERVERS ?? "").split(",").map((u) => u.trim().replace(/\/+$/, "")).filter(Boolean),
     },
   };
 };

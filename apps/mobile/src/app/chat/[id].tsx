@@ -135,7 +135,6 @@ export default function ConversationScreen() {
             accessibilityLabel={i18n.t("chat.searchHere")}
             style={[styles.search, type.body, { color: theme.text, backgroundColor: theme.inputBg, borderColor: theme.inputBorder }]}
           />
-          <Text variant="small">{i18n.t("chat.searchNote")}</Text>
         </View>
       ) : null}
 

@@ -1,4 +1,5 @@
 import Constants from "expo-constants";
+import { PublicServers } from "./PublicServers";
 import { useRef, useState, type ComponentRef } from "react";
 import { View, type TextInput } from "react-native";
 import { useT } from "@/i18n";
@@ -117,6 +118,7 @@ export function ConnectServer() {
   return (
     <View style={{ gap: 16 }}>
       <Text muted>{i18n.t("crew.connectBody")}</Text>
+      <PublicServers selected={address} onPick={setAddress} />
       <Field
         label={i18n.t("crew.serverUrl")}
         placeholder={i18n.t("crew.serverUrlPlaceholder")}

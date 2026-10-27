@@ -91,7 +91,6 @@ export default function SafetyNumberScreen() {
         />
       ) : null}
       <Text>{i18n.t("chat.safetyHow", { name: who })}</Text>
-      <Text variant="small">{i18n.t("chat.safetyWhy")}</Text>
       {meta.keyChanged[userId] ? (
         <Button
           label={i18n.t("chat.keyChangedOk")}

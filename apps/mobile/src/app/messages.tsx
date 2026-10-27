@@ -78,7 +78,7 @@ export default function MessagesScreen() {
 
   return (
     <Screen back title={i18n.t("chat.title")} onRefresh={() => refreshConversations().then(() => startChat())}>
-      <Field label={i18n.t("chat.search")} value={query} onChangeText={setQuery} placeholder={i18n.t("chat.searchPlaceholder")} hint={i18n.t("chat.searchNote")} returnKeyType="search" />
+      <Field label={i18n.t("chat.search")} value={query} onChangeText={setQuery} placeholder={i18n.t("chat.searchPlaceholder")} returnKeyType="search" />
 
       {results ? (
         results.length ? (

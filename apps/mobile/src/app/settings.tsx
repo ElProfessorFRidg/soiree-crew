@@ -6,7 +6,7 @@ import type { UnitSystem } from "@crew/units";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
 import { formatClock } from "@/i18n/format";
-import { setCrewAi, setCrewLeaderboard, setCrewPublicName, useCrewData } from "@/server/crewData";
+import { CREW_KINDS, setCrewAi, setCrewLeaderboard, setCrewPublicName, updateCrew, useCrewData } from "@/server/crewData";
 import { setCrewParticipation } from "@/server/venueData";
 import { setPreferences } from "@/state/preferences";
 import { followPhoneHourCycle, useAppStore } from "@/state/store";
@@ -123,7 +123,6 @@ export default function SettingsScreen() {
         />
         <SwitchRow
           label={i18n.t("settings.haptics")}
-          hint={i18n.t("settings.hapticsHint")}
           value={hapticsOn}
           onChange={(on) => {
             useAppStore.setState({ hapticsOn: on });
@@ -214,6 +213,12 @@ export default function SettingsScreen() {
               />
               {crew.role === "admin" ? (
                 <>
+                  <View style={styles.chips}>
+                    {CREW_KINDS.map((k) => (
+                      <Chip key={k} label={i18n.t(`crew.kinds.${k}`)} selected={(crew.kind ?? "friends") === k} onPress={() => void updateCrew(crew.id, { kind: k }).catch(offline)} />
+                    ))}
+                  </View>
+                  <SwitchRow label={i18n.t("crew.openSwitch")} hint={i18n.t("crew.openHint")} value={Boolean(crew.open)} onChange={(open) => void updateCrew(crew.id, { open }).catch(offline)} />
                   <SwitchRow label={i18n.t("settings.crewLeaderboard")} value={crew.leaderboardEnabled} onChange={(on) => void setCrewLeaderboard(crew.id, on).catch(offline)} />
                   <SwitchRow
                     label={i18n.t("settings.crewPublicName")}

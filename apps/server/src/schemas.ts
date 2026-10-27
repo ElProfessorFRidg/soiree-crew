@@ -94,7 +94,8 @@ export const accountSchema = z.object({
 
 export const passwordSchema = z.string().min(10).max(200);
 
-export const crewSchema = z.object({ name: z.string().trim().min(1).max(40) });
+export const CREW_KINDS = ["friends", "school", "family", "work", "sport", "other"] as const;
+export const crewSchema = z.object({ name: z.string().trim().min(1).max(40), kind: z.enum(CREW_KINDS).default("friends") });
 
 export const partySchema = z.object({
   id: uuid,
