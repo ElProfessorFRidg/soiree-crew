@@ -78,6 +78,7 @@ export default function Onboarding() {
           <Switch value={consent} onValueChange={setConsent} accessibilityLabel={i18n.t("onboarding.consent")} />
         </View>
         <Text variant="small">{i18n.t("onboarding.consentHint")}</Text>
+        <Button label={i18n.t("privacy.open")} variant="outline" height={40} onPress={() => router.push("/privacy")} />
       </Panel>
       {consent ? <ProfileFields draft={draft} onChange={setDraft} /> : null}
       {consent ? (
