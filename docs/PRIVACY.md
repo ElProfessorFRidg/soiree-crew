@@ -41,6 +41,10 @@ Database backups are the host's job. The stated delay for a deleted account to l
 
 TLS in transit (the server sits behind HTTPS), health data sealed with AES-256-GCM under `DATA_KEY`, token hashes only, rate-limited sign-up and sign-in, sessions listed and revocable, the next-morning vault for irreversible actions.
 
+## Third parties
+
+- GitHub: once a day, when "Look for new versions" is on (default), the app fetches the latest release of the public repository to compare build numbers (O-12). The request carries no account, token or identifier; GitHub sees the phone's IP address like any web request. Off in Settings.
+
 ## Impact assessment, short form
 
 - Risk: a crew member learns someone's drinking. Mitigation: BACs are shared only inside the crew and only during a party; leaving the leaderboard keeps everything else.

@@ -46,6 +46,10 @@ export interface AppState {
   travelDismissed: string | null;
   /** O-10: the 12 h / 24 h format follows the phone until the user picks one by hand. */
   hourCycleFollowsPhone: boolean;
+  /** O-12: ask GitHub once a day whether a newer build exists. */
+  checkUpdates: boolean;
+  updateCheckedAt: number | null;
+  latestRelease: { build: number; url: string } | null;
 }
 
 export const useAppStore = create<AppState>()(
@@ -69,6 +73,9 @@ export const useAppStore = create<AppState>()(
       vault: [],
       travelDismissed: null,
       hourCycleFollowsPhone: true,
+      checkUpdates: true,
+      updateCheckedAt: null,
+      latestRelease: null,
     }),
     {
       name: "crew-app-v1",

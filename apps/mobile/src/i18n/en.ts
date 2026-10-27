@@ -888,6 +888,12 @@ export const en: Messages = {
     add: "Add a drink",
     sos: "SOS",
   },
+  updates: {
+    available: "Version {build} is out.",
+    download: "Download",
+    check: "Look for new versions",
+    checkHint: "Once a day the app asks GitHub whether a newer version exists. Nothing about you is sent. Installed version: {build}.",
+  },
   addDrink: {
     quick: "Type what you're drinking",
     quickPlaceholder: "2 pints and a shot",

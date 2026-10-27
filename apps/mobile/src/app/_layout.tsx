@@ -2,6 +2,7 @@ import { useFonts } from "expo-font";
 import * as Notifications from "expo-notifications";
 import { router, Stack } from "expo-router";
 import { HeroOverlay } from "@/motion/hero";
+import { checkForUpdate } from "@/system/updates";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
@@ -67,9 +68,11 @@ export default function RootLayout() {
     void SplashScreen.hideAsync();
     // Whatever was queued before the app was killed goes out now (SYNC-06).
     void flush();
+    void checkForUpdate().catch(() => undefined);
     const subscription = RNAppState.addEventListener("change", (status) => {
       if (status === "active") {
         followPhoneHourCycle();
+        void checkForUpdate().catch(() => undefined);
         void flush();
         void flushUploads();
         void refreshReminders();

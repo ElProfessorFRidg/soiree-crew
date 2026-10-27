@@ -912,6 +912,12 @@ export const ru: Messages = {
     add: "Добавить напиток",
     sos: "SOS",
   },
+  updates: {
+    available: "Вышла версия {build}.",
+    download: "Скачать",
+    check: "Искать новые версии",
+    checkHint: "Раз в день приложение спрашивает GitHub, есть ли версия новее. О тебе ничего не отправляется. Установлена версия {build}.",
+  },
   addDrink: {
     quick: "Напиши, что пьёшь",
     quickPlaceholder: "2 пинты и шот",

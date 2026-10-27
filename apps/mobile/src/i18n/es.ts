@@ -887,6 +887,12 @@ export const es: Messages = {
     add: "Añadir bebida",
     sos: "SOS",
   },
+  updates: {
+    available: "Ya salió la versión {build}.",
+    download: "Descargar",
+    check: "Buscar versiones nuevas",
+    checkHint: "Una vez al día la app pregunta a GitHub si hay una versión más reciente. No se envía nada sobre ti. Versión instalada: {build}.",
+  },
   addDrink: {
     quick: "Escribe lo que bebes",
     quickPlaceholder: "2 cañas y un chupito",

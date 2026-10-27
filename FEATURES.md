@@ -22,7 +22,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-09 | P0 | Reglages.dc.html | build | 7 languages: FR, EN, ES, IT, DE, PT, RU. The whole app, not a few screens. See <localization>. |
 | O-10 | P2 | Reglages.dc.html | build | 12 h / 24 h format following the phone setting. |
 | O-11 | P0 | Backstage | build | Accessibility: large touch targets, respects Reduce Motion, text never truncated, nothing under the notch or c... |
-| O-12 | P2 | Reglages.dc.html | todo | In-app notice when a new version is available. |
+| O-12 | P2 | Reglages.dc.html | build | In-app notice when a new version is available. |
 | O-13 | P2 | Reglages.dc.html | build | Per-account data isolation on the device (several accounts on one phone without leaks). |
 | O-14 | P0 | Backstage | build | Opening the app never stops music already playing (Spotify, Deezer...). |
 

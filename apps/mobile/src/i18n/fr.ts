@@ -886,6 +886,12 @@ export const fr = {
     add: "Ajouter un verre",
     sos: "SOS",
   },
+  updates: {
+    available: "La version {build} est sortie.",
+    download: "Télécharger",
+    check: "Chercher les nouvelles versions",
+    checkHint: "Une fois par jour, l'app demande à GitHub si une version plus récente existe. Rien sur toi n'est envoyé. Version installée : {build}.",
+  },
   addDrink: {
     quick: "Tape ce que tu bois",
     quickPlaceholder: "2 pintes et un shot",

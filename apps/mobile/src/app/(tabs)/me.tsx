@@ -1,16 +1,18 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Linking, StyleSheet, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { duration } from "@crew/design-tokens";
 import { COUNTRIES, countryRules, drivingLimit, formatBacValue, breathRatio, type BacUnit, UI_LANGUAGES } from "@crew/units";
 import { useT } from "@/i18n";
+import { currentBuild } from "@/system/updates";
 import { AccountSection } from "@/profile/AccountSection";
 import { ProfileFields, type ProfileDraft } from "@/profile/ProfileFields";
 import { draftFromProfile, saveProfile } from "@/profile/saveProfile";
 import { useAppStore } from "@/state/store";
 import { setPreferences } from "@/state/preferences";
 import { useTheme } from "@/theme";
+import { Button } from "@/ui/Button";
 import { Chip, Panel, Row, Switch } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
@@ -27,6 +29,19 @@ const ALL_UNITS: readonly BacUnit[] = [
   "ug_per_100ml_breath",
   "ug_per_l_breath",
 ];
+
+/** O-12: a newer build is out; one tap downloads it. */
+function UpdateNotice() {
+  const i18n = useT();
+  const latest = useAppStore((state) => state.latestRelease);
+  if (!latest || latest.build <= currentBuild) return null;
+  return (
+    <Panel tint="amber">
+      <Text variant="h3">{i18n.t("updates.available", { build: latest.build })}</Text>
+      <Button label={i18n.t("updates.download")} icon="arrowdn" height={48} onPress={() => void Linking.openURL(latest.url).catch(() => undefined)} />
+    </Panel>
+  );
+}
 
 export default function MeScreen() {
   const i18n = useT();
@@ -55,6 +70,7 @@ export default function MeScreen() {
 
   return (
     <Screen title={i18n.t("profile.title")} withToasts>
+      <UpdateNotice />
       <Text variant="label">{i18n.t("profile.body")}</Text>
       <ProfileFields draft={draft} onChange={onProfileChange} />
 
