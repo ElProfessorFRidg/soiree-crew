@@ -9,6 +9,7 @@ import { join, resolve } from "node:path";
 import { checkDeck, mixedApostrophes } from "./decks.mjs";
 import { check, strings } from "./rules.mjs";
 import { designFindings } from "./design.mjs";
+import { glossaryFindings } from "./glossary.mjs";
 
 const CATALOGUES = [
   { locale: "fr", file: "apps/mobile/src/i18n/fr.ts", exportName: "fr" },
@@ -58,6 +59,7 @@ for (const { locale, file, exportName, oneApostrophe } of CATALOGUES) {
   const entries = [...strings(module[exportName])];
   for (const [key, text] of entries) {
     for (const finding of check(text, locale)) report(`${file}:${key}`, finding);
+    for (const finding of glossaryFindings(text, locale, key)) report(`${file}:${key}`, finding);
   }
   if (oneApostrophe && mixedApostrophes(entries.map(([, t]) => t))) report(file, { rule: "FO-09 apostrophes", match: "both ' and ’ used" });
 }
