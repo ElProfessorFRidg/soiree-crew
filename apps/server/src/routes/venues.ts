@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { challengers, seasonBounds, territoryTitles } from "@crew/territory";
-import { AC_CONFIG, evaluateCheckIn, fixHash } from "../anticheat";
+import { AC_CONFIG, distanceMeters, evaluateCheckIn, fixHash } from "../anticheat";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { crewStandings, crewTimeZone, currentSeason, updateBoss } from "../territory";
 import { nightOf, offsetMinutes } from "../time";
@@ -35,6 +35,36 @@ async function venueForMember(ctx: Context, venueId: string, userId: string) {
   );
   if (!rows[0]) throw new HttpError(404, "not_found");
   return rows[0];
+}
+
+/** Two crews' venues within this distance are the same bar. */
+const SAME_PLACE_M = 40;
+
+/**
+ * TER-07: when other crews play the same bar, which crew holds it this season, by the sum of
+ * their members' points. Other crews stay anonymous: only their count and the ranks come back.
+ */
+async function crewRivalry(
+  ctx: Context,
+  venue: { id: string; crew_id: string; lat: number; lng: number },
+  season: string,
+  myPoints: number,
+): Promise<{ crews: number; myRank: number; myPoints: number; leaderPoints: number } | null> {
+  const box = SAME_PLACE_M / 111_000;
+  const nearby = await ctx.db.query<{ id: string; crew_id: string; lat: number; lng: number }>(
+    `select id, crew_id, lat, lng from venues where crew_id <> $1 and kind <> 'home'
+       and lat between $2 and $3 and lng between $4 and $5`,
+    [venue.crew_id, venue.lat - box, venue.lat + box, venue.lng - box * 2, venue.lng + box * 2],
+  );
+  const others = nearby.filter((v) => distanceMeters(v, venue) <= SAME_PLACE_M);
+  if (!others.length) return null;
+  const totals: number[] = [];
+  for (const v of others) {
+    const standing = (await crewStandings(ctx, v.crew_id, season)).find((s) => s.venueId === v.id);
+    totals.push(standing ? standing.scores.reduce((sum, s) => sum + s.points, 0) : 0);
+  }
+  const all = [myPoints, ...totals];
+  return { crews: all.length, myRank: 1 + totals.filter((t) => t > myPoints).length, myPoints, leaderPoints: Math.max(...all) };
 }
 
 /** The member's own accepted check-in at this bar, open now or ended in the last half hour. */
@@ -204,8 +234,10 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
           [venue.id, user.id, here.at - AC_CONFIG.time.peerActiveWindowMin * 60_000, now],
         )
       : [];
+    const rivalry = venue.kind === "home" ? null : await crewRivalry(ctx, venue, season, standing?.scores.reduce((sum, s) => sum + s.points, 0) ?? 0);
     return {
       venue: { id: venue.id, crewId: venue.crew_id, name: venue.name, kind: venue.kind, lat: venue.lat, lng: venue.lng, address: venue.address },
+      rivalry,
       season,
       bossId: standing?.bossId ?? null,
       top: (standing?.scores ?? []).slice(0, 5).map((s) => ({ userId: s.memberId, name: nameOf.get(s.memberId) ?? "", points: s.points, nights: s.nights })),

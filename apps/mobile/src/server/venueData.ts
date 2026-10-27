@@ -36,6 +36,8 @@ export interface VenuePage {
   cheatAttempts: { id: string; userId: string; name: string; at: number; overturned: boolean }[];
   /** AC-04: unverified check-ins around mine that I can vouch for. */
   toConfirm?: { id: string; userId: string; name: string; at: number }[];
+  /** TER-07: other crews playing this bar, anonymous. */
+  rivalry?: { crews: number; myRank: number; myPoints: number; leaderPoints: number } | null;
 }
 
 export type CheckInVerdict = "accepted" | "unverified" | "rejected" | "not_here";

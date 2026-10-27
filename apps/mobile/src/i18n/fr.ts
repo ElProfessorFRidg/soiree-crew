@@ -350,6 +350,10 @@ export const fr = {
     confirmHere: "Confirmer",
     confirmHereA11y: "Confirmer que {name} est là",
     confirmedHere: "Présence de {name} confirmée.",
+    rivalryTitle: "Crew contre crew",
+    rivalryRank: "Ton crew : {rank} sur {crews} ici cette saison.",
+    rivalryLead: "En tête, avec {points} points. Les autres crews restent anonymes.",
+    rivalryBehind: "{gap} points de retard sur le crew en tête.",
   },
   ranking: {
     bars: "Les bars",

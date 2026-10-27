@@ -356,6 +356,10 @@ export const ru: Messages = {
     confirmHere: "Подтвердить",
     confirmHereA11y: "Подтвердить, что {name} здесь",
     confirmedHere: "{name} в баре: подтверждено.",
+    rivalryTitle: "Тусовка против тусовки",
+    rivalryRank: "Твоя тусовка: {rank} из {crews} здесь в этом сезоне.",
+    rivalryLead: "Впереди с {points} очками. Другие тусовки анонимны.",
+    rivalryBehind: "{gap} очков до лидера.",
   },
   ranking: {
     bars: "Бары",

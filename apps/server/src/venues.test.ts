@@ -102,6 +102,17 @@ describe("check-ins and territories", () => {
     expect((await app.inject({ method: "POST", url: `/v1/checkins/${doubtful.id}/confirm`, headers: jade.auth })).statusCode).toBe(403);
   });
 
+  it("ranks crews playing the same bar without naming the others (TER-07)", async () => {
+    const mine = await setup("jade");
+    const theirs = await setup("theo");
+    const other = await setup("ines");
+    // A third crew's bar 2 km away does not count.
+    await app.inject({ method: "POST", url: `/v1/crews/${other.crewId}/venues`, headers: other.users[0]!.auth, payload: { id: randomUUID(), name: "Ailleurs", kind: "bar", lat: ZINC.lat + 0.02, lng: ZINC.lng } });
+    const page = (await app.inject({ method: "GET", url: `/v1/venues/${mine.venueId}`, headers: mine.users[0]!.auth })).json() as { rivalry: { crews: number; myRank: number } | null };
+    expect(page.rivalry).toEqual({ crews: 3, myRank: 1, myPoints: 0, leaderPoints: 0 });
+    expect(JSON.stringify(page)).not.toContain(theirs.crewId);
+  });
+
   it("says 'not here' when the phone is far from the venue", async () => {
     const { users, venueId } = await setup("jade");
     expect((await checkIn(users[0]!, venueId, { lat: 48.9 })).verdict).toBe("not_here");

@@ -351,6 +351,10 @@ export const it: Messages = {
     confirmHere: "Conferma",
     confirmHereA11y: "Conferma che {name} è qui",
     confirmedHere: "Presenza di {name} confermata.",
+    rivalryTitle: "Crew contro crew",
+    rivalryRank: "La tua crew: {rank} su {crews} qui in questa stagione.",
+    rivalryLead: "In testa con {points} punti. Le altre crew restano anonime.",
+    rivalryBehind: "{gap} punti dietro la crew in testa.",
   },
   ranking: {
     bars: "I bar",

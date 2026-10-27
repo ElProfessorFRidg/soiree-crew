@@ -107,6 +107,18 @@ export default function VenueScreen() {
         onPress={() => router.push({ pathname: "/checkin", params: { venueId: page.venue.id, crewId: page.venue.crewId } })}
       />
 
+      {page.rivalry ? (
+        <Panel tint={page.rivalry.myRank === 1 ? "amber" : undefined}>
+          <Text variant="label">{i18n.t("venue.rivalryTitle")}</Text>
+          <Text variant="h3">{i18n.t("venue.rivalryRank", { rank: page.rivalry.myRank, crews: page.rivalry.crews })}</Text>
+          <Text variant="small">
+            {page.rivalry.myRank === 1
+              ? i18n.t("venue.rivalryLead", { points: page.rivalry.myPoints })
+              : i18n.t("venue.rivalryBehind", { gap: page.rivalry.leaderPoints - page.rivalry.myPoints })}
+          </Text>
+        </Panel>
+      ) : null}
+
       {page.toConfirm?.length ? (
         <Panel>
           <Text variant="label">{i18n.t("venue.toConfirm")}</Text>
