@@ -172,6 +172,8 @@ export const en: Messages = {
     newParty: "New party",
     offline: "No signal. Try again once you're back online.",
     serverError: "The server refused the request. Try again later.",
+    addToCalendar: "Add to calendar",
+    calendarAdded: "Party added to your calendar.",
   },
   newParty: {
     title: "New party",

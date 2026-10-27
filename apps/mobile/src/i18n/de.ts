@@ -170,6 +170,8 @@ export const de: Messages = {
     newParty: "Neuer Abend",
     offline: "Kein Netz. Versuch es nochmal, wenn du Empfang hast.",
     serverError: "Der Server hat die Anfrage abgelehnt. Versuch es später nochmal.",
+    addToCalendar: "Zum Kalender hinzufügen",
+    calendarAdded: "Abend im Kalender eingetragen.",
   },
   newParty: {
     title: "Neuer Abend",

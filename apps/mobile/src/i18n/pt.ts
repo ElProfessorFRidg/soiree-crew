@@ -171,6 +171,8 @@ export const pt: Messages = {
     newParty: "Nova festa",
     offline: "Sem rede. Tenta de novo quando apanhares rede.",
     serverError: "O servidor recusou o pedido. Tenta mais tarde.",
+    addToCalendar: "Adicionar ao calendário",
+    calendarAdded: "Festa adicionada ao calendário.",
   },
   newParty: {
     title: "Nova festa",

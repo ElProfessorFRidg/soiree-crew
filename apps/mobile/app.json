@@ -81,6 +81,13 @@
           "cameraPermission": "The camera adds photos to the party album, seen by your crew only.",
           "microphonePermission": false
         }
+      ],
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "The calendar gets the parties you add to it, nothing else is read.",
+          "remindersPermission": false
+        }
       ]
     ],
     "experiments": {

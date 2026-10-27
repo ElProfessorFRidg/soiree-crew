@@ -1,7 +1,7 @@
 import * as Clipboard from "expo-clipboard";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert, Share, StyleSheet, View } from "react-native";
+import { Alert, Platform, Share, StyleSheet, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { duration } from "@crew/design-tokens";
 import { ConnectServer } from "@/crew/ConnectServer";
@@ -17,7 +17,7 @@ import { useSession } from "@/server/session";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
-import { Button } from "@/ui/Button";
+import { Button, IconButton } from "@/ui/Button";
 import { Panel, Row, Segmented, Tag } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
@@ -30,6 +30,7 @@ import { ScalePressable } from "@/ui/Pressable";
 import { refreshRadar } from "@/server/radarData";
 import { serverMessage } from "@/server/errors";
 import { StartHereBanner } from "@/crew/StartHereBanner";
+import { addPartyToCalendar } from "@/crew/calendar";
 
 function errorMessage(error: unknown, i18n: Translator): string {
   if (error instanceof ApiError && error.failure.kind === "http") {
@@ -245,7 +246,13 @@ export default function CrewScreen() {
               title={party.name || i18n.t(`newParty.moods.${party.mood}`)}
               subtitle={`${crewNameOf(party.crewId)}, ${partyWhen(party, i18n, hourCycle)}`}
               leading={party.live ? <View style={[styles.liveDot, { backgroundColor: theme.ok }]} /> : <Icon name="cal" color={theme.textMuted} />}
-              trailing={<Icon name="chev" color={theme.textMuted} />}
+              trailing={
+                !party.live && Platform.OS !== "web" ? (
+                  <IconButton icon="cal" accessibilityLabel={i18n.t("crew.addToCalendar")} onPress={() => void addPartyToCalendar(party, crewNameOf(party.crewId), i18n)} />
+                ) : (
+                  <Icon name="chev" color={theme.textMuted} />
+                )
+              }
               onPress={() => router.push({ pathname: "/live", params: { id: party.id } })}
               last={index === going.length - 1}
             />

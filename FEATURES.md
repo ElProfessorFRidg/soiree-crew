@@ -179,7 +179,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | N-03 | P0 | Radar.dc.html | build | "I'm going out, who's in?": broadcast to the crew with quick replies, turns into a party (O-35) in one tap. |
 | N-04 | P1 | Radar.dc.html | todo | Outing polls: date slots (When2Meet style), place, plan; vote, close, event created automatically. |
 | N-05 | P1 | Radar.dc.html | todo | Recurring availability ("I usually go out on Thursdays") to suggest slots that suit everyone. |
-| N-06 | P1 | Radar.dc.html | todo | Sync with the phone calendar (add event / ICS subscription) + reminders. |
+| N-06 | P1 | Radar.dc.html | build | Sync with the phone calendar (add event / ICS subscription) + reminders. |
 | N-07 | P0 | Soirees.dc.html | build | Live location shared ONLY during a party and ONLY when the person turns it on: ghost mode, auto-expiry, no loc... |
 
 ## Our bars and places
@@ -266,7 +266,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-18 | P1 | Securite.dc.html | build | The user's own apps: directions in Apple Maps, Google Maps or Waze, rides in Uber, Bolt or local taxi apps, ch... |
 | QOL-19 | P1 | Argent.dc.html | build | Long-press copies what people copy (IBAN, codes, addresses), with a haptic and a short inline "Copied". |
 | QOL-20 | P1 | Recap.dc.html | build | Next-morning mode: the morning after, the app opens on a calm, dark, low-contrast screen with the recap, who o... |
-| QOL-21 | P1 | Radar.dc.html | todo | Calendar and birthdays: parties added to the phone calendar in one tap; a crew member's birthday reminds the o... |
+| QOL-21 | P1 | Radar.dc.html | build | Calendar and birthdays: parties added to the phone calendar in one tap; a crew member's birthday reminds the o... |
 | QOL-22 | P2 | Securite.dc.html | todo | Last ride home: after midnight, the last night bus / metro departures near the venue on the Party screen, when... |
 | QOL-23 | P1 | Etats.dc.html | todo | Search that helps: recent searches, typo tolerance (ADP-05), suggestions before typing, results grouped (venue... |
 | QOL-24 | P1 | Reglages.dc.html | build | Respect the phone: Low Power Mode lowers refresh rates and effects, a data-saver option for photos, light and ... |

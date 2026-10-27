@@ -2,6 +2,8 @@
   "ios": {
     "NSLocationWhenInUseUsageDescription": "La tua posizione serve per fare check-in in un bar con la tua crew, e per condividerla durante una serata se lo attivi. Viene verificata e poi cancellata.",
     "NSCameraUsageDescription": "La fotocamera serve per aggiungere foto all'album della serata, visibile solo alla tua crew.",
-    "NSPhotoLibraryUsageDescription": "Le tue foto servono per riempire l'album della serata, visibile solo alla tua crew. La loro posizione viene rimossa."
+    "NSPhotoLibraryUsageDescription": "Le tue foto servono per riempire l'album della serata, visibile solo alla tua crew. La loro posizione viene rimossa.",
+    "NSCalendarsUsageDescription": "Il calendario riceve le serate che aggiungi. Non viene letto altro.",
+    "NSCalendarsWriteOnlyAccessUsageDescription": "Il calendario riceve le serate che aggiungi. Non viene letto altro."
   }
 }

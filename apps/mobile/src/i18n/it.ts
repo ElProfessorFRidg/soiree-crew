@@ -171,6 +171,8 @@ export const it: Messages = {
     newParty: "Nuova serata",
     offline: "Niente rete. Riprova quando hai campo.",
     serverError: "Il server ha rifiutato la richiesta. Riprova più tardi.",
+    addToCalendar: "Aggiungi al calendario",
+    calendarAdded: "Serata aggiunta al calendario.",
   },
   newParty: {
     title: "Nuova serata",

@@ -170,6 +170,8 @@ export const fr = {
     newParty: "Nouvelle soirée",
     offline: "Pas de réseau. Réessaie quand tu captes.",
     serverError: "Le serveur a refusé la demande. Réessaie plus tard.",
+    addToCalendar: "Ajouter au calendrier",
+    calendarAdded: "Soirée ajoutée au calendrier.",
   },
   newParty: {
     title: "Nouvelle soirée",

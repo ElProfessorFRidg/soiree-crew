@@ -2,6 +2,8 @@
   "ios": {
     "NSLocationWhenInUseUsageDescription": "Ta position sert à pointer dans un bar avec ton crew, et à la partager pendant une soirée si tu l'actives. Elle est vérifiée puis effacée.",
     "NSCameraUsageDescription": "L'appareil photo sert à ajouter des photos à l'album de la soirée, visible par ton crew seulement.",
-    "NSPhotoLibraryUsageDescription": "Tes photos servent à remplir l'album de la soirée, visible par ton crew seulement. Leur position est retirée."
+    "NSPhotoLibraryUsageDescription": "Tes photos servent à remplir l'album de la soirée, visible par ton crew seulement. Leur position est retirée.",
+    "NSCalendarsUsageDescription": "Le calendrier reçoit les soirées que tu y ajoutes. Rien d'autre n'est lu.",
+    "NSCalendarsWriteOnlyAccessUsageDescription": "Le calendrier reçoit les soirées que tu y ajoutes. Rien d'autre n'est lu."
   }
 }
