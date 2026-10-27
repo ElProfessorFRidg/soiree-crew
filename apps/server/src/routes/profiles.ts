@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
+import { RateLimiter } from "../ratelimit";
 import { BacSimulation, distributionVolume, type BodyProfile, type DrinkIntake } from "@crew/bac";
 import { territoryTitles } from "@crew/territory";
 import { randomUUID } from "node:crypto";
@@ -206,7 +207,7 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
     const sections = await buildSections(ctx, ownerId, relation);
     const mine = ownerId === user.id && !as;
     const stored = mine
-      ? (await ctx.db.query<{ audiences: string }>("select audiences from profiles where user_id = $1", [ownerId]))[0]
+      ? (await ctx.db.query<{ audiences: string; findable: string }>("select audiences, findable from profiles where user_id = $1", [ownerId]))[0]
       : undefined;
     return {
       userId: ownerId,
@@ -214,7 +215,7 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
       friendship: await friendshipState(ctx, user.id, ownerId),
       muted: (await ctx.db.query("select 1 from mutes where muter = $1 and muted = $2", [user.id, ownerId])).length > 0,
       sections,
-      ...(mine ? { audiences: audiencesOf(stored ? (JSON.parse(stored.audiences) as Record<string, unknown>) : {}) } : {}),
+      ...(mine ? { audiences: audiencesOf(stored ? (JSON.parse(stored.audiences) as Record<string, unknown>) : {}), findable: stored?.findable ?? "username" } : {}),
     };
   });
 
@@ -228,6 +229,7 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
         preset: z.enum(["private", "friends", "public"]).optional(),
         audiences: z.record(z.enum(SECTIONS), z.enum(AUDIENCES)).optional(),
         hiddenVenues: z.array(uuid).max(500).optional(),
+        findable: z.enum(["search", "username", "nobody"]).optional(),
       })
       .parse(request.body);
     const current = (await ctx.db.query<{ bio: string; country: string; audiences: string; hidden_venues: string }>(
@@ -251,7 +253,42 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
         ctx.now(),
       ],
     );
+    if (input.findable) await ctx.db.query("update profiles set findable = $2 where user_id = $1", [user.id, input.findable]);
     return { audiences };
+  });
+
+  /**
+   * O-43, PROF-09: find people to add. Crew mates and friends always show; a stranger shows when
+   * they allow search, or when the exact username was typed and they allow that. Blocks hide both ways.
+   */
+  const searches = new RateLimiter(30, 60_000, ctx.now);
+  app.get<{ Querystring: { q?: string } }>("/v1/users/search", async (request) => {
+    const user = requireUser(request);
+    searches.check(user.id);
+    const q = z.string().trim().toLowerCase().min(2).max(40).parse(request.query.q ?? "");
+    // LIKE wildcards typed by the user are matched literally.
+    const like = `%${q.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
+    const rows = await ctx.db.query<{ id: string; username: string; display_name: string; findable: string | null; known: boolean }>(
+      `select u.id, u.username, u.display_name, p.findable,
+              (exists (select 1 from crew_members a join crew_members b on a.crew_id = b.crew_id where a.user_id = $1 and b.user_id = u.id)
+               or exists (select 1 from friendships f where (f.user_a = $1 and f.user_b = u.id) or (f.user_b = $1 and f.user_a = u.id))) as known
+       from users u left join profiles p on p.user_id = u.id
+       where u.id <> $1 and (u.username = $2 or lower(u.username) like $3 or lower(u.display_name) like $3)
+         and not exists (select 1 from blocks b where (b.blocker = $1 and b.blocked = u.id) or (b.blocker = u.id and b.blocked = $1))
+       order by (u.username = $2) desc, u.display_name limit 60`,
+      [user.id, q, like],
+    );
+    const visible = rows.filter((r) => {
+      const findable = r.findable ?? "username";
+      if (r.known) return true;
+      if (findable === "search") return true;
+      return findable === "username" && r.username === q;
+    });
+    return {
+      people: await Promise.all(
+        visible.slice(0, 20).map(async (r) => ({ userId: r.id, username: r.username, name: r.display_name, friendship: await friendshipState(ctx, user.id, r.id) })),
+      ),
+    };
   });
 
   /** O-39: add as friend in one tap; the other side accepts with the same tap. */

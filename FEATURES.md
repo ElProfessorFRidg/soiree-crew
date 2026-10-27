@@ -77,7 +77,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| O-43 | P1 | Profil.dc.html | todo | Reliable search, friend requests without duplicates (a request already received is accepted instead of duplica... |
+| O-43 | P1 | Profil.dc.html | build | Reliable search, friend requests without duplicates (a request already received is accepted instead of duplica... |
 
 ## Games (15)
 
@@ -395,7 +395,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | PROF-06 | P0 | Profil.dc.html | build | Records are stats, not trophies: the highest BAC reached and the biggest night show as plain figures, never ce... |
 | PROF-07 | P0 | Profil.dc.html | build | "View as": preview your own profile as a stranger, a friend or a crew member, one tap away from the profile an... |
 | PROF-08 | P0 | Backstage | build | Enforced by the server: the API never sends a field the viewer is not allowed to see (hiding it in the UI is n... |
-| PROF-09 | P1 | Profil.dc.html | todo | Findability: strangers can find you by search, by exact username only, or not at all. You appear among a venue... |
+| PROF-09 | P1 | Profil.dc.html | build | Findability: strangers can find you by search, by exact username only, or not at all. You appear among a venue... |
 | PROF-10 | P1 | Profil.dc.html | todo | Privacy summary: one screen listing what strangers can see right now, reachable from the profile, shown once a... |
 
 ## Messaging

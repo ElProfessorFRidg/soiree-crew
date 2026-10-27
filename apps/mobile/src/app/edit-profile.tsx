@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { Field } from "@/crew/Field";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
-import { fetchProfile, PROFILE_SECTIONS, saveProfile, type Audience, type ProfileSection, type ProfileView } from "@/server/profileData";
+import { fetchProfile, PROFILE_SECTIONS, saveProfile, type Audience, type Findable, type ProfileSection, type ProfileView } from "@/server/profileData";
 import { Button } from "@/ui/Button";
 import { Chip, Panel, Segmented, Switch } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
@@ -85,6 +85,22 @@ export default function EditProfileScreen() {
         </View>
       ))}
       <Text variant="small">{i18n.t("people.neverStrangers")}</Text>
+
+      <Text variant="label">{i18n.t("people.findable")}</Text>
+      <Segmented<Findable>
+        accessibilityLabel={i18n.t("people.findable")}
+        value={profile.findable ?? "username"}
+        items={[
+          { value: "search", label: i18n.t("people.findableSearch") },
+          { value: "username", label: i18n.t("people.findableUsername") },
+          { value: "nobody", label: i18n.t("people.findableNobody") },
+        ]}
+        onChange={(findable) => {
+          setProfile((p) => (p ? { ...p, findable } : p));
+          apply({ findable });
+        }}
+      />
+      <Text variant="small">{i18n.t("people.findableHint")}</Text>
 
       {venues.length ? (
         <Panel>

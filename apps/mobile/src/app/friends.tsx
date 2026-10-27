@@ -1,10 +1,11 @@
 import { router, useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { View } from "react-native";
 import { useT } from "@/i18n";
 import { flyHero, HeroSource } from "@/motion/hero";
 import { haptic } from "@/motion/haptics";
-import { befriend, fetchFriends, unblock, unmute, type FriendsList } from "@/server/profileData";
+import { befriend, fetchFriends, searchPeople, unblock, unmute, type FriendsList, type PersonFound } from "@/server/profileData";
+import { Field } from "@/crew/Field";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
 import { Button } from "@/ui/Button";
@@ -24,6 +25,33 @@ export default function FriendsScreen() {
     void fetchFriends().then(setList).catch(() => undefined);
   }, []);
   useFocusEffect(load);
+
+  const [query, setQuery] = useState("");
+  const [found, setFound] = useState<PersonFound[] | null>(null);
+  useEffect(() => {
+    const q = query.trim();
+    if (q.length < 2) {
+      setFound(null);
+      return;
+    }
+    // Wait for a pause in typing before asking the server.
+    const id = setTimeout(() => {
+      void searchPeople(q)
+        .then((res) => setFound(res.people))
+        .catch(() => setFound([]));
+    }, 300);
+    return () => clearTimeout(id);
+  }, [query]);
+  const add = (person: PersonFound) => {
+    haptic.confirmed();
+    void befriend(person.userId)
+      .then((res) => {
+        showToast({ message: res.friendship === "friends" ? i18n.t("people.nowFriends", { name: person.name }) : i18n.t("people.requestSent", { name: person.name }) });
+        setFound((list) => list?.map((p) => (p.userId === person.userId ? { ...p, friendship: res.friendship } : p)) ?? null);
+        load();
+      })
+      .catch(offline);
+  };
 
   const open = (userId: string) => {
     flyHero(`avatar:${userId}`);
@@ -54,6 +82,49 @@ export default function FriendsScreen() {
 
   return (
     <Screen back title={i18n.t("people.myFriends")} withToasts>
+      <Field
+        label={i18n.t("people.search")}
+        placeholder={i18n.t("people.searchPlaceholder")}
+        value={query}
+        onChangeText={setQuery}
+        autoCapitalize="none"
+        autoCorrect={false}
+        returnKeyType="search"
+        maxLength={40}
+      />
+      {found ? (
+        found.length ? (
+          <View>
+            {found.map((p, index) => (
+              <Row
+                key={p.userId}
+                title={p.name}
+                subtitle={`@${p.username}`}
+                leading={<Avatar personId={p.userId} name={p.name} size={36} />}
+                onPress={() => open(p.userId)}
+                trailing={
+                  p.friendship === "friends" ? (
+                    <Icon name="chev" color={theme.textMuted} />
+                  ) : p.friendship === "requested" ? (
+                    <Text variant="small">{i18n.t("people.requested")}</Text>
+                  ) : (
+                    <Button
+                      label={p.friendship === "incoming" ? i18n.t("people.accept") : i18n.t("people.addFriend")}
+                      accessibilityLabel={`${p.friendship === "incoming" ? i18n.t("people.accept") : i18n.t("people.addFriend")}, ${p.name}`}
+                      variant="secondary"
+                      height={44}
+                      onPress={() => add(p)}
+                    />
+                  )
+                }
+                last={index === found.length - 1}
+              />
+            ))}
+          </View>
+        ) : (
+          <Text variant="small">{i18n.t("people.searchEmpty")}</Text>
+        )
+      ) : null}
       {list && !list.friends.length && !list.incoming.length ? <Text>{i18n.t("people.noFriends")}</Text> : null}
       {section(i18n.t("people.incoming"), list?.incoming ?? [], (userId) => (
         <Button

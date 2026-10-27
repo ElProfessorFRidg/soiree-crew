@@ -122,3 +122,40 @@ describe("moderation (COM-08)", () => {
     expect((await app.inject({ method: "GET", url: `/v1/crews/${crewId}/reports`, headers: crewMate.auth })).statusCode).toBe(403);
   });
 });
+
+describe("search and findability (O-43, PROF-09)", () => {
+  const search = async (viewer: User, q: string) =>
+    ((await app.inject({ method: "GET", url: `/v1/users/search?q=${encodeURIComponent(q)}`, headers: viewer.auth })).json() as { people: { userId: string; friendship: string }[] }).people.map((p) => p.userId);
+
+  it("shows strangers only by exact username unless they open search, and crew mates always", async () => {
+    const { owner, crewMate, stranger } = await setup();
+    expect(await search(stranger, "own")).toEqual([]);
+    expect(await search(stranger, "owner")).toEqual([owner.id]);
+    expect(await search(crewMate, "own")).toEqual([owner.id]);
+
+    await app.inject({ method: "PUT", url: "/v1/me/profile", headers: owner.auth, payload: { findable: "nobody" } });
+    expect(await search(stranger, "owner")).toEqual([]);
+    expect(await search(crewMate, "owner")).toEqual([owner.id]);
+
+    await app.inject({ method: "PUT", url: "/v1/me/profile", headers: owner.auth, payload: { findable: "search" } });
+    expect(await search(stranger, "wne")).toEqual([owner.id]);
+    expect(await search(stranger, "%%")).toEqual([]);
+  });
+
+  it("hides blocked people both ways", async () => {
+    const { owner, crewMate } = await setup();
+    await app.inject({ method: "POST", url: `/v1/users/${owner.id}/block`, headers: crewMate.auth });
+    expect(await search(owner, "mate")).toEqual([]);
+    expect(await search(crewMate, "owner")).toEqual([]);
+  });
+
+  it("accepts a received request instead of sending a second one", async () => {
+    const { owner, stranger } = await setup();
+    await app.inject({ method: "POST", url: `/v1/users/${owner.id}/friend`, headers: stranger.auth });
+    const again = (await app.inject({ method: "POST", url: `/v1/users/${owner.id}/friend`, headers: stranger.auth })).json() as { friendship: string };
+    expect(again.friendship).toBe("requested");
+    const back = (await app.inject({ method: "POST", url: `/v1/users/${stranger.id}/friend`, headers: owner.auth })).json() as { friendship: string };
+    expect(back.friendship).toBe("friends");
+    expect((await db.query("select * from friendships")).length).toBe(2);
+  });
+});

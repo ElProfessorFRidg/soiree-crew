@@ -4,6 +4,7 @@ export const PROFILE_SECTIONS = ["identity", "crews", "titles", "venues", "drink
 export type ProfileSection = (typeof PROFILE_SECTIONS)[number];
 export type Audience = "me" | "crews" | "friends" | "everyone";
 export type Friendship = "none" | "friends" | "requested" | "incoming";
+export type Findable = "search" | "username" | "nobody";
 
 export interface ProfileView {
   userId: string;
@@ -11,6 +12,7 @@ export interface ProfileView {
   friendship: Friendship;
   muted: boolean;
   audiences?: Record<ProfileSection, Audience>;
+  findable?: Findable;
   sections: {
     identity?: { displayName: string; username: string; bio: string; country: string };
     crews?: { name: string; members: number }[];
@@ -32,8 +34,21 @@ export function saveProfile(input: {
   preset?: "private" | "friends" | "public";
   audiences?: Partial<Record<ProfileSection, Audience>>;
   hiddenVenues?: string[];
+  findable?: Findable;
 }): Promise<{ audiences: Record<ProfileSection, Audience> }> {
   return api("/v1/me/profile", { method: "PUT", body: input });
+}
+
+export interface PersonFound {
+  userId: string;
+  username: string;
+  name: string;
+  friendship: Friendship;
+}
+
+/** O-43: crew mates, friends, and strangers who let themselves be found. */
+export function searchPeople(q: string): Promise<{ people: PersonFound[] }> {
+  return api(`/v1/users/search?q=${encodeURIComponent(q)}`);
 }
 
 export function befriend(userId: string): Promise<{ friendship: Friendship }> {
