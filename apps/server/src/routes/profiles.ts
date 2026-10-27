@@ -428,12 +428,22 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
     const user = requireUser(request);
     const { role } = await assertCrewMember(ctx, request.params.id, user.id);
     if (role !== "admin") throw new HttpError(403, "forbidden");
-    const rows = await ctx.db.query<{ id: string; target_kind: string; target_id: string; reason: string; note: string; at: number; handled_at: number | null }>(
-      "select id, target_kind, target_id, reason, note, at, handled_at from reports where crew_id = $1 order by at desc limit 100",
+    const rows = await ctx.db.query<{ id: string; target_kind: string; target_id: string; reason: string; note: string; at: number; handled_at: number | null; evidence: string | null }>(
+      "select id, target_kind, target_id, reason, note, at, handled_at, evidence from reports where crew_id = $1 order by at desc limit 100",
       [request.params.id],
     );
     return {
-      reports: rows.map((r) => ({ id: r.id, targetKind: r.target_kind, targetId: r.target_id, reason: r.reason, note: r.note, at: r.at, handledAt: r.handled_at })),
+      reports: rows.map((r) => ({
+        id: r.id,
+        targetKind: r.target_kind,
+        targetId: r.target_id,
+        reason: r.reason,
+        note: r.note,
+        at: r.at,
+        handledAt: r.handled_at,
+        // MSG-07: the messages the reporter chose to send, decrypted on their phone.
+        ...(r.evidence ? { messages: ctx.sealer.open<{ id: string; userId: string; body: string; at: number; reported: boolean }[]>(r.evidence) } : {}),
+      })),
     };
   });
 

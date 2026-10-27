@@ -7,6 +7,7 @@
     "@crew/design-tokens": "workspace:*",
     "@crew/fuzzy": "workspace:*",
     "@crew/games": "workspace:*",
+    "@crew/mls": "workspace:*",
     "@crew/money": "workspace:*",
     "@crew/units": "workspace:*",
     "@react-native-async-storage/async-storage": "2.2.0",

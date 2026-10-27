@@ -11,6 +11,7 @@ import { partyRoutes } from "./routes/parties";
 import { photoRoutes } from "./routes/photos";
 import { pollRoutes } from "./routes/polls";
 import { cardRoutes } from "./routes/cards";
+import { chatRoutes } from "./routes/chat";
 import { feedRoutes } from "./routes/feed";
 import { aiOrderRoutes } from "./routes/aiOrder";
 import { communityRoutes } from "./routes/community";
@@ -89,6 +90,7 @@ export async function buildApp(ctx: Context, options: { logger?: boolean } = {})
   radarRoutes(app, ctx);
   moneyRoutes(app, ctx);
   recapRoutes(app, ctx);
+  chatRoutes(app, ctx);
   profileRoutes(app, ctx);
   photoRoutes(app, ctx);
   statsRoutes(app, ctx);

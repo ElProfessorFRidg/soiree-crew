@@ -9,7 +9,11 @@ export type LiveEvent =
   | { type: "party.unwell"; partyId: string; userId: string }
   | { type: "crew.changed"; crewId: string }
   | { type: "sync"; reason: "own_write" }
-  | { type: "security.newDevice" };
+  | { type: "security.newDevice" }
+  /** MSG-01: a conversation's group changed (devices, timer); without an id, look at all of them. */
+  | { type: "chat.roster"; conversationId?: string }
+  | { type: "chat.message"; conversationId: string }
+  | { type: "chat.typing"; conversationId: string; userId: string };
 
 /**
  * Pushes hints, never data: a device that hears "party.changed" refetches what

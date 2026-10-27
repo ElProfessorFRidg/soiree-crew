@@ -11,7 +11,8 @@
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
-    "@types/pg": "^8.23.1"
+    "@types/pg": "^8.23.1",
+    "@crew/mls": "workspace:*"
   },
   "dependencies": {
     "@crew/bac": "workspace:*",
