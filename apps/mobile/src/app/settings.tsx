@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 import type { UnitSystem } from "@crew/units";
 import { useT } from "@/i18n";
+import { haptic } from "@/motion/haptics";
 import { formatClock } from "@/i18n/format";
 import { setCrewAi, setCrewLeaderboard, useCrewData } from "@/server/crewData";
 import { setCrewParticipation } from "@/server/venueData";
@@ -49,6 +50,7 @@ export default function SettingsScreen() {
   const preferences = useAppStore((state) => state.preferences);
   const followsPhone = useAppStore((state) => state.hourCycleFollowsPhone);
   const checkUpdates = useAppStore((state) => state.checkUpdates);
+  const soundsOn = useAppStore((state) => state.soundsOn);
   const crews = useCrewData((state) => state.crews);
   const hour = (h: number) => formatClock(new Date(2026, 0, 1, h).getTime(), i18n.language, preferences.hourCycle);
   const offline = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
@@ -104,6 +106,15 @@ export default function SettingsScreen() {
       </Section>
 
       <Section title={i18n.t("appIcon.section")}>
+        <SwitchRow
+          label={i18n.t("settings.sounds")}
+          hint={i18n.t("settings.soundsHint")}
+          value={soundsOn}
+          onChange={(on) => {
+            useAppStore.setState({ soundsOn: on });
+            if (on) haptic.cheers();
+          }}
+        />
         <AppIconPicker />
       </Section>
 

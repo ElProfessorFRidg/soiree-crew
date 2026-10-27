@@ -601,6 +601,8 @@ export const de: Messages = {
     hourPhone: "Wie am Handy",
     crewAi: "KI-Entwürfe der Geschichte",
     crewAiHint: "Die Geschichte geht mit Vornamen, Bars und Uhrzeiten an den KI-Anbieter des Servers, nie mit Getränken. Nichts wird ohne Gegenlesen veröffentlicht.",
+    sounds: "Töne",
+    soundsHint: "Ein Glas, das sich füllt, ein Anstoßen bei Runden, eine kleine Fanfare für eine Krone. Stumm, wenn das Handy lautlos ist.",
   },
   vault: {
     queued: "Bis morgen zurückgelegt. Wir fragen dich nach dem Aufwachen nochmal.",

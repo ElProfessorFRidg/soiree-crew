@@ -601,6 +601,8 @@ export const fr = {
     hourPhone: "Comme le téléphone",
     crewAi: "Brouillons du récit par l'IA",
     crewAiHint: "Le récit part chez le fournisseur d'IA du serveur avec les prénoms, les bars et les heures, jamais les verres. Rien n'est publié sans relecture.",
+    sounds: "Sons",
+    soundsHint: "Un verre qui se remplit, un tchin pour les tournées, une petite fanfare pour une couronne. Muets si le téléphone est en silencieux.",
   },
   vault: {
     queued: "Mis de côté jusqu'à demain. On te redemande au réveil.",

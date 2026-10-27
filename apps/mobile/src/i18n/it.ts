@@ -602,6 +602,8 @@ export const it: Messages = {
     hourPhone: "Come il telefono",
     crewAi: "Bozze del racconto con l'IA",
     crewAiHint: "Il racconto va al fornitore di IA del server con nomi, locali e orari, mai i bicchieri. Niente viene pubblicato senza essere letto.",
+    sounds: "Suoni",
+    soundsHint: "Un bicchiere che si riempie, un cin per i giri, una fanfara per una corona. Muti se il telefono è in silenzioso.",
   },
   vault: {
     queued: "Messo da parte fino a domani. Te lo richiediamo al risveglio.",

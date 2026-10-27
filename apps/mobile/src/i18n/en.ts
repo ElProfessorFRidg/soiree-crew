@@ -603,6 +603,8 @@ export const en: Messages = {
     hourPhone: "Phone setting",
     crewAi: "AI drafts of the story",
     crewAiHint: "The story goes to the server's AI provider with first names, bars and times, never drinks. Nothing is published without someone reading it.",
+    sounds: "Sounds",
+    soundsHint: "A glass filling up, a clink for rounds, a little fanfare for a crown. Silent when the phone is on silent.",
   },
   vault: {
     queued: "Put aside until tomorrow. We'll ask again when you're up.",

@@ -59,7 +59,7 @@ export default function RoundScreen() {
       description: `${i18n.t("money.round")} · ${drinkLabel(drink, i18n)}`,
     })
       .then(() => {
-        haptic.drinkAdded();
+        haptic.cheers();
         void pull().catch(() => undefined);
         showToast({ tone: "info", message: i18n.t("money.roundLogged") });
         router.back();

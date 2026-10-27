@@ -56,6 +56,8 @@ export interface AppState {
   privacySummarySeen: boolean;
   /** O-69: what the mixer thinks is in the fridge. */
   barHave: string[];
+  /** JOY-05: the sound pack, off until switched on. */
+  soundsOn: boolean;
 }
 
 export const useAppStore = create<AppState>()(
@@ -85,6 +87,7 @@ export const useAppStore = create<AppState>()(
       recentSearches: [],
       privacySummarySeen: false,
       barHave: [],
+      soundsOn: false,
     }),
     {
       name: "crew-app-v1",

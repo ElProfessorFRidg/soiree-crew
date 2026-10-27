@@ -602,6 +602,8 @@ export const es: Messages = {
     hourPhone: "Como el móvil",
     crewAi: "Borradores de la historia con IA",
     crewAiHint: "La historia va al proveedor de IA del servidor con nombres, bares y horas, nunca las bebidas. Nada se publica sin que alguien lo lea.",
+    sounds: "Sonidos",
+    soundsHint: "Un vaso que se llena, un chinchín para las rondas, una fanfarria para una corona. Mudos si el móvil está en silencio.",
   },
   vault: {
     queued: "Lo dejamos para mañana. Te lo volvemos a preguntar cuando te despiertes.",
