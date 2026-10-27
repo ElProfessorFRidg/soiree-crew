@@ -7,7 +7,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { AppState as RNAppState, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { ReducedMotionConfig, ReduceMotion } from "react-native-reanimated";
+import { ReducedMotionConfig, ReduceMotion, useReducedMotion } from "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { themes } from "@crew/design-tokens";
 import { I18nProvider } from "@/i18n";
@@ -49,6 +49,8 @@ export default function RootLayout() {
   const ready = fontsLoaded && hydrated && sessionReady;
 
   const eco = useEco((state) => state.eco);
+  // MOT-12: with Reduce Motion, screens cross-fade instead of sliding in.
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     void loadSession();
@@ -110,7 +112,7 @@ export default function RootLayout() {
               screenOptions={{
                 headerShown: false,
                 contentStyle: { backgroundColor: themes.dark.bg },
-                animation: "slide_from_right",
+                animation: reduceMotion ? "fade" : "slide_from_right",
               }}
             >
               <Stack.Screen name="(tabs)" />
