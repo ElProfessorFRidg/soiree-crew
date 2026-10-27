@@ -328,7 +328,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | MOT-11 | P1 | Systeme.dc.html | todo | Animated widgets and Live Activity, within each OS's limits. |
 | MOT-12 | P0 | Backstage | build | Performance and motion accessibility: 60 / 120 fps without jank, tested on a modest phone, battery budget resp... |
 | MOT-13 | P0 | Classements.dc.html | build | Leaderboards: animated overtakes, podium, a dedicated effect when the leader changes. |
-| MOT-14 | P0 | Backstage | proposed | Global motion time scale (0.1x to 10x) and deterministic animation clock hooks in the motion module, exposed in a dev menu and to the test harness, so the frame-by-frame Motion review works across every animation engine. Source: motion.md §3.6, §5. |
+| MOT-14 | P0 | Backstage | build | Global motion time scale (0.1x to 10x) and deterministic animation clock hooks in the motion module, exposed in a dev menu and to the test harness, so the frame-by-frame Motion review works across every animation engine. Source: motion.md §3.6, §5. |
 | MOT-15 | P0 | Backstage | build | Haptic capability matrix and fallbacks per platform, API level and device support level, plus an in-app haptics switch independent of sound. Source: motion.md §3.3, §5. |
 
 ## Bar territories

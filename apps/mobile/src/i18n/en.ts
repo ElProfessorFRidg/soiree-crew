@@ -620,6 +620,8 @@ export const en: Messages = {
     crewPublicNameHint: "Without this, the crew's name stays among its members.",
     haptics: "Vibrations",
     hapticsHint: "One vibration per important action. Separate from sounds, and nothing is told by vibration alone.",
+    motionScale: "Animation speed (dev)",
+    motionScaleHint: "Slows down or speeds up every animation for the frame-by-frame review. Development builds only.",
   },
   vault: {
     queued: "Put aside until tomorrow. We'll ask again when you're up.",

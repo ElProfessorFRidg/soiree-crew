@@ -1,4 +1,5 @@
 import "@/chat/runtime";
+import { getMotionScale, setMotionScale } from "@crew/design-tokens";
 import { useFonts } from "expo-font";
 import * as Notifications from "expo-notifications";
 import { router, Stack } from "expo-router";
@@ -23,6 +24,9 @@ import { useEco, watchBattery } from "@/power/eco";
 import { logWater } from "@/drinks/actions";
 import { LOG_WATER_ACTION, MUTE_ACTION, muteUntilMorning, refreshReminders } from "@/reminders/reminders";
 import { flushUploads } from "@/photos/uploads";
+
+// MOT-14: the test harness drives the motion time scale in dev builds.
+if (__DEV__) (globalThis as { __crewMotion?: unknown }).__crewMotion = { setScale: setMotionScale, getScale: getMotionScale };
 
 void SplashScreen.preventAutoHideAsync();
 

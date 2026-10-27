@@ -8,7 +8,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import Svg, { Circle } from "react-native-svg";
-import { palette } from "@crew/design-tokens";
+import { palette, scaled } from "@crew/design-tokens";
 import { countryRules } from "@crew/units";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
@@ -137,7 +137,7 @@ export default function SosScreen() {
   const endHold = () => {
     setHolding(false);
     cancelAnimation(progress);
-    progress.value = withTiming(0, { duration: 200 });
+    progress.value = withTiming(0, { duration: scaled(200) });
     if (holdTimer.current) clearTimeout(holdTimer.current);
     if (ticker.current) clearInterval(ticker.current);
   };

@@ -164,7 +164,30 @@ export const easing = {
   spin: parseBezier(tokens.motion.easeSpin),
 } as const;
 
-export const duration = tokens.motion.durations;
+const baseDurations = tokens.motion.durations;
+type Durations = typeof baseDurations;
+let motionScale = 1;
+
+/**
+ * MOT-14: one time scale for every animation, 0.1x to 10x, so the frame-by-frame Motion review can
+ * slow the whole app down. Durations are read when an animation starts, so a change applies to
+ * the next one. Dev menu and test harness only; 1 in every release.
+ */
+export function setMotionScale(scale: number): void {
+  motionScale = Math.min(10, Math.max(0.1, scale));
+}
+
+export function getMotionScale(): number {
+  return motionScale;
+}
+
+/** Scales a duration written as a number in a component (the tokens already are). */
+export const scaled = (ms: number): number => Math.round(ms * motionScale);
+
+export const duration: Durations = Object.defineProperties(
+  {},
+  Object.fromEntries(Object.keys(baseDurations).map((key) => [key, { enumerable: true, get: () => scaled(baseDurations[key as keyof Durations]) }])),
+) as Durations;
 
 export const icons = iconsJson.icons as Record<string, string>;
 export type IconName = keyof typeof iconsJson.icons;

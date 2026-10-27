@@ -1,6 +1,7 @@
 import { router } from "expo-router";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
+import { getMotionScale, setMotionScale } from "@crew/design-tokens";
 import type { UnitSystem } from "@crew/units";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
@@ -105,6 +106,8 @@ export default function SettingsScreen() {
           increaseLabel={i18n.t("settings.laterBoundary")}
         />
       </Section>
+
+      {__DEV__ ? <MotionScale /> : null}
 
       <Section title={i18n.t("appIcon.section")}>
         <SwitchRow
@@ -245,3 +248,25 @@ const styles = StyleSheet.create({
   pair: { flexDirection: "row", gap: 12 },
   crew: { gap: 4, paddingVertical: 8 },
 });
+
+const SCALES = [0.1, 0.25, 1, 2, 10] as const;
+
+/** MOT-14, dev builds only: slows or speeds every animation for the frame-by-frame review. */
+function MotionScale() {
+  const i18n = useT();
+  const [scale, setScale] = useState(getMotionScale());
+  return (
+    <Section title={i18n.t("settings.motionScale")}>
+      <Segmented<number>
+        items={SCALES.map((s) => ({ value: s, label: `${i18n.number(s, s < 1 ? 2 : 0)}×` }))}
+        value={scale}
+        accessibilityLabel={i18n.t("settings.motionScale")}
+        onChange={(s) => {
+          setMotionScale(s);
+          setScale(s);
+        }}
+      />
+      <Text variant="small">{i18n.t("settings.motionScaleHint")}</Text>
+    </Section>
+  );
+}

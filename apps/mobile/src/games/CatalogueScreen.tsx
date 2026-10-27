@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { FlatList, StyleSheet, View, useWindowDimensions, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { palette, radius, space } from "@crew/design-tokens";
+import { palette, radius, space, scaled } from "@crew/design-tokens";
 import { filterGames, lockReason, typicalMinutes, type CatalogueFilter, type GameDefinition } from "@crew/games";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
@@ -26,7 +26,9 @@ const FILTERS: readonly CatalogueFilter[] = ["all", "single_device", "multi_devi
 
 function Dot({ active }: { active: boolean }) {
   const theme = useTheme();
-  const style = useAnimatedStyle(() => ({ width: withTiming(active ? 18 : 6, { duration: 250, easing: easings.out }) }), [active]);
+  // Read on the JS thread: the worklet gets a number, not a call (MOT-14 scale).
+  const ms = scaled(250);
+  const style = useAnimatedStyle(() => ({ width: withTiming(active ? 18 : 6, { duration: ms, easing: easings.out }) }), [active, ms]);
   return <Animated.View style={[styles.dot, { backgroundColor: active ? theme.amber : theme.lineStrong }, style]} />;
 }
 

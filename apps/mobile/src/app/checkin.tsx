@@ -2,7 +2,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, View, useWindowDimensions } from "react-native";
 import Animated, { FadeIn, useAnimatedStyle, useReducedMotion, useSharedValue, withSequence, withTiming, ZoomIn } from "react-native-reanimated";
-import { duration, palette } from "@crew/design-tokens";
+import { duration, palette, scaled } from "@crew/design-tokens";
 import { useT } from "@/i18n";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
@@ -32,7 +32,7 @@ function Takeover({ venue }: { venue: string }) {
   useEffect(() => {
     // MOT-09 signature moment: crown drop, amber wash, then a heavy haptic.
     haptic.heavy();
-    if (!reduceMotion) wash.value = withSequence(withTiming(1, { duration: duration.wash, easing: easings.out }), withTiming(0, { duration: 400 }));
+    if (!reduceMotion) wash.value = withSequence(withTiming(1, { duration: duration.wash, easing: easings.out }), withTiming(0, { duration: scaled(400) }));
   }, [wash, reduceMotion]);
   const washStyle = useAnimatedStyle(() => ({ opacity: 0.85 * (1 - wash.value), transform: [{ scale: 0.2 + wash.value * 3.8 }] }));
   return (

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withTiming } from "react-native-reanimated";
-import { duration, palette } from "@crew/design-tokens";
+import { duration, palette, scaled } from "@crew/design-tokens";
 
 const PIECES = 14;
 const COLOURS = palette.avatar;
@@ -29,7 +29,7 @@ export function Burst({ size, calm }: { size: number; calm?: boolean }) {
   const reduceMotion = useReducedMotion();
   const ring = useSharedValue(0);
   useEffect(() => {
-    ring.value = withTiming(1, { duration: 700, easing: Easing.out(Easing.cubic) });
+    ring.value = withTiming(1, { duration: scaled(700), easing: Easing.out(Easing.cubic) });
   }, [ring]);
   const ringStyle = useAnimatedStyle(() => ({ opacity: 1 - ring.value, transform: [{ scale: 0.4 + ring.value * 2.6 }] }));
   if (reduceMotion) return null;

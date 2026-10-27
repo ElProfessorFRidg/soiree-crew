@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
-import { radius } from "@crew/design-tokens";
+import { radius, scaled } from "@crew/design-tokens";
 import { haptic } from "@/motion/haptics";
 import { useTheme } from "@/theme";
 import { Text } from "@/ui/Text";
@@ -32,7 +32,8 @@ export function RoundTimer({ seconds, roundKey, paused }: { seconds: number; rou
   }, 200);
 
   const share = seconds > 0 ? left / (seconds * 1000) : 0;
-  const fill = useAnimatedStyle(() => ({ width: withTiming(`${share * 100}%`, { duration: 200 }) }), [share]);
+  const ms = scaled(200);
+  const fill = useAnimatedStyle(() => ({ width: withTiming(`${share * 100}%`, { duration: ms }) }), [share, ms]);
   if (seconds <= 0) return null;
   const done = left === 0;
   return (

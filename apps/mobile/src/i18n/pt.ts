@@ -619,6 +619,8 @@ export const pt: Messages = {
     crewPublicNameHint: "Sem isto, o nome da crew fica entre os membros.",
     haptics: "Vibração",
     hapticsHint: "Uma vibração por cada ação importante. Separada dos sons, e nada é dito só pela vibração.",
+    motionScale: "Velocidade das animações (dev)",
+    motionScaleHint: "Abranda ou acelera todas as animações para a revisão fotograma a fotograma. Só em versões de desenvolvimento.",
   },
   vault: {
     queued: "Guardado até amanhã. Voltamos a perguntar quando acordares.",

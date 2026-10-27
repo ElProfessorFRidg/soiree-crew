@@ -618,6 +618,8 @@ export const de: Messages = {
     crewPublicNameHint: "Ohne das bleibt der Name der Crew unter den Mitgliedern.",
     haptics: "Vibration",
     hapticsHint: "Eine Vibration pro wichtiger Aktion. Unabhängig von den Tönen, und nichts wird nur per Vibration mitgeteilt.",
+    motionScale: "Animationstempo (Dev)",
+    motionScaleHint: "Verlangsamt oder beschleunigt alle Animationen für die Einzelbild-Prüfung. Nur in Entwicklungsversionen.",
   },
   vault: {
     queued: "Bis morgen zurückgelegt. Wir fragen dich nach dem Aufwachen nochmal.",

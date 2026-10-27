@@ -618,6 +618,8 @@ export const fr = {
     crewPublicNameHint: "Sans ça, le nom du crew reste entre les membres.",
     haptics: "Vibrations",
     hapticsHint: "Une vibration par geste important, réglée à part des sons. Aucune information ne passe seulement par une vibration.",
+    motionScale: "Vitesse des animations (dev)",
+    motionScaleHint: "Ralentit ou accélère toutes les animations pour la revue image par image. Uniquement dans les versions de développement.",
   },
   vault: {
     queued: "Mis de côté jusqu'à demain. On te redemande au réveil.",

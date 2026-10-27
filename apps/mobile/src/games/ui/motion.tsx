@@ -11,7 +11,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
-import { duration } from "@crew/design-tokens";
+import { duration, scaled } from "@crew/design-tokens";
 import { easings } from "@/motion/easing";
 
 /**
@@ -112,9 +112,9 @@ export function Tremble({ trigger, children, calm, style }: { trigger: unknown; 
   useEffect(() => {
     if (trigger === null || trigger === undefined || trigger === false || calm || reduceMotion) return;
     x.value = withSequence(
-      withTiming(-4, { duration: 45 }),
-      withRepeat(withTiming(4, { duration: 70, easing: Easing.linear }), 4, true),
-      withTiming(0, { duration: 45 }),
+      withTiming(-4, { duration: scaled(45) }),
+      withRepeat(withTiming(4, { duration: scaled(70), easing: Easing.linear }), 4, true),
+      withTiming(0, { duration: scaled(45) }),
     );
   }, [trigger, calm, reduceMotion, x]);
   const animated = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }] }));
@@ -129,7 +129,7 @@ export function useShake(strength: number, enabled: boolean) {
   useEffect(() => {
     const on = enabled && !reduceMotion && strength > 0;
     amount.value = withTiming(on ? strength : 0, { duration: duration.toggle });
-    if (on) phase.value = withRepeat(withTiming(1, { duration: 250, easing: Easing.linear }), -1, false);
+    if (on) phase.value = withRepeat(withTiming(1, { duration: scaled(250), easing: Easing.linear }), -1, false);
     else phase.value = 0;
   }, [strength, enabled, reduceMotion, amount, phase]);
   return useAnimatedStyle(() => {

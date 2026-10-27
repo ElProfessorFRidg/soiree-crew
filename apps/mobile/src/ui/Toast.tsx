@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { AccessibilityInfo, StyleSheet, View } from "react-native";
 import Animated, { FadeOut, SlideInDown } from "react-native-reanimated";
 import { create } from "zustand";
-import { duration, radius } from "@crew/design-tokens";
+import { duration, radius, scaled } from "@crew/design-tokens";
 import { easings } from "@/motion/easing";
 import { useTheme } from "@/theme";
 import { Button } from "./Button";
@@ -55,7 +55,7 @@ export function ToastHost({ bottomOffset, large }: { bottomOffset: number; large
     <Animated.View
       key={current.id}
       entering={SlideInDown.duration(duration.toastIn).easing(easings.out)}
-      exiting={FadeOut.duration(160)}
+      exiting={FadeOut.duration(scaled(160))}
       accessibilityLiveRegion="polite"
       style={[
         styles.toast,

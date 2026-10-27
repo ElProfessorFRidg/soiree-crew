@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import { useEffect, useRef } from "react";
 import { StyleSheet, View, type GestureResponderEvent } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
-import { duration, palette, space } from "@crew/design-tokens";
+import { duration, palette, space, scaled } from "@crew/design-tokens";
 import { createFingerPick, fingerPickReducer, type Finger } from "@crew/games";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
@@ -26,10 +26,10 @@ function FingerDisc({ finger, settling, chosen, lost }: { finger: Finger; settli
   const pick = useSharedValue(0);
   useEffect(() => {
     if (settling && !reduceMotion) ripple.value = withRepeat(withTiming(1, { duration: duration.ripple, easing: Easing.out(Easing.quad) }), -1, false);
-    else ripple.value = withTiming(0, { duration: 150 });
+    else ripple.value = withTiming(0, { duration: scaled(150) });
   }, [settling, reduceMotion, ripple]);
   useEffect(() => {
-    pick.value = withTiming(chosen || lost ? 1 : 0, { duration: 400, easing: easings.out });
+    pick.value = withTiming(chosen || lost ? 1 : 0, { duration: scaled(400), easing: easings.out });
   }, [chosen, lost, pick]);
 
   const discStyle = useAnimatedStyle(() => ({

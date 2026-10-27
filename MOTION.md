@@ -68,6 +68,10 @@ Vibrations have their own switch in Settings, on by default and separate from th
 
 `apps/mobile/src/motion/hero.tsx`: a source registers what it shows (`HeroSource`), `flyHero(key)` runs right before `router.push`, the target reports where it lands (`HeroTarget`) and an overlay above the navigator flies between the two on `duration.enter`. Screens reached this way fade in instead of sliding, so the element lands where it stays. Today: a crew member's or a friend's avatar flies to their profile; the catalogue card grows into the game setup and fades over it. With Reduce Motion nothing flies, the screen fades.
 
+## Time scale (MOT-14)
+
+Every duration goes through one scale, 0.1x to 10x: the tokens (`duration.*`) read it when an animation starts, and a duration written as a number goes through `scaled(ms)`, read on the JS thread (never inside a worklet). Dev builds show the control in Settings and expose `globalThis.__crewMotion.setScale(x)` to the test harness; release builds stay at 1.
+
 ## Review checklist
 
 - Uses tokens, not literals.

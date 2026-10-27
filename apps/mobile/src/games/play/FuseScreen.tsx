@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, { FadeIn, interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import { duration, palette } from "@crew/design-tokens";
+import { duration, palette, scaled } from "@crew/design-tokens";
 import { createFuse, fuseEscalation, fuseHolder, fuseReducer, fuseTickInterval, mathRandom } from "@crew/games";
 import { haptic } from "@/motion/haptics";
 import { useTheme } from "@/theme";
@@ -66,7 +66,7 @@ export function FuseScreen({ session, content, onAgain }: GameScreenProps) {
   // Colour warms in three steps on the escalation ratio: cream, amber, coral.
   const step = useSharedValue(0);
   useEffect(() => {
-    step.value = withTiming(state.phase === "exploded" ? 3 : escalation > 0.66 ? 2 : escalation > 0.33 ? 1 : 0, { duration: 400 });
+    step.value = withTiming(state.phase === "exploded" ? 3 : escalation > 0.66 ? 2 : escalation > 0.33 ? 1 : 0, { duration: scaled(400) });
   }, [escalation, state.phase, step]);
   const discColour = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(step.value, [0, 1, 2, 3], [palette.dark.text, palette.accent.amber, cardColours.coral, palette.semantic.danger]),

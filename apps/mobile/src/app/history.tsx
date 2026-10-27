@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
-import { duration, radius } from "@crew/design-tokens";
+import { duration, radius, scaled } from "@crew/design-tokens";
 import { removeDrink, removeWater, restoreDrink } from "@/drinks/actions";
 import { drinkLabel } from "@/drinks/display";
 import { useT } from "@/i18n";
@@ -106,7 +106,7 @@ export default function HistoryScreen() {
                   <Animated.View
                     key={drink.id}
                     entering={FadeIn.duration(duration.enter)}
-                    exiting={FadeOut.duration(200)}
+                    exiting={FadeOut.duration(scaled(200))}
                     layout={LinearTransition.duration(duration.reorder)}
                     style={styles.itemWrap}
                   >
