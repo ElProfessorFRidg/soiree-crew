@@ -4,6 +4,14 @@ import type { GameMessages } from "./types";
 // Plain in the controls, playful in the rules.
 
 export const it: GameMessages = {
+  hall: {
+    title: "Albo d'oro",
+    open: "Albo d'oro",
+    empty: "Ancora nessuna partita finita.",
+    wins: { one: "{count} vittoria", other: "{count} vittorie" },
+    played: { one: "{count} partita giocata", other: "{count} partite giocate" },
+    note: "Salvato su questo telefono. Vince chi ha meno penitenze.",
+  },
   catalogue: {
     title: "Giochi",
     position: "{index} di {count}",

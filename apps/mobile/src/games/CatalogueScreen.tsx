@@ -127,6 +127,7 @@ export function CatalogueScreen() {
         </Text>
         {games.length > 0 ? <Text variant="small">{g.t("catalogue.position", { index: Math.min(index, games.length - 1) + 1, count: games.length })}</Text> : null}
         {g.language !== "fr" && g.language !== "en" ? <Text variant="small">{g.t("catalogue.cardsInEnglish")}</Text> : null}
+        <Button label={g.t("hall.open")} icon="trophy" variant="outline" height={40} onPress={() => router.push("/games/hall")} />
       </View>
       <View style={styles.padded}>
         <Segmented

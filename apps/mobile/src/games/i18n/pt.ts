@@ -3,6 +3,14 @@ import type { GameMessages } from "./types";
 // European Portuguese copy (pt-PT) of the games module, written for Portuguese speakers rather than translated.
 
 export const pt: GameMessages = {
+  hall: {
+    title: "Quadro de honra",
+    open: "Quadro de honra",
+    empty: "Ainda nenhuma partida terminada.",
+    wins: { one: "{count} vitória", other: "{count} vitórias" },
+    played: { one: "{count} partida jogada", other: "{count} partidas jogadas" },
+    note: "Guardado neste telemóvel. Ganha quem tem menos castigos.",
+  },
   catalogue: {
     title: "Jogos",
     position: "{index} de {count}",

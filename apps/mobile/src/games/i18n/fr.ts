@@ -2,6 +2,14 @@
 // Plural entries use Intl.PluralRules categories: one, other.
 
 export const fr = {
+  hall: {
+    title: "Tableau d'honneur",
+    open: "Tableau d'honneur",
+    empty: "Aucune partie finie pour l'instant.",
+    wins: { one: "{count} victoire", other: "{count} victoires" },
+    played: { one: "{count} partie jouée", other: "{count} parties jouées" },
+    note: "Gardé sur ce téléphone. Gagne qui a le moins de gages.",
+  },
   catalogue: {
     title: "Jeux",
     position: "{index} sur {count}",

@@ -2,6 +2,14 @@ import type { GameMessages } from "./types";
 
 // German copy of the games module, written for German speakers rather than translated.
 export const de: GameMessages = {
+  hall: {
+    title: "Ruhmeshalle",
+    open: "Ruhmeshalle",
+    empty: "Noch keine Partie zu Ende gespielt.",
+    wins: { one: "{count} Sieg", other: "{count} Siege" },
+    played: { one: "{count} Partie gespielt", other: "{count} Partien gespielt" },
+    note: "Auf diesem Handy gespeichert. Es gewinnt, wer die wenigsten Aufgaben hat.",
+  },
   catalogue: {
     title: "Spiele",
     position: "{index} von {count}",

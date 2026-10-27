@@ -4,6 +4,14 @@ import type { GameMessages } from "./types";
 // en-US spelling, like the main catalogue.
 
 export const en: GameMessages = {
+  hall: {
+    title: "Hall of fame",
+    open: "Hall of fame",
+    empty: "No finished game yet.",
+    wins: { one: "{count} win", other: "{count} wins" },
+    played: { one: "{count} game played", other: "{count} games played" },
+    note: "Kept on this phone. The fewest forfeits wins.",
+  },
   catalogue: {
     title: "Games",
     position: "{index} of {count}",

@@ -3,6 +3,14 @@ import type { GameMessages } from "./types";
 // Russian copy of the games module, written for Russian speakers rather than translated.
 
 export const ru: GameMessages = {
+  hall: {
+    title: "Доска почёта",
+    open: "Доска почёта",
+    empty: "Пока ни одной законченной игры.",
+    wins: { one: "{count} победа", few: "{count} победы", many: "{count} побед", other: "{count} победы" },
+    played: { one: "{count} игра сыграна", few: "{count} игры сыграно", many: "{count} игр сыграно", other: "{count} игры сыграно" },
+    note: "Хранится на этом телефоне. Побеждает тот, у кого меньше всего штрафов.",
+  },
   catalogue: {
     title: "Игры",
     position: "{index} из {count}",

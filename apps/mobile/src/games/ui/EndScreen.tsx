@@ -10,7 +10,7 @@ import { Button } from "@/ui/Button";
 import { Numeral, Text } from "@/ui/Text";
 import { useGameUi } from "../hooks";
 import { useGameT, type GamePluralKey } from "../i18n";
-import { recordDuration, toEnginePlayer, type TablePlayer } from "../store";
+import { recordDuration, recordResult, toEnginePlayer, type TablePlayer } from "../store";
 import { FadeInAfter } from "./motion";
 
 export interface GameRecord {
@@ -49,6 +49,10 @@ export function EndScreen({ gameId, players, ledger, endReason, startedAt, recor
     haptic.confirmed();
     // A finished game feeds the computed "usually N min" line of the catalogue.
     if (endReason !== "notEnoughPlayers") recordDuration(gameId, Date.now() - startedAt);
+    if (endReason === "completed" && players.length >= 2) {
+      const holder = record ? players.find((p) => p.id === record.playerId)?.name : undefined;
+      recordResult(gameId, ranking, record && holder ? { key: record.key, name: holder, count: record.count } : null);
+    }
   }, [endReason, gameId, startedAt]);
 
   const share = () => {

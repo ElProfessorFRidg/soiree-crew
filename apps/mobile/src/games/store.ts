@@ -35,6 +35,14 @@ interface GamesState {
   /** Length of finished games, newest last, for the computed "usually N min" line (O-44). */
   durations: Partial<Record<GameId, number[]>>;
   session: GameSession | null;
+  /** N-24: hall of fame on this phone: wins by player name and the best record, per game. */
+  hall: Partial<Record<GameId, HallEntry>>;
+}
+
+export interface HallEntry {
+  played: number;
+  wins: Record<string, number>;
+  record: { key: string; name: string; count: number; at: number } | null;
 }
 
 const KEPT_DURATIONS = 12;
@@ -42,7 +50,7 @@ export const DEFAULT_SETTINGS: GameSettings = { level: "normal", timerSeconds: 0
 
 /** Players, their order and per-game settings survive between nights; nothing here leaves the phone. */
 export const useGamesStore = create<GamesState>()(
-  persist((): GamesState => ({ table: [], settings: {}, durations: {}, session: null }), {
+  persist((): GamesState => ({ table: [], settings: {}, durations: {}, session: null, hall: {} }), {
     name: "games-v1",
     storage: createJSONStorage(() => AsyncStorage),
   }),
@@ -112,4 +120,23 @@ export function recordDuration(gameId: GameId, ms: number): void {
 
 export function toEnginePlayer(player: TablePlayer): Player {
   return { id: player.id, name: player.name, noAlcohol: player.noAlcohol };
+}
+
+/**
+ * N-24: a finished game counts once: the player with strictly the fewest
+ * penalties wins (a tie names nobody), and a higher record replaces the old one.
+ */
+export function recordResult(
+  gameId: GameId,
+  ranking: readonly { player: { name: string }; penalties: number }[],
+  record: { key: string; name: string; count: number } | null,
+): void {
+  useGamesStore.setState((s) => {
+    const entry: HallEntry = s.hall?.[gameId] ?? { played: 0, wins: {}, record: null };
+    const [first, second] = ranking;
+    const wins = { ...entry.wins };
+    if (first && second && first.penalties < second.penalties) wins[first.player.name] = (wins[first.player.name] ?? 0) + 1;
+    const best = record && (!entry.record || record.count > entry.record.count) ? { ...record, at: Date.now() } : entry.record;
+    return { hall: { ...s.hall, [gameId]: { played: entry.played + 1, wins, record: best } } };
+  });
 }
