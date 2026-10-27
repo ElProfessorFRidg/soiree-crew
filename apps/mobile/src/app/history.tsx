@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
 import { duration, radius } from "@crew/design-tokens";
 import { removeDrink, removeWater, restoreDrink } from "@/drinks/actions";
@@ -12,7 +13,7 @@ import { useAppStore } from "@/state/store";
 import { useNow } from "@/state/hooks";
 import type { DrinkEntry } from "@/sync/types";
 import { useTheme } from "@/theme";
-import { IconButton } from "@/ui/Button";
+import { Button, IconButton } from "@/ui/Button";
 import { Tag } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { ScalePressable } from "@/ui/Pressable";
@@ -68,7 +69,9 @@ export default function HistoryScreen() {
   const boundary = preferences.dayBoundaryHour;
   return (
     <Screen back title={i18n.t("history.title")} trailing={<Tag label={i18n.t("history.nightUntil", { hour: boundary })} />} withToasts>
-      <Text variant="small">{i18n.t("history.boundaryNote", { hour: boundary })}</Text>
+      <Text variant="small">
+        {i18n.t("history.boundaryNote", { hour: boundary })} {i18n.t("history.swipeHint")}
+      </Text>
       {groups.length === 0 && tonightWater.length === 0 ? <Text>{i18n.t("history.empty")}</Text> : null}
       {groups.map((group) => {
         const first = group.drinks[0]!;
@@ -105,13 +108,31 @@ export default function HistoryScreen() {
                     entering={FadeIn.duration(duration.enter)}
                     exiting={FadeOut.duration(200)}
                     layout={LinearTransition.duration(duration.reorder)}
-                    style={[styles.item, { backgroundColor: theme.surface }]}
+                    style={styles.itemWrap}
                   >
-                    <Numeral size={22}>{formatClock(drink.consumedAt, i18n.language, preferences.hourCycle)}</Numeral>
-                    <View style={styles.flex}>
-                      {drink.sync !== "saved" ? <Tag label={i18n.t("common.sending")} icon="clock" /> : null}
-                    </View>
-                    <IconButton icon="trash" accessibilityLabel={`${i18n.t("history.remove")} ${title}`} onPress={() => onRemove(drink)} />
+                    <ReanimatedSwipeable
+                      friction={2}
+                      rightThreshold={60}
+                      overshootRight={false}
+                      renderRightActions={() => (
+                        <Button
+                          label={i18n.t("history.remove")}
+                          variant="danger"
+                          height={54}
+                          style={styles.swipeAction}
+                          onPress={() => onRemove(drink)}
+                        />
+                      )}
+                    >
+                      <View style={[styles.item, { backgroundColor: theme.surface }]}>
+                        <Numeral size={22}>{formatClock(drink.consumedAt, i18n.language, preferences.hourCycle)}</Numeral>
+                        <View style={styles.flex}>
+                          {drink.sync !== "saved" ? <Tag label={i18n.t("common.sending")} icon="clock" /> : null}
+                        </View>
+                        {/* The swipe is a shortcut: the button stays for a drunk thumb (ADP-04). */}
+                        <IconButton icon="trash" accessibilityLabel={`${i18n.t("history.remove")} ${title}`} onPress={() => onRemove(drink)} />
+                      </View>
+                    </ReanimatedSwipeable>
                   </Animated.View>
                 ))
               : null}
@@ -141,6 +162,8 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   group: { gap: 6 },
   groupHeader: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 54 },
-  item: { flexDirection: "row", alignItems: "center", gap: 12, borderRadius: radius.button, paddingVertical: 8, paddingHorizontal: 14, marginLeft: 12 },
+  itemWrap: { marginLeft: 12 },
+  item: { flexDirection: "row", alignItems: "center", gap: 12, borderRadius: radius.button, paddingVertical: 8, paddingHorizontal: 14 },
+  swipeAction: { marginLeft: 8, minWidth: 110 },
   flex: { flex: 1 },
 });

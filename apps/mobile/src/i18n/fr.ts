@@ -151,6 +151,7 @@ export const fr = {
     empty: "Rien de noté ce soir.",
     remove: "Supprimer",
     removed: "Verre retiré",
+    swipeHint: "Glisse un verre vers la gauche pour le supprimer.",
     group: "{count} × {drink}",
   },
   sos: {

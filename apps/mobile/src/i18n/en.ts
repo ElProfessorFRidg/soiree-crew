@@ -153,6 +153,7 @@ export const en: Messages = {
     empty: "Nothing logged tonight.",
     remove: "Delete",
     removed: "Drink removed",
+    swipeHint: "Swipe a drink left to delete it.",
     group: "{count} × {drink}",
   },
   sos: {
