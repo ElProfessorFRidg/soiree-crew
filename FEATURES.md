@@ -454,7 +454,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | SLOP-05 | P0 | Backstage | todo | Fresh-eyes test: a screenshot or a text pasted into a blank model session with the question "which AI tool mad... |
 | SLOP-06 | P1 | Backstage | todo | Crew panel: before each release, the friends read the copy and the cards. Anything that "sounds like AI" or "d... |
 | SLOP-07 | P0 | Backstage | build | Fresh context: subagents writing copy start a new session with `VOICE.md` + `SLOP.md`, because long contexts m... |
-| SLOP-08 | P0 | Backstage | todo | Design: `DESIGN.md` explicitly bans the <design_patterns> tells. If the stack allows it, an automated detector... |
+| SLOP-08 | P0 | Backstage | build | Design: `DESIGN.md` explicitly bans the <design_patterns> tells. If the stack allows it, an automated detector... |
 | SLOP-09 | P1 | Backstage | proposed | Deck lint (SLOP.md R-20): opening cap, length spread, near duplicates, moralising cards, expiry of topical cards. Source: voice.md §5. |
 | SLOP-10 | P1 | Backstage | proposed | Glossary synonym lint (SLOP.md R-19) generated from GLOSSARY.md. Source: voice.md §5. |
 | SLOP-11 | P1 | Backstage | proposed | Copy variants: every recurring line (JOY-02 greetings, recurring notifications) has at least 3 written variants and a no-repeat rule per user. Source: voice.md §5. |

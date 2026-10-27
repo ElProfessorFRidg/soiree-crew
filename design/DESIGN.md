@@ -143,3 +143,19 @@ Reuse them as the starting point for `VOICE.md`. They are tutoiement, plain, spe
 - Destructive confirm: title "Supprimer « Samedi au Zinc » ?", buttons "Garder" / "Supprimer la soirée".
 
 The app name, the game names and all demo data in the prototype (people, venues, prices) are placeholders.
+
+## Banned tells (SLOP-08)
+
+These read as "an AI made this app". None of them ships, whatever the screen.
+
+- Violet-to-blue or indigo gradients, bright cyan on dark, gradient text, competing neons.
+- Radial halo or aurora behind content, glowing borders, text glow, glassmorphism or blur behind content.
+- Reflex beige or cream "good taste" backgrounds.
+- Cards inside cards, grids of identical icon + title + text cards, a coloured stripe on the side of every card, hairline border plus wide shadow, huge corner radii.
+- A rounded icon tile above every heading, a small label or pill above headings, decorative 01 / 02 / 03 numbers, the landing-page "big number + small label" block as decoration.
+- Emojis as icons, bullets or navigation (fine in reactions and user content).
+- Inter or Geist by default, one font with no hierarchy, italic serif "editorial" headlines, all caps, identical spacing everywhere.
+- Status dots pulsing with no state change, blinking cursors, marquees, elastic bounce on routine actions.
+- Generic-shape illustrations, sloppy SVG mascots, generated images.
+
+`pnpm lint:slop` runs `tools/slop-lint/design.mjs` on the UI code in CI: blur, radial gradients, decorative linear gradients (outside the SOS ring, the wheels and the BAC curve), text shadows, Inter / Geist, all caps and violet, indigo or bright cyan colours fail the build; wide shadows, big radii, italics and endless loops are warnings for the review. What a static read cannot see (cards in cards, identical grids) stays with the anti-slop review (SLOP-02).

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// SLOP-04: fails the build when a localisation catalogue or a game deck contains a machine-checkable AI tell.
+// SLOP-04 and SLOP-08: fails the build when a localisation catalogue, a game deck or the UI code contains a machine-checkable AI tell.
 // Usage: node tools/slop-lint/index.mjs
 // Needs Node 22.18 or later, which runs the .ts catalogues with type stripping.
 
@@ -8,6 +8,7 @@ import { pathToFileURL } from "node:url";
 import { join, resolve } from "node:path";
 import { checkDeck, mixedApostrophes } from "./decks.mjs";
 import { check, strings } from "./rules.mjs";
+import { designFindings } from "./design.mjs";
 
 const CATALOGUES = [
   { locale: "fr", file: "apps/mobile/src/i18n/fr.ts", exportName: "fr" },
@@ -93,9 +94,12 @@ for (const locale of ["fr", "en"]) {
   }
 }
 
+// SLOP-08: the design tells a static read of the UI code can catch.
+for (const [file, finding] of designFindings(["apps/mobile/src", "packages/design-tokens/src"])) report(file, finding);
+
 if (warnings > 0) console.log(`\n${warnings} warning(s) to read in review (SLOP-02).`);
 if (errors > 0) {
   console.log(`\n${errors} SLOP-04 error(s).`);
   process.exit(1);
 }
-console.log("SLOP-04: no machine-checkable tells.");
+console.log("SLOP-04, SLOP-08: no machine-checkable tells.");
