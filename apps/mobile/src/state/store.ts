@@ -60,6 +60,8 @@ export interface AppState {
   soundsOn: boolean;
   /** QOL-32: when the logging nudge was last answered. */
   nudgeDismissedAt: number | null;
+  /** QOL-30: party reminders muted until this morning time. */
+  remindersMutedUntil: number | null;
 }
 
 export const useAppStore = create<AppState>()(
@@ -91,6 +93,7 @@ export const useAppStore = create<AppState>()(
       barHave: [],
       soundsOn: false,
       nudgeDismissedAt: null,
+      remindersMutedUntil: null,
     }),
     {
       name: "crew-app-v1",

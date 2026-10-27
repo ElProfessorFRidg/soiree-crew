@@ -116,6 +116,9 @@ export const fr = {
     underAt: "Sous la limite à",
     underNow: "Déjà sous la limite",
     changeInMe: "Le pays et le jeune permis se changent dans Moi.",
+    muted: "Rappels coupés jusqu'à {time}.",
+    unmute: "Remettre les rappels",
+    muteNow: "Couper les rappels jusqu'à demain matin",
   },
   reminders: {
     nightChannel: "Soirée en cours",
@@ -128,6 +131,7 @@ export const fr = {
     limitTitle: "Ta limite approche",
     limitBody: "Au rythme actuel, tu la passes vers {time}.",
     limitToast: "Ta limite sera dépassée vers {time}.",
+    mute: "Couper jusqu'à demain",
   },
   crew: {
     tab: "Crew",

@@ -116,6 +116,9 @@ export const de: Messages = {
     underAt: "Unter dem Grenzwert ab",
     underNow: "Schon unter dem Grenzwert",
     changeInMe: "Land und Probezeit änderst du unter „Ich“.",
+    muted: "Erinnerungen stumm bis {time}.",
+    unmute: "Erinnerungen wieder an",
+    muteNow: "Erinnerungen bis morgen früh stummschalten",
   },
   reminders: {
     nightChannel: "Laufender Abend",
@@ -128,6 +131,7 @@ export const de: Messages = {
     limitTitle: "Dein Limit ist nah",
     limitBody: "Bei diesem Tempo bist du gegen {time} drüber.",
     limitToast: "Gegen {time} bist du über deinem Limit.",
+    mute: "Bis morgen stumm",
   },
   crew: {
     tab: "Crew",

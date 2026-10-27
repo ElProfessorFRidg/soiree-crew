@@ -50,6 +50,8 @@ function intakes(): DrinkIntake[] {
 /** QOL-03: actions straight from the notification. */
 export const WATER_CATEGORY = "water";
 export const LOG_WATER_ACTION = "log-water";
+/** QOL-30: every party reminder can be muted until the morning. */
+export const MUTE_ACTION = "mute-until-morning";
 
 let categoriesSet = false;
 async function setCategories(): Promise<void> {
@@ -58,6 +60,7 @@ async function setCategories(): Promise<void> {
   const i18n = createTranslator(useAppStore.getState().preferences.language);
   await Notifications.setNotificationCategoryAsync(WATER_CATEGORY, [
     { identifier: LOG_WATER_ACTION, buttonTitle: i18n.t("reminders.waterDone"), options: { opensAppToForeground: true } },
+    { identifier: MUTE_ACTION, buttonTitle: i18n.t("reminders.mute"), options: { opensAppToForeground: false } },
   ]).catch(() => undefined);
 }
 
@@ -114,10 +117,22 @@ async function updateNightNotification(estimate: BacEstimate, i18n: Translator, 
   });
 }
 
+/** QOL-30: no reminder until the end of the night, the day boundary of tomorrow morning. */
+export async function muteUntilMorning(): Promise<void> {
+  const { dayBoundaryHour } = useAppStore.getState().preferences;
+  const morning = new Date();
+  if (morning.getHours() >= dayBoundaryHour) morning.setDate(morning.getDate() + 1);
+  morning.setHours(dayBoundaryHour, 0, 0, 0);
+  useAppStore.setState({ remindersMutedUntil: morning.getTime() });
+  await Notifications.cancelScheduledNotificationAsync(WATER_ID).catch(() => undefined);
+  await Notifications.cancelScheduledNotificationAsync(LIMIT_ID).catch(() => undefined);
+}
+
 export async function refreshReminders(): Promise<void> {
   if (!supported) return;
-  const { profile, preferences, drinks, water } = useAppStore.getState();
+  const { profile, preferences, drinks, water, remindersMutedUntil } = useAppStore.getState();
   if (!profile) return;
+  if (remindersMutedUntil !== null && remindersMutedUntil > Date.now()) return;
   const i18n = createTranslator(preferences.language);
   const now = Date.now();
   const estimate = estimateBac(intakes(), profile, now);
@@ -163,6 +178,7 @@ export async function refreshReminders(): Promise<void> {
     Math.max(now + MINUTE_MS, estimate.peak.at - 15 * MINUTE_MS),
     i18n.t("reminders.limitTitle"),
     i18n.t("reminders.limitBody", { time }),
+    WATER_CATEGORY,
   );
 }
 

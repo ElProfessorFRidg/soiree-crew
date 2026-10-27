@@ -5,6 +5,7 @@ import { useT } from "@/i18n";
 import { formatClock } from "@/i18n/format";
 import { useLiveBac, useNow } from "@/state/hooks";
 import { setPreferences } from "@/state/preferences";
+import { muteUntilMorning, refreshReminders } from "@/reminders/reminders";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Button } from "@/ui/Button";
@@ -25,12 +26,18 @@ export default function LimitsScreen() {
   const now = useNow();
   const live = useLiveBac(now);
   const preferences = useAppStore((state) => state.preferences);
+  const mutedUntil = useAppStore((state) => state.remindersMutedUntil);
+  const hourCycle = preferences.hourCycle;
   if (!live) return null;
 
   const ratio = breathRatio(live.rules);
   const unit = i18n.t(`units.${preferences.bacUnit}`);
-  const format = (tenths: number) => formatBacValue(tenths / 10, preferences.bacUnit, ratio, i18n.locale);
-  const limitTenths = preferences.personalLimit === null ? null : Math.round(preferences.personalLimit * 10);
+  const format = (tenths: number) =>
+    formatBacValue(tenths / 10, preferences.bacUnit, ratio, i18n.locale);
+  const limitTenths =
+    preferences.personalLimit === null
+      ? null
+      : Math.round(preferences.personalLimit * 10);
   const { driving } = live;
   const underText =
     driving.underLimitAt === null || driving.underLimitAt <= now
@@ -42,7 +49,13 @@ export default function LimitsScreen() {
       <Panel>
         <Text variant="h3">{i18n.t("limits.myLimit")}</Text>
         {limitTenths === null ? (
-          <Button label={i18n.t("limits.setLimit")} variant="secondary" icon="plus" height={48} onPress={() => setPreferences({ personalLimit: 0.8 })} />
+          <Button
+            label={i18n.t("limits.setLimit")}
+            variant="secondary"
+            icon="plus"
+            height={48}
+            onPress={() => setPreferences({ personalLimit: 0.8 })}
+          />
         ) : (
           <>
             <Stepper
@@ -51,7 +64,9 @@ export default function LimitsScreen() {
               max={LIMIT_MAX}
               format={format}
               unit={unit}
-              onChange={(tenths) => setPreferences({ personalLimit: tenths / 10 })}
+              onChange={(tenths) =>
+                setPreferences({ personalLimit: tenths / 10 })
+              }
               decreaseLabel={i18n.t("limits.lower")}
               increaseLabel={i18n.t("limits.higher")}
             />
@@ -59,11 +74,18 @@ export default function LimitsScreen() {
               <Text style={styles.flex}>{i18n.t("limits.warn")}</Text>
               <Switch
                 value={preferences.warnNearLimit}
-                onValueChange={(warnNearLimit) => setPreferences({ warnNearLimit })}
+                onValueChange={(warnNearLimit) =>
+                  setPreferences({ warnNearLimit })
+                }
                 accessibilityLabel={i18n.t("limits.warn")}
               />
             </View>
-            <Button label={i18n.t("limits.removeLimit")} variant="outline" height={44} onPress={() => setPreferences({ personalLimit: null })} />
+            <Button
+              label={i18n.t("limits.removeLimit")}
+              variant="outline"
+              height={44}
+              onPress={() => setPreferences({ personalLimit: null })}
+            />
           </>
         )}
       </Panel>
@@ -82,7 +104,11 @@ export default function LimitsScreen() {
                   ? i18n.t("limits.waterHour")
                   : i18n.t("limits.waterEvery", { minutes }),
           }))}
-          onChange={(minutes) => setPreferences({ waterReminderMinutes: minutes === 0 ? null : minutes })}
+          onChange={(minutes) =>
+            setPreferences({
+              waterReminderMinutes: minutes === 0 ? null : minutes,
+            })
+          }
         />
       </Panel>
 
@@ -90,7 +116,9 @@ export default function LimitsScreen() {
         <Text variant="h3">{i18n.t("limits.driving")}</Text>
         <Row
           title={i18n.t("limits.country")}
-          subtitle={i18n.t(`countries.${preferences.legalCountry}` as "countries.FR")}
+          subtitle={i18n.t(
+            `countries.${preferences.legalCountry}` as "countries.FR",
+          )}
           trailing={<Icon name="chev" color={theme.textMuted} />}
           onPress={() => router.push("/(tabs)/me")}
         />
@@ -103,11 +131,42 @@ export default function LimitsScreen() {
         <Text variant="small">{i18n.t("limits.changeInMe")}</Text>
       </Panel>
       <Text variant="disclaimer">{i18n.t("party.notice")}</Text>
+      {/* QOL-30: one tap for a quiet night, back on its own in the morning. */}
+      {mutedUntil !== null && mutedUntil > Date.now() ? (
+        <>
+          <Text variant="small">
+            {i18n.t("limits.muted", {
+              time: formatClock(mutedUntil, i18n.language, hourCycle),
+            })}
+          </Text>
+          <Button
+            label={i18n.t("limits.unmute")}
+            variant="outline"
+            height={48}
+            onPress={() => {
+              useAppStore.setState({ remindersMutedUntil: null });
+              void refreshReminders();
+            }}
+          />
+        </>
+      ) : (
+        <Button
+          label={i18n.t("limits.muteNow")}
+          variant="outline"
+          height={48}
+          onPress={() => void muteUntilMorning()}
+        />
+      )}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  switchRow: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 48 },
+  switchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    minHeight: 48,
+  },
   flex: { flex: 1 },
 });

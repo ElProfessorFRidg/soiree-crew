@@ -117,6 +117,9 @@ export const pt: Messages = {
     underAt: "Abaixo do limite às",
     underNow: "Já estás abaixo do limite",
     changeInMe: "O país e a carta provisória mudam-se em «Eu».",
+    muted: "Lembretes silenciados até às {time}.",
+    unmute: "Voltar a ligar os lembretes",
+    muteNow: "Silenciar lembretes até amanhã de manhã",
   },
   reminders: {
     nightChannel: "Festa a decorrer",
@@ -129,6 +132,7 @@ export const pt: Messages = {
     limitTitle: "O teu limite está perto",
     limitBody: "A este ritmo, passas o limite por volta das {time}.",
     limitToast: "Vais passar o teu limite por volta das {time}.",
+    mute: "Silenciar até amanhã",
   },
   crew: {
     tab: "Crew",

@@ -20,7 +20,7 @@ import { followPhoneHourCycle, useAppStore } from "@/state/store";
 import { ThemeProvider } from "@/theme";
 import { useEco, watchBattery } from "@/power/eco";
 import { logWater } from "@/drinks/actions";
-import { LOG_WATER_ACTION, refreshReminders } from "@/reminders/reminders";
+import { LOG_WATER_ACTION, MUTE_ACTION, muteUntilMorning, refreshReminders } from "@/reminders/reminders";
 import { flushUploads } from "@/photos/uploads";
 
 void SplashScreen.preventAutoHideAsync();
@@ -91,6 +91,10 @@ export default function RootLayout() {
       void Notifications.clearLastNotificationResponseAsync().catch(() => undefined);
       if (response.actionIdentifier === LOG_WATER_ACTION) {
         logWater();
+        return;
+      }
+      if (response.actionIdentifier === MUTE_ACTION) {
+        void muteUntilMorning();
         return;
       }
       const url = response.notification.request.content.data?.url;

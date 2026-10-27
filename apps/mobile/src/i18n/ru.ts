@@ -117,6 +117,9 @@ export const ru: Messages = {
     underAt: "Ниже лимита в",
     underNow: "Уже ниже лимита",
     changeInMe: "Страна и режим начинающего водителя меняются в профиле.",
+    muted: "Напоминания выключены до {time}.",
+    unmute: "Вернуть напоминания",
+    muteNow: "Выключить напоминания до утра",
   },
   reminders: {
     nightChannel: "Вечеринка идёт",
@@ -129,6 +132,7 @@ export const ru: Messages = {
     limitTitle: "Лимит близко",
     limitBody: "В таком темпе превысишь его около {time}.",
     limitToast: "Лимит будет превышен около {time}.",
+    mute: "Тихо до утра",
   },
   crew: {
     tab: "Тусовка",

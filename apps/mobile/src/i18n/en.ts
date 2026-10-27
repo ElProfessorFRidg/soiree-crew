@@ -118,6 +118,9 @@ export const en: Messages = {
     underAt: "Under the limit at",
     underNow: "Already under the limit",
     changeInMe: "Country and novice-driver mode are in Me.",
+    muted: "Reminders muted until {time}.",
+    unmute: "Turn reminders back on",
+    muteNow: "Mute reminders until tomorrow morning",
   },
   reminders: {
     nightChannel: "Night in progress",
@@ -130,6 +133,7 @@ export const en: Messages = {
     limitTitle: "Close to your limit",
     limitBody: "At this pace you go over it around {time}.",
     limitToast: "You'll go over your limit around {time}.",
+    mute: "Mute until morning",
   },
   crew: {
     tab: "Crew",

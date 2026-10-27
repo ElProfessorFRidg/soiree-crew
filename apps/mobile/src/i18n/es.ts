@@ -117,6 +117,9 @@ export const es: Messages = {
     underAt: "Por debajo del límite desde",
     underNow: "Ya estás por debajo del límite",
     changeInMe: "El país y el carné novel se cambian en Yo.",
+    muted: "Recordatorios silenciados hasta las {time}.",
+    unmute: "Volver a activar los recordatorios",
+    muteNow: "Silenciar recordatorios hasta mañana",
   },
   reminders: {
     nightChannel: "Fiesta en curso",
@@ -129,6 +132,7 @@ export const es: Messages = {
     limitTitle: "Te acercas a tu límite",
     limitBody: "A este ritmo lo pasas. Hora estimada: {time}.",
     limitToast: "Vas a pasar tu límite. Hora estimada: {time}.",
+    mute: "Silenciar hasta mañana",
   },
   crew: {
     tab: "Crew",
