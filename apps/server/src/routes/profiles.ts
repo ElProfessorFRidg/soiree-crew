@@ -28,6 +28,17 @@ async function relationBetween(ctx: Context, viewer: string, owner: string): Pro
   return { me: false, friend: friend.length > 0, crewMate: crew.length > 0, blocked: blocked.length > 0 };
 }
 
+/** COM-05: friends we both have. */
+async function mutualFriends(ctx: Context, a: string, b: string): Promise<number> {
+  const rows = await ctx.db.query<{ n: number }>(
+    `with fa as (select case when user_a = $1 then user_b else user_a end as f from friendships where (user_a = $1 or user_b = $1) and status = 'accepted'),
+          fb as (select case when user_a = $2 then user_b else user_a end as f from friendships where (user_a = $2 or user_b = $2) and status = 'accepted')
+     select count(*)::int as n from fa join fb on fa.f = fb.f`,
+    [a, b],
+  );
+  return rows[0]!.n;
+}
+
 async function friendshipState(ctx: Context, viewer: string, owner: string): Promise<"none" | "friends" | "requested" | "incoming"> {
   if (viewer === owner) return "none";
   const [a, b] = pair(viewer, owner);
@@ -38,7 +49,7 @@ async function friendshipState(ctx: Context, viewer: string, owner: string): Pro
 }
 
 /** Every section, computed only when the viewer may see it (PROF-08: nothing else leaves the server). */
-async function buildSections(ctx: Context, ownerId: string, relation: Relation): Promise<Partial<Record<Section, unknown>>> {
+async function buildSections(ctx: Context, ownerId: string, relation: Relation, viewerId: string): Promise<Partial<Record<Section, unknown>>> {
   const stored = (await ctx.db.query<{ bio: string; country: string; audiences: string; hidden_venues: string }>(
     "select bio, country, audiences, hidden_venues from profiles where user_id = $1",
     [ownerId],
@@ -55,10 +66,13 @@ async function buildSections(ctx: Context, ownerId: string, relation: Relation):
   }
 
   if (visible("crews")) {
+    // COM-04: outside a crew, its name only shows if the crew agreed to it.
     out.crews = await ctx.db.query<{ name: string; members: number }>(
       `select c.name, (select count(*)::int from crew_members x where x.crew_id = c.id) as members
-       from crew_members m join crews c on c.id = m.crew_id where m.user_id = $1 order by m.joined_at`,
-      [ownerId],
+       from crew_members m join crews c on c.id = m.crew_id where m.user_id = $1
+         and ($2 or c.public_name or exists (select 1 from crew_members v where v.crew_id = c.id and v.user_id = $3))
+       order by m.joined_at`,
+      [ownerId, relation.me, viewerId],
     );
   }
 
@@ -204,10 +218,15 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
     if (as && ownerId === user.id) {
       relation = as === "stranger" ? STRANGER : as === "friend" ? { me: false, friend: true, crewMate: false } : { me: false, friend: false, crewMate: true };
     }
-    const sections = await buildSections(ctx, ownerId, relation);
+    const sections = await buildSections(ctx, ownerId, relation, user.id);
     const mine = ownerId === user.id && !as;
     const stored = mine
-      ? (await ctx.db.query<{ audiences: string; findable: string }>("select audiences, findable from profiles where user_id = $1", [ownerId]))[0]
+      ? (
+          await ctx.db.query<{ audiences: string; findable: string; regular_opt_in: boolean; open_to_meet: boolean; requests_from: string }>(
+            "select audiences, findable, regular_opt_in, open_to_meet, requests_from from profiles where user_id = $1",
+            [ownerId],
+          )
+        )[0]
       : undefined;
     return {
       userId: ownerId,
@@ -215,7 +234,8 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
       friendship: await friendshipState(ctx, user.id, ownerId),
       muted: (await ctx.db.query("select 1 from mutes where muter = $1 and muted = $2", [user.id, ownerId])).length > 0,
       sections,
-      ...(mine ? { audiences: audiencesOf(stored ? (JSON.parse(stored.audiences) as Record<string, unknown>) : {}), findable: stored?.findable ?? "username" } : {}),
+      ...(mine ? { audiences: audiencesOf(stored ? (JSON.parse(stored.audiences) as Record<string, unknown>) : {}), findable: stored?.findable ?? "username", regularOptIn: stored?.regular_opt_in ?? false, openToMeet: stored?.open_to_meet ?? false, requestsFrom: stored?.requests_from ?? "everyone" } : {}),
+      mutualFriends: ownerId === user.id ? 0 : await mutualFriends(ctx, user.id, ownerId),
     };
   });
 
@@ -230,6 +250,9 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
         audiences: z.record(z.enum(SECTIONS), z.enum(AUDIENCES)).optional(),
         hiddenVenues: z.array(uuid).max(500).optional(),
         findable: z.enum(["search", "username", "nobody"]).optional(),
+        regularOptIn: z.boolean().optional(),
+        openToMeet: z.boolean().optional(),
+        requestsFrom: z.enum(["nobody", "friendsOfFriends", "everyone"]).optional(),
       })
       .parse(request.body);
     const current = (await ctx.db.query<{ bio: string; country: string; audiences: string; hidden_venues: string }>(
@@ -254,6 +277,9 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
       ],
     );
     if (input.findable) await ctx.db.query("update profiles set findable = $2 where user_id = $1", [user.id, input.findable]);
+    if (input.regularOptIn !== undefined) await ctx.db.query("update profiles set regular_opt_in = $2 where user_id = $1", [user.id, input.regularOptIn]);
+    if (input.openToMeet !== undefined) await ctx.db.query("update profiles set open_to_meet = $2 where user_id = $1", [user.id, input.openToMeet]);
+    if (input.requestsFrom) await ctx.db.query("update profiles set requests_from = $2 where user_id = $1", [user.id, input.requestsFrom]);
     return { audiences };
   });
 
@@ -301,6 +327,11 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
     const [a, b] = pair(user.id, other);
     const row = (await ctx.db.query<{ status: string; requested_by: string }>("select status, requested_by from friendships where user_a = $1 and user_b = $2", [a, b]))[0];
     if (!row) {
+      // COM-05: each person picks who may send them a request; crew mates always can.
+      const from = (await ctx.db.query<{ requests_from: string }>("select requests_from from profiles where user_id = $1", [other]))[0]?.requests_from ?? "everyone";
+      if (from !== "everyone" && !relation.crewMate && !(from === "friendsOfFriends" && (await mutualFriends(ctx, user.id, other)) > 0)) {
+        throw new HttpError(403, "requests_closed");
+      }
       await ctx.db.query("insert into friendships (user_a, user_b, requested_by, status, at) values ($1, $2, $3, 'pending', $4)", [a, b, user.id, ctx.now()]);
     } else if (row.status === "pending" && row.requested_by !== user.id) {
       await ctx.db.query("update friendships set status = 'accepted', at = $3 where user_a = $1 and user_b = $2", [a, b, ctx.now()]);

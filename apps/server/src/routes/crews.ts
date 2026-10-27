@@ -28,10 +28,11 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
       role: string;
       leaderboard_enabled: boolean;
       ai_enabled: boolean;
+      public_name: boolean;
       leaderboard_opt_out: boolean;
       territory_opt_out: boolean;
     }>(
-      `select c.id, c.name, m.role, c.leaderboard_enabled, c.ai_enabled, m.leaderboard_opt_out, m.territory_opt_out
+      `select c.id, c.name, m.role, c.leaderboard_enabled, c.ai_enabled, c.public_name, m.leaderboard_opt_out, m.territory_opt_out
        from crews c join crew_members m on m.crew_id = c.id where m.user_id = $1 order by c.created_at`,
       [user.id],
     );
@@ -51,6 +52,7 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
         leaderboardEnabled: crew.leaderboard_enabled,
         aiEnabled: crew.ai_enabled,
         aiAvailable: Boolean(ctx.ai) && crew.ai_enabled,
+        publicName: crew.public_name,
         // My own participation (RANK-08, TER-07): only ever sent to me.
         me: { leaderboardOptOut: crew.leaderboard_opt_out, territoryOptOut: crew.territory_opt_out },
         members: members

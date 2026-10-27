@@ -93,6 +93,7 @@ export default function ProfileScreen() {
   return (
     <Screen back withToasts>
       <View style={styles.head}>
+        {profile.mutualFriends ? <Text variant="small">{i18n.plural("people.mutual", profile.mutualFriends)}</Text> : null}
         <HeroTarget heroKey={`avatar:${profile.userId}`}>
           <Avatar personId={profile.userId} name={name || "?"} size={72} />
         </HeroTarget>

@@ -13,6 +13,7 @@ import { pollRoutes } from "./routes/polls";
 import { cardRoutes } from "./routes/cards";
 import { feedRoutes } from "./routes/feed";
 import { aiOrderRoutes } from "./routes/aiOrder";
+import { communityRoutes } from "./routes/community";
 import { statsRoutes } from "./routes/stats";
 import { profileRoutes } from "./routes/profiles";
 import { radarRoutes } from "./routes/radar";
@@ -82,6 +83,7 @@ export async function buildApp(ctx: Context, options: { logger?: boolean } = {})
   cardRoutes(app, ctx);
   feedRoutes(app, ctx);
   aiOrderRoutes(app, ctx);
+  communityRoutes(app, ctx);
   venueRoutes(app, ctx, ctx.hashSecret);
   leaderboardRoutes(app, ctx);
   radarRoutes(app, ctx);

@@ -5,7 +5,7 @@ import type { UnitSystem } from "@crew/units";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
 import { formatClock } from "@/i18n/format";
-import { setCrewAi, setCrewLeaderboard, useCrewData } from "@/server/crewData";
+import { setCrewAi, setCrewLeaderboard, setCrewPublicName, useCrewData } from "@/server/crewData";
 import { setCrewParticipation } from "@/server/venueData";
 import { setPreferences } from "@/state/preferences";
 import { followPhoneHourCycle, useAppStore } from "@/state/store";
@@ -191,6 +191,12 @@ export default function SettingsScreen() {
               {crew.role === "admin" ? (
                 <>
                   <SwitchRow label={i18n.t("settings.crewLeaderboard")} value={crew.leaderboardEnabled} onChange={(on) => void setCrewLeaderboard(crew.id, on).catch(offline)} />
+                  <SwitchRow
+                    label={i18n.t("settings.crewPublicName")}
+                    hint={i18n.t("settings.crewPublicNameHint")}
+                    value={crew.publicName ?? false}
+                    onChange={(on) => void setCrewPublicName(crew.id, on).catch(offline)}
+                  />
                   <SwitchRow label={i18n.t("settings.crewAi")} hint={i18n.t("settings.crewAiHint")} value={crew.aiEnabled ?? false} onChange={(on) => void setCrewAi(crew.id, on).catch(offline)} />
                 </>
               ) : !crew.leaderboardEnabled ? (

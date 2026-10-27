@@ -100,6 +100,9 @@ export default function VenueScreen() {
         ))}
       </View>
 
+      {page.venue.kind !== "home" ? (
+        <Button label={i18n.t("place.open")} icon="eye" variant="outline" height={48} onPress={() => router.push({ pathname: "/place", params: { venueId: page.venue.id } })} />
+      ) : null}
       <Button
         label={i18n.t("bars.checkIn")}
         icon="pin"

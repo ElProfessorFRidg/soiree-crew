@@ -13,6 +13,10 @@ export interface ProfileView {
   muted: boolean;
   audiences?: Record<ProfileSection, Audience>;
   findable?: Findable;
+  regularOptIn?: boolean;
+  openToMeet?: boolean;
+  requestsFrom?: "nobody" | "friendsOfFriends" | "everyone";
+  mutualFriends?: number;
   sections: {
     identity?: { displayName: string; username: string; bio: string; country: string };
     crews?: { name: string; members: number }[];
@@ -35,6 +39,9 @@ export function saveProfile(input: {
   audiences?: Partial<Record<ProfileSection, Audience>>;
   hiddenVenues?: string[];
   findable?: Findable;
+  regularOptIn?: boolean;
+  openToMeet?: boolean;
+  requestsFrom?: "nobody" | "friendsOfFriends" | "everyone";
 }): Promise<{ audiences: Record<ProfileSection, Audience> }> {
   return api("/v1/me/profile", { method: "PUT", body: input });
 }

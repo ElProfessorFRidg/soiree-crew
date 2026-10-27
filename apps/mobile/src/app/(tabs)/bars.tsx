@@ -10,7 +10,7 @@ import { useCrewData, useLiveParty } from "@/server/crewData";
 import { useSession } from "@/server/session";
 import { refreshVenues, useVenueData, type VenueSummary } from "@/server/venueData";
 import { useTheme } from "@/theme";
-import { Button } from "@/ui/Button";
+import { Button, IconButton } from "@/ui/Button";
 import { Chip, Panel, Tag } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { ScalePressable } from "@/ui/Pressable";
@@ -124,7 +124,12 @@ export default function BarsScreen() {
   return (
     <Screen
       title={i18n.t("bars.title")}
-      trailing={<Button label={i18n.t("bars.leaderboard")} icon="trophy" variant="secondary" height={40} onPress={() => router.push({ pathname: "/leaderboard", params: { crewId } })} />}
+      trailing={
+        <View style={styles.headerButtons}>
+          <IconButton icon="search" accessibilityLabel={i18n.t("discover.title")} onPress={() => router.push("/discover")} />
+          <Button label={i18n.t("bars.leaderboard")} icon="trophy" variant="secondary" height={40} onPress={() => router.push({ pathname: "/leaderboard", params: { crewId } })} />
+        </View>
+      }
     >
       {crews.length > 1 ? (
         <View style={styles.chips}>
@@ -206,6 +211,7 @@ export default function BarsScreen() {
 }
 
 const styles = StyleSheet.create({
+  headerButtons: { flexDirection: "row", alignItems: "center", gap: 8 },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   tags: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   actions: { flexDirection: "row", gap: 10 },

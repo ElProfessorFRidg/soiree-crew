@@ -366,16 +366,16 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| COM-01 | P1 | Bars.dc.html | todo | Public venue page, extending TER-05 to all app users: opening hours, crowd-sourced prices (N-09), happy hours,... |
-| COM-02 | P1 | Bars.dc.html | todo | Reviews: only from users with a verified check-in at that venue (<anti_cheat>), structured ratings (prices, vi... |
-| COM-03 | P1 | Bars.dc.html | todo | Venue regulars: a public top of regulars per venue and per season, among users who opted in, by presence only ... |
-| COM-04 | P1 | Profil.dc.html | todo | Public profile: built and controlled through <profiles> (private by default, audience per section and per item... |
-| COM-05 | P1 | Profil.dc.html | todo | Meeting people: an "open to meeting people" switch. From a venue page or a regular's profile, send a friend re... |
+| COM-01 | P1 | Bars.dc.html | build | Public venue page, extending TER-05 to all app users: opening hours, crowd-sourced prices (N-09), happy hours,... |
+| COM-02 | P1 | Bars.dc.html | build | Reviews: only from users with a verified check-in at that venue (<anti_cheat>), structured ratings (prices, vi... |
+| COM-03 | P1 | Bars.dc.html | build | Venue regulars: a public top of regulars per venue and per season, among users who opted in, by presence only ... |
+| COM-04 | P1 | Profil.dc.html | build | Public profile: built and controlled through <profiles> (private by default, audience per section and per item... |
+| COM-05 | P1 | Profil.dc.html | build | Meeting people: an "open to meeting people" switch. From a venue page or a regular's profile, send a friend re... |
 | COM-06 | P0 | Bars.dc.html | build | Presence privacy: strangers only see "how busy tonight" levels and counts once at least 5 users are there, rou... |
-| COM-07 | P1 | Bars.dc.html | todo | Age-policy filter: crowd-sourced door policy per venue, meaning ID checks at the door (always / sometimes / ne... |
+| COM-07 | P1 | Bars.dc.html | build | Age-policy filter: crowd-sourced door policy per venue, meaning ID checks at the door (always / sometimes / ne... |
 | COM-08 | P0 | Bars.dc.html | build | Safety and moderation: report any review, photo, profile or party; block and mute; automatic filters for insul... |
-| COM-09 | P1 | Bars.dc.html | todo | Venue events: community-submitted events (DJ set, student night, match screening) with date, RSVP, how many fr... |
-| COM-10 | P1 | Bars.dc.html | todo | Discovery: venues nearby ranked by reviews and check-ins, filters (open now, pint under a set price, strict 18... |
+| COM-09 | P1 | Bars.dc.html | build | Venue events: community-submitted events (DJ set, student night, match screening) with date, RSVP, how many fr... |
+| COM-10 | P1 | Bars.dc.html | build | Discovery: venues nearby ranked by reviews and check-ins, filters (open now, pint under a set price, strict 18... |
 | COM-11 | P2 | Bars.dc.html | todo | Venue owners can claim their page to post hours, happy hours and events and to answer reviews. They can never ... |
 | COM-12 | P0 (before COM-02) | Backstage (near Bars.dc.html) | proposed | "How reviews work" page and the review-law notices next to every review list (check method, publication and experience dates, ranking criteria, no reward, retention). Source: community.md §2.1.3, §2.3, §5. |
 | COM-13 | P0 (before any public feature) | Backstage | proposed | Statement of reasons and contest flow (DSA art. 17 and 20) for every moderation decision, plus the notifier's decision notice. Source: community.md §2.1.2, §5. |
@@ -390,7 +390,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | PROF-01 | P0 | Profil.dc.html | build | Four audiences for everything on a profile: Only me, My crews, Friends, Everyone. Profile-wide presets (Privat... |
 | PROF-02 | P0 | Profil.dc.html | build | Profile sections, each with its own audience: identity (pseudonym, photo, bio, country), crews, titles and bad... |
 | PROF-03 | P0 | Profil.dc.html | build | Per-item overrides: hide one venue, one review or one stat without touching the rest. |
-| PROF-04 | P1 | Bars.dc.html | todo | Reviews: each review is posted as Public with name, Public anonymous ("a regular", still counted in the venue ... |
+| PROF-04 | P1 | Bars.dc.html | build | Reviews: each review is posted as Public with name, Public anonymous ("a regular", still counted in the venue ... |
 | PROF-05 | P0 | Profil.dc.html | build | Never shown to strangers, whatever the settings: current location, current venue, live status (N-01), live BAC... |
 | PROF-06 | P0 | Profil.dc.html | build | Records are stats, not trophies: the highest BAC reached and the biggest night show as plain figures, never ce... |
 | PROF-07 | P0 | Profil.dc.html | build | "View as": preview your own profile as a stranger, a friend or a crew member, one tap away from the profile an... |

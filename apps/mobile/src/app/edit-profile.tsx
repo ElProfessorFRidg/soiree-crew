@@ -111,6 +111,50 @@ export default function EditProfileScreen() {
       />
       <Text variant="small">{i18n.t("people.findableHint")}</Text>
 
+      <Text variant="label">{i18n.t("people.meeting")}</Text>
+      <View style={styles.switchRow}>
+        <View style={styles.flex}>
+          <Text>{i18n.t("people.regularOptIn")}</Text>
+          <Text variant="small">{i18n.t("people.regularOptInHint")}</Text>
+        </View>
+        <Switch
+          value={profile.regularOptIn ?? false}
+          accessibilityLabel={i18n.t("people.regularOptIn")}
+          onValueChange={(on) => {
+            setProfile((p) => (p ? { ...p, regularOptIn: on } : p));
+            apply({ regularOptIn: on });
+          }}
+        />
+      </View>
+      <View style={styles.switchRow}>
+        <View style={styles.flex}>
+          <Text>{i18n.t("people.openToMeet")}</Text>
+          <Text variant="small">{i18n.t("people.openToMeetHint")}</Text>
+        </View>
+        <Switch
+          value={profile.openToMeet ?? false}
+          accessibilityLabel={i18n.t("people.openToMeet")}
+          onValueChange={(on) => {
+            setProfile((p) => (p ? { ...p, openToMeet: on } : p));
+            apply({ openToMeet: on });
+          }}
+        />
+      </View>
+      <Text variant="small">{i18n.t("people.requestsFrom")}</Text>
+      <Segmented<"nobody" | "friendsOfFriends" | "everyone">
+        accessibilityLabel={i18n.t("people.requestsFrom")}
+        value={profile.requestsFrom ?? "everyone"}
+        items={[
+          { value: "everyone", label: i18n.t("people.requestsEveryone") },
+          { value: "friendsOfFriends", label: i18n.t("people.requestsFof") },
+          { value: "nobody", label: i18n.t("people.requestsNobody") },
+        ]}
+        onChange={(requestsFrom) => {
+          setProfile((p) => (p ? { ...p, requestsFrom } : p));
+          apply({ requestsFrom });
+        }}
+      />
+
       {venues.length ? (
         <Panel>
           <Text variant="label">{i18n.t("people.venues")}</Text>

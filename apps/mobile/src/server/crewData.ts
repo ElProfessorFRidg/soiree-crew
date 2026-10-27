@@ -22,6 +22,8 @@ export interface Crew {
   aiEnabled?: boolean;
   /** The server has a provider and the crew opted in. */
   aiAvailable?: boolean;
+  /** COM-04: the crew's name may show on public profiles. */
+  publicName?: boolean;
   me: { leaderboardOptOut: boolean; territoryOptOut: boolean };
   members: CrewMember[];
 }
@@ -195,6 +197,18 @@ export async function setCrewAi(crewId: string, aiEnabled: boolean): Promise<voi
     await api(`/v1/crews/${crewId}/settings`, { method: "PATCH", body: { aiEnabled } });
   } catch (error) {
     patch(!aiEnabled);
+    throw error;
+  }
+}
+
+/** COM-04: the crew admin lets the crew's name appear on members' public profiles. */
+export async function setCrewPublicName(crewId: string, publicName: boolean): Promise<void> {
+  const patch = (on: boolean) => useCrewData.setState((state) => ({ crews: state.crews.map((c) => (c.id === crewId ? { ...c, publicName: on } : c)) }));
+  patch(publicName);
+  try {
+    await api(`/v1/crews/${crewId}/settings`, { method: "PATCH", body: { publicName } });
+  } catch (error) {
+    patch(!publicName);
     throw error;
   }
 }
