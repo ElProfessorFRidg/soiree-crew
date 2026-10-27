@@ -1081,6 +1081,20 @@ export const es: Messages = {
     aiFailed: "La IA no respondió. La historia sin IA sigue ahí.",
     english: "Historia en inglés por ahora.",
   },
+  appIcon: {
+    names: {
+      default: "Clásico",
+      boss: "Jefe",
+      globetrotter: "Trotamundos",
+      nomad: "Nómada",
+    },
+    section: "Apariencia",
+    title: "Icono de la app",
+    hint: "Los otros iconos se desbloquean con los títulos de la crew: tener un bar, explorar, moverse mucho.",
+    restartTitle: "Cambiar icono",
+    restartBody: "La app se cerrará para cambiar el icono. Vuelve a abrirla después.",
+    apply: "Cambiar",
+  },
   addDrink: {
     quick: "Escribe lo que bebes",
     quickPlaceholder: "2 cañas y un chupito",

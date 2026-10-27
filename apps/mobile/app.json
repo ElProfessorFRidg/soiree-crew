@@ -89,6 +89,20 @@
           "calendarPermission": "The calendar gets the parties you add to it, nothing else is read.",
           "remindersPermission": false
         }
+      ],
+      [
+        "expo-quick-actions/icon/plugin",
+        {
+          "boss": {
+            "image": "./assets/icons/icon-boss.png"
+          },
+          "globetrotter": {
+            "image": "./assets/icons/icon-globetrotter.png"
+          },
+          "nomad": {
+            "image": "./assets/icons/icon-nomad.png"
+          }
+        }
       ]
     ],
     "experiments": {

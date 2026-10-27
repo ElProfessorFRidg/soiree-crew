@@ -1080,6 +1080,20 @@ export const de: Messages = {
     aiFailed: "Die KI hat nicht geantwortet. Die Geschichte ohne KI bleibt.",
     english: "Geschichte vorerst auf Englisch.",
   },
+  appIcon: {
+    names: {
+      default: "Klassisch",
+      boss: "Boss",
+      globetrotter: "Weltenbummler",
+      nomad: "Nomade",
+    },
+    section: "Aussehen",
+    title: "App-Symbol",
+    hint: "Die anderen Symbole schaltest du mit Crew-Titeln frei: eine Bar halten, erkunden, viel unterwegs sein.",
+    restartTitle: "Symbol ändern",
+    restartBody: "Die App schließt sich, um das Symbol zu ändern. Öffne sie danach wieder.",
+    apply: "Ändern",
+  },
   addDrink: {
     quick: "Tipp ein, was du trinkst",
     quickPlaceholder: "2 Bier und ein Shot",

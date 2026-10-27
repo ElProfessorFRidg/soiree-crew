@@ -1080,6 +1080,20 @@ export const fr = {
     aiFailed: "L'IA n'a pas répondu. Le récit sans IA reste là.",
     english: "Récit en anglais pour l'instant.",
   },
+  appIcon: {
+    names: {
+      default: "Classique",
+      boss: "Boss",
+      globetrotter: "Globe-trotter",
+      nomad: "Nomade",
+    },
+    section: "Apparence",
+    title: "Icône de l'app",
+    hint: "Les autres icônes se débloquent avec les titres du crew : tenir un bar, explorer, bouger beaucoup.",
+    restartTitle: "Changer d'icône",
+    restartBody: "L'app va se fermer pour changer d'icône. Rouvre-la ensuite.",
+    apply: "Changer",
+  },
   addDrink: {
     quick: "Tape ce que tu bois",
     quickPlaceholder: "2 pintes et un shot",

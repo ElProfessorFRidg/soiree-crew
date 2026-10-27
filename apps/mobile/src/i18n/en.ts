@@ -1082,6 +1082,20 @@ export const en: Messages = {
     aiFailed: "The AI didn't answer. The story without AI is still there.",
     english: "Story in English for now.",
   },
+  appIcon: {
+    names: {
+      default: "Classic",
+      boss: "Boss",
+      globetrotter: "Globetrotter",
+      nomad: "Nomad",
+    },
+    section: "Look",
+    title: "App icon",
+    hint: "The other icons unlock with crew titles: holding a bar, exploring, moving around a lot.",
+    restartTitle: "Change icon",
+    restartBody: "The app closes to change its icon. Open it again afterwards.",
+    apply: "Change",
+  },
   addDrink: {
     quick: "Type what you're drinking",
     quickPlaceholder: "2 pints and a shot",

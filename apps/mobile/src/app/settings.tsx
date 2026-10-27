@@ -16,6 +16,7 @@ import { Stepper } from "@/ui/Stepper";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { checkForUpdate, currentBuild } from "@/system/updates";
+import { AppIconPicker } from "@/profile/AppIconPicker";
 
 const CURRENCIES = ["EUR", "USD", "GBP", "CHF", "CAD", "AUD"] as const;
 const WATER_STEPS = [30, 45, 60, 90] as const;
@@ -100,6 +101,10 @@ export default function SettingsScreen() {
           decreaseLabel={i18n.t("settings.earlierBoundary")}
           increaseLabel={i18n.t("settings.laterBoundary")}
         />
+      </Section>
+
+      <Section title={i18n.t("appIcon.section")}>
+        <AppIconPicker />
       </Section>
 
       <Section title={i18n.t("settings.notifications")}>
