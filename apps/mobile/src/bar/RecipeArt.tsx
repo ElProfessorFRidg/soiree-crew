@@ -1,4 +1,4 @@
-import Svg, { Circle, ClipPath, Defs, G, Path, Rect } from "react-native-svg";
+import Svg, { Circle, ClipPath, Defs, G, LinearGradient, Path, Rect, Stop } from "react-native-svg";
 import { palette } from "@crew/design-tokens";
 import type { Recipe } from "./recipes";
 
@@ -35,6 +35,11 @@ const SHAPES: Record<Glass, { outline: string; liquid: string; top: number; bott
   mug: { outline: "M16 20h28v26a8 8 0 0 1-8 8h-12a8 8 0 0 1-8-8zM44 26h4a6 6 0 0 1 0 12h-4", liquid: "M16.5 26h27v20a7.5 7.5 0 0 1-7.5 7.5h-12a7.5 7.5 0 0 1-7.5-7.5z", top: 26, bottom: 54 },
 };
 
+function shade(hex: string, amount: number): string {
+  const n = Number.parseInt(hex.slice(1), 16);
+  const c = (v: number) => Math.max(0, Math.min(255, Math.round(v + 255 * amount)));
+  return `#${[(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => c(v).toString(16).padStart(2, "0")).join("")}`;
+}
 
 export function RecipeArt({ recipe, size = 64, background = true }: { recipe: Recipe; size?: number; background?: boolean }) {
   const glass = glassOf(recipe);
@@ -48,12 +53,16 @@ export function RecipeArt({ recipe, size = 64, background = true }: { recipe: Re
   return (
     <Svg width={size} height={size} viewBox="0 0 64 64">
       <Defs>
+        <LinearGradient id={`${id}-g`} x1="0" y1="0" x2="0" y2="1">
+          <Stop offset="0" stopColor={shade(recipe.colour, 0.12)} />
+          <Stop offset="1" stopColor={shade(recipe.colour, -0.18)} />
+        </LinearGradient>
         <ClipPath id={`${id}-c`}>
           <Path d={shape.liquid} />
         </ClipPath>
       </Defs>
       {background ? <Rect x="0" y="0" width="64" height="64" rx="14" fill={palette.dark.surfaceRaised} /> : null}
-      <Path d={shape.liquid} fill={recipe.colour} />
+      <Path d={shape.liquid} fill={`url(#${id}-g)`} />
       <G clipPath={`url(#${id}-c)`}>
         {ice ? (
           <>

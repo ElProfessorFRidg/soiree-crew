@@ -5,8 +5,11 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 
-/** The prototype's only functional gradients (DESIGN.md): SOS ring, roulette and wheel, BAC curve. */
-const GRADIENT_ALLOWED = [/sos/i, /roulette/i, /wheel/i, /curve/i];
+/**
+ * The prototype's only functional gradients (DESIGN.md): SOS ring, roulette and wheel, BAC curve,
+ * plus the recipe drawings, where the gradient is the drink's own light (O-66, asked for explicitly).
+ */
+const GRADIENT_ALLOWED = [/sos/i, /roulette/i, /wheel/i, /curve/i, /RecipeArt/];
 /** Repeating motion is allowed where it shows a state that is really changing. */
 const REPEAT_ALLOWED = [/Skeleton/, /sos/i, /fuse/i, /bomb/i, /timer/i, /roulette/i, /wheel/i, /Spinner/i];
 
