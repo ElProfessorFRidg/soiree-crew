@@ -578,6 +578,7 @@ export const fr = {
     drinks: "Mes boissons",
     drinksHint: "Tes boissons perso s'ajoutent et se retirent depuis l'écran Ajouter.",
     savedEverywhere: "Enregistré sur le serveur, visible sur tes autres téléphones.",
+    hourPhone: "Comme le téléphone",
   },
   vault: {
     queued: "Mis de côté jusqu'à demain. On te redemande au réveil.",

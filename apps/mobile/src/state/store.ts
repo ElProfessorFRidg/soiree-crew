@@ -44,6 +44,8 @@ export interface AppState {
   vault: VaultItem[];
   /** PREF-05: a country the user chose not to switch to; asked again only for another one. */
   travelDismissed: string | null;
+  /** O-10: the 12 h / 24 h format follows the phone until the user picks one by hand. */
+  hourCycleFollowsPhone: boolean;
 }
 
 export const useAppStore = create<AppState>()(
@@ -66,6 +68,7 @@ export const useAppStore = create<AppState>()(
       recapNotified: [],
       vault: [],
       travelDismissed: null,
+      hourCycleFollowsPhone: true,
     }),
     {
       name: "crew-app-v1",
@@ -78,12 +81,22 @@ export const useAppStore = create<AppState>()(
       },
       onRehydrateStorage: () => () => {
         useAppStore.setState({ hydrated: true });
+        followPhoneHourCycle();
       },
     },
   ),
 );
 
 export const newId = (): string => randomUUID();
+
+/** O-10: the phone's current 12 h / 24 h setting, read again whenever the app comes back. */
+export function followPhoneHourCycle(): void {
+  const state = useAppStore.getState();
+  if (!state.hourCycleFollowsPhone) return;
+  const phone = deviceDefaults().hourCycle;
+  // This phone's clock is a local matter: other devices keep following their own.
+  if (phone !== state.preferences.hourCycle) useAppStore.setState({ preferences: { ...state.preferences, hourCycle: phone } });
+}
 
 // Optimistic reducers: each mutation is applied at once and can be reverted if the server refuses it.
 

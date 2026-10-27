@@ -15,7 +15,7 @@ import { connect } from "@/server/connection";
 import { loadSession, useSession } from "@/server/session";
 import { useSyncFeedback } from "@/sync/feedback";
 import { flush } from "@/sync/engine";
-import { useAppStore } from "@/state/store";
+import { followPhoneHourCycle, useAppStore } from "@/state/store";
 import { ThemeProvider } from "@/theme";
 import { useEco, watchBattery } from "@/power/eco";
 import { logWater } from "@/drinks/actions";
@@ -69,6 +69,7 @@ export default function RootLayout() {
     void flush();
     const subscription = RNAppState.addEventListener("change", (status) => {
       if (status === "active") {
+        followPhoneHourCycle();
         void flush();
         void flushUploads();
         void refreshReminders();

@@ -578,6 +578,7 @@ export const de: Messages = {
     drinks: "Meine Getränke",
     drinksHint: "Eigene Getränke legst du unter „Hinzufügen“ an und entfernst sie dort auch.",
     savedEverywhere: "Auf dem Server gespeichert, sichtbar auf deinen anderen Handys.",
+    hourPhone: "Wie am Handy",
   },
   vault: {
     queued: "Bis morgen zurückgelegt. Wir fragen dich nach dem Aufwachen nochmal.",

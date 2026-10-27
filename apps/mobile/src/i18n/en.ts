@@ -580,6 +580,7 @@ export const en: Messages = {
     drinks: "Custom drinks",
     drinksHint: "Add or remove custom drinks from the add-a-drink screen.",
     savedEverywhere: "Saved on the server, shown on your other phones.",
+    hourPhone: "Phone setting",
   },
   vault: {
     queued: "Put aside until tomorrow. We'll ask again when you're up.",

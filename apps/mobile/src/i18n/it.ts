@@ -579,6 +579,7 @@ export const it: Messages = {
     drinks: "Le mie bevande",
     drinksHint: "Le tue bevande personali si aggiungono e si tolgono dalla schermata Aggiungi.",
     savedEverywhere: "Salvato sul server, visibile sugli altri tuoi telefoni.",
+    hourPhone: "Come il telefono",
   },
   vault: {
     queued: "Messo da parte fino a domani. Te lo richiediamo al risveglio.",

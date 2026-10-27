@@ -7,7 +7,7 @@ import { formatClock } from "@/i18n/format";
 import { setCrewLeaderboard, useCrewData } from "@/server/crewData";
 import { setCrewParticipation } from "@/server/venueData";
 import { setPreferences } from "@/state/preferences";
-import { useAppStore } from "@/state/store";
+import { followPhoneHourCycle, useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Chip, Panel, Row, Segmented, Switch } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
@@ -45,6 +45,7 @@ export default function SettingsScreen() {
   const i18n = useT();
   const theme = useTheme();
   const preferences = useAppStore((state) => state.preferences);
+  const followsPhone = useAppStore((state) => state.hourCycleFollowsPhone);
   const crews = useCrewData((state) => state.crews);
   const hour = (h: number) => formatClock(new Date(2026, 0, 1, h).getTime(), i18n.language, preferences.hourCycle);
   const offline = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
@@ -73,14 +74,19 @@ export default function SettingsScreen() {
           ))}
         </View>
         <Text variant="label">{i18n.t("settings.timeFormat")}</Text>
-        <Segmented<"h23" | "h12">
+        <Segmented<"phone" | "h23" | "h12">
           accessibilityLabel={i18n.t("settings.timeFormat")}
-          value={preferences.hourCycle}
+          value={followsPhone ? "phone" : preferences.hourCycle}
           items={[
+            { value: "phone", label: i18n.t("settings.hourPhone") },
             { value: "h23", label: i18n.t("settings.h23") },
             { value: "h12", label: i18n.t("settings.h12") },
           ]}
-          onChange={(hourCycle) => setPreferences({ hourCycle })}
+          onChange={(choice) => {
+            useAppStore.setState({ hourCycleFollowsPhone: choice === "phone" });
+            if (choice === "phone") followPhoneHourCycle();
+            else setPreferences({ hourCycle: choice });
+          }}
         />
         <Text variant="label">{i18n.t("settings.dayBoundary")}</Text>
         <Stepper
