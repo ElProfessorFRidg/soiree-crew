@@ -143,6 +143,11 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
     const repayments = await all("select id, pool_id, from_id, to_id, amount, currency, created_at from repayments where from_id = $1 or to_id = $1 order by created_at");
     const reactions = await all("select party_id, to_id, emoji, at from recap_reactions where from_id = $1");
     const sessions = await all("select device_label, created_at, last_seen_at from sessions where user_id = $1");
+    const publicProfile = await one<{ bio: string; country: string; audiences: string; hidden_venues: string }>(
+      "select bio, country, audiences, hidden_venues from profiles where user_id = $1",
+    );
+    const friendships = await all("select user_a, user_b, requested_by, status, at from friendships where user_a = $1 or user_b = $1");
+    const blocks = await all("select blocked, at from blocks where blocker = $1");
 
     return {
       exportedAt: ctx.now(),
@@ -162,6 +167,11 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
       repayments,
       recapReactions: reactions,
       sessions,
+      profile: publicProfile
+        ? { bio: publicProfile.bio, country: publicProfile.country, audiences: JSON.parse(publicProfile.audiences), hiddenVenues: JSON.parse(publicProfile.hidden_venues) }
+        : null,
+      friendships,
+      blocks,
     };
   });
 

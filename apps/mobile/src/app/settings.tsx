@@ -168,6 +168,13 @@ export default function SettingsScreen() {
       ) : null}
 
       <Row
+        title={i18n.t("people.viewAs")}
+        subtitle={i18n.t("people.neverStrangers")}
+        leading={<Icon name="eye" color={theme.textMuted} />}
+        trailing={<Icon name="chev" color={theme.textMuted} />}
+        onPress={() => router.push({ pathname: "/profile", params: { id: "me", as: "stranger" } })}
+      />
+      <Row
         title={i18n.t("settings.drinks")}
         subtitle={i18n.t("settings.drinksHint")}
         leading={<Icon name="glass" color={theme.textMuted} />}

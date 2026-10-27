@@ -68,7 +68,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-36 | P0 | Soirees.dc.html | build | Invite the crew: invitations as cards, reply straight from the list, tab badge with the real number of invitat... |
 | O-37 | P0 | Soirees.dc.html | build | Live dashboard: everyone's BAC in real time, who is speeding up, who is slowing down, who has gone missing for... |
 | O-38 | P0 | Soirees.dc.html | todo | Live crew notifications at a controlled volume (S2M had to cut a third of theirs): whatever remains must be us... |
-| O-39 | P0 | Soirees.dc.html | todo | Participant profiles tappable from the party, add as friend in one tap. |
+| O-39 | P0 | Soirees.dc.html | build | Participant profiles tappable from the party, add as friend in one tap. |
 | O-40 | P0 | Soirees.dc.html | build | Automatic closing (a party never stays open for days); trips keep correct group BACs for their whole duration. |
 | O-41 | P0 | Recap.dc.html | build | Recap: saved and kept, notification as soon as it is ready, only people actually present (including non-friend... |
 | O-42 | P0 | Soirees.dc.html | build | Squad mode: curves shared continuously between members. |
@@ -387,14 +387,14 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| PROF-01 | P0 | Profil.dc.html | todo | Four audiences for everything on a profile: Only me, My crews, Friends, Everyone. Profile-wide presets (Privat... |
-| PROF-02 | P0 | Profil.dc.html | todo | Profile sections, each with its own audience: identity (pseudonym, photo, bio, country), crews, titles and bad... |
-| PROF-03 | P0 | Profil.dc.html | todo | Per-item overrides: hide one venue, one review or one stat without touching the rest. |
+| PROF-01 | P0 | Profil.dc.html | build | Four audiences for everything on a profile: Only me, My crews, Friends, Everyone. Profile-wide presets (Privat... |
+| PROF-02 | P0 | Profil.dc.html | build | Profile sections, each with its own audience: identity (pseudonym, photo, bio, country), crews, titles and bad... |
+| PROF-03 | P0 | Profil.dc.html | build | Per-item overrides: hide one venue, one review or one stat without touching the rest. |
 | PROF-04 | P1 | Bars.dc.html | todo | Reviews: each review is posted as Public with name, Public anonymous ("a regular", still counted in the venue ... |
-| PROF-05 | P0 | Profil.dc.html | todo | Never shown to strangers, whatever the settings: current location, current venue, live status (N-01), live BAC... |
-| PROF-06 | P0 | Profil.dc.html | todo | Records are stats, not trophies: the highest BAC reached and the biggest night show as plain figures, never ce... |
-| PROF-07 | P0 | Profil.dc.html | todo | "View as": preview your own profile as a stranger, a friend or a crew member, one tap away from the profile an... |
-| PROF-08 | P0 | Backstage | todo | Enforced by the server: the API never sends a field the viewer is not allowed to see (hiding it in the UI is n... |
+| PROF-05 | P0 | Profil.dc.html | build | Never shown to strangers, whatever the settings: current location, current venue, live status (N-01), live BAC... |
+| PROF-06 | P0 | Profil.dc.html | build | Records are stats, not trophies: the highest BAC reached and the biggest night show as plain figures, never ce... |
+| PROF-07 | P0 | Profil.dc.html | build | "View as": preview your own profile as a stranger, a friend or a crew member, one tap away from the profile an... |
+| PROF-08 | P0 | Backstage | build | Enforced by the server: the API never sends a field the viewer is not allowed to see (hiding it in the UI is n... |
 | PROF-09 | P1 | Profil.dc.html | todo | Findability: strangers can find you by search, by exact username only, or not at all. You appear among a venue... |
 | PROF-10 | P1 | Profil.dc.html | todo | Privacy summary: one screen listing what strangers can see right now, reachable from the profile, shown once a... |
 

@@ -141,6 +141,9 @@ export default function RootLayout() {
               <Stack.Screen name="home" />
               <Stack.Screen name="where-to" />
               <Stack.Screen name="join" options={{ animation: "fade" }} />
+              <Stack.Screen name="profile" />
+              <Stack.Screen name="edit-profile" />
+              <Stack.Screen name="friends" />
               <Stack.Screen name="morning" options={{ animation: "fade" }} />
               <Stack.Screen name="sos" options={{ presentation: "fullScreenModal", animation: "fade" }} />
             </Stack>

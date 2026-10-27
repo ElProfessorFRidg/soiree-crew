@@ -26,6 +26,7 @@ import { showToast } from "@/ui/Toast";
 import { guarded } from "@/vault/vault";
 import { useDraft } from "@/state/drafts";
 import { usePendingInvite } from "@/server/pendingInvite";
+import { ScalePressable } from "@/ui/Pressable";
 
 function errorMessage(error: unknown, i18n: Translator): string {
   if (error instanceof ApiError && error.failure.kind === "http") {
@@ -110,12 +111,18 @@ function CrewCard({ crew }: { crew: Crew }) {
       </View>
       <View style={styles.members}>
         {crew.members.map((member) => (
-          <View key={member.id} style={styles.member}>
+          <ScalePressable
+            key={member.id}
+            style={styles.member}
+            accessibilityRole="button"
+            accessibilityLabel={member.nickname ?? member.displayName}
+            onPress={() => router.push({ pathname: "/profile", params: { id: member.id === me ? "me" : member.id } })}
+          >
             <Avatar personId={member.id} name={member.nickname ?? member.displayName} />
             <Text variant="tab" align="center" numberOfLines={2}>
               {member.id === me ? i18n.t("crew.you") : (member.nickname ?? member.displayName)}
             </Text>
-          </View>
+          </ScalePressable>
         ))}
       </View>
       <Row

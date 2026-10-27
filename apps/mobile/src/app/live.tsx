@@ -21,6 +21,7 @@ import { Screen } from "@/ui/Screen";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { useEcoInterval } from "@/power/eco";
+import { ScalePressable } from "@/ui/Pressable";
 
 /** Live dashboard refresh while the screen is open, on top of socket hints (O-37). */
 const REFRESH_MS = 20_000;
@@ -36,7 +37,14 @@ function MemberRow({ member, me }: { member: LiveMember; me: boolean }) {
   const quietMinutes = member.lastActivityAt ? Math.round((now - member.lastActivityAt) / 60_000) : 0;
 
   return (
-    <View style={[styles.member, { borderBottomColor: theme.line }]} accessible accessibilityLabel={member.displayName}>
+    // O-39: every participant opens their profile.
+    <ScalePressable
+      pressedScale={0.99}
+      onPress={() => router.push({ pathname: "/profile", params: { id: member.userId } })}
+      accessibilityRole="button"
+      accessibilityLabel={member.displayName}
+      style={[styles.member, { borderBottomColor: theme.line }]}
+    >
       <Avatar personId={member.userId} name={member.displayName} size={44} faded={home || absent} />
       <View style={styles.flex}>
         <Text variant="h3">{me ? `${member.displayName} (${i18n.t("crew.you")})` : member.displayName}</Text>
@@ -63,7 +71,7 @@ function MemberRow({ member, me }: { member: LiveMember; me: boolean }) {
           {member.trend === "rising" ? <Text variant="tab">{i18n.t("live.rising")}</Text> : member.trend === "falling" ? <Text variant="tab">{i18n.t("live.falling")}</Text> : null}
         </View>
       )}
-    </View>
+    </ScalePressable>
   );
 }
 

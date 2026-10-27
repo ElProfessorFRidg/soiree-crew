@@ -127,6 +127,18 @@ export default function MeScreen() {
         />
       </Panel>
       <Row
+        title={i18n.t("people.myProfile")}
+        leading={<Icon name="user" color={theme.textMuted} />}
+        trailing={<Icon name="chev" color={theme.textMuted} />}
+        onPress={() => router.push({ pathname: "/profile", params: { id: "me" } })}
+      />
+      <Row
+        title={i18n.t("people.myFriends")}
+        leading={<Icon name="users" color={theme.textMuted} />}
+        trailing={<Icon name="chev" color={theme.textMuted} />}
+        onPress={() => router.push("/friends")}
+      />
+      <Row
         title={i18n.t("settings.open")}
         leading={<Icon name="gear" color={theme.textMuted} />}
         trailing={<Icon name="chev" color={theme.textMuted} />}
