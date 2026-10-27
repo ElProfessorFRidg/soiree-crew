@@ -157,6 +157,7 @@ export default function RootLayout() {
               <Stack.Screen name="items" />
               <Stack.Screen name="privacy" />
               <Stack.Screen name="morning" options={{ animation: "fade" }} />
+              <Stack.Screen name="quick/[action]" options={{ animation: "none" }} />
               <Stack.Screen name="sos" options={{ presentation: "fullScreenModal", animation: "fade" }} />
             </Stack>
             <HeroOverlay />

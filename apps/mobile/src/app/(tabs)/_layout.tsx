@@ -5,6 +5,7 @@ import type { BottomTabBarProps } from "expo-router/tabs";
 import { useGameT } from "@/games/i18n";
 import { useT } from "@/i18n";
 import { useMorningAfter } from "@/recap/morning";
+import { useHomeScreenActions } from "@/system/quickActions";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Icon, type AnyIconName } from "@/ui/Icon";
@@ -62,6 +63,7 @@ export default function TabsLayout() {
   const insets = useSafeAreaInsets();
   const onboarded = useAppStore((state) => state.ageConfirmedAt !== null && state.profile !== null);
   useMorningAfter();
+  useHomeScreenActions(i18n);
   if (!onboarded) return <Redirect href="/onboarding" />;
   return (
     <View style={{ flex: 1 }}>

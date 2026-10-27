@@ -860,6 +860,12 @@ export const en: Messages = {
     save: "Save the price",
     saved: "Price noted.",
   },
+  quick: {
+    again: "Same again",
+    water: "Glass of water",
+    add: "Add a drink",
+    sos: "SOS",
+  },
   addDrink: {
     quick: "Type what you're drinking",
     quickPlaceholder: "2 pints and a shot",

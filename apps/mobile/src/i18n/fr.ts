@@ -858,6 +858,12 @@ export const fr = {
     save: "Enregistrer le prix",
     saved: "Prix noté.",
   },
+  quick: {
+    again: "Encore la même",
+    water: "Verre d'eau",
+    add: "Ajouter un verre",
+    sos: "SOS",
+  },
   addDrink: {
     quick: "Tape ce que tu bois",
     quickPlaceholder: "2 pintes et un shot",

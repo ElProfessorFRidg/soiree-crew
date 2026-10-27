@@ -859,6 +859,12 @@ export const es: Messages = {
     save: "Guardar el precio",
     saved: "Precio apuntado.",
   },
+  quick: {
+    again: "Otra igual",
+    water: "Vaso de agua",
+    add: "Añadir bebida",
+    sos: "SOS",
+  },
   addDrink: {
     quick: "Escribe lo que bebes",
     quickPlaceholder: "2 cañas y un chupito",

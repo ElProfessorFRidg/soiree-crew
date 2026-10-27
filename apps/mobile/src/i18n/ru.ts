@@ -884,6 +884,12 @@ export const ru: Messages = {
     save: "Сохранить цену",
     saved: "Цена отмечена.",
   },
+  quick: {
+    again: "Ещё такой же",
+    water: "Стакан воды",
+    add: "Добавить напиток",
+    sos: "SOS",
+  },
   addDrink: {
     quick: "Напиши, что пьёшь",
     quickPlaceholder: "2 пинты и шот",

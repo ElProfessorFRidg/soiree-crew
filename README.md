@@ -11,6 +11,8 @@ Every push to `main` builds both apps and publishes them as the latest GitHub re
 
 The app works alone on the phone. Crew features need a server (below): the first screen of the Crew tab asks for its address.
 
+Shortcuts: a long press on the app icon offers "same again", water, add a drink and SOS. On an iPhone, a Shortcut that opens `soireecrew://quick/again` (or `soireecrew://quick/water`) can sit on the Action Button or Back Tap.
+
 ## Layout
 
 - `apps/mobile`: the app (Expo Router, screens in `src/app`, catalogues in `src/i18n`).

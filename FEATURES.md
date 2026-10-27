@@ -249,7 +249,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-01 | P0 | Soiree.dc.html | build | "Same again": one tap re-logs the last drink (same size, same price, same venue), also from the widget, the no... |
 | QOL-02 | P0 | Soiree.dc.html | build | A night belongs to the evening it started: a configurable day boundary (default 6 am) for stats, recaps, "toni... |
 | QOL-03 | P0 | Systeme.dc.html | build | Actionable notifications: answer "On my way" / "Not tonight" to "who's in?", add a drink, confirm a round or a... |
-| QOL-04 | P0 | Systeme.dc.html | todo | System shortcuts for a drunk thumb: Siri / App Intents and Android App Actions ("Hey Siri, add a beer"), iPhon... |
+| QOL-04 | P0 | Systeme.dc.html | build | System shortcuts for a drunk thumb: Siri / App Intents and Android App Actions ("Hey Siri, add a beer"), iPhon... |
 | QOL-05 | P0 | Systeme.dc.html | build | Deep links and universal links for every party, venue, profile, crew invite, recap and game card. Links pasted... |
 | QOL-06 | P0 | Soiree.dc.html | todo | Native sharing: recap and story cards go straight to Instagram Stories, Snapchat (Creative Kit), TikTok and Wh... |
 | QOL-07 | P0 | Etats.dc.html | build | Typed content is never lost: drafts (party name, review, expense, card) survive the app being killed, errors a... |
