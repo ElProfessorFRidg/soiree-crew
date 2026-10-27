@@ -116,6 +116,7 @@ export const en: Messages = {
     changeInMe: "Country and new-driver mode are in Me.",
   },
   reminders: {
+    waterDone: "I had water",
     waterTitle: "Glass of water",
     waterSince: "Last glass of water {minutes} min ago.",
     waterNone: "No water yet tonight.",

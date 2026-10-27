@@ -46,12 +46,27 @@ function intakes(): DrinkIntake[] {
     .map((d) => ({ id: d.id, volumeMl: d.volumeMl, abv: d.abv, consumedAt: d.consumedAt, withFood: d.withFood }));
 }
 
-async function schedule(identifier: string, at: number, title: string, body: string): Promise<void> {
+/** QOL-03: actions straight from the notification. */
+export const WATER_CATEGORY = "water";
+export const LOG_WATER_ACTION = "log-water";
+
+let categoriesSet = false;
+async function setCategories(): Promise<void> {
+  if (categoriesSet || !supported) return;
+  categoriesSet = true;
+  const i18n = createTranslator(useAppStore.getState().preferences.language);
+  await Notifications.setNotificationCategoryAsync(WATER_CATEGORY, [
+    { identifier: LOG_WATER_ACTION, buttonTitle: i18n.t("reminders.waterDone"), options: { opensAppToForeground: true } },
+  ]).catch(() => undefined);
+}
+
+async function schedule(identifier: string, at: number, title: string, body: string, categoryIdentifier?: string): Promise<void> {
   await Notifications.cancelScheduledNotificationAsync(identifier).catch(() => undefined);
   if (at <= Date.now()) return;
+  if (categoryIdentifier) await setCategories();
   await Notifications.scheduleNotificationAsync({
     identifier,
-    content: { title, body },
+    content: { title, body, ...(categoryIdentifier ? { categoryIdentifier } : {}) },
     trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: new Date(at) },
   });
 }
@@ -90,7 +105,7 @@ export async function refreshReminders(): Promise<void> {
         lastWater > 0
           ? i18n.t("reminders.waterSince", { minutes: Math.round((at - lastWater) / MINUTE_MS) })
           : i18n.t("reminders.waterNone");
-      await schedule(WATER_ID, at, i18n.t("reminders.waterTitle"), body);
+      await schedule(WATER_ID, at, i18n.t("reminders.waterTitle"), body, WATER_CATEGORY);
     } else {
       await Notifications.cancelScheduledNotificationAsync(WATER_ID).catch(() => undefined);
     }

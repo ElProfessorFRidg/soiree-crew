@@ -17,6 +17,8 @@ import { flush } from "@/sync/engine";
 import { useAppStore } from "@/state/store";
 import { ThemeProvider } from "@/theme";
 import { useEco, watchBattery } from "@/power/eco";
+import { logWater } from "@/drinks/actions";
+import { LOG_WATER_ACTION } from "@/reminders/reminders";
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -71,7 +73,15 @@ export default function RootLayout() {
     if (!ready || Platform.OS === "web") return;
     // A tapped notification opens the screen it is about (the recap, O-41).
     const open = (response: Notifications.NotificationResponse | null) => {
-      const url = response?.notification.request.content.data?.url;
+      // QOL-03: "I had water" right from the reminder logs it, like the in-app button.
+      if (!response) return;
+      // The last response survives restarts: handle it once, then forget it.
+      void Notifications.clearLastNotificationResponseAsync().catch(() => undefined);
+      if (response.actionIdentifier === LOG_WATER_ACTION) {
+        logWater();
+        return;
+      }
+      const url = response.notification.request.content.data?.url;
       if (typeof url === "string" && url.startsWith("/")) router.push(url as never);
     };
     void Notifications.getLastNotificationResponseAsync().then(open);

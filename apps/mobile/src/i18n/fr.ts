@@ -114,6 +114,7 @@ export const fr = {
     changeInMe: "Le pays et le jeune permis se changent dans Moi.",
   },
   reminders: {
+    waterDone: "J'ai bu de l'eau",
     waterTitle: "Verre d'eau",
     waterSince: "Dernier verre d'eau il y a {minutes} min.",
     waterNone: "Pas encore d'eau ce soir.",
