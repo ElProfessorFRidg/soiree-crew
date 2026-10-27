@@ -15,6 +15,7 @@ import { Screen } from "@/ui/Screen";
 import { Stepper } from "@/ui/Stepper";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { RecipeArt } from "@/bar/RecipeArt";
 
 const OZ_PER_CL = 0.338;
 
@@ -64,7 +65,9 @@ export default function RecipeScreen() {
         ) : undefined
       }
     >
-      <View style={[styles.band, { backgroundColor: recipe.colour }]} />
+      <View style={styles.art}>
+        <RecipeArt recipe={recipe} size={160} />
+      </View>
       <View style={styles.facts}>
         <View style={styles.fact}>
           <Numeral size={32} color={theme.amber}>
@@ -131,7 +134,7 @@ export default function RecipeScreen() {
 }
 
 const styles = StyleSheet.create({
-  band: { height: 10, borderRadius: 5 },
+  art: { alignItems: "center" },
   facts: { flexDirection: "row", gap: 12 },
   fact: { flex: 1, gap: 2 },
   controls: { flexDirection: "row", alignItems: "center", gap: 12 },

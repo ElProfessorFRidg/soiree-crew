@@ -12,6 +12,7 @@ import { Chip, Row } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
+import { RecipeArt } from "@/bar/RecipeArt";
 
 /** O-66, O-68: the Bar, searchable by name or ingredient, filtered by category. */
 export default function BarScreen() {
@@ -55,7 +56,7 @@ export default function BarScreen() {
                 abv: percent.format(recipeAbv(recipe)),
                 minutes: recipe.minutes,
               })}
-              leading={<View style={[styles.swatch, { backgroundColor: recipe.colour }]} />}
+              leading={<RecipeArt recipe={recipe} size={44} />}
               trailing={<Icon name="chev" color={theme.textMuted} />}
               onPress={() => router.push({ pathname: "/recipe", params: { id: recipe.id } })}
               last={index === list.length - 1}
@@ -70,5 +71,4 @@ export default function BarScreen() {
 
 const styles = StyleSheet.create({
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  swatch: { width: 28, height: 28, borderRadius: 8 },
 });
