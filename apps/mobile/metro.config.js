@@ -11,6 +11,7 @@ config.resolver.extraNodeModules = {
   "@crew/bac": path.join(packages, "bac"),
   "@crew/units": path.join(packages, "units"),
   "@crew/design-tokens": path.join(packages, "design-tokens"),
+  "@crew/games": path.join(packages, "games"),
 };
 
 module.exports = config;

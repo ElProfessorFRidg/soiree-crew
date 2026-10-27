@@ -132,7 +132,8 @@ export const RULES = [
   {
     id: "R-08 vous",
     locale: "fr",
-    test: (text) => text.match(word("vous|votre|vos|veuillez"))?.[0] ?? null,
+    // « rendez-vous » is a noun, not a « vous » addressed to the reader.
+    test: (text) => text.match(word("(?<!rendez-)vous|votre|vos|veuillez"))?.[0] ?? null,
   },
   {
     id: "R-10 English blacklist",
