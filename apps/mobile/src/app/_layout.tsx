@@ -173,6 +173,7 @@ export default function RootLayout() {
               <Stack.Screen name="mixer" />
               <Stack.Screen name="place" />
               <Stack.Screen name="discover" />
+              <Stack.Screen name="estimate" />
               <Stack.Screen name="morning" options={{ animation: "fade" }} />
               <Stack.Screen name="quick/[action]" options={{ animation: "none" }} />
               <Stack.Screen name="sos" options={{ presentation: "fullScreenModal", animation: "fade" }} />

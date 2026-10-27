@@ -94,6 +94,17 @@ function LivingBackground({ mine, level }: { mine: number; level: number }) {
   return <BubbleField drinks={mine + others} mood={(live?.party.mood as PartyMood | undefined) ?? "party"} level={level} />;
 }
 
+/** The standing notice, and one tap to how the estimate is made (O-86). */
+function EstimateNotice({ i18n }: { i18n: Translator }) {
+  return (
+    <Pressable accessibilityRole="link" accessibilityHint={i18n.t("estimate.open")} onPress={() => router.push("/estimate")} hitSlop={8}>
+      <Text variant="disclaimer">
+        {i18n.t("party.notice")} {i18n.t("estimate.open")}
+      </Text>
+    </Pressable>
+  );
+}
+
 function MoodBand() {
   const insets = useSafeAreaInsets();
   const live = useLiveParty();
@@ -446,7 +457,7 @@ function LevelZero(props: LevelProps) {
       <BacHero {...props} size={124} />
       <Text>{trendLine(props, hourCycle)}</Text>
       <DrivingPanels {...props} />
-      <Text variant="disclaimer">{i18n.t("party.notice")}</Text>
+      <EstimateNotice i18n={i18n} />
       <View style={styles.actions}>
         <AddDrinkButton label={props.againLabel} pending={props.pendingDrink} onPress={props.onAgain} height={size.partyAction} />
         <Button
@@ -523,7 +534,7 @@ function LevelOne(props: LevelProps) {
       <Text style={{ fontSize: 18, lineHeight: 24 }}>
         {rising ? `${unitLabel}. ${i18n.t("party.stillRising")}` : trendLine(props, hourCycle)}
       </Text>
-      <Text variant="disclaimer">{i18n.t("party.notice")}</Text>
+      <EstimateNotice i18n={i18n} />
       <View style={styles.actions}>
         <AddDrinkButton
           label={props.againLabel}
@@ -572,7 +583,7 @@ function LevelTwo(props: LevelProps) {
         <View style={styles.flex} />
         <Tag label={i18n.t("party.level", { level: 2 })} tone="amber" />
       </View>
-      <Text variant="disclaimer">{i18n.t("party.notice")}</Text>
+      <EstimateNotice i18n={i18n} />
       <View style={styles.bigGrid}>
         <Button
           label={i18n.t("party.drinkShort")}
