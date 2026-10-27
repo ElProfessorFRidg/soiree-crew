@@ -39,6 +39,15 @@ export async function buildApp(ctx: Context, options: { logger?: boolean } = {})
     else if (!PUBLIC_ROUTES.has(route)) throw new HttpError(401, "unauthenticated");
   });
 
+  // SEC-03: once served over HTTPS, browsers must stay on it; nothing is framed or sniffed.
+  const https = ctx.publicUrl.startsWith("https://");
+  app.addHook("onSend", async (_request, reply) => {
+    if (https) reply.header("strict-transport-security", "max-age=31536000; includeSubDomains");
+    reply.header("x-content-type-options", "nosniff");
+    reply.header("referrer-policy", "no-referrer");
+    reply.header("x-frame-options", "DENY");
+  });
+
   app.setErrorHandler((error, _request, reply) => {
     if (error instanceof ZodError) return reply.status(400).send({ error: "invalid" });
     return sendError(reply, error);

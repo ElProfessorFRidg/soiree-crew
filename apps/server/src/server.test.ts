@@ -155,6 +155,13 @@ describe("crews, parties and the live dashboard", () => {
     expect(page).toMatchObject({ crew: { name: "Les Quais", members: 2 } });
   });
 
+  it("sends HSTS and basic security headers (SEC-03)", async () => {
+    const res = await app.inject({ method: "GET", url: "/v1/health" });
+    expect(res.headers["strict-transport-security"]).toContain("max-age=");
+    expect(res.headers["x-content-type-options"]).toBe("nosniff");
+    expect(res.headers["x-frame-options"]).toBe("DENY");
+  });
+
   it("serves the shared invite link as a page that opens the app (QOL-05)", async () => {
     const { users, crewId } = await crewWith("jade", "malik");
     const invite = (await app.inject({ method: "POST", url: `/v1/crews/${crewId}/invites`, headers: users[0]!.auth })).json() as { code: string; url: string };

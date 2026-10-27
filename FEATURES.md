@@ -371,7 +371,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | COM-03 | P1 | Bars.dc.html | todo | Venue regulars: a public top of regulars per venue and per season, among users who opted in, by presence only ... |
 | COM-04 | P1 | Profil.dc.html | todo | Public profile: built and controlled through <profiles> (private by default, audience per section and per item... |
 | COM-05 | P1 | Profil.dc.html | todo | Meeting people: an "open to meeting people" switch. From a venue page or a regular's profile, send a friend re... |
-| COM-06 | P0 | Bars.dc.html | todo | Presence privacy: strangers only see "how busy tonight" levels and counts once at least 5 users are there, rou... |
+| COM-06 | P0 | Bars.dc.html | build | Presence privacy: strangers only see "how busy tonight" levels and counts once at least 5 users are there, rou... |
 | COM-07 | P1 | Bars.dc.html | todo | Age-policy filter: crowd-sourced door policy per venue, meaning ID checks at the door (always / sometimes / ne... |
 | COM-08 | P0 | Bars.dc.html | build | Safety and moderation: report any review, photo, profile or party; block and mute; automatic filters for insul... |
 | COM-09 | P1 | Bars.dc.html | todo | Venue events: community-submitted events (DJ set, student night, match screening) with date, RSVP, how many fr... |
@@ -479,7 +479,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 |---|---|---|---|---|
 | SEC-01 | P0 | Backstage | build | Data minimisation in every response: each endpoint returns a shape built for its use case, never a whole datab... |
 | SEC-02 | P0 | Backstage | build | Authorisation on every object and every field (OWASP API Security Top 10: broken object-level authorisation, b... |
-| SEC-03 | P0 | Backstage | todo | Encryption in transit: TLS 1.2 minimum, 1.3 preferred, everywhere; certificate pinning for the API (AC-05); HS... |
+| SEC-03 | P0 | Backstage | build | Encryption in transit: TLS 1.2 minimum, 1.3 preferred, everywhere; certificate pinning for the API (AC-05); HS... |
 | SEC-04 | P0 | Backstage | build | Encryption at rest on the server: storage and database encryption, plus application-level envelope encryption ... |
 | SEC-05 | P0 | Backstage | build | Encryption on the device: tokens and keys in the iOS Keychain / Android Keystore, local database encrypted, se... |
 | SEC-06 | P0 | Backstage | build | Retention: precise location points are deleted once the recap is built (N-07); raw GPS data of a check-in is d... |

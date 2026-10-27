@@ -9,6 +9,7 @@ Threat model per major feature (STRIDE), then the checks that run on every chang
 - Health data, IBANs and SOS locations are sealed with AES-256-GCM under `DATA_KEY`, outside the database.
 - Every endpoint checks crew membership and answers 404, not 403, for other crews' ids (SEC-01).
 - Logs keep paths, never query strings or bodies (the live socket token rides in the query).
+- Responses carry HSTS (when `PUBLIC_URL` is https), `nosniff`, `no-referrer` and `DENY` framing.
 
 ## Threat model
 
