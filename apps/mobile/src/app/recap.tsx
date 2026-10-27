@@ -23,6 +23,8 @@ import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
 import { RollingNumber } from "@/party/RollingNumber";
 import { Confetti, DropIn, Podium, type PodiumEntry } from "@/recap/Podium";
+import { Narration } from "@/recap/Narration";
+import { nightFacts } from "@/recap/nightStory";
 import { RecapCurves } from "@/recap/RecapCurves";
 import {
   fetchRecap,
@@ -483,6 +485,7 @@ export default function RecapScreen() {
         </DropIn>
       ))}
       <Quotes recap={recap} me={me} onChange={load} />
+      <Narration recap={recap} facts={nightFacts(recap, nameOf, partyDate(recap.party.startsAt, i18n), clock)} onPublished={load} />
     </View>,
     <View key="share" style={styles.slide}>
       <View

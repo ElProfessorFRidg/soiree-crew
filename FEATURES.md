@@ -440,7 +440,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | AI-01 | P1 | Soiree.dc.html | todo | Free text or voice input structured by AI: "two pints and a jäger shot at Bar Y with Lucas, I'm paying" become... |
-| AI-02 | P1 | Recap.dc.html | todo | Narrated recap: AI writes the summary of the night from the timeline (N-22) in a chosen tone (plain, epic, roa... |
+| AI-02 | P1 | Recap.dc.html | build | Narrated recap: AI writes the summary of the night from the timeline (N-22) in a chosen tone (plain, epic, roa... |
 | AI-03 | P2 | Jeux.dc.html | todo | Custom card generator for the games, built from the crew's inside jokes, always approved by the admin (N-33). |
 
 ## Anti-slop (process)

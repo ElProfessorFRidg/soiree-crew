@@ -26,6 +26,9 @@ export interface Recap {
   timeline: { at: number; kind: TimelineKind; userId?: string; venueName?: string; count?: number }[];
   reactions: { fromId: string; toId: string; emoji: RecapEmoji }[];
   quotes: { id: string; saidBy: string | null; addedBy: string; text: string; votes: number; mine: boolean }[];
+  /** AI-02: the story published by someone who was there. */
+  narration?: { text: string; tone: "plain" | "epic" | "roast"; authorId: string; at: number } | null;
+  aiAvailable?: boolean;
 }
 
 export interface RecapSummary {

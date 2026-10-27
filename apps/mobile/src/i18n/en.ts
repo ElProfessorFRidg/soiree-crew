@@ -597,6 +597,8 @@ export const en: Messages = {
     drinksHint: "Add or remove custom drinks from the add-a-drink screen.",
     savedEverywhere: "Saved on the server, shown on your other phones.",
     hourPhone: "Phone setting",
+    crewAi: "AI drafts of the story",
+    crewAiHint: "The story goes to the server's AI provider with first names, bars and times, never drinks. Nothing is published without someone reading it.",
   },
   vault: {
     queued: "Put aside until tomorrow. We'll ask again when you're up.",
@@ -1058,6 +1060,23 @@ export const en: Messages = {
     missingCount: { one: "{count} missing", other: "{count} missing" },
     fewer: "One glass fewer",
     more: "One glass more",
+  },
+  narration: {
+    tones: {
+      plain: "Plain",
+      epic: "Epic",
+      roast: "Roast",
+    },
+    title: "The night's story",
+    tone: "Tone",
+    another: "Another version",
+    ai: "Write with AI",
+    publish: "Publish to the recap",
+    published: "Story published for the crew.",
+    share: "Share the text",
+    by: "Published by {name}",
+    aiFailed: "The AI didn't answer. The story without AI is still there.",
+    english: "Story in English for now.",
   },
   addDrink: {
     quick: "Type what you're drinking",

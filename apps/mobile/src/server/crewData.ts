@@ -18,6 +18,8 @@ export interface Crew {
   name: string;
   role: "admin" | "member";
   leaderboardEnabled: boolean;
+  /** <ai_features>: opt-in per crew, off by default. */
+  aiEnabled?: boolean;
   me: { leaderboardOptOut: boolean; territoryOptOut: boolean };
   members: CrewMember[];
 }
@@ -181,6 +183,18 @@ export function useLiveParty(): { party: Party; live: LiveParty | undefined } | 
   const party = parties.find((p) => p.myResponse === "going" && p.closedAt === null && p.startsAt <= now && p.endsAt >= now);
   if (!party) return null;
   return { party, live: liveMap[party.id] };
+}
+
+/** <ai_features>: the crew admin turns AI drafts on or off for the whole crew. */
+export async function setCrewAi(crewId: string, aiEnabled: boolean): Promise<void> {
+  const patch = (on: boolean) => useCrewData.setState((state) => ({ crews: state.crews.map((c) => (c.id === crewId ? { ...c, aiEnabled: on } : c)) }));
+  patch(aiEnabled);
+  try {
+    await api(`/v1/crews/${crewId}/settings`, { method: "PATCH", body: { aiEnabled } });
+  } catch (error) {
+    patch(!aiEnabled);
+    throw error;
+  }
 }
 
 /** RANK-08: the crew admin switches the drinking leaderboard on or off for everyone. */

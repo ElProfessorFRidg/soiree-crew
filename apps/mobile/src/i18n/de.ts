@@ -595,6 +595,8 @@ export const de: Messages = {
     drinksHint: "Eigene Getränke legst du unter „Hinzufügen“ an und entfernst sie dort auch.",
     savedEverywhere: "Auf dem Server gespeichert, sichtbar auf deinen anderen Handys.",
     hourPhone: "Wie am Handy",
+    crewAi: "KI-Entwürfe der Geschichte",
+    crewAiHint: "Die Geschichte geht mit Vornamen, Bars und Uhrzeiten an den KI-Anbieter des Servers, nie mit Getränken. Nichts wird ohne Gegenlesen veröffentlicht.",
   },
   vault: {
     queued: "Bis morgen zurückgelegt. Wir fragen dich nach dem Aufwachen nochmal.",
@@ -1056,6 +1058,23 @@ export const de: Messages = {
     missingCount: { one: "{count} fehlt", other: "{count} fehlen" },
     fewer: "Ein Glas weniger",
     more: "Ein Glas mehr",
+  },
+  narration: {
+    tones: {
+      plain: "Schlicht",
+      epic: "Episch",
+      roast: "Frech",
+    },
+    title: "Die Geschichte des Abends",
+    tone: "Ton",
+    another: "Andere Version",
+    ai: "Mit KI schreiben",
+    publish: "Im Rückblick veröffentlichen",
+    published: "Geschichte für die Crew veröffentlicht.",
+    share: "Text teilen",
+    by: "Veröffentlicht von {name}",
+    aiFailed: "Die KI hat nicht geantwortet. Die Geschichte ohne KI bleibt.",
+    english: "Geschichte vorerst auf Englisch.",
   },
   addDrink: {
     quick: "Tipp ein, was du trinkst",

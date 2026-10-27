@@ -109,3 +109,37 @@ describe("quote of the night (N-23)", () => {
     expect((await app.inject({ method: "DELETE", url: `/v1/quotes/${quoteId}`, headers: malik.auth })).statusCode).toBe(204);
   });
 });
+
+describe("narrated recap (AI-02)", () => {
+  it("publishes a story written by someone who was there, and drafts with AI only when the crew opted in", async () => {
+    const calls: string[] = [];
+    await app.close();
+    app = await buildApp({
+      db,
+      sealer: new Sealer(randomBytes(32).toString("base64")),
+      live: new LiveHub(),
+      now: () => clock,
+      publicUrl: "https://crew.test",
+      hashSecret: "s",
+      ai: { name: "fake", complete: async (_system, user) => (calls.push(user), "Une soirée — tranquille au Zinc.") },
+    });
+    const [jade, malik] = (await Promise.all(["jade", "malik"].map(account))) as [User, User];
+    const crewId = ((await app.inject({ method: "POST", url: "/v1/crews", headers: jade.auth, payload: { name: "Crew" } })).json() as { crew: { id: string } }).crew.id;
+    const { code } = (await app.inject({ method: "POST", url: `/v1/crews/${crewId}/invites`, headers: jade.auth })).json() as { code: string };
+    await app.inject({ method: "POST", url: `/v1/invites/${code}/accept`, headers: malik.auth });
+    const partyId = randomUUID();
+    await app.inject({ method: "POST", url: "/v1/parties", headers: jade.auth, payload: { id: partyId, crewId, name: "Samedi", mood: "party", kind: "party", startsAt: clock, endsAt: clock + 6 * H } });
+    const facts = { party: "Samedi", date: "samedi", people: ["Jade", "Malik"], venues: ["Le Zinc"], firstIn: "Jade", takeovers: [], rounds: 0, lastHome: null, quote: null };
+    const draft = (payload: object) => app.inject({ method: "POST", url: `/v1/parties/${partyId}/narration/draft`, headers: jade.auth, payload });
+    expect((await draft({ tone: "plain", language: "fr", facts })).statusCode).toBe(403);
+    await app.inject({ method: "PATCH", url: `/v1/crews/${crewId}/settings`, headers: jade.auth, payload: { aiEnabled: true } });
+    const ok = await draft({ tone: "plain", language: "fr", facts });
+    expect(ok.json()).toEqual({ text: "Une soirée , tranquille au Zinc." });
+    expect(calls[0]).not.toContain("drinks");
+
+    expect((await app.inject({ method: "POST", url: `/v1/parties/${partyId}/narration`, headers: jade.auth, payload: { text: "Une belle soirée au Zinc.", tone: "plain" } })).statusCode).toBe(200);
+    const recap = (await app.inject({ method: "GET", url: `/v1/parties/${partyId}/recap`, headers: jade.auth })).json() as { narration: { text: string } | null; aiAvailable: boolean };
+    expect(recap.narration?.text).toBe("Une belle soirée au Zinc.");
+    expect(recap.aiAvailable).toBe(true);
+  });
+});

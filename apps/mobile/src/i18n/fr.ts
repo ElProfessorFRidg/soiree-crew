@@ -595,6 +595,8 @@ export const fr = {
     drinksHint: "Tes boissons perso s'ajoutent et se retirent depuis l'écran Ajouter.",
     savedEverywhere: "Enregistré sur le serveur, visible sur tes autres téléphones.",
     hourPhone: "Comme le téléphone",
+    crewAi: "Brouillons du récit par l'IA",
+    crewAiHint: "Le récit part chez le fournisseur d'IA du serveur avec les prénoms, les bars et les heures, jamais les verres. Rien n'est publié sans relecture.",
   },
   vault: {
     queued: "Mis de côté jusqu'à demain. On te redemande au réveil.",
@@ -1056,6 +1058,23 @@ export const fr = {
     missingCount: { one: "manque {count}", other: "manque {count}" },
     fewer: "Un verre de moins",
     more: "Un verre de plus",
+  },
+  narration: {
+    tones: {
+      plain: "Sobre",
+      epic: "Épique",
+      roast: "Taquin",
+    },
+    title: "Le récit de la soirée",
+    tone: "Ton",
+    another: "Une autre version",
+    ai: "Écrire avec l'IA",
+    publish: "Publier dans le récap",
+    published: "Récit publié pour le crew.",
+    share: "Partager le texte",
+    by: "Publié par {name}",
+    aiFailed: "L'IA n'a pas répondu. Le récit sans IA reste là.",
+    english: "Récit en anglais pour l'instant.",
   },
   addDrink: {
     quick: "Tape ce que tu bois",

@@ -596,6 +596,8 @@ export const es: Messages = {
     drinksHint: "Tus bebidas personalizadas se añaden y se quitan desde la pantalla Añadir.",
     savedEverywhere: "Guardado en el servidor y visible en tus otros móviles.",
     hourPhone: "Como el móvil",
+    crewAi: "Borradores de la historia con IA",
+    crewAiHint: "La historia va al proveedor de IA del servidor con nombres, bares y horas, nunca las bebidas. Nada se publica sin que alguien lo lea.",
   },
   vault: {
     queued: "Lo dejamos para mañana. Te lo volvemos a preguntar cuando te despiertes.",
@@ -1057,6 +1059,23 @@ export const es: Messages = {
     missingCount: { one: "falta {count}", other: "faltan {count}" },
     fewer: "Un vaso menos",
     more: "Un vaso más",
+  },
+  narration: {
+    tones: {
+      plain: "Sobrio",
+      epic: "Épico",
+      roast: "Pullas",
+    },
+    title: "La historia de la noche",
+    tone: "Tono",
+    another: "Otra versión",
+    ai: "Escribir con IA",
+    publish: "Publicar en el resumen",
+    published: "Historia publicada para la crew.",
+    share: "Compartir el texto",
+    by: "Publicado por {name}",
+    aiFailed: "La IA no respondió. La historia sin IA sigue ahí.",
+    english: "Historia en inglés por ahora.",
   },
   addDrink: {
     quick: "Escribe lo que bebes",

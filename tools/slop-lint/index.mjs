@@ -17,6 +17,8 @@ const CATALOGUES = [
   { locale: "en", file: "apps/mobile/src/games/i18n/en.ts", exportName: "en", oneApostrophe: true },
   { locale: "fr", file: "apps/mobile/src/bar/text/fr.ts", exportName: "barFr" },
   { locale: "en", file: "apps/mobile/src/bar/text/en.ts", exportName: "barEn" },
+  { locale: "fr", file: "apps/mobile/src/recap/narrationText/fr.ts", exportName: "narrationFr" },
+  { locale: "en", file: "apps/mobile/src/recap/narrationText/en.ts", exportName: "narrationEn" },
 ];
 
 const CONTENT_ROOT = "packages/games/src/content";

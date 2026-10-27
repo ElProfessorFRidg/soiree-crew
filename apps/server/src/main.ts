@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { existsSync, rmSync } from "node:fs";
+import { aiProvider } from "./ai";
 import { buildApp } from "./app";
 import { Sealer } from "./crypto";
 import { connectPglite, connectPostgres, migrate } from "./db";
@@ -30,6 +31,7 @@ const app = await buildApp(
     publicUrl: process.env.PUBLIC_URL ?? `http://localhost:${port}`,
     hashSecret: createHash("sha256").update(`fix-hash:${dataKey}`).digest("hex"),
     uploadDir: process.env.UPLOAD_DIR ?? "./data/uploads",
+    ai: aiProvider(),
   },
   { logger: true },
 );

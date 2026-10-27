@@ -596,6 +596,8 @@ export const pt: Messages = {
     drinksHint: "As tuas bebidas personalizadas adicionam-se e tiram-se no ecrã Adicionar.",
     savedEverywhere: "Guardado no servidor, visível nos teus outros telemóveis.",
     hourPhone: "Como o telemóvel",
+    crewAi: "Rascunhos da história com IA",
+    crewAiHint: "A história vai para o fornecedor de IA do servidor com nomes, bares e horas, nunca os copos. Nada é publicado sem alguém ler.",
   },
   vault: {
     queued: "Guardado até amanhã. Voltamos a perguntar quando acordares.",
@@ -1057,6 +1059,23 @@ export const pt: Messages = {
     missingCount: { one: "falta {count}", other: "faltam {count}" },
     fewer: "Menos um copo",
     more: "Mais um copo",
+  },
+  narration: {
+    tones: {
+      plain: "Sóbrio",
+      epic: "Épico",
+      roast: "Provocador",
+    },
+    title: "A história da noite",
+    tone: "Tom",
+    another: "Outra versão",
+    ai: "Escrever com IA",
+    publish: "Publicar no resumo",
+    published: "História publicada para a crew.",
+    share: "Partilhar o texto",
+    by: "Publicado por {name}",
+    aiFailed: "A IA não respondeu. A história sem IA continua lá.",
+    english: "História em inglês por agora.",
   },
   addDrink: {
     quick: "Escreve o que estás a beber",

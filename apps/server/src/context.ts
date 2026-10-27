@@ -1,3 +1,4 @@
+import type { AiProvider } from "./ai";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type { Sealer } from "./crypto";
 import { hashToken } from "./crypto";
@@ -16,6 +17,8 @@ export interface Context {
   hashSecret: string;
   /** Where album photos are kept (N-21). Defaults to ./data/uploads. */
   uploadDir?: string;
+  /** <ai_features>: the language model, when the server is configured for one. */
+  ai?: AiProvider | null;
 }
 
 export class HttpError extends Error {

@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { BacSimulation, distributionVolume, type BodyProfile, type DrinkIntake } from "@crew/bac";
 import { HttpError, requireUser, type Context } from "../context";
+import { RateLimiter } from "../ratelimit";
 
 const HOUR_MS = 3_600_000;
 const PRE_PARTY_MS = 12 * HOUR_MS;
@@ -170,6 +171,10 @@ export function recapRoutes(app: FastifyInstance, ctx: Context): void {
 
     const timeline: { at: number; kind: TimelineKind; userId?: string; venueName?: string; count?: number }[] = [{ at: party.starts_at, kind: "start" }];
     const presentIds = new Set(participants.map((p) => p.userId));
+    const narration = (
+      await ctx.db.query<{ text: string; tone: string; author_id: string; at: number }>("select text, tone, author_id, at from party_narrations where party_id = $1", [party.id])
+    )[0];
+    const crewAi = Boolean((await ctx.db.query<{ ai_enabled: boolean }>("select ai_enabled from crews where id = $1", [party.crew_id]))[0]?.ai_enabled);
     for (const p of participants) {
       const firstSign = [partyDrinks.find((d) => d.user_id === p.userId)?.consumed_at, checkIns.find((c) => c.user_id === p.userId)?.at]
         .filter((t): t is number => t !== undefined)
@@ -197,7 +202,72 @@ export function recapRoutes(app: FastifyInstance, ctx: Context): void {
       timeline: timeline.filter((t) => !t.userId || presentIds.has(t.userId)),
       reactions: reactions.map((r) => ({ fromId: r.from_id, toId: r.to_id, emoji: r.emoji })),
       quotes: quotes.map((q) => ({ id: q.id, saidBy: q.said_by, addedBy: q.added_by, text: q.text, votes: q.votes, mine: q.mine > 0 })),
+      narration: narration ? { text: narration.text, tone: narration.tone, authorId: narration.author_id, at: narration.at } : null,
+      aiAvailable: Boolean(ctx.ai) && crewAi,
     };
+  });
+
+  /** AI-02: someone who was there publishes the night's story to the recap, after reading it. */
+  app.post<{ Params: { id: string } }>("/v1/parties/:id/narration", async (request) => {
+    const user = requireUser(request);
+    const party = await partyForMember(ctx, request.params.id, user.id);
+    const going = await ctx.db.query("select 1 from party_members where party_id = $1 and user_id = $2 and response = 'going'", [party.id, user.id]);
+    if (!going.length) throw new HttpError(403, "not_going");
+    const input = z.object({ text: z.string().trim().min(10).max(1200), tone: z.enum(["plain", "epic", "roast"]) }).parse(request.body);
+    await ctx.db.query(
+      `insert into party_narrations (party_id, text, tone, author_id, at) values ($1, $2, $3, $4, $5)
+       on conflict (party_id) do update set text = $2, tone = $3, author_id = $4, at = $5`,
+      [party.id, input.text, input.tone, user.id, ctx.now()],
+    );
+    return { ok: true };
+  });
+
+  /**
+   * AI-02 with AI: a draft written by the model from the facts the phone already shows (first
+   * names, places, times; never drinks), only when the server has a provider and the crew opted in.
+   * Nothing is stored: the draft comes back to be read, edited and published by a person.
+   */
+  const drafts = new RateLimiter(10, 60 * 60_000, ctx.now);
+  app.post<{ Params: { id: string } }>("/v1/parties/:id/narration/draft", async (request) => {
+    const user = requireUser(request);
+    const party = await partyForMember(ctx, request.params.id, user.id);
+    if (!ctx.ai) throw new HttpError(503, "ai_unavailable");
+    const crew = (await ctx.db.query<{ ai_enabled: boolean }>("select ai_enabled from crews where id = $1", [party.crew_id]))[0];
+    if (!crew?.ai_enabled) throw new HttpError(403, "ai_off");
+    drafts.check(user.id);
+    const name = z.string().trim().max(40);
+    const input = z
+      .object({
+        tone: z.enum(["plain", "epic", "roast"]),
+        language: z.enum(["fr", "en", "es", "it", "de", "pt", "ru"]),
+        facts: z.object({
+          party: z.string().max(60),
+          date: z.string().max(40),
+          people: z.array(name).max(20),
+          venues: z.array(z.string().max(60)).max(12),
+          firstIn: name.nullable(),
+          takeovers: z.array(z.object({ name, venue: z.string().max(60) })).max(5),
+          rounds: z.number().int().min(0).max(100),
+          lastHome: z.object({ name, time: z.string().max(12) }).nullable(),
+          quote: z.string().max(200).nullable(),
+        }),
+      })
+      .parse(request.body);
+    const system = [
+      `You write the story of a night out among friends, for their own app, in the language "${input.language}".`,
+      `Tone: ${input.tone === "plain" ? "plain and warm" : input.tone === "epic" ? "mock-epic, like a saga" : "a friendly roast, teasing but never cruel"}.`,
+      "Four to six short sentences, one paragraph. Use only the facts given; invent nothing.",
+      "Never mention how much anyone drank, alcohol levels or health. No em dashes, no en dashes, no lists, no hashtags, no emojis, no rhetorical questions.",
+      "In French: address nobody as « vous », use wording that does not depend on anyone's gender, and French spacing before : ; ! ?.",
+      "Return only the story.",
+    ].join(" ");
+    try {
+      const text = await ctx.ai.complete(system, JSON.stringify(input.facts), 400);
+      // The house rule on dashes holds for model output too.
+      return { text: text.replace(/[\u2013\u2014]/g, ",").slice(0, 1200) };
+    } catch {
+      throw new HttpError(502, "ai_failed");
+    }
   });
 
   /** N-23: anyone who was there adds a line; it may name who said it, if that person was there too. */

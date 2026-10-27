@@ -596,6 +596,8 @@ export const it: Messages = {
     drinksHint: "Le tue bevande personali si aggiungono e si tolgono dalla schermata Aggiungi.",
     savedEverywhere: "Salvato sul server, visibile sugli altri tuoi telefoni.",
     hourPhone: "Come il telefono",
+    crewAi: "Bozze del racconto con l'IA",
+    crewAiHint: "Il racconto va al fornitore di IA del server con nomi, locali e orari, mai i bicchieri. Niente viene pubblicato senza essere letto.",
   },
   vault: {
     queued: "Messo da parte fino a domani. Te lo richiediamo al risveglio.",
@@ -1057,6 +1059,23 @@ export const it: Messages = {
     missingCount: { one: "manca {count}", other: "mancano {count}" },
     fewer: "Un bicchiere in meno",
     more: "Un bicchiere in più",
+  },
+  narration: {
+    tones: {
+      plain: "Sobrio",
+      epic: "Epico",
+      roast: "Sfottò",
+    },
+    title: "Il racconto della serata",
+    tone: "Tono",
+    another: "Un'altra versione",
+    ai: "Scrivi con l'IA",
+    publish: "Pubblica nel riepilogo",
+    published: "Racconto pubblicato per la crew.",
+    share: "Condividi il testo",
+    by: "Pubblicato da {name}",
+    aiFailed: "L'IA non ha risposto. Il racconto senza IA resta lì.",
+    english: "Racconto in inglese per ora.",
   },
   addDrink: {
     quick: "Scrivi cosa bevi",

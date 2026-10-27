@@ -270,7 +270,10 @@ export function leaderboardRoutes(app: FastifyInstance, ctx: Context): void {
     const user = requireUser(request);
     const { role } = await assertCrewMember(ctx, request.params.id, user.id);
     if (role !== "admin") throw new HttpError(403, "forbidden");
-    const input = z.object({ leaderboardEnabled: z.boolean().optional(), timeZone: z.string().min(3).max(60).optional() }).parse(request.body);
+    const input = z
+      .object({ leaderboardEnabled: z.boolean().optional(), timeZone: z.string().min(3).max(60).optional(), aiEnabled: z.boolean().optional() })
+      .parse(request.body);
+    if (input.aiEnabled !== undefined) await ctx.db.query("update crews set ai_enabled = $2 where id = $1", [request.params.id, input.aiEnabled]);
     if (input.leaderboardEnabled !== undefined) {
       await ctx.db.query("update crews set leaderboard_enabled = $2 where id = $1", [request.params.id, input.leaderboardEnabled]);
     }

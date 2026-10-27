@@ -20,3 +20,5 @@ Build from the repository root with `apps/server/Dockerfile`, then set:
 - `UPLOAD_DIR` (optional, default `./data/uploads`): where album photos are kept. Mount it as a volume so photos survive a redeploy
 
 Expose port 8787 behind HTTPS.
+
+Optional AI (ADR 0004): set `AI_PROVIDER=anthropic` and `ANTHROPIC_API_KEY` (and `AI_MODEL` to change the model). Each crew admin still has to turn it on in Settings. Without these, the app writes recap stories from templates.
