@@ -6,7 +6,7 @@ import { avatarColor, duration, palette } from "@crew/design-tokens";
 import { useT } from "@/i18n";
 import { easings } from "@/motion/easing";
 import { fitRegion, TileMap, type LatLng } from "@/map/TileMap";
-import { useCrewData } from "@/server/crewData";
+import { useCrewData, useLiveParty } from "@/server/crewData";
 import { useSession } from "@/server/session";
 import { refreshVenues, useVenueData, type VenueSummary } from "@/server/venueData";
 import { useTheme } from "@/theme";
@@ -16,6 +16,9 @@ import { Icon } from "@/ui/Icon";
 import { ScalePressable } from "@/ui/Pressable";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
+import { fetchFriendLocations, type FriendLocation } from "@/location/liveShare";
+import { useEcoInterval } from "@/power/eco";
+import { Avatar } from "@/ui/Avatar";
 
 type Filter = "all" | "friends" | "fog";
 const MAP_HEIGHT_RATIO = 0.46;
@@ -69,6 +72,23 @@ export default function BarsScreen() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [region, setRegion] = useState<{ center: LatLng; zoom: number } | null>(null);
   const mapHeight = Math.round(height * MAP_HEIGHT_RATIO);
+  const live = useLiveParty();
+  const livePartyId = live && live.party.crewId === crewId ? live.party.id : null;
+  const [friends, setFriends] = useState<FriendLocation[]>([]);
+  const me = session?.userId;
+  const pollMs = useEcoInterval(60_000);
+
+  // N-07: friends who share their position tonight show on the map, refreshed every minute.
+  useEffect(() => {
+    if (!livePartyId) {
+      setFriends([]);
+      return;
+    }
+    const load = () => void fetchFriendLocations(livePartyId).then((list) => setFriends(list.filter((f) => f.userId !== me))).catch(() => undefined);
+    load();
+    const timer = setInterval(load, pollMs);
+    return () => clearInterval(timer);
+  }, [livePartyId, me, pollMs]);
 
   useEffect(() => {
     if (!crewId && crews[0]) setCrewId(crews[0].id);
@@ -120,12 +140,20 @@ export default function BarsScreen() {
         height={mapHeight}
         onRegionChange={(center, zoom) => setRegion({ center, zoom })}
         accessibilityLabel={i18n.t("bars.mapA11y")}
-        markers={venues.map((venue) => ({
-          id: venue.id,
-          lat: venue.lat,
-          lng: venue.lng,
-          render: () => <VenuePin venue={venue} selected={venue.id === selectedId} onPress={() => setSelectedId(venue.id)} />,
-        }))}
+        markers={[
+          ...venues.map((venue) => ({
+            id: venue.id,
+            lat: venue.lat,
+            lng: venue.lng,
+            render: () => <VenuePin venue={venue} selected={venue.id === selectedId} onPress={() => setSelectedId(venue.id)} />,
+          })),
+          ...friends.map((f) => ({
+            id: `friend-${f.userId}`,
+            lat: f.lat,
+            lng: f.lng,
+            render: () => <Avatar personId={f.userId} name={f.name} size={30} ring={palette.accent.amber} />,
+          })),
+        ]}
       />
 
       <View style={styles.chips}>

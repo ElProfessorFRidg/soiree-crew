@@ -205,6 +205,10 @@ export const en: Messages = {
     },
   },
   live: {
+    shareLocation: "Share my location tonight",
+    shareLocationHint: "Seen by this party's crew only. Stops when the party ends, deleted after.",
+    shareLocationDenied: "Location refused: allow it in the phone's settings.",
+    shareLocationOn: "Location shared at {time}",
     title: "Live",
     open: "The crew, live",
     crewTonight: "The crew tonight",

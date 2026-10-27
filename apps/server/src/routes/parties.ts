@@ -39,9 +39,16 @@ function partyView(row: PartyRow, now: number) {
   };
 }
 
-/** Closes every party past its end, so nothing stays open for days. */
+/** A shared position older than this is dropped (N-07 auto-expiry). */
+const LOCATION_TTL_MS = 15 * 60_000;
+
+/** Closes every party past its end, so nothing stays open for days. Positions go with it (SEC-06). */
 async function closeEnded(ctx: Context): Promise<void> {
   await ctx.db.query("update parties set closed_at = ends_at where closed_at is null and ends_at < $1", [ctx.now()]);
+  await ctx.db.query(
+    "delete from party_locations where at < $1 or party_id in (select id from parties where closed_at is not null)",
+    [ctx.now() - LOCATION_TTL_MS],
+  );
 }
 
 async function loadPartyForMember(ctx: Context, partyId: string, userId: string): Promise<PartyRow> {
@@ -139,6 +146,51 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
     const members = await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1 and response = 'going'", [party.id]);
     ctx.live.notify(members.map((m) => m.user_id), { type: "party.changed", partyId: party.id });
     return { ok: true };
+  });
+
+  /**
+   * N-07: my position for the crew of this party, only while it is live and only
+   * when I turn it on. The client sends it every minute or so; DELETE is ghost mode.
+   */
+  app.put<{ Params: { id: string } }>("/v1/parties/:id/location", async (request) => {
+    const user = requireUser(request);
+    await closeEnded(ctx);
+    const party = await loadPartyForMember(ctx, request.params.id, user.id);
+    const now = ctx.now();
+    if (party.closed_at !== null || party.starts_at > now || party.ends_at < now) throw new HttpError(409, "party_not_live");
+    const going = await ctx.db.query("select 1 from party_members where party_id = $1 and user_id = $2 and response = 'going'", [party.id, user.id]);
+    if (!going.length) throw new HttpError(403, "not_going");
+    const input = z.object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180), accuracy: z.number().min(0).max(10_000) }).parse(request.body);
+    await ctx.db.query(
+      `insert into party_locations (party_id, user_id, sealed, at) values ($1, $2, $3, $4)
+       on conflict (party_id, user_id) do update set sealed = excluded.sealed, at = excluded.at`,
+      [party.id, user.id, ctx.sealer.seal(input), now],
+    );
+    return { ok: true };
+  });
+
+  app.delete<{ Params: { id: string } }>("/v1/parties/:id/location", async (request, reply) => {
+    const user = requireUser(request);
+    await ctx.db.query("delete from party_locations where party_id = $1 and user_id = $2", [request.params.id, user.id]);
+    return reply.status(204).send();
+  });
+
+  /** Positions of the party's members who share theirs, for members going to it. Never anyone else. */
+  app.get<{ Params: { id: string } }>("/v1/parties/:id/locations", async (request) => {
+    const user = requireUser(request);
+    await closeEnded(ctx);
+    const party = await loadPartyForMember(ctx, request.params.id, user.id);
+    const going = await ctx.db.query("select 1 from party_members where party_id = $1 and user_id = $2 and response = 'going'", [party.id, user.id]);
+    if (!going.length) return { locations: [] };
+    const rows = await ctx.db.query<{ user_id: string; display_name: string; sealed: string; at: number }>(
+      `select l.user_id, u.display_name, l.sealed, l.at from party_locations l join users u on u.id = l.user_id
+       join party_members m on m.party_id = l.party_id and m.user_id = l.user_id and m.response = 'going'
+       where l.party_id = $1`,
+      [party.id],
+    );
+    return {
+      locations: rows.map((r) => ({ userId: r.user_id, name: r.display_name, at: r.at, ...ctx.sealer.open<{ lat: number; lng: number; accuracy: number }>(r.sealed) })),
+    };
   });
 
   /** N-11: the crew votes on where to go next; everyone sees the tally. */
@@ -323,6 +375,7 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
     const { role } = await assertCrewMember(ctx, party.crew_id, user.id);
     if (party.created_by !== user.id && role !== "admin") throw new HttpError(403, "forbidden");
     await ctx.db.query("update parties set closed_at = $2 where id = $1 and closed_at is null", [party.id, ctx.now()]);
+    await ctx.db.query("delete from party_locations where party_id = $1", [party.id]);
     const members = await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1", [party.id]);
     ctx.live.notify(members.map((m) => m.user_id), { type: "party.changed", partyId: party.id });
     return { ok: true };

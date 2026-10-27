@@ -99,3 +99,19 @@ describe("territory titles endpoint (TER-06)", () => {
     expect(body.rows[0]).toMatchObject({ ruled: 0, titles: [] });
   });
 });
+
+describe("live location (N-07)", () => {
+  it("shares a sealed position with the party's crew only, and drops it at the end of the party", async () => {
+    const { users, partyId } = await crewWithParty("jade", "malik", "ines");
+    const [jade, malik, ines] = users as [User, User, User];
+    await app.inject({ method: "POST", url: `/v1/parties/${partyId}/response`, headers: ines.auth, payload: { response: "declined" } });
+    expect((await app.inject({ method: "PUT", url: `/v1/parties/${partyId}/location`, headers: jade.auth, payload: { lat: 48.8611, lng: 2.3712, accuracy: 15 } })).statusCode).toBe(200);
+    const seen = (await app.inject({ method: "GET", url: `/v1/parties/${partyId}/locations`, headers: malik.auth })).json() as { locations: { userId: string; lat: number }[] };
+    expect(seen.locations).toEqual([expect.objectContaining({ userId: jade.id, lat: 48.8611 })]);
+    const declined = (await app.inject({ method: "GET", url: `/v1/parties/${partyId}/locations`, headers: ines.auth })).json() as { locations: unknown[] };
+    expect(declined.locations).toEqual([]);
+    expect(JSON.stringify(await db.query("select * from party_locations"))).not.toContain("48.8611");
+    await app.inject({ method: "POST", url: `/v1/parties/${partyId}/close`, headers: jade.auth });
+    expect(await db.query("select * from party_locations")).toEqual([]);
+  });
+});

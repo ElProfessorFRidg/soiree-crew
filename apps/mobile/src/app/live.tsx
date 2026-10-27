@@ -22,6 +22,7 @@ import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { useEcoInterval } from "@/power/eco";
 import { ScalePressable } from "@/ui/Pressable";
+import { startSharing, stopSharing, useLiveShare } from "@/location/liveShare";
 
 /** Live dashboard refresh while the screen is open, on top of socket hints (O-37). */
 const REFRESH_MS = 20_000;
@@ -83,6 +84,7 @@ export default function LiveScreen() {
   const me = useSession((state) => state.session?.userId);
   const hourCycle = useAppStore((state) => state.preferences.hourCycle);
   const refreshMs = useEcoInterval(REFRESH_MS);
+  const share = useLiveShare();
 
   useEffect(() => {
     if (!id) return;
@@ -127,6 +129,26 @@ export default function LiveScreen() {
           <View style={styles.switchRow}>
             <Text style={styles.flex}>{i18n.t("live.imDriver")}</Text>
             <Switch value={mine.designatedDriver} onValueChange={(on) => toggle({ designatedDriver: on })} accessibilityLabel={i18n.t("live.imDriver")} />
+          </View>
+          <View style={styles.switchRow}>
+            <View style={styles.flex}>
+              <Text>{i18n.t("live.shareLocation")}</Text>
+              <Text variant="small">
+                {share.error === "denied"
+                  ? i18n.t("live.shareLocationDenied")
+                  : share.partyId === id && share.lastSentAt
+                    ? i18n.t("live.shareLocationOn", { time: formatClock(share.lastSentAt, i18n.language, hourCycle) })
+                    : i18n.t("live.shareLocationHint")}
+              </Text>
+            </View>
+            <Switch
+              value={share.partyId === id}
+              onValueChange={(on) => {
+                haptic.select();
+                void (on ? startSharing(id) : stopSharing());
+              }}
+              accessibilityLabel={i18n.t("live.shareLocation")}
+            />
           </View>
           <Button label={i18n.t("goingHome.open")} icon="car" variant="outline" height={48} onPress={() => router.push({ pathname: "/home", params: { id } })} />
         </Panel>

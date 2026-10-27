@@ -203,6 +203,10 @@ export const fr = {
     },
   },
   live: {
+    shareLocation: "Partager ma position ce soir",
+    shareLocationHint: "Visible par le crew de cette soirée seulement. S'arrête à la fin de la soirée, effacée ensuite.",
+    shareLocationDenied: "Position refusée : autorise-la dans les réglages du téléphone.",
+    shareLocationOn: "Position partagée à {time}",
     title: "En direct",
     open: "Le crew en direct",
     crewTonight: "Le crew ce soir",
