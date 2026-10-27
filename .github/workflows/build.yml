@@ -24,6 +24,9 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm lint:slop
+      - name: Audit production dependencies (SEC-09, reported, not blocking)
+        run: pnpm audit --prod --audit-level=high
+        continue-on-error: true
 
   ios:
     # Unsigned IPA: sign it on your side with your sideloading tool (ADR 0001).

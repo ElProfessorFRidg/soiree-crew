@@ -315,7 +315,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| MOT-01 | P0 | Backstage | todo | Motion system in `MOTION.md`, written before any screen: duration tokens, springs and curves, choreography rul... |
+| MOT-01 | P0 | Backstage | build | Motion system in `MOTION.md`, written before any screen: duration tokens, springs and curves, choreography rul... |
 | MOT-02 | P0 | Backstage | todo | Living background within our art direction (no radial halo or generic aurora, see <anti_slop>): it breathes an... |
 | MOT-03 | P0 | Soiree.dc.html | build | Adding a drink: glass filling up, bubbles, BAC digits rolling to the new value, dedicated haptic. It is the mo... |
 | MOT-04 | P0 | Soiree.dc.html | build | Curve: the trace draws itself, smooth colour change when crossing a threshold, clearly marked peak point (no d... |
@@ -447,7 +447,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| SLOP-01 | P0 | Backstage | todo | `VOICE.md` (a FR voice and an EN voice, examples to do / not to do for every type of text, linked to <glossary... |
+| SLOP-01 | P0 | Backstage | build | `VOICE.md` (a FR voice and an EN voice, examples to do / not to do for every type of text, linked to <glossary... |
 | SLOP-02 | P0 | Backstage | todo | Anti-slop review per ID: a subagent rereads copy, screenshots and code against `SLOP.md` with one question: "d... |
 | SLOP-03 | P0 | Backstage | todo | Pass on every text in every language: a translation that reads machine-made counts as a defect; each language ... |
 | SLOP-04 | P0 | Backstage | build | Automated CI lint on every localisation file: em and en dashes, blacklisted words, "successfully" / "avec succ... |
@@ -485,7 +485,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | SEC-06 | P0 | Backstage | todo | Retention: precise location points are deleted once the recap is built (N-07); raw GPS data of a check-in is d... |
 | SEC-07 | P0 | Reglages.dc.html | build | Accounts: passkeys first; passwords, if any, hashed with Argon2id; list of active sessions with remote sign-ou... |
 | SEC-08 | P0 | Arrivee.dc.html | build | GDPR: alcohol consumption and BAC may count as health data under GDPR article 9, which means explicit consent,... |
-| SEC-09 | P0 | Backstage | todo | Secure development: a threat model (STRIDE) per major feature in `SECURITY.md`, secret scanning, static analys... |
+| SEC-09 | P0 | Backstage | build | Secure development: a threat model (STRIDE) per major feature in `SECURITY.md`, secret scanning, static analys... |
 | SEC-10 | P0 | Backstage | todo | Export compliance for encryption: App Store encryption questions, US export rules, and the French ANSSI declar... |
 | SEC-11 | P0 | Backstage | proposed | BAC computed on the device; drinks, weight and sex stored on the server only when the user shares with their crew, with a "local only" mode. Tension with server-authoritative scoring, see `research/open-decisions.md`. Source: security.md §2.8, §5. |
 | SEC-12 | P0 | Backstage | proposed | No health data in iCloud: local DB and backups excluded from iCloud device backup; the MSG-08 archive never in iCloud Drive (App Store 5.1.3(ii)). Source: security.md §1 item 4, §5. |
