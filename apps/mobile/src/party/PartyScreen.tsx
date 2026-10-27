@@ -28,7 +28,7 @@ import { SosBanner } from "@/crew/SosBanner";
 import { useEco } from "@/power/eco";
 import { TravelPrompt } from "@/travel/TravelPrompt";
 import { VaultPrompt } from "@/vault/VaultPrompt";
-import { useLiveParty } from "@/server/crewData";
+import { useLiveParty, type PartyMood } from "@/server/crewData";
 import { useVenueData } from "@/server/venueData";
 import { RollingNumber } from "./RollingNumber";
 
@@ -63,6 +63,28 @@ function EcoNotice() {
   const eco = useEco((state) => state.eco);
   if (!eco) return null;
   return <Tag label={i18n.t("party.eco")} icon="battery" tone="amber" />;
+}
+
+/** JOY-04: the mood picked for the party tints the top of the screen, nothing more. */
+const MOOD_COLOURS: Record<PartyMood, string> = {
+  party: palette.avatar[0]!,
+  birthday: palette.avatar[5]!,
+  champagne: palette.avatar[6]!,
+  sunset: palette.avatar[3]!,
+  costume: palette.avatar[4]!,
+  wine: palette.avatar[4]!,
+  fire: palette.avatar[5]!,
+  night: palette.avatar[2]!,
+  home: palette.avatar[1]!,
+  tropical: palette.avatar[1]!,
+};
+
+function MoodBand() {
+  const insets = useSafeAreaInsets();
+  const live = useLiveParty();
+  if (!live) return null;
+  const colour = MOOD_COLOURS[live.party.mood as PartyMood] ?? palette.avatar[0]!;
+  return <View pointerEvents="none" style={[styles.moodBand, { top: insets.top, backgroundColor: colour }]} />;
 }
 
 export function PartyScreen() {
@@ -124,6 +146,7 @@ export function PartyScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.bg }]}>
+      <MoodBand />
       <ScrollView
         contentContainerStyle={[styles.content, { paddingTop: insets.top + space.screenTop }]}
         contentInsetAdjustmentBehavior="never"
@@ -574,6 +597,7 @@ function PoisoningCard({ live, i18n }: { live: LiveBac; i18n: Translator }) {
 }
 
 const styles = StyleSheet.create({
+  moodBand: { position: "absolute", left: 0, right: 0, height: 4, zIndex: 2, opacity: 0.9 },
   screen: { flex: 1 },
   content: {
     paddingHorizontal: space.screenX,
