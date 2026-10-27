@@ -31,6 +31,10 @@ Threat model per major feature (STRIDE), then the checks that run on every chang
 | Account deletion while drunk | Irreversible action regretted | T | Next-morning vault from UI level 2 (ADP-06) |
 | Whole API | Request floods | D | Body size limit 512 KB; per-route limits on auth; the host's proxy for the rest |
 
+## Route audit (October 2026)
+
+Every route was checked for an ownership or membership test before it reads or writes. The ones without one are scoped by design: the caller's own account and sessions, the caller's own crews and parties lists, the public invite page, and photo files behind a signed, expiring link.
+
 ## Checks on every change
 
 - `pnpm check`: typecheck, 270+ tests including authorisation tests per route, slop lint.
