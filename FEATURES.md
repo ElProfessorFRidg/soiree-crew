@@ -67,7 +67,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-35 | P0 | Soirees.dc.html | build | Create a party: mood (about ten icons: party, birthday, champagne, sunset, costume, wine, fire, night, home, t... |
 | O-36 | P0 | Soirees.dc.html | build | Invite the crew: invitations as cards, reply straight from the list, tab badge with the real number of invitat... |
 | O-37 | P0 | Soirees.dc.html | build | Live dashboard: everyone's BAC in real time, who is speeding up, who is slowing down, who has gone missing for... |
-| O-38 | P0 | Soirees.dc.html | todo | Live crew notifications at a controlled volume (S2M had to cut a third of theirs): whatever remains must be us... |
+| O-38 | P0 | Soirees.dc.html | build | Live crew notifications at a controlled volume (S2M had to cut a third of theirs): whatever remains must be us... |
 | O-39 | P0 | Soirees.dc.html | build | Participant profiles tappable from the party, add as friend in one tap. |
 | O-40 | P0 | Soirees.dc.html | build | Automatic closing (a party never stays open for days); trips keep correct group BACs for their whole duration. |
 | O-41 | P0 | Recap.dc.html | build | Recap: saved and kept, notification as soon as it is ready, only people actually present (including non-friend... |
@@ -324,7 +324,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | MOT-07 | P0 | JeuxAction.dc.html | build | Game physics: roulette with real deceleration and haptic clicks, a bomb that shakes harder and harder then bur... |
 | MOT-08 | P0 | Recap.dc.html | build | Cinematic recap: story format, counters rolling, podium rising, curves drawing, badges dropping with confetti,... |
 | MOT-09 | P0 | Bars.dc.html | build | Venue map: takeover (crown dropping, the new boss's colour washing over the venue); venues where the crew is r... |
-| MOT-10 | P0 | Etats.dc.html | todo | Micro-interactions: buttons, toggles, custom pull-to-refresh, skeletons, illustrated and animated empty states... |
+| MOT-10 | P0 | Etats.dc.html | build | Micro-interactions: buttons, toggles, custom pull-to-refresh, skeletons, illustrated and animated empty states... |
 | MOT-11 | P1 | Systeme.dc.html | todo | Animated widgets and Live Activity, within each OS's limits. |
 | MOT-12 | P0 | Backstage | todo | Performance and motion accessibility: 60 / 120 fps without jank, tested on a modest phone, battery budget resp... |
 | MOT-13 | P0 | Classements.dc.html | build | Leaderboards: animated overtakes, podium, a dedicated effect when the leader changes. |

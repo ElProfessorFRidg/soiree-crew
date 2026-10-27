@@ -1,6 +1,6 @@
 import { router } from "expo-router";
-import { type ReactNode } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from "react-native";
+import { useState, type ReactNode } from "react";
+import { KeyboardAvoidingView, Platform, RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { space } from "@crew/design-tokens";
 import { useT } from "@/i18n";
@@ -17,9 +17,12 @@ interface Props {
   /** Pinned under the scroll view, above the home indicator. */
   footer?: ReactNode;
   withToasts?: boolean;
+  /** MOT-10: pull to refresh. The screen shows the spinner until the promise settles. */
+  onRefresh?: () => Promise<unknown>;
 }
 
-export function Screen({ title, back, trailing, children, footer, withToasts }: Props) {
+export function Screen({ title, back, trailing, children, footer, withToasts, onRefresh }: Props) {
+  const [refreshing, setRefreshing] = useState(false);
   const theme = useTheme();
   const i18n = useT();
   const insets = useSafeAreaInsets();
@@ -29,6 +32,22 @@ export function Screen({ title, back, trailing, children, footer, withToasts }: 
       <ScrollView
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
+        refreshControl={
+          onRefresh ? (
+            <RefreshControl
+              refreshing={refreshing}
+              tintColor={theme.amber}
+              colors={[theme.amber]}
+              progressBackgroundColor={theme.surface}
+              onRefresh={() => {
+                setRefreshing(true);
+                void onRefresh()
+                  .catch(() => undefined)
+                  .finally(() => setRefreshing(false));
+              }}
+            />
+          ) : undefined
+        }
         contentContainerStyle={[styles.content, { paddingTop: insets.top + space.screenTop, paddingBottom: footer ? 24 : insets.bottom + 110 }]}
       >
         {back || trailing ? (

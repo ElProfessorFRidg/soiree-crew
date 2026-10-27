@@ -14,6 +14,7 @@ import { Panel, Row } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { SkeletonRows } from "@/ui/Skeleton";
 
 export default function PoolScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -29,7 +30,12 @@ export default function PoolScreen() {
   }, [id, i18n]);
   useFocusEffect(load);
 
-  if (!detail) return <Screen back title={i18n.t("money.title")} withToasts>{null}</Screen>;
+  if (!detail)
+    return (
+      <Screen back title={i18n.t("money.title")} withToasts>
+        <SkeletonRows />
+      </Screen>
+    );
 
   const nameOf = (userId: string) => (userId === me ? i18n.t("common.you") : (detail.members.find((m) => m.userId === userId)?.name ?? "?"));
   const money = (amount: number, currency: string) => formatMoney(amount, currency, i18n.locale);

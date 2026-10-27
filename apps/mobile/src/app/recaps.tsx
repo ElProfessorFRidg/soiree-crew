@@ -9,6 +9,7 @@ import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { SkeletonRows } from "@/ui/Skeleton";
 
 /** O-41: every recap is kept. */
 export default function RecapsScreen() {
@@ -16,18 +17,24 @@ export default function RecapsScreen() {
   const theme = useTheme();
   const [recaps, setRecaps] = useState<RecapSummary[] | null>(null);
 
+  const load = useCallback(
+    () =>
+      fetchRecaps()
+        .then((data) => setRecaps(data.recaps))
+        .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") })),
+    [i18n],
+  );
   useFocusEffect(
     useCallback(() => {
-      void fetchRecaps()
-        .then((data) => setRecaps(data.recaps))
-        .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }));
-    }, [i18n]),
+      void load();
+    }, [load]),
   );
 
   const date = (at: number) => new Intl.DateTimeFormat(i18n.locale, { weekday: "short", day: "numeric", month: "long", year: "numeric" }).format(new Date(at));
 
   return (
-    <Screen back title={i18n.t("recap.list")} withToasts>
+    <Screen back title={i18n.t("recap.list")} withToasts onRefresh={load}>
+      {recaps === null ? <SkeletonRows /> : null}
       {recaps && recaps.length === 0 ? <Text>{i18n.t("recap.none")}</Text> : null}
       <View>
         {recaps?.map((recap, index) => (

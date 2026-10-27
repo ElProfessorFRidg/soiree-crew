@@ -12,7 +12,7 @@ import { useT, type Translator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
 import { ApiError } from "@/server/api";
-import { acceptInvite, createCrew, createInvite, leaveCrew, respondToParty, useCrewData, type Crew, type Party } from "@/server/crewData";
+import { acceptInvite, createCrew, createInvite, leaveCrew, refreshCrews, refreshParties, respondToParty, useCrewData, type Crew, type Party } from "@/server/crewData";
 import { useSession } from "@/server/session";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
@@ -27,6 +27,7 @@ import { guarded } from "@/vault/vault";
 import { useDraft } from "@/state/drafts";
 import { usePendingInvite } from "@/server/pendingInvite";
 import { ScalePressable } from "@/ui/Pressable";
+import { refreshRadar } from "@/server/radarData";
 
 function errorMessage(error: unknown, i18n: Translator): string {
   if (error instanceof ApiError && error.failure.kind === "http") {
@@ -210,7 +211,11 @@ export default function CrewScreen() {
   const going = parties.filter((p) => p.closedAt === null && p.endsAt > now && p.myResponse === "going");
 
   return (
-    <Screen title={i18n.t("crew.tab")} withToasts>
+    <Screen
+      title={i18n.t("crew.tab")}
+      withToasts
+      onRefresh={() => Promise.all([refreshCrews(), refreshParties(), ...crews.map((c) => refreshRadar(c.id))])}
+    >
       <SosBanner />
       {crews[0] ? <RadarSection crewId={crews[0].id} /> : null}
       {invitations.length ? (

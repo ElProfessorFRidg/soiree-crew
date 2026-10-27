@@ -16,6 +16,7 @@ import { Panel, Segmented, Tag } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { SkeletonRows } from "@/ui/Skeleton";
 
 type ViewAs = "me" | "stranger" | "friend" | "crew";
 
@@ -46,7 +47,12 @@ export default function ProfileScreen() {
       </Screen>
     );
   }
-  if (!profile) return <Screen back>{null}</Screen>;
+  if (!profile)
+    return (
+      <Screen back>
+        <SkeletonRows rows={3} />
+      </Screen>
+    );
 
   const s = profile.sections;
   const name = s.identity?.displayName ?? "";

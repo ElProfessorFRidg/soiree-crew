@@ -66,7 +66,7 @@ export default function MoneyScreen() {
   const nextName = rounds?.present.find((p) => p.userId === rounds.nextPayerId)?.name;
 
   return (
-    <Screen back title={i18n.t("money.title")} withToasts>
+    <Screen back title={i18n.t("money.title")} withToasts onRefresh={async () => load()}>
       <Panel>
         <Text variant="h3">{i18n.t("money.round")}</Text>
         {live && rounds ? (
