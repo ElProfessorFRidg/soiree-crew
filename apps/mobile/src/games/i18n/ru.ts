@@ -39,6 +39,12 @@ export const ru: GameMessages = {
     pending: "ждёт",
     rejected: "отклонена",
     remove: "Убрать",
+    aiTitle: "Идеи с ИИ",
+    aiJokes: "Шутки тусовки",
+    aiHint: "Хватит пары слов: прозвище, место, вечер.",
+    aiSuggest: "Предложить карты",
+    keep: "Оставить",
+    aiFailed: "ИИ ничего не предложил. Попробуй позже.",
   },
   hall: {
     title: "Доска почёта",

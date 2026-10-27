@@ -40,6 +40,12 @@ export const en: GameMessages = {
     pending: "waiting",
     rejected: "turned down",
     remove: "Remove",
+    aiTitle: "Ideas with AI",
+    aiJokes: "The crew's inside jokes",
+    aiHint: "A few words are enough: a nickname, a place, a night.",
+    aiSuggest: "Suggest cards",
+    keep: "Keep",
+    aiFailed: "The AI came up with nothing. Try again later.",
   },
   hall: {
     title: "Hall of fame",

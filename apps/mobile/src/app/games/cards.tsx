@@ -6,6 +6,7 @@ import { Field } from "@/crew/Field";
 import { CREW_CARD_KINDS, deleteCrewCard, refreshCrewCards, reviewCrewCard, useCrewCards, writeCrewCard, type CrewCardKind } from "@/games/crewCards";
 import { useGameT } from "@/games/i18n";
 import { haptic } from "@/motion/haptics";
+import { api } from "@/server/api";
 import { useCrewData } from "@/server/crewData";
 import { useSession } from "@/server/session";
 import { newId } from "@/state/store";
@@ -31,6 +32,9 @@ export default function CrewCardsScreen() {
   const [level, setLevel] = useState<GameLevel>("normal");
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
+  const [jokes, setJokes] = useState("");
+  const [ideas, setIdeas] = useState<string[]>([]);
+  const [suggesting, setSuggesting] = useState(false);
   const offline = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
   const isAdmin = crew?.role === "admin";
 
@@ -46,6 +50,19 @@ export default function CrewCardsScreen() {
       </Screen>
     );
   }
+
+  /** AI-03: suggestions from the crew's inside jokes; the admin keeps the good ones. */
+  const suggest = () => {
+    if (!crew) return;
+    setSuggesting(true);
+    void api<{ cards: string[] }>(`/v1/crews/${crew.id}/cards/suggest`, {
+      method: "POST",
+      body: { kind, level, language: g.language === "fr" ? "fr" : "en", jokes: jokes.trim() },
+    })
+      .then((res) => setIdeas(res.cards))
+      .catch(() => showToast({ tone: "danger", message: g.t("crewCards.aiFailed") }))
+      .finally(() => setSuggesting(false));
+  };
 
   const send = () => {
     setBusy(true);
@@ -80,6 +97,31 @@ export default function CrewCardsScreen() {
       />
       <Field label={g.t("crewCards.text")} hint={g.t(`crewCards.hint.${kind}`)} value={text} onChangeText={setText} maxLength={220} multiline />
       <Button label={isAdmin ? g.t("crewCards.add") : g.t("crewCards.propose")} height={52} disabled={text.trim().length < 4} loading={busy} onPress={send} />
+
+      {isAdmin && crew.aiAvailable ? (
+        <Panel>
+          <Text variant="label">{g.t("crewCards.aiTitle")}</Text>
+          <Field label={g.t("crewCards.aiJokes")} hint={g.t("crewCards.aiHint")} value={jokes} onChangeText={setJokes} maxLength={600} multiline />
+          <Button label={g.t("crewCards.aiSuggest")} variant="secondary" height={48} disabled={jokes.trim().length < 10} loading={suggesting} onPress={suggest} />
+          {ideas.map((idea) => (
+            <View key={idea} style={[styles.card, { borderTopColor: theme.line }]}>
+              <Text>{idea}</Text>
+              <Button
+                label={g.t("crewCards.keep")}
+                height={40}
+                onPress={() =>
+                  void writeCrewCard(crew.id, { id: newId(), kind, level, text: idea })
+                    .then(() => {
+                      setIdeas((list) => list.filter((x) => x !== idea));
+                      load();
+                    })
+                    .catch(offline)
+                }
+              />
+            </View>
+          ))}
+        </Panel>
+      ) : null}
 
       {isAdmin && pending.length ? (
         <Panel>

@@ -55,6 +55,51 @@ export function cardRoutes(app: FastifyInstance, ctx: Context): void {
     return { cards: rows.map(view) };
   });
 
+  /**
+   * AI-03: the admin describes a few inside jokes, the model suggests cards; nothing is saved here,
+   * the admin keeps the ones worth it through the usual route, approved straight away.
+   */
+  const generations = new RateLimiter(10, 60 * 60_000, ctx.now);
+  app.post<{ Params: { id: string } }>("/v1/crews/:id/cards/suggest", async (request) => {
+    const user = requireUser(request);
+    const { role } = await assertCrewMember(ctx, request.params.id, user.id);
+    if (role !== "admin") throw new HttpError(403, "forbidden");
+    if (!ctx.ai) throw new HttpError(503, "ai_unavailable");
+    const crew = (await ctx.db.query<{ ai_enabled: boolean }>("select ai_enabled from crews where id = $1", [request.params.id]))[0];
+    if (!crew?.ai_enabled) throw new HttpError(403, "ai_off");
+    generations.check(user.id);
+    const input = z
+      .object({ kind: z.enum(KINDS), level: z.enum(LEVELS), language: z.enum(["fr", "en"]), jokes: z.string().trim().min(10).max(600) })
+      .parse(request.body);
+    const kindHint: Record<(typeof KINDS)[number], string> = {
+      neverEver: 'endings of "Never have I ever..." (no prefix)',
+      pointBlank: "questions where everyone points at someone",
+      verdict: 'endings of "Which of the two..." (no prefix)',
+      truth: "truth questions for the player",
+      dare: "dares for the player",
+      bigDare: "short party dares",
+    };
+    const system = [
+      `You write party game cards for one group of friends, in "${input.language}". Write 5 ${kindHint[input.kind]}, level ${input.level}.`,
+      "Build on their inside jokes; vary sentence shapes and lengths; real punchlines, no stock quips.",
+      "Nothing hateful, no real names of people outside the group, nothing illegal or dangerous, no pressure to drink.",
+      "No em dashes or en dashes, no emojis. In French: tutoiement, never « vous ».",
+      'Reply with JSON only: {"cards":[string,string,string,string,string]}.',
+    ].join(" ");
+    let raw: string;
+    try {
+      raw = await ctx.ai.complete(system, input.jokes, 500);
+    } catch {
+      throw new HttpError(502, "ai_failed");
+    }
+    try {
+      const parsed = z.object({ cards: z.array(z.string().min(4).max(220)).max(8) }).parse(JSON.parse(raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1)));
+      return { cards: parsed.cards.map((c) => c.replace(/[\u2013\u2014]/g, ",").trim()) };
+    } catch {
+      throw new HttpError(502, "ai_failed");
+    }
+  });
+
   app.post<{ Params: { id: string } }>("/v1/cards/:id/review", async (request) => {
     const user = requireUser(request);
     const card = (await ctx.db.query<CardRow>("select * from crew_cards where id = $1", [uuid.parse(request.params.id)]))[0];

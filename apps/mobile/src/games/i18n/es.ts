@@ -40,6 +40,12 @@ export const es: GameMessages = {
     pending: "pendiente",
     rejected: "rechazada",
     remove: "Quitar",
+    aiTitle: "Ideas con IA",
+    aiJokes: "Las bromas de la crew",
+    aiHint: "Bastan unas palabras: un mote, un sitio, una noche.",
+    aiSuggest: "Proponer cartas",
+    keep: "Guardar",
+    aiFailed: "La IA no propuso nada. Inténtalo más tarde.",
   },
   hall: {
     title: "Cuadro de honor",

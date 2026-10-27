@@ -38,6 +38,12 @@ export const de: GameMessages = {
     pending: "wartet",
     rejected: "abgelehnt",
     remove: "Entfernen",
+    aiTitle: "Ideen mit KI",
+    aiJokes: "Die Insider der Crew",
+    aiHint: "Ein paar Worte reichen: ein Spitzname, ein Ort, ein Abend.",
+    aiSuggest: "Karten vorschlagen",
+    keep: "Behalten",
+    aiFailed: "Die KI hatte keine Idee. Versuch es später.",
   },
   hall: {
     title: "Ruhmeshalle",

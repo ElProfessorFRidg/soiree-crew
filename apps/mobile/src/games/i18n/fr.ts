@@ -38,6 +38,12 @@ export const fr = {
     pending: "en attente",
     rejected: "refusée",
     remove: "Retirer",
+    aiTitle: "Idées avec l'IA",
+    aiJokes: "Les blagues du crew",
+    aiHint: "Quelques mots sur les histoires du crew suffisent : un surnom, un lieu, une soirée.",
+    aiSuggest: "Proposer des cartes",
+    keep: "Garder",
+    aiFailed: "L'IA n'a rien proposé. Réessaie plus tard.",
   },
   hall: {
     title: "Tableau d'honneur",

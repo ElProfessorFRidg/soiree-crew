@@ -166,3 +166,28 @@ describe("crew feed (N-31)", () => {
     expect(feed.items.map((i) => i.kind)).toContain("poll");
   });
 });
+
+describe("AI card suggestions (AI-03)", () => {
+  it("lets only the admin of an opted-in crew ask for suggestions, and saves nothing", async () => {
+    await app.close();
+    app = await buildApp({
+      db,
+      sealer: new Sealer(randomBytes(32).toString("base64")),
+      live: new LiveHub(),
+      now: () => clock,
+      publicUrl: "https://crew.test",
+      hashSecret: "s",
+      ai: { name: "fake", complete: async () => '{"cards":["dormi dans le bus 42 — encore","appelé Théo par le nom du chien"]}' },
+    });
+    const { users, crewId } = await crew("jade", "malik");
+    const [jade, malik] = users as [User, User];
+    const ask = (u: User) =>
+      app.inject({ method: "POST", url: `/v1/crews/${crewId}/cards/suggest`, headers: u.auth, payload: { kind: "neverEver", level: "normal", language: "fr", jokes: "Le bus 42, le chien de Théo, la fois au karaoké" } });
+    expect((await ask(jade)).statusCode).toBe(403);
+    await app.inject({ method: "PATCH", url: `/v1/crews/${crewId}/settings`, headers: jade.auth, payload: { aiEnabled: true } });
+    expect((await ask(malik)).statusCode).toBe(403);
+    const res = (await ask(jade)).json() as { cards: string[] };
+    expect(res.cards).toEqual(["dormi dans le bus 42 , encore", "appelé Théo par le nom du chien"]);
+    expect((await db.query("select * from crew_cards")).length).toBe(0);
+  });
+});
