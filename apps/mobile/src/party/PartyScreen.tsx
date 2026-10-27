@@ -203,6 +203,8 @@ interface LevelProps {
   now: number;
 }
 
+const zeroTaps = { current: 0, last: 0 };
+
 function BacHero({ i18n, live, unit, flipUnit, size: fontSize }: LevelProps & { size: number }) {
   const theme = useTheme();
   const { estimate, ratio, rules } = live;
@@ -214,7 +216,21 @@ function BacHero({ i18n, live, unit, flipUnit, size: fontSize }: LevelProps & { 
   return (
     <Animated.View entering={FadeIn.duration(duration.enter).easing(easings.out)}>
       <View style={styles.heroRow} accessible accessibilityLabel={`${shown.value} ${i18n.t(`units.long.${unit}`)}`}>
-        <RollingNumber value={estimate.bac} format={format} size={fontSize} color={theme.amber} />
+        {/* JOY-07: ten taps on a zero say thanks (EASTER_EGGS.md). Nothing happens above zero. */}
+        <Pressable
+          disabled={estimate.bac > 0}
+          onPress={() => {
+            const now = Date.now();
+            zeroTaps.current = now - zeroTaps.last > 3_000 ? 1 : zeroTaps.current + 1;
+            zeroTaps.last = now;
+            if (zeroTaps.current === 10) {
+              haptic.confirmed();
+              showToast({ message: i18n.t("party.eggZero") });
+            }
+          }}
+        >
+          <RollingNumber value={estimate.bac} format={format} size={fontSize} color={theme.amber} />
+        </Pressable>
         {/* Only the unit switches units: a stray tap on the number must not change what it means (ADP-09). */}
         <Pressable
           accessibilityRole="button"

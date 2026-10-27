@@ -124,6 +124,12 @@ export default function SearchScreen() {
         onSubmitEditing={remember}
         maxLength={60}
       />
+      {/* JOY-07: the crew's word for cheers gets an answer (EASTER_EGGS.md). */}
+      {["tchin", "tchin tchin", "cheers", "salud", "prost", "santé", "sante", "saude", "saúde", "cin cin", "na zdorovie", "за здоровье"].includes(query.trim().toLowerCase()) ? (
+        <Text variant="h2" align="center" color={theme.amber}>
+          {i18n.t("search.eggCheers")}
+        </Text>
+      ) : null}
       {query.trim().length < 2 ? (
         <>
           {recent.length ? (

@@ -72,6 +72,7 @@ export const fr = {
     dareHint: "Pour qui veut. Un nouveau chaque soir, le même pour tout le crew.",
     waterAdded: "Verre d'eau noté.",
     homeMarked: "Le crew sait que tu es chez toi.",
+    eggZero: "Zéro pointé. Ton volant te dit merci.",
   },
   curve: {
     title: "Ta courbe",
@@ -1000,6 +1001,7 @@ export const fr = {
     ideas: "Pour commencer",
     none: "Rien trouvé, même avec une faute de frappe.",
     tapToAdd: "Toucher pour l'ajouter",
+    eggCheers: "Tchin !",
   },
   addDrink: {
     quick: "Tape ce que tu bois",

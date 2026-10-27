@@ -74,6 +74,7 @@ export const en: Messages = {
     dareHint: "For whoever wants it. A new one every night, the same for the whole crew.",
     waterAdded: "Glass of water logged.",
     homeMarked: "The crew knows you're home.",
+    eggZero: "Flat zero. Your car says thanks.",
   },
   curve: {
     title: "Your curve",
@@ -1002,6 +1003,7 @@ export const en: Messages = {
     ideas: "To start with",
     none: "Nothing found, typos included.",
     tapToAdd: "Tap to add it",
+    eggCheers: "Cheers!",
   },
   addDrink: {
     quick: "Type what you're drinking",

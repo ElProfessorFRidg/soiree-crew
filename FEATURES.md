@@ -289,7 +289,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | JOY-04 | P1 | Soirees.dc.html | build | Mood themes: the mood picked for a party (O-35) tints the Party screen, the widget and the recap. |
 | JOY-05 | P2 | Reglages.dc.html | todo | Optional sound pack (pour, clink, crown), respects the silent switch, off by default. |
 | JOY-06 | P1 | Radar.dc.html | build | Crew streak: consecutive weeks where the crew went out together (any night out counts, drinking or not), with ... |
-| JOY-07 | P1 | Reglages.dc.html | todo | Easter eggs: a handful of hidden interactions (tap the logo ten times, shake on the recap...), documented only... |
+| JOY-07 | P1 | Reglages.dc.html | build | Easter eggs: a handful of hidden interactions (tap the logo ten times, shake on the recap...), documented only... |
 | JOY-08 | P1 | Radar.dc.html | build | Milestones: 10th, 50th, 100th night out together, crew anniversary, first venue conquered. Milestones count ni... |
 | JOY-09 | P1 | Recap.dc.html | todo | Photo booth: at the end of a party, an automatic photo strip from the shared album, ready for stories. |
 | JOY-10 | P2 | Reglages.dc.html | todo | Sticker packs (iMessage / WhatsApp) made from crew avatars and moments. |

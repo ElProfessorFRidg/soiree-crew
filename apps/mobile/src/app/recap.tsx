@@ -167,6 +167,7 @@ export default function RecapScreen() {
   } | null>(null);
   const [slide, setSlide] = useState(0);
   const [replay, setReplay] = useState(0);
+  const [egg, setEgg] = useState(0);
   const [sharing, setSharing] = useState(false);
   const card = useRef<ComponentRef<typeof View>>(null);
 
@@ -320,7 +321,17 @@ export default function RecapScreen() {
   const slides = [
     <View key="figures" style={styles.slide}>
       <Text variant="label">{partyDate(recap.party.startsAt, i18n)}</Text>
-      <Text variant="h1">{recap.party.name}</Text>
+      {/* JOY-07: a long press on the party's name throws the confetti again (EASTER_EGGS.md). */}
+      <Text
+        variant="h1"
+        onLongPress={() => {
+          haptic.heavy();
+          setEgg((n) => n + 1);
+        }}
+      >
+        {recap.party.name}
+      </Text>
+      {egg > 0 ? <Confetti replay={egg} /> : null}
       {figures}
       <Text variant="label">{i18n.t("recap.whoWasThere")}</Text>
       <View>

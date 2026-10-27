@@ -73,6 +73,7 @@ export const es: Messages = {
     dareHint: "Para quien quiera. Uno nuevo cada noche, el mismo para toda la crew.",
     waterAdded: "Vaso de agua apuntado.",
     homeMarked: "La crew sabe que estás en casa.",
+    eggZero: "Cero absoluto. Tu coche te da las gracias.",
   },
   curve: {
     title: "Tu curva",
@@ -1001,6 +1002,7 @@ export const es: Messages = {
     ideas: "Para empezar",
     none: "No hay nada, ni con errores de tecleo.",
     tapToAdd: "Toca para añadirla",
+    eggCheers: "¡Salud!",
   },
   addDrink: {
     quick: "Escribe lo que bebes",
