@@ -38,6 +38,7 @@ import { UnwellBanner } from "./UnwellBanner";
 import { useVenueData } from "@/server/venueData";
 import { RollingNumber } from "./RollingNumber";
 import { DareOfTheNight } from "./DareOfTheNight";
+import { variantKey } from "@/i18n/variants";
 
 function greetingKey(hour: number) {
   if (hour < 5) return "greeting.lateNight" as const;
@@ -482,7 +483,7 @@ function LevelZero(props: LevelProps) {
     <>
       <View style={styles.header}>
         <View style={styles.flex}>
-          <Text variant="small">{i18n.t(greetingKey(new Date(now).getHours()))}</Text>
+          <Text variant="small">{i18n.t(variantKey(greetingKey(new Date(now).getHours()), new Date(now).toDateString()))}</Text>
           <PartyTitle i18n={i18n} />
         </View>
         <IconButton icon="clock" accessibilityLabel={i18n.t("party.history")} onPress={() => router.push("/history")} />

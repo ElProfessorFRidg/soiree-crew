@@ -4,6 +4,7 @@ import { estimateBac, type BacEstimate, type DrinkIntake } from "@crew/bac";
 import { afterQuietHours, breathRatio, countryRules, formatBacValue, type UserPreferences } from "@crew/units";
 import { createTranslator, type Translator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
+import { variantKey } from "@/i18n/variants";
 import { useAppStore } from "@/state/store";
 
 const MINUTE_MS = 60_000;
@@ -158,8 +159,8 @@ export async function refreshReminders(): Promise<void> {
     if (at < backToZero) {
       const body =
         lastWater > 0
-          ? i18n.t("reminders.waterSince", { minutes: Math.round((at - lastWater) / MINUTE_MS) })
-          : i18n.t("reminders.waterNone");
+          ? i18n.t(variantKey("reminders.waterSince", String(at)), { minutes: Math.round((at - lastWater) / MINUTE_MS) })
+          : i18n.t(variantKey("reminders.waterNone", String(at)));
       await schedule(WATER_ID, at, i18n.t("reminders.waterTitle"), body, WATER_CATEGORY);
     } else {
       await Notifications.cancelScheduledNotificationAsync(WATER_ID).catch(() => undefined);

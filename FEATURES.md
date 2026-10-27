@@ -457,7 +457,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | SLOP-08 | P0 | Backstage | build | Design: `DESIGN.md` explicitly bans the <design_patterns> tells. If the stack allows it, an automated detector... |
 | SLOP-09 | P1 | Backstage | build | Deck lint (SLOP.md R-20): opening cap, length spread, near duplicates, moralising cards, expiry of topical cards. Source: voice.md §5. |
 | SLOP-10 | P1 | Backstage | build | Glossary synonym lint (SLOP.md R-19) generated from GLOSSARY.md. Source: voice.md §5. |
-| SLOP-11 | P1 | Backstage | proposed | Copy variants: every recurring line (JOY-02 greetings, recurring notifications) has at least 3 written variants and a no-repeat rule per user. Source: voice.md §5. |
+| SLOP-11 | P1 | Backstage | build | Copy variants: every recurring line (JOY-02 greetings, recurring notifications) has at least 3 written variants and a no-repeat rule per user. Source: voice.md §5. |
 | SLOP-12 | P0 | Backstage | build | Native anti-slop lint for UI code (gradient text, glow, nested cards, raw hex, emoji icons, pulsing dots without state), because the Impeccable detector reads HTML and CSS only. Renumbered from skills.md SLOP-09. Source: skills.md §1, §5. |
 
 ## Sync and feedback

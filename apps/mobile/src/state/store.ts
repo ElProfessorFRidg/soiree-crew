@@ -60,6 +60,8 @@ export interface AppState {
   soundsOn: boolean;
   /** MOT-15: vibrations, on by default, switched separately from sounds. */
   hapticsOn: boolean;
+  /** SLOP-11: the last variant shown of each recurring line, and for which occasion. */
+  copyVariants: Record<string, { index: number; occasion: string }>;
   /** QOL-32: when the logging nudge was last answered. */
   nudgeDismissedAt: number | null;
   /** QOL-30: party reminders muted until this morning time. */
@@ -95,6 +97,7 @@ export const useAppStore = create<AppState>()(
       barHave: [],
       soundsOn: false,
       hapticsOn: true,
+      copyVariants: {},
       nudgeDismissedAt: null,
       remindersMutedUntil: null,
     }),
