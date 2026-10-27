@@ -1004,6 +1004,13 @@ export const pt: Messages = {
     tapToAdd: "Toca para adicionar",
     eggCheers: "Saúde!",
   },
+  strip: {
+    title: "Tira de fotos",
+    open: "Fazer a tira de fotos",
+    share: "Partilhar a tira",
+    another: "Outra mistura",
+    empty: "O álbum precisa de pelo menos duas fotos.",
+  },
   addDrink: {
     quick: "Escreve o que estás a beber",
     quickPlaceholder: "2 cocktails e 1 shot",

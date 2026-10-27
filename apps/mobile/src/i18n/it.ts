@@ -1004,6 +1004,13 @@ export const it: Messages = {
     tapToAdd: "Tocca per aggiungerla",
     eggCheers: "Cin cin!",
   },
+  strip: {
+    title: "Striscia di foto",
+    open: "Fai la striscia di foto",
+    share: "Condividi la striscia",
+    another: "Un altro mix",
+    empty: "Servono almeno due foto nell'album.",
+  },
   addDrink: {
     quick: "Scrivi cosa bevi",
     quickPlaceholder: "2 pinte e uno shot",

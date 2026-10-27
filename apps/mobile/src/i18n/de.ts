@@ -1003,6 +1003,13 @@ export const de: Messages = {
     tapToAdd: "Tippen zum Hinzufügen",
     eggCheers: "Prost!",
   },
+  strip: {
+    title: "Fotostreifen",
+    open: "Fotostreifen machen",
+    share: "Streifen teilen",
+    another: "Andere Auswahl",
+    empty: "Das Album braucht mindestens zwei Fotos.",
+  },
   addDrink: {
     quick: "Tipp ein, was du trinkst",
     quickPlaceholder: "2 Bier und ein Shot",

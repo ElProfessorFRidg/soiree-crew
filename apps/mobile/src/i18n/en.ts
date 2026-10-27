@@ -1005,6 +1005,13 @@ export const en: Messages = {
     tapToAdd: "Tap to add it",
     eggCheers: "Cheers!",
   },
+  strip: {
+    title: "Photo strip",
+    open: "Make the photo strip",
+    share: "Share the strip",
+    another: "Another mix",
+    empty: "The album needs at least two photos.",
+  },
   addDrink: {
     quick: "Type what you're drinking",
     quickPlaceholder: "2 pints and a shot",

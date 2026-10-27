@@ -1003,6 +1003,13 @@ export const fr = {
     tapToAdd: "Toucher pour l'ajouter",
     eggCheers: "Tchin !",
   },
+  strip: {
+    title: "Bande photo",
+    open: "Faire la bande photo",
+    share: "Partager la bande",
+    another: "Un autre mélange",
+    empty: "Il faut au moins deux photos dans l'album.",
+  },
   addDrink: {
     quick: "Tape ce que tu bois",
     quickPlaceholder: "2 pintes et un shot",

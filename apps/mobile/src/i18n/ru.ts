@@ -1029,6 +1029,13 @@ export const ru: Messages = {
     tapToAdd: "Нажми, чтобы добавить",
     eggCheers: "За здоровье!",
   },
+  strip: {
+    title: "Фотополоса",
+    open: "Собрать фотополосу",
+    share: "Поделиться полосой",
+    another: "Другой набор",
+    empty: "В альбоме нужно хотя бы две фотографии.",
+  },
   addDrink: {
     quick: "Напиши, что пьёшь",
     quickPlaceholder: "2 пинты и шот",

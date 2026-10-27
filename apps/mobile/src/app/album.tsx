@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, Image, Modal, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
 import { radius } from "@crew/design-tokens";
@@ -53,6 +53,9 @@ export default function AlbumScreen() {
         <Button label={i18n.t("album.take")} icon="camera" height={52} style={styles.flex} onPress={() => add("camera")} />
         <Button label={i18n.t("album.pick")} icon="image" variant="secondary" height={52} style={styles.flex} onPress={() => add("library")} />
       </View>
+      {photos.length >= 2 ? (
+        <Button label={i18n.t("strip.open")} icon="sparkdot" variant="outline" height={48} onPress={() => router.push({ pathname: "/photo-strip", params: { partyId } })} />
+      ) : null}
       {photos.length ? <Text variant="label">{i18n.plural("album.count", photos.length)}</Text> : null}
       {!photos.length && !pending.length ? <Text>{i18n.t("album.empty")}</Text> : null}
 
