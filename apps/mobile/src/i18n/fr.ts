@@ -298,6 +298,8 @@ export const fr = {
     credentialsSave: "Enregistrer",
     credentialsSaved: "C'est enregistré.",
     credentialsWrong: "Mot de passe actuel incorrect.",
+    scanLink: "Scanner le code de l'autre téléphone",
+    linkHistory: "Les discussions passées ne suivent que si une sauvegarde existe (Discussions, Sauvegarde).",
   },
   bars: {
     tab: "Bars",

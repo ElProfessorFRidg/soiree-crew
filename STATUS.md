@@ -4,8 +4,8 @@ Generated from FEATURES.md on 2026-10-27 by `pnpm status`. Edit FEATURES.md, not
 
 | Status | Count |
 |---|---|
-| Built | 291 |
-| Partly built | 6 |
+| Built | 292 |
+| Partly built | 5 |
 | To do | 6 |
 | Proposed (not in the brief yet) | 6 |
 | Total | 309 |
@@ -17,7 +17,6 @@ Generated from FEATURES.md on 2026-10-27 by `pnpm status`. Edit FEATURES.md, not
 - **QOL-22** (P2, Everyday polish): Last ride home: after midnight, the last night bus / metro departures near the venue on the Party screen, when
 - **QOL-27** (P0, Everyday polish): Discreet lock screen: by default lock screen, Live Activity, widget and notifications show no BAC figure or drink count (level icon and time to zero only); numb
 - **QOL-29** (P0, Everyday polish): Invite survives the install: a friend who installs from an invite link lands in the right crew or party (Play Install Referrer; invite code plus system Paste bu
-- **MSG-11** (P1, Messaging): Linking a new device: QR scan from an existing device, "new device linked" notice to the owner's other devices, plain warning that history does not follow witho
 
 ## To do
 
@@ -66,7 +65,7 @@ Generated from FEATURES.md on 2026-10-27 by `pnpm status`. Edit FEATURES.md, not
 - Leaderboards: RANK-01, RANK-02, RANK-03, RANK-04, RANK-05, RANK-06, RANK-07, RANK-08, RANK-09
 - Community: COM-01, COM-02, COM-03, COM-04, COM-05, COM-06, COM-07, COM-08, COM-09, COM-10, COM-11
 - Profiles and visibility: PROF-01, PROF-02, PROF-03, PROF-04, PROF-05, PROF-06, PROF-07, PROF-08, PROF-09, PROF-10
-- Messaging: MSG-01, MSG-02, MSG-03, MSG-04, MSG-05, MSG-06, MSG-07, MSG-08, MSG-09, MSG-10, MSG-12
+- Messaging: MSG-01, MSG-02, MSG-03, MSG-04, MSG-05, MSG-06, MSG-07, MSG-08, MSG-09, MSG-10, MSG-11, MSG-12
 - Anti-cheat: AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09, AC-10, AC-11, AC-12, AC-15
 - AI features: AI-01, AI-02, AI-03
 - Anti-slop (process): SLOP-01, SLOP-02, SLOP-03, SLOP-04, SLOP-05, SLOP-07, SLOP-08, SLOP-09, SLOP-10, SLOP-11, SLOP-12

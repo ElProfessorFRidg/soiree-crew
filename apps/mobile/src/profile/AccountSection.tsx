@@ -1,3 +1,6 @@
+import QRCode from "react-native-qrcode-svg";
+import { palette } from "@crew/design-tokens";
+import { linkValue } from "@/crew/LinkScanner";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
@@ -244,7 +247,16 @@ export function AccountSection() {
         <>
           <Text>{i18n.t("account.signedInAs", { name: session.displayName, username: session.username })}</Text>
           <Text variant="small">{i18n.t("account.server", { url: session.url })}</Text>
-          {transfer ? <Text variant="h3">{i18n.t("account.transferCode", { code: transfer })}</Text> : null}
+          {transfer ? (
+            <View style={{ alignItems: "center", gap: 8 }}>
+              {/* MSG-11: the new phone scans this; typing the code still works. */}
+              <View style={{ padding: 12, borderRadius: 12, backgroundColor: palette.dark.text }}>
+                <QRCode value={linkValue(session.url, transfer)} size={168} backgroundColor={palette.dark.text} color={palette.accent.onAccent} />
+              </View>
+              <Text variant="h3">{i18n.t("account.transferCode", { code: transfer })}</Text>
+              <Text variant="small">{i18n.t("account.linkHistory")}</Text>
+            </View>
+          ) : null}
           <Button
             label={i18n.t("account.addDevice")}
             variant="secondary"

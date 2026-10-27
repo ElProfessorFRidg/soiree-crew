@@ -1,4 +1,5 @@
 import Constants from "expo-constants";
+import { LinkScanner } from "./LinkScanner";
 import { PublicServers } from "./PublicServers";
 import { useRef, useState, type ComponentRef } from "react";
 import { View, type TextInput } from "react-native";
@@ -238,6 +239,12 @@ export function ConnectServer() {
         ) : (
           <>
             <Text variant="small">{i18n.t("crew.haveAccount")}</Text>
+            <LinkScanner
+              onLink={(link) => {
+                setAddress(link.url);
+                setCode(link.code);
+              }}
+            />
             <Field
               label={i18n.t("crew.transferCode")}
               value={code}

@@ -299,6 +299,8 @@ export const pt: Messages = {
     credentialsSave: "Guardar",
     credentialsSaved: "Guardado.",
     credentialsWrong: "A palavra-passe atual está errada.",
+    scanLink: "Ler o código do outro telemóvel",
+    linkHistory: "As conversas antigas só vêm se houver uma cópia (Conversas, Cópia).",
   },
   bars: {
     tab: "Bares",

@@ -415,7 +415,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | MSG-08 | P1 | Messages.dc.html | build | New phone and backups: optional encrypted backup protected by a recovery key or passphrase only the user knows... |
 | MSG-09 | P1 | Messages.dc.html | build | Search in conversations runs on the device only. AI features (<ai_features>) never receive chat content unless... |
 | MSG-10 | P1 | Messages.dc.html | build | Chat basics: replies, reactions, mentions, voice notes with a big record button (adaptive levels 2 and 3), rea... |
-| MSG-11 | P1 | Backstage (near Messages.dc.html) | partial | Linking a new device: QR scan from an existing device, "new device linked" notice to the owner's other devices, plain warning that history does not follow without a backup. Source: security.md §2.2, §5. |
+| MSG-11 | P1 | Backstage (near Messages.dc.html) | build | Linking a new device: QR scan from an existing device, "new device linked" notice to the owner's other devices, plain warning that history does not follow without a backup. Source: security.md §2.2, §5. |
 | MSG-12 | P1 | Backstage (near Messages.dc.html) | build | Group conversation info: members, roles, leave, mute, group key state. Renumbered from design-b MSG-11. Source: design-b.md §2.7 G-12, §5. |
 
 ## Anti-cheat

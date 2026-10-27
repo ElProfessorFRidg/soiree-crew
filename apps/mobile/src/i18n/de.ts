@@ -298,6 +298,8 @@ export const de: Messages = {
     credentialsSave: "Speichern",
     credentialsSaved: "Gespeichert.",
     credentialsWrong: "Das aktuelle Passwort stimmt nicht.",
+    scanLink: "Code des anderen Handys scannen",
+    linkHistory: "Alte Chats kommen nur mit, wenn es ein Backup gibt (Chats, Backup).",
   },
   bars: {
     tab: "Bars",

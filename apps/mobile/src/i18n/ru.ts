@@ -299,6 +299,8 @@ export const ru: Messages = {
     credentialsSave: "Сохранить",
     credentialsSaved: "Сохранено.",
     credentialsWrong: "Текущий пароль неверный.",
+    scanLink: "Сканировать код другого телефона",
+    linkHistory: "Старые чаты переедут, только если есть копия (Чаты, Копия).",
   },
   bars: {
     tab: "Бары",

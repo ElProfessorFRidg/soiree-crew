@@ -300,6 +300,8 @@ export const en: Messages = {
     credentialsSave: "Save",
     credentialsSaved: "Saved.",
     credentialsWrong: "Current password is wrong.",
+    scanLink: "Scan the other phone's code",
+    linkHistory: "Past chats only follow if a backup exists (Chats, Backup).",
   },
   bars: {
     tab: "Bars",

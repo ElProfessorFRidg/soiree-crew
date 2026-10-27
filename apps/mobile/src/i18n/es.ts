@@ -299,6 +299,8 @@ export const es: Messages = {
     credentialsSave: "Guardar",
     credentialsSaved: "Guardado.",
     credentialsWrong: "La contraseña actual no es correcta.",
+    scanLink: "Escanear el código del otro móvil",
+    linkHistory: "Los chats anteriores solo siguen si hay una copia (Chats, Copia).",
   },
   bars: {
     tab: "Bares",
