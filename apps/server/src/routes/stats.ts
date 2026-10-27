@@ -4,6 +4,7 @@ import { assertCrewMember, HttpError, requireUser, type Context } from "../conte
 import { byMonth, byWeekday, crewStreak, milestones } from "../stats";
 import { crewTimeZone } from "../territory";
 import { nightOf, offsetMinutes } from "../time";
+import { seasonBounds } from "@crew/territory";
 
 /** RANK-09: drinking-based boards follow the same flag as the main leaderboard. */
 const drinkingBoards = () => (process.env.DRINKING_LEADERBOARD ?? "on") !== "off";
@@ -126,6 +127,87 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
         if ((board?.venuesRuled ?? 0) >= 1) badges.push("boss");
         return { userId: m.user_id, name: m.display_name, joinedAt: m.joined_at, organised: m.organised, homeSafe: m.home_safe, badges };
       }),
+    };
+  });
+
+  /**
+   * N-15: the crew's month or year as a story. Facts about the crew together, never a drinking
+   * ranking: drink and water totals only show where the crew keeps the leaderboard on.
+   */
+  app.get<{ Params: { id: string }; Querystring: { period?: string; key?: string } }>("/v1/crews/:id/wrapped", async (request) => {
+    const user = requireUser(request);
+    await assertCrewMember(ctx, request.params.id, user.id);
+    const crewId = request.params.id;
+    const timeZone = await crewTimeZone(ctx.db, crewId);
+    const now = ctx.now();
+    const period = z.enum(["month", "year"]).default("month").parse(request.query.period);
+    const thisMonth = nightOf(now, timeZone).slice(0, 7);
+    const key = (period === "month" ? z.string().regex(/^\d{4}-\d{2}$/) : z.string().regex(/^\d{4}$/))
+      .default(period === "month" ? thisMonth : thisMonth.slice(0, 4))
+      .parse(request.query.key);
+    const offset = offsetMinutes(Date.parse(`${period === "month" ? key : `${key}-06`}-15T12:00:00Z`), timeZone);
+    const from = seasonBounds(period === "month" ? key : `${key}-01`, offset).start;
+    const to = period === "month" ? seasonBounds(key, offset).end : seasonBounds(`${Number(key) + 1}-01`, offset).start;
+
+    const parties = await ctx.db.query<{ id: string; name: string; starts_at: number; going: number }>(
+      `select p.id, p.name, p.starts_at, (select count(*)::int from party_members m where m.party_id = p.id and m.response = 'going') as going
+       from parties p where p.crew_id = $1 and p.starts_at >= $2 and p.starts_at < $3 and p.starts_at <= $4 order by p.starts_at`,
+      [crewId, from, to, now],
+    );
+    const together = parties.filter((p) => p.going >= 2);
+    const nights = [...new Set(together.map((p) => nightOf(p.starts_at, timeZone)))];
+    const ids = together.map((p) => p.id);
+    const presence = ids.length
+      ? await ctx.db.query<{ user_id: string; display_name: string; n: number; home: number }>(
+          `select m.user_id, u.display_name, count(*)::int as n, count(m.home_safe_at)::int as home from party_members m join users u on u.id = m.user_id
+           where m.party_id = any($1::uuid[]) and m.response = 'going' group by m.user_id, u.display_name order by n desc, u.display_name`,
+          [ids],
+        )
+      : [];
+    const venues = await ctx.db.query<{ name: string; visits: number }>(
+      `select v.name, count(*)::int as visits from check_ins c join venues v on v.id = c.venue_id and v.crew_id = $1 and v.kind <> 'home'
+       join crew_members m on m.crew_id = $1 and m.user_id = c.user_id
+       where c.verdict = 'accepted' and c.private = false and c.at >= $2 and c.at < $3 group by v.name order by visits desc, v.name`,
+      [crewId, from, to],
+    );
+    const quote = ids.length
+      ? (
+          await ctx.db.query<{ text: string; said_by: string | null; votes: number }>(
+            `select q.text, q.said_by, (select count(*)::int from party_quote_votes v where v.quote_id = q.id) as votes
+             from party_quotes q where q.party_id = any($1::uuid[]) order by votes desc, q.created_at limit 1`,
+            [ids],
+          )
+        )[0]
+      : undefined;
+    const crew = (await ctx.db.query<{ leaderboard_enabled: boolean }>("select leaderboard_enabled from crews where id = $1", [crewId]))[0]!;
+    const showDrinks = drinkingBoards() && crew.leaderboard_enabled && ids.length > 0;
+    const totals = showDrinks
+      ? (
+          await ctx.db.query<{ drinks: number; water: number }>(
+            `select (select count(*)::int from drinks where party_id = any($1::uuid[]) and deleted_at is null and kind <> 'soft') as drinks,
+                    (select count(*)::int from water where party_id = any($1::uuid[]) and deleted_at is null) as water`,
+            [ids],
+          )
+        )[0]
+      : undefined;
+    const weekdays = byWeekday(nights);
+    const busiest = weekdays.indexOf(Math.max(...weekdays));
+    const biggest = [...together].sort((a, b) => b.going - a.going || a.starts_at - b.starts_at)[0];
+    const nameOf = async (id: string | null) =>
+      id ? ((await ctx.db.query<{ display_name: string }>("select display_name from users where id = $1", [id]))[0]?.display_name ?? null) : null;
+    return {
+      period,
+      key,
+      nights: nights.length,
+      parties: together.length,
+      venuesVisited: venues.length,
+      topVenue: venues[0] ? { name: venues[0].name, visits: venues[0].visits } : null,
+      regulars: presence.slice(0, 3).map((p) => ({ userId: p.user_id, name: p.display_name, nights: p.n })),
+      homeSafe: presence.reduce((sum, p) => sum + p.home, 0),
+      busiestWeekday: nights.length ? busiest + 1 : null,
+      biggestNight: biggest ? { name: biggest.name, at: biggest.starts_at, people: biggest.going } : null,
+      quote: quote ? { text: quote.text, saidBy: await nameOf(quote.said_by), votes: quote.votes } : null,
+      ...(totals ? { drinks: totals.drinks, water: totals.water } : {}),
     };
   });
 

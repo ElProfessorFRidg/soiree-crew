@@ -162,6 +162,7 @@ export default function RootLayout() {
               <Stack.Screen name="privacy" />
               <Stack.Screen name="polls" />
               <Stack.Screen name="new-poll" />
+              <Stack.Screen name="wrapped" />
               <Stack.Screen name="morning" options={{ animation: "fade" }} />
               <Stack.Screen name="quick/[action]" options={{ animation: "none" }} />
               <Stack.Screen name="sos" options={{ presentation: "fullScreenModal", animation: "fade" }} />

@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useT, type Translator } from "@/i18n";
@@ -7,6 +7,7 @@ import { fetchCrewStats, type CrewBoardRow, type CrewStats } from "@/server/stat
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
+import { Button } from "@/ui/Button";
 import { Panel, Tag } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { SkeletonRows } from "@/ui/Skeleton";
@@ -83,6 +84,9 @@ export default function CrewStatsScreen() {
   return (
     <Screen back title={i18n.t("crewStats.title")} onRefresh={load}>
       {stats.totalNights === 0 ? <Text>{i18n.t("crewStats.empty")}</Text> : null}
+      {stats.totalNights > 0 ? (
+        <Button label={i18n.t("wrapped.open")} icon="sparkdot" variant="secondary" height={52} onPress={() => router.push({ pathname: "/wrapped", params: { crewId } })} />
+      ) : null}
 
       <Panel>
         <Numeral size={48} color={theme.amber}>

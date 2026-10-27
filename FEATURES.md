@@ -198,7 +198,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 |---|---|---|---|---|
 | N-13 | P1 | Profil.dc.html | build | Each member's drinking profile: favourite drinks, usual pace, time of first drink, usual leaving time. |
 | N-14 | P1 | Profil.dc.html | build | Crew habits: nights and hours out, frequency, venues, seasonality, calendar heatmap. |
-| N-15 | P1 | Profil.dc.html | todo | Monthly recap + yearly crew "Wrapped" (Spotify Wrapped spirit), as shareable stories. |
+| N-15 | P1 | Profil.dc.html | build | Monthly recap + yearly crew "Wrapped" (Spotify Wrapped spirit), as shareable stories. |
 | N-16 | P1 | Soiree.dc.html | todo | Detailed charts (O-81) filterable by period, venue, drink type, person. |
 | N-17 | P2 | Reglages.dc.html | build | Personal data export (CSV / JSON) and selective deletion. |
 

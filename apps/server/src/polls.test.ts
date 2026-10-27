@@ -121,3 +121,34 @@ describe("crew cards (N-33)", () => {
     expect(own.json()).toEqual({ status: "approved" });
   });
 });
+
+describe("crew wrapped (N-15)", () => {
+  it("sums up the month: nights together, regulars, the biggest night", async () => {
+    const { users, crewId } = await crew("jade", "malik");
+    const [jade, malik] = users as [User, User];
+    const partyId = randomUUID();
+    await app.inject({
+      method: "POST",
+      url: "/v1/parties",
+      headers: jade.auth,
+      payload: { id: partyId, crewId, name: "Mercredi", mood: "party", kind: "party", startsAt: clock - 2 * HOUR, endsAt: clock + 4 * HOUR },
+    });
+    await app.inject({ method: "POST", url: `/v1/parties/${partyId}/response`, headers: malik.auth, payload: { response: "going" } });
+    const wrapped = (await app.inject({ method: "GET", url: `/v1/crews/${crewId}/wrapped?period=month&key=2026-11`, headers: malik.auth })).json() as {
+      nights: number;
+      regulars: { name: string; nights: number }[];
+      biggestNight: { name: string; people: number } | null;
+      busiestWeekday: number | null;
+      drinks?: number;
+    };
+    expect(wrapped.nights).toBe(1);
+    expect(wrapped.regulars.map((r) => r.nights)).toEqual([1, 1]);
+    expect(wrapped.biggestNight).toMatchObject({ name: "Mercredi", people: 2 });
+    expect(wrapped.busiestWeekday).toBe(3);
+    expect(wrapped.drinks).toBe(0);
+    const year = (await app.inject({ method: "GET", url: `/v1/crews/${crewId}/wrapped?period=year&key=2026`, headers: malik.auth })).json() as { nights: number };
+    expect(year.nights).toBe(1);
+    const october = (await app.inject({ method: "GET", url: `/v1/crews/${crewId}/wrapped?period=month&key=2026-10`, headers: malik.auth })).json() as { nights: number };
+    expect(october.nights).toBe(0);
+  });
+});
