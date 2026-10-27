@@ -143,3 +143,21 @@ describe("crew and venue stats (N-12, N-14, JOY-06, JOY-08, RANK-05)", () => {
     expect(venue).toMatchObject({ visits: 1, people: 1, nights: 1 });
   });
 });
+
+describe("shopping list (N-32)", () => {
+  it("adds, claims, ticks and removes items for the party's crew only", async () => {
+    const { users, partyId } = await crewWithParty("jade", "malik");
+    const [jade, malik] = users as [User, User];
+    const stranger = await account("stranger");
+    const id = randomUUID();
+    const post = (u: User, payload: Record<string, unknown>) => app.inject({ method: "POST", url: `/v1/parties/${partyId}/items`, headers: u.auth, payload });
+    expect((await post(jade, { id, label: "Glaçons" })).statusCode).toBe(201);
+    await post(malik, { id, claim: true });
+    await post(malik, { id, done: true });
+    const list = (await app.inject({ method: "GET", url: `/v1/parties/${partyId}/items`, headers: jade.auth })).json() as { items: { claimedBy: string; done: boolean }[] };
+    expect(list.items).toEqual([expect.objectContaining({ claimedBy: malik.id, done: true })]);
+    expect((await post(stranger, { id: randomUUID(), label: "Chips" })).statusCode).toBe(404);
+    await post(jade, { id, remove: true });
+    expect(((await app.inject({ method: "GET", url: `/v1/parties/${partyId}/items`, headers: jade.auth })).json() as { items: unknown[] }).items).toEqual([]);
+  });
+});

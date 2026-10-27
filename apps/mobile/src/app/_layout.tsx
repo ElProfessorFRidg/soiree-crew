@@ -149,6 +149,7 @@ export default function RootLayout() {
               <Stack.Screen name="reports" />
               <Stack.Screen name="album" />
               <Stack.Screen name="crew-stats" />
+              <Stack.Screen name="items" />
               <Stack.Screen name="morning" options={{ animation: "fade" }} />
               <Stack.Screen name="sos" options={{ presentation: "fullScreenModal", animation: "fade" }} />
             </Stack>

@@ -315,6 +315,14 @@ function CurrentVenueRow({ i18n }: { i18n: Translator }) {
       ) : null}
       {live ? (
         <Row
+          title={i18n.t("items.open")}
+          leading={<Icon name="check" color={theme.textMuted} />}
+          trailing={<Icon name="chev" color={theme.textMuted} />}
+          onPress={() => router.push({ pathname: "/items", params: { partyId: live.party.id } })}
+        />
+      ) : null}
+      {live ? (
+        <Row
           title={i18n.t("album.open")}
           leading={<Icon name="camera" color={theme.textMuted} />}
           trailing={<Icon name="chev" color={theme.textMuted} />}

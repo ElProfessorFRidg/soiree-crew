@@ -31,7 +31,7 @@ function atMinutes(dayStart: Date, minutes: number): number {
 export default function NewPartyScreen() {
   const i18n = useT();
   const crews = useCrewData((state) => state.crews);
-  const params = useLocalSearchParams<{ outCallId?: string; crewId?: string }>();
+  const params = useLocalSearchParams<{ outCallId?: string; crewId?: string; name?: string }>();
   const hourCycle = useAppStore((state) => state.preferences.hourCycle);
   const boundary = useAppStore((state) => state.preferences.dayBoundaryHour);
   // QOL-02: before the day boundary, "tonight" is the night already under way.
@@ -44,7 +44,7 @@ export default function NewPartyScreen() {
   const minutesNow = Math.floor((Date.now() - nightBase) / 60_000);
   const [crewId, setCrewId] = useState(params.crewId ?? crews[0]?.id ?? "");
   const [mood, setMood] = useState<PartyMood>("party");
-  const [name, setName, clearName] = useDraft("new-party:name");
+  const [name, setName, clearName] = useDraft("new-party:name", params.name ?? "");
   const [kind, setKind] = useState<"party" | "trip">("party");
   const [dayOffset, setDayOffset] = useState(0);
   // Minutes after midnight of the start day; the end may run past midnight.

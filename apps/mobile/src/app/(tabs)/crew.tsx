@@ -29,6 +29,7 @@ import { usePendingInvite } from "@/server/pendingInvite";
 import { ScalePressable } from "@/ui/Pressable";
 import { refreshRadar } from "@/server/radarData";
 import { serverMessage } from "@/server/errors";
+import { StartHereBanner } from "@/crew/StartHereBanner";
 
 function errorMessage(error: unknown, i18n: Translator): string {
   if (error instanceof ApiError && error.failure.kind === "http") {
@@ -104,6 +105,7 @@ function CrewCard({ crew }: { crew: Crew }) {
 
   return (
     <Panel>
+      <StartHereBanner crew={crew} />
       <View style={styles.crewHead}>
         <View style={styles.flex}>
           <Text variant="h2">{crew.name}</Text>

@@ -193,6 +193,46 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
     };
   });
 
+  /** N-32: the party's shopping list, open to its crew. */
+  app.get<{ Params: { id: string } }>("/v1/parties/:id/items", async (request) => {
+    const user = requireUser(request);
+    const party = await loadPartyForMember(ctx, request.params.id, user.id);
+    const rows = await ctx.db.query<{ id: string; label: string; added_by: string; claimed_by: string | null; done: boolean }>(
+      "select id, label, added_by, claimed_by, done from party_items where party_id = $1 order by created_at",
+      [party.id],
+    );
+    return { items: rows.map((r) => ({ id: r.id, label: r.label, addedBy: r.added_by, claimedBy: r.claimed_by, done: r.done })) };
+  });
+
+  /** Add an item, or change one: take it ("I bring it"), let it go, tick it, or remove it. */
+  app.post<{ Params: { id: string } }>("/v1/parties/:id/items", async (request, reply) => {
+    const user = requireUser(request);
+    const party = await loadPartyForMember(ctx, request.params.id, user.id);
+    const input = z
+      .object({
+        id: z.string().uuid(),
+        label: z.string().trim().min(1).max(60).optional(),
+        claim: z.boolean().optional(),
+        done: z.boolean().optional(),
+        remove: z.boolean().optional(),
+      })
+      .parse(request.body);
+    const existing = (await ctx.db.query<{ party_id: string; added_by: string }>("select party_id, added_by from party_items where id = $1", [input.id]))[0];
+    if (existing && existing.party_id !== party.id) throw new HttpError(404, "not_found");
+    if (!existing) {
+      if (!input.label) throw new HttpError(400, "invalid");
+      await ctx.db.query("insert into party_items (id, party_id, label, added_by, created_at) values ($1, $2, $3, $4, $5)", [input.id, party.id, input.label, user.id, ctx.now()]);
+    } else if (input.remove) {
+      await ctx.db.query("delete from party_items where id = $1", [input.id]);
+    } else {
+      if (input.claim !== undefined) await ctx.db.query("update party_items set claimed_by = $2 where id = $1", [input.id, input.claim ? user.id : null]);
+      if (input.done !== undefined) await ctx.db.query("update party_items set done = $2 where id = $1", [input.id, input.done]);
+    }
+    const members = await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1 and response <> 'declined'", [party.id]);
+    ctx.live.notify(members.map((m) => m.user_id), { type: "party.changed", partyId: party.id });
+    return reply.status(existing ? 200 : 201).send({ ok: true });
+  });
+
   /** N-11: the crew votes on where to go next; everyone sees the tally. */
   app.get<{ Params: { id: string } }>("/v1/parties/:id/where-to", async (request) => {
     const user = requireUser(request);

@@ -237,7 +237,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 |---|---|---|---|---|
 | N-30 | P0 | Systeme.dc.html | build | Several crews per user, roles (admin / member), invite by link or QR, clean invitation web page when the app i... |
 | N-31 | P1 | Radar.dc.html | todo | Crew feed: activity, reactions, mentions, with grouped digests instead of spam. |
-| N-32 | P1 | Bar.dc.html | todo | Shared shopping list for a party (who brings what), can be generated from the cocktails picked in the Bar. |
+| N-32 | P1 | Bar.dc.html | build | Shared shopping list for a party (who brings what), can be generated from the cocktails picked in the Bar. |
 | N-33 | P1 | Jeux.dc.html | todo | Crew-made cards in the games (inside jokes, home-made questions), moderated by the admin. |
 | N-34 | P1 | Profil.dc.html | todo | Crew titles and seniority; badges that also reward organising, hydration, designated driving, getting home saf... |
 | N-35 | P1 | Reglages.dc.html | build | Notification centre with fine per-type settings and quiet hours. |
@@ -262,7 +262,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-14 | P0 | Backstage | build | Navigation without traps: Android back and iOS swipe-back work everywhere, sheets close with a swipe, the app ... |
 | QOL-15 | P1 | Arrivee.dc.html | todo | Try before signing up: games and the Bar work without an account; sign-up is asked only when the user needs a ... |
 | QOL-16 | P1 | Soirees.dc.html | build | Defaults learned from habits: usual party end time, usual venue, usual drinks first in quick add, the friends ... |
-| QOL-17 | P1 | Soirees.dc.html | todo | Suggestions that save taps: when 3+ crew members check in at the same venue, offer to start a party; when the ... |
+| QOL-17 | P1 | Soirees.dc.html | build | Suggestions that save taps: when 3+ crew members check in at the same venue, offer to start a party; when the ... |
 | QOL-18 | P1 | Securite.dc.html | build | The user's own apps: directions in Apple Maps, Google Maps or Waze, rides in Uber, Bolt or local taxi apps, ch... |
 | QOL-19 | P1 | Argent.dc.html | build | Long-press copies what people copy (IBAN, codes, addresses), with a haptic and a short inline "Copied". |
 | QOL-20 | P1 | Recap.dc.html | build | Next-morning mode: the morning after, the app opens on a calm, dark, low-contrast screen with the recap, who o... |
