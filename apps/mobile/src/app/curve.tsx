@@ -1,10 +1,14 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { breathRatio, countryRules, drivingLimit, formatBacValue } from "@crew/units";
 import { BacChart } from "@/curve/BacChart";
 import { buildSeries, gramStats, type CurvePeriod } from "@/curve/series";
 import { useT } from "@/i18n";
 import { formatClock } from "@/i18n/format";
+import { RecapCurves } from "@/recap/RecapCurves";
+import { useLiveParty } from "@/server/crewData";
+import { fetchRecap, type Recap } from "@/server/recapData";
+import { useSession } from "@/server/session";
 import { useBodyProfile, useIntakes, useNow } from "@/state/hooks";
 import { useAppStore } from "@/state/store";
 import { Panel, Segmented } from "@/ui/controls";
@@ -104,7 +108,46 @@ export default function CurveScreen() {
         ))}
       </View>
       <Text variant="small">{i18n.t("curve.gramsNote")}</Text>
+      <CrewCurves now={now} legalLimit={legalLimit} formatX={(at) => formatClock(at, i18n.language, preferences.hourCycle)} />
     </Screen>
+  );
+}
+
+/** O-29: the crew's curves next to mine during a live party, refreshed every minute. */
+function CrewCurves({ now, legalLimit, formatX }: { now: number; legalLimit: number; formatX: (at: number) => string }) {
+  const i18n = useT();
+  const live = useLiveParty();
+  const me = useSession((state) => state.session?.userId);
+  const partyId = live?.party.id;
+  const minute = Math.floor(now / 60_000);
+  const [recap, setRecap] = useState<Recap | null>(null);
+  useEffect(() => {
+    if (!partyId) return;
+    void fetchRecap(partyId).then(setRecap).catch(() => undefined);
+  }, [partyId, minute]);
+  if (!partyId || !recap || recap.participants.filter((p) => p.curve.length > 1).length < 2) return null;
+  return (
+    <>
+      <Text variant="label">{i18n.t("curve.withCrew")}</Text>
+      <Panel>
+        <RecapCurves
+          participants={recap.participants}
+          from={recap.window.from}
+          legalLimit={legalLimit}
+          replay={0}
+          meId={me}
+          nowAt={now}
+          formatX={formatX}
+          labels={{
+            range: (from, to) => i18n.t("recap.curvesRange", { from, to }),
+            hint: i18n.t("curve.withCrewHint"),
+            legal: i18n.t("recap.legalLine"),
+            rangeEnd: i18n.t("recap.rangeEnd"),
+            you: i18n.t("common.you"),
+          }}
+        />
+      </Panel>
+    </>
   );
 }
 

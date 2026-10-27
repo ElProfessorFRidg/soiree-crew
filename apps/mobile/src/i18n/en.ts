@@ -90,6 +90,8 @@ export const en: Messages = {
     gramsNote: "In grams of pure alcohol.",
     averageNote: "Average over the last 7 nights.",
     profileNote: "Calculated for {weight} kg, {body} body.",
+    withCrew: "With the crew tonight",
+    withCrewHint: "Each dot is where that person is right now.",
     open: "Your curve",
   },
   limits: {

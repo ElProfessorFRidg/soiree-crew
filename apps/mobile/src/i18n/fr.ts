@@ -88,6 +88,8 @@ export const fr = {
     gramsNote: "En grammes d'alcool pur.",
     averageNote: "Moyenne sur 7 soirées glissantes.",
     profileNote: "Calculé pour {weight} kg, corps {body}.",
+    withCrew: "Avec le crew ce soir",
+    withCrewHint: "Chaque pastille est la personne en ce moment.",
     open: "Ta courbe",
   },
   limits: {

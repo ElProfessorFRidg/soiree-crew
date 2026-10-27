@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, View, type GestureResponderEvent, type LayoutChangeEvent } from "react-native";
 import Animated, { useAnimatedProps, useReducedMotion, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
-import Svg, { Line, Path } from "react-native-svg";
+import Svg, { Circle, G, Line, Path, Text as SvgText } from "react-native-svg";
 import { avatarColor, duration, radius } from "@crew/design-tokens";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
@@ -48,11 +48,13 @@ interface Props {
   replay: number;
   meId: string | undefined;
   formatX: (at: number) => string;
+  /** O-29: during a live party, each friend's avatar dot sits on their curve at this time. */
+  nowAt?: number;
   labels: { range: (from: string, to: string) => string; hint: string; legal: string; rangeEnd: string; you: string };
 }
 
 /** O-41, MOT-08: everyone's curves overlaid, drawing themselves, with a time-range slider. */
-export function RecapCurves({ participants, from, legalLimit, replay, meId, formatX, labels }: Props) {
+export function RecapCurves({ participants, from, legalLimit, replay, meId, formatX, nowAt, labels }: Props) {
   const theme = useTheme();
   const reduceMotion = useReducedMotion();
   const [width, setWidth] = useState(0);
@@ -81,14 +83,18 @@ export function RecapCurves({ participants, from, legalLimit, replay, meId, form
     const y = (v: number) => PAD.top + innerH - (Math.min(v, max) / max) * innerH;
     return withCurves.map((p) => {
       const xy = p.curve.filter(([at]) => at >= from && at <= to).map(([at, v]) => ({ x: x(at), y: y(v) }));
+      const nearest = nowAt === undefined ? undefined : p.curve.reduce((best, pt) => (Math.abs(pt[0] - nowAt) < Math.abs(best[0] - nowAt) ? pt : best), p.curve[0]!);
       return {
         userId: p.userId,
+        initial: p.name.trim().charAt(0).toLocaleUpperCase(),
+        dot: nearest && nearest[0] >= from && nearest[0] <= to ? { x: x(nearest[0]), y: y(nearest[1]) } : null,
+        nowX: nowAt !== undefined && nowAt >= from && nowAt <= to ? x(nowAt) : null,
         d: xy.map((pt, i) => `${i === 0 ? "M" : "L"}${pt.x.toFixed(1)},${pt.y.toFixed(1)}`).join(" "),
         length: Math.max(1, lengthOf(xy)),
         legalY: y(legalLimit),
       };
     });
-  }, [width, withCurves, from, to, legalLimit]);
+  }, [width, withCurves, from, to, legalLimit, nowAt]);
 
   const setEnd = (event: GestureResponderEvent) => {
     if (width === 0) return;
@@ -109,6 +115,9 @@ export function RecapCurves({ participants, from, legalLimit, replay, meId, form
             {legalLimit > 0 && legalY !== undefined ? (
               <Line x1={PAD.left} x2={width - PAD.right} y1={legalY} y2={legalY} stroke={theme.danger} strokeDasharray="5 6" strokeWidth={1.5} />
             ) : null}
+            {lines[0]?.nowX != null ? (
+              <Line x1={lines[0].nowX} x2={lines[0].nowX} y1={PAD.top} y2={HEIGHT - PAD.bottom} stroke={theme.textMuted} strokeDasharray="2 5" strokeWidth={1} />
+            ) : null}
             {lines.map((line) => (
               <DrawnLine
                 key={`${line.userId}-${replay}`}
@@ -119,6 +128,16 @@ export function RecapCurves({ participants, from, legalLimit, replay, meId, form
                 progress={progress}
               />
             ))}
+            {lines.map((line) =>
+              line.dot && (isolated === null || isolated === line.userId) ? (
+                <G key={`dot-${line.userId}`}>
+                  <Circle cx={line.dot.x} cy={line.dot.y} r={9} fill={avatarColor(line.userId)} stroke={theme.bg} strokeWidth={2} />
+                  <SvgText x={line.dot.x} y={line.dot.y + 4} fontSize={10} fontWeight="700" fill={theme.bg} textAnchor="middle">
+                    {line.initial}
+                  </SvgText>
+                </G>
+              ) : null,
+            )}
           </Svg>
         ) : null}
       </View>

@@ -44,7 +44,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-26 | P0 | Soiree.dc.html | build | Set a limit / goal before going out + alerts when getting close, without spam. |
 | O-27 | P0 | Soiree.dc.html | build | Scheduled hydration reminders. |
 | O-28 | P1 | Soiree.dc.html | build | Stats in grams of pure alcohol (this month, total, average). |
-| O-29 | P0 | Soiree.dc.html | todo | Friends' avatars on the graph + curve comparison between friends. |
+| O-29 | P0 | Soiree.dc.html | build | Friends' avatars on the graph + curve comparison between friends. |
 | O-30 | P1 | Soiree.dc.html | todo | Share: styled visual with photo / selfie (front or back camera) + stats + curve. |
 | O-31 | P0 | Etats.dc.html | build | Offline: a drink added without network is kept and sent when the network returns, never counted twice; the app... |
 | O-32 | P0 | JeuxCartes.dc.html | build | Small floating button in every game to add a drink without leaving the game. |
