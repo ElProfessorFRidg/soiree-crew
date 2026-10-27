@@ -336,6 +336,12 @@ export const fr = {
     done: "Fermer",
   },
   venue: {
+    variant: {
+      discovery: "Ce mois-ci : découvertes ×2",
+      games: "Ce mois-ci : victoires aux jeux ×2",
+      organiser: "Ce mois-ci : bonus d'orga renforcé",
+      regulars: "Ce mois-ci : check-in mieux payé",
+    },
     season: "Saison {season}",
     top: "Le top du mois",
     pointsShort: "{count} pts",

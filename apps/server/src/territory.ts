@@ -1,4 +1,4 @@
-import { resolveBoss, scoreSeason, seasonBounds, seasonKey, weekKey, type CountedCheckIn, type VenueStanding } from "@crew/territory";
+import { resolveBoss, rulesForSeason, scoreSeason, seasonBounds, seasonKey, weekKey, type CountedCheckIn, type SeasonVariant, type VenueStanding } from "@crew/territory";
 import type { Context } from "./context";
 import { newId } from "./crypto";
 import type { Db } from "./db";
@@ -22,6 +22,19 @@ export async function crewTimeZone(db: Db, crewId: string): Promise<string> {
 
 export function currentSeason(at: number, timeZone: string): string {
   return seasonKey(at, offsetMinutes(at, timeZone));
+}
+
+/** TER-12: remote config for season variants, `{"2026-12": "games"}`; the rotation fills the rest. */
+function variantOverrides(): Record<string, string> {
+  try {
+    return JSON.parse(process.env.SEASON_VARIANTS ?? "{}") as Record<string, string>;
+  } catch {
+    return {};
+  }
+}
+
+export function seasonRules(season: string): { variant: SeasonVariant; rules: ReturnType<typeof rulesForSeason>["rules"] } {
+  return rulesForSeason(season, variantOverrides());
 }
 
 /**
@@ -100,6 +113,7 @@ export async function crewStandings(ctx: Context, crewId: string, season: string
     discoveredBefore: new Set(before.map((b) => b.venue_id)),
     workplaceExclusions: new Set(exclusions.map((e) => `${e.venue_id}:${e.user_id}`)),
     now,
+    rules: seasonRules(season).rules,
   });
 }
 

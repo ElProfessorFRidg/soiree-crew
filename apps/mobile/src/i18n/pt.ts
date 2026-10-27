@@ -337,6 +337,12 @@ export const pt: Messages = {
     done: "Fechar",
   },
   venue: {
+    variant: {
+      discovery: "Este mês: descobertas ×2",
+      games: "Este mês: vitórias nos jogos ×2",
+      organiser: "Este mês: bónus de organizar maior",
+      regulars: "Este mês: os check-ins valem mais",
+    },
     season: "Temporada {season}",
     top: "O top do mês",
     pointsShort: "{count} pts",

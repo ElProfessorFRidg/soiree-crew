@@ -337,6 +337,12 @@ export const ru: Messages = {
     done: "Закрыть",
   },
   venue: {
+    variant: {
+      discovery: "В этом месяце: открытия ×2",
+      games: "В этом месяце: победы в играх ×2",
+      organiser: "В этом месяце: бонус организатору больше",
+      regulars: "В этом месяце: чек-ины ценнее",
+    },
     season: "Сезон {season}",
     top: "Топ месяца",
     pointsShort: "{count} очк.",

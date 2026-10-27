@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { challengers, countedCheckIns, resolveBoss, scoreSeason, seasonBounds, seasonKey, territoryTitles, timePoints, weekKey, type CountedCheckIn } from "./index";
+import { challengers, countedCheckIns, resolveBoss, RULES_V1, rulesForSeason, scoreSeason, SEASON_VARIANTS, seasonBounds, seasonKey, seasonVariant, territoryTitles, timePoints, weekKey, type CountedCheckIn } from "./index";
 
 const MIN = 60_000;
 const T0 = Date.UTC(2026, 10, 6, 21, 0); // Fri 6 Nov 2026, 22:00 in Paris
@@ -167,5 +167,18 @@ describe("territory titles (TER-06)", () => {
     expect(jade!.titles.map((t) => t.kind)).toEqual(["mayor", "mayor", "mayor", "conqueror", "explorer"]);
     expect(malik!.titles.map((t) => t.kind)).toEqual(["mayor", "nomad"]);
     expect(malik!.visited).toBe(3);
+  });
+});
+
+describe("season variants (TER-12)", () => {
+  it("rotates by month, honours overrides and only scales presence, discovery, organising or games", () => {
+    expect(rulesForSeason("2026-11").variant).toBe(rulesForSeason("2026-11").variant);
+    expect(seasonVariant("2026-12", { "2026-12": "games" })).toBe("games");
+    expect(seasonVariant("2026-12", { "2026-12": "beer" })).toBe(seasonVariant("2026-12"));
+    const months = Array.from({ length: 12 }, (_, i) => `2027-${String(i + 1).padStart(2, "0")}`);
+    expect(new Set(months.map((m) => seasonVariant(m))).size).toBeGreaterThan(2);
+    const allowed = new Set(["discoveryPoints", "discoveryPerSeasonCap", "gameWinPoints", "organiserPoints", "checkInPoints"]);
+    for (const patch of Object.values(SEASON_VARIANTS)) for (const key of Object.keys(patch)) expect(allowed.has(key)).toBe(true);
+    expect(rulesForSeason("2026-12", { "2026-12": "discovery" }).rules.discoveryPoints).toBe(RULES_V1.discoveryPoints * 2);
   });
 });

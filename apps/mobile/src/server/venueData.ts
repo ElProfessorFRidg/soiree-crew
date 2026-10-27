@@ -28,6 +28,8 @@ export interface VenueSummary {
 
 export interface VenuePage {
   validated?: boolean;
+  /** TER-12: this month's rule twist. */
+  variant?: "none" | "discovery" | "games" | "organiser" | "regulars";
   venue: { id: string; crewId: string; name: string; kind: VenueKind; lat: number; lng: number; address: string };
   season: string;
   bossId: string | null;

@@ -346,7 +346,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | TER-09 | P0 | Bars.dc.html | build | Privacy: only check-ins are shared (never continuous tracking for this game), anyone can opt out of the territ... |
 | TER-10 | P1 | Backstage (near Bars.dc.html) | build | Venue loyalty tiers (Bronze, Silver, Gold at 3, 10 and 25 lifetime counted nights), never lost, crew-visible, audience set by the profile. FR label must not reuse "habitué" (see GLOSSARY.md conflicts). Source: territories.md §2.5, §3.4, §5. |
 | TER-11 | P0 | Backstage (near Bars.dc.html) | build | Workplace exclusion ("I work here", admin-approved; 0 territory points there) and validation of new venues (external place ID or corroborated check-ins by 2 members on 2 nights) before they can be played. Source: territories.md §3.7 cases D and F, §5. |
-| TER-12 | P2 | Backstage (near Bars.dc.html) | proposed | Season variants: one rule modifier per month from remote config, never related to drinks, frozen into the season's rule version. Source: territories.md §3.6, §5. |
+| TER-12 | P2 | Backstage (near Bars.dc.html) | build | Season variants: one rule modifier per month from remote config, never related to drinks, frozen into the season's rule version. Source: territories.md §3.6, §5. |
 
 ## Leaderboards
 

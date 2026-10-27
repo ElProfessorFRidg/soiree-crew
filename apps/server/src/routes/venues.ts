@@ -3,7 +3,7 @@ import { z } from "zod";
 import { challengers, seasonBounds, territoryTitles } from "@crew/territory";
 import { AC_CONFIG, distanceMeters, evaluateCheckIn, fixHash } from "../anticheat";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
-import { crewStandings, crewTimeZone, currentSeason, updateBoss, validatedVenues } from "../territory";
+import { crewStandings, crewTimeZone, currentSeason, seasonRules, updateBoss, validatedVenues } from "../territory";
 import { nightOf, offsetMinutes } from "../time";
 
 const venueSchema = z.object({
@@ -176,6 +176,7 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
     const visitedSet = new Set(visited.map((v) => v.venue_id));
     return {
       season,
+      variant: seasonRules(season).variant,
       venues: venues.map((v) => {
         const standing = standings.find((s) => s.venueId === v.id);
         const boss = standing?.bossId ?? null;
@@ -247,6 +248,7 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
     const validated = (await validatedVenues(ctx.db, venue.crew_id, timeZone)).has(venue.id);
     return {
       validated,
+      variant: seasonRules(season).variant,
       venue: { id: venue.id, crewId: venue.crew_id, name: venue.name, kind: venue.kind, lat: venue.lat, lng: venue.lng, address: venue.address },
       rivalry,
       myNights,

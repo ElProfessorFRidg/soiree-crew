@@ -74,6 +74,7 @@ export default function VenueScreen() {
   return (
     <Screen back title={page.venue.name} withToasts>
       <Text variant="small">{i18n.t("venue.season", { season: page.season })}</Text>
+      {page.variant && page.variant !== "none" ? <Tag tone="amber" label={i18n.t(`venue.variant.${page.variant}`)} /> : null}
       {page.validated === false ? (
         <Panel tint="amber">
           <Text variant="small">{i18n.t("venue.notValidated")}</Text>

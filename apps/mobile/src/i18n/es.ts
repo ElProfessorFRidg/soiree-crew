@@ -337,6 +337,12 @@ export const es: Messages = {
     done: "Cerrar",
   },
   venue: {
+    variant: {
+      discovery: "Este mes: descubrimientos ×2",
+      games: "Este mes: victorias en juegos ×2",
+      organiser: "Este mes: más bonus de organizar",
+      regulars: "Este mes: los check-ins valen más",
+    },
     season: "Temporada {season}",
     top: "Lo mejor del mes",
     pointsShort: "{count} pts",
