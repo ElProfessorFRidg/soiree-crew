@@ -29,8 +29,14 @@ export function restoreDrink(drink: DrinkEntry): void {
   submit({ kind: "drink.add", drink: { ...drink, sync: "pending" } });
 }
 
-export function logWater(): WaterEntry {
-  const water = buildWater(Date.now());
+let lastWaterAt = 0;
+
+/** Null when it follows another water within the double-tap window (ADP-09). */
+export function logWater(): WaterEntry | null {
+  const now = Date.now();
+  if (now - lastWaterAt < DOUBLE_TAP_MS) return null;
+  lastWaterAt = now;
+  const water = buildWater(now);
   haptic.water();
   submit({ kind: "water.add", water });
   void refreshReminders();

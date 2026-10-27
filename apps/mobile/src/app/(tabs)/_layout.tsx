@@ -6,6 +6,7 @@ import { useGameT } from "@/games/i18n";
 import { useT } from "@/i18n";
 import { useMorningAfter } from "@/recap/morning";
 import { useHomeScreenActions } from "@/system/quickActions";
+import { useLevelNow } from "@/state/levelNow";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Icon, type AnyIconName } from "@/ui/Icon";
@@ -64,6 +65,8 @@ export default function TabsLayout() {
   const onboarded = useAppStore((state) => state.ageConfirmedAt !== null && state.profile !== null);
   useMorningAfter();
   useHomeScreenActions(i18n);
+  // ADP-09: at levels 2 and 3 the undo button grows like everything else.
+  const level = useLevelNow((state) => state.level);
   if (!onboarded) return <Redirect href="/onboarding" />;
   return (
     <View style={{ flex: 1 }}>
@@ -74,7 +77,7 @@ export default function TabsLayout() {
         <Tabs.Screen name="games" options={{ title: games.t("catalogue.title") }} />
         <Tabs.Screen name="me" options={{ title: i18n.t("tabs.me") }} />
       </Tabs>
-      <ToastHost bottomOffset={insets.bottom + 76} />
+      <ToastHost bottomOffset={insets.bottom + 76} large={level >= 2} />
     </View>
   );
 }

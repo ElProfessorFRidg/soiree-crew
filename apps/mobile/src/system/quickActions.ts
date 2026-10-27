@@ -4,7 +4,7 @@ import * as QuickActions from "expo-quick-actions";
 import { useQuickActionRouting } from "expo-quick-actions/router";
 import { lastDrink, logDrink, logWater } from "@/drinks/actions";
 import { defaultPreset, presetFromEntry } from "@/drinks/presets";
-import { offerUndo } from "@/drinks/undoToast";
+import { offerUndo, offerWaterUndo } from "@/drinks/undoToast";
 import type { Translator } from "@/i18n";
 import { useAppStore } from "@/state/store";
 
@@ -16,7 +16,8 @@ export type QuickAction = "again" | "water";
  */
 export function runQuickAction(action: QuickAction, i18n: Translator): void {
   if (action === "water") {
-    logWater();
+    const water = logWater();
+    if (water) offerWaterUndo(water, i18n);
     return;
   }
   const { preferences } = useAppStore.getState();

@@ -100,11 +100,11 @@ export function SetupScreen({ gameId }: { gameId: GameId }) {
               </View>
               {ui.big ? null : (
                 <>
-                  <IconButton icon="arrowup" size={36} accessibilityLabel={g.t("setup.moveUp", { name: player.name })} onPress={() => index > 0 && moveTablePlayer(player.id, -1)} />
-                  <IconButton icon="arrowdn" size={36} accessibilityLabel={g.t("setup.moveDown", { name: player.name })} onPress={() => index < table.length - 1 && moveTablePlayer(player.id, 1)} />
+                  <IconButton icon="arrowup" size={44} accessibilityLabel={g.t("setup.moveUp", { name: player.name })} onPress={() => index > 0 && moveTablePlayer(player.id, -1)} />
+                  <IconButton icon="arrowdn" size={44} accessibilityLabel={g.t("setup.moveDown", { name: player.name })} onPress={() => index < table.length - 1 && moveTablePlayer(player.id, 1)} />
                 </>
               )}
-              <IconButton icon="x" size={36} accessibilityLabel={g.t("setup.remove", { name: player.name })} onPress={() => removeTablePlayer(player.id)} />
+              <IconButton icon="x" size={44} accessibilityLabel={g.t("setup.remove", { name: player.name })} onPress={() => removeTablePlayer(player.id)} />
             </View>
           ))}
         </View>

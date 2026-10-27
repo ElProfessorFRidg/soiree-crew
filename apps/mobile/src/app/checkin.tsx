@@ -105,7 +105,13 @@ export default function CheckInScreen() {
   const tookIt = result?.verdict === "accepted" && result.takeover?.bossId === me;
 
   return (
-    <Screen back title={venueName || i18n.t("checkin.title")} withToasts>
+    <Screen
+      back
+      title={venueName || i18n.t("checkin.title")}
+      withToasts
+      // ADP-09: closing sits under the thumb, away from "I'm leaving".
+      footer={phase === "done" ? <Button label={i18n.t("checkin.done")} height={64} onPress={() => router.back()} /> : undefined}
+    >
       {tookIt ? <Takeover venue={venueName} /> : null}
 
       {phase !== "idle" ? (
@@ -170,7 +176,6 @@ export default function CheckInScreen() {
         </View>
       ) : null}
 
-      {phase === "done" ? <Button label={i18n.t("checkin.done")} variant="secondary" height={48} onPress={() => router.back()} /> : null}
     </Screen>
   );
 }
@@ -179,7 +184,7 @@ const styles = StyleSheet.create({
   step: { flexDirection: "row", alignItems: "center", gap: 10, minHeight: 32 },
   switchRow: { flexDirection: "row", alignItems: "center", gap: 12 },
   flex: { flex: 1 },
-  actions: { flexDirection: "row", gap: 10 },
+  actions: { flexDirection: "row", gap: 20 },
   takeover: { alignItems: "center", gap: 14, paddingVertical: 24, overflow: "visible" },
   wash: { position: "absolute", top: -60 },
 });

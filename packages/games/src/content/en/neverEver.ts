@@ -26,7 +26,7 @@ export const neverEver: NeverEverContent = {
     "accidentally liked a five-year-old photo while deep in someone's profile.",
     "waved back at someone who was waving at the person behind me.",
     "faked being sick to skip a family reunion.",
-    "said “you too” to a waiter who told me to enjoy my meal.",
+    "fallen asleep on the night bus and woken up at the end of the line.",
     "waited over an hour for brunch.",
     "played one song on repeat for an entire road trip.",
     "been the last one awake at a house party where I knew nobody.",

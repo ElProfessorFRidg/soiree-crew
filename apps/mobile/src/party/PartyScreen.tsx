@@ -7,13 +7,14 @@ import { POISONING_CARD_THRESHOLD, type UiLevel } from "@crew/bac";
 import { duration, palette, size, space } from "@crew/design-tokens";
 import type { BacUnit } from "@crew/units";
 import { lastDrink, logDrink, logWater } from "@/drinks/actions";
-import { offerUndo } from "@/drinks/undoToast";
+import { offerUndo, offerWaterUndo } from "@/drinks/undoToast";
 import { againLabel, alternateUnit, bacText, unitCycle } from "@/drinks/display";
 import { defaultPreset, presetFromEntry } from "@/drinks/presets";
 import { useT, type Translator } from "@/i18n";
 import { formatClock, formatDuration } from "@/i18n/format";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
+import { showToast } from "@/ui/Toast";
 import { useLiveBac, useNow, useUiLevel, type LiveBac } from "@/state/hooks";
 import { useAppStore } from "@/state/store";
 import { submit } from "@/sync/engine";
@@ -28,8 +29,10 @@ import { SosBanner } from "@/crew/SosBanner";
 import { useEco } from "@/power/eco";
 import { TravelPrompt } from "@/travel/TravelPrompt";
 import { VaultPrompt } from "@/vault/VaultPrompt";
-import { useLiveParty, type PartyMood } from "@/server/crewData";
+import { setPartyStatus, useLiveParty, type PartyMood } from "@/server/crewData";
 import { useSession } from "@/server/session";
+import { useLevelNow } from "@/state/levelNow";
+import { openRide, RIDE_APPS } from "./rides";
 import { BubbleField } from "./BubbleField";
 import { useVenueData } from "@/server/venueData";
 import { RollingNumber } from "./RollingNumber";
@@ -111,6 +114,10 @@ export function PartyScreen() {
   const pendingDrink = tonight.drinks.some((d) => d.sync !== "saved");
 
   useEffect(() => {
+    useLevelNow.setState({ level });
+  }, [level]);
+
+  useEffect(() => {
     // While the BAC rises, refresh faster so the number visibly climbs after a drink.
     setFastTick(live?.estimate.trend === "rising");
   }, [live?.estimate.trend]);
@@ -131,7 +138,10 @@ export function PartyScreen() {
     const drink = logDrink(again.preset, Date.now(), false);
     if (drink) offerUndo(drink, i18n, preferences.hourCycle);
   };
-  const onWater = () => logWater();
+  const onWater = () => {
+    const water = logWater();
+    if (water) offerWaterUndo(water, i18n);
+  };
   const flipUnit = () => {
     haptic.select();
     setUnitIndex((index) => index + 1);
@@ -203,19 +213,21 @@ function BacHero({ i18n, live, unit, flipUnit, size: fontSize }: LevelProps & { 
 
   return (
     <Animated.View entering={FadeIn.duration(duration.enter).easing(easings.out)}>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={`${shown.value} ${i18n.t(`units.long.${unit}`)}`}
-        accessibilityHint={i18n.t("party.changeUnit")}
-        onPress={flipUnit}
-        style={styles.heroRow}
-      >
+      <View style={styles.heroRow} accessible accessibilityLabel={`${shown.value} ${i18n.t(`units.long.${unit}`)}`}>
         <RollingNumber value={estimate.bac} format={format} size={fontSize} color={theme.amber} />
-        <View style={styles.heroUnit}>
+        {/* Only the unit switches units: a stray tap on the number must not change what it means (ADP-09). */}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={i18n.t(`units.long.${unit}`)}
+          accessibilityHint={i18n.t("party.changeUnit")}
+          onPress={flipUnit}
+          hitSlop={12}
+          style={styles.heroUnit}
+        >
           <Text variant="h3">{shown.unit}</Text>
           <Text variant="small">{i18n.t("party.alternate", { value: alt.value, unit: i18n.t(`units.long.${alternate}`) })}</Text>
-        </View>
-      </Pressable>
+        </Pressable>
+      </View>
     </Animated.View>
   );
 }
@@ -296,6 +308,7 @@ function LevelPicker({ i18n, level, setLevel }: LevelProps) {
     <View style={styles.block}>
       <Segmented
         accessibilityLabel={i18n.t("party.levelPicker")}
+        height={52}
         value={level}
         items={([0, 1, 2, 3] as const).map((value) => ({ value, label: String(value) }))}
         onChange={(value) => {
@@ -576,22 +589,45 @@ function LevelTwo(props: LevelProps) {
 
 function LevelThree(props: LevelProps) {
   const { i18n } = props;
+  const live = useLiveParty();
+  const me = useSession((state) => state.session?.userId);
+  const rideApp = useAppStore((state) => state.preferences.rideApp);
+  const ride = RIDE_APPS.find((a) => a.id === rideApp) ?? RIDE_APPS[0];
+  const mine = live?.live?.members.find((m) => m.userId === me);
+  const offline = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
+  const markHome = () => {
+    if (!live) return;
+    haptic.confirmed();
+    void setPartyStatus(live.party.id, { homeSafe: true })
+      .then(() =>
+        showToast({
+          message: i18n.t("party.homeMarked"),
+          durationMs: 5_000,
+          action: { label: i18n.t("common.undo"), onPress: () => void setPartyStatus(live.party.id, { homeSafe: false }).catch(offline) },
+        }),
+      )
+      .catch(offline);
+  };
+  // ADP-09: the rare, risky actions sit at the top; the way home sits under the thumb.
   return (
     <>
       <Text style={styles.levelThreeTitle}>{i18n.t("party.howHome")}</Text>
+      <LevelPicker {...props} />
+      <Button label={i18n.t("party.addAnyway")} variant="outline" height={56} onPress={props.onAgain} />
+      <Button label={i18n.t("party.water")} icon="drop" iconSize={30} fontSize={24} height={size.levelThreeTarget} variant="water" onPress={props.onWater} />
       <Button
-        label={i18n.t("party.ride")}
+        label={i18n.t("goingHome.rideWith", { app: ride.name })}
         icon="car"
         iconSize={30}
         fontSize={24}
-        height={104}
+        height={size.levelThreeTarget}
         variant="secondary"
-        onPress={() => void Linking.openURL("https://m.uber.com/ul/")}
+        onPress={() => void openRide(ride).catch(offline)}
       />
-      <Button label={i18n.t("party.water")} icon="drop" iconSize={30} fontSize={24} height={size.levelThreeTarget} variant="water" onPress={props.onWater} />
+      {mine && mine.homeSafeAt === null ? (
+        <Button label={i18n.t("live.imHome")} icon="home" iconSize={30} fontSize={24} height={104} onPress={markHome} />
+      ) : null}
       <Button label={i18n.t("party.sos")} icon="alert" iconSize={30} fontSize={24} height={size.levelThreeTarget} variant="danger" onPress={() => router.push("/sos")} />
-      <Button label={i18n.t("party.addAnyway")} variant="outline" height={56} onPress={props.onAgain} />
-      <LevelPicker {...props} />
     </>
   );
 }
@@ -626,8 +662,9 @@ const styles = StyleSheet.create({
   actions: { flexDirection: "row", gap: 10 },
   square: { width: size.partyAction, paddingHorizontal: 0 },
   statusRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" },
-  bigGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
-  bigCell: { flexBasis: "47%", flexGrow: 1 },
+  // ADP-09: 20 px between big cells, so a thumb that lands off logs the right thing or nothing.
+  bigGrid: { flexDirection: "row", flexWrap: "wrap", gap: 20 },
+  bigCell: { flexBasis: "44%", flexGrow: 1 },
   levelThreeTitle: { fontSize: 20, lineHeight: 26, fontFamily: "Archivo-Bold" },
   titleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   liveDot: { width: 8, height: 8, borderRadius: 4 },

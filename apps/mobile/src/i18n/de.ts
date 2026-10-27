@@ -37,7 +37,7 @@ export const de: Messages = {
     atZero: "Kein Alkohol im Blut.",
     backToZero: "Wieder bei 0",
     driving: "Fahren",
-    drivingOk: "OK",
+    drivingOk: "Unter dem Limit (geschätzt)",
     tooClose: "Zu knapp",
     zeroTolerance: "Alkoholverbot",
     notice: "Eine Schätzung, kein Alkoholtester. Entscheide nie anhand dieser Zahl, ob du fahren kannst.",
@@ -50,7 +50,7 @@ export const de: Messages = {
     levelNote0: "Stufe 0: der ganze Bildschirm.",
     levelNote1: "Stufe 1: größer, weniger Optionen.",
     levelNote2: "Stufe 2: große Tasten, nur das Wichtigste.",
-    levelNote3: "Stufe 3: nach Hause kommen, anrufen, Wasser trinken.",
+    levelNote3: "Stufe 3: heimkommen, Wasser trinken, Hilfe rufen.",
     howHome: "Wie kommst du nach Hause?",
     ride: "Fahrt bestellen",
     addAnyway: "Trotzdem ein Getränk eintragen",
@@ -70,6 +70,8 @@ export const de: Messages = {
     poisoningBody: "Anzeichen einer schweren Alkoholvergiftung: Verwirrung, Erbrechen, langsame Atmung, blasse oder bläuliche Haut. Bei diesen Anzeichen ruf {number} an. Bleib nicht allein. Keine kalte Dusche, kein Kaffee.",
     dareTitle: "Mutprobe des Abends",
     dareHint: "Für alle, die Lust haben. Jeden Abend eine neue, für die ganze Crew dieselbe.",
+    waterAdded: "Glas Wasser notiert.",
+    homeMarked: "Die Crew weiß, dass du zu Hause bist.",
   },
   curve: {
     title: "Deine Kurve",
@@ -326,7 +328,7 @@ export const de: Messages = {
     stillHere: "Noch da",
     stillHereDone: "Notiert, deine Zeit läuft weiter.",
     leave: "Ich gehe",
-    done: "OK",
+    done: "Schließen",
   },
   venue: {
     season: "Saison {season}",
@@ -412,6 +414,7 @@ export const de: Messages = {
     received: "{name} braucht Hilfe",
     openMap: "Ort ansehen",
     resolve: "Ist geklärt",
+    failed: "Der Alarm ist nicht rausgegangen. Versuch es nochmal oder ruf den Notruf.",
   },
   money: {
     title: "Kassen und Runden",

@@ -112,6 +112,9 @@ export function CatalogueScreen() {
     setIndex(target);
     list.current?.scrollToIndex({ index: target, animated: true });
   };
+  // ADP-09: Play launches the card under the thumb right now, even mid-swipe, not the last settled one.
+  const offset = useRef(0);
+  const cardAtOffset = () => games[Math.max(0, Math.min(games.length - 1, Math.round(offset.current / (cardWidth + GAP))))];
   const onScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const next = Math.round(event.nativeEvent.contentOffset.x / (cardWidth + GAP));
     if (next !== index) {
@@ -165,6 +168,10 @@ export function CatalogueScreen() {
             contentContainerStyle={styles.carousel}
             ItemSeparatorComponent={() => <View style={{ width: GAP }} />}
             getItemLayout={(_, i) => ({ length: cardWidth + GAP, offset: (cardWidth + GAP) * i, index: i })}
+            onScroll={(event) => {
+              offset.current = event.nativeEvent.contentOffset.x;
+            }}
+            scrollEventThrottle={32}
             onMomentumScrollEnd={onScrollEnd}
             onScrollEndDrag={onScrollEnd}
             style={{ flexGrow: 0 }}
@@ -195,8 +202,9 @@ export function CatalogueScreen() {
                 height={ui.action}
                 accessibilityLabel={`${g.t("catalogue.play")}, ${g.t(`games.${current.id}.name`)}`}
                 onPress={() => {
-                  flyHero(`game:${current.id}`);
-                  router.push({ pathname: "/games/[gameId]", params: { gameId: current.id } });
+                  const game = cardAtOffset() ?? current;
+                  flyHero(`game:${game.id}`);
+                  router.push({ pathname: "/games/[gameId]", params: { gameId: game.id } });
                 }}
               />
             </View>

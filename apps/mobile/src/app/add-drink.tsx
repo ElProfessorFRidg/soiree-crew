@@ -87,7 +87,7 @@ export default function AddDrinkSheet() {
       <ScrollView
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]}
+        contentContainerStyle={[styles.content, { paddingBottom: 24 }]}
       >
         <View style={styles.title}>
           <Text variant="h2" accessibilityRole="header">
@@ -255,9 +255,12 @@ export default function AddDrinkSheet() {
             }
           />
         ) : null}
+      </ScrollView>
+      {/* ADP-09: the main action stays pinned under the thumb, never at the end of a long scroll. */}
+      <View style={[styles.footer, { paddingBottom: insets.bottom + 12, borderTopColor: theme.line }]}>
         <Button
           label={i18n.t("addDrink.add", { drink: drinkWithArticle(preset, i18n) })}
-          height={56}
+          height={64}
           onPress={() => {
             const drink = logDrink(preset, consumedAt, withFood);
             if (!drink) return;
@@ -266,8 +269,8 @@ export default function AddDrinkSheet() {
             offerUndo(drink, i18n, preferences.hourCycle);
           }}
         />
-      </ScrollView>
-      <ToastHost bottomOffset={insets.bottom + 16} />
+      </View>
+      <ToastHost bottomOffset={insets.bottom + 92} />
     </View>
   );
 }
@@ -333,6 +336,7 @@ function QuickType({ presets, consumedAt, withFood, onPick }: { presets: DrinkPr
 }
 
 const styles = StyleSheet.create({
+  footer: { paddingHorizontal: space.screenX, paddingTop: 12, borderTopWidth: 1 },
   quick: { gap: 8 },
   sheet: { flex: 1 },
   content: { paddingHorizontal: space.screenX, paddingTop: 20, gap: 16 },

@@ -50,6 +50,8 @@ export function Chip({
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ selected: !!selected }}
+      // The touch area reaches 48 px tall without crowding a row of chips (ADP-09).
+      hitSlop={{ top: 6, bottom: 6, left: 4, right: 4 }}
       style={[styles.chip, { backgroundColor: bg }]}
     >
       {icon ? <Icon name={icon} size={16} color={fg} /> : null}

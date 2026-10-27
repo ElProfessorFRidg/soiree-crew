@@ -308,7 +308,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ADP-06 | P0 | ModeBourre.dc.html | build | "Next-morning vault": above a threshold, sensitive actions are locked or queued for confirmation the next day ... |
 | ADP-07 | P0 | ModeBourre.dc.html | build | Legibility: text size, maximum contrast, readable under strobe or very low light, no disorienting motion (effe... |
 | ADP-08 | P0 | ModeBourre.dc.html | build | Battery: automatic eco mode during a party when the battery gets low (fewer refreshes, lighter effects; essent... |
-| ADP-09 | P0 | Backstage | todo | Drunk-mode test bench: a tester subagent runs EVERY P0 screen under simulated constraints (one hand, thumb onl... |
+| ADP-09 | P0 | Backstage | build | Drunk-mode test bench: a tester subagent runs EVERY P0 screen under simulated constraints (one hand, thumb onl... |
 | ADP-10 | P1 | Messages.dc.html | todo | Drunk-text guard: the user picks contacts (inside the app) whose messages are held at adaptive levels 2 and 3 ... |
 
 ## Motion
@@ -428,7 +428,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | AC-07 | P0 | Soiree.dc.html | build | Drink fraud: bursts that are physiologically implausible against the BAC model, large retroactive batches, dri... |
 | AC-08 | P0 | Backstage | build | Replay and tampering protection: signed requests, nonces, server timestamps, idempotency keys, rate limits. Th... |
 | AC-09 | P0 | Etats.dc.html | build | Consequences: a rejected event earns nothing and is recorded as a "cheat attempt", visible to the crew (notifi... |
-| AC-10 | P0 | Backstage | todo | Red team: a dedicated subagent attacks our own app and backend (mock location, location simulated from a compu... |
+| AC-10 | P0 | Backstage | build | Red team: a dedicated subagent attacks our own app and backend (mock location, location simulated from a compu... |
 | AC-11 | P0 | Backstage | proposed | Verdicts only get kinder automatically: re-evaluation can only upgrade a verdict; "rejected" needs risk from 2 or more signal categories and no corroboration; shaming only on rejection. Source: anticheat.md §2.4, §5. |
 | AC-12 | P0 | Backstage | proposed | Event timing from the monotonic clock, a pre-fetched nonce book and a prev_hash chain for queued events, so replay protection works offline. Source: anticheat.md §2.6, §5. |
 | AC-13 | P0 | Backstage | proposed | Native modules "LocationIntegrity" (isProducedByAccessory, raw source flags) and "ProximityHandshake" (BLE peripheral and GATT), needed whatever the stack. Source: anticheat.md §1, §2.3, §5. |
@@ -451,7 +451,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | SLOP-02 | P0 | Backstage | build | Anti-slop review per ID: a subagent rereads copy, screenshots and code against `SLOP.md` with one question: "d... |
 | SLOP-03 | P0 | Backstage | build | Pass on every text in every language: a translation that reads machine-made counts as a defect; each language ... |
 | SLOP-04 | P0 | Backstage | build | Automated CI lint on every localisation file: em and en dashes, blacklisted words, "successfully" / "avec succ... |
-| SLOP-05 | P0 | Backstage | todo | Fresh-eyes test: a screenshot or a text pasted into a blank model session with the question "which AI tool mad... |
+| SLOP-05 | P0 | Backstage | build | Fresh-eyes test: a screenshot or a text pasted into a blank model session with the question "which AI tool mad... |
 | SLOP-06 | P1 | Backstage | todo | Crew panel: before each release, the friends read the copy and the cards. Anything that "sounds like AI" or "d... |
 | SLOP-07 | P0 | Backstage | build | Fresh context: subagents writing copy start a new session with `VOICE.md` + `SLOP.md`, because long contexts m... |
 | SLOP-08 | P0 | Backstage | build | Design: `DESIGN.md` explicitly bans the <design_patterns> tells. If the stack allows it, an automated detector... |

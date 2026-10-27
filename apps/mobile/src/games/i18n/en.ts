@@ -240,9 +240,9 @@ export const en: GameMessages = {
     },
     wheel: {
       name: "The Wheel",
-      tagline: "It spins, it slows down, it picks someone.",
+      tagline: "One slice each. Wherever it stops, that's you.",
       rule1: "One slice per player.",
-      rule2: "It really slows down. The result lands when it stops, not a second before.",
+      rule2: "Tap the button, the wheel does the rest.",
       rule3: "Whoever ends up under the pointer pays.",
       spin: "Spin the wheel",
       spinning: "The wheel is spinning",
@@ -263,7 +263,7 @@ export const en: GameMessages = {
     },
     verdict: {
       name: "The Verdict",
-      tagline: "Two friends face the table. The table decides.",
+      tagline: "Two of you in the dock. Everyone else votes.",
       rule1: "Two players face the table and get one question.",
       rule2: "Everyone else votes once by tapping a name.",
       rule3: "Most votes pays. On a tie, both do.",

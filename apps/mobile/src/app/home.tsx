@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from "expo-router";
-import { useEffect } from "react";
-import { Linking, StyleSheet, View } from "react-native";
+import { useEffect, useRef } from "react";
+import { StyleSheet, View } from "react-native";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
 import { refreshLiveParty, setGoingHome, setPartyStatus, useCrewData, type HomeMode, type LiveMember } from "@/server/crewData";
@@ -14,28 +14,13 @@ import { Chip, Panel, Segmented, Tag } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
-
-/** QOL-18: ride apps open in the app when installed, on the web otherwise. */
-const RIDE_APPS = [
-  { id: "uber", name: "Uber", app: "uber://", web: "https://m.uber.com/ul/" },
-  { id: "bolt", name: "Bolt", app: "bolt://", web: "https://bolt.eu/" },
-  { id: "heetch", name: "Heetch", app: "heetch://", web: "https://www.heetch.com/" },
-  { id: "freenow", name: "FREENOW", app: "freenow://", web: "https://www.free-now.com/" },
-  { id: "g7", name: "G7", app: "g7taxi://", web: "https://www.g7.fr/" },
-] as const;
-
-async function openRide(app: (typeof RIDE_APPS)[number]): Promise<void> {
-  try {
-    await Linking.openURL(app.app);
-  } catch {
-    await Linking.openURL(app.web);
-  }
-}
+import { openRide, RIDE_APPS } from "@/party/rides";
 
 const MODES: HomeMode[] = ["walk", "car", "ride", "transit"];
 
 /** N-27: who goes home with whom, offers to walk someone home, and a ride in one tap. */
 export default function GoingHomeScreen() {
+  const lastHomeTap = useRef(0);
   const { id } = useLocalSearchParams<{ id: string }>();
   const i18n = useT();
   const theme = useTheme();
@@ -81,6 +66,10 @@ export default function GoingHomeScreen() {
             variant={mine.homeSafeAt ? "outline" : "primary"}
             height={52}
             onPress={() => {
+              // A double tap must not mark me home and straight back out (ADP-09).
+              const now = Date.now();
+              if (now - lastHomeTap.current < 1_500) return;
+              lastHomeTap.current = now;
               haptic.confirmed();
               void setPartyStatus(id, { homeSafe: !mine.homeSafeAt }).catch(offline);
             }}

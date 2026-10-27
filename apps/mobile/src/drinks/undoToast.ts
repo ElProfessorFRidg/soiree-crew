@@ -2,9 +2,9 @@ import type { Translator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
 import { crossesPersonalLimit } from "@/reminders/reminders";
-import type { DrinkEntry } from "@/sync/types";
+import type { DrinkEntry, WaterEntry } from "@/sync/types";
 import { showToast } from "@/ui/Toast";
-import { removeDrink } from "./actions";
+import { removeDrink, removeWater } from "./actions";
 import { drinkLabel } from "./display";
 import { findPreset } from "./presets";
 
@@ -29,6 +29,21 @@ export function offerUndo(drink: DrinkEntry, i18n: Translator, hourCycle: "h12" 
       onPress: () => {
         haptic.select();
         removeDrink(drink);
+      },
+    },
+  });
+}
+
+/** A glass of water logged by mistake can be taken back the same way (ADP-09). */
+export function offerWaterUndo(water: WaterEntry, i18n: Translator): void {
+  showToast({
+    message: i18n.t("party.waterAdded"),
+    durationMs: 5_000,
+    action: {
+      label: i18n.t("common.undo"),
+      onPress: () => {
+        haptic.select();
+        removeWater(water);
       },
     },
   });

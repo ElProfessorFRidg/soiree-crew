@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Linking, Pressable, StyleSheet, View } from "react-native";
-import Animated, { cancelAnimation, Easing, useAnimatedProps, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, {
+  cancelAnimation,
+  Easing,
+  useAnimatedProps,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import Svg, { Circle } from "react-native-svg";
 import { palette } from "@crew/design-tokens";
 import { countryRules } from "@crew/units";
@@ -46,7 +52,8 @@ export default function SosScreen() {
   const primary = rules.emergency.ambulance ?? rules.emergency.primary;
   const session = useSession((state) => state.session);
   const liveParty = useLiveParty();
-  const [sent, setSent] = useState<null | "with" | "without">(null);
+  const [sent, setSent] = useState<null | "with" | "without" | "failed">(null);
+  const [holding, setHolding] = useState(false);
 
   /** N-28: the hold alerts the crew (with the location when allowed); without a crew it calls for help. */
   const trigger = () => {
@@ -55,11 +62,28 @@ export default function SosScreen() {
       return;
     }
     haptic.heavy();
-    const fix = Promise.race([currentFix(), new Promise<null>((resolve) => setTimeout(() => resolve(null), 4_000))]);
+    const fix = Promise.race([
+      currentFix(),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 4_000)),
+    ]);
     void fix.then(async (result) => {
-      const location = result && result.ok ? { lat: result.fix.lat, lng: result.fix.lng, accuracy: result.fix.accuracy } : undefined;
-      await sendSos({ ...(liveParty ? { partyId: liveParty.party.id } : {}), ...(location ? { location } : {}) }).catch(() => undefined);
-      setSent(location ? "with" : "without");
+      const location =
+        result && result.ok
+          ? {
+              lat: result.fix.lat,
+              lng: result.fix.lng,
+              accuracy: result.fix.accuracy,
+            }
+          : undefined;
+      // Saying "sent" when nothing left would be the worst lie in the app (ADP-09).
+      const ok = await sendSos({
+        ...(liveParty ? { partyId: liveParty.party.id } : {}),
+        ...(location ? { location } : {}),
+      })
+        .then(() => true)
+        .catch(() => false);
+      if (!ok) haptic.error();
+      setSent(ok ? (location ? "with" : "without") : "failed");
     });
   };
 
@@ -83,15 +107,24 @@ export default function SosScreen() {
       trigger();
       return;
     }
-    const timer = setTimeout(() => setCountdown((s) => (s === null ? null : s - 1)), 1_000);
+    const timer = setTimeout(
+      () => setCountdown((s) => (s === null ? null : s - 1)),
+      1_000,
+    );
     return () => clearTimeout(timer);
   }, [countdown, primary]);
 
   const circumference = Math.PI * (RING - STROKE);
-  const ringProps = useAnimatedProps(() => ({ strokeDashoffset: circumference * (1 - progress.value) }));
+  const ringProps = useAnimatedProps(() => ({
+    strokeDashoffset: circumference * (1 - progress.value),
+  }));
 
   const startHold = () => {
-    progress.value = withTiming(1, { duration: HOLD_MS, easing: Easing.linear });
+    setHolding(true);
+    progress.value = withTiming(1, {
+      duration: HOLD_MS,
+      easing: Easing.linear,
+    });
     let ticks = 0;
     ticker.current = setInterval(() => {
       ticks += 1;
@@ -101,6 +134,7 @@ export default function SosScreen() {
     holdTimer.current = setTimeout(trigger, HOLD_MS);
   };
   const endHold = () => {
+    setHolding(false);
     cancelAnimation(progress);
     progress.value = withTiming(0, { duration: 200 });
     if (holdTimer.current) clearTimeout(holdTimer.current);
@@ -110,18 +144,29 @@ export default function SosScreen() {
   const holdMode = level < 2;
 
   return (
-    <Screen back title={i18n.t("sos.title")}>
+    <Screen back title={i18n.t("sos.title")} scrollEnabled={!holding}>
       <View style={styles.center}>
         {holdMode ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={session ? i18n.t("sosAlert.alertA11y") : i18n.t("sos.holdA11y")}
+            accessibilityLabel={
+              session ? i18n.t("sosAlert.alertA11y") : i18n.t("sos.holdA11y")
+            }
             onPressIn={startHold}
             onPressOut={endHold}
+            // A shaky thumb can drift well off the ring without cancelling the hold.
+            pressRetentionOffset={{ top: 80, bottom: 80, left: 80, right: 80 }}
             style={styles.ringButton}
           >
             <Svg width={RING} height={RING} style={StyleSheet.absoluteFill}>
-              <Circle cx={RING / 2} cy={RING / 2} r={(RING - STROKE) / 2} stroke={palette.tint.dangerBg} strokeWidth={STROKE} fill="none" />
+              <Circle
+                cx={RING / 2}
+                cy={RING / 2}
+                r={(RING - STROKE) / 2}
+                stroke={palette.tint.dangerBg}
+                strokeWidth={STROKE}
+                fill="none"
+              />
               <AnimatedCircle
                 cx={RING / 2}
                 cy={RING / 2}
@@ -144,7 +189,11 @@ export default function SosScreen() {
           </Pressable>
         ) : countdown === null ? (
           <Button
-            label={session ? i18n.t("sosAlert.tapToAlert") : i18n.t("sos.tap", { number: primary })}
+            label={
+              session
+                ? i18n.t("sosAlert.tapToAlert")
+                : i18n.t("sos.tap", { number: primary })
+            }
             icon="phone"
             variant="danger"
             height={104}
@@ -158,16 +207,63 @@ export default function SosScreen() {
           />
         ) : (
           <View style={[styles.wide, styles.countdown]}>
-            <Text variant="h2" align="center" accessibilityLiveRegion="assertive">
-              {session ? i18n.t("sosAlert.countdown", { seconds: countdown }) : i18n.t("sos.countdown", { seconds: countdown })}
+            <Text
+              variant="h2"
+              align="center"
+              accessibilityLiveRegion="assertive"
+            >
+              {session
+                ? i18n.t("sosAlert.countdown", { seconds: countdown })
+                : i18n.t("sos.countdown", { seconds: countdown })}
             </Text>
-            <Button label={session ? i18n.t("sosAlert.cancel") : i18n.t("sos.cancel")} variant="secondary" height={104} fontSize={24} onPress={() => setCountdown(null)} />
+            <Button
+              label={session ? i18n.t("sosAlert.cancel") : i18n.t("sos.cancel")}
+              variant="secondary"
+              height={104}
+              fontSize={24}
+              onPress={() => setCountdown(null)}
+            />
           </View>
         )}
-        {holdMode && !sent ? <Text align="center">{session ? i18n.t("sosAlert.holdToAlert") : i18n.t("sos.hold")}</Text> : null}
-        {sent ? (
+        {holdMode && !sent ? (
+          <Text align="center">
+            {session ? i18n.t("sosAlert.holdToAlert") : i18n.t("sos.hold")}
+          </Text>
+        ) : null}
+        {sent === "failed" ? (
+          <View style={styles.wide}>
+            <Text
+              variant="h2"
+              align="center"
+              color={theme.danger}
+              accessibilityLiveRegion="assertive"
+            >
+              {i18n.t("sosAlert.failed")}
+            </Text>
+            <Button
+              label={i18n.t("common.retry")}
+              variant="secondary"
+              height={64}
+              fontSize={20}
+              onPress={() => {
+                setSent(null);
+                trigger();
+              }}
+            />
+            <Button
+              label={i18n.t("party.callEmergency", { number: primary })}
+              icon="phone"
+              variant="danger"
+              height={64}
+              onPress={() => call(primary)}
+            />
+          </View>
+        ) : sent ? (
           <Text variant="h2" align="center" accessibilityLiveRegion="assertive">
-            {i18n.t("sosAlert.sent")} {sent === "with" ? i18n.t("sosAlert.withLocation") : i18n.t("sosAlert.withoutLocation")}
+            {i18n.t("sosAlert.sent")}{" "}
+            {sent === "with"
+              ? i18n.t("sosAlert.withLocation")
+              : i18n.t("sosAlert.withoutLocation")}
           </Text>
         ) : null}
       </View>
@@ -175,18 +271,40 @@ export default function SosScreen() {
       <Text variant="label">{i18n.t("sos.numbers")}</Text>
       <Panel>
         {rules.emergency.ambulance ? (
-          <Row title={i18n.t("sos.ambulance")} subtitle={rules.emergency.ambulance} onPress={() => call(rules.emergency.ambulance!)} />
+          <Row
+            title={i18n.t("sos.ambulance")}
+            subtitle={rules.emergency.ambulance}
+            onPress={() => call(rules.emergency.ambulance!)}
+          />
         ) : null}
         {rules.emergency.police ? (
-          <Row title={i18n.t("sos.police")} subtitle={rules.emergency.police} onPress={() => call(rules.emergency.police!)} />
+          <Row
+            title={i18n.t("sos.police")}
+            subtitle={rules.emergency.police}
+            onPress={() => call(rules.emergency.police!)}
+          />
         ) : null}
         {rules.emergency.fire ? (
-          <Row title={i18n.t("sos.fire")} subtitle={rules.emergency.fire} onPress={() => call(rules.emergency.fire!)} />
+          <Row
+            title={i18n.t("sos.fire")}
+            subtitle={rules.emergency.fire}
+            onPress={() => call(rules.emergency.fire!)}
+          />
         ) : null}
         {rules.emergency.eu112 && primary !== "112" ? (
-          <Row title={i18n.t("sos.europe")} subtitle="112" onPress={() => call("112")} last />
+          <Row
+            title={i18n.t("sos.europe")}
+            subtitle="112"
+            onPress={() => call("112")}
+            last
+          />
         ) : !rules.emergency.ambulance ? (
-          <Row title={i18n.t("sos.ambulance")} subtitle={primary} onPress={() => call(primary)} last />
+          <Row
+            title={i18n.t("sos.ambulance")}
+            subtitle={primary}
+            onPress={() => call(primary)}
+            last
+          />
         ) : null}
       </Panel>
     </Screen>
@@ -195,8 +313,20 @@ export default function SosScreen() {
 
 const styles = StyleSheet.create({
   center: { alignItems: "center", gap: 16, paddingVertical: 12 },
-  ringButton: { width: RING, height: RING, alignItems: "center", justifyContent: "center" },
-  core: { width: RING - 44, height: RING - 44, borderRadius: RING, alignItems: "center", justifyContent: "center", gap: 6 },
+  ringButton: {
+    width: RING,
+    height: RING,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  core: {
+    width: RING - 44,
+    height: RING - 44,
+    borderRadius: RING,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+  },
   wide: { alignSelf: "stretch" },
   countdown: { gap: 16 },
 });

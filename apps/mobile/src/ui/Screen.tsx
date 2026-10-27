@@ -19,9 +19,11 @@ interface Props {
   withToasts?: boolean;
   /** MOT-10: pull to refresh. The screen shows the spinner until the promise settles. */
   onRefresh?: () => Promise<unknown>;
+  /** Off while a hold is running, so a small slide of the finger does not turn into a scroll. */
+  scrollEnabled?: boolean;
 }
 
-export function Screen({ title, back, trailing, children, footer, withToasts, onRefresh }: Props) {
+export function Screen({ title, back, trailing, children, footer, withToasts, onRefresh, scrollEnabled = true }: Props) {
   const [refreshing, setRefreshing] = useState(false);
   const theme = useTheme();
   const i18n = useT();
@@ -30,6 +32,7 @@ export function Screen({ title, back, trailing, children, footer, withToasts, on
     // QOL-08: the keyboard never covers the field being typed, and the footer button rides above it.
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={[styles.screen, { backgroundColor: theme.bg }]}>
       <ScrollView
+        scrollEnabled={scrollEnabled}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         refreshControl={

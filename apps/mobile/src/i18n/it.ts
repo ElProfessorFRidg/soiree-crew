@@ -38,7 +38,7 @@ export const it: Messages = {
     atZero: "Niente alcol nel sangue.",
     backToZero: "Di nuovo a 0",
     driving: "Guida",
-    drivingOk: "OK",
+    drivingOk: "Sotto il limite stimato",
     tooClose: "Troppo vicino al limite",
     zeroTolerance: "Nessun bicchiere consentito",
     notice: "Una stima, non un etilometro. Non metterti mai alla guida basandoti su questo numero.",
@@ -51,7 +51,7 @@ export const it: Messages = {
     levelNote0: "Livello 0: schermo completo.",
     levelNote1: "Livello 1: più grande, meno opzioni.",
     levelNote2: "Livello 2: tasti grandi, solo l'essenziale.",
-    levelNote3: "Livello 3: tornare a casa, chiamare, bere acqua.",
+    levelNote3: "Livello 3: tornare a casa, bere acqua, chiedere aiuto.",
     howHome: "Come torni a casa?",
     ride: "In taxi",
     addAnyway: "Aggiungi comunque un bicchiere",
@@ -71,6 +71,8 @@ export const it: Messages = {
     poisoningBody: "Segni di intossicazione grave: confusione, vomito, respiro lento, pelle pallida o bluastra. Se vedi questi segni, chiama il {number}. Resta con qualcuno. Niente doccia fredda, niente caffè.",
     dareTitle: "La sfida della serata",
     dareHint: "Per chi vuole. Una nuova ogni sera, la stessa per tutta la crew.",
+    waterAdded: "Bicchiere d'acqua segnato.",
+    homeMarked: "La crew sa che sei a casa.",
   },
   curve: {
     title: "La tua curva",
@@ -327,7 +329,7 @@ export const it: Messages = {
     stillHere: "Sono ancora qui",
     stillHereDone: "Ok, il tempo continua a contare.",
     leave: "Me ne vado",
-    done: "OK",
+    done: "Chiudi",
   },
   venue: {
     season: "Stagione {season}",
@@ -413,6 +415,7 @@ export const it: Messages = {
     received: "{name} ha bisogno di aiuto",
     openMap: "Vedi dove",
     resolve: "Tutto risolto",
+    failed: "L'allerta non è partita. Riprova o chiama i soccorsi.",
   },
   money: {
     title: "Casse comuni e giri",
