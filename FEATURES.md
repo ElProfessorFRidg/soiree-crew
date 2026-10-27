@@ -434,7 +434,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | AC-10 | P0 | Backstage | build | Red team: a dedicated subagent attacks our own app and backend (mock location, location simulated from a compu... |
 | AC-11 | P0 | Backstage | build | Verdicts only get kinder automatically: re-evaluation can only upgrade a verdict; "rejected" needs risk from 2 or more signal categories and no corroboration; shaming only on rejection. Source: anticheat.md §2.4, §5. |
 | AC-12 | P0 | Backstage | build | Event timing from the monotonic clock, a pre-fetched nonce book and a prev_hash chain for queued events, so replay protection works offline. Source: anticheat.md §2.6, §5. |
-| AC-13 | P0 | Backstage | proposed | Native modules "LocationIntegrity" (isProducedByAccessory, raw source flags) and "ProximityHandshake" (BLE peripheral and GATT), needed whatever the stack. Source: anticheat.md §1, §2.3, §5. |
+| AC-13 | P0 | Backstage | partial | Native modules "LocationIntegrity" (isProducedByAccessory, raw source flags) and "ProximityHandshake" (BLE peripheral and GATT), needed whatever the stack. Source: anticheat.md §1, §2.3, §5. |
 | AC-14 | P1 | Backstage | proposed | Persistent device-level repeat-offender marker (DeviceCheck bits on iOS, Play deviceRecall beta on Android). Source: anticheat.md §5. |
 | AC-15 | P0 | Backstage (near Bars.dc.html) | build | Imprecise location (approximate permission or accuracy above 150 m) gives "unverified, ask a friend", never a penalty. Source: anticheat.md §2.2, §5. |
 
