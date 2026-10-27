@@ -14,6 +14,8 @@ import {
   fetchConfirmable,
   fetchLeaderboard,
   setCrewParticipation,
+  fetchTitles,
+  type TitlesRow,
   type ConfirmableDrink,
   type LeaderboardMetric,
   type LeaderboardPeriod,
@@ -24,7 +26,7 @@ import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
 import { Button } from "@/ui/Button";
-import { Chip, Panel, Segmented, Switch } from "@/ui/controls";
+import { Chip, Panel, Segmented, Switch, Tag } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { Numeral, Text } from "@/ui/Text";
@@ -174,6 +176,8 @@ export default function LeaderboardScreen() {
         </Panel>
       ) : null}
 
+      {crewId ? <BarTitles crewId={crewId} /> : null}
+
       {crewId ? (
         <Panel>
           <View style={styles.switchRow}>
@@ -187,6 +191,46 @@ export default function LeaderboardScreen() {
         </Panel>
       ) : null}
     </Screen>
+  );
+}
+
+/** TER-06: bars held this season and the titles that come with going out. */
+function BarTitles({ crewId }: { crewId: string }) {
+  const i18n = useT();
+  const theme = useTheme();
+  const [rows, setRows] = useState<TitlesRow[]>([]);
+  useEffect(() => {
+    void fetchTitles(crewId)
+      .then((data) => setRows(data.rows.filter((r) => r.visited > 0)))
+      .catch(() => undefined);
+  }, [crewId]);
+  if (!rows.length) return null;
+  const label = (t: TitlesRow["titles"][number]) => (t.kind === "mayor" ? i18n.t("ranking.mayor", { venue: t.venueName ?? "" }) : i18n.t(`ranking.${t.kind}`));
+  return (
+    <>
+      <Text variant="label">{i18n.t("ranking.bars")}</Text>
+      <Text variant="small">{i18n.t("ranking.barsHint")}</Text>
+      <View>
+        {rows.map((row, index) => (
+          <View key={row.userId} style={[styles.row, { borderBottomColor: theme.line, borderBottomWidth: index === rows.length - 1 ? 0 : 1 }]}>
+            <Avatar personId={row.userId} name={row.name} />
+            <View style={styles.flex}>
+              <Text variant="h3">{row.name}</Text>
+              <Text variant="small">
+                {i18n.plural("ranking.ruled", row.ruled)}, {i18n.plural("ranking.visited", row.visited)}
+              </Text>
+              {row.titles.length ? (
+                <View style={styles.chips}>
+                  {row.titles.map((t, i) => (
+                    <Tag key={`${t.kind}-${i}`} label={label(t)} tone={t.kind === "mayor" ? "amber" : "neutral"} icon={t.kind === "mayor" ? "crown" : undefined} />
+                  ))}
+                </View>
+              ) : null}
+            </View>
+          </View>
+        ))}
+      </View>
+    </>
   );
 }
 

@@ -1,9 +1,10 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { challengers } from "@crew/territory";
+import { challengers, seasonBounds, territoryTitles } from "@crew/territory";
 import { AC_CONFIG, evaluateCheckIn, fixHash } from "../anticheat";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { crewStandings, crewTimeZone, currentSeason, updateBoss } from "../territory";
+import { nightOf, offsetMinutes } from "../time";
 
 const venueSchema = z.object({
   id: z.string().uuid(),
@@ -41,6 +42,52 @@ async function notifyCrew(ctx: Context, crewId: string): Promise<void> {
 }
 
 export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string): void {
+  /** TER-06: venues ruled and titles, per member who plays the territory game. */
+  app.get<{ Params: { id: string } }>("/v1/crews/:id/titles", async (request) => {
+    const user = requireUser(request);
+    await assertCrewMember(ctx, request.params.id, user.id);
+    const crewId = request.params.id;
+    const timeZone = await crewTimeZone(ctx.db, crewId);
+    const season = currentSeason(ctx.now(), timeZone);
+    const { start } = seasonBounds(season, offsetMinutes(ctx.now(), timeZone));
+    const members = await ctx.db.query<{ user_id: string; display_name: string }>(
+      `select m.user_id, u.display_name from crew_members m join users u on u.id = m.user_id
+       where m.crew_id = $1 and m.territory_opt_out = false`,
+      [crewId],
+    );
+    const reigns = await ctx.db.query<{ user_id: string; venue_id: string; name: string }>(
+      `select r.user_id, r.venue_id, v.name from reigns r join venues v on v.id = r.venue_id
+       where v.crew_id = $1 and r.season = $2 and r.ended_at is null`,
+      [crewId, season],
+    );
+    const checkIns = await ctx.db.query<{ user_id: string; venue_id: string; at: number }>(
+      `select c.user_id, c.venue_id, c.at from check_ins c join venues v on v.id = c.venue_id and v.crew_id = $1 and v.kind <> 'home'
+       where c.verdict = 'accepted' and c.private = false`,
+      [crewId],
+    );
+    const rows = territoryTitles(
+      members.map((m) => ({
+        memberId: m.user_id,
+        ruled: reigns.filter((r) => r.user_id === m.user_id).map((r) => r.venue_id),
+        checkIns: checkIns
+          .filter((c) => c.user_id === m.user_id)
+          .map((c) => ({ venueId: c.venue_id, night: nightOf(c.at, timeZone), thisSeason: c.at >= start })),
+      })),
+    );
+    const venueName = new Map(reigns.map((r) => [r.venue_id, r.name]));
+    const name = new Map(members.map((m) => [m.user_id, m.display_name]));
+    return {
+      season,
+      rows: rows.map((r) => ({
+        userId: r.memberId,
+        name: name.get(r.memberId) ?? "",
+        ruled: r.ruled,
+        visited: r.visited,
+        titles: r.titles.map((t) => (t.venueId ? { kind: t.kind, venueName: venueName.get(t.venueId) ?? "" } : { kind: t.kind })),
+      })),
+    };
+  });
+
   app.post<{ Params: { id: string } }>("/v1/crews/:id/venues", async (request, reply) => {
     const user = requireUser(request);
     await assertCrewMember(ctx, request.params.id, user.id);

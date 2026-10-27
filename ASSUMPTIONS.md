@@ -17,6 +17,7 @@ Status values: `open`, `confirmed`, `overturned`.
 | A-ORCH-7 | Recap reactions are a fixed set of six emojis. | Faster than a keyboard the morning after; keeps the copy reviewable. | Widen if crews ask. | open |
 | A-ORCH-8 | Deleted accounts leave the host's backups within 30 days. | GDPR asks for a stated delay; the private build has no backup policy of its own. | Confirm with whoever hosts the server. | open |
 | A-ORCH-9 | No passwords, passkeys or 2FA in the private build: accounts sign in with a device token, and new phones join with a one-time code from a signed-in phone. | Nothing to phish or reuse; the server never holds a password. | Add passkeys before a public release (SEC-07). | open |
+| A-ORCH-10 | Territory titles: Mayor per bar held, Empire from 3 bars held, Globetrotter from 8 bars ever visited, Nomad from 3 bars in one night this season. French names are épicène (« Maire », « Empire », « Globe-trotter », « Nomade ») instead of « Conquérant » and « Explorateur ». | Titles must read right for everyone. | Thresholds live in `TITLE_RULES`. | open |
 
 ## From recon reports
 

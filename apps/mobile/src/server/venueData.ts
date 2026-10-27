@@ -173,3 +173,16 @@ export function fetchConfirmable(partyId: string): Promise<{ drinks: Confirmable
 export function confirmDrink(drinkId: string): Promise<unknown> {
   return api(`/v1/drinks/${drinkId}/confirm`, { method: "POST" });
 }
+
+export interface TitlesRow {
+  userId: string;
+  name: string;
+  ruled: number;
+  visited: number;
+  titles: { kind: "mayor" | "conqueror" | "explorer" | "nomad"; venueName?: string }[];
+}
+
+/** TER-06 */
+export function fetchTitles(crewId: string): Promise<{ season: string; rows: TitlesRow[] }> {
+  return api(`/v1/crews/${crewId}/titles`);
+}

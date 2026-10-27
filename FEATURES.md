@@ -340,7 +340,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | TER-03 | P0 | Bars.dc.html | build | Check-ins: one counted check-in per venue per party, a minimum delay between two check-ins; every check-in goe... |
 | TER-04 | P0 | Bars.dc.html | build | Seasons and takeovers: monthly seasons with a reset, "X just took Bar Y from you" notification, history of rei... |
 | TER-05 | P0 | Bars.dc.html | build | Venue page: current boss, season top 5, past bosses, drink prices (N-09), happy hours, the crew's latest night... |
-| TER-06 | P0 | Bars.dc.html | todo | Rankings and titles: number of venues ruled, titles ("Mayor of Bar Y", "Conqueror", "Explorer", "Nomad"), tied... |
+| TER-06 | P0 | Bars.dc.html | build | Rankings and titles: number of venues ruled, titles ("Mayor of Bar Y", "Conqueror", "Explorer", "Nomad"), tied... |
 | TER-07 | P1 | Bars.dc.html | todo | Crew vs crew: which crew rules which venue when several crews use the app. |
 | TER-08 | P1 | Bars.dc.html | build | Fog of war: never-visited venues are "to conquer", conquest suggestions for the next night out (linked to N-11). |
 | TER-09 | P0 | Bars.dc.html | build | Privacy: only check-ins are shared (never continuous tracking for this game), anyone can opt out of the territ... |

@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
-import { challengers, countedCheckIns, resolveBoss, scoreSeason, seasonBounds, seasonKey, timePoints, weekKey, type CountedCheckIn } from "./index";
+import {
+  territoryTitles, describe, expect, it } from "vitest";
+import { challengers, countedCheckIns, resolveBoss, scoreSeason, seasonBounds, seasonKey, territoryTitles, timePoints, weekKey, type CountedCheckIn } from "./index";
 
 const MIN = 60_000;
 const T0 = Date.UTC(2026, 10, 6, 21, 0); // Fri 6 Nov 2026, 22:00 in Paris
@@ -149,5 +150,23 @@ describe("seasons", () => {
   it("computes ISO weeks", () => {
     expect(weekKey("2026-11-06")).toBe("2026-W45");
     expect(weekKey("2026-01-01")).toBe("2026-W01");
+  });
+});
+
+describe("territory titles (TER-06)", () => {
+  const ci = (venueId: string, night: string, thisSeason = true) => ({ venueId, night, thisSeason });
+  it("gives mayor per venue held, conqueror from 3, explorer from 8 venues, nomad from 3 venues in a night", () => {
+    const [jade, malik] = territoryTitles([
+      { memberId: "malik", ruled: ["a"], checkIns: [ci("a", "2026-11-07"), ci("b", "2026-11-07"), ci("c", "2026-11-07")] },
+      {
+        memberId: "jade",
+        ruled: ["a", "b", "c"],
+        checkIns: ["a", "b", "c", "d", "e", "f", "g", "h"].map((v, i) => ci(v, `2026-10-0${(i % 4) + 1}`, false)),
+      },
+    ]);
+    expect(jade!.memberId).toBe("jade");
+    expect(jade!.titles.map((t) => t.kind)).toEqual(["mayor", "mayor", "mayor", "conqueror", "explorer"]);
+    expect(malik!.titles.map((t) => t.kind)).toEqual(["mayor", "nomad"]);
+    expect(malik!.visited).toBe(3);
   });
 });

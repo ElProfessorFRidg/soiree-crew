@@ -88,3 +88,14 @@ describe("where to? (N-11)", () => {
     expect((await vote(jade, randomUUID())).statusCode).toBe(404);
   });
 });
+
+describe("territory titles endpoint (TER-06)", () => {
+  it("lists players with venues ruled and leaves out members who opted out", async () => {
+    const { users, crewId } = await crewWithParty("jade", "malik");
+    const [jade, malik] = users as [User, User];
+    await app.inject({ method: "PATCH", url: `/v1/crews/${crewId}/me`, headers: malik.auth, payload: { territoryOptOut: true } });
+    const body = (await app.inject({ method: "GET", url: `/v1/crews/${crewId}/titles`, headers: jade.auth })).json() as { rows: { userId: string; ruled: number; titles: unknown[] }[] };
+    expect(body.rows.map((r) => r.userId)).toEqual([jade.id]);
+    expect(body.rows[0]).toMatchObject({ ruled: 0, titles: [] });
+  });
+});
