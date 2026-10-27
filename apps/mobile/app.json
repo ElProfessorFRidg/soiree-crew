@@ -121,6 +121,25 @@
           "recordAudioAndroid": false,
           "barcodeScannerEnabled": true
         }
+      ],
+      [
+        "react-native-android-widget",
+        {
+          "widgets": [
+            {
+              "name": "Night",
+              "label": "Soirée Crew",
+              "description": "Back to zero and one-tap buttons for tonight.",
+              "minWidth": "250dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 4,
+              "targetCellHeight": 2,
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 1800000,
+              "widgetCategory": "home_screen|keyguard"
+            }
+          ]
+        }
       ]
     ],
     "experiments": {

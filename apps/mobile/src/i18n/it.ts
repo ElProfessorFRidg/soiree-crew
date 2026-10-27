@@ -1238,7 +1238,7 @@ export const it: Messages = {
     happyLine: "Happy hour: {hours}",
     ownerTitle: "La tua pagina",
     hoursField: "Orari",
-    hoursPlaceholder: "Mar-sab 18-2",
+    hoursPlaceholder: "Da martedì a sabato, dalle 18 alle 2",
     happyField: "Happy hour",
     ownerRules: "Puoi rispondere alle recensioni, mai nasconderle o cancellarle.",
     claimPending: "Richiesta inviata, in verifica.",
@@ -1463,6 +1463,14 @@ export const it: Messages = {
     leaveCrew: "Esci dalla crew",
     leaveParty: "Esci dalla serata",
     leavePartyConfirm: "Uscire dalla serata? La sua chat se ne va con lei.",
+  },
+  widget: {
+    title: "Stasera",
+    zero: "Niente nel sangue",
+    backAt: "Ritorno a 0 verso le {time}",
+    levelBack: "{value}, ritorno a 0 verso le {time}",
+    pint: "Un altro",
+    water: "Acqua",
   },
   addDrink: {
     quick: "Scrivi cosa bevi",

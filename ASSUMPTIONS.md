@@ -39,6 +39,7 @@ Status values: `open`, `confirmed`, `overturned`.
 | A-ORCH-29 | Safety numbers show 60 digits (both people, Signal's format) where the prototype draws 30. | 30 digits cover one side only. | Design review. | open |
 | A-ORCH-30 | MSG-04 holds because nothing about a chat leaves through a notification: the app sends no remote push at all yet, and chat activity shows only as an unread count inside the app. Encrypted push payloads wait for remote notifications (paid Apple account). | No push service is configured. | When push is added. | open |
 | A-ORCH-31 | QOL-22 ships without GTFS: after midnight the way-home screen opens the maps app's public-transport directions from the current spot, which list the last departures. QOL-29 ships the pasted invite link; Android Install Referrer and an iOS clipboard prompt at first launch wait for native work. | No transit feed or API key is configured. | A GTFS feed per city. | open |
+| A-ORCH-32 | O-33 and HUB-03 ship on Android first: one resizable home-screen widget (time back to zero, the level only if the person allows figures, Same again and Water buttons through the quick actions), also offered on the lock screen where Android 16 allows widgets there. iOS widgets, the live curve and Live Activity need a WidgetKit target and a paid Apple account. | react-native-android-widget builds in CI without signing. | iOS target. | open |
 
 ## From recon reports
 

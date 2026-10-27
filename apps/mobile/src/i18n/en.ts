@@ -1239,7 +1239,7 @@ export const en: Messages = {
     happyLine: "Happy hour: {hours}",
     ownerTitle: "Your page",
     hoursField: "Hours",
-    hoursPlaceholder: "Tue-Sat 6 pm - 2 am",
+    hoursPlaceholder: "Tuesday to Saturday, 6 pm to 2 am",
     happyField: "Happy hour",
     ownerRules: "You can answer reviews, never hide or delete them.",
     claimPending: "Request sent, being checked.",
@@ -1464,6 +1464,14 @@ export const en: Messages = {
     leaveCrew: "Leave the crew",
     leaveParty: "Leave the party",
     leavePartyConfirm: "Leave the party? Its chat goes with it.",
+  },
+  widget: {
+    title: "Tonight",
+    zero: "Nothing in the blood",
+    backAt: "Back to zero around {time}",
+    levelBack: "{value}, back to zero around {time}",
+    pint: "Same again",
+    water: "Water",
   },
   addDrink: {
     quick: "Type what you're drinking",

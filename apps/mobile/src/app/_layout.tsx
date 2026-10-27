@@ -24,6 +24,7 @@ import { useEco, watchBattery } from "@/power/eco";
 import { logWater } from "@/drinks/actions";
 import { LOG_WATER_ACTION, MUTE_ACTION, muteUntilMorning, refreshReminders } from "@/reminders/reminders";
 import { flushUploads } from "@/photos/uploads";
+import { watchWidget } from "@/widgets/sync";
 
 // MOT-14: the test harness drives the motion time scale in dev builds.
 if (__DEV__) (globalThis as { __crewMotion?: unknown }).__crewMotion = { setScale: setMotionScale, getScale: getMotionScale };
@@ -61,6 +62,7 @@ export default function RootLayout() {
   useEffect(() => {
     void loadSession();
     watchBattery();
+    watchWidget();
   }, []);
 
   useEffect(() => {

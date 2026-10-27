@@ -1237,7 +1237,7 @@ export const fr = {
     happyLine: "Happy hour : {hours}",
     ownerTitle: "Ta page",
     hoursField: "Horaires",
-    hoursPlaceholder: "Mar.-sam. 18 h - 2 h",
+    hoursPlaceholder: "Du mardi au samedi, 18 h à 2 h",
     happyField: "Happy hour",
     ownerRules: "Tu peux répondre aux avis, jamais les cacher ni les supprimer.",
     claimPending: "Demande envoyée, en cours de vérification.",
@@ -1462,6 +1462,14 @@ export const fr = {
     leaveCrew: "Quitter le crew",
     leaveParty: "Quitter la soirée",
     leavePartyConfirm: "Quitter la soirée ? Tu ne verras plus sa discussion.",
+  },
+  widget: {
+    title: "Ce soir",
+    zero: "Rien dans le sang",
+    backAt: "Retour à 0 vers {time}",
+    levelBack: "{value}, retour à 0 vers {time}",
+    pint: "Encore un verre",
+    water: "Eau",
   },
   addDrink: {
     quick: "Tape ce que tu bois",

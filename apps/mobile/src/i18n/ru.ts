@@ -1263,7 +1263,7 @@ export const ru: Messages = {
     happyLine: "Счастливые часы: {hours}",
     ownerTitle: "Твоя страница",
     hoursField: "Часы работы",
-    hoursPlaceholder: "Вт-сб 18-2",
+    hoursPlaceholder: "Со вторника по субботу, с 18 до 2",
     happyField: "Счастливые часы",
     ownerRules: "Ты можешь отвечать на отзывы, но не скрывать и не удалять их.",
     claimPending: "Запрос отправлен, идёт проверка.",
@@ -1488,6 +1488,14 @@ export const ru: Messages = {
     leaveCrew: "Выйти из крю",
     leaveParty: "Выйти из вечеринки",
     leavePartyConfirm: "Выйти из вечеринки? Её чат пропадёт вместе с ней.",
+  },
+  widget: {
+    title: "Сегодня",
+    zero: "В крови ничего",
+    backAt: "Ноль примерно к {time}",
+    levelBack: "{value}, ноль примерно к {time}",
+    pint: "Ещё такой же",
+    water: "Вода",
   },
   addDrink: {
     quick: "Напиши, что пьёшь",

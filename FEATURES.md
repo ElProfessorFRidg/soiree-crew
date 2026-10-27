@@ -57,7 +57,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| O-33 | P0 | Systeme.dc.html | todo | iOS and Android home-screen widget in 3 sizes: live curve that falls on its own, back-to-zero, interactive but... |
+| O-33 | P0 | Systeme.dc.html | partial | iOS and Android home-screen widget in 3 sizes: live curve that falls on its own, back-to-zero, interactive but... |
 | O-34 | P0 | Soiree.dc.html | build | In-app home blocks: real-time BAC up front, "Party in progress" block, continuous refresh. |
 
 ## Parties and trips
@@ -156,7 +156,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 |---|---|---|---|---|
 | HUB-01 | P0 | Soiree.dc.html | build | Party screen, opened automatically during a party. Shows, without pointless scrolling: my BAC and trend, add a... |
 | HUB-02 | P0 | Systeme.dc.html | build | iOS Live Activity / Dynamic Island and a persistent Android notification during the party: BAC, back-to-zero, ... |
-| HUB-03 | P0 | Systeme.dc.html | todo | Lock-screen widgets (BAC, next water, who is out tonight). |
+| HUB-03 | P0 | Systeme.dc.html | partial | Lock-screen widgets (BAC, next water, who is out tonight). |
 | HUB-04 | P2 | Systeme.dc.html | todo | Smartwatch: BAC, add drink and water from the wrist. |
 
 ## Preferences and units

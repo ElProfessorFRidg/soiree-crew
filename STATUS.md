@@ -5,13 +5,15 @@ Generated from FEATURES.md on 2026-10-27 by `pnpm status`. Edit FEATURES.md, not
 | Status | Count |
 |---|---|
 | Built | 291 |
-| Partly built | 4 |
-| To do | 8 |
+| Partly built | 6 |
+| To do | 6 |
 | Proposed (not in the brief yet) | 6 |
 | Total | 309 |
 
 ## Partly built
 
+- **O-33** (P0, Widgets): iOS and Android home-screen widget in 3 sizes: live curve that falls on its own, back-to-zero, interactive but
+- **HUB-03** (P0, Party hub): Lock-screen widgets (BAC, next water, who is out tonight).
 - **QOL-22** (P2, Everyday polish): Last ride home: after midnight, the last night bus / metro departures near the venue on the Party screen, when
 - **QOL-27** (P0, Everyday polish): Discreet lock screen: by default lock screen, Live Activity, widget and notifications show no BAC figure or drink count (level icon and time to zero only); numb
 - **QOL-29** (P0, Everyday polish): Invite survives the install: a friend who installs from an invite link lands in the right crew or party (Play Install Referrer; invite code plus system Paste bu
@@ -19,8 +21,6 @@ Generated from FEATURES.md on 2026-10-27 by `pnpm status`. Edit FEATURES.md, not
 
 ## To do
 
-- **O-33** (P0, Widgets): iOS and Android home-screen widget in 3 sizes: live curve that falls on its own, back-to-zero, interactive but
-- **HUB-03** (P0, Party hub): Lock-screen widgets (BAC, next water, who is out tonight).
 - **HUB-04** (P2, Party hub): Smartwatch: BAC, add drink and water from the wrist.
 - **QOL-06** (P0, Everyday polish): Native sharing: recap and story cards go straight to Instagram Stories, Snapchat (Creative Kit), TikTok and Wh
 - **JOY-01** (P1, Delight): Cheers: bring two phones together (Bluetooth LE / NFC) and both screens play a clink with sound and haptic. It
