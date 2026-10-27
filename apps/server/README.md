@@ -12,13 +12,6 @@ Without `DATABASE_URL` it stores data in `apps/server/data` with PGlite. Stop it
 
 ## Deploy (Coolify or any Docker host)
 
-Build from the repository root with `apps/server/Dockerfile`, then set:
-
-- `DATABASE_URL`: a PostgreSQL 16 database
-- `DATA_KEY`: `openssl rand -base64 32`, kept secret and backed up (losing it makes health data unreadable)
-- `PUBLIC_URL`: the https address of the server, used in invite links and photo links
-- `UPLOAD_DIR` (optional, default `./data/uploads`): where album photos are kept. Mount it as a volume so photos survive a redeploy
-
-Expose port 8787 behind HTTPS.
+See `deploy/README.md` (compose file with PostgreSQL, every variable, what the proxy must allow, backups) and `deploy/VPS_PROMPT.md` (step-by-step brief for setting up a public server).
 
 Optional AI (ADR 0004): set `AI_PROVIDER=anthropic` and `ANTHROPIC_API_KEY` (and `AI_MODEL` to change the model). Each crew admin still has to turn it on in Settings. Without these, the app writes recap stories from templates.
