@@ -1,5 +1,6 @@
 import { AppState as RNAppState } from "react-native";
 import type { CustomDrink } from "@/drinks/presets";
+import { createTranslator } from "@/i18n";
 import { clearAccountHistory, useAppStore } from "@/state/store";
 import { flush, onSyncEvent, setTransport, submit } from "@/sync/engine";
 import { HttpTransport } from "@/sync/httpTransport";
@@ -9,6 +10,7 @@ import { api } from "./api";
 import { refreshCrews, refreshLiveParty, refreshParties, useCrewData } from "./crewData";
 import { refreshRadar, refreshSos } from "./radarData";
 import { useSession, type ServerSession } from "./session";
+import { showToast } from "@/ui/Toast";
 
 type Deleted = { id: string; deleted: true };
 interface SyncResponse {
@@ -110,6 +112,7 @@ function openSocket(session: ServerSession): void {
         if (message.crewId) void refreshRadar(message.crewId).catch(() => undefined);
       }
       if (message.type === "sync") void pull().catch(() => undefined);
+      if (message.type === "security.newDevice") showToast({ message: createTranslator(useAppStore.getState().preferences.language).t("account.newDevice") });
     } catch {
       // A malformed hint is ignored: the next foreground sync catches up anyway.
     }

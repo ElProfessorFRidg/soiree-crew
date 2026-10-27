@@ -1,7 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { requireUser, HttpError, type Context } from "../context";
+import { bearer, requireUser, HttpError, type Context } from "../context";
 import { hashToken, newCode, newId, newToken } from "../crypto";
+import { RateLimiter } from "../ratelimit";
 import { accountSchema } from "../schemas";
 
 const TRANSFER_TTL_MS = 10 * 60_000;
@@ -17,7 +18,13 @@ async function createSession(ctx: Context, userId: string, deviceLabel: string):
 }
 
 export function accountRoutes(app: FastifyInstance, ctx: Context): void {
+  // SEC-07: sign-up and sign-in are rate-limited per address. A transfer code has
+  // 10 characters, so guessing one at 10 tries per 10 minutes goes nowhere.
+  const signUps = new RateLimiter(10, 10 * 60_000, ctx.now);
+  const claims = new RateLimiter(10, 10 * 60_000, ctx.now);
+
   app.post("/v1/accounts", async (request, reply) => {
+    signUps.check(request.ip);
     const input = accountSchema.parse(request.body);
     const taken = await ctx.db.query("select 1 from users where username = $1", [input.username]);
     if (taken.length) throw new HttpError(409, "username_taken");
@@ -55,6 +62,7 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
   });
 
   app.post("/v1/sessions/claim", async (request, reply) => {
+    claims.check(request.ip);
     const input = z.object({ code: z.string().trim().toUpperCase().length(10), deviceLabel: z.string().max(60).optional() }).parse(request.body);
     const rows = await ctx.db.query<{ user_id: string; expires_at: number }>(
       "delete from transfer_codes where code_hash = $1 returning user_id, expires_at",
@@ -68,6 +76,8 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
     );
     const user = users[0]!;
     const token = await createSession(ctx, user.id, input.deviceLabel ?? "");
+    // SEC-07: the phones already signed in hear about the new one.
+    ctx.live.notify([user.id], { type: "security.newDevice" });
     return reply.status(201).send({ user: { id: user.id, username: user.username, displayName: user.display_name }, token });
   });
 
@@ -77,8 +87,82 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
       "select token_hash, device_label, created_at, last_seen_at from sessions where user_id = $1 order by last_seen_at desc",
       [user.id],
     );
+    const current = hashToken(bearer(request) ?? "");
     // The hash prefix identifies a session for sign-out without exposing the token.
-    return { sessions: rows.map((r) => ({ id: r.token_hash.slice(0, 16), deviceLabel: r.device_label, createdAt: r.created_at, lastSeenAt: r.last_seen_at })) };
+    return {
+      sessions: rows.map((r) => ({
+        id: r.token_hash.slice(0, 16),
+        deviceLabel: r.device_label,
+        createdAt: r.created_at,
+        lastSeenAt: r.last_seen_at,
+        current: r.token_hash === current,
+      })),
+    };
+  });
+
+  /** Signing out ends the session on the server too, not only on the phone. */
+  app.delete("/v1/sessions/current", async (request, reply) => {
+    requireUser(request);
+    await ctx.db.query("delete from sessions where token_hash = $1", [hashToken(bearer(request) ?? "")]);
+    return reply.status(204).send();
+  });
+
+  /**
+   * N-17, SEC-08: everything the server holds about me, decrypted, in one JSON
+   * document. Other people's data only appears where it is part of mine (a crew name, a payer).
+   */
+  app.get("/v1/me/export", async (request) => {
+    const user = requireUser(request);
+    const one = async <T>(sql: string) => (await ctx.db.query<T>(sql, [user.id]))[0];
+    const all = <T>(sql: string) => ctx.db.query<T>(sql, [user.id]);
+    const open = <T>(sealed: string | null | undefined): T | null => (sealed ? ctx.sealer.open<T>(sealed) : null);
+
+    const account = await one<{ id: string; username: string; display_name: string; created_at: number }>(
+      "select id, username, display_name, created_at from users where id = $1",
+    );
+    const preferences = await one<{ data: string }>("select data from user_preferences where user_id = $1");
+    const profile = await one<{ sealed: string }>("select sealed from body_profiles where user_id = $1");
+    const payment = await one<{ sealed: string }>("select sealed from payment_details where user_id = $1");
+    const drinks = await all<{ id: string; party_id: string | null; kind: string; preset_id: string; sealed: string; consumed_at: number; logged_at: number; verified: boolean; deleted_at: number | null }>(
+      "select id, party_id, kind, preset_id, sealed, consumed_at, logged_at, verified, deleted_at from drinks where user_id = $1 order by consumed_at",
+    );
+    const water = await all("select id, party_id, at, deleted_at from water where user_id = $1 order by at");
+    const customDrinks = await all<{ id: string; data: string; deleted_at: number | null }>("select id, data, deleted_at from custom_drinks where user_id = $1");
+    const crews = await all("select c.id, c.name, m.role, m.nickname, m.joined_at, m.leaderboard_opt_out, m.territory_opt_out from crew_members m join crews c on c.id = m.crew_id where m.user_id = $1");
+    const parties = await all(
+      "select p.id, p.name, p.starts_at, p.ends_at, p.closed_at, m.response, m.designated_driver, m.home_safe_at from party_members m join parties p on p.id = m.party_id where m.user_id = $1 order by p.starts_at",
+    );
+    const checkIns = await all(
+      "select c.id, v.name as venue, c.at, c.ended_at, c.verdict, c.private from check_ins c join venues v on v.id = c.venue_id where c.user_id = $1 order by c.at",
+    );
+    const statuses = await all("select night, status, from_minute, to_minute, place from night_statuses where user_id = $1 order by night");
+    const sos = await all("select id, crew_id, party_id, created_at, resolved_at from sos_alerts where user_id = $1 order by created_at");
+    const expenses = await all(
+      "select id, pool_id, payer_id, amount, currency, description, split, created_at, deleted_at from expenses where payer_id = $1 or created_by = $1 order by created_at",
+    );
+    const repayments = await all("select id, pool_id, from_id, to_id, amount, currency, created_at from repayments where from_id = $1 or to_id = $1 order by created_at");
+    const reactions = await all("select party_id, to_id, emoji, at from recap_reactions where from_id = $1");
+    const sessions = await all("select device_label, created_at, last_seen_at from sessions where user_id = $1");
+
+    return {
+      exportedAt: ctx.now(),
+      account,
+      preferences: preferences ? JSON.parse(preferences.data) : null,
+      bodyProfile: open(profile?.sealed),
+      paymentDetails: open(payment?.sealed),
+      drinks: drinks.map(({ sealed, ...d }) => ({ ...d, ...open<Record<string, unknown>>(sealed) })),
+      water,
+      customDrinks: customDrinks.map((d) => ({ id: d.id, deletedAt: d.deleted_at, ...JSON.parse(d.data) })),
+      crews,
+      parties,
+      checkIns,
+      nightStatuses: statuses,
+      sosAlerts: sos,
+      expenses,
+      repayments,
+      recapReactions: reactions,
+      sessions,
+    };
   });
 
   app.delete<{ Params: { id: string } }>("/v1/sessions/:id", async (request, reply) => {

@@ -9,6 +9,7 @@ import { Button } from "@/ui/Button";
 import { Panel, Segmented } from "@/ui/controls";
 import { Text } from "@/ui/Text";
 import { Field } from "./Field";
+import { deviceName } from "@/server/device";
 
 interface AccountResponse {
   user: { id: string; username: string; displayName: string };
@@ -45,7 +46,7 @@ export function ConnectServer() {
       return;
     }
     try {
-      const deviceLabel = "phone";
+      const deviceLabel = deviceName();
       const body =
         mode === "create"
           ? await api<AccountResponse>("/v1/accounts", {

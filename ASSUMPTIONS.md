@@ -15,6 +15,8 @@ Status values: `open`, `confirmed`, `overturned`.
 | A-ORCH-5 | The morning-after screen (QOL-20) stays on the dark theme, toned down, as PROMPT.md says; the prototype shows it light. | PROMPT.md is the master spec; the conflict is listed in FEATURES.md. | One line in the morning screen to flip if the light version is confirmed. | open |
 | A-ORCH-6 | The recap is computed on request from what the server keeps, instead of a frozen snapshot at close. | Same figures every time as long as nobody deletes a drink; a deleted drink should leave the recap anyway. | Freeze it at close if crews want an immutable record. | open |
 | A-ORCH-7 | Recap reactions are a fixed set of six emojis. | Faster than a keyboard the morning after; keeps the copy reviewable. | Widen if crews ask. | open |
+| A-ORCH-8 | Deleted accounts leave the host's backups within 30 days. | GDPR asks for a stated delay; the private build has no backup policy of its own. | Confirm with whoever hosts the server. | open |
+| A-ORCH-9 | No passwords, passkeys or 2FA in the private build: accounts sign in with a device token, and new phones join with a one-time code from a signed-in phone. | Nothing to phish or reuse; the server never holds a password. | Add passkeys before a public release (SEC-07). | open |
 
 ## From recon reports
 

@@ -6,7 +6,8 @@ export interface LiveSocket {
 export type LiveEvent =
   | { type: "party.changed"; partyId: string }
   | { type: "crew.changed"; crewId: string }
-  | { type: "sync"; reason: "own_write" };
+  | { type: "sync"; reason: "own_write" }
+  | { type: "security.newDevice" };
 
 /**
  * Pushes hints, never data: a device that hears "party.changed" refetches what

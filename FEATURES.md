@@ -200,7 +200,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | N-14 | P1 | Profil.dc.html | todo | Crew habits: nights and hours out, frequency, venues, seasonality, calendar heatmap. |
 | N-15 | P1 | Profil.dc.html | todo | Monthly recap + yearly crew "Wrapped" (Spotify Wrapped spirit), as shareable stories. |
 | N-16 | P1 | Soiree.dc.html | todo | Detailed charts (O-81) filterable by period, venue, drink type, person. |
-| N-17 | P2 | Reglages.dc.html | todo | Personal data export (CSV / JSON) and selective deletion. |
+| N-17 | P2 | Reglages.dc.html | build | Personal data export (CSV / JSON) and selective deletion. |
 
 ## Rounds and money
 
@@ -483,8 +483,8 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | SEC-04 | P0 | Backstage | build | Encryption at rest on the server: storage and database encryption, plus application-level envelope encryption ... |
 | SEC-05 | P0 | Backstage | build | Encryption on the device: tokens and keys in the iOS Keychain / Android Keystore, local database encrypted, se... |
 | SEC-06 | P0 | Backstage | todo | Retention: precise location points are deleted once the recap is built (N-07); raw GPS data of a check-in is d... |
-| SEC-07 | P0 | Reglages.dc.html | todo | Accounts: passkeys first; passwords, if any, hashed with Argon2id; list of active sessions with remote sign-ou... |
-| SEC-08 | P0 | Arrivee.dc.html | todo | GDPR: alcohol consumption and BAC may count as health data under GDPR article 9, which means explicit consent,... |
+| SEC-07 | P0 | Reglages.dc.html | build | Accounts: passkeys first; passwords, if any, hashed with Argon2id; list of active sessions with remote sign-ou... |
+| SEC-08 | P0 | Arrivee.dc.html | build | GDPR: alcohol consumption and BAC may count as health data under GDPR article 9, which means explicit consent,... |
 | SEC-09 | P0 | Backstage | todo | Secure development: a threat model (STRIDE) per major feature in `SECURITY.md`, secret scanning, static analys... |
 | SEC-10 | P0 | Backstage | todo | Export compliance for encryption: App Store encryption questions, US export rules, and the French ANSSI declar... |
 | SEC-11 | P0 | Backstage | proposed | BAC computed on the device; drinks, weight and sex stored on the server only when the user shares with their crew, with a "local only" mode. Tension with server-authoritative scoring, see `research/open-decisions.md`. Source: security.md §2.8, §5. |
