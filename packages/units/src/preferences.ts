@@ -18,6 +18,12 @@ export interface UserPreferences {
   hourCycle: "h12" | "h23";
   /** Hour (0 to 23, local) when "tonight" ends: 2 am on Sunday counts as Saturday night (QOL-02). */
   dayBoundaryHour: number;
+  /** Personal BAC limit for the night, g/L of blood (O-25, O-26). Null when not set. */
+  personalLimit: number | null;
+  /** Warn once when the estimate gets close to the personal limit (O-26). */
+  warnNearLimit: boolean;
+  /** Minutes between water reminders during a night (O-27). Null when off. */
+  waterReminderMinutes: number | null;
 }
 
 export interface DeviceLocale {
@@ -55,6 +61,9 @@ export function defaultPreferences(device: DeviceLocale): UserPreferences {
     currency: rules.currency,
     hourCycle,
     dayBoundaryHour: 6,
+    personalLimit: null,
+    warnNearLimit: true,
+    waterReminderMinutes: 45,
   };
 }
 

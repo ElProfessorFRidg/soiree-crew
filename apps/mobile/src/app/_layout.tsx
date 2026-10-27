@@ -77,6 +77,8 @@ export default function RootLayout() {
                 }}
               />
               <Stack.Screen name="history" />
+              <Stack.Screen name="curve" />
+              <Stack.Screen name="limits" />
               <Stack.Screen name="sos" options={{ presentation: "fullScreenModal", animation: "fade" }} />
             </Stack>
           </I18nProvider>

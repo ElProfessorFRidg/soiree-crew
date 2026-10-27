@@ -295,10 +295,22 @@ function LevelZero(props: LevelProps) {
       <StatusRow {...props} />
       <View>
         <Row
+          title={i18n.t("curve.open")}
+          leading={<Icon name="x:curve" color={theme.textMuted} />}
+          trailing={<Icon name="chev" color={theme.textMuted} />}
+          onPress={() => router.push("/curve")}
+        />
+        <Row
           title={i18n.t("party.history")}
           leading={<Icon name="clock" color={theme.textMuted} />}
           trailing={<Icon name="chev" color={theme.textMuted} />}
           onPress={() => router.push("/history")}
+        />
+        <Row
+          title={i18n.t("limits.open")}
+          leading={<Icon name="x:target" color={theme.textMuted} />}
+          trailing={<Icon name="chev" color={theme.textMuted} />}
+          onPress={() => router.push("/limits")}
         />
         <Row
           title={i18n.t("party.sos")}

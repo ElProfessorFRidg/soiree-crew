@@ -23,3 +23,13 @@ export const glassIcons = {
 } as const;
 
 export type GlassIconName = keyof typeof glassIcons;
+
+/** App icons missing from design/icons.json, drawn in the same style. */
+export const extraIcons = {
+  /** BAC curve. */
+  curve: "M3 20h18M4 16c2.5 0 3-8 6-8s3.5 6 6 6c1.8 0 2.6-2.3 4-2.3",
+  /** Target for the personal limit. */
+  target: "M12 3a9 9 0 1 1 0 18a9 9 0 1 1 0-18zM12 7.5a4.5 4.5 0 1 1 0 9a4.5 4.5 0 1 1 0-9zM12 11.5h.01",
+} as const;
+
+export type ExtraIconName = keyof typeof extraIcons;

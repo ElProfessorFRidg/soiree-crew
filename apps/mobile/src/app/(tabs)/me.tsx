@@ -4,12 +4,10 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { duration } from "@crew/design-tokens";
 import { COUNTRIES, countryRules, drivingLimit, formatBacValue, breathRatio, type BacUnit, type UiLanguage } from "@crew/units";
 import { useT } from "@/i18n";
-import { haptic } from "@/motion/haptics";
 import { ProfileFields, type ProfileDraft } from "@/profile/ProfileFields";
 import { draftFromProfile, saveProfile } from "@/profile/saveProfile";
 import { useAppStore } from "@/state/store";
-import { submit } from "@/sync/engine";
-import type { UserPreferences } from "@crew/units";
+import { setPreferences } from "@/state/preferences";
 import { useTheme } from "@/theme";
 import { Chip, Panel, Row, Segmented, Switch } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
@@ -25,16 +23,6 @@ const ALL_UNITS: readonly BacUnit[] = [
   "ug_per_100ml_breath",
   "ug_per_l_breath",
 ];
-
-function setPreferences(patch: Partial<UserPreferences>) {
-  const current = useAppStore.getState().preferences;
-  const previous: Partial<UserPreferences> = {};
-  for (const key of Object.keys(patch) as (keyof UserPreferences)[]) {
-    (previous as Record<string, unknown>)[key] = current[key];
-  }
-  haptic.select();
-  submit({ kind: "preferences.set", patch, previous });
-}
 
 export default function MeScreen() {
   const i18n = useT();

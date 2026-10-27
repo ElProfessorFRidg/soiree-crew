@@ -1,8 +1,8 @@
 import Svg, { Path } from "react-native-svg";
-import { glassIcons, icons, iconStroke, type GlassIconName, type IconName } from "@crew/design-tokens";
+import { extraIcons, glassIcons, icons, iconStroke, type ExtraIconName, type GlassIconName, type IconName } from "@crew/design-tokens";
 import { useTheme } from "@/theme";
 
-export type AnyIconName = IconName | `glass:${GlassIconName}`;
+export type AnyIconName = IconName | `glass:${GlassIconName}` | `x:${ExtraIconName}`;
 
 interface Props {
   name: AnyIconName;
@@ -14,7 +14,11 @@ interface Props {
 /** Custom stroke icons on a 24 grid (DESIGN.md §7). Decorative by default: the parent carries the label. */
 export function Icon({ name, size = 22, color, strokeWidth = iconStroke.width }: Props) {
   const theme = useTheme();
-  const d = name.startsWith("glass:") ? glassIcons[name.slice(6) as GlassIconName] : icons[name];
+  const d = name.startsWith("glass:")
+    ? glassIcons[name.slice(6) as GlassIconName]
+    : name.startsWith("x:")
+      ? extraIcons[name.slice(2) as ExtraIconName]
+      : icons[name as IconName];
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
       <Path

@@ -47,6 +47,11 @@ export const useAppStore = create<AppState>()(
       name: "crew-app-v1",
       storage: createJSONStorage(() => AsyncStorage),
       partialize: ({ hydrated: _hydrated, ...rest }) => rest,
+      // Settings added in a later version get their default instead of undefined.
+      merge: (persisted, current) => {
+        const stored = (persisted ?? {}) as Partial<AppState>;
+        return { ...current, ...stored, preferences: { ...current.preferences, ...stored.preferences } };
+      },
       onRehydrateStorage: () => () => {
         useAppStore.setState({ hydrated: true });
       },

@@ -39,11 +39,11 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-21 | P0 | Soiree.dc.html | todo | Custom drinks: create, long-press to edit / move / remove, custom order, synced across devices, personal presets. |
 | O-22 | P0 | Soiree.dc.html | build | Drink time adjustable to the minute (forgotten drink); a drink "in the future" never counts in the calculation. |
 | O-23 | P0 | Soiree.dc.html | build | Grouped history (e.g. 5x Beer 50 cl) that expands to each drink's exact time, delete one at a time, edit with ... |
-| O-24 | P0 | Soiree.dc.html | todo | BAC curve: Day / Week / Month / Total / Average (7-day moving average), zoom, pan, a trace that truly follows ... |
-| O-25 | P1 | Soiree.dc.html | todo | Personal limits drawn on the curve. |
+| O-24 | P0 | Soiree.dc.html | build | BAC curve: Day / Week / Month / Total / Average (7-day moving average), zoom, pan, a trace that truly follows ... |
+| O-25 | P1 | Soiree.dc.html | build | Personal limits drawn on the curve. |
 | O-26 | P0 | Soiree.dc.html | todo | Set a limit / goal before going out + alerts when getting close, without spam. |
 | O-27 | P0 | Soiree.dc.html | todo | Scheduled hydration reminders. |
-| O-28 | P1 | Soiree.dc.html | todo | Stats in grams of pure alcohol (this month, total, average). |
+| O-28 | P1 | Soiree.dc.html | build | Stats in grams of pure alcohol (this month, total, average). |
 | O-29 | P0 | Soiree.dc.html | todo | Friends' avatars on the graph + curve comparison between friends. |
 | O-30 | P1 | Soiree.dc.html | todo | Share: styled visual with photo / selfie (front or back camera) + stats + curve. |
 | O-31 | P0 | Etats.dc.html | build | Offline: a drink added without network is kept and sent when the network returns, never counted twice; the app... |
@@ -318,7 +318,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | MOT-01 | P0 | Backstage | todo | Motion system in `MOTION.md`, written before any screen: duration tokens, springs and curves, choreography rul... |
 | MOT-02 | P0 | Backstage | todo | Living background within our art direction (no radial halo or generic aurora, see <anti_slop>): it breathes an... |
 | MOT-03 | P0 | Soiree.dc.html | build | Adding a drink: glass filling up, bubbles, BAC digits rolling to the new value, dedicated haptic. It is the mo... |
-| MOT-04 | P0 | Soiree.dc.html | todo | Curve: the trace draws itself, smooth colour change when crossing a threshold, clearly marked peak point (no d... |
+| MOT-04 | P0 | Soiree.dc.html | build | Curve: the trace draws itself, smooth colour change when crossing a threshold, clearly marked peak point (no d... |
 | MOT-05 | P0 | Backstage | todo | Screen transitions: shared elements (a friend's avatar flies from the list to their profile, a game card grows... |
 | MOT-06 | P0 | JeuxCartes.dc.html | todo | Card games: dealing, 3D flip, swipe, drawing, a card that trembles before a penalty. |
 | MOT-07 | P0 | JeuxAction.dc.html | todo | Game physics: roulette with real deceleration and haptic clicks, a bomb that shakes harder and harder then bur... |

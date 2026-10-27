@@ -82,6 +82,9 @@ describe("smart defaults (PREF-02, PREF-04)", () => {
       currency: "EUR",
       hourCycle: "h23",
       dayBoundaryHour: 6,
+      personalLimit: null,
+      warnNearLimit: true,
+      waterReminderMinutes: 45,
     });
   });
   it("French speaker living in the US gets French UI with US rules", () => {
