@@ -3,7 +3,7 @@ import { useCallback, useState } from "react";
 import { View } from "react-native";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
-import { befriend, fetchFriends, unblock, type FriendsList } from "@/server/profileData";
+import { befriend, fetchFriends, unblock, unmute, type FriendsList } from "@/server/profileData";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
 import { Button } from "@/ui/Button";
@@ -60,6 +60,9 @@ export default function FriendsScreen() {
       ))}
       {section(i18n.t("people.friends"), list?.friends ?? [], () => <Icon name="chev" color={theme.textMuted} />)}
       {section(i18n.t("people.outgoing"), list?.outgoing ?? [], () => <Text variant="small">{i18n.t("people.requested")}</Text>)}
+      {section(i18n.t("people.mutedList"), list?.muted ?? [], (userId) => (
+        <Button label={i18n.t("people.unmute")} variant="outline" height={36} onPress={() => void unmute(userId).then(load).catch(offline)} />
+      ))}
       {section(i18n.t("people.blockedList"), list?.blocked ?? [], (userId) => (
         <Button label={i18n.t("people.unblock")} variant="outline" height={36} onPress={() => void unblock(userId).then(load).catch(offline)} />
       ))}

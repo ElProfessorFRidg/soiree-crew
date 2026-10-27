@@ -9,6 +9,7 @@ export interface ProfileView {
   userId: string;
   relation: { me: boolean; friend: boolean; crewMate: boolean };
   friendship: Friendship;
+  muted: boolean;
   audiences?: Record<ProfileSection, Audience>;
   sections: {
     identity?: { displayName: string; username: string; bio: string; country: string };
@@ -52,6 +53,7 @@ export function unblock(userId: string): Promise<unknown> {
 }
 
 export interface FriendsList {
+  muted: { userId: string; name: string }[];
   friends: { userId: string; name: string }[];
   incoming: { userId: string; name: string }[];
   outgoing: { userId: string; name: string }[];
@@ -60,4 +62,36 @@ export interface FriendsList {
 
 export function fetchFriends(): Promise<FriendsList> {
   return api("/v1/friends");
+}
+
+export function mute(userId: string): Promise<unknown> {
+  return api(`/v1/users/${userId}/mute`, { method: "POST" });
+}
+
+export function unmute(userId: string): Promise<unknown> {
+  return api(`/v1/users/${userId}/mute`, { method: "DELETE" });
+}
+
+export type ReportReason = "harassment" | "fake" | "inappropriate" | "other";
+
+export function report(input: { targetKind: "profile" | "party" | "venue"; targetId: string; reason: ReportReason; note?: string }): Promise<unknown> {
+  return api("/v1/reports", { method: "POST", body: input });
+}
+
+export interface CrewReport {
+  id: string;
+  targetKind: "profile" | "party" | "venue";
+  targetId: string;
+  reason: ReportReason;
+  note: string;
+  at: number;
+  handledAt: number | null;
+}
+
+export function fetchReports(crewId: string): Promise<{ reports: CrewReport[] }> {
+  return api(`/v1/crews/${crewId}/reports`);
+}
+
+export function markReportHandled(crewId: string, reportId: string): Promise<unknown> {
+  return api(`/v1/crews/${crewId}/reports/${reportId}/handled`, { method: "POST" });
 }

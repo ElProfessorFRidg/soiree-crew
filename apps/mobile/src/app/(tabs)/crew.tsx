@@ -136,8 +136,17 @@ function CrewCard({ crew }: { crew: Crew }) {
         leading={<Icon name="sparkdot" color={theme.textMuted} />}
         trailing={<Icon name="chev" color={theme.textMuted} />}
         onPress={() => router.push("/recaps")}
-        last
+        last={crew.role !== "admin"}
       />
+      {crew.role === "admin" ? (
+        <Row
+          title={i18n.t("people.reports")}
+          leading={<Icon name="flag" color={theme.textMuted} />}
+          trailing={<Icon name="chev" color={theme.textMuted} />}
+          onPress={() => router.push({ pathname: "/reports", params: { crewId: crew.id } })}
+          last
+        />
+      ) : null}
       {invite ? (
         <Animated.View entering={FadeIn.duration(duration.enter)} style={styles.inviteRow}>
           <Text style={styles.flex}>{i18n.t("crew.inviteCodeIs", { code: invite.code })}</Text>

@@ -68,8 +68,9 @@ export function radarRoutes(app: FastifyInstance, ctx: Context): void {
       [request.params.id, tonight, last],
     );
     const calls = await ctx.db.query<{ id: string; user_id: string; night: string; note: string; party_id: string | null; created_at: number }>(
-      "select id, user_id, night, note, party_id, created_at from out_calls where crew_id = $1 and night = $2 order by created_at desc",
-      [request.params.id, tonight],
+      `select id, user_id, night, note, party_id, created_at from out_calls
+       where crew_id = $1 and night = $2 and user_id not in (select muted from mutes where muter = $3) order by created_at desc`,
+      [request.params.id, tonight, user.id],
     );
     const replies = calls.length
       ? await ctx.db.query<{ call_id: string; user_id: string; reply: string }>("select call_id, user_id, reply from out_call_replies where call_id = any($1::uuid[])", [

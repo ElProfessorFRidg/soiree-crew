@@ -373,7 +373,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | COM-05 | P1 | Profil.dc.html | todo | Meeting people: an "open to meeting people" switch. From a venue page or a regular's profile, send a friend re... |
 | COM-06 | P0 | Bars.dc.html | todo | Presence privacy: strangers only see "how busy tonight" levels and counts once at least 5 users are there, rou... |
 | COM-07 | P1 | Bars.dc.html | todo | Age-policy filter: crowd-sourced door policy per venue, meaning ID checks at the door (always / sometimes / ne... |
-| COM-08 | P0 | Bars.dc.html | todo | Safety and moderation: report any review, photo, profile or party; block and mute; automatic filters for insul... |
+| COM-08 | P0 | Bars.dc.html | build | Safety and moderation: report any review, photo, profile or party; block and mute; automatic filters for insul... |
 | COM-09 | P1 | Bars.dc.html | todo | Venue events: community-submitted events (DJ set, student night, match screening) with date, RSVP, how many fr... |
 | COM-10 | P1 | Bars.dc.html | todo | Discovery: venues nearby ranked by reviews and check-ins, filters (open now, pint under a set price, strict 18... |
 | COM-11 | P2 | Bars.dc.html | todo | Venue owners can claim their page to post hours, happy hours and events and to answer reviews. They can never ... |

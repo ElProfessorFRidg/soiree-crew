@@ -104,3 +104,21 @@ describe("profile audiences (PROF-01, PROF-08)", () => {
     expect((await app.inject({ method: "POST", url: `/v1/users/${owner.id}/friend`, headers: stranger.auth })).statusCode).toBe(404);
   });
 });
+
+describe("moderation (COM-08)", () => {
+  it("mutes a member's crew calls for me only, and sends reports to the crew's admins", async () => {
+    const { owner, crewMate, crewId } = await setup();
+    await app.inject({ method: "POST", url: `/v1/crews/${crewId}/out-calls`, headers: crewMate.auth, payload: { note: "Qui vient ?" } });
+    const calls = async (u: User) => ((await app.inject({ method: "GET", url: `/v1/crews/${crewId}/radar`, headers: u.auth })).json() as { calls: unknown[] }).calls.length;
+    expect(await calls(owner)).toBe(1);
+    await app.inject({ method: "POST", url: `/v1/users/${crewMate.id}/mute`, headers: owner.auth });
+    expect(await calls(owner)).toBe(0);
+    expect(await calls(crewMate)).toBe(1);
+
+    expect((await app.inject({ method: "POST", url: "/v1/reports", headers: crewMate.auth, payload: { targetKind: "profile", targetId: owner.id, reason: "harassment" } })).statusCode).toBe(201);
+    const list = (await app.inject({ method: "GET", url: `/v1/crews/${crewId}/reports`, headers: owner.auth })).json() as { reports: { reason: string; reporter?: string }[] };
+    expect(list.reports).toEqual([expect.objectContaining({ reason: "harassment" })]);
+    expect(list.reports[0]!.reporter).toBeUndefined();
+    expect((await app.inject({ method: "GET", url: `/v1/crews/${crewId}/reports`, headers: crewMate.auth })).statusCode).toBe(403);
+  });
+});

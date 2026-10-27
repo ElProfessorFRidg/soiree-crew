@@ -6,7 +6,8 @@ import { drinkLabel } from "@/drinks/display";
 import type { DrinkKind } from "@/drinks/presets";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
-import { befriend, block, fetchProfile, unfriend, type ProfileView } from "@/server/profileData";
+import { ReportPanel } from "@/moderation/ReportPanel";
+import { befriend, block, fetchProfile, mute, unfriend, unmute, type ProfileView } from "@/server/profileData";
 import { useSession } from "@/server/session";
 import { useAppStore } from "@/state/store";
 import { Avatar } from "@/ui/Avatar";
@@ -193,6 +194,15 @@ export default function ProfileScreen() {
 
       {mine ? <Text variant="small">{i18n.t("people.neverStrangers")}</Text> : null}
 
+      {!mine ? (
+        <Button
+          label={profile.muted ? i18n.t("people.unmute") : i18n.t("people.mute")}
+          variant="outline"
+          height={44}
+          onPress={() => void (profile.muted ? unmute(profile.userId) : mute(profile.userId)).then(load).catch(offline)}
+        />
+      ) : null}
+      {!mine ? <ReportPanel targetKind="profile" targetId={profile.userId} /> : null}
       {!mine ? (
         <Button
           label={i18n.t("people.block")}

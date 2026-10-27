@@ -2,7 +2,8 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { BacSimulation, distributionVolume, type BodyProfile, type DrinkIntake } from "@crew/bac";
 import { territoryTitles } from "@crew/territory";
-import { HttpError, requireUser, type Context } from "../context";
+import { randomUUID } from "node:crypto";
+import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { AUDIENCES, audiencesOf, canSee, PRESETS, SECTIONS, seesDates, STRANGER, type Relation, type Section } from "../profileRules";
 import { nightOf } from "../time";
 
@@ -182,6 +183,7 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
       userId: ownerId,
       relation: { me: relation.me, friend: relation.friend, crewMate: relation.crewMate },
       friendship: await friendshipState(ctx, user.id, ownerId),
+      muted: (await ctx.db.query("select 1 from mutes where muter = $1 and muted = $2", [user.id, ownerId])).length > 0,
       sections,
       ...(mine ? { audiences: audiencesOf(stored ? (JSON.parse(stored.audiences) as Record<string, unknown>) : {}) } : {}),
     };
@@ -264,6 +266,84 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
     return reply.status(204).send();
   });
 
+  /** COM-08: muting hides their crew calls and notes from me; nothing tells them. */
+  app.post<{ Params: { id: string } }>("/v1/users/:id/mute", async (request) => {
+    const user = requireUser(request);
+    const other = uuid.parse(request.params.id);
+    if (other === user.id) throw new HttpError(400, "invalid");
+    await ctx.db.query("insert into mutes (muter, muted, at) values ($1, $2, $3) on conflict do nothing", [user.id, other, ctx.now()]);
+    return { ok: true };
+  });
+
+  app.delete<{ Params: { id: string } }>("/v1/users/:id/mute", async (request, reply) => {
+    const user = requireUser(request);
+    await ctx.db.query("delete from mutes where muter = $1 and muted = $2", [user.id, uuid.parse(request.params.id)]);
+    return reply.status(204).send();
+  });
+
+  /**
+   * COM-08: a report about a profile, a party or a venue. In a private build the
+   * crew's admins read them; a report about a person goes to every crew we share.
+   */
+  app.post("/v1/reports", async (request, reply) => {
+    const user = requireUser(request);
+    const input = z
+      .object({
+        targetKind: z.enum(["profile", "party", "venue"]),
+        targetId: uuid,
+        reason: z.enum(["harassment", "fake", "inappropriate", "other"]),
+        note: z.string().trim().max(300).optional(),
+      })
+      .parse(request.body);
+    let crews: string[] = [];
+    if (input.targetKind === "profile") {
+      crews = (
+        await ctx.db.query<{ crew_id: string }>(
+          "select x.crew_id from crew_members x join crew_members y on y.crew_id = x.crew_id where x.user_id = $1 and y.user_id = $2",
+          [user.id, input.targetId],
+        )
+      ).map((r) => r.crew_id);
+    } else {
+      const table = input.targetKind === "party" ? "parties" : "venues";
+      crews = (
+        await ctx.db.query<{ crew_id: string }>(
+          `select t.crew_id from ${table} t join crew_members m on m.crew_id = t.crew_id and m.user_id = $2 where t.id = $1`,
+          [input.targetId, user.id],
+        )
+      ).map((r) => r.crew_id);
+      if (!crews.length) throw new HttpError(404, "not_found");
+    }
+    for (const crewId of crews.length ? crews : [null]) {
+      await ctx.db.query(
+        "insert into reports (id, reporter, target_kind, target_id, crew_id, reason, note, at) values ($1, $2, $3, $4, $5, $6, $7, $8)",
+        [randomUUID(), user.id, input.targetKind, input.targetId, crewId, input.reason, input.note ?? "", ctx.now()],
+      );
+    }
+    return reply.status(201).send({ ok: true });
+  });
+
+  /** Admins see the reports about their crew; the reporter stays anonymous to them. */
+  app.get<{ Params: { id: string } }>("/v1/crews/:id/reports", async (request) => {
+    const user = requireUser(request);
+    const { role } = await assertCrewMember(ctx, request.params.id, user.id);
+    if (role !== "admin") throw new HttpError(403, "forbidden");
+    const rows = await ctx.db.query<{ id: string; target_kind: string; target_id: string; reason: string; note: string; at: number; handled_at: number | null }>(
+      "select id, target_kind, target_id, reason, note, at, handled_at from reports where crew_id = $1 order by at desc limit 100",
+      [request.params.id],
+    );
+    return {
+      reports: rows.map((r) => ({ id: r.id, targetKind: r.target_kind, targetId: r.target_id, reason: r.reason, note: r.note, at: r.at, handledAt: r.handled_at })),
+    };
+  });
+
+  app.post<{ Params: { id: string; reportId: string } }>("/v1/crews/:id/reports/:reportId/handled", async (request) => {
+    const user = requireUser(request);
+    const { role } = await assertCrewMember(ctx, request.params.id, user.id);
+    if (role !== "admin") throw new HttpError(403, "forbidden");
+    await ctx.db.query("update reports set handled_at = $3 where id = $1 and crew_id = $2", [request.params.reportId, request.params.id, ctx.now()]);
+    return { ok: true };
+  });
+
   app.get("/v1/friends", async (request) => {
     const user = requireUser(request);
     const rows = await ctx.db.query<{ other: string; name: string; status: string; requested_by: string }>(
@@ -276,7 +356,12 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
       "select b.blocked, u.display_name as name from blocks b join users u on u.id = b.blocked where b.blocker = $1",
       [user.id],
     );
+    const muted = await ctx.db.query<{ muted: string; name: string }>(
+      "select m.muted, u.display_name as name from mutes m join users u on u.id = m.muted where m.muter = $1",
+      [user.id],
+    );
     return {
+      muted: muted.map((m) => ({ userId: m.muted, name: m.name })),
       friends: rows.filter((r) => r.status === "accepted").map((r) => ({ userId: r.other, name: r.name })),
       incoming: rows.filter((r) => r.status === "pending" && r.requested_by !== user.id).map((r) => ({ userId: r.other, name: r.name })),
       outgoing: rows.filter((r) => r.status === "pending" && r.requested_by === user.id).map((r) => ({ userId: r.other, name: r.name })),

@@ -17,6 +17,7 @@ import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { ReportPanel } from "@/moderation/ReportPanel";
 
 export default function VenueScreen() {
   const i18n = useT();
@@ -151,6 +152,7 @@ export default function VenueScreen() {
           }
         />
       </Panel>
+      <ReportPanel targetKind="venue" targetId={page.venue.id} />
     </Screen>
   );
 }
