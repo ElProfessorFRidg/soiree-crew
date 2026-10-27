@@ -11,3 +11,4 @@ ios/
 android/
 *.ipa
 coverage/
+.claude/worktrees/
