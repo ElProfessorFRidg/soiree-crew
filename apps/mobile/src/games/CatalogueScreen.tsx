@@ -15,6 +15,7 @@ import { Icon } from "@/ui/Icon";
 import { Numeral, Text } from "@/ui/Text";
 import { useGameUi } from "./hooks";
 import { useGameT } from "./i18n";
+import { useT } from "@/i18n";
 import { useGamesStore } from "./store";
 import { refreshCrewCards } from "./crewCards";
 import { useCrewData } from "@/server/crewData";
@@ -89,6 +90,7 @@ function GameCardView({ game, width, height }: { game: GameDefinition; width: nu
 
 /** O-44: swipeable catalogue with pagination, filter, and a Play button for the game on screen. */
 export function CatalogueScreen() {
+  const i18n = useT();
   const firstCrew = useCrewData((state) => state.crews[0]?.id);
   useEffect(() => {
     // N-33: the crew's approved cards are ready before a game starts, and stay for offline nights.
@@ -142,6 +144,7 @@ export function CatalogueScreen() {
           <Button label={g.t("hall.open")} icon="trophy" variant="outline" height={44} style={styles.flex} onPress={() => router.push("/games/hall")} />
           <Button label={g.t("crewCards.open")} icon="edit" variant="outline" height={44} style={styles.flex} onPress={() => router.push("/games/cards")} />
         </View>
+        <Button label={i18n.t("bar.title")} icon="wine" variant="secondary" height={44} onPress={() => router.push("/bar")} />
       </View>
       <View style={styles.padded}>
         <Segmented

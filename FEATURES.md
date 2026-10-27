@@ -113,10 +113,10 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| O-66 | P1 | Bar.dc.html | todo | 470+ recipes with photo and preparation: Classics, Shots, Party, Alcohol-free, Beers, Desserts, + signature co... |
-| O-67 | P1 | Bar.dc.html | todo | Factual recipe card: ingredients and measures, steps, prep time, difficulty, ABV. |
-| O-68 | P1 | Bar.dc.html | todo | Search + category filters, fast loading. |
-| O-69 | P1 | Bar.dc.html | todo | Mixer: "what can I make?" from the ingredients at hand. |
+| O-66 | P1 | Bar.dc.html | build | 470+ recipes with photo and preparation: Classics, Shots, Party, Alcohol-free, Beers, Desserts, + signature co... |
+| O-67 | P1 | Bar.dc.html | build | Factual recipe card: ingredients and measures, steps, prep time, difficulty, ABV. |
+| O-68 | P1 | Bar.dc.html | build | Search + category filters, fast loading. |
+| O-69 | P1 | Bar.dc.html | build | Mixer: "what can I make?" from the ingredients at hand. |
 
 ## Shared expenses
 

@@ -168,6 +168,9 @@ export default function RootLayout() {
               <Stack.Screen name="search" />
               <Stack.Screen name="photo-strip" />
               <Stack.Screen name="privacy-summary" />
+              <Stack.Screen name="bar" />
+              <Stack.Screen name="recipe" />
+              <Stack.Screen name="mixer" />
               <Stack.Screen name="morning" options={{ animation: "fade" }} />
               <Stack.Screen name="quick/[action]" options={{ animation: "none" }} />
               <Stack.Screen name="sos" options={{ presentation: "fullScreenModal", animation: "fade" }} />

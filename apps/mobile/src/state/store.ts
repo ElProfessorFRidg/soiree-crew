@@ -54,6 +54,8 @@ export interface AppState {
   recentSearches: string[];
   /** PROF-10: the privacy summary opened once, the first time something went public. */
   privacySummarySeen: boolean;
+  /** O-69: what the mixer thinks is in the fridge. */
+  barHave: string[];
 }
 
 export const useAppStore = create<AppState>()(
@@ -82,6 +84,7 @@ export const useAppStore = create<AppState>()(
       latestRelease: null,
       recentSearches: [],
       privacySummarySeen: false,
+      barHave: [],
     }),
     {
       name: "crew-app-v1",
