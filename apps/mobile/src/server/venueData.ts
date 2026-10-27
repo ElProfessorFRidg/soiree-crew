@@ -2,6 +2,7 @@ import * as Location from "expo-location";
 import { create } from "zustand";
 import { newId } from "@/state/store";
 import { api } from "./api";
+import { useCrewData } from "./crewData";
 
 export type VenueKind = "bar" | "club" | "spot" | "home";
 
@@ -121,8 +122,18 @@ export function overturnCheckIn(checkInId: string): Promise<unknown> {
   return api(`/v1/checkins/${checkInId}/overturn`, { method: "POST" });
 }
 
-export function setCrewParticipation(crewId: string, input: { territoryOptOut?: boolean; leaderboardOptOut?: boolean }): Promise<unknown> {
-  return api(`/v1/crews/${crewId}/me`, { method: "PATCH", body: input });
+/** RANK-08, TER-07: instant in the UI, rolled back if the server refuses. */
+export async function setCrewParticipation(crewId: string, input: { territoryOptOut?: boolean; leaderboardOptOut?: boolean }): Promise<void> {
+  const patchCrew = (patch: typeof input) =>
+    useCrewData.setState((state) => ({ crews: state.crews.map((c) => (c.id === crewId ? { ...c, me: { ...c.me, ...patch } } : c)) }));
+  const before = useCrewData.getState().crews.find((c) => c.id === crewId)?.me;
+  patchCrew(input);
+  try {
+    await api(`/v1/crews/${crewId}/me`, { method: "PATCH", body: input });
+  } catch (error) {
+    if (before) patchCrew(before);
+    throw error;
+  }
 }
 
 export type LeaderboardPeriod = "party" | "week" | "month" | "all";

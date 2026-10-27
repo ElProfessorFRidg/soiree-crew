@@ -21,8 +21,16 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
   /** My crews and their members. Members see each other's display name and username only (SEC-01). */
   app.get("/v1/crews", async (request) => {
     const user = requireUser(request);
-    const crews = await ctx.db.query<{ id: string; name: string; role: string }>(
-      "select c.id, c.name, m.role from crews c join crew_members m on m.crew_id = c.id where m.user_id = $1 order by c.created_at",
+    const crews = await ctx.db.query<{
+      id: string;
+      name: string;
+      role: string;
+      leaderboard_enabled: boolean;
+      leaderboard_opt_out: boolean;
+      territory_opt_out: boolean;
+    }>(
+      `select c.id, c.name, m.role, c.leaderboard_enabled, m.leaderboard_opt_out, m.territory_opt_out
+       from crews c join crew_members m on m.crew_id = c.id where m.user_id = $1 order by c.created_at`,
       [user.id],
     );
     const members = crews.length
@@ -38,6 +46,9 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
         id: crew.id,
         name: crew.name,
         role: crew.role,
+        leaderboardEnabled: crew.leaderboard_enabled,
+        // My own participation (RANK-08, TER-07): only ever sent to me.
+        me: { leaderboardOptOut: crew.leaderboard_opt_out, territoryOptOut: crew.territory_opt_out },
         members: members
           .filter((m) => m.crew_id === crew.id)
           .map((m) => ({ id: m.user_id, username: m.username, displayName: m.display_name, nickname: m.nickname, role: m.role })),

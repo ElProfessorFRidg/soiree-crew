@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Alert } from "react-native";
-import { useT } from "@/i18n";
+import { useT, type Translator } from "@/i18n";
 import { api } from "@/server/api";
 import { useCrewData } from "@/server/crewData";
 import { saveSession, useSession } from "@/server/session";
@@ -11,6 +11,7 @@ import { Button } from "@/ui/Button";
 import { Panel } from "@/ui/controls";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { guarded } from "@/vault/vault";
 
 /** Wipes everything this phone holds about the user, then sends them back to the age gate. */
 async function wipeDevice(): Promise<void> {
@@ -28,8 +29,22 @@ async function wipeDevice(): Promise<void> {
     syncCursor: null,
     uploadedToServerAt: null,
     accountUserId: null,
+    vault: [],
   });
   await AsyncStorage.multiRemove(["crew-app-v1", "crew-data-v1"]);
+}
+
+/** O-07: deletes the account on the server, then everything on this phone. */
+export async function deleteAccount(i18n: Translator): Promise<void> {
+  const remote = useSession.getState().session ? api("/v1/me", { method: "DELETE" }) : Promise.resolve();
+  try {
+    await remote;
+    await wipeDevice();
+    showToast({ message: i18n.t("account.deleted") });
+    router.replace("/onboarding");
+  } catch {
+    showToast({ tone: "danger", message: i18n.t("crew.offline") });
+  }
 }
 
 export function AccountSection() {
@@ -44,14 +59,7 @@ export function AccountSection() {
         text: i18n.t("account.deleteConfirm"),
         style: "destructive",
         onPress: () => {
-          const remote = session ? api("/v1/me", { method: "DELETE" }) : Promise.resolve();
-          remote
-            .then(wipeDevice)
-            .then(() => {
-              showToast({ message: i18n.t("account.deleted") });
-              router.replace("/onboarding");
-            })
-            .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }));
+          if (!guarded({ kind: "deleteAccount" }, () => void deleteAccount(i18n))) showToast({ message: i18n.t("vault.queued") });
         },
       },
     ]);

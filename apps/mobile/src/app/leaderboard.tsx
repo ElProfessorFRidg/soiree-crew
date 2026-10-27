@@ -45,7 +45,7 @@ export default function LeaderboardScreen() {
   const [metric, setMetric] = useState<LeaderboardMetric>("drinks");
   const [rows, setRows] = useState<LeaderboardRow[]>([]);
   const [disabled, setDisabled] = useState(false);
-  const [optedOut, setOptedOut] = useState(false);
+  const optedOut = crews.find((c) => c.id === crewId)?.me.leaderboardOptOut ?? false;
   const [confirmable, setConfirmable] = useState<ConfirmableDrink[]>([]);
   const leaderRef = useRef<string | null>(null);
   const [leaderChanged, setLeaderChanged] = useState(0);
@@ -178,10 +178,7 @@ export default function LeaderboardScreen() {
             <Text style={styles.flex}>{i18n.t("ranking.leave")}</Text>
             <Switch
               value={optedOut}
-              onValueChange={(on) => {
-                setOptedOut(on);
-                void setCrewParticipation(crewId, { leaderboardOptOut: on }).then(load).catch(() => setOptedOut(!on));
-              }}
+              onValueChange={(on) => void setCrewParticipation(crewId, { leaderboardOptOut: on }).then(load).catch(() => undefined)}
               accessibilityLabel={i18n.t("ranking.leave")}
             />
           </View>

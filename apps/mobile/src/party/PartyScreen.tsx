@@ -25,6 +25,7 @@ import { Numeral, Text } from "@/ui/Text";
 import { AddDrinkButton } from "./AddDrinkButton";
 import { CrewStrip } from "./CrewStrip";
 import { SosBanner } from "@/crew/SosBanner";
+import { VaultPrompt } from "@/vault/VaultPrompt";
 import { useLiveParty } from "@/server/crewData";
 import { useVenueData } from "@/server/venueData";
 import { RollingNumber } from "./RollingNumber";
@@ -118,6 +119,7 @@ export function PartyScreen() {
         contentInsetAdjustmentBehavior="never"
       >
         <SosBanner />
+        <VaultPrompt />
         {level === 0 ? <LevelZero {...common} /> : null}
         {level === 1 ? <LevelOne {...common} /> : null}
         {level === 2 ? <LevelTwo {...common} /> : null}

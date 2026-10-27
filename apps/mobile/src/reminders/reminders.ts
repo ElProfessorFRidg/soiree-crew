@@ -1,6 +1,7 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 import { estimateBac, type DrinkIntake } from "@crew/bac";
+import { afterQuietHours } from "@crew/units";
 import { createTranslator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
 import { useAppStore } from "@/state/store";
@@ -120,29 +121,14 @@ export function crossesPersonalLimit(): { crosses: boolean; at: number | null } 
   return { crosses: true, at: estimate.peak.at };
 }
 
-/** QOL-20: the recap notification never lands in the middle of the night. */
-const DECENT_FROM_HOUR = 9;
-const DECENT_UNTIL_HOUR = 22;
-const MORNING_HOUR = 11;
-
-export function decentTime(now: number): number {
-  const date = new Date(now);
-  const hour = date.getHours();
-  if (hour >= DECENT_FROM_HOUR && hour < DECENT_UNTIL_HOUR) return now;
-  const next = new Date(now);
-  if (hour >= DECENT_UNTIL_HOUR) next.setDate(next.getDate() + 1);
-  next.setHours(MORNING_HOUR, 0, 0, 0);
-  return next.getTime();
-}
-
 /** O-41: "the recap is ready" as soon as a party closes, at a decent hour. Once per party. */
 export async function notifyRecapReady(party: { id: string; name: string }): Promise<void> {
   const { recapNotified, preferences } = useAppStore.getState();
   if (recapNotified.includes(party.id)) return;
   useAppStore.setState({ recapNotified: [...recapNotified, party.id].slice(-40) });
-  if (!(await allowed())) return;
+  if (!preferences.notifyRecap || !(await allowed())) return;
   const i18n = createTranslator(preferences.language);
-  const at = decentTime(Date.now());
+  const at = afterQuietHours(Date.now(), preferences.quietFromHour, preferences.quietToHour);
   await Notifications.scheduleNotificationAsync({
     identifier: `recap-${party.id}`,
     content: { title: i18n.t("recap.notifTitle"), body: i18n.t("recap.notifBody", { party: party.name }), data: { url: `/recap?id=${party.id}` } },

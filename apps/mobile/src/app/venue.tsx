@@ -26,7 +26,7 @@ export default function VenueScreen() {
   const crews = useCrewData((state) => state.crews);
   const hourCycle = useAppStore((state) => state.preferences.hourCycle);
   const [page, setPage] = useState<VenuePage | null>(null);
-  const [territoryOut, setTerritoryOut] = useState(false);
+  const territoryOut = crews.find((c) => c.id === page?.venue.crewId)?.me.territoryOptOut ?? false;
 
   const load = useCallback(() => {
     if (!id) return;
@@ -131,9 +131,8 @@ export default function VenueScreen() {
           <Switch
             value={territoryOut}
             onValueChange={(on) => {
-              setTerritoryOut(on);
               haptic.select();
-              void setCrewParticipation(page.venue.crewId, { territoryOptOut: on }).then(load).catch(() => setTerritoryOut(!on));
+              void setCrewParticipation(page.venue.crewId, { territoryOptOut: on }).then(load).catch(() => undefined);
             }}
             accessibilityLabel={i18n.t("venue.territoryOut")}
           />

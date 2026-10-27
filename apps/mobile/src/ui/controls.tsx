@@ -87,6 +87,7 @@ export function Switch({
       accessibilityRole="switch"
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ checked: value, disabled: !!disabled }}
+      aria-checked={value}
       onPress={disabled ? undefined : () => onValueChange(!value)}
       hitSlop={6}
       style={{ opacity: disabled ? 0.4 : 1 }}

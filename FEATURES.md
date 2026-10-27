@@ -163,9 +163,9 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| PREF-01 | P0 | Reglages.dc.html | todo | Settings live on the server: every preference is stored in the database (`UserPreferences`), synced across dev... |
+| PREF-01 | P0 | Reglages.dc.html | build | Settings live on the server: every preference is stored in the database (`UserPreferences`), synced across dev... |
 | PREF-02 | P0 | Arrivee.dc.html | build | Smart defaults on first launch, from the device language and region (no location permission needed for this): ... |
-| PREF-03 | P0 | Reglages.dc.html | todo | Settings page where all of it can be changed by hand: language, country for the legal limit, novice driver mod... |
+| PREF-03 | P0 | Reglages.dc.html | build | Settings page where all of it can be changed by hand: language, country for the legal limit, novice driver mod... |
 | PREF-04 | P0 | Arrivee.dc.html | build | Language, region and units are independent settings. A French speaker living in the US can have French UI, US ... |
 | PREF-05 | P1 | Reglages.dc.html | todo | Travel: when the phone's region or time zone changes (a trip abroad), the app suggests switching the legal-lim... |
 | PREF-06 | P0 | Backstage | build | Canonical storage: the database stores one unit per quantity (ml, grams of ethanol, kg, g/L of blood, UTC time... |
@@ -305,7 +305,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ADP-03 | P0 | ModeBourre.dc.html | build | Party screen at level 3 (variant of HUB-01). |
 | ADP-04 | P0 | Soiree.dc.html | build | "Heavy fingers" ergonomics: giant targets, no essential action behind a long-press, a precise swipe or a small... |
 | ADP-05 | P0 | Soiree.dc.html | todo | Forgiving input: fuzzy search that tolerates typos, suggestions, voice input (see AI-01). |
-| ADP-06 | P0 | ModeBourre.dc.html | todo | "Next-morning vault": above a threshold, sensitive actions are locked or queued for confirmation the next day ... |
+| ADP-06 | P0 | ModeBourre.dc.html | build | "Next-morning vault": above a threshold, sensitive actions are locked or queued for confirmation the next day ... |
 | ADP-07 | P0 | ModeBourre.dc.html | todo | Legibility: text size, maximum contrast, readable under strobe or very low light, no disorienting motion (effe... |
 | ADP-08 | P0 | ModeBourre.dc.html | todo | Battery: automatic eco mode during a party when the battery gets low (fewer refreshes, lighter effects; essent... |
 | ADP-09 | P0 | Backstage | todo | Drunk-mode test bench: a tester subagent runs EVERY P0 screen under simulated constraints (one hand, thumb onl... |

@@ -117,6 +117,7 @@ export default function RootLayout() {
               <Stack.Screen name="round" />
               <Stack.Screen name="recap" options={{ presentation: "fullScreenModal", animation: "fade" }} />
               <Stack.Screen name="recaps" />
+              <Stack.Screen name="settings" />
               <Stack.Screen name="morning" options={{ animation: "fade" }} />
               <Stack.Screen name="sos" options={{ presentation: "fullScreenModal", animation: "fade" }} />
             </Stack>

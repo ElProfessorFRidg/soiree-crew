@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  afterQuietHours,
   breathRatio,
   convertBac,
   convertVolume,
@@ -86,6 +87,9 @@ describe("smart defaults (PREF-02, PREF-04)", () => {
       warnNearLimit: true,
       waterReminderMinutes: 45,
       partyBudget: null,
+      notifyRecap: true,
+      quietFromHour: 22,
+      quietToHour: 9,
     });
   });
   it("French speaker living in the US gets French UI with US rules", () => {
@@ -116,5 +120,22 @@ describe("night boundary (QOL-02)", () => {
     expect(nightKey(saturday23, 120, 6)).toBe("2026-10-24");
     expect(nightKey(sunday02, 120, 6)).toBe("2026-10-24");
     expect(nightKey(sunday07, 120, 6)).toBe("2026-10-25");
+  });
+});
+
+describe("afterQuietHours (QOL-20)", () => {
+  const at = (h: number, m = 0) => new Date(2026, 10, 7, h, m).getTime();
+  it("lets a notification out at once outside the quiet hours", () => {
+    expect(afterQuietHours(at(14), 22, 9)).toBe(at(14));
+  });
+  it("holds a 6 am notification until the end of the quiet hours", () => {
+    expect(afterQuietHours(at(6), 22, 9)).toBe(at(9));
+  });
+  it("holds a late-night one until the next morning", () => {
+    expect(afterQuietHours(at(23, 30), 22, 9)).toBe(new Date(2026, 10, 8, 9).getTime());
+  });
+  it("handles quiet hours inside one day and none at all", () => {
+    expect(afterQuietHours(at(14), 13, 15)).toBe(at(15));
+    expect(afterQuietHours(at(3), 0, 0)).toBe(at(3));
   });
 });

@@ -5,6 +5,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import type { UiLevel, UiLevelState } from "@crew/bac";
 import { defaultPreferences, type UserPreferences } from "@crew/units";
+import type { VaultItem } from "@/vault/vault";
 import type { CustomDrink, DrinkPreset } from "@/drinks/presets";
 import type { DrinkEntry, Mutation, PendingMutation, StoredProfile, SyncState, WaterEntry } from "@/sync/types";
 
@@ -39,6 +40,8 @@ export interface AppState {
   morningShown: string[];
   /** Parties whose "recap ready" notification is already scheduled or sent (O-41). */
   recapNotified: string[];
+  /** Sensitive actions waiting for the next morning (ADP-06). */
+  vault: VaultItem[];
 }
 
 export const useAppStore = create<AppState>()(
@@ -59,6 +62,7 @@ export const useAppStore = create<AppState>()(
       accountUserId: null,
       morningShown: [],
       recapNotified: [],
+      vault: [],
     }),
     {
       name: "crew-app-v1",

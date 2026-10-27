@@ -26,6 +26,11 @@ export interface UserPreferences {
   waterReminderMinutes: number | null;
   /** Spending cap for one night, in minor units of `currency` (N-20). Null when not set. */
   partyBudget: number | null;
+  /** "The recap is ready" notification (O-41). */
+  notifyRecap: boolean;
+  /** Quiet hours, local, for notifications that can wait (QOL-20). Safety alerts ignore them. */
+  quietFromHour: number;
+  quietToHour: number;
 }
 
 export interface DeviceLocale {
@@ -67,6 +72,9 @@ export function defaultPreferences(device: DeviceLocale): UserPreferences {
     warnNearLimit: true,
     waterReminderMinutes: 45,
     partyBudget: null,
+    notifyRecap: true,
+    quietFromHour: 22,
+    quietToHour: 9,
   };
 }
 
@@ -77,4 +85,20 @@ export function defaultPreferences(device: DeviceLocale): UserPreferences {
 export function nightKey(at: number, offsetMinutes: number, dayBoundaryHour: number): string {
   const local = new Date(at + offsetMinutes * 60_000 - dayBoundaryHour * 3_600_000);
   return local.toISOString().slice(0, 10);
+}
+
+/**
+ * QOL-20: when a notification that can wait may go out. `now` itself outside
+ * the quiet hours, else the end of the quiet hours. Uses the device's local time.
+ */
+export function afterQuietHours(now: number, quietFromHour: number, quietToHour: number): number {
+  if (quietFromHour === quietToHour) return now;
+  const hour = new Date(now).getHours();
+  const wraps = quietFromHour > quietToHour;
+  const quiet = wraps ? hour >= quietFromHour || hour < quietToHour : hour >= quietFromHour && hour < quietToHour;
+  if (!quiet) return now;
+  const next = new Date(now);
+  if (hour >= quietToHour) next.setDate(next.getDate() + 1);
+  next.setHours(quietToHour, 0, 0, 0);
+  return next.getTime();
 }

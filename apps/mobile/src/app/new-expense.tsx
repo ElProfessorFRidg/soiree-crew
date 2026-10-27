@@ -14,6 +14,7 @@ import { Chip, Segmented } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { BIG_EXPENSE, guarded } from "@/vault/vault";
 
 type Mode = Split["kind"];
 
@@ -80,6 +81,12 @@ export default function NewExpenseScreen() {
 
   const submit = () => {
     if (!ready || !split.split || amount === null || !payer) return;
+    const expense = { payerId: payer, amount, currency, description: description.trim(), split: split.split };
+    if (amount >= BIG_EXPENSE && !guarded({ kind: "bigExpense", poolId, expense }, () => undefined)) {
+      showToast({ message: i18n.t("vault.queued") });
+      router.back();
+      return;
+    }
     setSending(true);
     void addExpense(poolId, { payerId: payer, amount, currency, description: description.trim(), split: split.split })
       .then(() => {

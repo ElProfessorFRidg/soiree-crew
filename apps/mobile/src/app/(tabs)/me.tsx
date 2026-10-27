@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -14,6 +15,8 @@ import { Chip, Panel, Row, Segmented, Switch } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
+import { showToast } from "@/ui/Toast";
+import { vaultClosed } from "@/vault/vault";
 
 const ALL_UNITS: readonly BacUnit[] = [
   "g_per_l_blood",
@@ -41,6 +44,11 @@ export default function MeScreen() {
   const standard = drivingLimit(rules, "standard");
 
   const onProfileChange = (next: ProfileDraft) => {
+    // ADP-06: the weight drives tonight's estimate, so it is not changed in the middle of a night.
+    if (next.weightKg !== draft.weightKg && vaultClosed()) {
+      showToast({ message: i18n.t("vault.weightLocked") });
+      return;
+    }
     setDraft(next);
     saveProfile(next, profile?.healthConsentAt ?? Date.now());
   };
@@ -118,6 +126,13 @@ export default function MeScreen() {
           onChange={(language) => setPreferences({ language })}
         />
       </Panel>
+      <Row
+        title={i18n.t("settings.open")}
+        leading={<Icon name="gear" color={theme.textMuted} />}
+        trailing={<Icon name="chev" color={theme.textMuted} />}
+        onPress={() => router.push("/settings")}
+        last
+      />
       <AccountSection />
     </Screen>
   );

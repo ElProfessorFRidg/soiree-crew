@@ -23,6 +23,7 @@ import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { guarded } from "@/vault/vault";
 
 function errorMessage(error: unknown, i18n: Translator): string {
   if (error instanceof ApiError && error.failure.kind === "http") {
@@ -86,7 +87,12 @@ function CrewCard({ crew }: { crew: Crew }) {
       {
         text: i18n.t("crew.leave"),
         style: "destructive",
-        onPress: () => void leaveCrew(crew.id).catch((error: unknown) => showToast({ tone: "danger", message: errorMessage(error, i18n) })),
+        onPress: () => {
+          const ran = guarded({ kind: "leaveCrew", crewId: crew.id, crewName: crew.name }, () =>
+            void leaveCrew(crew.id).catch((error: unknown) => showToast({ tone: "danger", message: errorMessage(error, i18n) })),
+          );
+          if (!ran) showToast({ message: i18n.t("vault.queued") });
+        },
       },
     ]);
   };

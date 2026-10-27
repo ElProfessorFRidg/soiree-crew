@@ -17,6 +17,8 @@ export interface Crew {
   id: string;
   name: string;
   role: "admin" | "member";
+  leaderboardEnabled: boolean;
+  me: { leaderboardOptOut: boolean; territoryOptOut: boolean };
   members: CrewMember[];
 }
 
@@ -165,4 +167,17 @@ export function useLiveParty(): { party: Party; live: LiveParty | undefined } | 
   const party = parties.find((p) => p.myResponse === "going" && p.closedAt === null && p.startsAt <= now && p.endsAt >= now);
   if (!party) return null;
   return { party, live: liveMap[party.id] };
+}
+
+/** RANK-08: the crew admin switches the drinking leaderboard on or off for everyone. */
+export async function setCrewLeaderboard(crewId: string, leaderboardEnabled: boolean): Promise<void> {
+  const patch = (enabled: boolean) =>
+    useCrewData.setState((state) => ({ crews: state.crews.map((c) => (c.id === crewId ? { ...c, leaderboardEnabled: enabled } : c)) }));
+  patch(leaderboardEnabled);
+  try {
+    await api(`/v1/crews/${crewId}/settings`, { method: "PATCH", body: { leaderboardEnabled } });
+  } catch (error) {
+    patch(!leaderboardEnabled);
+    throw error;
+  }
 }
