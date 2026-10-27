@@ -494,6 +494,13 @@ export default function RecapScreen() {
         loading={sharing}
         onPress={() => void share()}
       />
+      <Button
+        label={i18n.t("album.open")}
+        icon="image"
+        variant="outline"
+        height={48}
+        onPress={() => router.push({ pathname: "/album", params: { partyId: recap.party.id } })}
+      />
     </View>,
   ];
 
