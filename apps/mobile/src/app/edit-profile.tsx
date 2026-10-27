@@ -1,7 +1,9 @@
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Field } from "@/crew/Field";
 import { useT } from "@/i18n";
+import { useAppStore } from "@/state/store";
 import { haptic } from "@/motion/haptics";
 import { fetchProfile, PROFILE_SECTIONS, saveProfile, type Audience, type Findable, type ProfileSection, type ProfileView } from "@/server/profileData";
 import { Button } from "@/ui/Button";
@@ -41,7 +43,14 @@ export default function EditProfileScreen() {
   const apply = (input: Parameters<typeof saveProfile>[0]) => {
     haptic.select();
     void saveProfile(input)
-      .then((res) => setProfile((p) => (p ? { ...p, audiences: res.audiences } : p)))
+      .then((res) => {
+        setProfile((p) => (p ? { ...p, audiences: res.audiences } : p));
+        // PROF-10: the first time anything opens to everyone, show what strangers now see.
+        if (Object.values(res.audiences).includes("everyone") && !useAppStore.getState().privacySummarySeen) {
+          useAppStore.setState({ privacySummarySeen: true });
+          router.push("/privacy-summary");
+        }
+      })
       .catch(offline);
   };
   const audienceLabel = (a: Audience) =>

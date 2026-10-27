@@ -260,7 +260,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-12 | P0 | Etats.dc.html | build | Correct plurals and formats everywhere ("1 verre", "2 verres", decimal comma in French), relative times ("5 mi... |
 | QOL-13 | P0 | Etats.dc.html | build | Only destructive actions ask for confirmation, and the confirm button names the action ("Delete the party", ne... |
 | QOL-14 | P0 | Backstage | build | Navigation without traps: Android back and iOS swipe-back work everywhere, sheets close with a swipe, the app ... |
-| QOL-15 | P1 | Arrivee.dc.html | todo | Try before signing up: games and the Bar work without an account; sign-up is asked only when the user needs a ... |
+| QOL-15 | P1 | Arrivee.dc.html | build | Try before signing up: games and the Bar work without an account; sign-up is asked only when the user needs a ... |
 | QOL-16 | P1 | Soirees.dc.html | build | Defaults learned from habits: usual party end time, usual venue, usual drinks first in quick add, the friends ... |
 | QOL-17 | P1 | Soirees.dc.html | build | Suggestions that save taps: when 3+ crew members check in at the same venue, offer to start a party; when the ... |
 | QOL-18 | P1 | Securite.dc.html | build | The user's own apps: directions in Apple Maps, Google Maps or Waze, rides in Uber, Bolt or local taxi apps, ch... |
@@ -396,7 +396,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | PROF-07 | P0 | Profil.dc.html | build | "View as": preview your own profile as a stranger, a friend or a crew member, one tap away from the profile an... |
 | PROF-08 | P0 | Backstage | build | Enforced by the server: the API never sends a field the viewer is not allowed to see (hiding it in the UI is n... |
 | PROF-09 | P1 | Profil.dc.html | build | Findability: strangers can find you by search, by exact username only, or not at all. You appear among a venue... |
-| PROF-10 | P1 | Profil.dc.html | todo | Privacy summary: one screen listing what strangers can see right now, reachable from the profile, shown once a... |
+| PROF-10 | P1 | Profil.dc.html | build | Privacy summary: one screen listing what strangers can see right now, reachable from the profile, shown once a... |
 
 ## Messaging
 

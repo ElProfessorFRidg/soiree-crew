@@ -52,6 +52,8 @@ export interface AppState {
   latestRelease: { build: number; url: string } | null;
   /** QOL-23: the last few searches, newest first, on this phone only. */
   recentSearches: string[];
+  /** PROF-10: the privacy summary opened once, the first time something went public. */
+  privacySummarySeen: boolean;
 }
 
 export const useAppStore = create<AppState>()(
@@ -79,6 +81,7 @@ export const useAppStore = create<AppState>()(
       updateCheckedAt: null,
       latestRelease: null,
       recentSearches: [],
+      privacySummarySeen: false,
     }),
     {
       name: "crew-app-v1",

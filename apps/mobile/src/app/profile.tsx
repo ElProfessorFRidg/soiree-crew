@@ -120,6 +120,7 @@ export default function ProfileScreen() {
             ]}
           />
           <Button label={i18n.t("people.edit")} icon="edit" variant="secondary" height={48} onPress={() => router.push("/edit-profile")} />
+          <Button label={i18n.t("privacySummary.open")} icon="eye" variant="outline" height={48} onPress={() => router.push("/privacy-summary")} />
         </>
       ) : (
         friendButton()
