@@ -48,6 +48,7 @@ export function Chip({
     <ScalePressable
       onPress={onPress}
       accessibilityRole="button"
+      accessibilityLabel={label}
       accessibilityState={{ selected: !!selected }}
       style={[styles.chip, { backgroundColor: bg }]}
     >

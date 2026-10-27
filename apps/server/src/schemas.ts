@@ -41,6 +41,7 @@ export const preferencesPatchSchema = z
     personalLimit: z.number().min(0.1).max(3).nullable(),
     warnNearLimit: z.boolean(),
     waterReminderMinutes: z.number().int().min(10).max(240).nullable(),
+    partyBudget: z.number().int().positive().max(10_000_000).nullable(),
   })
   .partial();
 

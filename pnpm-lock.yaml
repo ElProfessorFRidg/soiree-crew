@@ -23,6 +23,9 @@ importers:
       '@crew/design-tokens':
         specifier: workspace:*
         version: link:../../packages/design-tokens
+      '@crew/money':
+        specifier: workspace:*
+        version: link:../../packages/money
       '@crew/units':
         specifier: workspace:*
         version: link:../../packages/units
@@ -117,6 +120,9 @@ importers:
       '@crew/bac':
         specifier: workspace:*
         version: link:../../packages/bac
+      '@crew/money':
+        specifier: workspace:*
+        version: link:../../packages/money
       '@crew/territory':
         specifier: workspace:*
         version: link:../../packages/territory
@@ -155,6 +161,8 @@ importers:
   packages/bac: {}
 
   packages/design-tokens: {}
+
+  packages/money: {}
 
   packages/territory: {}
 

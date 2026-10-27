@@ -24,6 +24,8 @@ export interface UserPreferences {
   warnNearLimit: boolean;
   /** Minutes between water reminders during a night (O-27). Null when off. */
   waterReminderMinutes: number | null;
+  /** Spending cap for one night, in minor units of `currency` (N-20). Null when not set. */
+  partyBudget: number | null;
 }
 
 export interface DeviceLocale {
@@ -64,6 +66,7 @@ export function defaultPreferences(device: DeviceLocale): UserPreferences {
     personalLimit: null,
     warnNearLimit: true,
     waterReminderMinutes: 45,
+    partyBudget: null,
   };
 }
 

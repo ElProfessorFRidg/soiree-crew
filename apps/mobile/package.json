@@ -5,6 +5,7 @@
   "dependencies": {
     "@crew/bac": "workspace:*",
     "@crew/design-tokens": "workspace:*",
+    "@crew/money": "workspace:*",
     "@crew/units": "workspace:*",
     "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~58.0.19",

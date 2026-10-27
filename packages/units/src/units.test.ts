@@ -85,6 +85,7 @@ describe("smart defaults (PREF-02, PREF-04)", () => {
       personalLimit: null,
       warnNearLimit: true,
       waterReminderMinutes: 45,
+      partyBudget: null,
     });
   });
   it("French speaker living in the US gets French UI with US rules", () => {

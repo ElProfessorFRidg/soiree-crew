@@ -122,7 +122,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| O-70 | P1 | Argent.dc.html | todo | Create a pool, add friends and expenses, compute who owes whom with the minimum number of transfers, record re... |
+| O-70 | P1 | Argent.dc.html | build | Create a pool, add friends and expenses, compute who owes whom with the minimum number of transfers, record re... |
 
 ## Status, monetisation, extras
 
@@ -206,9 +206,9 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| N-18 | P0 | Argent.dc.html | todo | Rounds: who pays next (fair rotation computed); logging a round adds the drinks to each person AND the expense... |
-| N-19 | P1 | Argent.dc.html | todo | Better pools: unequal splits (shares, amounts, percentages), expenses tied to a venue, a party or a trip, rece... |
-| N-20 | P1 | Argent.dc.html | todo | Personal party budget with alert. |
+| N-18 | P0 | Argent.dc.html | build | Rounds: who pays next (fair rotation computed); logging a round adds the drinks to each person AND the expense... |
+| N-19 | P1 | Argent.dc.html | build | Better pools: unequal splits (shares, amounts, percentages), expenses tied to a venue, a party or a trip, rece... |
+| N-20 | P1 | Argent.dc.html | build | Personal party budget with alert. |
 
 ## Crew memory
 
@@ -264,7 +264,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-16 | P1 | Soirees.dc.html | build | Defaults learned from habits: usual party end time, usual venue, usual drinks first in quick add, the friends ... |
 | QOL-17 | P1 | Soirees.dc.html | todo | Suggestions that save taps: when 3+ crew members check in at the same venue, offer to start a party; when the ... |
 | QOL-18 | P1 | Securite.dc.html | todo | The user's own apps: directions in Apple Maps, Google Maps or Waze, rides in Uber, Bolt or local taxi apps, ch... |
-| QOL-19 | P1 | Argent.dc.html | todo | Long-press copies what people copy (IBAN, codes, addresses), with a haptic and a short inline "Copied". |
+| QOL-19 | P1 | Argent.dc.html | build | Long-press copies what people copy (IBAN, codes, addresses), with a haptic and a short inline "Copied". |
 | QOL-20 | P1 | Recap.dc.html | todo | Next-morning mode: the morning after, the app opens on a calm, dark, low-contrast screen with the recap, who o... |
 | QOL-21 | P1 | Radar.dc.html | todo | Calendar and birthdays: parties added to the phone calendar in one tap; a crew member's birthday reminds the o... |
 | QOL-22 | P2 | Securite.dc.html | todo | Last ride home: after midnight, the last night bus / metro departures near the venue on the Party screen, when... |

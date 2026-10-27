@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@crew/bac": "workspace:*",
+    "@crew/money": "workspace:*",
     "@crew/territory": "workspace:*",
     "@crew/units": "workspace:*",
     "@electric-sql/pglite": "^0.5.12",

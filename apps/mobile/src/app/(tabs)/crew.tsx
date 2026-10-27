@@ -65,6 +65,7 @@ function InvitationCard({ party, crewName }: { party: Party; crewName: string })
 
 function CrewCard({ crew }: { crew: Crew }) {
   const i18n = useT();
+  const theme = useTheme();
   const me = useSession((state) => state.session?.userId);
   const [invite, setInvite] = useState<{ code: string; url: string } | null>(null);
   const [copied, setCopied] = useState(false);
@@ -109,6 +110,13 @@ function CrewCard({ crew }: { crew: Crew }) {
           </View>
         ))}
       </View>
+      <Row
+        title={i18n.t("money.pools")}
+        leading={<Icon name="euro" color={theme.textMuted} />}
+        trailing={<Icon name="chev" color={theme.textMuted} />}
+        onPress={() => router.push({ pathname: "/money", params: { crewId: crew.id } })}
+        last
+      />
       {invite ? (
         <Animated.View entering={FadeIn.duration(duration.enter)} style={styles.inviteRow}>
           <Text style={styles.flex}>{i18n.t("crew.inviteCodeIs", { code: invite.code })}</Text>

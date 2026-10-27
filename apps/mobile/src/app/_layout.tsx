@@ -98,6 +98,10 @@ export default function RootLayout() {
               <Stack.Screen name="checkin" />
               <Stack.Screen name="venue" />
               <Stack.Screen name="leaderboard" />
+              <Stack.Screen name="money" />
+              <Stack.Screen name="pool" />
+              <Stack.Screen name="new-expense" />
+              <Stack.Screen name="round" />
               <Stack.Screen name="sos" options={{ presentation: "fullScreenModal", animation: "fade" }} />
             </Stack>
           </I18nProvider>

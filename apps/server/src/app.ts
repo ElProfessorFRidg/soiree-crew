@@ -5,6 +5,7 @@ import { ZodError } from "zod";
 import { bearer, HttpError, sendError, userFromToken, type Context } from "./context";
 import { accountRoutes } from "./routes/accounts";
 import { crewRoutes } from "./routes/crews";
+import { moneyRoutes } from "./routes/money";
 import { mutationRoutes } from "./routes/mutations";
 import { partyRoutes } from "./routes/parties";
 import { radarRoutes } from "./routes/radar";
@@ -56,5 +57,6 @@ export async function buildApp(ctx: Context, options: { logger?: boolean } = {})
   venueRoutes(app, ctx, ctx.hashSecret);
   leaderboardRoutes(app, ctx);
   radarRoutes(app, ctx);
+  moneyRoutes(app, ctx);
   return app;
 }
