@@ -5,6 +5,7 @@ import { palette } from "@crew/design-tokens";
 import { breathRatio, countryRules, formatBacValue, type UiLanguage, type UserPreferences } from "@crew/units";
 import { createTranslator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
+import { readQueue } from "./queue";
 
 // O-33 (Android): the home-screen widget. It runs in a headless task, outside the app, so it reads
 // the persisted state straight from storage and computes the estimate itself, like the app does.
@@ -38,7 +39,12 @@ export async function readSnapshot(now = Date.now()): Promise<Snapshot> {
   const language = (state.preferences?.language ?? "fr") as UiLanguage;
   const i18n = createTranslator(language);
   const base = { title: i18n.t("widget.title"), water: i18n.t("widget.water"), pint: i18n.t("widget.pint") };
-  const drinks = (state.drinks ?? []).filter((d) => d.abv > 0);
+  // Taps on the widget the app has not taken yet count too: "same again" repeats the latest drink.
+  const queue = await readQueue();
+  const stored = state.drinks ?? [];
+  const latest = [...stored].sort((a, b) => b.consumedAt - a.consumedAt)[0];
+  const tapped = latest ? queue.filter((t) => t.kind === "again").map((t, i) => ({ ...latest, id: `widget-${i}`, consumedAt: t.at })) : [];
+  const drinks = [...stored, ...tapped].filter((d) => d.abv > 0);
   if (!state.profile || !state.preferences || !drinks.length) return { ...base, line: i18n.t("widget.zero") };
   const estimate = estimateBac(drinks, state.profile, now);
   if (estimate.bac <= 0 || estimate.backToZeroAt === null) return { ...base, line: i18n.t("widget.zero") };
@@ -50,11 +56,11 @@ export async function readSnapshot(now = Date.now()): Promise<Snapshot> {
   return { ...base, line: i18n.t("widget.levelBack", { value, time: back }) };
 }
 
-function Button({ label, uri, fill }: { label: string; uri: string; fill: boolean }) {
+/** QOL-25: the tap is handled in the background task, the app does not open. */
+function Button({ label, action, fill }: { label: string; action: "AGAIN" | "WATER"; fill: boolean }) {
   return (
     <FlexWidget
-      clickAction="OPEN_URI"
-      clickActionData={{ uri }}
+      clickAction={action}
       style={{
         flex: 1,
         height: 44,
@@ -80,8 +86,8 @@ export function NightWidget({ snapshot }: { snapshot: Snapshot }) {
         <TextWidget text={snapshot.line} style={{ fontSize: 18, fontWeight: "700", color: c(palette.dark.text) }} maxLines={2} />
       </FlexWidget>
       <FlexWidget style={{ flexDirection: "row", flexGap: 8, width: "match_parent" }}>
-        <Button label={snapshot.pint} uri="soireecrew://quick/again" fill />
-        <Button label={snapshot.water} uri="soireecrew://quick/water" fill={false} />
+        <Button label={snapshot.pint} action="AGAIN" fill />
+        <Button label={snapshot.water} action="WATER" fill={false} />
       </FlexWidget>
     </FlexWidget>
   );
