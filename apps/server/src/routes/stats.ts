@@ -48,6 +48,15 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
       "select m.user_id, u.display_name from crew_members m join users u on u.id = m.user_id where m.crew_id = $1 and m.leaderboard_opt_out = false",
       [crewId],
     );
+    // N-34: seniority and badges for what keeps a crew going, never for drinking.
+    const everyone = await ctx.db.query<{ user_id: string; display_name: string; joined_at: number; organised: number; home_safe: number }>(
+      `select m.user_id, u.display_name, m.joined_at,
+              (select count(*)::int from parties p where p.crew_id = $1 and p.created_by = m.user_id and p.starts_at <= $2) as organised,
+              (select count(*)::int from party_members pm join parties p on p.id = pm.party_id
+                 where p.crew_id = $1 and pm.user_id = m.user_id and pm.home_safe_at is not null) as home_safe
+       from crew_members m join users u on u.id = m.user_id where m.crew_id = $1 order by m.joined_at`,
+      [crewId, now],
+    );
     const ids = members.map((m) => m.user_id);
     const going = ids.length
       ? await ctx.db.query<{ user_id: string; party_id: string; designated_driver: boolean; home_safe_at: number | null }>(
@@ -107,6 +116,16 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
       milestones: milestones(nights.length),
       crewSince: crew.created_at,
       boards,
+      honours: everyone.map((m) => {
+        const board = boards.find((b) => b.userId === m.user_id);
+        const badges: string[] = [];
+        if (m.organised >= 3) badges.push("organiser");
+        if (m.home_safe >= 5) badges.push("homeSafe");
+        if ((board?.soberDriver ?? 0) >= 3) badges.push("soberDriver");
+        if (typeof board?.hydration === "number" && board.hydration >= 0.5) badges.push("hydrated");
+        if ((board?.venuesRuled ?? 0) >= 1) badges.push("boss");
+        return { userId: m.user_id, name: m.display_name, joinedAt: m.joined_at, organised: m.organised, homeSafe: m.home_safe, badges };
+      }),
     };
   });
 

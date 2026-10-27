@@ -799,6 +799,15 @@ export const ru: Messages = {
     venueAverage: "В среднем {value} бокала за визит",
     bestNights: "Лучшие вечеринки здесь",
     bestNight: { one: "{date}: {count} человек", few: "{date}: {count} человека", many: "{date}: {count} человек", other: "{date}: {count} человека" },
+    badge: {
+      organiser: "Организация",
+      homeSafe: "Всегда до дома",
+      soberDriver: "Надёжный водитель",
+      hydrated: "Верблюд",
+      boss: "Хозяин бара",
+    },
+    honours: "Стаж и значки",
+    since: "В тусовке с {date}",
   },
   travel: {
     title: "Ты за границей?",

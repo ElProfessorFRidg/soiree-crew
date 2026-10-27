@@ -773,6 +773,15 @@ export const fr = {
     venueAverage: "{value} verres par passage en moyenne",
     bestNights: "Meilleures soirées ici",
     bestNight: { one: "{date} : {count} personne", other: "{date} : {count} personnes" },
+    badge: {
+      organiser: "Organisation",
+      homeSafe: "Retour assuré",
+      soberDriver: "Volant fidèle",
+      hydrated: "Chameau",
+      boss: "Boss d'un bar",
+    },
+    honours: "Ancienneté et badges",
+    since: "Dans le crew depuis le {date}",
   },
   travel: {
     title: "Tu es à l'étranger ?",

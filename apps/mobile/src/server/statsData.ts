@@ -22,6 +22,7 @@ export interface CrewStats {
   milestones: { reached: number[]; next: number | null };
   crewSince: number;
   boards: CrewBoardRow[];
+  honours: { userId: string; name: string; joinedAt: number; organised: number; homeSafe: number; badges: ("organiser" | "homeSafe" | "soberDriver" | "hydrated" | "boss")[] }[];
 }
 
 export interface VenueStats {

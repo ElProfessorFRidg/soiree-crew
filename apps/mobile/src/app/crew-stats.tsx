@@ -126,6 +126,28 @@ export default function CrewStatsScreen() {
         </Panel>
       ) : null}
 
+      <Text variant="label">{i18n.t("crewStats.honours")}</Text>
+      <Panel>
+        {stats.honours.map((h) => (
+          <View key={h.userId} style={styles.honour}>
+            <Avatar personId={h.userId} name={h.name} size={32} />
+            <View style={styles.flex}>
+              <Text variant="h3">{h.name}</Text>
+              <Text variant="small">
+                {i18n.t("crewStats.since", { date: new Intl.DateTimeFormat(i18n.locale, { day: "numeric", month: "long", year: "numeric" }).format(new Date(h.joinedAt)) })}
+              </Text>
+              {h.badges.length ? (
+                <View style={styles.tags}>
+                  {h.badges.map((b) => (
+                    <Tag key={b} label={i18n.t(`crewStats.badge.${b}`)} tone={b === "boss" ? "amber" : "ok"} />
+                  ))}
+                </View>
+              ) : null}
+            </View>
+          </View>
+        ))}
+      </Panel>
+
       {boards.length ? <Text variant="label">{i18n.t("crewStats.boards")}</Text> : null}
       {boards.map((b) => (
         <Panel key={b.title}>
@@ -154,4 +176,5 @@ const styles = StyleSheet.create({
   line: { flexDirection: "row", alignItems: "center", gap: 10, minHeight: 40 },
   flex: { flex: 1 },
   rank: { width: 16 },
+  honour: { flexDirection: "row", alignItems: "flex-start", gap: 10, paddingVertical: 6 },
 });

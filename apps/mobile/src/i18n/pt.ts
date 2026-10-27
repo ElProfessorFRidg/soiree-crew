@@ -774,6 +774,15 @@ export const pt: Messages = {
     venueAverage: "Em média {value} copos por visita",
     bestNights: "As melhores noites aqui",
     bestNight: { one: "{date}: {count} pessoa", other: "{date}: {count} pessoas" },
+    badge: {
+      organiser: "Organização",
+      homeSafe: "Chega sempre a casa",
+      soberDriver: "Volante de confiança",
+      hydrated: "Camelo",
+      boss: "Manda num bar",
+    },
+    honours: "Antiguidade e distintivos",
+    since: "Na crew desde {date}",
   },
   travel: {
     title: "Estás no estrangeiro?",
