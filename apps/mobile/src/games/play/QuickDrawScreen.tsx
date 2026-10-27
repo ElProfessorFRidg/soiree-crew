@@ -81,7 +81,6 @@ export function QuickDrawScreen({ session, content, onAgain }: GameScreenProps) 
     <GameShell {...shellProps} status={g.t("games.quickDraw.drawerTurn", { name: drawer?.name ?? "" })} footer={footer} fab="top" scroll={!drawing}>
       {state.phase === "ready" ? (
         <>
-          <Text variant="h2">{g.t("games.quickDraw.drawerTurn", { name: drawer?.name ?? "" })}</Text>
           <ScalePressable
             accessibilityLabel={g.t("games.quickDraw.peek")}
             onPress={() => setPeek((p) => !p)}

@@ -113,7 +113,8 @@ export function HiddenWordScreen({ session, content, onAgain }: GameScreenProps)
                   </Text>
                 </View>
               }
-              back={<WordFace state={state} playerId={holder.id} />}
+              // The word only exists on screen while its player looks at it.
+              back={state.peeking ? <WordFace state={state} playerId={holder.id} /> : <View style={[styles.face, { backgroundColor: palette.dark.text }]} />}
             />
           </ScalePressable>
         </>

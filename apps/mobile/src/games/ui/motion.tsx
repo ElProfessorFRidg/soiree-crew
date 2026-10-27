@@ -16,7 +16,8 @@ import { easings } from "@/motion/easing";
 
 /**
  * 3D card flip (MOT-06): rotateY 0 to 180 in 550 ms easeFlip, backface hidden.
- * Reduce Motion swaps the turn for a crossfade with the same end state.
+ * Reduce Motion swaps the turn for a crossfade with the same end state. The face turned away is hidden
+ * from screen readers too, so a card nobody may see is never read out.
  */
 export function FlipCard({
   flipped,
@@ -48,10 +49,22 @@ export function FlipCard({
 
   return (
     <View style={style}>
-      <Animated.View style={[StyleSheet.absoluteFill, styles.face, frontStyle]} pointerEvents={flipped ? "none" : "auto"}>
+      <Animated.View
+        style={[StyleSheet.absoluteFill, styles.face, frontStyle]}
+        pointerEvents={flipped ? "none" : "auto"}
+        accessibilityElementsHidden={flipped}
+        importantForAccessibility={flipped ? "no-hide-descendants" : "auto"}
+        aria-hidden={flipped}
+      >
         {front}
       </Animated.View>
-      <Animated.View style={[StyleSheet.absoluteFill, styles.face, backStyle]} pointerEvents={flipped ? "auto" : "none"}>
+      <Animated.View
+        style={[StyleSheet.absoluteFill, styles.face, backStyle]}
+        pointerEvents={flipped ? "auto" : "none"}
+        accessibilityElementsHidden={!flipped}
+        importantForAccessibility={flipped ? "auto" : "no-hide-descendants"}
+        aria-hidden={!flipped}
+      >
         {back}
       </Animated.View>
     </View>

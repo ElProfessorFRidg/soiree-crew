@@ -47,7 +47,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-29 | P0 | Soiree.dc.html | todo | Friends' avatars on the graph + curve comparison between friends. |
 | O-30 | P1 | Soiree.dc.html | todo | Share: styled visual with photo / selfie (front or back camera) + stats + curve. |
 | O-31 | P0 | Etats.dc.html | build | Offline: a drink added without network is kept and sent when the network returns, never counted twice; the app... |
-| O-32 | P0 | JeuxCartes.dc.html | todo | Small floating button in every game to add a drink without leaving the game. |
+| O-32 | P0 | JeuxCartes.dc.html | build | Small floating button in every game to add a drink without leaving the game. |
 | O-85 | P1 | Backstage (near Soiree.dc.html) | proposed | Food input for the BAC model ("ate / light meal / empty stomach", per evening or per drink, changeable mid-party) feeding absorption and elimination within Recon-BAC bounds. Merges app.md O-85 and bac.md BAC-FOOD-01. Source: app.md §5, bac.md §5. |
 | O-86 | P1 | Backstage (near Soiree.dc.html) | proposed | "How this is estimated" sheet one tap from the BAC: inputs used, standard-drink equivalent per country, model limits, why it differs from a breathalyser. Source: app.md §5. |
 | O-87 | P0 | Backstage (near Soiree.dc.html) | proposed | Conservative driving timer: "under the limit at" uses the slow elimination rate (0.10 g/L/h), is never shown while BAC is rising, and says "too close to call" within 0.10 g/L or 1 h of the limit. Renumbered from BAC-SAFE-01. Source: bac.md §5. |
@@ -83,28 +83,28 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| O-44 | P0 | Jeux.dc.html | todo | Swipeable carousel catalogue (illustration, tags, duration, player count, Play button, pagination), "one phone... |
-| O-45 | P0 | Jeux.dc.html | todo | 3 levels per game: Normal, Hard, Extreme. |
-| O-46 | P0 | Jeux.dc.html | todo | Rules shown as cards at launch + a "?" button to see them again mid-game. |
-| O-47 | P0 | JeuxCartes.dc.html | todo | Round timers, shareable result cards, multiplayer robustness (someone leaves, the game goes on). |
-| O-48 | P1 | Jeux.dc.html | todo | Conditional unlocks (e.g. Double Agent unlocks at 4 friends). |
-| O-49 | P0 | Jeux.dc.html | todo | Player management: names, order, players without an account, penalty counter. |
-| O-50 | P0 | JeuxCartes.dc.html | todo | "Le Soirée2Malade": card game that ends when the last card is drawn, a mash-up of all the classics with a bite... |
-| O-51 | P0 | JeuxCartes.dc.html | todo | "L'Autoroute": cross 5 checkpoints by betting on card values, a "Customs" at checkpoint 2, finish with as few ... |
-| O-52 | P0 | JeuxCartes.dc.html | todo | "Le 1VS1": face-to-face card duel, 2 players on the same phone, the weaker hand takes the penalty. |
-| O-53 | P0 | JeuxCartes.dc.html | todo | "Qui a ?" |
-| O-54 | P0 | JeuxAction.dc.html | todo | "La Bombe" |
-| O-55 | P0 | JeuxAction.dc.html | todo | "La Roulette": random draw, the loser takes the penalty. |
-| O-56 | P0 | JeuxCartes.dc.html | todo | "Je n'ai jamais" (Never Have I Ever), including an unfiltered mode. |
-| O-57 | P0 | JeuxCartes.dc.html | todo | "Qui de nous ?": two friends face off, "which of you two is more likely to...". |
-| O-58 | P0 | JeuxCartes.dc.html | todo | "Action ou Vérité" (Truth or Dare), including an Extreme mode. |
-| O-59 | P0 | JeuxAction.dc.html | todo | "Les Mines" |
-| O-60 | P0 | JeuxAction.dc.html | todo | "Le Doigt": reflex game that settles the group (fingers on the screen). |
-| O-61 | P0 | JeuxAction.dc.html | todo | "L'Imposteur": a secret word, one intruder, discuss, vote, unmask. |
-| O-62 | P0 | JeuxAction.dc.html | todo | "Le Double Agent": two infiltrated agents with a different word, 5 players minimum. |
-| O-63 | P0 | JeuxAction.dc.html | todo | "Gribouille": one player draws, the others guess, 3 to 8 players online (real-time, multi-phone). |
-| O-64 | P0 | JeuxAction.dc.html | todo | "La Courbe" (listed on the store pages, rules not public). |
-| O-65 | P0 | Jeux.dc.html | todo | More than 500 cards / questions / dares per language for FR and EN, all written by us (see <localization> and ... |
+| O-44 | P0 | Jeux.dc.html | build | Swipeable carousel catalogue (illustration, tags, duration, player count, Play button, pagination), "one phone... |
+| O-45 | P0 | Jeux.dc.html | build | 3 levels per game: Normal, Hard, Extreme. |
+| O-46 | P0 | Jeux.dc.html | build | Rules shown as cards at launch + a "?" button to see them again mid-game. |
+| O-47 | P0 | JeuxCartes.dc.html | build | Round timers, shareable result cards, multiplayer robustness (someone leaves, the game goes on). |
+| O-48 | P1 | Jeux.dc.html | build | Conditional unlocks (e.g. Double Agent unlocks at 4 friends). |
+| O-49 | P0 | Jeux.dc.html | build | Player management: names, order, players without an account, penalty counter. |
+| O-50 | P0 | JeuxCartes.dc.html | build | "Le Soirée2Malade": card game that ends when the last card is drawn, a mash-up of all the classics with a bite... |
+| O-51 | P0 | JeuxCartes.dc.html | build | "L'Autoroute": cross 5 checkpoints by betting on card values, a "Customs" at checkpoint 2, finish with as few ... |
+| O-52 | P0 | JeuxCartes.dc.html | build | "Le 1VS1": face-to-face card duel, 2 players on the same phone, the weaker hand takes the penalty. |
+| O-53 | P0 | JeuxCartes.dc.html | build | "Qui a ?" |
+| O-54 | P0 | JeuxAction.dc.html | build | "La Bombe" |
+| O-55 | P0 | JeuxAction.dc.html | build | "La Roulette": random draw, the loser takes the penalty. |
+| O-56 | P0 | JeuxCartes.dc.html | build | "Je n'ai jamais" (Never Have I Ever), including an unfiltered mode. |
+| O-57 | P0 | JeuxCartes.dc.html | build | "Qui de nous ?": two friends face off, "which of you two is more likely to...". |
+| O-58 | P0 | JeuxCartes.dc.html | build | "Action ou Vérité" (Truth or Dare), including an Extreme mode. |
+| O-59 | P0 | JeuxAction.dc.html | build | "Les Mines" |
+| O-60 | P0 | JeuxAction.dc.html | build | "Le Doigt": reflex game that settles the group (fingers on the screen). |
+| O-61 | P0 | JeuxAction.dc.html | build | "L'Imposteur": a secret word, one intruder, discuss, vote, unmask. |
+| O-62 | P0 | JeuxAction.dc.html | build | "Le Double Agent": two infiltrated agents with a different word, 5 players minimum. |
+| O-63 | P0 | JeuxAction.dc.html | build | "Gribouille": one player draws, the others guess, 3 to 8 players online (real-time, multi-phone). |
+| O-64 | P0 | JeuxAction.dc.html | build | "La Courbe" (listed on the store pages, rules not public). |
+| O-65 | P0 | Jeux.dc.html | build | More than 500 cards / questions / dares per language for FR and EN, all written by us (see <localization> and ... |
 | O-89 | P0 | Backstage (near Jeux.dc.html) | proposed | Penalty model shared by every game: N sips or a forfeit of the same size, per-player "no alcohol" switch, water-or-forfeit swap for a player at UI level 3, penalty counter never creates a drink. Source: games.md §2.0, §5 (proposed there as N-xx). |
 | O-90 | P0 | Backstage (near Jeux.dc.html) | proposed | Forfeit deck: forfeit cards in three sizes (small, medium, large), FR and EN, counted in the O-65 content budget. Source: games.md §5. |
 | O-91 | P1 | Backstage (near JeuxAction.dc.html) | proposed | Table style for passing games: the phone stays on the table and the holder taps their name; suggested automatically at UI levels 2 and 3. Source: games.md §2.2, §5. |
