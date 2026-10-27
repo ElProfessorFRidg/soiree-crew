@@ -116,6 +116,9 @@ export const en: Messages = {
     changeInMe: "Country and new-driver mode are in Me.",
   },
   reminders: {
+    nightChannel: "Night in progress",
+    nightTitle: "Estimate at {time}: {value}",
+    nightBody: "Back to zero around {time}.",
     waterDone: "I had water",
     waterTitle: "Glass of water",
     waterSince: "Last glass of water {minutes} min ago.",

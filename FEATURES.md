@@ -155,7 +155,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | HUB-01 | P0 | Soiree.dc.html | build | Party screen, opened automatically during a party. Shows, without pointless scrolling: my BAC and trend, add a... |
-| HUB-02 | P0 | Systeme.dc.html | todo | iOS Live Activity / Dynamic Island and a persistent Android notification during the party: BAC, back-to-zero, ... |
+| HUB-02 | P0 | Systeme.dc.html | build | iOS Live Activity / Dynamic Island and a persistent Android notification during the party: BAC, back-to-zero, ... |
 | HUB-03 | P0 | Systeme.dc.html | todo | Lock-screen widgets (BAC, next water, who is out tonight). |
 | HUB-04 | P2 | Systeme.dc.html | todo | Smartwatch: BAC, add drink and water from the wrist. |
 

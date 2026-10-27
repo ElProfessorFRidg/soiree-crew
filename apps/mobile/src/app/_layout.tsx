@@ -18,7 +18,7 @@ import { useAppStore } from "@/state/store";
 import { ThemeProvider } from "@/theme";
 import { useEco, watchBattery } from "@/power/eco";
 import { logWater } from "@/drinks/actions";
-import { LOG_WATER_ACTION } from "@/reminders/reminders";
+import { LOG_WATER_ACTION, refreshReminders } from "@/reminders/reminders";
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -64,7 +64,10 @@ export default function RootLayout() {
     // Whatever was queued before the app was killed goes out now (SYNC-06).
     void flush();
     const subscription = RNAppState.addEventListener("change", (status) => {
-      if (status === "active") void flush();
+      if (status === "active") {
+        void flush();
+        void refreshReminders();
+      }
     });
     return () => subscription.remove();
   }, [ready]);

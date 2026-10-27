@@ -1,8 +1,8 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
-import { estimateBac, type DrinkIntake } from "@crew/bac";
-import { afterQuietHours } from "@crew/units";
-import { createTranslator } from "@/i18n";
+import { estimateBac, type BacEstimate, type DrinkIntake } from "@crew/bac";
+import { afterQuietHours, breathRatio, countryRules, formatBacValue, type UserPreferences } from "@crew/units";
+import { createTranslator, type Translator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
 import { useAppStore } from "@/state/store";
 
@@ -19,8 +19,9 @@ const LIMIT_MARGIN = 0.05;
 const supported = Platform.OS === "ios" || Platform.OS === "android";
 
 Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
+  handleNotification: async (notification) => ({
+    // The night notification updates quietly in the list, never as a banner.
+    shouldShowBanner: notification.request.identifier !== "night-in-progress",
     shouldShowList: true,
     shouldPlaySound: false,
     shouldSetBadge: false,
@@ -76,6 +77,43 @@ async function schedule(identifier: string, at: number, title: string, body: str
  * water reminder and one limit warning, and never fires once the estimate is
  * back to zero.
  */
+const NIGHT_ID = "night-in-progress";
+const NIGHT_CHANNEL = "night";
+
+/**
+ * HUB-02 on Android: one quiet, persistent notification for the night with the
+ * estimate when it was computed and the back-to-zero time, which stays true as time passes.
+ * Gone once the estimate is back to zero. iOS needs a Live Activity (native extension).
+ */
+async function updateNightNotification(estimate: BacEstimate, i18n: Translator, preferences: UserPreferences): Promise<void> {
+  if (Platform.OS !== "android") return;
+  if (estimate.bac <= 0 || estimate.backToZeroAt === null) {
+    await Notifications.dismissNotificationAsync(NIGHT_ID).catch(() => undefined);
+    return;
+  }
+  await Notifications.setNotificationChannelAsync(NIGHT_CHANNEL, {
+    name: i18n.t("reminders.nightChannel"),
+    importance: Notifications.AndroidImportance.LOW,
+    sound: null,
+    vibrationPattern: null,
+    enableVibrate: false,
+    showBadge: false,
+  });
+  const ratio = breathRatio(countryRules(preferences.legalCountry));
+  const value = `${formatBacValue(estimate.bac, preferences.bacUnit, ratio, i18n.locale)} ${i18n.t(`units.${preferences.bacUnit}`)}`;
+  await Notifications.scheduleNotificationAsync({
+    identifier: NIGHT_ID,
+    content: {
+      title: i18n.t("reminders.nightTitle", { time: formatClock(estimate.at, preferences.language, preferences.hourCycle), value }),
+      body: i18n.t("reminders.nightBody", { time: formatClock(estimate.backToZeroAt, preferences.language, preferences.hourCycle) }),
+      sticky: true,
+      autoDismiss: false,
+      priority: Notifications.AndroidNotificationPriority.LOW,
+    },
+    trigger: { channelId: NIGHT_CHANNEL },
+  });
+}
+
 export async function refreshReminders(): Promise<void> {
   if (!supported) return;
   const { profile, preferences, drinks, water } = useAppStore.getState();
@@ -85,6 +123,8 @@ export async function refreshReminders(): Promise<void> {
   const estimate = estimateBac(intakes(), profile, now);
 
   if (!(await allowed())) return;
+
+  await updateNightNotification(estimate, i18n, preferences).catch(() => undefined);
 
   // Water (O-27).
   const interval = preferences.waterReminderMinutes;
