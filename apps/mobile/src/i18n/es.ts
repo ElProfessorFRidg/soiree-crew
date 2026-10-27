@@ -552,6 +552,10 @@ export const es: Messages = {
     waterDone: "Hecho",
     seePool: "Ver el bote",
     later: "Luego",
+    alibi: "Tu coartada de hoy",
+    alibiAnother: "Otra",
+    alibiSend: "Enviar",
+    alibiLanguage: "Coartadas en inglés por ahora.",
   },
   settings: {
     title: "Ajustes",

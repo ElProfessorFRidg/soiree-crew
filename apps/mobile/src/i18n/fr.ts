@@ -551,6 +551,10 @@ export const fr = {
     waterDone: "Fait",
     seePool: "Voir la cagnotte",
     later: "Plus tard",
+    alibi: "Ton alibi du jour",
+    alibiAnother: "Un autre",
+    alibiSend: "Envoyer",
+    alibiLanguage: "Alibis en anglais pour l'instant.",
   },
   settings: {
     title: "Réglages",

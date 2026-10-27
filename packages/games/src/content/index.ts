@@ -1,3 +1,4 @@
+import { alibis as enAlibis } from "./en/alibis";
 import { bigDeck as enBigDeck } from "./en/bigDeck";
 import { drawWords as enDrawWords } from "./en/drawWords";
 import { forfeits as enForfeits } from "./en/forfeits";
@@ -7,6 +8,7 @@ import { pointBlank as enPointBlank } from "./en/pointBlank";
 import { truthDare as enTruthDare } from "./en/truthDare";
 import { verdict as enVerdict } from "./en/verdict";
 import { wordPairs as enWordPairs } from "./en/wordPairs";
+import { alibis as frAlibis } from "./fr/alibis";
 import { bigDeck as frBigDeck } from "./fr/bigDeck";
 import { drawWords as frDrawWords } from "./fr/drawWords";
 import { forfeits as frForfeits } from "./fr/forfeits";
@@ -31,6 +33,7 @@ const CONTENT: Readonly<Record<ContentLanguage, GameContent>> = {
     drawWords: frDrawWords,
     fusePrompts: frFusePrompts,
     forfeits: frForfeits,
+    alibis: frAlibis,
   },
   en: {
     bigDeck: enBigDeck,
@@ -42,6 +45,7 @@ const CONTENT: Readonly<Record<ContentLanguage, GameContent>> = {
     drawWords: enDrawWords,
     fusePrompts: enFusePrompts,
     forfeits: enForfeits,
+    alibis: enAlibis,
   },
 };
 

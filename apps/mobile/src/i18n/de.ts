@@ -551,6 +551,10 @@ export const de: Messages = {
     waterDone: "Erledigt",
     seePool: "Kasse ansehen",
     later: "Später",
+    alibi: "Dein Alibi für heute",
+    alibiAnother: "Noch eins",
+    alibiSend: "Senden",
+    alibiLanguage: "Alibis vorerst auf Englisch.",
   },
   settings: {
     title: "Einstellungen",

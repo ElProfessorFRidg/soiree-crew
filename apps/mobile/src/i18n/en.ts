@@ -553,6 +553,10 @@ export const en: Messages = {
     waterDone: "Done",
     seePool: "See the pool",
     later: "Later",
+    alibi: "Today's alibi",
+    alibiAnother: "Another one",
+    alibiSend: "Send",
+    alibiLanguage: "Alibis in English for now.",
   },
   settings: {
     title: "Settings",

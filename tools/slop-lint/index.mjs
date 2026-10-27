@@ -29,6 +29,7 @@ const DECKS = {
   fusePrompts: { deck: true, lengthSpread: false },
   drawWords: { deck: false },
   wordPairs: { deck: false, firstOfTuple: true },
+  alibis: { deck: false },
 };
 
 let errors = 0;

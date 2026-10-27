@@ -52,4 +52,6 @@ export interface GameContent {
   drawWords: DrawWordContent;
   fusePrompts: FusePromptContent;
   forfeits: ForfeitContent;
+  /** O-76: morning-after alibis, first person; `{other}` is someone from last night. */
+  alibis: readonly string[];
 }

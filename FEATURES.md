@@ -135,7 +135,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | O-73 | retired | none (no tips) | retired | In-app tips (Beer 25 cl, 33 cl, 50 cl, 1 L). |
 | O-74 | retired | Bar.dc.html | retired | Built-in shop (catalogue, product page, cart, payment). |
 | O-75 | retired | none | retired | Subscriber-only community (Instagram link). |
-| O-76 | P1 | Bar.dc.html | todo | Next-morning alibi generator. |
+| O-76 | P1 | Bar.dc.html | build | Next-morning alibi generator. |
 | O-77 | P1 | Reglages.dc.html | build | Report content (user-generated content). |
 | O-78 | P0 | Backstage | build | Visual direction. S2M uses a violet / cyan "aurora" background, liquid-glass effects and a neon home. Keep the... |
 | O-79 | retired | Systeme.dc.html | retired | Bilingual marketing website (video, parallax, scroll reveals, store links, reviews). |

@@ -8,6 +8,7 @@ import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
 import { fetchPool, fetchPools } from "@/server/moneyData";
 import { fetchRecap, type Recap } from "@/server/recapData";
+import { Alibi } from "@/recap/Alibi";
 import { useSession } from "@/server/session";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
@@ -106,6 +107,8 @@ export default function MorningScreen() {
         </View>
       ))}
       {poolId ? <Button label={i18n.t("morning.seePool")} variant="outline" height={44} onPress={() => router.push({ pathname: "/pool", params: { id: poolId } })} /> : null}
+
+      <Alibi names={(recap?.participants ?? []).filter((p) => p.userId !== me).map((p) => p.name)} />
 
       <Panel tint="water">
         <View style={styles.water}>

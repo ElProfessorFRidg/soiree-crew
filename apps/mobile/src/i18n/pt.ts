@@ -552,6 +552,10 @@ export const pt: Messages = {
     waterDone: "Feito",
     seePool: "Ver o fundo comum",
     later: "Mais tarde",
+    alibi: "O teu álibi de hoje",
+    alibiAnother: "Outro",
+    alibiSend: "Enviar",
+    alibiLanguage: "Álibis em inglês por agora.",
   },
   settings: {
     title: "Definições",

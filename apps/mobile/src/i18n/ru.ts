@@ -567,6 +567,10 @@ export const ru: Messages = {
     waterDone: "Готово",
     seePool: "Открыть общий счёт",
     later: "Позже",
+    alibi: "Алиби на сегодня",
+    alibiAnother: "Другое",
+    alibiSend: "Отправить",
+    alibiLanguage: "Пока алиби только на английском.",
   },
   settings: {
     title: "Настройки",

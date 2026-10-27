@@ -552,6 +552,10 @@ export const it: Messages = {
     waterDone: "Fatto",
     seePool: "Vedi la cassa comune",
     later: "Più tardi",
+    alibi: "Il tuo alibi di oggi",
+    alibiAnother: "Un altro",
+    alibiSend: "Invia",
+    alibiLanguage: "Alibi in inglese per ora.",
   },
   settings: {
     title: "Impostazioni",
