@@ -60,7 +60,7 @@ export function GameShell({ gameId, status, helpHidden, fab = "bottom", players,
     <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
       <IconButton icon="back" accessibilityLabel={i18n.t("common.back")} onPress={() => (router.canGoBack() ? router.back() : router.replace("/(tabs)/games"))} />
       <View style={styles.title}>
-        <Text variant="h3" numberOfLines={1} accessibilityRole="header">
+        <Text variant="h3" numberOfLines={2} accessibilityRole="header">
           {g.t(`games.${gameId}.name`)}
         </Text>
         {status ? <Text variant="small">{status}</Text> : null}

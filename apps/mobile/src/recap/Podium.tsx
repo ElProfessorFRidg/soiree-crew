@@ -43,7 +43,7 @@ function Step({ entry, place, replay, valueLabel }: { entry: PodiumEntry; place:
     <View style={styles.slot}>
       <Animated.View style={[styles.person, label]}>
         <Avatar personId={entry.userId} name={entry.name} size={place === 0 ? 52 : 42} ring={place === 0 ? theme.amber : undefined} />
-        <Text variant="h3" align="center" numberOfLines={1}>
+        <Text variant="h3" align="center" numberOfLines={2}>
           {entry.name}
         </Text>
         <Text variant="small" align="center">

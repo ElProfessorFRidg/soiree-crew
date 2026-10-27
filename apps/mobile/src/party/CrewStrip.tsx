@@ -47,7 +47,7 @@ export function CrewStrip({ big }: { big?: boolean }) {
               style={[styles.cell, { minWidth: big ? 72 : 66 }]}
             >
               <Avatar personId={member.userId} name={member.displayName} size={size} faded={member.homeSafeAt !== null} />
-              <Text variant="h3" style={{ fontSize: 13 }} numberOfLines={1}>
+              <Text variant="h3" style={{ fontSize: 13 }} numberOfLines={2}>
                 {member.displayName}
               </Text>
               {!big && member.bac !== null ? (

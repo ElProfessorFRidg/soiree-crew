@@ -109,7 +109,7 @@ export function RadarSection({ crewId }: { crewId: string }) {
           {out.map((s) => (
             <View key={s.userId} style={styles.outCell}>
               <Avatar personId={s.userId} name={nameOf(s.userId)} ring={s.status === "going_out" ? theme.amber : theme.water} />
-              <Text variant="tab" numberOfLines={1}>
+              <Text variant="tab" numberOfLines={2}>
                 {s.userId === me ? i18n.t("crew.you") : nameOf(s.userId)}
               </Text>
             </View>
@@ -152,7 +152,7 @@ export function RadarSection({ crewId }: { crewId: string }) {
         </View>
         {radar.members.map((member) => (
           <View key={member.userId} style={styles.weekRow}>
-            <Text variant="small" style={styles.weekName} numberOfLines={1}>
+            <Text variant="small" style={styles.weekName} numberOfLines={2}>
               {member.userId === me ? i18n.t("crew.you") : member.name}
             </Text>
             {radar.nights.map((night) => {

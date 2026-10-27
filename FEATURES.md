@@ -21,7 +21,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-08 | P1 | Arrivee.dc.html | todo | Privacy policy readable without an account; analytics consent revocable at any time. |
 | O-09 | P0 | Reglages.dc.html | todo | 7 languages: FR, EN, ES, IT, DE, PT, RU. The whole app, not a few screens. See <localization>. |
 | O-10 | P2 | Reglages.dc.html | todo | 12 h / 24 h format following the phone setting. |
-| O-11 | P0 | Backstage | todo | Accessibility: large touch targets, respects Reduce Motion, text never truncated, nothing under the notch or c... |
+| O-11 | P0 | Backstage | build | Accessibility: large touch targets, respects Reduce Motion, text never truncated, nothing under the notch or c... |
 | O-12 | P2 | Reglages.dc.html | todo | In-app notice when a new version is available. |
 | O-13 | P2 | Reglages.dc.html | build | Per-account data isolation on the device (several accounts on one phone without leaks). |
 | O-14 | P0 | Backstage | build | Opening the app never stops music already playing (Spotify, Deezer...). |
@@ -259,7 +259,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-11 | P0 | Etats.dc.html | build | Names that work: long names, emojis in names, two "Lucas" in one crew disambiguated automatically, initials av... |
 | QOL-12 | P0 | Etats.dc.html | build | Correct plurals and formats everywhere ("1 verre", "2 verres", decimal comma in French), relative times ("5 mi... |
 | QOL-13 | P0 | Etats.dc.html | build | Only destructive actions ask for confirmation, and the confirm button names the action ("Delete the party", ne... |
-| QOL-14 | P0 | Backstage | todo | Navigation without traps: Android back and iOS swipe-back work everywhere, sheets close with a swipe, the app ... |
+| QOL-14 | P0 | Backstage | build | Navigation without traps: Android back and iOS swipe-back work everywhere, sheets close with a swipe, the app ... |
 | QOL-15 | P1 | Arrivee.dc.html | todo | Try before signing up: games and the Bar work without an account; sign-up is asked only when the user needs a ... |
 | QOL-16 | P1 | Soirees.dc.html | build | Defaults learned from habits: usual party end time, usual venue, usual drinks first in quick add, the friends ... |
 | QOL-17 | P1 | Soirees.dc.html | todo | Suggestions that save taps: when 3+ crew members check in at the same venue, offer to start a party; when the ... |

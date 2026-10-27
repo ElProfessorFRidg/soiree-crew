@@ -339,7 +339,7 @@ function PartyTitle({ i18n }: { i18n: Translator }) {
     <View style={styles.titleRow}>
       {/* The live dot only shows while a party is really live (DESIGN.md §5). */}
       <View style={[styles.liveDot, { backgroundColor: theme.ok }]} />
-      <Text variant="h3" style={styles.flex} numberOfLines={1}>
+      <Text variant="h3" style={styles.flex}>
         {current.party.name}
       </Text>
     </View>

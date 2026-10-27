@@ -473,7 +473,7 @@ export default function RecapScreen() {
                   {entry.rank}
                 </Text>
                 <Avatar personId={entry.userId} name={entry.name} size={30} />
-                <Text variant="h3" style={styles.flex} numberOfLines={1}>
+                <Text variant="h3" style={styles.flex}>
                   {entry.name}
                 </Text>
               </View>
