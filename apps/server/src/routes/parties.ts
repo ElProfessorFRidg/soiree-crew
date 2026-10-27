@@ -121,14 +121,21 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
     const user = requireUser(request);
     const party = await loadPartyForMember(ctx, request.params.id, user.id);
     const input = z
-      .object({ homeSafe: z.boolean().optional(), designatedDriver: z.boolean().optional(), batteryLow: z.boolean().optional() })
+      .object({ homeSafe: z.boolean().optional(), designatedDriver: z.boolean().optional(), batteryLow: z.boolean().optional(), unwell: z.boolean().optional() })
       .parse(request.body);
     const now = ctx.now();
     if (input.homeSafe !== undefined) {
-      await ctx.db.query("update party_members set home_safe_at = $3, last_activity_at = $4 where party_id = $1 and user_id = $2", [
+      // Home safe also means fine: it clears "not feeling well" (N-36).
+      await ctx.db.query(
+        "update party_members set home_safe_at = $3, last_activity_at = $4, unwell_at = case when $5 then null else unwell_at end where party_id = $1 and user_id = $2",
+        [party.id, user.id, input.homeSafe ? now : null, now, input.homeSafe],
+      );
+    }
+    if (input.unwell !== undefined) {
+      await ctx.db.query("update party_members set unwell_at = $3, last_activity_at = $4 where party_id = $1 and user_id = $2", [
         party.id,
         user.id,
-        input.homeSafe ? now : null,
+        input.unwell ? now : null,
         now,
       ]);
     }
@@ -145,6 +152,8 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
     }
     const members = await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1 and response = 'going'", [party.id]);
     ctx.live.notify(members.map((m) => m.user_id), { type: "party.changed", partyId: party.id });
+    // N-36: the others hear it at once, quietly; nobody outside the party does.
+    if (input.unwell) ctx.live.notify(members.map((m) => m.user_id).filter((id) => id !== user.id), { type: "party.unwell", partyId: party.id, userId: user.id });
     return { ok: true };
   });
 
@@ -346,12 +355,13 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
       home_safe_at: number | null;
       last_activity_at: number | null;
       battery_low: boolean;
+      unwell_at: number | null;
       home_with: string | null;
       home_mode: string | null;
       home_offer_from: string | null;
       sealed: string | null;
     }>(
-      `select m.user_id, u.display_name, m.response, m.designated_driver, m.home_safe_at, m.last_activity_at, m.battery_low,
+      `select m.user_id, u.display_name, m.response, m.designated_driver, m.home_safe_at, m.last_activity_at, m.battery_low, m.unwell_at,
               m.home_with, m.home_mode, m.home_offer_from, b.sealed
        from party_members m join users u on u.id = m.user_id left join body_profiles b on b.user_id = m.user_id
        where m.party_id = $1 order by u.display_name`,
@@ -377,6 +387,7 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
         designatedDriver: m.designated_driver,
         homeSafeAt: m.home_safe_at,
         batteryLow: m.battery_low,
+        unwellAt: m.unwell_at,
         homeWith: m.home_with,
         homeMode: m.home_mode,
         homeOfferFrom: m.home_offer_from,

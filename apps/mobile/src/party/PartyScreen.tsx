@@ -34,6 +34,7 @@ import { useSession } from "@/server/session";
 import { useLevelNow } from "@/state/levelNow";
 import { openRide, RIDE_APPS } from "./rides";
 import { BubbleField } from "./BubbleField";
+import { UnwellBanner } from "./UnwellBanner";
 import { useVenueData } from "@/server/venueData";
 import { RollingNumber } from "./RollingNumber";
 import { DareOfTheNight } from "./DareOfTheNight";
@@ -174,6 +175,7 @@ export function PartyScreen() {
         contentInsetAdjustmentBehavior="never"
       >
         <SosBanner />
+        <UnwellBanner />
         <VaultPrompt />
         <EcoNotice />
         <TravelPrompt />

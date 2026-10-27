@@ -1208,6 +1208,15 @@ export const it: Messages = {
     none: "Nessun locale valutato entro 3 km.",
     note: "Ordinati per recensioni e passaggi recenti. I prezzi arrivano dagli utenti.",
   },
+  unwell: {
+    tell: "Non mi sento bene",
+    told: "La crew della serata lo sa, senza allarme.",
+    mine: "La crew sa che non ti senti bene.",
+    better: "Sto meglio",
+    other: "{name} non si sente bene.",
+    see: "Vedi dov'è la crew",
+    tag: "non sta bene",
+  },
   addDrink: {
     quick: "Scrivi cosa bevi",
     quickPlaceholder: "2 pinte e uno shot",

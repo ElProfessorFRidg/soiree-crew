@@ -51,6 +51,8 @@ export interface LiveMember {
   designatedDriver: boolean;
   homeSafeAt: number | null;
   batteryLow: boolean;
+  /** N-36: not feeling well since then. */
+  unwellAt?: number | null;
   lastActivityAt: number | null;
   bac: number | null;
   trend: "rising" | "falling" | "steady" | null;
@@ -168,7 +170,7 @@ export async function respondToParty(partyId: string, response: "going" | "decli
 
 export async function setPartyStatus(
   partyId: string,
-  status: { homeSafe?: boolean; designatedDriver?: boolean; batteryLow?: boolean },
+  status: { homeSafe?: boolean; designatedDriver?: boolean; batteryLow?: boolean; unwell?: boolean },
 ): Promise<void> {
   await api(`/v1/parties/${partyId}/status`, { method: "POST", body: status });
   await refreshLiveParty(partyId);

@@ -1209,6 +1209,15 @@ export const en: Messages = {
     none: "No place rated in the app within 3 km.",
     note: "Ranked by reviews and recent check-ins. Prices come from app users.",
   },
+  unwell: {
+    tell: "I don't feel well",
+    told: "The party's crew knows, without an alarm.",
+    mine: "The crew knows you don't feel well.",
+    better: "I'm better now",
+    other: "{name} doesn't feel well.",
+    see: "See where the crew is",
+    tag: "not well",
+  },
   addDrink: {
     quick: "Type what you're drinking",
     quickPlaceholder: "2 pints and a shot",

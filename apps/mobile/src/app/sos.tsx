@@ -14,6 +14,7 @@ import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
 import { useLiveParty } from "@/server/crewData";
 import { sendSos } from "@/server/radarData";
+import { UnwellButton } from "@/party/UnwellBanner";
 import { useSession } from "@/server/session";
 import { currentFix } from "@/server/venueData";
 import { useLiveBac, useNow, useUiLevel } from "@/state/hooks";
@@ -267,6 +268,8 @@ export default function SosScreen() {
           </Text>
         ) : null}
       </View>
+
+      <UnwellButton />
 
       <Text variant="label">{i18n.t("sos.numbers")}</Text>
       <Panel>

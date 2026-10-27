@@ -1208,6 +1208,15 @@ export const pt: Messages = {
     none: "Nenhum sítio avaliado a menos de 3 km.",
     note: "Ordenados por avaliações e visitas recentes. Os preços vêm dos utilizadores.",
   },
+  unwell: {
+    tell: "Não me sinto bem",
+    told: "A crew da festa sabe, sem alarme.",
+    mine: "A crew sabe que não te sentes bem.",
+    better: "Já estou melhor",
+    other: "{name} não se sente bem.",
+    see: "Ver onde está a crew",
+    tag: "não está bem",
+  },
   addDrink: {
     quick: "Escreve o que estás a beber",
     quickPlaceholder: "2 cocktails e 1 shot",

@@ -1207,6 +1207,15 @@ export const de: Messages = {
     none: "Kein bewerteter Ort im Umkreis von 3 km.",
     note: "Nach Bewertungen und letzten Check-ins sortiert. Preise kommen von App-Nutzern.",
   },
+  unwell: {
+    tell: "Mir geht's nicht gut",
+    told: "Die Crew des Abends weiß Bescheid, ohne Alarm.",
+    mine: "Die Crew weiß, dass es dir nicht gut geht.",
+    better: "Geht wieder",
+    other: "{name} geht's nicht gut.",
+    see: "Sehen, wo die Crew ist",
+    tag: "nicht gut",
+  },
   addDrink: {
     quick: "Tipp ein, was du trinkst",
     quickPlaceholder: "2 Bier und ein Shot",

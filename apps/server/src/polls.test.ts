@@ -191,3 +191,25 @@ describe("AI card suggestions (AI-03)", () => {
     expect((await db.query("select * from crew_cards")).length).toBe(0);
   });
 });
+
+describe("not feeling well (N-36)", () => {
+  it("tells the others at the party, and clears once home safe", async () => {
+    await app.close();
+    const live = new LiveHub();
+    app = await buildApp({ db, sealer: new Sealer(randomBytes(32).toString("base64")), live, now: () => clock, publicUrl: "https://crew.test", hashSecret: "s" });
+    const { users, crewId } = await crew("jade", "malik");
+    const [jade, malik] = users as [User, User];
+    const partyId = randomUUID();
+    await app.inject({ method: "POST", url: "/v1/parties", headers: jade.auth, payload: { id: partyId, crewId, name: "Ce soir", mood: "party", kind: "party", startsAt: clock - HOUR, endsAt: clock + 4 * HOUR } });
+    await app.inject({ method: "POST", url: `/v1/parties/${partyId}/response`, headers: malik.auth, payload: { response: "going" } });
+    const heard: string[] = [];
+    live.add(jade.id, { send: (data) => heard.push(data) });
+    await app.inject({ method: "POST", url: `/v1/parties/${partyId}/status`, headers: malik.auth, payload: { unwell: true } });
+    expect(heard.some((m) => m.includes("party.unwell"))).toBe(true);
+    const view = async () =>
+      ((await app.inject({ method: "GET", url: `/v1/parties/${partyId}/live`, headers: jade.auth })).json() as { members: { userId: string; unwellAt: number | null }[] }).members.find((m) => m.userId === malik.id)!;
+    expect((await view()).unwellAt).toBe(clock);
+    await app.inject({ method: "POST", url: `/v1/parties/${partyId}/status`, headers: malik.auth, payload: { homeSafe: true } });
+    expect((await view()).unwellAt).toBeNull();
+  });
+});

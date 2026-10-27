@@ -5,6 +5,8 @@ export interface LiveSocket {
 
 export type LiveEvent =
   | { type: "party.changed"; partyId: string }
+  /** N-36: someone at the party does not feel well. */
+  | { type: "party.unwell"; partyId: string; userId: string }
   | { type: "crew.changed"; crewId: string }
   | { type: "sync"; reason: "own_write" }
   | { type: "security.newDevice" };

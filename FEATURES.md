@@ -48,10 +48,10 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-30 | P1 | Soiree.dc.html | build | Share: styled visual with photo / selfie (front or back camera) + stats + curve. |
 | O-31 | P0 | Etats.dc.html | build | Offline: a drink added without network is kept and sent when the network returns, never counted twice; the app... |
 | O-32 | P0 | JeuxCartes.dc.html | build | Small floating button in every game to add a drink without leaving the game. |
-| O-85 | P1 | Backstage (near Soiree.dc.html) | proposed | Food input for the BAC model ("ate / light meal / empty stomach", per evening or per drink, changeable mid-party) feeding absorption and elimination within Recon-BAC bounds. Merges app.md O-85 and bac.md BAC-FOOD-01. Source: app.md §5, bac.md §5. |
+| O-85 | P1 | Backstage (near Soiree.dc.html) | build | Food input for the BAC model ("ate / light meal / empty stomach", per evening or per drink, changeable mid-party) feeding absorption and elimination within Recon-BAC bounds. Merges app.md O-85 and bac.md BAC-FOOD-01. Source: app.md §5, bac.md §5. |
 | O-86 | P1 | Backstage (near Soiree.dc.html) | proposed | "How this is estimated" sheet one tap from the BAC: inputs used, standard-drink equivalent per country, model limits, why it differs from a breathalyser. Source: app.md §5. |
-| O-87 | P0 | Backstage (near Soiree.dc.html) | proposed | Conservative driving timer: "under the limit at" uses the slow elimination rate (0.10 g/L/h), is never shown while BAC is rising, and says "too close to call" within 0.10 g/L or 1 h of the limit. Renumbered from BAC-SAFE-01. Source: bac.md §5. |
-| O-88 | P0 | Backstage (near Securite.dc.html) | proposed | Alcohol-poisoning signs card above 2.0 g/L estimated, with the local emergency number, aimed at the person and the crew, linked to SOS. Renumbered from BAC-DANGER-01. Source: bac.md §2.5, §5. |
+| O-87 | P0 | Backstage (near Soiree.dc.html) | build | Conservative driving timer: "under the limit at" uses the slow elimination rate (0.10 g/L/h), is never shown while BAC is rising, and says "too close to call" within 0.10 g/L or 1 h of the limit. Renumbered from BAC-SAFE-01. Source: bac.md §5. |
+| O-88 | P0 | Backstage (near Securite.dc.html) | build | Alcohol-poisoning signs card above 2.0 g/L estimated, with the local emergency number, aimed at the person and the crew, linked to SOS. Renumbered from BAC-DANGER-01. Source: bac.md §2.5, §5. |
 
 ## Widgets
 
@@ -105,8 +105,8 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-63 | P0 | JeuxAction.dc.html | build | "Gribouille": one player draws, the others guess, 3 to 8 players online (real-time, multi-phone). |
 | O-64 | P0 | JeuxAction.dc.html | build | "La Courbe" (listed on the store pages, rules not public). |
 | O-65 | P0 | Jeux.dc.html | build | More than 500 cards / questions / dares per language for FR and EN, all written by us (see <localization> and ... |
-| O-89 | P0 | Backstage (near Jeux.dc.html) | proposed | Penalty model shared by every game: N sips or a forfeit of the same size, per-player "no alcohol" switch, water-or-forfeit swap for a player at UI level 3, penalty counter never creates a drink. Source: games.md §2.0, §5 (proposed there as N-xx). |
-| O-90 | P0 | Backstage (near Jeux.dc.html) | proposed | Forfeit deck: forfeit cards in three sizes (small, medium, large), FR and EN, counted in the O-65 content budget. Source: games.md §5. |
+| O-89 | P0 | Backstage (near Jeux.dc.html) | build | Penalty model shared by every game: N sips or a forfeit of the same size, per-player "no alcohol" switch, water-or-forfeit swap for a player at UI level 3, penalty counter never creates a drink. Source: games.md §2.0, §5 (proposed there as N-xx). |
+| O-90 | P0 | Backstage (near Jeux.dc.html) | build | Forfeit deck: forfeit cards in three sizes (small, medium, large), FR and EN, counted in the O-65 content budget. Source: games.md §5. |
 | O-91 | P1 | Backstage (near JeuxAction.dc.html) | proposed | Table style for passing games: the phone stays on the table and the holder taps their name; suggested automatically at UI levels 2 and 3. Source: games.md §2.2, §5. |
 
 ## The Bar (recipes)
@@ -229,7 +229,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | N-27 | P0 | Securite.dc.html | build | Who goes home with whom, walking each other home, shortcuts to ride-hailing / taxis / night transport. |
 | N-28 | P0 | Securite.dc.html | build | Discreet SOS button: alert to the crew with location (if allowed), shortcuts to 112 and local emergency number... |
 | N-29 | P0 | Soirees.dc.html | build | Gentle alert when a member has given no sign of life for X minutes during a party (extension of O-37). |
-| N-36 | P0 | Backstage (near Securite.dc.html) | proposed | "Not feeling well" status, private to the crew in the party: the crew is told quietly, nearest members first, one tap to SOS (N-28); clears when the user says they are fine or confirms home safe (N-25). Source: app.md §2.3 E, §3 decision 4, §5. |
+| N-36 | P0 | Backstage (near Securite.dc.html) | build | "Not feeling well" status, private to the crew in the party: the crew is told quietly, nearest members first, one tap to SOS (N-28); clears when the user says they are fine or confirms home safe (N-25). Source: app.md §2.3 E, §3 decision 4, §5. |
 
 ## Crew life
 
@@ -273,7 +273,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-25 | P0 | Backstage (near Systeme.dc.html) | proposed | Native fast path: every out-of-app action (widget, Live Activity / Live Update, notification action, Siri / Shortcut, Control, Quick Settings tile, launcher shortcut) is written natively to a shared queue with an idempotency key and sent natively within seconds, even with the app killed; the app reconciles on launch. Source: polish.md §1, §2.4 R1, §5. |
 | QOL-26 | P0 | Backstage (near Systeme.dc.html) | proposed | The Live Activity outlives the night: renewed by push-to-start before the 8 h cap, stale state when no update arrives, ended when the party ends; Android equivalent re-posted only if the user did not dismiss it. Source: polish.md §2.4 R2, §5; skills.md §5 (HUB-02 note). |
 | QOL-27 | P0 | Backstage (near Systeme.dc.html) | proposed | Discreet lock screen: by default lock screen, Live Activity, widget and notifications show no BAC figure or drink count (level icon and time to zero only); numbers are opt-in. Conflicts with the approved lock screen board, see `research/open-decisions.md`. Source: polish.md §2.4 R3, §5. |
-| QOL-28 | P0 | Backstage (near Etats.dc.html) | proposed | Feedback without haptics or sound: every confirmation is visible on its own, because iOS haptics are off in Low Power Mode. Source: polish.md §2.4 R7, §5. |
+| QOL-28 | P0 | Backstage (near Etats.dc.html) | build | Feedback without haptics or sound: every confirmation is visible on its own, because iOS haptics are off in Low Power Mode. Source: polish.md §2.4 R7, §5. |
 | QOL-29 | P0 | Backstage (near Systeme.dc.html) | proposed | Invite survives the install: a friend who installs from an invite link lands in the right crew or party (Play Install Referrer; invite code plus system Paste button on iOS), with a rich preview that leaks no private data. Source: polish.md §2.4 R11, §5. |
 | QOL-30 | P0 | Backstage (near Reglages.dc.html) | proposed | Notification taxonomy and per-party mute: fixed channel list designed before v1 (six at most), one thread per party, at most 3 actions, "Mute this party until morning" on every party notification, bursts merged in place. Source: polish.md §2.3, §3 decisions 5 and 6, §5. |
 | QOL-31 | P1 | Backstage (near Reglages.dc.html) | proposed | Night-aware delivery: after midnight, crew members not at the party get non-safety notifications passively, with a morning digest; safety is never muted. Source: polish.md §5. |
@@ -429,11 +429,11 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | AC-08 | P0 | Backstage | build | Replay and tampering protection: signed requests, nonces, server timestamps, idempotency keys, rate limits. Th... |
 | AC-09 | P0 | Etats.dc.html | build | Consequences: a rejected event earns nothing and is recorded as a "cheat attempt", visible to the crew (notifi... |
 | AC-10 | P0 | Backstage | build | Red team: a dedicated subagent attacks our own app and backend (mock location, location simulated from a compu... |
-| AC-11 | P0 | Backstage | proposed | Verdicts only get kinder automatically: re-evaluation can only upgrade a verdict; "rejected" needs risk from 2 or more signal categories and no corroboration; shaming only on rejection. Source: anticheat.md §2.4, §5. |
+| AC-11 | P0 | Backstage | build | Verdicts only get kinder automatically: re-evaluation can only upgrade a verdict; "rejected" needs risk from 2 or more signal categories and no corroboration; shaming only on rejection. Source: anticheat.md §2.4, §5. |
 | AC-12 | P0 | Backstage | proposed | Event timing from the monotonic clock, a pre-fetched nonce book and a prev_hash chain for queued events, so replay protection works offline. Source: anticheat.md §2.6, §5. |
 | AC-13 | P0 | Backstage | proposed | Native modules "LocationIntegrity" (isProducedByAccessory, raw source flags) and "ProximityHandshake" (BLE peripheral and GATT), needed whatever the stack. Source: anticheat.md §1, §2.3, §5. |
 | AC-14 | P1 | Backstage | proposed | Persistent device-level repeat-offender marker (DeviceCheck bits on iOS, Play deviceRecall beta on Android). Source: anticheat.md §5. |
-| AC-15 | P0 | Backstage (near Bars.dc.html) | proposed | Imprecise location (approximate permission or accuracy above 150 m) gives "unverified, ask a friend", never a penalty. Source: anticheat.md §2.2, §5. |
+| AC-15 | P0 | Backstage (near Bars.dc.html) | build | Imprecise location (approximate permission or accuracy above 150 m) gives "unverified, ask a friend", never a penalty. Source: anticheat.md §2.2, §5. |
 
 ## AI features
 
@@ -455,10 +455,10 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | SLOP-06 | P1 | Backstage | todo | Crew panel: before each release, the friends read the copy and the cards. Anything that "sounds like AI" or "d... |
 | SLOP-07 | P0 | Backstage | build | Fresh context: subagents writing copy start a new session with `VOICE.md` + `SLOP.md`, because long contexts m... |
 | SLOP-08 | P0 | Backstage | build | Design: `DESIGN.md` explicitly bans the <design_patterns> tells. If the stack allows it, an automated detector... |
-| SLOP-09 | P1 | Backstage | proposed | Deck lint (SLOP.md R-20): opening cap, length spread, near duplicates, moralising cards, expiry of topical cards. Source: voice.md §5. |
+| SLOP-09 | P1 | Backstage | build | Deck lint (SLOP.md R-20): opening cap, length spread, near duplicates, moralising cards, expiry of topical cards. Source: voice.md §5. |
 | SLOP-10 | P1 | Backstage | proposed | Glossary synonym lint (SLOP.md R-19) generated from GLOSSARY.md. Source: voice.md §5. |
 | SLOP-11 | P1 | Backstage | proposed | Copy variants: every recurring line (JOY-02 greetings, recurring notifications) has at least 3 written variants and a no-repeat rule per user. Source: voice.md §5. |
-| SLOP-12 | P0 | Backstage | proposed | Native anti-slop lint for UI code (gradient text, glow, nested cards, raw hex, emoji icons, pulsing dots without state), because the Impeccable detector reads HTML and CSS only. Renumbered from skills.md SLOP-09. Source: skills.md §1, §5. |
+| SLOP-12 | P0 | Backstage | build | Native anti-slop lint for UI code (gradient text, glow, nested cards, raw hex, emoji icons, pulsing dots without state), because the Impeccable detector reads HTML and CSS only. Renumbered from skills.md SLOP-09. Source: skills.md §1, §5. |
 
 ## Sync and feedback
 
@@ -487,8 +487,8 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | SEC-08 | P0 | Arrivee.dc.html | build | GDPR: alcohol consumption and BAC may count as health data under GDPR article 9, which means explicit consent,... |
 | SEC-09 | P0 | Backstage | build | Secure development: a threat model (STRIDE) per major feature in `SECURITY.md`, secret scanning, static analys... |
 | SEC-10 | P0 | Backstage | build | Export compliance for encryption: App Store encryption questions, US export rules, and the French ANSSI declar... |
-| SEC-11 | P0 | Backstage | proposed | BAC computed on the device; drinks, weight and sex stored on the server only when the user shares with their crew, with a "local only" mode. Tension with server-authoritative scoring, see `research/open-decisions.md`. Source: security.md §2.8, §5. |
-| SEC-12 | P0 | Backstage | proposed | No health data in iCloud: local DB and backups excluded from iCloud device backup; the MSG-08 archive never in iCloud Drive (App Store 5.1.3(ii)). Source: security.md §1 item 4, §5. |
+| SEC-11 | P0 | Backstage | build | BAC computed on the device; drinks, weight and sex stored on the server only when the user shares with their crew, with a "local only" mode. Tension with server-authoritative scoring, see `research/open-decisions.md`. Source: security.md §2.8, §5. |
+| SEC-12 | P0 | Backstage | build | No health data in iCloud: local DB and backups excluded from iCloud device backup; the MSG-08 archive never in iCloud Drive (App Store 5.1.3(ii)). Source: security.md §1 item 4, §5. |
 | SEC-13 | P0 | Backstage | proposed | Export compliance file: classification memo, ANSSI declaration, App Store key, annual review. security.md allows merging it into SEC-10. Source: security.md §2.9, §5. |
 | SEC-14 | P1 | Backstage | proposed | External audit of the `crew-crypto` integration crate before the public release. Source: security.md §2.1, A-SEC-2, §5. |
 

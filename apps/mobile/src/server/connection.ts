@@ -1,3 +1,4 @@
+import { haptic } from "@/motion/haptics";
 import { AppState as RNAppState } from "react-native";
 import type { CustomDrink } from "@/drinks/presets";
 import { createTranslator } from "@/i18n";
@@ -112,6 +113,11 @@ function openSocket(session: ServerSession): void {
         if (message.crewId) void refreshRadar(message.crewId).catch(() => undefined);
       }
       if (message.type === "sync") void pull().catch(() => undefined);
+      if (message.type === "party.unwell" && message.partyId) {
+        // N-36: a quiet heads-up; the banner on the party screen says who.
+        haptic.error();
+        void refreshLiveParty(message.partyId).catch(() => undefined);
+      }
       if (message.type === "security.newDevice") showToast({ message: createTranslator(useAppStore.getState().preferences.language).t("account.newDevice") });
     } catch {
       // A malformed hint is ignored: the next foreground sync catches up anyway.

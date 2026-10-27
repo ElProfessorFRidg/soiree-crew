@@ -1208,6 +1208,15 @@ export const es: Messages = {
     none: "Ningún sitio valorado a menos de 3 km.",
     note: "Ordenados por reseñas y visitas recientes. Los precios vienen de usuarios de la app.",
   },
+  unwell: {
+    tell: "No me encuentro bien",
+    told: "La crew de la fiesta lo sabe, sin alarma.",
+    mine: "La crew sabe que no te encuentras bien.",
+    better: "Ya estoy mejor",
+    other: "{name} no se encuentra bien.",
+    see: "Ver dónde está la crew",
+    tag: "no está bien",
+  },
   addDrink: {
     quick: "Escribe lo que bebes",
     quickPlaceholder: "2 cañas y un chupito",

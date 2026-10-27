@@ -1207,6 +1207,15 @@ export const fr = {
     none: "Aucun lieu noté par l'app à moins de 3 km.",
     note: "Classés par avis et passages récents. Les prix viennent des membres de l'app.",
   },
+  unwell: {
+    tell: "Je ne me sens pas bien",
+    told: "Le crew de la soirée est au courant, sans alarme.",
+    mine: "Le crew sait que tu ne te sens pas bien.",
+    better: "Ça va mieux",
+    other: "{name} ne se sent pas bien.",
+    see: "Voir où est le crew",
+    tag: "pas bien",
+  },
   addDrink: {
     quick: "Tape ce que tu bois",
     quickPlaceholder: "2 pintes et un shot",

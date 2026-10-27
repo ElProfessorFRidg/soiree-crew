@@ -53,6 +53,7 @@ function MemberRow({ member, me }: { member: LiveMember; me: boolean }) {
           {absent ? <Tag label={member.response === "declined" ? i18n.t("live.notGoing") : i18n.t("live.invited")} /> : null}
           {home ? <Tag label={i18n.t("live.homeSafe")} tone="ok" icon="home" /> : null}
           {member.designatedDriver ? <Tag label={i18n.t("live.driver")} tone="water" icon="car" /> : null}
+          {member.unwellAt && !member.homeSafeAt ? <Tag label={i18n.t("unwell.tag")} tone="danger" /> : null}
           {member.batteryLow ? <Tag label={i18n.t("live.battery")} tone="danger" icon="battery" /> : null}
           {member.quiet && !member.batteryLow ? <Tag label={i18n.t("live.quiet", { minutes: quietMinutes })} tone="amber" icon="clock" /> : null}
           {!absent ? (
