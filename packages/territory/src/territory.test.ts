@@ -1,5 +1,4 @@
-import {
-  territoryTitles, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { challengers, countedCheckIns, resolveBoss, scoreSeason, seasonBounds, seasonKey, territoryTitles, timePoints, weekKey, type CountedCheckIn } from "./index";
 
 const MIN = 60_000;
