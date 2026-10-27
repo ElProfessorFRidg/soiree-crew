@@ -6,6 +6,8 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { duration } from "@crew/design-tokens";
 import { ConnectServer } from "@/crew/ConnectServer";
 import { Field } from "@/crew/Field";
+import { RadarSection } from "@/crew/RadarSection";
+import { SosBanner } from "@/crew/SosBanner";
 import { useT, type Translator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
@@ -156,7 +158,9 @@ export default function CrewScreen() {
   const going = parties.filter((p) => p.closedAt === null && p.endsAt > now && p.myResponse === "going");
 
   return (
-    <Screen title={i18n.t("crew.tab")}>
+    <Screen title={i18n.t("crew.tab")} withToasts>
+      <SosBanner />
+      {crews[0] ? <RadarSection crewId={crews[0].id} /> : null}
       {invitations.length ? (
         <>
           <Text variant="label">{i18n.t("crew.invitations")}</Text>

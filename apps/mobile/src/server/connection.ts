@@ -6,7 +6,8 @@ import { HttpTransport } from "@/sync/httpTransport";
 import { LocalTransport } from "@/sync/localTransport";
 import type { DrinkEntry, StoredProfile } from "@/sync/types";
 import { api } from "./api";
-import { refreshCrews, refreshLiveParty, refreshParties } from "./crewData";
+import { refreshCrews, refreshLiveParty, refreshParties, useCrewData } from "./crewData";
+import { refreshRadar, refreshSos } from "./radarData";
 import { useSession, type ServerSession } from "./session";
 
 type Deleted = { id: string; deleted: true };
@@ -100,10 +101,14 @@ function openSocket(session: ServerSession): void {
   };
   ws.onmessage = (event) => {
     try {
-      const message = JSON.parse(String(event.data)) as { type: string; partyId?: string };
+      const message = JSON.parse(String(event.data)) as { type: string; partyId?: string; crewId?: string };
       if (message.type === "party.changed" && message.partyId) void refreshLiveParty(message.partyId).catch(() => undefined);
       if (message.type === "party.changed" || message.type === "crew.changed") void refreshParties().catch(() => undefined);
-      if (message.type === "crew.changed") void refreshCrews().catch(() => undefined);
+      if (message.type === "crew.changed") {
+        void refreshCrews().catch(() => undefined);
+        void refreshSos().catch(() => undefined);
+        if (message.crewId) void refreshRadar(message.crewId).catch(() => undefined);
+      }
       if (message.type === "sync") void pull().catch(() => undefined);
     } catch {
       // A malformed hint is ignored: the next foreground sync catches up anyway.
@@ -124,7 +129,8 @@ function openSocket(session: ServerSession): void {
 
 async function refreshAll(): Promise<void> {
   await flush();
-  await Promise.allSettled([pull(), refreshCrews(), refreshParties()]);
+  await Promise.allSettled([pull(), refreshCrews(), refreshParties(), refreshSos()]);
+  await Promise.allSettled(useCrewData.getState().crews.map((crew) => refreshRadar(crew.id)));
 }
 
 let unsubscribeAppState: (() => void) | null = null;

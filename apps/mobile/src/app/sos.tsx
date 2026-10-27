@@ -6,6 +6,10 @@ import { palette } from "@crew/design-tokens";
 import { countryRules } from "@crew/units";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
+import { useLiveParty } from "@/server/crewData";
+import { sendSos } from "@/server/radarData";
+import { useSession } from "@/server/session";
+import { currentFix } from "@/server/venueData";
 import { useLiveBac, useNow, useUiLevel } from "@/state/hooks";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
@@ -40,6 +44,24 @@ export default function SosScreen() {
   const country = useAppStore((state) => state.preferences.legalCountry);
   const rules = countryRules(country);
   const primary = rules.emergency.ambulance ?? rules.emergency.primary;
+  const session = useSession((state) => state.session);
+  const liveParty = useLiveParty();
+  const [sent, setSent] = useState<null | "with" | "without">(null);
+
+  /** N-28: the hold alerts the crew (with the location when allowed); without a crew it calls for help. */
+  const trigger = () => {
+    if (!session) {
+      call(primary);
+      return;
+    }
+    haptic.heavy();
+    const fix = Promise.race([currentFix(), new Promise<null>((resolve) => setTimeout(() => resolve(null), 4_000))]);
+    void fix.then(async (result) => {
+      const location = result && result.ok ? { lat: result.fix.lat, lng: result.fix.lng, accuracy: result.fix.accuracy } : undefined;
+      await sendSos({ ...(liveParty ? { partyId: liveParty.party.id } : {}), ...(location ? { location } : {}) }).catch(() => undefined);
+      setSent(location ? "with" : "without");
+    });
+  };
 
   const progress = useSharedValue(0);
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -58,7 +80,7 @@ export default function SosScreen() {
     if (countdown === null) return;
     if (countdown === 0) {
       setCountdown(null);
-      call(primary);
+      trigger();
       return;
     }
     const timer = setTimeout(() => setCountdown((s) => (s === null ? null : s - 1)), 1_000);
@@ -76,7 +98,7 @@ export default function SosScreen() {
       haptic.holdTick();
       if (ticks >= 4 && ticker.current) clearInterval(ticker.current);
     }, HOLD_MS / 4);
-    holdTimer.current = setTimeout(() => call(primary), HOLD_MS);
+    holdTimer.current = setTimeout(trigger, HOLD_MS);
   };
   const endHold = () => {
     cancelAnimation(progress);
@@ -93,7 +115,7 @@ export default function SosScreen() {
         {holdMode ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={i18n.t("sos.holdA11y")}
+            accessibilityLabel={session ? i18n.t("sosAlert.alertA11y") : i18n.t("sos.holdA11y")}
             onPressIn={startHold}
             onPressOut={endHold}
             style={styles.ringButton}
@@ -122,7 +144,7 @@ export default function SosScreen() {
           </Pressable>
         ) : countdown === null ? (
           <Button
-            label={i18n.t("sos.tap", { number: primary })}
+            label={session ? i18n.t("sosAlert.tapToAlert") : i18n.t("sos.tap", { number: primary })}
             icon="phone"
             variant="danger"
             height={104}
@@ -137,12 +159,17 @@ export default function SosScreen() {
         ) : (
           <View style={[styles.wide, styles.countdown]}>
             <Text variant="h2" align="center" accessibilityLiveRegion="assertive">
-              {i18n.t("sos.countdown", { seconds: countdown })}
+              {session ? i18n.t("sosAlert.countdown", { seconds: countdown }) : i18n.t("sos.countdown", { seconds: countdown })}
             </Text>
-            <Button label={i18n.t("sos.cancel")} variant="secondary" height={104} fontSize={24} onPress={() => setCountdown(null)} />
+            <Button label={session ? i18n.t("sosAlert.cancel") : i18n.t("sos.cancel")} variant="secondary" height={104} fontSize={24} onPress={() => setCountdown(null)} />
           </View>
         )}
-        {holdMode ? <Text align="center">{i18n.t("sos.hold")}</Text> : null}
+        {holdMode && !sent ? <Text align="center">{session ? i18n.t("sosAlert.holdToAlert") : i18n.t("sos.hold")}</Text> : null}
+        {sent ? (
+          <Text variant="h2" align="center" accessibilityLiveRegion="assertive">
+            {i18n.t("sosAlert.sent")} {sent === "with" ? i18n.t("sosAlert.withLocation") : i18n.t("sosAlert.withoutLocation")}
+          </Text>
+        ) : null}
       </View>
 
       <Text variant="label">{i18n.t("sos.numbers")}</Text>

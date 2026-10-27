@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Field } from "@/crew/Field";
@@ -7,6 +7,7 @@ import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
 import { ApiError } from "@/server/api";
 import { createParty, useCrewData, type PartyMood } from "@/server/crewData";
+import { linkCallToParty } from "@/server/radarData";
 import { useAppStore } from "@/state/store";
 import { Button } from "@/ui/Button";
 import { Chip, Panel, Segmented } from "@/ui/controls";
@@ -28,6 +29,7 @@ function atMinutes(dayStart: Date, minutes: number): number {
 export default function NewPartyScreen() {
   const i18n = useT();
   const crews = useCrewData((state) => state.crews);
+  const params = useLocalSearchParams<{ outCallId?: string; crewId?: string }>();
   const hourCycle = useAppStore((state) => state.preferences.hourCycle);
   const boundary = useAppStore((state) => state.preferences.dayBoundaryHour);
   // QOL-02: before the day boundary, "tonight" is the night already under way.
@@ -38,7 +40,7 @@ export default function NewPartyScreen() {
     return d.getTime();
   });
   const minutesNow = Math.floor((Date.now() - nightBase) / 60_000);
-  const [crewId, setCrewId] = useState(crews[0]?.id ?? "");
+  const [crewId, setCrewId] = useState(params.crewId ?? crews[0]?.id ?? "");
   const [mood, setMood] = useState<PartyMood>("party");
   const [name, setName] = useState("");
   const [kind, setKind] = useState<"party" | "trip">("party");
@@ -90,7 +92,9 @@ export default function NewPartyScreen() {
           onPress={() => {
             setBusy(true);
             createParty({ crewId, name: name.trim() || autoName, mood, kind, startsAt, endsAt })
-              .then((party) => {
+              .then(async (party) => {
+                // N-03: the call becomes the party, and everyone who said "in" is going.
+                if (params.outCallId) await linkCallToParty(params.outCallId, party.id).catch(() => undefined);
                 haptic.confirmed();
                 router.replace({ pathname: "/live", params: { id: party.id } });
               })

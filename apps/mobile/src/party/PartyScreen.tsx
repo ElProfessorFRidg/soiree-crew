@@ -24,6 +24,7 @@ import { Icon } from "@/ui/Icon";
 import { Numeral, Text } from "@/ui/Text";
 import { AddDrinkButton } from "./AddDrinkButton";
 import { CrewStrip } from "./CrewStrip";
+import { SosBanner } from "@/crew/SosBanner";
 import { useLiveParty } from "@/server/crewData";
 import { useVenueData } from "@/server/venueData";
 import { RollingNumber } from "./RollingNumber";
@@ -116,6 +117,7 @@ export function PartyScreen() {
         contentContainerStyle={[styles.content, { paddingTop: insets.top + space.screenTop }]}
         contentInsetAdjustmentBehavior="never"
       >
+        <SosBanner />
         {level === 0 ? <LevelZero {...common} /> : null}
         {level === 1 ? <LevelOne {...common} /> : null}
         {level === 2 ? <LevelTwo {...common} /> : null}

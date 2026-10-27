@@ -7,6 +7,7 @@ import { accountRoutes } from "./routes/accounts";
 import { crewRoutes } from "./routes/crews";
 import { mutationRoutes } from "./routes/mutations";
 import { partyRoutes } from "./routes/parties";
+import { radarRoutes } from "./routes/radar";
 import { leaderboardRoutes } from "./routes/leaderboards";
 import { syncRoutes } from "./routes/sync";
 import { venueRoutes } from "./routes/venues";
@@ -16,7 +17,7 @@ const PUBLIC_ROUTES = new Set(["POST /v1/accounts", "POST /v1/sessions/claim", "
 export async function buildApp(ctx: Context, options: { logger?: boolean } = {}): Promise<FastifyInstance> {
   const app = Fastify({ logger: options.logger ?? false, bodyLimit: 512 * 1024 });
   // Tokens travel in the Authorization header, never in cookies, so any origin may call the API.
-  await app.register(cors, { origin: true, methods: ["GET", "POST", "PATCH", "DELETE"], allowedHeaders: ["authorization", "content-type"] });
+  await app.register(cors, { origin: true, methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], allowedHeaders: ["authorization", "content-type"] });
   await app.register(websocket);
 
   app.addHook("preHandler", async (request) => {
@@ -54,5 +55,6 @@ export async function buildApp(ctx: Context, options: { logger?: boolean } = {})
   partyRoutes(app, ctx);
   venueRoutes(app, ctx, ctx.hashSecret);
   leaderboardRoutes(app, ctx);
+  radarRoutes(app, ctx);
   return app;
 }
