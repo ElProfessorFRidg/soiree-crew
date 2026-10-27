@@ -29,6 +29,12 @@ Threat model per major feature (STRIDE), then the checks that run on every chang
 | Recap | Reactions as harassment | T | Fixed emoji set, one per person per participant, removable |
 | Export | Someone exports my data | I | Needs my session; contains my data only |
 | Account deletion while drunk | Irreversible action regretted | T | Next-morning vault from UI level 2 (ADP-06) |
+| Messaging | The server or its host reads chats | I | MLS end to end (ADR 0005): the server holds ciphertext, key packages and welcomes, never a key; media sealed per file on the phone |
+| Messaging | The server adds a device it controls to a group | S, I | Every leaf key is checked against the device list, devices are visible per person, safety numbers cover all of a person's keys, and a change shows a notice (MSG-05) |
+| Messaging | A member poses as another member | S | The MLS sender is read from the authenticated framing, never from the payload; leaf keys must match the device list |
+| Messaging | Someone who left keeps reading | I | Members who leave a crew or party and signed-out phones are removed by a commit; the next epoch has keys they never get (post-compromise security), and each device renews its own keys daily |
+| Messaging | A reporter or moderator sees more than needed | I | Only the reported message and up to 3 around it, decrypted on the reporter's phone by their choice, sealed at rest |
+| Messaging | Lost phone, history exposed | I | History, group state and keys sealed on the phone with a Keychain / Keystore key; the backup opens only with the user's 160-bit recovery key |
 | Whole API | Request floods | D | Body size limit 512 KB; per-route limits on auth; the host's proxy for the rest |
 
 ## Route audit (October 2026)
@@ -58,6 +64,8 @@ A dedicated agent attacked the local dev server with throwaway accounts (mock an
 Known and accepted: a modified client that sends a plausible fix with `mocked: false` gets an accepted check-in. Location alone cannot prove presence; that is why points need corroboration over time (AC-04, AC-06) and why the admin can overturn.
 
 ## Not done yet (before any public release)
+
+- An independent review of `packages/mls` and of ts-mls, which has had no formal audit (ADR 0005), or a move to OpenMLS behind the same interface.
 
 - Certificate pinning and app integrity (App Attest, Play Integrity) as anti-cheat signals (AC-05, SEC-03).
 - Passkeys and optional 2FA (SEC-07).

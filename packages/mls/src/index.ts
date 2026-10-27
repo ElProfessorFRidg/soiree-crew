@@ -19,4 +19,4 @@ export {
 export { MAX_BODY, readPayload, writePayload, type ChatPayload } from "./payload";
 export { installCrypto } from "./runtime";
 export { fingerprint, groupDigits, keySetTag, safetyNumber, type Party } from "./safety";
-export { newRecoveryKey, normaliseRecoveryKey, openBackup, openMedia, sealBackup, sealMedia, type SealedMedia } from "./sealed";
+export { newLocalKey, newRecoveryKey, normaliseRecoveryKey, openBackup, openLocal, openMedia, sealBackup, sealLocal, sealMedia, type SealedMedia } from "./sealed";

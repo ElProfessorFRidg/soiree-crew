@@ -12,6 +12,8 @@ import { refreshCrews, refreshLiveParty, refreshParties, useCrewData } from "./c
 import { refreshRadar, refreshSos } from "./radarData";
 import { useSession, type ServerSession } from "./session";
 import { showToast } from "@/ui/Toast";
+import { backupIfDue } from "@/chat/backup";
+import { onChatHint, onTyping, startChat } from "@/chat/engine";
 
 type Deleted = { id: string; deleted: true };
 interface SyncResponse {
@@ -101,10 +103,14 @@ function openSocket(session: ServerSession): void {
   socket = ws;
   ws.onopen = () => {
     retry = 0;
+    // Anything that arrived while the socket was down is picked up now.
+    void startChat().then(() => backupIfDue());
   };
   ws.onmessage = (event) => {
     try {
-      const message = JSON.parse(String(event.data)) as { type: string; partyId?: string; crewId?: string };
+      const message = JSON.parse(String(event.data)) as { type: string; partyId?: string; crewId?: string; conversationId?: string; userId?: string };
+      if (message.type === "chat.typing" && message.conversationId && message.userId) onTyping(message.conversationId, message.userId);
+      else if (message.type.startsWith("chat.")) onChatHint(message.type, message.conversationId);
       if (message.type === "party.changed" && message.partyId) void refreshLiveParty(message.partyId).catch(() => undefined);
       if (message.type === "party.changed" || message.type === "crew.changed") void refreshParties().catch(() => undefined);
       if (message.type === "crew.changed") {

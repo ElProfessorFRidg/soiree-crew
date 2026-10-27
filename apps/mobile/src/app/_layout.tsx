@@ -1,3 +1,4 @@
+import "@/chat/runtime";
 import { useFonts } from "expo-font";
 import * as Notifications from "expo-notifications";
 import { router, Stack } from "expo-router";

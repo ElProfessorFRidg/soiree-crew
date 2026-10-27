@@ -86,6 +86,12 @@
         }
       ],
       [
+        "expo-audio",
+        {
+          "microphonePermission": "Voice notes in your chats use the microphone, only while you record one. They are encrypted on your phone before they are sent."
+        }
+      ],
+      [
         "expo-calendar",
         {
           "calendarPermission": "The calendar gets the parties you add to it, nothing else is read.",

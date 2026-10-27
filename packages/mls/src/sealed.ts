@@ -28,6 +28,20 @@ export function openMedia(data: Uint8Array, key: string): Uint8Array {
   return gcm(fromBase64(key), data.subarray(0, 12)).decrypt(data.subarray(12));
 }
 
+/** SEC-05 for chats: history and group state are sealed on the phone with a key kept in the Keychain / Keystore. */
+export function newLocalKey(): string {
+  return toBase64(random(32));
+}
+
+export function sealLocal(plain: Uint8Array, key: string): Uint8Array {
+  const nonce = random(12);
+  return concat(nonce, gcm(fromBase64(key), nonce).encrypt(plain));
+}
+
+export function openLocal(data: Uint8Array, key: string): Uint8Array {
+  return gcm(fromBase64(key), data.subarray(0, 12)).decrypt(data.subarray(12));
+}
+
 // Crockford base32 without the letters people confuse (I, L, O, U).
 const ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
 

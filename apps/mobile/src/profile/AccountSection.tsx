@@ -9,6 +9,7 @@ import { exportMyData } from "./exportData";
 import { api, ApiError } from "@/server/api";
 import { serverMessage } from "@/server/errors";
 import { useCrewData } from "@/server/crewData";
+import { forgetChat } from "@/chat/engine";
 import { saveSession, useSession } from "@/server/session";
 import { clearAccountHistory, useAppStore } from "@/state/store";
 import { Button } from "@/ui/Button";
@@ -19,6 +20,8 @@ import { guarded } from "@/vault/vault";
 
 /** Wipes everything this phone holds about the user, then sends them back to the age gate. */
 async function wipeDevice(): Promise<void> {
+  const userId = useSession.getState().session?.userId;
+  if (userId) await forgetChat(userId);
   await saveSession(null);
   useCrewData.setState({ crews: [], parties: [], live: {} });
   useAppStore.setState({
@@ -272,6 +275,9 @@ export function AccountSection() {
             onPress={() => {
               // The session ends on the server too; if it can't be reached, the token dies with the phone's copy.
               void api("/v1/sessions/current", { method: "DELETE" }).catch(() => undefined);
+              const userId = useSession.getState().session?.userId;
+              // Chat keys and history are tied to this session's device: they go with it.
+              if (userId) void forgetChat(userId);
               clearAccountHistory();
               useCrewData.setState({ crews: [], parties: [], live: {} });
               void saveSession(null);

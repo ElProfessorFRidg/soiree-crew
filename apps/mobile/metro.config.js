@@ -14,12 +14,22 @@ const workspace = Object.fromEntries(
     .map((entry) => [`@crew/${entry.name}`, path.join(packages, entry.name, "src", "index.ts")]),
 );
 
+// ts-mls loads optional algorithms with import() inside try/catch, and @hpke reaches for Node's
+// crypto only where WebCrypto is missing. None of them is used here (ADR 0005): they resolve to
+// an empty module, so the bundle builds and the library reports them as unavailable.
+const emptyModule = path.join(__dirname, "metro.empty.js");
+const optional = new Set(["crypto", "@hpke/chacha20poly1305", "@hpke/dhkem-x448", "@hpke/hybridkem-x-wing", "@hpke/ml-kem", "@noble/post-quantum/ml-dsa.js"]);
+
 const defaultResolve = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   const entry = workspace[moduleName];
   if (entry) return { type: "sourceFile", filePath: entry };
+  if (optional.has(moduleName)) return { type: "sourceFile", filePath: emptyModule };
   return defaultResolve ? defaultResolve(context, moduleName, platform) : context.resolveRequest(context, moduleName, platform);
 };
+// The server's own node_modules are nothing the app bundles, and pnpm's links there trip Metro's crawler on Windows.
+const existing = config.resolver.blockList;
+config.resolver.blockList = [...(Array.isArray(existing) ? existing : existing ? [existing] : []), /[\\/]apps[\\/]server[\\/].*/];
 config.watchFolders = [...(config.watchFolders ?? []), packages, path.resolve(__dirname, "../../design")];
 
 module.exports = config;

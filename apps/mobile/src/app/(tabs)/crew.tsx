@@ -241,7 +241,12 @@ export default function CrewScreen() {
   return (
     <Screen
       title={i18n.t("crew.tab")}
-      trailing={<IconButton icon="search" accessibilityLabel={i18n.t("search.title")} onPress={() => router.push("/search")} />}
+      trailing={
+        <View style={styles.headerActions}>
+          <IconButton icon="chat" accessibilityLabel={i18n.t("chat.title")} onPress={() => router.push("/messages")} />
+          <IconButton icon="search" accessibilityLabel={i18n.t("search.title")} onPress={() => router.push("/search")} />
+        </View>
+      }
       withToasts
       onRefresh={() => Promise.all([refreshCrews(), refreshParties(), ...crews.map((c) => refreshRadar(c.id))])}
     >
@@ -341,6 +346,7 @@ export default function CrewScreen() {
 }
 
 const styles = StyleSheet.create({
+  headerActions: { flexDirection: "row", gap: 8 },
   flex: { flex: 1 },
   crewHead: { flexDirection: "row", alignItems: "center", gap: 12 },
   members: { flexDirection: "row", flexWrap: "wrap", gap: 12 },

@@ -94,6 +94,16 @@ describe("MLS groups without WebCrypto", () => {
     ga = second.group;
     const read = await ga.process(late.message);
     expect(read.kind === "application" && dec(read.plaintext)).toBe("en retard");
+
+    // An empty commit renews the sender's leaf keys; the others follow it.
+    gb = (await gb.process(second.commit)).group;
+    const renewal = await gb.commit();
+    gb = renewal.group;
+    ga = (await ga.process(renewal.commit)).group;
+    expect(ga.epoch).toBe(gb.epoch);
+    const after = await ga.encrypt(enc("toujours là"));
+    const got = await gb.process(after.message);
+    expect(got.kind === "application" && dec(got.plaintext)).toBe("toujours là");
   });
 
   it("refuses a device whose key does not match the directory", async () => {

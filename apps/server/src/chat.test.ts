@@ -153,6 +153,19 @@ describe("messaging delivery service (MSG-01, MSG-02)", () => {
     expect(future.json()).toEqual({ error: "stale_epoch" });
   });
 
+  it("keeps a group with its creator however long it waits alone, and frees it once nobody is left", async () => {
+    const { users } = await crew("jade", "malik");
+    const [jade, malik] = users as [User, User];
+    await phone(jade);
+    await phone(malik);
+    const conv = (await conversations(jade)).conversations[0]!;
+    await app.inject({ method: "POST", url: `/v1/conversations/${conv.id}/init`, headers: jade.auth });
+    clock += 60 * 60_000;
+    expect((await app.inject({ method: "POST", url: `/v1/conversations/${conv.id}/init`, headers: malik.auth })).statusCode).toBe(409);
+    await app.inject({ method: "DELETE", url: "/v1/sessions/current", headers: jade.auth });
+    expect((await app.inject({ method: "POST", url: `/v1/conversations/${conv.id}/init`, headers: malik.auth })).statusCode).toBe(200);
+  });
+
   it("drops a signed-out device from the roster and lets disappearing messages go", async () => {
     const { users } = await crew("jade", "malik");
     const [jade, malik] = users as [User, User];

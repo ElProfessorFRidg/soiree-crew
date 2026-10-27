@@ -1,0 +1,103 @@
+import { File, Paths } from "expo-file-system";
+import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
+import * as ImagePicker from "expo-image-picker";
+import { Platform } from "react-native";
+import { fromBase64, openMedia, sealMedia, toBase64 } from "@crew/mls";
+import { api } from "@/server/api";
+import { sendMediaPayload } from "./engine";
+import type { ChatMedia } from "./store";
+
+// MSG-03: every photo and voice note is encrypted here with its own key before upload. The key
+// travels inside the end-to-end encrypted message; the server stores bytes it cannot open.
+
+const MAX_SIDE = 1600;
+const THUMB_SIDE = 48;
+
+async function upload(conversationId: string, plain: Uint8Array): Promise<{ blob: string; key: string }> {
+  const sealed = sealMedia(plain);
+  const { id } = await api<{ id: string }>(`/v1/conversations/${conversationId}/blobs`, { method: "POST", body: { data: toBase64(sealed.data) } });
+  return { blob: id, key: sealed.key };
+}
+
+async function readBytes(uri: string, base64?: string): Promise<Uint8Array> {
+  if (base64) return fromBase64(base64);
+  if (Platform.OS === "web") return new Uint8Array(await (await fetch(uri)).arrayBuffer());
+  return fromBase64(await new File(uri).base64());
+}
+
+/** Opens the camera or the library, re-encodes (which drops the location), encrypts and sends. -1: no permission. */
+export async function sendPhoto(conversationId: string, source: "camera" | "library", reply?: string): Promise<number> {
+  const permission = source === "camera" ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (!permission.granted) return -1;
+  const result =
+    source === "camera"
+      ? await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 1, exif: false })
+      : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], quality: 1, exif: false });
+  if (result.canceled || !result.assets[0]) return 0;
+  const asset = result.assets[0];
+  const longest = Math.max(asset.width, asset.height);
+  const context = ImageManipulator.manipulate(asset.uri);
+  if (longest > MAX_SIDE) context.resize(asset.width >= asset.height ? { width: MAX_SIDE } : { height: MAX_SIDE });
+  const image = await (await context.renderAsync()).saveAsync({ compress: 0.72, format: SaveFormat.JPEG, base64: true });
+  // The thumbnail is made on the phone too and travels inside the encrypted message.
+  const thumbContext = ImageManipulator.manipulate(image.uri);
+  thumbContext.resize(image.width >= image.height ? { width: THUMB_SIDE } : { height: THUMB_SIDE });
+  const thumb = await (await thumbContext.renderAsync()).saveAsync({ compress: 0.5, format: SaveFormat.JPEG, base64: true });
+  const { blob, key } = await upload(conversationId, await readBytes(image.uri, image.base64));
+  if (Platform.OS !== "web") {
+    try {
+      new File(image.uri).delete();
+      new File(thumb.uri).delete();
+    } catch {
+      // A cache file left behind is cleaned by the system.
+    }
+  }
+  sendMediaPayload(conversationId, {
+    kind: "photo",
+    blob,
+    key,
+    mime: "image/jpeg",
+    width: image.width,
+    height: image.height,
+    ...(thumb.base64 ? { thumb: thumb.base64 } : {}),
+    ...(reply ? { reply } : {}),
+  });
+  return 1;
+}
+
+export async function sendVoice(conversationId: string, uri: string, durationMs: number, reply?: string): Promise<void> {
+  const bytes = await readBytes(uri);
+  const mime = Platform.OS === "web" ? "audio/webm" : "audio/mp4";
+  const { blob, key } = await upload(conversationId, bytes);
+  if (Platform.OS !== "web") {
+    try {
+      new File(uri).delete();
+    } catch {
+      // Same as above.
+    }
+  }
+  sendMediaPayload(conversationId, { kind: "voice", blob, key, mime, durationMs: Math.round(durationMs), ...(reply ? { reply } : {}) });
+}
+
+const opened = new Map<string, Promise<string>>();
+
+/**
+ * Downloads and decrypts a file once per run. Photos become data URIs held in memory; voice notes
+ * need a file for the player, written to the cache and gone when the system clears it.
+ */
+export function openChatMedia(media: ChatMedia): Promise<string> {
+  let promise = opened.get(media.blob);
+  if (!promise) {
+    promise = (async () => {
+      const { data } = await api<{ data: string }>(`/v1/chat/blobs/${media.blob}`);
+      const plain = openMedia(fromBase64(data), media.key);
+      if (media.kind === "photo" || Platform.OS === "web") return `data:${media.mime};base64,${toBase64(plain)}`;
+      const file = new File(Paths.cache, `voice-${media.blob}.m4a`);
+      if (!file.exists) await file.write(plain);
+      return file.uri;
+    })();
+    promise.catch(() => opened.delete(media.blob));
+    opened.set(media.blob, promise);
+  }
+  return promise;
+}

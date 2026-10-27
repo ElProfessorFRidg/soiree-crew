@@ -18,8 +18,6 @@ const DAY_MS = 86_400_000;
 const APPLICATION_TTL_MS = 30 * DAY_MS;
 /** Commits are what a late device needs to catch up with the group: kept longer. */
 const COMMIT_TTL_MS = 90 * DAY_MS;
-/** A device that claimed group creation and vanished frees the slot after this. */
-const INIT_STALE_MS = 2 * 60_000;
 /** Application messages may arrive from a recent epoch; ts-mls keeps the keys of the last four. */
 const EPOCH_SLACK = 3;
 /** Party chats close a day after the party ends, once the recap is out. */
@@ -151,6 +149,16 @@ async function purge(ctx: Context): Promise<void> {
   for (const blob of blobs) await unlink(blobPath(ctx, blob.id)).catch(() => undefined);
 }
 
+/** Everyone who may share a conversation with this person: crews and friends. */
+async function sharingUsers(ctx: Context, userId: string): Promise<string[]> {
+  const rows = await ctx.db.query<{ user_id: string }>(
+    `select user_id from crew_members where crew_id in (select crew_id from crew_members where user_id = $1)
+     union select case when user_a = $1 then user_b else user_a end from friendships where (user_a = $1 or user_b = $1) and status = 'accepted'`,
+    [userId],
+  );
+  return rows.map((r) => r.user_id);
+}
+
 function notify(ctx: Context, userIds: string[], event: Parameters<Context["live"]["notify"]>[1]) {
   ctx.live.notify(userIds, event);
 }
@@ -159,12 +167,27 @@ export function chatRoutes(app: FastifyInstance, ctx: Context): void {
   /** Registers this device's MLS client. The signature key never changes for a device. */
   app.put("/v1/chat/device", async (request) => {
     const user = requireUser(request);
-    const input = z.object({ signatureKey: b64(64) }).parse(request.body);
+    const input = z.object({ signatureKey: b64(64), reset: z.boolean().optional() }).parse(request.body);
     if (Buffer.from(input.signatureKey, "base64").length !== 32) throw new HttpError(400, "invalid_key");
     const existing = await deviceOf(ctx, request);
     if (existing) {
       const row = (await ctx.db.query<{ signature_key: string }>("select signature_key from chat_devices where id = $1", [existing.id]))[0]!;
-      if (row.signature_key !== input.signatureKey) throw new HttpError(409, "key_mismatch");
+      if (row.signature_key !== input.signatureKey) {
+        if (!input.reset) throw new HttpError(409, "key_mismatch");
+        // The phone lost its chat keys (reinstalled, storage cleared): it starts over as a new leaf
+        // everywhere. Its old key stays on record under a retired id, so old leaves still check.
+        await ctx.db.transaction(async (tx) => {
+          await tx.query("update chat_devices set session_hash = null where id = $1", [existing.id]);
+          await tx.query("insert into chat_devices (id, user_id, session_hash, signature_key, created_at) values ($1, $2, $3, $4, $5)", [
+            randomUUID(),
+            user.id,
+            hashToken(bearer(request)!),
+            input.signatureKey,
+            ctx.now(),
+          ]);
+        });
+        notify(ctx, await sharingUsers(ctx, user.id), { type: "chat.roster" });
+      }
     } else {
       const id = randomUUID();
       await ctx.db.query("insert into chat_devices (id, user_id, session_hash, signature_key, created_at) values ($1, $2, $3, $4, $5)", [
@@ -175,11 +198,7 @@ export function chatRoutes(app: FastifyInstance, ctx: Context): void {
         ctx.now(),
       ]);
       // Every conversation of this person now has a device to add.
-      const rows = await ctx.db.query<{ user_id: string }>(
-        "select distinct user_id from crew_members where crew_id in (select crew_id from crew_members where user_id = $1)",
-        [user.id],
-      );
-      notify(ctx, rows.map((r) => r.user_id), { type: "chat.roster" });
+      notify(ctx, await sharingUsers(ctx, user.id), { type: "chat.roster" });
     }
     const device = (await deviceOf(ctx, request))!;
     const packages = (await ctx.db.query<{ n: number }>("select count(*)::int as n from chat_key_packages where device_id = $1", [device.id]))[0]!.n;
@@ -308,19 +327,22 @@ export function chatRoutes(app: FastifyInstance, ctx: Context): void {
     };
   });
 
-  /** The first device to open a conversation creates its group; the others wait for a welcome. */
+  /**
+   * The first device to open a conversation creates its group; the others wait for a welcome. A group
+   * starts over only when no active device is left in it (everyone signed out or lost their state).
+   */
   app.post<{ Params: { id: string } }>("/v1/conversations/:id/init", async (request) => {
     const user = requireUser(request);
     const { conversation } = await conversationFor(ctx, request.params.id, user.id);
     const device = await requireDevice(ctx, request);
     const now = ctx.now();
-    const free = conversation.epoch === null || (conversation.epoch === 0 && conversation.init_at !== null && now - conversation.init_at > INIT_STALE_MS);
-    if (!free) throw new HttpError(409, "initialised");
+    const orphan = `not exists (select 1 from conversation_devices cd join chat_devices d on d.id = cd.device_id where cd.conversation_id = conversations.id and d.session_hash is not null)`;
     await ctx.db.transaction(async (tx) => {
-      const updated = await tx.query(
-        "update conversations set epoch = 0, init_device = $2, init_at = $3 where id = $1 and (epoch is null or (epoch = 0 and init_at < $4)) returning id",
-        [conversation.id, device.id, now, now - INIT_STALE_MS],
-      );
+      const updated = await tx.query(`update conversations set epoch = 0, init_device = $2, init_at = $3 where id = $1 and (epoch is null or ${orphan}) returning id`, [
+        conversation.id,
+        device.id,
+        now,
+      ]);
       if (!updated.length) throw new HttpError(409, "initialised");
       await tx.query("delete from conversation_devices where conversation_id = $1", [conversation.id]);
       const last = (await tx.query<{ n: number }>("select coalesce(max(seq), 0)::int as n from chat_messages where conversation_id = $1", [conversation.id]))[0]!.n;

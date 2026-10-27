@@ -19,6 +19,11 @@ Not set yet: the private build runs on a server the crew hosts itself. Before an
 | SOS alerts | Crew safety | `sos_alerts`, location sealed | Account deletion |
 | Pools, expenses, repayments, IBAN | Splitting costs | `expenses`, `repayments`, `payment_details` (sealed) | Account deletion (expenses paid by others stay for them) |
 | Session tokens | Staying signed in | `sessions`, SHA-256 hashes only | Sign-out or account deletion |
+| Chat messages, photos, voice notes | Crew, party and friend chats (MSG-01) | `chat_messages`, `chat_blobs`: ciphertext only, the server cannot open it (ADR 0005) | The conversation's disappearing timer, else 30 days for messages and files, 90 days for group changes |
+| Chat devices and keys | Adding each phone to its groups | `chat_devices` (public signature key), `chat_key_packages` (public, single use) | Public keys kept for checking old groups; packages until used |
+| Chat membership metadata | Routing ciphertext | `conversations`, `conversation_devices`: who is in which chat, timer, order of messages | Leaving the crew, party or friendship; account deletion |
+| Chat history backup (optional) | A new phone gets its history back (MSG-08) | `chat_backups` and a file, sealed with the user's recovery key only | Turning the backup off or account deletion |
+| Reported chat messages | Moderation (MSG-07) | `reports.evidence`, sealed: the message and up to 3 around it, sent by the reporter's phone | Handled reports, then account deletion |
 
 Alcohol consumption and BAC are treated as health data (GDPR article 9).
 

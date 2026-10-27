@@ -309,7 +309,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ADP-07 | P0 | ModeBourre.dc.html | build | Legibility: text size, maximum contrast, readable under strobe or very low light, no disorienting motion (effe... |
 | ADP-08 | P0 | ModeBourre.dc.html | build | Battery: automatic eco mode during a party when the battery gets low (fewer refreshes, lighter effects; essent... |
 | ADP-09 | P0 | Backstage | build | Drunk-mode test bench: a tester subagent runs EVERY P0 screen under simulated constraints (one hand, thumb onl... |
-| ADP-10 | P1 | Messages.dc.html | todo | Drunk-text guard: the user picks contacts (inside the app) whose messages are held at adaptive levels 2 and 3 ... |
+| ADP-10 | P1 | Messages.dc.html | build | Drunk-text guard: the user picks contacts (inside the app) whose messages are held at adaptive levels 2 and 3 ... |
 
 ## Motion
 
@@ -402,18 +402,18 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| MSG-01 | P1 | Messages.dc.html | todo | Conversations: one chat per crew, one chat per party (created with the party, archived after the recap), direc... |
-| MSG-02 | P1 | Backstage | todo | End-to-end encryption for every conversation, with a vetted protocol and library: the Signal protocol (libsign... |
-| MSG-03 | P1 | Messages.dc.html | todo | Media in chats (photos, videos, voice notes) encrypted on the device with a key per file before upload; the se... |
-| MSG-04 | P1 | Systeme.dc.html | todo | Push notifications never carry readable content: the payload is encrypted and decrypted on the device (iOS Not... |
-| MSG-05 | P1 | Messages.dc.html | todo | Key verification: compare safety numbers or scan a QR code with a friend; a clear notice when a contact's key ... |
-| MSG-06 | P1 | Messages.dc.html | todo | Disappearing messages, per conversation. |
-| MSG-07 | P1 | Messages.dc.html | todo | Reporting without breaking encryption: reporting a message sends that message and a few around it, decrypted o... |
-| MSG-08 | P1 | Messages.dc.html | todo | New phone and backups: optional encrypted backup protected by a recovery key or passphrase only the user knows... |
-| MSG-09 | P1 | Messages.dc.html | todo | Search in conversations runs on the device only. AI features (<ai_features>) never receive chat content unless... |
-| MSG-10 | P1 | Messages.dc.html | todo | Chat basics: replies, reactions, mentions, voice notes with a big record button (adaptive levels 2 and 3), rea... |
-| MSG-11 | P1 | Backstage (near Messages.dc.html) | proposed | Linking a new device: QR scan from an existing device, "new device linked" notice to the owner's other devices, plain warning that history does not follow without a backup. Source: security.md §2.2, §5. |
-| MSG-12 | P1 | Backstage (near Messages.dc.html) | proposed | Group conversation info: members, roles, leave, mute, group key state. Renumbered from design-b MSG-11. Source: design-b.md §2.7 G-12, §5. |
+| MSG-01 | P1 | Messages.dc.html | build | Conversations: one chat per crew, one chat per party (created with the party, archived after the recap), direc... |
+| MSG-02 | P1 | Backstage | build | End-to-end encryption for every conversation, with a vetted protocol and library: the Signal protocol (libsign... |
+| MSG-03 | P1 | Messages.dc.html | partial | Media in chats (photos, videos, voice notes) encrypted on the device with a key per file before upload; the se... |
+| MSG-04 | P1 | Systeme.dc.html | build | Push notifications never carry readable content: the payload is encrypted and decrypted on the device (iOS Not... |
+| MSG-05 | P1 | Messages.dc.html | partial | Key verification: compare safety numbers or scan a QR code with a friend; a clear notice when a contact's key ... |
+| MSG-06 | P1 | Messages.dc.html | build | Disappearing messages, per conversation. |
+| MSG-07 | P1 | Messages.dc.html | build | Reporting without breaking encryption: reporting a message sends that message and a few around it, decrypted o... |
+| MSG-08 | P1 | Messages.dc.html | build | New phone and backups: optional encrypted backup protected by a recovery key or passphrase only the user knows... |
+| MSG-09 | P1 | Messages.dc.html | build | Search in conversations runs on the device only. AI features (<ai_features>) never receive chat content unless... |
+| MSG-10 | P1 | Messages.dc.html | build | Chat basics: replies, reactions, mentions, voice notes with a big record button (adaptive levels 2 and 3), rea... |
+| MSG-11 | P1 | Backstage (near Messages.dc.html) | partial | Linking a new device: QR scan from an existing device, "new device linked" notice to the owner's other devices, plain warning that history does not follow without a backup. Source: security.md §2.2, §5. |
+| MSG-12 | P1 | Backstage (near Messages.dc.html) | partial | Group conversation info: members, roles, leave, mute, group key state. Renumbered from design-b MSG-11. Source: design-b.md §2.7 G-12, §5. |
 
 ## Anti-cheat
 
