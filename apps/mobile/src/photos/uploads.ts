@@ -118,6 +118,8 @@ export interface AlbumPhoto {
   height: number;
   at: number;
   url: string;
+  /** N-37: false when the person who took it said no to stories. */
+  storyOk?: boolean;
 }
 
 export async function fetchAlbum(partyId: string): Promise<AlbumPhoto[]> {

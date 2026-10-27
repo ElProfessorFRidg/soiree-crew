@@ -21,6 +21,8 @@ export interface Recap {
     curve: [number, number][];
     designatedDriver: boolean;
     homeSafeAt: number | null;
+    /** N-37: said no to appearing in stories that leave the crew. */
+    storyOptOut?: boolean;
   }[];
   badges: { kind: BadgeKind; userId: string; value?: number; venueName?: string }[];
   timeline: { at: number; kind: TimelineKind; userId?: string; venueName?: string; count?: number }[];

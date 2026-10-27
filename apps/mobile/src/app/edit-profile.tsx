@@ -140,6 +140,20 @@ export default function EditProfileScreen() {
           }}
         />
       </View>
+      <View style={styles.switchRow}>
+        <View style={styles.flex}>
+          <Text>{i18n.t("people.inStories")}</Text>
+          <Text variant="small">{i18n.t("people.inStoriesHint")}</Text>
+        </View>
+        <Switch
+          value={!(profile.storyOptOut ?? false)}
+          accessibilityLabel={i18n.t("people.inStories")}
+          onValueChange={(on) => {
+            setProfile((p) => (p ? { ...p, storyOptOut: !on } : p));
+            apply({ storyOptOut: !on });
+          }}
+        />
+      </View>
       <Text variant="small">{i18n.t("people.requestsFrom")}</Text>
       <Segmented<"nobody" | "friendsOfFriends" | "everyone">
         accessibilityLabel={i18n.t("people.requestsFrom")}

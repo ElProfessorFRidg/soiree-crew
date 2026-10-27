@@ -31,7 +31,7 @@ export default function PhotoStripScreen() {
 
   useEffect(() => {
     void fetchAlbum(partyId)
-      .then(setPhotos)
+      .then((list) => setPhotos(list.filter((p) => p.storyOk !== false)))
       .catch(() => setPhotos([]));
   }, [partyId]);
 

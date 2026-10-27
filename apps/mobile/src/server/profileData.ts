@@ -17,6 +17,7 @@ export interface ProfileView {
   openToMeet?: boolean;
   requestsFrom?: "nobody" | "friendsOfFriends" | "everyone";
   mutualFriends?: number;
+  storyOptOut?: boolean;
   sections: {
     identity?: { displayName: string; username: string; bio: string; country: string };
     crews?: { name: string; members: number }[];
@@ -42,6 +43,7 @@ export function saveProfile(input: {
   regularOptIn?: boolean;
   openToMeet?: boolean;
   requestsFrom?: "nobody" | "friendsOfFriends" | "everyone";
+  storyOptOut?: boolean;
 }): Promise<{ audiences: Record<ProfileSection, Audience> }> {
   return api("/v1/me/profile", { method: "PUT", body: input });
 }

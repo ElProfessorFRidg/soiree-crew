@@ -776,6 +776,8 @@ export const fr = {
     requestsFof: "Amis d'amis",
     requestsNobody: "Personne",
     mutual: { one: "{count} ami en commun", other: "{count} amis en commun" },
+    inStories: "Apparaître dans les stories des autres",
+    inStoriesHint: "Sur les visuels qui sortent du crew : ton prénom sur le podium, tes photos dans la bande. Ta courbe n'y est jamais.",
   },
   album: {
     title: "Album de la soirée",

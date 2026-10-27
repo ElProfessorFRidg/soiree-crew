@@ -777,6 +777,8 @@ export const it: Messages = {
     requestsFof: "Amici di amici",
     requestsNobody: "Nessuno",
     mutual: { one: "{count} amico in comune", other: "{count} amici in comune" },
+    inStories: "Apparire nelle story degli altri",
+    inStoriesHint: "Sulle immagini che escono dalla crew: il tuo nome sul podio, le tue foto nella striscia. La tua curva mai.",
   },
   album: {
     title: "Album della serata",

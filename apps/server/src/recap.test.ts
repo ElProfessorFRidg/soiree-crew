@@ -165,3 +165,19 @@ describe("AI order (AI-01)", () => {
     expect((await ask()).json()).toEqual({ items: [{ id: "pint", quantity: 2 }], minutesAgo: 60, venue: "Le Zinc", iPay: true });
   });
 });
+
+describe("stories leave the crew only with consent (N-37)", () => {
+  it("flags the people who said no in the recap and keeps their photos out of the strip", async () => {
+    const jade = await account("jade");
+    await app.inject({ method: "PUT", url: "/v1/me/profile", headers: jade.auth, payload: { storyOptOut: true } });
+    const crewId = ((await app.inject({ method: "POST", url: "/v1/crews", headers: jade.auth, payload: { name: "Crew" } })).json() as { crew: { id: string } }).crew.id;
+    const partyId = randomUUID();
+    await app.inject({ method: "POST", url: "/v1/parties", headers: jade.auth, payload: { id: partyId, crewId, name: "Samedi", mood: "party", kind: "party", startsAt: clock, endsAt: clock + 6 * H } });
+    clock += 10 * 60_000;
+    await mutate(jade, pint(clock));
+    const recap = (await app.inject({ method: "GET", url: `/v1/parties/${partyId}/recap`, headers: jade.auth })).json() as { participants: { storyOptOut: boolean }[] };
+    expect(recap.participants[0]!.storyOptOut).toBe(true);
+    const me = (await app.inject({ method: "GET", url: "/v1/users/me/profile", headers: jade.auth })).json() as { storyOptOut: boolean };
+    expect(me.storyOptOut).toBe(true);
+  });
+});

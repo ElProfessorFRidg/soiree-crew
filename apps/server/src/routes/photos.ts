@@ -72,8 +72,9 @@ export function photoRoutes(app: FastifyInstance, ctx: Context): void {
   app.get<{ Params: { id: string } }>("/v1/parties/:id/photos", async (request) => {
     const user = requireUser(request);
     await assertGoing(ctx, request.params.id, user.id);
-    const rows = await ctx.db.query<{ id: string; user_id: string; display_name: string; width: number; height: number; created_at: number }>(
-      `select p.id, p.user_id, u.display_name, p.width, p.height, p.created_at from photos p join users u on u.id = p.user_id
+    const rows = await ctx.db.query<{ id: string; user_id: string; display_name: string; width: number; height: number; created_at: number; story_opt_out: boolean | null }>(
+      `select p.id, p.user_id, u.display_name, p.width, p.height, p.created_at, pr.story_opt_out from photos p join users u on u.id = p.user_id
+       left join profiles pr on pr.user_id = p.user_id
        where p.party_id = $1 order by p.created_at`,
       [request.params.id],
     );
@@ -86,6 +87,8 @@ export function photoRoutes(app: FastifyInstance, ctx: Context): void {
         width: r.width,
         height: r.height,
         at: r.created_at,
+        // N-37: a photo by someone who said no to stories stays in the album, out of the strip.
+        storyOk: !r.story_opt_out,
         url: `${ctx.publicUrl}/v1/photos/${r.id}?exp=${exp}&sig=${signature(ctx, r.id, exp)}`,
       })),
     };

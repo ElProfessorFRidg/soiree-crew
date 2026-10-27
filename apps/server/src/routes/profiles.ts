@@ -224,8 +224,8 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
     const mine = ownerId === user.id && !as;
     const stored = mine
       ? (
-          await ctx.db.query<{ audiences: string; findable: string; regular_opt_in: boolean; open_to_meet: boolean; requests_from: string }>(
-            "select audiences, findable, regular_opt_in, open_to_meet, requests_from from profiles where user_id = $1",
+          await ctx.db.query<{ audiences: string; findable: string; regular_opt_in: boolean; open_to_meet: boolean; requests_from: string; story_opt_out: boolean }>(
+            "select audiences, findable, regular_opt_in, open_to_meet, requests_from, story_opt_out from profiles where user_id = $1",
             [ownerId],
           )
         )[0]
@@ -236,7 +236,7 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
       friendship: await friendshipState(ctx, user.id, ownerId),
       muted: (await ctx.db.query("select 1 from mutes where muter = $1 and muted = $2", [user.id, ownerId])).length > 0,
       sections,
-      ...(mine ? { audiences: audiencesOf(stored ? (JSON.parse(stored.audiences) as Record<string, unknown>) : {}), findable: stored?.findable ?? "username", regularOptIn: stored?.regular_opt_in ?? false, openToMeet: stored?.open_to_meet ?? false, requestsFrom: stored?.requests_from ?? "everyone" } : {}),
+      ...(mine ? { audiences: audiencesOf(stored ? (JSON.parse(stored.audiences) as Record<string, unknown>) : {}), findable: stored?.findable ?? "username", regularOptIn: stored?.regular_opt_in ?? false, openToMeet: stored?.open_to_meet ?? false, requestsFrom: stored?.requests_from ?? "everyone", storyOptOut: stored?.story_opt_out ?? false } : {}),
       mutualFriends: ownerId === user.id ? 0 : await mutualFriends(ctx, user.id, ownerId),
     };
   });
@@ -255,6 +255,7 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
         regularOptIn: z.boolean().optional(),
         openToMeet: z.boolean().optional(),
         requestsFrom: z.enum(["nobody", "friendsOfFriends", "everyone"]).optional(),
+        storyOptOut: z.boolean().optional(),
       })
       .parse(request.body);
     const current = (await ctx.db.query<{ bio: string; country: string; audiences: string; hidden_venues: string }>(
@@ -282,6 +283,7 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
     if (input.regularOptIn !== undefined) await ctx.db.query("update profiles set regular_opt_in = $2 where user_id = $1", [user.id, input.regularOptIn]);
     if (input.openToMeet !== undefined) await ctx.db.query("update profiles set open_to_meet = $2 where user_id = $1", [user.id, input.openToMeet]);
     if (input.requestsFrom) await ctx.db.query("update profiles set requests_from = $2 where user_id = $1", [user.id, input.requestsFrom]);
+    if (input.storyOptOut !== undefined) await ctx.db.query("update profiles set story_opt_out = $2 where user_id = $1", [user.id, input.storyOptOut]);
     return { audiences };
   });
 

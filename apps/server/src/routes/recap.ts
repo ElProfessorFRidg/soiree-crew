@@ -123,6 +123,11 @@ export function recapRoutes(app: FastifyInstance, ctx: Context): void {
     // Curves run until everyone is back to zero, capped at 10 hours after the end.
     const curveEnd = to + 10 * HOUR_MS;
 
+    const optedOut = new Set(
+      (
+        await ctx.db.query<{ user_id: string }>("select user_id from profiles where user_id = any($1::uuid[]) and story_opt_out = true", [present.map((m) => m.user_id)])
+      ).map((r) => r.user_id),
+    );
     const participants = present.map((m) => {
       const mine = drinkRows.filter((d) => d.user_id === m.user_id);
       const intakes: DrinkIntake[] = mine.map((d) => {
@@ -149,6 +154,7 @@ export function recapRoutes(app: FastifyInstance, ctx: Context): void {
         curve,
         designatedDriver: m.designated_driver,
         homeSafeAt: m.home_safe_at,
+        storyOptOut: optedOut.has(m.user_id),
       };
     });
 

@@ -500,10 +500,10 @@ export default function RecapScreen() {
         <Text variant="label">{partyDate(recap.party.startsAt, i18n)}</Text>
         <Text variant="h1">{recap.party.name}</Text>
         {figures}
-        {/* O-30: the night's curves travel with the story, drawn still. */}
-        {recap.participants.some((p) => p.curve.length > 1) ? (
+        {/* O-30, N-37: only my own curve travels with the story; the others stay in the crew. */}
+        {recap.participants.some((p) => p.userId === me && p.curve.length > 1) ? (
           <RecapCurves
-            participants={recap.participants}
+            participants={recap.participants.filter((p) => p.userId === me)}
             from={recap.window.from}
             legalLimit={legalLimit}
             replay={0}
@@ -520,7 +520,7 @@ export default function RecapScreen() {
         ) : null}
         {podium && !podium.disabled && podium.entries.length ? (
           <View style={styles.cardPodium}>
-            {podium.entries.map((entry) => (
+            {podium.entries.filter((entry) => !recap.participants.find((p) => p.userId === entry.userId)?.storyOptOut).map((entry) => (
               <View key={entry.userId} style={styles.cardRank}>
                 <Text
                   variant="h2"

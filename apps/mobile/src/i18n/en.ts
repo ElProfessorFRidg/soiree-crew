@@ -778,6 +778,8 @@ export const en: Messages = {
     requestsFof: "Friends of friends",
     requestsNobody: "Nobody",
     mutual: { one: "{count} mutual friend", other: "{count} mutual friends" },
+    inStories: "Appear in other people's stories",
+    inStoriesHint: "On images that leave the crew: your name on the podium, your photos in the strip. Your curve never is.",
   },
   album: {
     title: "Party album",

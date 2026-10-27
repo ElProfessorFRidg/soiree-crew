@@ -802,6 +802,8 @@ export const ru: Messages = {
     requestsFof: "Друзья друзей",
     requestsNobody: "Никто",
     mutual: { one: "{count} общий друг", few: "{count} общих друга", many: "{count} общих друзей", other: "{count} общих друга" },
+    inStories: "Появляться в сторис других",
+    inStoriesHint: "На картинках, которые уходят из тусовки: твоё имя на пьедестале, твои фото в полосе. Твоя кривая никогда.",
   },
   album: {
     title: "Альбом вечеринки",

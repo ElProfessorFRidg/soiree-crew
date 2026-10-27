@@ -158,8 +158,10 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
     const nights = [...new Set(together.map((p) => nightOf(p.starts_at, timeZone)))];
     const ids = together.map((p) => p.id);
     const presence = ids.length
-      ? await ctx.db.query<{ user_id: string; display_name: string; n: number; home: number }>(
-          `select m.user_id, u.display_name, count(*)::int as n, count(m.home_safe_at)::int as home from party_members m join users u on u.id = m.user_id
+      ? await ctx.db.query<{ user_id: string; display_name: string; n: number; home: number; hidden: boolean }>(
+          // N-37: the story can leave the crew, so people who said no are counted, never named.
+          `select m.user_id, u.display_name, count(*)::int as n, count(m.home_safe_at)::int as home, coalesce(bool_or(p.story_opt_out), false) as hidden
+           from party_members m join users u on u.id = m.user_id left join profiles p on p.user_id = m.user_id
            where m.party_id = any($1::uuid[]) and m.response = 'going' group by m.user_id, u.display_name order by n desc, u.display_name`,
           [ids],
         )
@@ -202,7 +204,7 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
       parties: together.length,
       venuesVisited: venues.length,
       topVenue: venues[0] ? { name: venues[0].name, visits: venues[0].visits } : null,
-      regulars: presence.slice(0, 3).map((p) => ({ userId: p.user_id, name: p.display_name, nights: p.n })),
+      regulars: presence.filter((p) => !p.hidden).slice(0, 3).map((p) => ({ userId: p.user_id, name: p.display_name, nights: p.n })),
       homeSafe: presence.reduce((sum, p) => sum + p.home, 0),
       busiestWeekday: nights.length ? busiest + 1 : null,
       biggestNight: biggest ? { name: biggest.name, at: biggest.starts_at, people: biggest.going } : null,
