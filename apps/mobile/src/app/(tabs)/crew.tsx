@@ -9,6 +9,7 @@ import { Field } from "@/crew/Field";
 import { RadarSection } from "@/crew/RadarSection";
 import { SosBanner } from "@/crew/SosBanner";
 import { useT, type Translator } from "@/i18n";
+import { flyHero, HeroSource } from "@/motion/hero";
 import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
 import { ApiError } from "@/server/api";
@@ -121,9 +122,14 @@ function CrewCard({ crew }: { crew: Crew }) {
             style={styles.member}
             accessibilityRole="button"
             accessibilityLabel={member.nickname ?? member.displayName}
-            onPress={() => router.push({ pathname: "/profile", params: { id: member.id === me ? "me" : member.id } })}
+            onPress={() => {
+              flyHero(`avatar:${member.id}`);
+              router.push({ pathname: "/profile", params: { id: member.id === me ? "me" : member.id } });
+            }}
           >
-            <Avatar personId={member.id} name={member.nickname ?? member.displayName} />
+            <HeroSource heroKey={`avatar:${member.id}`} node={<Avatar personId={member.id} name={member.nickname ?? member.displayName} />}>
+              <Avatar personId={member.id} name={member.nickname ?? member.displayName} />
+            </HeroSource>
             <Text variant="tab" align="center" numberOfLines={2}>
               {member.id === me ? i18n.t("crew.you") : (member.nickname ?? member.displayName)}
             </Text>

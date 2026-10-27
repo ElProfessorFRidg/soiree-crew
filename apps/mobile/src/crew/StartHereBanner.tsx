@@ -9,11 +9,13 @@ import { Text } from "@/ui/Text";
 
 /** At this many members in one bar with no party running, the app offers to start one there. */
 const GATHERING = 3;
+/** One shared empty list: a fresh [] in a selector re-renders forever before the venues arrive. */
+const NO_VENUES: never[] = [];
 
 /** QOL-17: a suggestion that saves taps, never an action taken for the crew. */
 export function StartHereBanner({ crew }: { crew: Crew }) {
   const i18n = useT();
-  const venues = useVenueData((state) => state.byCrew[crew.id]?.venues ?? []);
+  const venues = useVenueData((state) => state.byCrew[crew.id]?.venues ?? NO_VENUES);
   const live = useCrewData((state) => {
     const now = Date.now();
     return state.parties.some((p) => p.crewId === crew.id && p.closedAt === null && p.startsAt <= now && p.endsAt >= now);

@@ -2,6 +2,7 @@ import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { View } from "react-native";
 import { useT } from "@/i18n";
+import { flyHero, HeroSource } from "@/motion/hero";
 import { haptic } from "@/motion/haptics";
 import { befriend, fetchFriends, unblock, unmute, type FriendsList } from "@/server/profileData";
 import { useTheme } from "@/theme";
@@ -24,7 +25,10 @@ export default function FriendsScreen() {
   }, []);
   useFocusEffect(load);
 
-  const open = (userId: string) => router.push({ pathname: "/profile", params: { id: userId } });
+  const open = (userId: string) => {
+    flyHero(`avatar:${userId}`);
+    router.push({ pathname: "/profile", params: { id: userId } });
+  };
   const section = (title: string, people: { userId: string; name: string }[], trailing: (userId: string) => React.ReactNode) =>
     people.length ? (
       <>
@@ -34,7 +38,11 @@ export default function FriendsScreen() {
             <Row
               key={p.userId}
               title={p.name}
-              leading={<Avatar personId={p.userId} name={p.name} size={36} />}
+              leading={
+                <HeroSource heroKey={`avatar:${p.userId}`} node={<Avatar personId={p.userId} name={p.name} size={36} />}>
+                  <Avatar personId={p.userId} name={p.name} size={36} />
+                </HeroSource>
+              }
               trailing={trailing(p.userId)}
               onPress={() => open(p.userId)}
               last={index === people.length - 1}

@@ -52,6 +52,10 @@ Functions in `apps/mobile/src/motion/haptics.ts`. One meaning per vibration, and
 
 `apps/mobile/src/party/BubbleField.tsx`, behind the Party screen. Each drink the crew logs releases 3 to 6 slate bubbles (2 to 6 px, alpha 0.25 to 0.5) that rise and fade; calm moods (wine, sunset, home, champagne) rise slower and straight, the others faster with a slight sway. At most 40 alive, updated at 30 Hz at most by a frame callback that stops once the last bubble is gone. The ground shifts within 2 % lightness with the hour (lighter at 8 pm, deepest at 3 am), once a minute. Off in eco mode, with Reduce Motion and at levels 2 and 3, where only the lightness step stays. The CPU budget (under 2 % over 10 idle minutes, A-MOTION-6) is still to be measured on a modest Android phone.
 
+## Shared elements (MOT-05)
+
+`apps/mobile/src/motion/hero.tsx`: a source registers what it shows (`HeroSource`), `flyHero(key)` runs right before `router.push`, the target reports where it lands (`HeroTarget`) and an overlay above the navigator flies between the two on `duration.enter`. Screens reached this way fade in instead of sliding, so the element lands where it stays. Today: a crew member's or a friend's avatar flies to their profile; the catalogue card grows into the game setup and fades over it. With Reduce Motion nothing flies, the screen fades.
+
 ## Review checklist
 
 - Uses tokens, not literals.

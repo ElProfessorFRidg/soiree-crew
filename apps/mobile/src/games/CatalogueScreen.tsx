@@ -7,6 +7,7 @@ import { palette, radius, space } from "@crew/design-tokens";
 import { filterGames, lockReason, typicalMinutes, type CatalogueFilter, type GameDefinition } from "@crew/games";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
+import { flyHero, HeroSource } from "@/motion/hero";
 import { useTheme } from "@/theme";
 import { Button, IconButton } from "@/ui/Button";
 import { Segmented } from "@/ui/controls";
@@ -167,7 +168,15 @@ export function CatalogueScreen() {
             onMomentumScrollEnd={onScrollEnd}
             onScrollEndDrag={onScrollEnd}
             style={{ flexGrow: 0 }}
-            renderItem={({ item }) => <GameCardView game={item} width={cardWidth} height={cardHeight} />}
+            renderItem={({ item }) => (
+              <HeroSource
+                heroKey={`game:${item.id}`}
+                mode="stretch"
+                node={<View style={{ width: cardWidth, height: cardHeight, borderRadius: radius.sheet, backgroundColor: item.colour }} />}
+              >
+                <GameCardView game={item} width={cardWidth} height={cardHeight} />
+              </HeroSource>
+            )}
           />
           <View style={[styles.padded, styles.pager]}>
             <IconButton icon="back" accessibilityLabel={g.t("catalogue.previous")} onPress={() => go(index - 1)} />
@@ -185,7 +194,10 @@ export function CatalogueScreen() {
                 icon="dice"
                 height={ui.action}
                 accessibilityLabel={`${g.t("catalogue.play")}, ${g.t(`games.${current.id}.name`)}`}
-                onPress={() => router.push({ pathname: "/games/[gameId]", params: { gameId: current.id } })}
+                onPress={() => {
+                  flyHero(`game:${current.id}`);
+                  router.push({ pathname: "/games/[gameId]", params: { gameId: current.id } });
+                }}
               />
             </View>
           ) : null}

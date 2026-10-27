@@ -319,7 +319,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | MOT-02 | P0 | Backstage | build | Living background within our art direction (no radial halo or generic aurora, see <anti_slop>): it breathes an... |
 | MOT-03 | P0 | Soiree.dc.html | build | Adding a drink: glass filling up, bubbles, BAC digits rolling to the new value, dedicated haptic. It is the mo... |
 | MOT-04 | P0 | Soiree.dc.html | build | Curve: the trace draws itself, smooth colour change when crossing a threshold, clearly marked peak point (no d... |
-| MOT-05 | P0 | Backstage | todo | Screen transitions: shared elements (a friend's avatar flies from the list to their profile, a game card grows... |
+| MOT-05 | P0 | Backstage | build | Screen transitions: shared elements (a friend's avatar flies from the list to their profile, a game card grows... |
 | MOT-06 | P0 | JeuxCartes.dc.html | build | Card games: dealing, 3D flip, swipe, drawing, a card that trembles before a penalty. |
 | MOT-07 | P0 | JeuxAction.dc.html | build | Game physics: roulette with real deceleration and haptic clicks, a bomb that shakes harder and harder then bur... |
 | MOT-08 | P0 | Recap.dc.html | build | Cinematic recap: story format, counters rolling, podium rising, curves drawing, badges dropping with confetti,... |

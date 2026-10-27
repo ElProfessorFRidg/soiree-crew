@@ -1,6 +1,7 @@
 import { useFonts } from "expo-font";
 import * as Notifications from "expo-notifications";
 import { router, Stack } from "expo-router";
+import { HeroOverlay } from "@/motion/hero";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
@@ -143,7 +144,9 @@ export default function RootLayout() {
               <Stack.Screen name="home" />
               <Stack.Screen name="where-to" />
               <Stack.Screen name="join" options={{ animation: "fade" }} />
-              <Stack.Screen name="profile" />
+              {/* MOT-05: screens reached by a shared element fade in, so the element lands where it stays. */}
+              <Stack.Screen name="profile" options={{ animation: "fade" }} />
+              <Stack.Screen name="games/[gameId]" options={{ animation: "fade" }} />
               <Stack.Screen name="edit-profile" />
               <Stack.Screen name="friends" />
               <Stack.Screen name="reports" />
@@ -154,6 +157,7 @@ export default function RootLayout() {
               <Stack.Screen name="morning" options={{ animation: "fade" }} />
               <Stack.Screen name="sos" options={{ presentation: "fullScreenModal", animation: "fade" }} />
             </Stack>
+            <HeroOverlay />
           </I18nProvider>
         </ThemeProvider>
       </SafeAreaProvider>

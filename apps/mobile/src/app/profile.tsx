@@ -5,6 +5,7 @@ import { breathRatio, countryRules, formatBacValue } from "@crew/units";
 import { drinkLabel } from "@/drinks/display";
 import type { DrinkKind } from "@/drinks/presets";
 import { useT } from "@/i18n";
+import { HeroTarget } from "@/motion/hero";
 import { haptic } from "@/motion/haptics";
 import { ReportPanel } from "@/moderation/ReportPanel";
 import { befriend, block, fetchProfile, mute, unfriend, unmute, type ProfileView } from "@/server/profileData";
@@ -92,7 +93,9 @@ export default function ProfileScreen() {
   return (
     <Screen back withToasts>
       <View style={styles.head}>
-        <Avatar personId={profile.userId} name={name || "?"} size={72} />
+        <HeroTarget heroKey={`avatar:${profile.userId}`}>
+          <Avatar personId={profile.userId} name={name || "?"} size={72} />
+        </HeroTarget>
         <View style={styles.flex}>
           {name ? <Text variant="h1">{name}</Text> : null}
           {s.identity ? <Text variant="small">@{s.identity.username}</Text> : null}
