@@ -24,9 +24,16 @@ interface ExpenseRow {
   created_by: string;
 }
 
+/**
+ * A pool, for one of its own members who is still in the crew. Being in the crew is not enough:
+ * the pool shows its members' payment details (N-19, red team AC-10).
+ */
 async function poolForMember(ctx: Context, poolId: string, userId: string) {
   const rows = await ctx.db.query<{ id: string; crew_id: string; party_id: string | null; name: string; currency: string; created_by: string }>(
-    "select p.id, p.crew_id, p.party_id, p.name, p.currency, p.created_by from pools p join crew_members m on m.crew_id = p.crew_id and m.user_id = $2 where p.id = $1",
+    `select p.id, p.crew_id, p.party_id, p.name, p.currency, p.created_by from pools p
+     join crew_members m on m.crew_id = p.crew_id and m.user_id = $2
+     join pool_members pm on pm.pool_id = p.id and pm.user_id = $2
+     where p.id = $1`,
     [poolId, userId],
   );
   if (!rows[0]) throw new HttpError(404, "not_found");

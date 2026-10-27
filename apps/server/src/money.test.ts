@@ -69,14 +69,16 @@ describe("pools (O-70, N-19)", () => {
     expect(res.json()).toMatchObject({ error: "amounts_mismatch" });
   });
 
-  it("keeps IBANs sealed and shows them to pool members", async () => {
-    const { users, crewId } = await crewWithParty("jade", "malik");
+  it("keeps IBANs sealed and shows them to pool members only", async () => {
+    const { users, crewId } = await crewWithParty("jade", "malik", "theo");
     await app.inject({ method: "PUT", url: "/v1/me/payment", headers: users[0]!.auth, payload: { iban: "FR7630006000011234567890189" } });
     const poolId = randomUUID();
     await app.inject({ method: "POST", url: `/v1/crews/${crewId}/pools`, headers: users[0]!.auth, payload: { id: poolId, name: "Bar", currency: "EUR", memberIds: [users[1]!.id] } });
     const state = (await app.inject({ method: "GET", url: `/v1/pools/${poolId}`, headers: users[1]!.auth })).json() as { members: { payment: { iban?: string } | null }[] };
     expect(state.members.some((m) => m.payment?.iban === "FR7630006000011234567890189")).toBe(true);
     expect(JSON.stringify(await db.query("select * from payment_details"))).not.toContain("FR76");
+    // Théo is in the crew, not in the pool: no IBAN, no expenses (red team AC-10).
+    expect((await app.inject({ method: "GET", url: `/v1/pools/${poolId}`, headers: users[2]!.auth })).statusCode).toBe(404);
   });
 });
 

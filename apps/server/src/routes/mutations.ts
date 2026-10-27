@@ -52,7 +52,9 @@ async function apply(ctx: Context, db: Db, userId: string, mutation: MutationInp
         `insert into drinks (id, user_id, party_id, kind, preset_id, sealed, consumed_at, logged_at, updated_at)
          values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
          on conflict (id) do update set kind = $4, preset_id = $5, sealed = $6, consumed_at = $7, deleted_at = null, updated_at = $9`,
-        [d.id, userId, partyId, d.kind, d.presetId, sealed, d.consumedAt, d.loggedAt, now],
+        // AC-07: "logged" is when the server first heard of the drink, never what the client claims,
+        // so a backdated batch cannot pass for drinks logged on the spot (red team AC-10).
+        [d.id, userId, partyId, d.kind, d.presetId, sealed, d.consumedAt, now, now],
       );
       await touchParty(ctx, db, partyId, userId, now, changedParties);
       return;

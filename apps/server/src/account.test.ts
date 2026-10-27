@@ -144,3 +144,15 @@ describe("email and password (O-01)", () => {
     expect(statuses.at(-1)).toBe(429);
   });
 });
+
+describe("error answers (red team AC-10)", () => {
+  it("keeps Fastify's 4xx and turns a malformed id into a 404, never a 500", async () => {
+    const jade = await signUp("jade");
+    const empty = await app.inject({ method: "POST", url: "/v1/sessions/transfer-code", headers: { ...jade.auth, "content-type": "application/json" }, payload: "" });
+    expect(empty.statusCode).toBe(400);
+    const big = await app.inject({ method: "POST", url: "/v1/accounts", headers: { "content-type": "application/json" }, payload: JSON.stringify({ username: "x".repeat(600_000) }) });
+    expect(big.statusCode).toBe(413);
+    const bad = await app.inject({ method: "POST", url: "/v1/drinks/not-a-uuid/confirm", headers: jade.auth });
+    expect(bad.statusCode).toBe(404);
+  });
+});

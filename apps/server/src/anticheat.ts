@@ -2,14 +2,14 @@ import { createHmac } from "node:crypto";
 import { ethanolGrams } from "@crew/bac";
 
 // AC-03 and AC-06 (research/anticheat.md §2.2 to §2.5). Every number is a default of
-// ac_config_version 1; verdicts store the version so scoring can be replayed (AC-01).
+// ac_config_version 2 (2: city jumps under 5 km are flagged); verdicts store the version so scoring can be replayed (AC-01).
 
 export const AC_CONFIG = {
-  version: 1,
+  version: 2,
   bands: { acceptBelow: 30, rejectAt: 70, rejectMinCategories: 2 },
-  weights: { mocked: 50, speedStrong: 45, speedMedium: 20, coordsIdentical: 30, coordsOnPin: 25, clockDrift: 5, venueHopping: 20 },
+  weights: { mocked: 50, speedStrong: 45, speedMedium: 20, speedCity: 30, coordsIdentical: 30, coordsOnPin: 25, clockDrift: 5, venueHopping: 20 },
   credits: { peerPassive: 20 },
-  geo: { maxAccuracyM: 150, speedStrongKmh: 250, speedMediumKmh: 130 },
+  geo: { maxAccuracyM: 150, speedStrongKmh: 250, speedMediumKmh: 130, speedCityKmh: 90, cityMinKm: 1 },
   time: { clockDriftMin: 5, peerWindowMin: 20, peerActiveWindowMin: 30, hoppingWindowMin: 10 },
   peers: { confirmsPerNight: 10 },
   drinks: { burst30Grams: 40, burst60Grams: 60, retroMinutes: 45, partyPreMinutes: 30, confirmWindowMinutes: 30 },
@@ -94,6 +94,8 @@ export function evaluateCheckIn(input: CheckInEvaluationInput): Evaluation {
     const speed = km / hours;
     if (speed > cfg.geo.speedStrongKmh && km > 20) signals.push({ name: "speed_strong", points: cfg.weights.speedStrong, category: "P" });
     else if (speed > cfg.geo.speedMediumKmh && km > 5) signals.push({ name: "speed_medium", points: cfg.weights.speedMedium, category: "P" });
+    // Two bars across town a minute apart: no taxi does that (red team AC-10).
+    else if (speed > cfg.geo.speedCityKmh && km > cfg.geo.cityMinKm) signals.push({ name: "speed_city", points: cfg.weights.speedCity, category: "P" });
   }
   if (input.previous.some((p) => p.fixHash === input.fixHash)) {
     signals.push({ name: "coords_identical", points: cfg.weights.coordsIdentical, category: "P" });
@@ -170,9 +172,11 @@ export function verifyDrinks(
   for (const drink of sorted) {
     let reason: string | undefined;
     if (!party || drink.consumedAt < party.startsAt - cfg.partyPreMinutes * 60_000 || drink.consumedAt > party.endsAt) reason = "outside_party";
-    else if (drink.loggedAt - drink.consumedAt > cfg.retroMinutes * 60_000) reason = "late_entry";
     else if (burstOver.has(drink.id)) reason = "burst";
-    else if (!drink.confirmed) reason = "not_confirmed";
+    // A friend who was there vouches even for a drink that reached the server late (offline, AC-08).
+    else if (drink.confirmed) reason = undefined;
+    else if (drink.loggedAt - drink.consumedAt > cfg.retroMinutes * 60_000) reason = "late_entry";
+    else reason = "not_confirmed";
     result.set(drink.id, reason ? { status: "unverified", reason } : { status: "verified" });
   }
   return result;

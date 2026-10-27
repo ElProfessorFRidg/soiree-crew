@@ -28,6 +28,16 @@ describe("check-in verdicts (research/anticheat.md §2.4 worked examples)", () =
     expect(result).toMatchObject({ verdict: "not_here", reason: "not_here", risk: 0 });
   });
 
+  it("flags a 1.3 km jump half a minute after the last bar, and lets a short walk through", () => {
+    // Bastille, about 1.3 km east of the venue.
+    const bastille = { venueId: "bastille", lat: 48.8532, lng: 2.3692, fixHash: "h-before" };
+    const jump = evaluateCheckIn(input({ previous: [{ ...bastille, at: NOW - 30_000 }] }));
+    expect(jump.signals.map((s) => s.name)).toContain("speed_city");
+    expect(jump.verdict).toBe("unverified");
+    const ride = evaluateCheckIn(input({ previous: [{ ...bastille, at: NOW - 15 * 60_000 }] }));
+    expect(ride.verdict).toBe("accepted");
+  });
+
   it("asks a friend to confirm in a basement with a 180 m fix", () => {
     expect(evaluateCheckIn(input({ fix: { accuracy: 180 } }))).toMatchObject({ verdict: "unverified", reason: "imprecise" });
   });
@@ -92,9 +102,11 @@ describe("drink verification (AC-07)", () => {
     // 3 pints = 59 g > 40 g in 30 min.
     expect(result.get("c")).toMatchObject({ status: "unverified", reason: "burst" });
   });
-  it("does not verify late entries or drinks outside the party", () => {
-    const late = verifyDrinks([pint("a", 0, { loggedAt: NOW + 60 * 60_000 })], party);
+  it("does not verify late entries or drinks outside the party, unless a friend there confirms a late one", () => {
+    const late = verifyDrinks([pint("a", 0, { loggedAt: NOW + 60 * 60_000, confirmed: false })], party);
     expect(late.get("a")).toMatchObject({ reason: "late_entry" });
+    const vouched = verifyDrinks([pint("a", 0, { loggedAt: NOW + 60 * 60_000, confirmed: true })], party);
+    expect(vouched.get("a")).toEqual({ status: "verified" });
     expect(verifyDrinks([pint("a", 0)], null).get("a")).toMatchObject({ reason: "outside_party" });
   });
 });

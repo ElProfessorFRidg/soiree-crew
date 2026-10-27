@@ -63,6 +63,11 @@ export function requireUser(request: FastifyRequest): AuthedUser {
 
 export function sendError(reply: FastifyReply, error: unknown): FastifyReply {
   if (error instanceof HttpError) return reply.status(error.status).send({ error: error.code });
+  // Fastify's own refusals (empty or oversized body, bad JSON) keep their 4xx instead of turning into a 500.
+  const status = (error as { statusCode?: number }).statusCode;
+  if (typeof status === "number" && status >= 400 && status < 500) return reply.status(status).send({ error: status === 413 ? "too_large" : "invalid" });
+  // A malformed id in a path reaches Postgres as an invalid uuid: for the caller it is simply not found.
+  if ((error as { code?: string }).code === "22P02") return reply.status(404).send({ error: "not_found" });
   // Never leak internals (SEC-01): stack traces stay in the server log.
   reply.log.error(error);
   return reply.status(500).send({ error: "internal" });

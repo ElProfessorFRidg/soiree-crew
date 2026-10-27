@@ -46,9 +46,20 @@ Every route was checked for an ownership or membership test before it reads or w
 
 The app itself only uses the system's HTTPS: `ITSAppUsesNonExemptEncryption` is `false` in `app.json`. The AES-256-GCM sealing runs on the server, not in the app. A public release still needs the App Store questionnaire answered and the French ANSSI declaration checked by the publisher.
 
+## Red team (AC-10), first pass
+
+A dedicated agent attacked the local dev server with throwaway accounts (mock and forged locations, clock games, drink batches, replayed and forged requests, IDOR, privilege escalation, collusion, rate limits, malformed input). Fixed:
+
+- Pools were readable by any crew member, members' IBANs included: every pool route now requires being in the pool.
+- A drink's "logged at" came from the client, so a backdated batch looked logged on the spot: the server now stamps it on receipt. A friend present still vouches for a drink that arrived late (offline).
+- A jump between two bars under 5 km apart was not flagged: a "city speed" signal (over 90 km/h on more than 1 km) now makes the check-in wait for a friend's confirmation (anti-cheat config version 2).
+- Empty or oversized bodies and malformed ids answered 500: they now answer 400, 413 and 404.
+
+Known and accepted: a modified client that sends a plausible fix with `mocked: false` gets an accepted check-in. Location alone cannot prove presence; that is why points need corroboration over time (AC-04, AC-06) and why the admin can overturn.
+
 ## Not done yet (before any public release)
 
 - Certificate pinning and app integrity (App Attest, Play Integrity) as anti-cheat signals (AC-05, SEC-03).
 - Passkeys and optional 2FA (SEC-07).
 - Static analysis beyond TypeScript strict mode, OWASP MASVS L2 review.
-- A red-team pass on the anti-cheat (AC-10).
+- A second red-team pass with two phones: BLE handshake, real mock-location apps and an intercepting proxy (AC-10).
