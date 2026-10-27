@@ -44,7 +44,7 @@ export default function HistoryScreen() {
     const byKey = new Map<string, DrinkEntry[]>();
     for (const drink of drinks) {
       if (drink.consumedAt < from) continue;
-      const key = `${drink.kind}:${drink.volumeMl}`;
+      const key = `${drink.kind}:${drink.name ?? ""}:${drink.volumeMl}`;
       byKey.set(key, [...(byKey.get(key) ?? []), drink]);
     }
     const list: Group[] = [...byKey.entries()].map(([key, items]) => ({
@@ -75,7 +75,7 @@ export default function HistoryScreen() {
         const open = !collapsed.has(group.key);
         const title = i18n.t("history.group", {
           count: group.drinks.length,
-          drink: `${drinkLabel(first.kind, i18n)} ${formatVolume(first.volumeMl, unit, i18n.locale)} ${unit === "us_fl_oz" ? "oz" : unit}`,
+          drink: `${drinkLabel(first, i18n)} ${formatVolume(first.volumeMl, unit, i18n.locale)} ${unit === "us_fl_oz" ? "oz" : unit}`,
         });
         return (
           <Animated.View key={group.key} layout={LinearTransition.duration(duration.reorder).easing(easings.reorder)} style={styles.group}>

@@ -13,7 +13,9 @@ export type DrinkKind =
   | "cocktail"
   | "cider"
   | "seltzer"
-  | "soft";
+  | "soft"
+  /** Made by the user (O-21): its label is its name. */
+  | "custom";
 
 export interface DrinkPreset {
   id: string;
@@ -24,6 +26,8 @@ export interface DrinkPreset {
   icon: GlassIconName;
   /** French grammatical gender of the label, for "ajouté" / "ajoutée". */
   feminine: boolean;
+  /** Set for custom drinks only. */
+  name?: string;
 }
 
 const oz = (n: number) => Math.round(n * ML_PER_US_FL_OZ);
@@ -76,4 +80,40 @@ export function defaultPreset(system: UnitSystem): DrinkPreset {
 
 export function findPreset(id: string): DrinkPreset | undefined {
   return [...METRIC, ...UK, ...US].find((preset) => preset.id === id);
+}
+
+export interface CustomDrink {
+  id: string;
+  name: string;
+  volumeMl: number;
+  abv: number;
+  icon: GlassIconName;
+  /** Position in "Mes boissons", lowest first. */
+  order: number;
+}
+
+export function presetFromCustom(custom: CustomDrink): DrinkPreset {
+  return {
+    id: `custom:${custom.id}`,
+    kind: "custom",
+    volumeMl: custom.volumeMl,
+    abv: custom.abv,
+    icon: custom.icon,
+    feminine: false,
+    name: custom.name,
+  };
+}
+
+/** QOL-01: "same again" repeats the last drink exactly, custom or not. */
+export function presetFromEntry(entry: { presetId: string; kind: DrinkKind; volumeMl: number; abv: number; name?: string }): DrinkPreset {
+  const known = findPreset(entry.presetId);
+  return {
+    id: entry.presetId,
+    kind: entry.kind,
+    volumeMl: entry.volumeMl,
+    abv: entry.abv,
+    icon: known?.icon ?? "pint",
+    feminine: known?.feminine ?? false,
+    ...(entry.name ? { name: entry.name } : {}),
+  };
 }

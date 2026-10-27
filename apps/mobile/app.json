@@ -55,6 +55,13 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 120
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "enableRemoteNotifications": false,
+          "color": "#F4B33D"
+        }
       ]
     ],
     "experiments": {

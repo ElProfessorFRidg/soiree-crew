@@ -9,7 +9,7 @@ import type { BacUnit } from "@crew/units";
 import { lastDrink, logDrink, logWater } from "@/drinks/actions";
 import { offerUndo } from "@/drinks/undoToast";
 import { againLabel, alternateUnit, bacText, unitCycle } from "@/drinks/display";
-import { defaultPreset, findPreset } from "@/drinks/presets";
+import { defaultPreset, presetFromEntry } from "@/drinks/presets";
 import { useT, type Translator } from "@/i18n";
 import { formatClock, formatDuration } from "@/i18n/format";
 import { easings } from "@/motion/easing";
@@ -75,8 +75,8 @@ export function PartyScreen() {
 
   const again = (() => {
     const last = lastDrink();
-    const preset = (last && findPreset(last.presetId)) ?? defaultPreset(preferences.unitSystem);
-    return { preset, label: againLabel(preset.kind, i18n) };
+    const preset = last ? presetFromEntry(last) : defaultPreset(preferences.unitSystem);
+    return { preset, label: againLabel(preset, i18n) };
   })();
 
   const onAgain = () => {
@@ -236,7 +236,7 @@ function StatusRow({ i18n, tonight, pendingDrink }: LevelProps) {
   );
 }
 
-function LevelPicker({ i18n, level, setLevel, manual }: LevelProps) {
+function LevelPicker({ i18n, level, setLevel }: LevelProps) {
   const note = i18n.t(`party.levelNote${level}` as const);
   return (
     <View style={styles.block}>
@@ -249,7 +249,7 @@ function LevelPicker({ i18n, level, setLevel, manual }: LevelProps) {
           setLevel(value);
         }}
       />
-      <Text variant="small">{level < 2 || manual !== null ? `${note} ${i18n.t("party.levelLocksFollow")}` : note}</Text>
+      <Text variant="small">{note}</Text>
     </View>
   );
 }

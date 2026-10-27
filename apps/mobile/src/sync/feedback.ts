@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { drinkLabel } from "@/drinks/display";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
 import { showToast } from "@/ui/Toast";
@@ -11,7 +12,7 @@ export function useSyncFeedback(): void {
 
   useEffect(() => {
     const action = (mutation: Mutation): string => {
-      if (mutation.kind === "drink.add") return i18n.t(`drinks.${mutation.drink.kind}`);
+      if (mutation.kind === "drink.add") return drinkLabel(mutation.drink, i18n);
       return i18n.t("common.save");
     };
     const reason = (code: RejectionReason): string =>

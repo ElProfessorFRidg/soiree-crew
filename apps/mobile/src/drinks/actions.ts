@@ -1,4 +1,5 @@
 import { haptic } from "@/motion/haptics";
+import { refreshReminders } from "@/reminders/reminders";
 import { buildDrink, buildWater, useAppStore } from "@/state/store";
 import { submit } from "@/sync/engine";
 import type { DrinkEntry, WaterEntry } from "@/sync/types";
@@ -15,11 +16,13 @@ export function logDrink(preset: DrinkPreset, consumedAt: number, withFood: bool
   const drink = buildDrink(preset, Math.min(consumedAt, now), withFood);
   haptic.drinkAdded();
   submit({ kind: "drink.add", drink });
+  void refreshReminders();
   return drink;
 }
 
 export function removeDrink(drink: DrinkEntry): void {
   submit({ kind: "drink.remove", drink });
+  void refreshReminders();
 }
 
 export function restoreDrink(drink: DrinkEntry): void {
@@ -30,6 +33,7 @@ export function logWater(): WaterEntry {
   const water = buildWater(Date.now());
   haptic.water();
   submit({ kind: "water.add", water });
+  void refreshReminders();
   return water;
 }
 

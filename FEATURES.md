@@ -36,13 +36,13 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-18 | P0 | Soiree.dc.html | build | Driving status and timer: under / over the legal limit, at least 22 countries with automatic thresholds (watch... |
 | O-19 | P0 | Soiree.dc.html | build | Permanent notice next to the BAC: indicative estimate, not a certified breathalyser, never drive based on it a... |
 | O-20 | P0 | Soiree.dc.html | build | Quick adds (beer 25 / 33 / 50 cl, wine, shot, cocktail...) with custom-drawn glass icons. |
-| O-21 | P0 | Soiree.dc.html | todo | Custom drinks: create, long-press to edit / move / remove, custom order, synced across devices, personal presets. |
+| O-21 | P0 | Soiree.dc.html | build | Custom drinks: create, long-press to edit / move / remove, custom order, synced across devices, personal presets. |
 | O-22 | P0 | Soiree.dc.html | build | Drink time adjustable to the minute (forgotten drink); a drink "in the future" never counts in the calculation. |
 | O-23 | P0 | Soiree.dc.html | build | Grouped history (e.g. 5x Beer 50 cl) that expands to each drink's exact time, delete one at a time, edit with ... |
 | O-24 | P0 | Soiree.dc.html | build | BAC curve: Day / Week / Month / Total / Average (7-day moving average), zoom, pan, a trace that truly follows ... |
 | O-25 | P1 | Soiree.dc.html | build | Personal limits drawn on the curve. |
-| O-26 | P0 | Soiree.dc.html | todo | Set a limit / goal before going out + alerts when getting close, without spam. |
-| O-27 | P0 | Soiree.dc.html | todo | Scheduled hydration reminders. |
+| O-26 | P0 | Soiree.dc.html | build | Set a limit / goal before going out + alerts when getting close, without spam. |
+| O-27 | P0 | Soiree.dc.html | build | Scheduled hydration reminders. |
 | O-28 | P1 | Soiree.dc.html | build | Stats in grams of pure alcohol (this month, total, average). |
 | O-29 | P0 | Soiree.dc.html | todo | Friends' avatars on the graph + curve comparison between friends. |
 | O-30 | P1 | Soiree.dc.html | todo | Share: styled visual with photo / selfie (front or back camera) + stats + curve. |

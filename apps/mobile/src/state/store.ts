@@ -5,7 +5,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import type { UiLevel, UiLevelState } from "@crew/bac";
 import { defaultPreferences, type UserPreferences } from "@crew/units";
-import type { DrinkPreset } from "@/drinks/presets";
+import type { CustomDrink, DrinkPreset } from "@/drinks/presets";
 import type { DrinkEntry, Mutation, PendingMutation, StoredProfile, SyncState, WaterEntry } from "@/sync/types";
 
 function deviceDefaults(): UserPreferences {
@@ -25,6 +25,7 @@ export interface AppState {
   preferences: UserPreferences;
   drinks: DrinkEntry[];
   water: WaterEntry[];
+  customDrinks: CustomDrink[];
   manualLevel: UiLevel | null;
   levelState: UiLevelState | null;
   outbox: PendingMutation[];
@@ -39,6 +40,7 @@ export const useAppStore = create<AppState>()(
       preferences: deviceDefaults(),
       drinks: [],
       water: [],
+      customDrinks: [],
       manualLevel: null,
       levelState: null,
       outbox: [],
@@ -80,6 +82,10 @@ export function applyMutation(mutation: Mutation): void {
         return { preferences: { ...state.preferences, ...mutation.patch } };
       case "uiLevel.set":
         return { manualLevel: mutation.manual };
+      case "customDrink.set":
+        return { customDrinks: [...state.customDrinks.filter((d) => d.id !== mutation.drink.id), mutation.drink] };
+      case "customDrink.remove":
+        return { customDrinks: state.customDrinks.filter((d) => d.id !== mutation.drink.id) };
     }
   });
 }
@@ -101,6 +107,11 @@ export function revertMutation(mutation: Mutation): void {
       return applyMutation({ kind: "preferences.set", patch: mutation.previous, previous: {} });
     case "uiLevel.set":
       return applyMutation({ kind: "uiLevel.set", manual: mutation.previous, previous: null });
+    case "customDrink.set":
+      if (mutation.previous) return applyMutation({ kind: "customDrink.set", drink: mutation.previous, previous: null });
+      return applyMutation({ kind: "customDrink.remove", drink: mutation.drink });
+    case "customDrink.remove":
+      return applyMutation({ kind: "customDrink.set", drink: mutation.drink, previous: null });
   }
 }
 
@@ -126,6 +137,7 @@ export function buildDrink(preset: DrinkPreset, consumedAt: number, withFood: bo
     consumedAt,
     loggedAt: Date.now(),
     withFood,
+    ...(preset.name ? { name: preset.name } : {}),
     sync: "pending",
   };
 }

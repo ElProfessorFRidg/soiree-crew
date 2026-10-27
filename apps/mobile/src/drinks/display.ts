@@ -38,12 +38,23 @@ export function bacColor(gPerL: number, legalLimit: number): string {
   return palette.bacThreshold.high;
 }
 
-export function drinkLabel(kind: DrinkKind, i18n: Translator): string {
-  return i18n.t(`drinks.${kind}`);
+interface Labelled {
+  kind: DrinkKind;
+  name?: string;
 }
 
-export function againLabel(kind: DrinkKind, i18n: Translator): string {
-  return i18n.t("party.again", { article: i18n.t(`drinks.again.${kind}` as const) });
+export function drinkLabel(drink: Labelled, i18n: Translator): string {
+  return drink.kind === "custom" ? (drink.name ?? i18n.t("drinks.custom")) : i18n.t(`drinks.${drink.kind}`);
+}
+
+export function againLabel(drink: Labelled, i18n: Translator): string {
+  if (drink.kind === "custom") return i18n.t("party.againNamed", { name: drinkLabel(drink, i18n) });
+  return i18n.t("party.again", { article: i18n.t(`drinks.again.${drink.kind}`) });
+}
+
+/** "une pinte", "a pint", or the custom drink's own name. */
+export function drinkWithArticle(drink: Labelled, i18n: Translator): string {
+  return drink.kind === "custom" ? drinkLabel(drink, i18n) : i18n.t(`drinks.article.${drink.kind}`);
 }
 
 export { convertBac };
