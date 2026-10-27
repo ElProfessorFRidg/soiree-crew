@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { type ReactNode } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { space } from "@crew/design-tokens";
 import { useT } from "@/i18n";
@@ -24,7 +24,8 @@ export function Screen({ title, back, trailing, children, footer, withToasts }: 
   const i18n = useT();
   const insets = useSafeAreaInsets();
   return (
-    <View style={[styles.screen, { backgroundColor: theme.bg }]}>
+    // QOL-08: the keyboard never covers the field being typed, and the footer button rides above it.
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={[styles.screen, { backgroundColor: theme.bg }]}>
       <ScrollView
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
@@ -45,7 +46,7 @@ export function Screen({ title, back, trailing, children, footer, withToasts }: 
       </ScrollView>
       {footer ? <View style={[styles.footer, { paddingBottom: insets.bottom + 12 }]}>{footer}</View> : null}
       {withToasts ? <ToastHost bottomOffset={insets.bottom + 24} /> : null}
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

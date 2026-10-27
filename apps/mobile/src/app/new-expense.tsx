@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 import { radius, type } from "@crew/design-tokens";
 import { formatMoney, parseAmount, type Split } from "@crew/money";
@@ -33,6 +33,7 @@ export default function NewExpenseScreen() {
   const [included, setIncluded] = useState<Set<string>>(new Set());
   const [values, setValues] = useState<Record<string, string>>({});
   const [sending, setSending] = useState(false);
+  const amountRef = useRef<ComponentRef<typeof TextInput>>(null);
 
   useEffect(() => {
     void fetchPool(poolId)
@@ -117,8 +118,11 @@ export default function NewExpenseScreen() {
         value={description}
         onChangeText={setDescription}
         maxLength={80}
+        returnKeyType="next"
+        onSubmitEditing={() => amountRef.current?.focus()}
       />
       <Field
+        ref={amountRef}
         label={i18n.t("money.amount")}
         value={amountText}
         onChangeText={setAmountText}
