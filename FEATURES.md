@@ -238,7 +238,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | N-30 | P0 | Systeme.dc.html | build | Several crews per user, roles (admin / member), invite by link or QR, clean invitation web page when the app i... |
 | N-31 | P1 | Radar.dc.html | todo | Crew feed: activity, reactions, mentions, with grouped digests instead of spam. |
 | N-32 | P1 | Bar.dc.html | build | Shared shopping list for a party (who brings what), can be generated from the cocktails picked in the Bar. |
-| N-33 | P1 | Jeux.dc.html | todo | Crew-made cards in the games (inside jokes, home-made questions), moderated by the admin. |
+| N-33 | P1 | Jeux.dc.html | build | Crew-made cards in the games (inside jokes, home-made questions), moderated by the admin. |
 | N-34 | P1 | Profil.dc.html | build | Crew titles and seniority; badges that also reward organising, hydration, designated driving, getting home saf... |
 | N-35 | P1 | Reglages.dc.html | build | Notification centre with fine per-type settings and quiet hours. |
 

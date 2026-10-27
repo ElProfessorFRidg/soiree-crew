@@ -16,6 +16,8 @@ import { Numeral, Text } from "@/ui/Text";
 import { useGameUi } from "./hooks";
 import { useGameT } from "./i18n";
 import { useGamesStore } from "./store";
+import { refreshCrewCards } from "./crewCards";
+import { useCrewData } from "@/server/crewData";
 import { GameIcon } from "./ui/GameIcon";
 
 const GAP = 12;
@@ -87,6 +89,11 @@ function GameCardView({ game, width, height }: { game: GameDefinition; width: nu
 
 /** O-44: swipeable catalogue with pagination, filter, and a Play button for the game on screen. */
 export function CatalogueScreen() {
+  const firstCrew = useCrewData((state) => state.crews[0]?.id);
+  useEffect(() => {
+    // N-33: the crew's approved cards are ready before a game starts, and stay for offline nights.
+    if (firstCrew) void refreshCrewCards(firstCrew).catch(() => undefined);
+  }, [firstCrew]);
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const g = useGameT();
@@ -131,7 +138,10 @@ export function CatalogueScreen() {
         </Text>
         {games.length > 0 ? <Text variant="small">{g.t("catalogue.position", { index: Math.min(index, games.length - 1) + 1, count: games.length })}</Text> : null}
         {g.language !== "fr" && g.language !== "en" ? <Text variant="small">{g.t("catalogue.cardsInEnglish")}</Text> : null}
-        <Button label={g.t("hall.open")} icon="trophy" variant="outline" height={40} onPress={() => router.push("/games/hall")} />
+        <View style={styles.headerButtons}>
+          <Button label={g.t("hall.open")} icon="trophy" variant="outline" height={44} style={styles.flex} onPress={() => router.push("/games/hall")} />
+          <Button label={g.t("crewCards.open")} icon="edit" variant="outline" height={44} style={styles.flex} onPress={() => router.push("/games/cards")} />
+        </View>
       </View>
       <View style={styles.padded}>
         <Segmented
@@ -216,6 +226,7 @@ export function CatalogueScreen() {
 }
 
 const styles = StyleSheet.create({
+  headerButtons: { flexDirection: "row", gap: 12 },
   screen: { flex: 1, gap: space.sectionGap },
   header: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", paddingHorizontal: space.screenX },
   padded: { paddingHorizontal: space.screenX },

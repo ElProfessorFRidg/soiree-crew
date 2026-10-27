@@ -3,6 +3,43 @@ import type { GameMessages } from "./types";
 // Russian copy of the games module, written for Russian speakers rather than translated.
 
 export const ru: GameMessages = {
+  crewCards: {
+    kind: {
+      neverEver: "Never have I ever",
+      pointBlank: "Point Blank",
+      verdict: "The Verdict",
+      truth: "Truth or dare: truth",
+      dare: "Truth or dare: dare",
+      bigDare: "The Big Deck",
+    },
+    hint: {
+      neverEver: "What follows “Never have I ever...”, like: slept in a bath.",
+      pointBlank: "A question where everyone points at someone.",
+      verdict: "What follows “Which of the two...”.",
+      truth: "A question for whoever draws the card.",
+      dare: "A dare for whoever draws the card.",
+      bigDare: "A Big Deck dare for whoever draws the card.",
+    },
+    title: "Карты тусовки",
+    open: "Карты тусовки",
+    needCrew: "Вступи в тусовку, чтобы писать свои карты.",
+    intro: "Ваши шутки, истории и вопросы. Админ одобряет их, прежде чем они попадут в игру.",
+    game: "Для какой игры",
+    level: "Уровень",
+    text: "Карта",
+    add: "Добавить",
+    propose: "Предложить админу",
+    added: "Карта добавлена в игры.",
+    waiting: "Отправлено. Появится в игре после одобрения.",
+    toReview: "На проверку",
+    approve: "Одобрить",
+    reject: "Отклонить",
+    inPlay: { one: "{count} карта в игре", few: "{count} карты в игре", many: "{count} карт в игре", other: "{count} карты в игре" },
+    none: "Пока нет карт тусовки.",
+    pending: "ждёт",
+    rejected: "отклонена",
+    remove: "Убрать",
+  },
   hall: {
     title: "Доска почёта",
     open: "Доска почёта",

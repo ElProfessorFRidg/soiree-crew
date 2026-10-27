@@ -4,6 +4,43 @@ import type { GameMessages } from "./types";
 // en-US spelling, like the main catalogue.
 
 export const en: GameMessages = {
+  crewCards: {
+    kind: {
+      neverEver: "Never have I ever",
+      pointBlank: "Point Blank",
+      verdict: "The Verdict",
+      truth: "Truth or dare: truth",
+      dare: "Truth or dare: dare",
+      bigDare: "The Big Deck",
+    },
+    hint: {
+      neverEver: "What follows “Never have I ever...”, like: slept in a bath.",
+      pointBlank: "A question where everyone points at someone.",
+      verdict: "What follows “Which of the two...”.",
+      truth: "A question for whoever draws the card.",
+      dare: "A dare for whoever draws the card.",
+      bigDare: "A Big Deck dare for whoever draws the card.",
+    },
+    title: "Crew cards",
+    open: "Crew cards",
+    needCrew: "Join a crew to write your own cards.",
+    intro: "Your jokes, your stories, your questions. The admin approves them before they turn up in a game.",
+    game: "For which game",
+    level: "Level",
+    text: "The card",
+    add: "Add",
+    propose: "Send to the admin",
+    added: "Card added to the games.",
+    waiting: "Sent. It turns up in games once approved.",
+    toReview: "To approve",
+    approve: "Approve",
+    reject: "Turn down",
+    inPlay: { one: "{count} card in play", other: "{count} cards in play" },
+    none: "No crew cards yet.",
+    pending: "waiting",
+    rejected: "turned down",
+    remove: "Remove",
+  },
   hall: {
     title: "Hall of fame",
     open: "Hall of fame",

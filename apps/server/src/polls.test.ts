@@ -102,3 +102,22 @@ describe("usual nights (N-05)", () => {
     expect(friday.usually.sort()).toEqual([jade.id, malik.id].sort());
   });
 });
+
+describe("crew cards (N-33)", () => {
+  it("plays a member's card only once the admin approved it", async () => {
+    const { users, crewId } = await crew("jade", "malik", "ines");
+    const [jade, malik, ines] = users as [User, User, User];
+    const id = randomUUID();
+    const sent = await app.inject({ method: "POST", url: `/v1/crews/${crewId}/cards`, headers: malik.auth, payload: { id, kind: "neverEver", level: "normal", text: "pris le dernier bus de {player} {sneaky}." } });
+    expect(sent.json()).toEqual({ status: "pending" });
+    const list = async (u: User) => ((await app.inject({ method: "GET", url: `/v1/crews/${crewId}/cards`, headers: u.auth })).json() as { cards: { id: string; text: string; status: string }[] }).cards;
+    expect(await list(ines)).toEqual([]);
+    expect((await list(malik))[0]?.text).toBe("pris le dernier bus de {player} .");
+    expect((await app.inject({ method: "POST", url: `/v1/cards/${id}/review`, headers: ines.auth, payload: { approve: true } })).statusCode).toBe(403);
+    await app.inject({ method: "POST", url: `/v1/cards/${id}/review`, headers: jade.auth, payload: { approve: true } });
+    expect((await list(ines)).map((c) => c.status)).toEqual(["approved"]);
+    // The admin's own cards need nobody's approval.
+    const own = await app.inject({ method: "POST", url: `/v1/crews/${crewId}/cards`, headers: jade.auth, payload: { id: randomUUID(), kind: "dare", level: "hard", text: "Imite {other} au réveil." } });
+    expect(own.json()).toEqual({ status: "approved" });
+  });
+});

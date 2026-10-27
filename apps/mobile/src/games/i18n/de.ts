@@ -2,6 +2,43 @@ import type { GameMessages } from "./types";
 
 // German copy of the games module, written for German speakers rather than translated.
 export const de: GameMessages = {
+  crewCards: {
+    kind: {
+      neverEver: "Never have I ever",
+      pointBlank: "Point Blank",
+      verdict: "The Verdict",
+      truth: "Truth or dare: truth",
+      dare: "Truth or dare: dare",
+      bigDare: "The Big Deck",
+    },
+    hint: {
+      neverEver: "What follows “Never have I ever...”, like: slept in a bath.",
+      pointBlank: "A question where everyone points at someone.",
+      verdict: "What follows “Which of the two...”.",
+      truth: "A question for whoever draws the card.",
+      dare: "A dare for whoever draws the card.",
+      bigDare: "A Big Deck dare for whoever draws the card.",
+    },
+    title: "Crew-Karten",
+    open: "Crew-Karten",
+    needCrew: "Tritt einer Crew bei, um eure Karten zu schreiben.",
+    intro: "Eure Witze, Geschichten und Fragen. Der Admin gibt sie frei, bevor sie im Spiel auftauchen.",
+    game: "Für welches Spiel",
+    level: "Stufe",
+    text: "Die Karte",
+    add: "Hinzufügen",
+    propose: "Dem Admin vorschlagen",
+    added: "Karte zu den Spielen hinzugefügt.",
+    waiting: "Gesendet. Sie taucht im Spiel auf, sobald sie freigegeben ist.",
+    toReview: "Freizugeben",
+    approve: "Freigeben",
+    reject: "Ablehnen",
+    inPlay: { one: "{count} Karte im Spiel", other: "{count} Karten im Spiel" },
+    none: "Noch keine Crew-Karten.",
+    pending: "wartet",
+    rejected: "abgelehnt",
+    remove: "Entfernen",
+  },
   hall: {
     title: "Ruhmeshalle",
     open: "Ruhmeshalle",

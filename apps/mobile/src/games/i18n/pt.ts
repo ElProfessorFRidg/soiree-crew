@@ -3,6 +3,43 @@ import type { GameMessages } from "./types";
 // European Portuguese copy (pt-PT) of the games module, written for Portuguese speakers rather than translated.
 
 export const pt: GameMessages = {
+  crewCards: {
+    kind: {
+      neverEver: "Never have I ever",
+      pointBlank: "Point Blank",
+      verdict: "The Verdict",
+      truth: "Truth or dare: truth",
+      dare: "Truth or dare: dare",
+      bigDare: "The Big Deck",
+    },
+    hint: {
+      neverEver: "What follows “Never have I ever...”, like: slept in a bath.",
+      pointBlank: "A question where everyone points at someone.",
+      verdict: "What follows “Which of the two...”.",
+      truth: "A question for whoever draws the card.",
+      dare: "A dare for whoever draws the card.",
+      bigDare: "A Big Deck dare for whoever draws the card.",
+    },
+    title: "Cartas da crew",
+    open: "Cartas da crew",
+    needCrew: "Entra numa crew para escreverem as vossas cartas.",
+    intro: "As vossas piadas, histórias e perguntas. O admin aprova antes de aparecerem no jogo.",
+    game: "Para que jogo",
+    level: "Nível",
+    text: "A carta",
+    add: "Adicionar",
+    propose: "Propor ao admin",
+    added: "Carta adicionada aos jogos.",
+    waiting: "Enviada. Aparece no jogo depois de aprovada.",
+    toReview: "Por aprovar",
+    approve: "Aprovar",
+    reject: "Recusar",
+    inPlay: { one: "{count} carta em jogo", other: "{count} cartas em jogo" },
+    none: "Ainda não há cartas da crew.",
+    pending: "pendente",
+    rejected: "recusada",
+    remove: "Tirar",
+  },
   hall: {
     title: "Quadro de honra",
     open: "Quadro de honra",

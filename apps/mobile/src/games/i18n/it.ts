@@ -4,6 +4,43 @@ import type { GameMessages } from "./types";
 // Plain in the controls, playful in the rules.
 
 export const it: GameMessages = {
+  crewCards: {
+    kind: {
+      neverEver: "Never have I ever",
+      pointBlank: "Point Blank",
+      verdict: "The Verdict",
+      truth: "Truth or dare: truth",
+      dare: "Truth or dare: dare",
+      bigDare: "The Big Deck",
+    },
+    hint: {
+      neverEver: "What follows “Never have I ever...”, like: slept in a bath.",
+      pointBlank: "A question where everyone points at someone.",
+      verdict: "What follows “Which of the two...”.",
+      truth: "A question for whoever draws the card.",
+      dare: "A dare for whoever draws the card.",
+      bigDare: "A Big Deck dare for whoever draws the card.",
+    },
+    title: "Carte della crew",
+    open: "Carte della crew",
+    needCrew: "Entra in una crew per scrivere le vostre carte.",
+    intro: "Le vostre battute, storie e domande. L'admin le approva prima che escano in partita.",
+    game: "Per quale gioco",
+    level: "Livello",
+    text: "La carta",
+    add: "Aggiungi",
+    propose: "Proponi all'admin",
+    added: "Carta aggiunta alle partite.",
+    waiting: "Inviata. Uscirà in partita una volta approvata.",
+    toReview: "Da approvare",
+    approve: "Approva",
+    reject: "Rifiuta",
+    inPlay: { one: "{count} carta in gioco", other: "{count} carte in gioco" },
+    none: "Ancora nessuna carta della crew.",
+    pending: "in attesa",
+    rejected: "rifiutata",
+    remove: "Togli",
+  },
   hall: {
     title: "Albo d'oro",
     open: "Albo d'oro",

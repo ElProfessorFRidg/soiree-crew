@@ -2,6 +2,43 @@
 // Plural entries use Intl.PluralRules categories: one, other.
 
 export const fr = {
+  crewCards: {
+    kind: {
+      neverEver: "Je n'ai jamais",
+      pointBlank: "Le Doigt",
+      verdict: "Le Verdict",
+      truth: "Action ou vérité : vérité",
+      dare: "Action ou vérité : action",
+      bigDare: "Le Grand Paquet",
+    },
+    hint: {
+      neverEver: "La suite de « Je n'ai jamais... », par exemple : dormi dans une baignoire.",
+      pointBlank: "Une question où tout le monde pointe quelqu'un.",
+      verdict: "La suite de « Lequel des deux... ».",
+      truth: "Une question pour la personne qui tire la carte.",
+      dare: "Un défi pour la personne qui tire la carte.",
+      bigDare: "Un défi du Grand Paquet, pour la personne qui tire la carte.",
+    },
+    title: "Cartes du crew",
+    open: "Cartes du crew",
+    needCrew: "Rejoins un crew pour écrire les cartes du crew.",
+    intro: "Les blagues, les histoires et les questions du crew. L'admin valide avant qu'elles tombent en partie.",
+    game: "Pour quel jeu",
+    level: "Difficulté",
+    text: "La carte",
+    add: "Ajouter",
+    propose: "Proposer à l'admin",
+    added: "Carte ajoutée aux parties.",
+    waiting: "Envoyée. Elle tombera en partie une fois validée.",
+    toReview: "À valider",
+    approve: "Valider",
+    reject: "Refuser",
+    inPlay: { one: "{count} carte en jeu", other: "{count} cartes en jeu" },
+    none: "Aucune carte du crew pour l'instant.",
+    pending: "en attente",
+    rejected: "refusée",
+    remove: "Retirer",
+  },
   hall: {
     title: "Tableau d'honneur",
     open: "Tableau d'honneur",
