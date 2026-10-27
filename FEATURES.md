@@ -186,9 +186,9 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| N-08 | P0 | Bars.dc.html | todo | Crew venue directory: bars, clubs, flats, spots, with address, opening hours, happy hours, vibe, crew ratings,... |
+| N-08 | P0 | Bars.dc.html | build | Crew venue directory: bars, clubs, flats, spots, with address, opening hours, happy hours, vibe, crew ratings,... |
 | N-09 | P1 | Bars.dc.html | todo | Drink prices logged by the crew per venue (pint, half, shot, cocktail, soft drink), price history, flag when a... |
-| N-10 | P0 | Bars.dc.html | todo | Check-in at a venue, visible in the party and the recap (verification in <anti_cheat>). |
+| N-10 | P0 | Bars.dc.html | build | Check-in at a venue, visible in the party and the recap (verification in <anti_cheat>). |
 | N-11 | P0 | Bars.dc.html | todo | "Where to?": suggestion, vote or roulette between venues by availability, budget, distance, current happy hours. |
 | N-12 | P1 | Bars.dc.html | todo | Venue stats: visits, average spend, average drinks, best nights there. |
 
@@ -323,11 +323,11 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | MOT-06 | P0 | JeuxCartes.dc.html | todo | Card games: dealing, 3D flip, swipe, drawing, a card that trembles before a penalty. |
 | MOT-07 | P0 | JeuxAction.dc.html | todo | Game physics: roulette with real deceleration and haptic clicks, a bomb that shakes harder and harder then bur... |
 | MOT-08 | P0 | Recap.dc.html | todo | Cinematic recap: story format, counters rolling, podium rising, curves drawing, badges dropping with confetti,... |
-| MOT-09 | P0 | Bars.dc.html | todo | Venue map: takeover (crown dropping, the new boss's colour washing over the venue); venues where the crew is r... |
+| MOT-09 | P0 | Bars.dc.html | build | Venue map: takeover (crown dropping, the new boss's colour washing over the venue); venues where the crew is r... |
 | MOT-10 | P0 | Etats.dc.html | todo | Micro-interactions: buttons, toggles, custom pull-to-refresh, skeletons, illustrated and animated empty states... |
 | MOT-11 | P1 | Systeme.dc.html | todo | Animated widgets and Live Activity, within each OS's limits. |
 | MOT-12 | P0 | Backstage | todo | Performance and motion accessibility: 60 / 120 fps without jank, tested on a modest phone, battery budget resp... |
-| MOT-13 | P0 | Classements.dc.html | todo | Leaderboards: animated overtakes, podium, a dedicated effect when the leader changes. |
+| MOT-13 | P0 | Classements.dc.html | build | Leaderboards: animated overtakes, podium, a dedicated effect when the leader changes. |
 | MOT-14 | P0 | Backstage | proposed | Global motion time scale (0.1x to 10x) and deterministic animation clock hooks in the motion module, exposed in a dev menu and to the test harness, so the frame-by-frame Motion review works across every animation engine. Source: motion.md §3.6, §5. |
 | MOT-15 | P0 | Backstage | proposed | Haptic capability matrix and fallbacks per platform, API level and device support level, plus an in-app haptics switch independent of sound. Source: motion.md §3.3, §5. |
 
@@ -335,15 +335,15 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| TER-01 | P0 | Bars.dc.html | todo | Venue map: all crew venues (N-08), each in the colour and avatar of its current boss, crown, area of influence... |
-| TER-02 | P0 | Bars.dc.html | todo | Rule points: a member earns points at a venue through presence (verified check-ins, time spent there), parties... |
-| TER-03 | P0 | Bars.dc.html | todo | Check-ins: one counted check-in per venue per party, a minimum delay between two check-ins; every check-in goe... |
-| TER-04 | P0 | Bars.dc.html | todo | Seasons and takeovers: monthly seasons with a reset, "X just took Bar Y from you" notification, history of rei... |
-| TER-05 | P0 | Bars.dc.html | todo | Venue page: current boss, season top 5, past bosses, drink prices (N-09), happy hours, the crew's latest night... |
+| TER-01 | P0 | Bars.dc.html | build | Venue map: all crew venues (N-08), each in the colour and avatar of its current boss, crown, area of influence... |
+| TER-02 | P0 | Bars.dc.html | build | Rule points: a member earns points at a venue through presence (verified check-ins, time spent there), parties... |
+| TER-03 | P0 | Bars.dc.html | build | Check-ins: one counted check-in per venue per party, a minimum delay between two check-ins; every check-in goe... |
+| TER-04 | P0 | Bars.dc.html | build | Seasons and takeovers: monthly seasons with a reset, "X just took Bar Y from you" notification, history of rei... |
+| TER-05 | P0 | Bars.dc.html | build | Venue page: current boss, season top 5, past bosses, drink prices (N-09), happy hours, the crew's latest night... |
 | TER-06 | P0 | Bars.dc.html | todo | Rankings and titles: number of venues ruled, titles ("Mayor of Bar Y", "Conqueror", "Explorer", "Nomad"), tied... |
 | TER-07 | P1 | Bars.dc.html | todo | Crew vs crew: which crew rules which venue when several crews use the app. |
-| TER-08 | P1 | Bars.dc.html | todo | Fog of war: never-visited venues are "to conquer", conquest suggestions for the next night out (linked to N-11). |
-| TER-09 | P0 | Bars.dc.html | todo | Privacy: only check-ins are shared (never continuous tracking for this game), anyone can opt out of the territ... |
+| TER-08 | P1 | Bars.dc.html | build | Fog of war: never-visited venues are "to conquer", conquest suggestions for the next night out (linked to N-11). |
+| TER-09 | P0 | Bars.dc.html | build | Privacy: only check-ins are shared (never continuous tracking for this game), anyone can opt out of the territ... |
 | TER-10 | P1 | Backstage (near Bars.dc.html) | proposed | Venue loyalty tiers (Bronze, Silver, Gold at 3, 10 and 25 lifetime counted nights), never lost, crew-visible, audience set by the profile. FR label must not reuse "habitué" (see GLOSSARY.md conflicts). Source: territories.md §2.5, §3.4, §5. |
 | TER-11 | P0 | Backstage (near Bars.dc.html) | proposed | Workplace exclusion ("I work here", admin-approved; 0 territory points there) and validation of new venues (external place ID or corroborated check-ins by 2 members on 2 nights) before they can be played. Source: territories.md §3.7 cases D and F, §5. |
 | TER-12 | P2 | Backstage (near Bars.dc.html) | proposed | Season variants: one rule modifier per month from remote config, never related to drinks, frozen into the season's rule version. Source: territories.md §3.6, §5. |
@@ -352,15 +352,15 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| RANK-01 | P0 | Classements.dc.html | todo | Drinking leaderboard per party, week, month, season and all time. Metrics: number of drinks, grams of pure alc... |
-| RANK-02 | P0 | Classements.dc.html | todo | Live leaderboard on the Party screen (HUB-01): live positions, "X just overtook you" notification, animated ov... |
+| RANK-01 | P0 | Classements.dc.html | build | Drinking leaderboard per party, week, month, season and all time. Metrics: number of drinks, grams of pure alc... |
+| RANK-02 | P0 | Classements.dc.html | build | Live leaderboard on the Party screen (HUB-01): live positions, "X just overtook you" notification, animated ov... |
 | RANK-03 | P0 | Recap.dc.html | todo | Podium in the recap (O-41) and on the shareable story card. |
 | RANK-04 | P1 | Classements.dc.html | todo | History and titles: champion of each week, month and season, winning streaks, titles tied to N-34. |
 | RANK-05 | P1 | Classements.dc.html | todo | Secondary leaderboards: most nights out, earliest first drink, last one home, most venues ruled (<bar_territor... |
-| RANK-06 | P0 | Classements.dc.html | todo | Only verified drinks count (verification in AC-07). Unverified drinks still count in personal stats and BAC. |
-| RANK-07 | P0 | Classements.dc.html | todo | Danger cap: above a very high estimated BAC (threshold set by Recon-BAC on the severe-intoxication risk zone),... |
-| RANK-08 | P0 | Classements.dc.html | todo | Settings: leaderboard on by default, the crew admin can switch it off, any member can go "off the board" witho... |
-| RANK-09 | P0 | Backstage | todo | Feature flag: the drinking leaderboard is on in the crew's private build and can be switched off for a possibl... |
+| RANK-06 | P0 | Classements.dc.html | build | Only verified drinks count (verification in AC-07). Unverified drinks still count in personal stats and BAC. |
+| RANK-07 | P0 | Classements.dc.html | build | Danger cap: above a very high estimated BAC (threshold set by Recon-BAC on the severe-intoxication risk zone),... |
+| RANK-08 | P0 | Classements.dc.html | build | Settings: leaderboard on by default, the crew admin can switch it off, any member can go "off the board" witho... |
+| RANK-09 | P0 | Backstage | build | Feature flag: the drinking leaderboard is on in the crew's private build and can be switched off for a possibl... |
 
 ## Community
 
@@ -420,14 +420,14 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | AC-01 | P0 | Backstage | build | Server-authoritative scoring: the client only sends raw events (drink logged, check-in attempt, game result). ... |
-| AC-02 | P0 | Bars.dc.html | todo | Location source flags, read but never trusted alone. Check the current official docs before implementing. |
-| AC-03 | P0 | Bars.dc.html | todo | Server-side plausibility: impossible travel speed between events, accuracy values that are too perfect or froz... |
+| AC-02 | P0 | Bars.dc.html | build | Location source flags, read but never trusted alone. Check the current official docs before implementing. |
+| AC-03 | P0 | Bars.dc.html | build | Server-side plausibility: impossible travel speed between events, accuracy values that are too perfect or froz... |
 | AC-04 | P0 | Bars.dc.html | todo | Physical-world corroboration, the hardest signals to fake alone: |
 | AC-05 | P0 | Bars.dc.html | todo | Device and app integrity as one weighted signal: App Attest / DeviceCheck on iOS, Play Integrity on Android, j... |
-| AC-06 | P0 | Bars.dc.html | todo | Risk score per event: all signals combine into accepted / unverified (needs peer confirmation) / rejected as c... |
-| AC-07 | P0 | Soiree.dc.html | todo | Drink fraud: bursts that are physiologically implausible against the BAC model, large retroactive batches, dri... |
+| AC-06 | P0 | Bars.dc.html | build | Risk score per event: all signals combine into accepted / unverified (needs peer confirmation) / rejected as c... |
+| AC-07 | P0 | Soiree.dc.html | build | Drink fraud: bursts that are physiologically implausible against the BAC model, large retroactive batches, dri... |
 | AC-08 | P0 | Backstage | build | Replay and tampering protection: signed requests, nonces, server timestamps, idempotency keys, rate limits. Th... |
-| AC-09 | P0 | Etats.dc.html | todo | Consequences: a rejected event earns nothing and is recorded as a "cheat attempt", visible to the crew (notifi... |
+| AC-09 | P0 | Etats.dc.html | build | Consequences: a rejected event earns nothing and is recorded as a "cheat attempt", visible to the crew (notifi... |
 | AC-10 | P0 | Backstage | todo | Red team: a dedicated subagent attacks our own app and backend (mock location, location simulated from a compu... |
 | AC-11 | P0 | Backstage | proposed | Verdicts only get kinder automatically: re-evaluation can only upgrade a verdict; "rejected" needs risk from 2 or more signal categories and no corroboration; shaming only on rejection. Source: anticheat.md §2.4, §5. |
 | AC-12 | P0 | Backstage | proposed | Event timing from the monotonic clock, a pre-fetched nonce book and a prev_hash chain for queued events, so replay protection works offline. Source: anticheat.md §2.6, §5. |

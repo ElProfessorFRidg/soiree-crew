@@ -25,6 +25,7 @@ import { Numeral, Text } from "@/ui/Text";
 import { AddDrinkButton } from "./AddDrinkButton";
 import { CrewStrip } from "./CrewStrip";
 import { useLiveParty } from "@/server/crewData";
+import { useVenueData } from "@/server/venueData";
 import { RollingNumber } from "./RollingNumber";
 
 function greetingKey(hour: number) {
@@ -256,6 +257,42 @@ function LevelPicker({ i18n, level, setLevel }: LevelProps) {
   );
 }
 
+/** HUB-01: the venue I'm checked in at, its boss, and the live leaderboard one tap away. */
+function CurrentVenueRow({ i18n }: { i18n: Translator }) {
+  const theme = useTheme();
+  const live = useLiveParty();
+  const open = useVenueData((state) => state.openCheckIn);
+  const venue = useVenueData((state) => {
+    if (!open) return undefined;
+    for (const crew of Object.values(state.byCrew)) {
+      const found = crew.venues.find((v) => v.id === open.venueId);
+      if (found) return found;
+    }
+    return undefined;
+  });
+  return (
+    <>
+      {venue ? (
+        <Row
+          title={venue.name}
+          subtitle={venue.bossName ? i18n.t("bars.boss", { name: venue.bossName }) : i18n.t("bars.noBoss")}
+          leading={<Icon name="crown" color={theme.amber} />}
+          trailing={<Icon name="chev" color={theme.textMuted} />}
+          onPress={() => router.push({ pathname: "/venue", params: { id: venue.id } })}
+        />
+      ) : null}
+      {live ? (
+        <Row
+          title={i18n.t("ranking.title")}
+          leading={<Icon name="trophy" color={theme.textMuted} />}
+          trailing={<Icon name="chev" color={theme.textMuted} />}
+          onPress={() => router.push({ pathname: "/leaderboard", params: { crewId: live.party.crewId } })}
+        />
+      ) : null}
+    </>
+  );
+}
+
 function PartyTitle({ i18n }: { i18n: Translator }) {
   const theme = useTheme();
   const current = useLiveParty();
@@ -312,6 +349,7 @@ function LevelZero(props: LevelProps) {
       <StatusRow {...props} />
       <CrewStrip />
       <View>
+        <CurrentVenueRow i18n={i18n} />
         <Row
           title={i18n.t("curve.open")}
           leading={<Icon name="x:curve" color={theme.textMuted} />}

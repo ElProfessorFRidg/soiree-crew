@@ -94,6 +94,10 @@ export default function RootLayout() {
               <Stack.Screen name="limits" />
               <Stack.Screen name="new-party" />
               <Stack.Screen name="live" />
+              <Stack.Screen name="add-venue" />
+              <Stack.Screen name="checkin" />
+              <Stack.Screen name="venue" />
+              <Stack.Screen name="leaderboard" />
               <Stack.Screen name="sos" options={{ presentation: "fullScreenModal", animation: "fade" }} />
             </Stack>
           </I18nProvider>
