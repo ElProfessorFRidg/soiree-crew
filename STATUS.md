@@ -5,8 +5,8 @@ Generated from FEATURES.md on 2026-10-27 by `pnpm status`. Edit FEATURES.md, not
 | Status | Count |
 |---|---|
 | Built | 293 |
-| Partly built | 9 |
-| To do | 3 |
+| Partly built | 10 |
+| To do | 2 |
 | Proposed (not in the brief yet) | 4 |
 | Total | 309 |
 
@@ -20,12 +20,12 @@ Generated from FEATURES.md on 2026-10-27 by `pnpm status`. Edit FEATURES.md, not
 - **QOL-27** (P0, Everyday polish): Discreet lock screen: by default lock screen, Live Activity, widget and notifications show no BAC figure or drink count (level icon and time to zero only); numb
 - **QOL-29** (P0, Everyday polish): Invite survives the install: a friend who installs from an invite link lands in the right crew or party (Play Install Referrer; invite code plus system Paste bu
 - **JOY-10** (P2, Delight): Sticker packs (iMessage / WhatsApp) made from crew avatars and moments.
+- **MOT-11** (P1, Motion): Animated widgets and Live Activity, within each OS's limits.
 - **AC-13** (P0, Anti-cheat): Native modules "LocationIntegrity" (isProducedByAccessory, raw source flags) and "ProximityHandshake" (BLE peripheral and GATT), needed whatever the stack. Sour
 
 ## To do
 
 - **HUB-04** (P2, Party hub): Smartwatch: BAC, add drink and water from the wrist.
-- **MOT-11** (P1, Motion): Animated widgets and Live Activity, within each OS's limits.
 - **SLOP-06** (P1, Anti-slop (process)): Crew panel: before each release, the friends read the copy and the cards. Anything that "sounds like AI" or "d
 
 ## Proposed (not in the brief yet)
