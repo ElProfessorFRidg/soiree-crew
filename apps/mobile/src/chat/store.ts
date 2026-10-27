@@ -74,6 +74,8 @@ export interface ChatMeta {
   verified: Record<string, string>;
   keyChanged: Record<string, number>;
   muted: string[];
+  /** MSG-12: conversations in silence: no unread badge. */
+  quiet: string[];
   backupAt: number | null;
 }
 
@@ -86,6 +88,7 @@ export const EMPTY_META: ChatMeta = {
   verified: {},
   keyChanged: {},
   muted: [],
+  quiet: [],
   backupAt: null,
 };
 

@@ -204,6 +204,8 @@ export const de: Messages = {
     openNone: "Noch keine offene Crew.",
     publicServers: "Öffentliche Server",
     openCrewsCount: { one: "{count} offene Crew", other: "{count} offene Crews" },
+    pasteInvite: "Einladungslink einfügen",
+    pasteNothing: "Nichts zum Einfügen: Kopier zuerst den Link.",
   },
   newParty: {
     title: "Neuer Abend",
@@ -1455,6 +1457,10 @@ export const de: Messages = {
     scanMatch: "Der Code von {name} stimmt. Niemand hört mit: als verifiziert markiert.",
     scanMismatch: "Der Code stimmt nicht. Teile nichts Sensibles mit diesem Konto, bevor du mit {name} gesprochen hast.",
     scanHow: "Öffne auf dem Handy von {name} den Bildschirm mit der Sicherheitsnummer und richte die Kamera auf den Code.",
+    quiet: "Stumm",
+    leaveCrew: "Crew verlassen",
+    leaveParty: "Party verlassen",
+    leavePartyConfirm: "Party verlassen? Ihr Chat verschwindet mit.",
   },
   addDrink: {
     quick: "Tipp ein, was du trinkst",

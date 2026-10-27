@@ -112,7 +112,7 @@ export default function MessagesScreen() {
       {!results ? (
         <View>
           {conversations.map((c, index) => {
-            const unread = unreadCount(c.id, me);
+            const unread = meta.quiet?.includes(c.id) ? 0 : unreadCount(c.id, me);
             const last = c.lastAt ?? (messages[c.id]?.at(-1)?.at ?? null);
             return (
               <Row

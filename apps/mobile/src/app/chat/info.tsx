@@ -1,5 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
+import { Alert } from "react-native";
 import { View } from "react-native";
 import { CIPHERSUITE } from "@crew/mls";
 import { setDisappearing, updateMeta } from "@/chat/engine";
@@ -8,6 +9,8 @@ import { TIMER_CHOICES, useNames } from "@/chat/names";
 import { useChat } from "@/chat/store";
 import { useT } from "@/i18n";
 import { api } from "@/server/api";
+import { leaveCrew, respondToParty } from "@/server/crewData";
+import { guarded } from "@/vault/vault";
 import { useSession } from "@/server/session";
 import { Avatar } from "@/ui/Avatar";
 import { Button } from "@/ui/Button";
@@ -81,6 +84,16 @@ export default function ConversationInfoScreen() {
 
       <View>
         <Row title={i18n.t("chat.readReceipts")} trailing={<Switch value={meta.settings.readReceipts} onValueChange={(v) => setting("readReceipts", v)} accessibilityLabel={i18n.t("chat.readReceipts")} />} />
+        <Row
+          title={i18n.t("chat.quiet")}
+          trailing={
+            <Switch
+              value={Boolean(meta.quiet?.includes(id))}
+              accessibilityLabel={i18n.t("chat.quiet")}
+              onValueChange={(on) => updateMeta((m) => ({ ...m, quiet: on ? [...(m.quiet ?? []), id] : (m.quiet ?? []).filter((q) => q !== id) }))}
+            />
+          }
+        />
         <Row title={i18n.t("chat.typingSwitch")} trailing={<Switch value={meta.settings.typing} onValueChange={(v) => setting("typing", v)} accessibilityLabel={i18n.t("chat.typingSwitch")} />} last />
       </View>
 
@@ -95,6 +108,30 @@ export default function ConversationInfoScreen() {
         <Text variant="small">{i18n.t("chat.reportHow")}</Text>
       </Panel>
       <Button label={i18n.t("chat.backupTitle")} icon="lock" variant="outline" height={48} onPress={() => router.push("/chat/backup")} />
+      {conversation.kind !== "direct" && !conversation.readOnly ? (
+        <Button
+          label={conversation.kind === "crew" ? i18n.t("chat.leaveCrew") : i18n.t("chat.leaveParty")}
+          variant="danger"
+          height={48}
+          onPress={() =>
+            Alert.alert(conversation.kind === "crew" ? i18n.t("crew.leaveConfirm", { crew: conversation.title }) : i18n.t("chat.leavePartyConfirm"), undefined, [
+              { text: i18n.t("crew.leaveKeep"), style: "cancel" },
+              {
+                text: i18n.t("crew.leave"),
+                style: "destructive",
+                onPress: () => {
+                  // Leaving the crew or the party is what takes this phone out of the group (MLS remove).
+                  if (conversation.kind === "crew" && conversation.crewId) {
+                    const ran = guarded({ kind: "leaveCrew", crewId: conversation.crewId, crewName: conversation.title }, () => void leaveCrew(conversation.crewId!).catch(() => undefined));
+                    if (!ran) showToast({ message: i18n.t("vault.queued") });
+                  } else if (conversation.partyId) void respondToParty(conversation.partyId, "declined").catch(() => undefined);
+                  router.back();
+                },
+              },
+            ])
+          }
+        />
+      ) : null}
     </Screen>
   );
 }

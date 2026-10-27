@@ -72,6 +72,13 @@ function InvitationCard({ party, crewName }: { party: Party; crewName: string })
   );
 }
 
+/** An invite code from what was copied: a link ending in /i/CODE, or the 8 characters alone. */
+function inviteCodeFrom(text: string): string | null {
+  const fromLink = /\/i\/([A-Za-z0-9]{8})\b/.exec(text)?.[1];
+  const alone = /^\s*([A-Za-z0-9]{8})\s*$/.exec(text)?.[1];
+  return (fromLink ?? alone)?.toUpperCase() ?? null;
+}
+
 function CrewCard({ crew }: { crew: Crew }) {
   const i18n = useT();
   const theme = useTheme();
@@ -314,6 +321,20 @@ export default function CrewScreen() {
           autoCapitalize="characters"
           autoCorrect={false}
           maxLength={8}
+        />
+        <Button
+          label={i18n.t("crew.pasteInvite")}
+          variant="outline"
+          icon="link"
+          height={44}
+          onPress={() =>
+            void Clipboard.getStringAsync().then((text) => {
+              // QOL-29: a friend who installed from a link pastes it here; the code is taken from the link or as typed.
+              const found = inviteCodeFrom(text);
+              if (found) setCode(found);
+              else showToast({ message: i18n.t("crew.pasteNothing") });
+            })
+          }
         />
         <Button
           label={i18n.t("crew.join")}

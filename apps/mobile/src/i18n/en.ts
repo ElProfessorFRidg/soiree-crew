@@ -206,6 +206,8 @@ export const en: Messages = {
     openNone: "No open crew yet.",
     publicServers: "Public servers",
     openCrewsCount: { one: "{count} open crew", other: "{count} open crews" },
+    pasteInvite: "Paste the invite link",
+    pasteNothing: "Nothing to paste: copy the link you got first.",
   },
   newParty: {
     title: "New party",
@@ -1457,6 +1459,10 @@ export const en: Messages = {
     scanMatch: "{name}'s code matches. Nobody is listening in: marked as verified.",
     scanMismatch: "The code does not match. Share nothing sensitive with this account until you have talked to {name}.",
     scanHow: "On {name}'s phone, open the safety number screen and point at the code.",
+    quiet: "Muted",
+    leaveCrew: "Leave the crew",
+    leaveParty: "Leave the party",
+    leavePartyConfirm: "Leave the party? Its chat goes with it.",
   },
   addDrink: {
     quick: "Type what you're drinking",
