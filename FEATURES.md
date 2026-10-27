@@ -11,7 +11,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| O-01 | P0 | Arrivee.dc.html | todo | Sign up / sign in with email and Google (first name and username kept separate). Add Sign in with Apple (requi... |
+| O-01 | P0 | Arrivee.dc.html | build | Sign up / sign in with email and Google (first name and username kept separate). Add Sign in with Apple (requi... |
 | O-02 | P0 | Arrivee.dc.html | build | 18+ age gate on first launch. |
 | O-03 | P1 | Arrivee.dc.html | build | Onboarding where the user picks their notifications. |
 | O-04 | P0 | Arrivee.dc.html | build | Profile for the BAC model: weight, sex (check what the model really needs; S2M dropped height because the calc... |

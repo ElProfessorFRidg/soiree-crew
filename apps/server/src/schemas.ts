@@ -87,7 +87,12 @@ export const accountSchema = z.object({
     .regex(/^[a-z0-9_.]+$/),
   displayName: z.string().trim().min(1).max(40),
   deviceLabel: z.string().max(60).optional(),
-});
+  // O-01: both or neither; without them the account lives on this phone and moves by code.
+  email: z.string().trim().toLowerCase().pipe(z.email().max(254)).optional(),
+  password: z.string().min(10).max(200).optional(),
+}).refine((input) => (input.email === undefined) === (input.password === undefined), { message: "email_and_password" });
+
+export const passwordSchema = z.string().min(10).max(200);
 
 export const crewSchema = z.object({ name: z.string().trim().min(1).max(40) });
 

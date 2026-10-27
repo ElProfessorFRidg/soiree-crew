@@ -17,7 +17,7 @@ import { leaderboardRoutes } from "./routes/leaderboards";
 import { syncRoutes } from "./routes/sync";
 import { venueRoutes } from "./routes/venues";
 
-const PUBLIC_ROUTES = new Set(["POST /v1/accounts", "POST /v1/sessions/claim", "GET /v1/health", "GET /v1/invites/:code", "GET /v1/live", "GET /i/:code", "GET /v1/photos/:id"]);
+const PUBLIC_ROUTES = new Set(["POST /v1/accounts", "POST /v1/sessions/claim", "POST /v1/sessions/password", "GET /v1/health", "GET /v1/invites/:code", "GET /v1/live", "GET /i/:code", "GET /v1/photos/:id"]);
 
 export async function buildApp(ctx: Context, options: { logger?: boolean } = {}): Promise<FastifyInstance> {
   const app = Fastify({

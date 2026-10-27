@@ -2,10 +2,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, View } from "react-native";
+import { Field } from "@/crew/Field";
 import { useT, type Translator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
 import { exportMyData } from "./exportData";
-import { api } from "@/server/api";
+import { api, ApiError } from "@/server/api";
+import { serverMessage } from "@/server/errors";
 import { useCrewData } from "@/server/crewData";
 import { saveSession, useSession } from "@/server/session";
 import { clearAccountHistory, useAppStore } from "@/state/store";
@@ -102,6 +104,118 @@ function Devices() {
   );
 }
 
+/** O-01: an optional email and password, to sign in again without another phone. */
+function Credentials() {
+  const i18n = useT();
+  const [state, setState] = useState<{ hasPassword: boolean; email: string | null } | null>(null);
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [current, setCurrent] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    void api<{ hasPassword: boolean; email: string | null }>("/v1/me/credentials")
+      .then((data) => {
+        setState(data);
+        setEmail(data.email ?? "");
+      })
+      .catch(() => undefined);
+  }, []);
+  if (!state) return null;
+
+  const save = () => {
+    setBusy(true);
+    setError(null);
+    api<{ hasPassword: boolean; email: string | null }>("/v1/me/credentials", {
+      method: "PUT",
+      body: { email: email.trim() || null, password, ...(state.hasPassword ? { currentPassword: current } : {}) },
+    })
+      .then((data) => {
+        setState(data);
+        setOpen(false);
+        setCurrent("");
+        setPassword("");
+        showToast({ message: i18n.t("account.credentialsSaved") });
+      })
+      .catch((err) => {
+        if (err instanceof ApiError && err.failure.kind === "http") {
+          setError(
+            err.failure.code === "credentials_invalid"
+              ? i18n.t("account.credentialsWrong")
+              : err.failure.code === "email_taken"
+                ? i18n.t("crew.emailTaken")
+                : serverMessage(err.failure.code, i18n),
+          );
+        } else setError(i18n.t("crew.offline"));
+      })
+      .finally(() => setBusy(false));
+  };
+
+  const emailOk = email.trim() === "" || /^\S+@\S+\.\S+$/.test(email.trim());
+  return (
+    <View style={{ gap: 8 }}>
+      <Text variant="label">{i18n.t("account.credentials")}</Text>
+      <Text variant="small">
+        {state.email ? i18n.t("account.credentialsEmail", { email: state.email }) : state.hasPassword ? i18n.t("account.credentialsSet") : i18n.t("account.credentialsNone")}
+      </Text>
+      {open ? (
+        <>
+          <Field
+            label={i18n.t("crew.email")}
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="email-address"
+            textContentType="emailAddress"
+            autoComplete="email"
+            maxLength={254}
+          />
+          {state.hasPassword ? (
+            <Field
+              label={i18n.t("account.currentPassword")}
+              value={current}
+              onChangeText={setCurrent}
+              secureTextEntry
+              autoCapitalize="none"
+              textContentType="password"
+              autoComplete="current-password"
+              maxLength={200}
+            />
+          ) : null}
+          <Field
+            label={i18n.t("account.newPassword")}
+            hint={i18n.t("crew.passwordHint")}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            autoCapitalize="none"
+            textContentType="newPassword"
+            autoComplete="new-password"
+            maxLength={200}
+            error={error}
+          />
+          <Button
+            label={i18n.t("account.credentialsSave")}
+            height={44}
+            loading={busy}
+            disabled={!emailOk || password.length < 10 || (state.hasPassword && current.length === 0)}
+            onPress={save}
+          />
+        </>
+      ) : (
+        <Button
+          label={state.hasPassword ? i18n.t("account.credentialsChange") : i18n.t("account.credentialsAdd")}
+          variant="secondary"
+          height={44}
+          onPress={() => setOpen(true)}
+        />
+      )}
+    </View>
+  );
+}
+
 export function AccountSection() {
   const i18n = useT();
   const session = useSession((state) => state.session);
@@ -138,6 +252,7 @@ export function AccountSection() {
                 .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
             }
           />
+          <Credentials />
           <Devices />
           <Button
             label={i18n.t("account.export")}

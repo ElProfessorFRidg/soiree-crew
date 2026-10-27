@@ -1,4 +1,4 @@
-import { createCipheriv, createDecipheriv, createHash, randomBytes, randomUUID } from "node:crypto";
+import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, randomUUID, scrypt, timingSafeEqual } from "node:crypto";
 
 // Vetted primitives from Node's crypto module only (SEC-04, no home-made cryptography).
 
@@ -29,6 +29,35 @@ export function newCode(length = 10): string {
   return code;
 }
 
+const SCRYPT = { N: 1 << 15, r: 8, p: 1, maxmem: 64 * 1024 * 1024 };
+
+function scryptAsync(password: string, salt: Buffer, length: number, options: typeof SCRYPT): Promise<Buffer> {
+  return new Promise((resolve, reject) => scrypt(password, salt, length, options, (err, key) => (err ? reject(err) : resolve(key))));
+}
+
+/** O-01: scrypt with a random salt; the parameters travel with the hash so they can be raised later. */
+export async function hashPassword(password: string): Promise<string> {
+  const salt = randomBytes(16);
+  const key = await scryptAsync(password.normalize("NFKC"), salt, 32, SCRYPT);
+  return ["scrypt", SCRYPT.N, SCRYPT.r, SCRYPT.p, salt.toString("base64"), key.toString("base64")].join("$");
+}
+
+export async function verifyPassword(password: string, stored: string): Promise<boolean> {
+  const [kind, n, r, p, salt, key] = stored.split("$");
+  if (kind !== "scrypt" || !n || !r || !p || !salt || !key) return false;
+  const expected = Buffer.from(key, "base64");
+  const actual = await scryptAsync(password.normalize("NFKC"), Buffer.from(salt, "base64"), expected.length, {
+    N: Number(n),
+    r: Number(r),
+    p: Number(p),
+    maxmem: SCRYPT.maxmem,
+  });
+  return timingSafeEqual(actual, expected);
+}
+
+/** A hash to compare against when no account matches, so both paths cost the same. */
+export const DUMMY_PASSWORD_HASH = "scrypt$32768$8$1$AAAAAAAAAAAAAAAAAAAAAA==$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+
 /** Application-level envelope for health data: AES-256-GCM, key from the environment. */
 export class Sealer {
   private readonly key: Buffer;
@@ -44,6 +73,11 @@ export class Sealer {
     const cipher = createCipheriv("aes-256-gcm", this.key, iv);
     const body = Buffer.concat([cipher.update(JSON.stringify(value), "utf8"), cipher.final()]);
     return ["v1", iv.toString("base64"), cipher.getAuthTag().toString("base64"), body.toString("base64")].join(".");
+  }
+
+  /** Keyed hash for looking a value up (an email) without storing it in clear. */
+  lookup(value: string): string {
+    return createHmac("sha256", createHmac("sha256", this.key).update("lookup").digest()).update(value).digest("hex");
   }
 
   open<T>(sealed: string): T {

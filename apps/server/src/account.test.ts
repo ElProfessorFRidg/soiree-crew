@@ -91,3 +91,56 @@ describe("export (N-17, SEC-08)", () => {
     expect(data.paymentDetails.iban).toBe("FR7630006000011234567890189");
   });
 });
+
+describe("email and password (O-01)", () => {
+  const signUpWith = (username: string, email: string, password: string) =>
+    app.inject({ method: "POST", url: "/v1/accounts", payload: { username, displayName: username, email, password } });
+  const signIn = (login: string, password: string) => app.inject({ method: "POST", url: "/v1/sessions/password", payload: { login, password, deviceLabel: "Pixel" } });
+
+  it("signs in with the email or the username, and keeps the email sealed", async () => {
+    expect((await signUpWith("jade", "Jade@Example.com", "long enough pass")).statusCode).toBe(201);
+    expect((await signIn("jade@example.com", "long enough pass")).statusCode).toBe(201);
+    expect((await signIn("JADE", "long enough pass")).statusCode).toBe(201);
+    const stored = await db.query<{ email_sealed: string; email_lookup: string; password_hash: string }>("select * from credentials");
+    expect(JSON.stringify(stored)).not.toContain("example.com");
+    expect(stored[0]!.password_hash.startsWith("scrypt$")).toBe(true);
+  });
+
+  it("answers the same for an unknown login and a wrong password", async () => {
+    await signUpWith("jade", "jade@example.com", "long enough pass");
+    const wrong = await signIn("jade@example.com", "not the password");
+    const unknown = await signIn("nobody@example.com", "not the password");
+    expect([wrong.statusCode, unknown.statusCode]).toEqual([401, 401]);
+    expect(wrong.json()).toEqual(unknown.json());
+  });
+
+  it("refuses a short password, an email without password and a taken email", async () => {
+    expect((await signUpWith("jade", "jade@example.com", "short")).statusCode).toBe(400);
+    expect((await app.inject({ method: "POST", url: "/v1/accounts", payload: { username: "jade", displayName: "Jade", email: "jade@example.com" } })).statusCode).toBe(400);
+    await signUpWith("jade", "jade@example.com", "long enough pass");
+    const again = await signUpWith("theo", "JADE@example.com", "long enough pass");
+    expect(again.statusCode).toBe(409);
+    expect(again.json()).toMatchObject({ error: "email_taken" });
+  });
+
+  it("adds credentials later, and changing them needs the current password", async () => {
+    const jade = await signUp("jade");
+    expect((await app.inject({ method: "GET", url: "/v1/me/credentials", headers: jade.auth })).json()).toEqual({ hasPassword: false, email: null });
+    const put = (payload: object) => app.inject({ method: "PUT", url: "/v1/me/credentials", headers: jade.auth, payload });
+    expect((await put({ email: "jade@example.com", password: "first password" })).statusCode).toBe(200);
+    expect((await put({ email: null, password: "second password" })).statusCode).toBe(403);
+    expect((await put({ email: null, password: "second password", currentPassword: "first password" })).statusCode).toBe(200);
+    expect((await signIn("jade@example.com", "second password")).statusCode).toBe(401);
+    expect((await signIn("jade", "second password")).statusCode).toBe(201);
+    const exported = (await app.inject({ method: "GET", url: "/v1/me/export", headers: jade.auth })).json() as { account: { email: string | null } };
+    expect(exported.account.email).toBeNull();
+  });
+
+  it("rate-limits password guesses on one login", async () => {
+    await signUpWith("jade", "jade@example.com", "long enough pass");
+    const statuses: number[] = [];
+    for (let i = 0; i < 6; i++) statuses.push((await signIn("jade", `guess number ${i}`)).statusCode);
+    expect(statuses.slice(0, 5).every((s) => s === 401)).toBe(true);
+    expect(statuses.at(-1)).toBe(429);
+  });
+});

@@ -20,6 +20,8 @@ Status values: `open`, `confirmed`, `overturned`.
 | A-ORCH-10 | Territory titles: Mayor per bar held, Empire from 3 bars held, Globetrotter from 8 bars ever visited, Nomad from 3 bars in one night this season. French names are épicène (« Maire », « Empire », « Globe-trotter », « Nomade ») instead of « Conquérant » and « Explorateur ». | Titles must read right for everyone. | Thresholds live in `TITLE_RULES`. | open |
 | A-ORCH-11 | COM-06 presence privacy holds by construction in the private build: venues, check-ins and who is where are crew-only, so strangers see no presence at all, not even counts. | There is no public venue page yet. | When public venue pages exist, show busy levels only from 5 users, rounded. | open |
 | A-ORCH-12 | French home-safe wording is épicène: « Je suis chez moi » and « à la maison » replace « Je suis bien rentré » and « rentré ». | The copy review (SLOP-02) found gendered forms where French has neutral ones. | Back to « rentré(e) » only if the crew prefers it. | open |
+| A-ORCH-13 | O-01 ships email + password only; Google and Apple sign-in wait for a Google OAuth client and a paid Apple developer account. No reset email: a forgotten password is replaced after signing in with a code from another phone. | No mail sender and no OAuth credentials in a personal setup. | Add a mail sender (reset link) and the OAuth clients when the app goes public; Sign in with Apple then becomes mandatory on iOS. | open |
+| A-ORCH-14 | Password guesses are limited to 10 per address and 5 per login every 10 minutes; a locked login unlocks by itself. | Stops spraying without a permanent lockout someone could trigger on purpose. | Raise or lower after real use. | open |
 
 ## From recon reports
 

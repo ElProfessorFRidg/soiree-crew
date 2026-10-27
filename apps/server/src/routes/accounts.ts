@@ -1,10 +1,10 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { bearer, requireUser, HttpError, type Context } from "../context";
-import { hashToken, newCode, newId, newToken } from "../crypto";
+import { DUMMY_PASSWORD_HASH, hashPassword, hashToken, newCode, newId, newToken, verifyPassword } from "../crypto";
 import { RateLimiter } from "../ratelimit";
 import { deletePhotoFiles } from "./photos";
-import { accountSchema } from "../schemas";
+import { accountSchema, passwordSchema } from "../schemas";
 
 const TRANSFER_TTL_MS = 10 * 60_000;
 
@@ -23,12 +23,32 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
   // 10 characters, so guessing one at 10 tries per 10 minutes goes nowhere.
   const signUps = new RateLimiter(10, 10 * 60_000, ctx.now);
   const claims = new RateLimiter(10, 10 * 60_000, ctx.now);
+  // O-01: per address and per login, so spreading guesses over many addresses does not help either.
+  const passwordTries = new RateLimiter(10, 10 * 60_000, ctx.now);
+  const loginTries = new RateLimiter(5, 10 * 60_000, ctx.now);
+
+  const saveCredentials = async (userId: string, email: string | null, password: string) => {
+    if (email) {
+      const owner = await ctx.db.query<{ user_id: string }>("select user_id from credentials where email_lookup = $1", [ctx.sealer.lookup(email)]);
+      if (owner[0] && owner[0].user_id !== userId) throw new HttpError(409, "email_taken");
+    }
+    await ctx.db.query(
+      `insert into credentials (user_id, email_lookup, email_sealed, password_hash, updated_at) values ($1, $2, $3, $4, $5)
+       on conflict (user_id) do update set email_lookup = excluded.email_lookup, email_sealed = excluded.email_sealed,
+         password_hash = excluded.password_hash, updated_at = excluded.updated_at`,
+      [userId, email ? ctx.sealer.lookup(email) : null, email ? ctx.sealer.seal(email) : null, await hashPassword(password), ctx.now()],
+    );
+  };
 
   app.post("/v1/accounts", async (request, reply) => {
     signUps.check(request.ip);
     const input = accountSchema.parse(request.body);
     const taken = await ctx.db.query("select 1 from users where username = $1", [input.username]);
     if (taken.length) throw new HttpError(409, "username_taken");
+    if (input.email) {
+      const emailTaken = await ctx.db.query("select 1 from credentials where email_lookup = $1", [ctx.sealer.lookup(input.email)]);
+      if (emailTaken.length) throw new HttpError(409, "email_taken");
+    }
     const id = newId();
     await ctx.db.query("insert into users (id, username, display_name, created_at) values ($1, $2, $3, $4)", [
       id,
@@ -36,8 +56,52 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
       input.displayName,
       ctx.now(),
     ]);
+    if (input.email && input.password) await saveCredentials(id, input.email, input.password);
     const token = await createSession(ctx, id, input.deviceLabel ?? "");
     return reply.status(201).send({ user: { id, username: input.username, displayName: input.displayName }, token });
+  });
+
+  /** O-01: sign in with an email or a username and a password. Same answer for an unknown login and a wrong password. */
+  app.post("/v1/sessions/password", async (request, reply) => {
+    passwordTries.check(request.ip);
+    const input = z
+      .object({ login: z.string().trim().toLowerCase().min(3).max(254), password: z.string().min(1).max(200), deviceLabel: z.string().max(60).optional() })
+      .parse(request.body);
+    loginTries.check(input.login);
+    const rows = await ctx.db.query<{ id: string; username: string; display_name: string; password_hash: string }>(
+      `select u.id, u.username, u.display_name, c.password_hash from credentials c join users u on u.id = c.user_id
+       where c.email_lookup = $1 or u.username = $2`,
+      [ctx.sealer.lookup(input.login), input.login],
+    );
+    const user = rows[0];
+    const ok = await verifyPassword(input.password, user?.password_hash ?? DUMMY_PASSWORD_HASH);
+    if (!user || !ok) throw new HttpError(401, "credentials_invalid");
+    const token = await createSession(ctx, user.id, input.deviceLabel ?? "");
+    ctx.live.notify([user.id], { type: "security.newDevice" });
+    return reply.status(201).send({ user: { id: user.id, username: user.username, displayName: user.display_name }, token });
+  });
+
+  app.get("/v1/me/credentials", async (request) => {
+    const user = requireUser(request);
+    const row = (await ctx.db.query<{ email_sealed: string | null }>("select email_sealed from credentials where user_id = $1", [user.id]))[0];
+    return { hasPassword: Boolean(row), email: row?.email_sealed ? ctx.sealer.open<string>(row.email_sealed) : null };
+  });
+
+  /** O-01: add or change the email and password. Changing them needs the current password. */
+  app.put("/v1/me/credentials", async (request) => {
+    const user = requireUser(request);
+    const input = z
+      .object({
+        email: z.string().trim().toLowerCase().pipe(z.email().max(254)).nullable(),
+        password: passwordSchema,
+        currentPassword: z.string().max(200).optional(),
+      })
+      .parse(request.body);
+    passwordTries.check(`me:${user.id}`);
+    const existing = (await ctx.db.query<{ password_hash: string }>("select password_hash from credentials where user_id = $1", [user.id]))[0];
+    if (existing && !(await verifyPassword(input.currentPassword ?? "", existing.password_hash))) throw new HttpError(403, "credentials_invalid");
+    await saveCredentials(user.id, input.email, input.password);
+    return { hasPassword: true, email: input.email };
   });
 
   app.get("/v1/me", async (request) => {
@@ -144,6 +208,7 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
     const repayments = await all("select id, pool_id, from_id, to_id, amount, currency, created_at from repayments where from_id = $1 or to_id = $1 order by created_at");
     const reactions = await all("select party_id, to_id, emoji, at from recap_reactions where from_id = $1");
     const sessions = await all("select device_label, created_at, last_seen_at from sessions where user_id = $1");
+    const credentials = await one<{ email_sealed: string | null; updated_at: number }>("select email_sealed, updated_at from credentials where user_id = $1");
     const publicProfile = await one<{ bio: string; country: string; audiences: string; hidden_venues: string }>(
       "select bio, country, audiences, hidden_venues from profiles where user_id = $1",
     );
@@ -152,7 +217,7 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
 
     return {
       exportedAt: ctx.now(),
-      account,
+      account: account ? { ...account, email: open<string>(credentials?.email_sealed), passwordSetAt: credentials?.updated_at ?? null } : account,
       preferences: preferences ? JSON.parse(preferences.data) : null,
       bodyProfile: open(profile?.sealed),
       paymentDetails: open(payment?.sealed),
