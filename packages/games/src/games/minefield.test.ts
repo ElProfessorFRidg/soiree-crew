@@ -103,7 +103,7 @@ describe("Minefield", () => {
   });
 
   it("ends the game after the set grids", () => {
-    let state = { ...rigged([0]), grids: 1 };
+    let state: MinefieldState = { ...rigged([0]), grids: 1 };
     state = act(state, { type: "reveal", index: 0 }, { type: "continue" }, { type: "nextGrid" });
     expect(state.phase).toBe("end");
     expect(state.endReason).toBe("completed");

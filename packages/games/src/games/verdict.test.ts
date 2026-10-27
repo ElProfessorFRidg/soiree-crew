@@ -29,7 +29,7 @@ describe("The Verdict", () => {
     let previous: [string, string] | null = null;
     const appearances: Record<string, number> = {};
     for (let i = 0; i < 20; i++) {
-      const pair = pickPair(ps, appearances, previous, rng)!;
+      const pair: [string, string] = pickPair(ps, appearances, previous, rng)!;
       if (previous) expect([...pair].sort()).not.toEqual([...previous].sort());
       for (const id of pair) appearances[id] = (appearances[id] ?? 0) + 1;
       previous = pair;

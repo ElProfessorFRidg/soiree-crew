@@ -2,6 +2,7 @@ import { Redirect, Tabs } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { BottomTabBarProps } from "expo-router/tabs";
+import { useGameT } from "@/games/i18n";
 import { useT } from "@/i18n";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
@@ -14,6 +15,7 @@ import { ToastHost } from "@/ui/Toast";
 const TAB_ICONS: Record<string, AnyIconName> = {
   index: "glass",
   crew: "users",
+  games: "dice",
   me: "user",
 };
 
@@ -54,6 +56,7 @@ function TabBar({ state, descriptors, navigateToTab }: BottomTabBarProps) {
 
 export default function TabsLayout() {
   const i18n = useT();
+  const games = useGameT();
   const insets = useSafeAreaInsets();
   const onboarded = useAppStore((state) => state.ageConfirmedAt !== null && state.profile !== null);
   if (!onboarded) return <Redirect href="/onboarding" />;
@@ -62,6 +65,7 @@ export default function TabsLayout() {
       <Tabs screenOptions={{ headerShown: false }} tabBar={(props) => <TabBar {...props} />}>
         <Tabs.Screen name="index" options={{ title: i18n.t("tabs.party") }} />
         <Tabs.Screen name="crew" options={{ title: i18n.t("crew.tab") }} />
+        <Tabs.Screen name="games" options={{ title: games.t("catalogue.title") }} />
         <Tabs.Screen name="me" options={{ title: i18n.t("tabs.me") }} />
       </Tabs>
       <ToastHost bottomOffset={insets.bottom + 76} />
