@@ -696,6 +696,12 @@ export const fr = {
     outgoing: "Demandes envoyées",
     blockedList: "Bloqués",
     noFriends: "Pas encore d'ami. Ajoute quelqu'un depuis son profil.",
+    usualFirst: "Premier verre d'habitude : {time}",
+    usualPace: "{value} verres par heure en moyenne",
+    shareCard: "Partager ma carte",
+    cardTitles: "Titres",
+    cardBars: { one: "{count} bar tenu", other: "{count} bars tenus" },
+    cardEmpty: "Ta carte ne montre que ce que tout le monde peut voir. Pour la remplir, ouvre ton identité à tout le monde.",
   },
   album: {
     title: "Album de la soirée",

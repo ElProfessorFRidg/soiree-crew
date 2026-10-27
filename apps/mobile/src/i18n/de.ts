@@ -696,6 +696,12 @@ export const de: Messages = {
     outgoing: "Gesendete Anfragen",
     blockedList: "Blockiert",
     noFriends: "Noch keine Freunde. Füg jemanden über das Profil der Person hinzu.",
+    usualFirst: "Erstes Getränk meist: {time}",
+    usualPace: "Im Schnitt {value} Getränke pro Stunde",
+    shareCard: "Meine Karte teilen",
+    cardTitles: "Titel",
+    cardBars: { one: "{count} Bar gehalten", other: "{count} Bars gehalten" },
+    cardEmpty: "Deine Karte zeigt nur, was alle sehen dürfen. Gib deine Identität für alle frei, um sie zu füllen.",
   },
   album: {
     title: "Album des Abends",

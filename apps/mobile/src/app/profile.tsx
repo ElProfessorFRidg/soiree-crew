@@ -17,6 +17,8 @@ import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { SkeletonRows } from "@/ui/Skeleton";
+import { formatClock } from "@/i18n/format";
+import { MemberCard } from "@/profile/MemberCard";
 
 type ViewAs = "me" | "stranger" | "friend" | "crew";
 
@@ -172,6 +174,12 @@ export default function ProfileScreen() {
               {i18n.t("people.favourites", { list: s.drinks.favourites.map((f) => drinkLabel({ kind: f.kind as DrinkKind }, i18n)).join(", ") })}
             </Text>
           ) : null}
+          {s.drinks.usualFirstDrink !== null ? (
+            <Text variant="small">
+              {i18n.t("people.usualFirst", { time: formatClock(new Date(2026, 0, 1, 12, s.drinks.usualFirstDrink).getTime(), i18n.language, preferences.hourCycle) })}
+            </Text>
+          ) : null}
+          {s.drinks.usualPacePerHour !== null ? <Text variant="small">{i18n.t("people.usualPace", { value: i18n.number(s.drinks.usualPacePerHour, 1) })}</Text> : null}
         </Panel>
       ) : null}
 
@@ -197,6 +205,7 @@ export default function ProfileScreen() {
         </Panel>
       ) : null}
 
+      {mine && viewAs === "me" ? <MemberCard /> : null}
       {mine ? <Text variant="small">{i18n.t("people.neverStrangers")}</Text> : null}
 
       {!mine ? (

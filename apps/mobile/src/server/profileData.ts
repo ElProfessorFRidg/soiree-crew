@@ -16,7 +16,7 @@ export interface ProfileView {
     crews?: { name: string; members: number }[];
     titles?: { kind: "mayor" | "conqueror" | "explorer" | "nomad"; venueName?: string }[];
     venues?: { venueId: string; name: string; visits: number; ruled: boolean; lastAt?: number; hidden?: boolean }[];
-    drinks?: { total: number; favourites: { kind: string; count: number }[] };
+    drinks?: { total: number; favourites: { kind: string; count: number }[]; usualFirstDrink: number | null; usualPacePerHour: number | null };
     records?: { highestBac: number | null; biggestNight: number };
     nights?: { total: number; last30Days: number };
   };

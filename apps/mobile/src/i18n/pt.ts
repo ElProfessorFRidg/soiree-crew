@@ -697,6 +697,12 @@ export const pt: Messages = {
     outgoing: "Pedidos enviados",
     blockedList: "Bloqueados",
     noFriends: "Ainda sem amigos. Adiciona alguém a partir do perfil dessa pessoa.",
+    usualFirst: "Primeiro copo, normalmente: {time}",
+    usualPace: "Em média {value} copos por hora",
+    shareCard: "Partilhar o meu cartão",
+    cardTitles: "Títulos",
+    cardBars: { one: "{count} bar conquistado", other: "{count} bares conquistados" },
+    cardEmpty: "O cartão só mostra o que toda a gente pode ver. Para o preencher, abre a tua identidade a toda a gente.",
   },
   album: {
     title: "Álbum da festa",

@@ -5,7 +5,7 @@ import { territoryTitles } from "@crew/territory";
 import { randomUUID } from "node:crypto";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { AUDIENCES, audiencesOf, canSee, PRESETS, SECTIONS, seesDates, STRANGER, type Relation, type Section } from "../profileRules";
-import { nightOf } from "../time";
+import { nightOf, offsetMinutes } from "../time";
 
 const HOUR_MS = 3_600_000;
 const uuid = z.string().uuid();
@@ -117,7 +117,36 @@ async function buildSections(ctx: Context, ownerId: string, relation: Relation):
       [ownerId],
     );
     const total = (await ctx.db.query<{ n: number }>("select count(*)::int as n from drinks where user_id = $1 and deleted_at is null", [ownerId]))[0]!.n;
-    out.drinks = { total, favourites: kinds.map((k) => ({ kind: k.kind, count: k.n })) };
+    // N-13: habits as plain figures: the usual time of the first drink and the usual pace.
+    const nights = await ctx.db.query<{ party_id: string; consumed_at: number; time_zone: string }>(
+      `select d.party_id, d.consumed_at, c.time_zone from drinks d join parties p on p.id = d.party_id join crews c on c.id = p.crew_id
+       where d.user_id = $1 and d.deleted_at is null and d.kind <> 'soft' order by d.consumed_at`,
+      [ownerId],
+    );
+    const byParty = new Map<string, { times: number[]; timeZone: string }>();
+    for (const n of nights) {
+      const entry = byParty.get(n.party_id) ?? { times: [], timeZone: n.time_zone };
+      entry.times.push(n.consumed_at);
+      byParty.set(n.party_id, entry);
+    }
+    const firsts: number[] = [];
+    const paces: number[] = [];
+    for (const { times, timeZone } of byParty.values()) {
+      const first = times[0]!;
+      const local = new Date(first + offsetMinutes(first, timeZone) * 60_000);
+      firsts.push(((local.getUTCHours() - 12 + 24) % 24) * 60 + local.getUTCMinutes());
+      const span = (times[times.length - 1]! - first) / HOUR_MS;
+      if (times.length >= 2 && span >= 0.5) paces.push(times.length / span);
+    }
+    const mean = (xs: number[]) => (xs.length ? xs.reduce((s, x) => s + x, 0) / xs.length : null);
+    const firstMean = mean(firsts);
+    const paceMean = mean(paces);
+    out.drinks = {
+      total,
+      favourites: kinds.map((k) => ({ kind: k.kind, count: k.n })),
+      usualFirstDrink: firstMean === null ? null : Math.round(firstMean),
+      usualPacePerHour: paceMean === null ? null : Math.round(paceMean * 10) / 10,
+    };
   }
 
   if (visible("records") && (relation.me || recordsPublic())) {

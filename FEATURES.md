@@ -196,7 +196,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| N-13 | P1 | Profil.dc.html | todo | Each member's drinking profile: favourite drinks, usual pace, time of first drink, usual leaving time. |
+| N-13 | P1 | Profil.dc.html | build | Each member's drinking profile: favourite drinks, usual pace, time of first drink, usual leaving time. |
 | N-14 | P1 | Profil.dc.html | build | Crew habits: nights and hours out, frequency, venues, seasonality, calendar heatmap. |
 | N-15 | P1 | Profil.dc.html | todo | Monthly recap + yearly crew "Wrapped" (Spotify Wrapped spirit), as shareable stories. |
 | N-16 | P1 | Soiree.dc.html | todo | Detailed charts (O-81) filterable by period, venue, drink type, person. |
@@ -293,7 +293,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | JOY-08 | P1 | Radar.dc.html | build | Milestones: 10th, 50th, 100th night out together, crew anniversary, first venue conquered. Milestones count ni... |
 | JOY-09 | P1 | Recap.dc.html | todo | Photo booth: at the end of a party, an automatic photo strip from the shared album, ready for stories. |
 | JOY-10 | P2 | Reglages.dc.html | todo | Sticker packs (iMessage / WhatsApp) made from crew avatars and moments. |
-| JOY-11 | P1 | Profil.dc.html | todo | Member card: a shareable profile card with titles, venues ruled, favourite drink, nights out. |
+| JOY-11 | P1 | Profil.dc.html | build | Member card: a shareable profile card with titles, venues ruled, favourite drink, nights out. |
 | JOY-12 | P1 | Soiree.dc.html | build | Dare of the night on the Party screen, different every night, taken from the crew's own cards when they exist ... |
 
 ## Adaptive drunk mode

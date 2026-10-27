@@ -698,6 +698,12 @@ export const en: Messages = {
     outgoing: "Requests sent",
     blockedList: "Blocked",
     noFriends: "No friends yet. Add someone from their profile.",
+    usualFirst: "Usual first drink: {time}",
+    usualPace: "{value} drinks an hour on average",
+    shareCard: "Share my card",
+    cardTitles: "Titles",
+    cardBars: { one: "{count} bar held", other: "{count} bars held" },
+    cardEmpty: "Your card only shows what everyone can see. To fill it, open your identity to everyone.",
   },
   album: {
     title: "Party album",

@@ -697,6 +697,12 @@ export const it: Messages = {
     outgoing: "Richieste inviate",
     blockedList: "Persone bloccate",
     noFriends: "Ancora nessuna amicizia. Aggiungi qualcuno dal suo profilo.",
+    usualFirst: "Primo bicchiere di solito: {time}",
+    usualPace: "In media {value} bicchieri all'ora",
+    shareCard: "Condividi la mia tessera",
+    cardTitles: "Titoli",
+    cardBars: { one: "{count} locale conquistato", other: "{count} locali conquistati" },
+    cardEmpty: "La tessera mostra solo ciò che tutti possono vedere. Per riempirla, apri la tua identità a tutti.",
   },
   album: {
     title: "Album della serata",
