@@ -5,6 +5,7 @@
   "dependencies": {
     "@crew/bac": "workspace:*",
     "@crew/design-tokens": "workspace:*",
+    "@crew/fuzzy": "workspace:*",
     "@crew/games": "workspace:*",
     "@crew/money": "workspace:*",
     "@crew/units": "workspace:*",

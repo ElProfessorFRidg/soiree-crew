@@ -304,7 +304,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ADP-02 | P0 | ModeBourre.dc.html | build | Party screen at level 2 (variant of HUB-01). |
 | ADP-03 | P0 | ModeBourre.dc.html | build | Party screen at level 3 (variant of HUB-01). |
 | ADP-04 | P0 | Soiree.dc.html | build | "Heavy fingers" ergonomics: giant targets, no essential action behind a long-press, a precise swipe or a small... |
-| ADP-05 | P0 | Soiree.dc.html | todo | Forgiving input: fuzzy search that tolerates typos, suggestions, voice input (see AI-01). |
+| ADP-05 | P0 | Soiree.dc.html | build | Forgiving input: fuzzy search that tolerates typos, suggestions, voice input (see AI-01). |
 | ADP-06 | P0 | ModeBourre.dc.html | build | "Next-morning vault": above a threshold, sensitive actions are locked or queued for confirmation the next day ... |
 | ADP-07 | P0 | ModeBourre.dc.html | todo | Legibility: text size, maximum contrast, readable under strobe or very low light, no disorienting motion (effe... |
 | ADP-08 | P0 | ModeBourre.dc.html | build | Battery: automatic eco mode during a party when the battery gets low (fewer refreshes, lighter effects; essent... |

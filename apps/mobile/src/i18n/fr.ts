@@ -687,6 +687,12 @@ export const fr = {
     noFriends: "Pas encore d'ami. Ajoute quelqu'un depuis son profil.",
   },
   addDrink: {
+    quick: "Tape ce que tu bois",
+    quickPlaceholder: "2 pintes et un shot",
+    quickHint: "Fautes et accents ne comptent pas. Le micro du clavier marche aussi.",
+    quickAdd: "Ajouter : {list}",
+    quickAdded: { one: "{count} verre ajouté", other: "{count} verres ajoutés" },
+    quickNone: "Pas compris. Choisis dans la liste.",
     title: "Ajouter",
     myDrinks: "Mes boissons",
     drankAt: "Bu à",

@@ -1,28 +1,31 @@
 import { router } from "expo-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { duration, radius, space } from "@crew/design-tokens";
+import { parseOrder, search } from "@crew/fuzzy";
 import { drinkVolumeUnit, formatVolume, type VolumeUnit } from "@crew/units";
+import { Field } from "@/crew/Field";
 import { logDrink } from "@/drinks/actions";
 import { CustomDrinkEditor } from "@/drinks/CustomDrinkEditor";
 import { removeCustomDrink, restoreCustomDrink, saveCustomDrink, sortedCustomDrinks } from "@/drinks/customDrinks";
 import { drinkLabel, drinkWithArticle } from "@/drinks/display";
 import { offerUndo } from "@/drinks/undoToast";
 import { presetFromCustom, presetsFor, type CustomDrink, type DrinkPreset } from "@/drinks/presets";
-import { useT, type Translator } from "@/i18n";
+import { createTranslator, useT, type Translator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
 import { useNow } from "@/state/hooks";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Button, IconButton } from "@/ui/Button";
-import { Switch } from "@/ui/controls";
+import { Chip, Switch } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { ScalePressable } from "@/ui/Pressable";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast, ToastHost } from "@/ui/Toast";
+
 
 const MINUTE_MS = 60_000;
 
@@ -89,6 +92,12 @@ export default function AddDrinkSheet() {
           </Text>
           <IconButton icon="x" accessibilityLabel={i18n.t("common.close")} onPress={() => (router.canGoBack() ? router.back() : router.replace("/(tabs)"))} />
         </View>
+
+        <QuickType presets={[...customDrinks.map(presetFromCustom), ...presets]} consumedAt={consumedAt} withFood={withFood} onPick={(id) => {
+          const index = presets.findIndex((p) => p.id === id);
+          if (index >= 0) pick({ type: "preset", index });
+          else pick({ type: "custom", id });
+        }} />
 
         <View style={styles.grid} accessibilityRole="radiogroup">
           {presets.map((item, index) => {
@@ -243,7 +252,67 @@ export default function AddDrinkSheet() {
   );
 }
 
+const FR = createTranslator("fr");
+const EN = createTranslator("en");
+
+/** ADP-05: type or dictate "2 pintes et un shot"; typos, plurals and accents are fine. */
+function QuickType({ presets, consumedAt, withFood, onPick }: { presets: DrinkPreset[]; consumedAt: number; withFood: boolean; onPick: (id: string) => void }) {
+  const i18n = useT();
+  const [text, setText] = useState("");
+  const candidates = useMemo(
+    () => presets.map((p) => ({ value: p.id, names: p.kind === "custom" ? [p.name ?? ""] : [drinkLabel(p, FR), drinkLabel(p, EN)] })),
+    [presets],
+  );
+  const order = useMemo(() => (text.trim() ? parseOrder(text, candidates) : []), [text, candidates]);
+  const suggestions = useMemo(() => (text.trim() && !order.length ? search(text, candidates, 4) : []), [text, order, candidates]);
+  const byId = (id: string) => presets.find((p) => p.id === id)!;
+  const summary = order.map((o) => `${o.quantity} × ${drinkLabel(byId(o.value), i18n)}`).join(", ");
+
+  return (
+    <View style={styles.quick}>
+      <Field
+        label={i18n.t("addDrink.quick")}
+        placeholder={i18n.t("addDrink.quickPlaceholder")}
+        value={text}
+        onChangeText={setText}
+        autoCorrect={false}
+        returnKeyType="done"
+        hint={text.trim() && !order.length && !suggestions.length ? i18n.t("addDrink.quickNone") : i18n.t("addDrink.quickHint")}
+      />
+      {order.length ? (
+        <Button
+          label={i18n.t("addDrink.quickAdd", { list: summary })}
+          icon="plus"
+          height={56}
+          onPress={() => {
+            let count = 0;
+            for (const o of order) {
+              for (let n = 0; n < o.quantity; n++) if (logDrink(byId(o.value), consumedAt, withFood)) count += 1;
+            }
+            if (!count) return;
+            haptic.drinkAdded();
+            showToast({ message: i18n.plural("addDrink.quickAdded", count) });
+            if (router.canGoBack()) router.back();
+            else router.replace("/(tabs)");
+          }}
+        />
+      ) : null}
+      {suggestions.length ? (
+        <View style={styles.grid}>
+          {suggestions.map((id) => (
+            <Chip key={id} label={drinkLabel(byId(id), i18n)} onPress={() => {
+              onPick(id);
+              setText("");
+            }} />
+          ))}
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  quick: { gap: 8 },
   sheet: { flex: 1 },
   content: { paddingHorizontal: space.screenX, paddingTop: 20, gap: 16 },
   title: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },

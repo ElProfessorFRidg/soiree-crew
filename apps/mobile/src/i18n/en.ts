@@ -689,6 +689,12 @@ export const en: Messages = {
     noFriends: "No friends yet. Add someone from their profile.",
   },
   addDrink: {
+    quick: "Type what you're drinking",
+    quickPlaceholder: "2 pints and a shot",
+    quickHint: "Typos and accents don't matter. The keyboard mic works too.",
+    quickAdd: "Add: {list}",
+    quickAdded: { one: "{count} drink added", other: "{count} drinks added" },
+    quickNone: "Didn't get that. Pick from the list.",
     title: "Add",
     myDrinks: "My drinks",
     drankAt: "Had at",
