@@ -15,6 +15,7 @@ import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { BIG_EXPENSE, guarded } from "@/vault/vault";
+import { useDraft } from "@/state/drafts";
 
 type Mode = Split["kind"];
 
@@ -25,8 +26,8 @@ export default function NewExpenseScreen() {
   const theme = useTheme();
   const me = useSession((state) => state.session?.userId);
   const [detail, setDetail] = useState<PoolDetail | null>(null);
-  const [description, setDescription] = useState("");
-  const [amountText, setAmountText] = useState("");
+  const [description, setDescription, clearDescription] = useDraft(`expense:${poolId}:description`);
+  const [amountText, setAmountText, clearAmount] = useDraft(`expense:${poolId}:amount`);
   const [payer, setPayer] = useState<string | undefined>(me);
   const [mode, setMode] = useState<Mode>("equal");
   const [included, setIncluded] = useState<Set<string>>(new Set());
@@ -84,6 +85,8 @@ export default function NewExpenseScreen() {
     const expense = { payerId: payer, amount, currency, description: description.trim(), split: split.split };
     if (amount >= BIG_EXPENSE && !guarded({ kind: "bigExpense", poolId, expense }, () => undefined)) {
       showToast({ message: i18n.t("vault.queued") });
+      clearDescription();
+      clearAmount();
       router.back();
       return;
     }
@@ -91,6 +94,8 @@ export default function NewExpenseScreen() {
     void addExpense(poolId, { payerId: payer, amount, currency, description: description.trim(), split: split.split })
       .then(() => {
         haptic.confirmed();
+        clearDescription();
+        clearAmount();
         router.back();
       })
       .catch(() => {

@@ -252,7 +252,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-04 | P0 | Systeme.dc.html | todo | System shortcuts for a drunk thumb: Siri / App Intents and Android App Actions ("Hey Siri, add a beer"), iPhon... |
 | QOL-05 | P0 | Systeme.dc.html | todo | Deep links and universal links for every party, venue, profile, crew invite, recap and game card. Links pasted... |
 | QOL-06 | P0 | Soiree.dc.html | todo | Native sharing: recap and story cards go straight to Instagram Stories, Snapchat (Creative Kit), TikTok and Wh... |
-| QOL-07 | P0 | Etats.dc.html | todo | Typed content is never lost: drafts (party name, review, expense, card) survive the app being killed, errors a... |
+| QOL-07 | P0 | Etats.dc.html | build | Typed content is never lost: drafts (party name, review, expense, card) survive the app being killed, errors a... |
 | QOL-08 | P0 | Arrivee.dc.html | todo | Forms done right: the right keyboard per field (numeric pad with the locale's decimal separator for amounts, e... |
 | QOL-09 | P0 | Etats.dc.html | todo | Photos: compressed before upload, background upload with progress and retry, HEIC accepted, location metadata ... |
 | QOL-10 | P0 | Soirees.dc.html | build | Dying battery: when a member's battery drops under 10% during a party, the crew sees "low battery" next to the... |

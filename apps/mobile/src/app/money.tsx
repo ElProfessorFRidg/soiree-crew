@@ -17,6 +17,7 @@ import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { useDraft } from "@/state/drafts";
 
 /** N-20: tonight's spending is my share of the party pool's expenses. */
 function useTonightSpent(partyPoolId: string | undefined, me: string | undefined): number | null {
@@ -45,7 +46,7 @@ export default function MoneyScreen() {
   const preferences = useAppStore((state) => state.preferences);
   const [pools, setPools] = useState<PoolSummary[]>([]);
   const [rounds, setRounds] = useState<RoundsState | null>(null);
-  const [poolName, setPoolName] = useState("");
+  const [poolName, setPoolName, clearPoolName] = useDraft("money:pool-name");
   const [budgetInput, setBudgetInput] = useState("");
 
   // Keyed on ids: useLiveParty builds a new object on every render.
@@ -157,7 +158,7 @@ export default function MoneyScreen() {
             onPress={() =>
               void createPool(crew.id, poolName.trim(), preferences.currency, crew.members.map((m) => m.id))
                 .then((id) => {
-                  setPoolName("");
+                  clearPoolName();
                   router.push({ pathname: "/pool", params: { id } });
                 })
                 .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))

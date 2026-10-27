@@ -14,6 +14,7 @@ import { ScalePressable } from "@/ui/Pressable";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { Field } from "./Field";
+import { useDraft } from "@/state/drafts";
 
 const STATUSES: readonly NightStatus[] = ["going_out", "maybe", "home", "unavailable"];
 
@@ -23,7 +24,7 @@ export function RadarSection({ crewId }: { crewId: string }) {
   const theme = useTheme();
   const me = useSession((state) => state.session?.userId);
   const radar = useRadar((state) => state.byCrew[crewId]);
-  const [note, setNote] = useState("");
+  const [note, setNote, clearNote] = useDraft(`radar:note:${crewId}`);
   const [calling, setCalling] = useState(false);
 
   useEffect(() => {
@@ -129,7 +130,7 @@ export function RadarSection({ crewId }: { crewId: string }) {
               callCrew(crewId, note.trim())
                 .then(() => {
                   haptic.confirmed();
-                  setNote("");
+                  clearNote();
                   showToast({ message: i18n.t("radar.sent") });
                 })
                 .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))

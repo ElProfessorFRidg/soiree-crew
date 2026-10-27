@@ -24,6 +24,7 @@ import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { guarded } from "@/vault/vault";
+import { useDraft } from "@/state/drafts";
 
 function errorMessage(error: unknown, i18n: Translator): string {
   if (error instanceof ApiError && error.failure.kind === "http") {
@@ -160,7 +161,7 @@ export default function CrewScreen() {
   const crews = useCrewData((state) => state.crews);
   const parties = useCrewData((state) => state.parties);
   const hourCycle = useAppStore((state) => state.preferences.hourCycle);
-  const [crewName, setCrewName] = useState("");
+  const [crewName, setCrewName, clearCrewName] = useDraft("crew:name");
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState<"create" | "join" | null>(null);
 
@@ -257,7 +258,7 @@ export default function CrewScreen() {
             createCrew(crewName.trim())
               .then(() => {
                 haptic.confirmed();
-                setCrewName("");
+                clearCrewName();
               })
               .catch((error: unknown) => showToast({ tone: "danger", message: errorMessage(error, i18n) }))
               .finally(() => setBusy(null));

@@ -11,13 +11,14 @@ import { Panel, Segmented } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { useDraft } from "@/state/drafts";
 
 /** N-08: a venue is placed where the user stands; no address search, no third-party geocoder. */
 export default function AddVenueScreen() {
   const i18n = useT();
   const theme = useTheme();
   const { crewId } = useLocalSearchParams<{ crewId: string }>();
-  const [name, setName] = useState("");
+  const [name, setName, clearName] = useDraft("add-venue:name");
   const [kind, setKind] = useState<VenueKind>("bar");
   const [position, setPosition] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -47,6 +48,7 @@ export default function AddVenueScreen() {
             addVenue(crewId, { name: name.trim(), kind, ...position })
               .then(() => {
                 haptic.confirmed();
+                clearName();
                 router.back();
               })
               .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))

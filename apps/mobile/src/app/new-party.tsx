@@ -15,6 +15,7 @@ import { Screen } from "@/ui/Screen";
 import { Stepper } from "@/ui/Stepper";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { useDraft } from "@/state/drafts";
 
 const MOODS: readonly PartyMood[] = ["party", "birthday", "champagne", "sunset", "costume", "wine", "fire", "night", "home", "tropical"];
 const STEP_MIN = 30;
@@ -42,7 +43,7 @@ export default function NewPartyScreen() {
   const minutesNow = Math.floor((Date.now() - nightBase) / 60_000);
   const [crewId, setCrewId] = useState(params.crewId ?? crews[0]?.id ?? "");
   const [mood, setMood] = useState<PartyMood>("party");
-  const [name, setName] = useState("");
+  const [name, setName, clearName] = useDraft("new-party:name");
   const [kind, setKind] = useState<"party" | "trip">("party");
   const [dayOffset, setDayOffset] = useState(0);
   // Minutes after midnight of the start day; the end may run past midnight.
@@ -96,6 +97,7 @@ export default function NewPartyScreen() {
                 // N-03: the call becomes the party, and everyone who said "in" is going.
                 if (params.outCallId) await linkCallToParty(params.outCallId, party.id).catch(() => undefined);
                 haptic.confirmed();
+                clearName();
                 router.replace({ pathname: "/live", params: { id: party.id } });
               })
               .catch((error: unknown) => {
