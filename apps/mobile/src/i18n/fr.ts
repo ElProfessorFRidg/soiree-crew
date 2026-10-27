@@ -1239,6 +1239,10 @@ export const fr = {
     limitsBody: "La fatigue, les médicaments, un estomac plus ou moins plein, ta propre vitesse d'élimination : tout ça change le vrai taux, parfois beaucoup.",
     breath: "Un éthylotest mesure l'air expiré à un instant donné. L'app estime à partir de ce que tu notes : elle peut se tromper, dans les deux sens. Ne prends jamais le volant sur cette base.",
   },
+  nudge: {
+    body: "Rien de noté depuis un moment. Un verre oublié, de l'eau, ou rien du tout ?",
+    nothing: "Rien, tout est à jour",
+  },
   addDrink: {
     quick: "Tape ce que tu bois",
     quickPlaceholder: "2 pintes et un shot",

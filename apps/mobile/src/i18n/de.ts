@@ -1239,6 +1239,10 @@ export const de: Messages = {
     limitsBody: "Müdigkeit, Medikamente, wie voll der Magen ist, dein eigener Abbau: all das ändert den echten Wert, manchmal stark.",
     breath: "Ein Alkoholtester misst die Atemluft in einem Moment. Die App schätzt aus deinen Einträgen: sie kann sich in beide Richtungen irren. Fahr nie auf dieser Grundlage.",
   },
+  nudge: {
+    body: "Seit einer Weile nichts eingetragen. Ein vergessenes Getränk, Wasser oder nichts?",
+    nothing: "Nichts, alles ist aktuell",
+  },
   addDrink: {
     quick: "Tipp ein, was du trinkst",
     quickPlaceholder: "2 Bier und ein Shot",

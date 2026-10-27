@@ -58,6 +58,8 @@ export interface AppState {
   barHave: string[];
   /** JOY-05: the sound pack, off until switched on. */
   soundsOn: boolean;
+  /** QOL-32: when the logging nudge was last answered. */
+  nudgeDismissedAt: number | null;
 }
 
 export const useAppStore = create<AppState>()(
@@ -88,6 +90,7 @@ export const useAppStore = create<AppState>()(
       privacySummarySeen: false,
       barHave: [],
       soundsOn: false,
+      nudgeDismissedAt: null,
     }),
     {
       name: "crew-app-v1",

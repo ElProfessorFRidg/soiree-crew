@@ -1240,6 +1240,10 @@ export const pt: Messages = {
     limitsBody: "O cansaço, os medicamentos, o estômago mais ou menos cheio, a tua velocidade de eliminação: tudo muda a taxa real, às vezes muito.",
     breath: "Um alcoolímetro mede o ar expirado num momento. A app estima a partir do que registas: pode errar para os dois lados. Nunca conduzas com base nela.",
   },
+  nudge: {
+    body: "Há algum tempo que não registas nada. Um copo esquecido, água ou nada?",
+    nothing: "Nada, está tudo em dia",
+  },
   addDrink: {
     quick: "Escreve o que estás a beber",
     quickPlaceholder: "2 cocktails e 1 shot",

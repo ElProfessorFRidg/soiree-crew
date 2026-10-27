@@ -1241,6 +1241,10 @@ export const en: Messages = {
     limitsBody: "Tiredness, medication, how full your stomach is, your own elimination speed: all of these change the real level, sometimes a lot.",
     breath: "A breathalyser measures your breath at one moment. The app estimates from what you log: it can be wrong either way. Never drive on the strength of it.",
   },
+  nudge: {
+    body: "Nothing logged for a while. A drink you forgot, some water, or nothing at all?",
+    nothing: "Nothing, it's all up to date",
+  },
   addDrink: {
     quick: "Type what you're drinking",
     quickPlaceholder: "2 pints and a shot",

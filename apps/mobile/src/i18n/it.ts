@@ -1240,6 +1240,10 @@ export const it: Messages = {
     limitsBody: "Stanchezza, farmaci, stomaco più o meno pieno, la tua velocità di eliminazione: tutto cambia il tasso reale, a volte di molto.",
     breath: "Un etilometro misura l'aria espirata in un momento. L'app stima da quello che segni: può sbagliare in tutti e due i sensi. Non guidare mai basandoti su di lei.",
   },
+  nudge: {
+    body: "Niente segnato da un po'. Un bicchiere dimenticato, acqua o niente?",
+    nothing: "Niente, è tutto aggiornato",
+  },
   addDrink: {
     quick: "Scrivi cosa bevi",
     quickPlaceholder: "2 pinte e uno shot",

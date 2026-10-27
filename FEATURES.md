@@ -277,7 +277,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-29 | P0 | Backstage (near Systeme.dc.html) | proposed | Invite survives the install: a friend who installs from an invite link lands in the right crew or party (Play Install Referrer; invite code plus system Paste button on iOS), with a rich preview that leaks no private data. Source: polish.md §2.4 R11, §5. |
 | QOL-30 | P0 | Backstage (near Reglages.dc.html) | proposed | Notification taxonomy and per-party mute: fixed channel list designed before v1 (six at most), one thread per party, at most 3 actions, "Mute this party until morning" on every party notification, bursts merged in place. Source: polish.md §2.3, §3 decisions 5 and 6, §5. |
 | QOL-31 | P1 | Backstage (near Reglages.dc.html) | proposed | Night-aware delivery: after midnight, crew members not at the party get non-safety notifications passively, with a morning digest; safety is never muted. Source: polish.md §5. |
-| QOL-32 | P1 | Backstage (near Soiree.dc.html) | proposed | Logging nudge during a party: when nothing has been logged for a while, a quiet prompt offering same again, water or nothing; never a push to drink; rate-limited. Renumbered from app.md QOL-25. Source: app.md §2.3 B, §5. |
+| QOL-32 | P1 | Backstage (near Soiree.dc.html) | build | Logging nudge during a party: when nothing has been logged for a while, a quiet prompt offering same again, water or nothing; never a push to drink; rate-limited. Renumbered from app.md QOL-25. Source: app.md §2.3 B, §5. |
 
 ## Delight
 

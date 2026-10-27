@@ -94,6 +94,38 @@ function LivingBackground({ mine, level }: { mine: number; level: number }) {
   return <BubbleField drinks={mine + others} mood={(live?.party.mood as PartyMood | undefined) ?? "party"} level={level} />;
 }
 
+const NUDGE_AFTER_MS = 75 * 60_000;
+const NUDGE_EVERY_MS = 90 * 60_000;
+
+/**
+ * QOL-32: during a live party, after a long while with nothing logged, a quiet line offering the
+ * same again, water, or nothing. It is a reminder to keep the count right, never a push to drink.
+ */
+function LoggingNudge({ i18n, tonight, now, onAgain, onWater, againLabel }: { i18n: Translator; tonight: ReturnType<typeof useTonight>; now: number; onAgain: () => void; onWater: () => void; againLabel: string }) {
+  const live = useLiveParty();
+  const dismissedAt = useAppStore((state) => state.nudgeDismissedAt);
+  if (!live || live.party.startsAt > now) return null;
+  const last = Math.max(live.party.startsAt, ...tonight.drinks.map((d) => d.consumedAt), ...tonight.water.map((w) => w.at));
+  if (now - last < NUDGE_AFTER_MS || (dismissedAt !== null && now - dismissedAt < NUDGE_EVERY_MS)) return null;
+  const dismiss = () => useAppStore.setState({ nudgeDismissedAt: Date.now() });
+  return (
+    <Panel>
+      <Text>{i18n.t("nudge.body")}</Text>
+      <View style={styles.actions}>
+        <Button label={againLabel} variant="secondary" height={48} style={styles.flex} onPress={() => {
+            onAgain();
+            dismiss();
+          }} />
+        <Button label={i18n.t("party.waterShort")} variant="water" height={48} style={styles.flex} onPress={() => {
+            onWater();
+            dismiss();
+          }} />
+      </View>
+      <Button label={i18n.t("nudge.nothing")} variant="outline" height={44} onPress={dismiss} />
+    </Panel>
+  );
+}
+
 /** The standing notice, and one tap to how the estimate is made (O-86). */
 function EstimateNotice({ i18n }: { i18n: Translator }) {
   return (
@@ -189,6 +221,7 @@ export function PartyScreen() {
         <UnwellBanner />
         <VaultPrompt />
         <EcoNotice />
+        <LoggingNudge i18n={i18n} tonight={tonight} now={now} onAgain={onAgain} onWater={onWater} againLabel={again.label} />
         <TravelPrompt />
         {level === 0 ? <LevelZero {...common} /> : null}
         {level === 1 ? <LevelOne {...common} /> : null}
