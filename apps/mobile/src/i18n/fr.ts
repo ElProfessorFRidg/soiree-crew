@@ -1475,12 +1475,27 @@ export const fr = {
   },
   cheers: {
     title: "Trinquer",
-    clink: "Tchin \u0001",
+    clink: "Tchin !",
     with: "Tchin avec {name}",
     waiting: "Choc reçu, on attend l'autre téléphone…",
     how: "Cogne doucement ton téléphone contre celui d'un pote du crew, en même temps.",
     proof: "Même bar : les deux check-ins sont confirmés.",
     tap: "Tchin à la main (appuie en même temps)",
+  },
+  stickers: {
+    lines: {
+      cheers: "Tchin !",
+      lastOne: "Le dernier, promis",
+      whoComes: "Qui vient ?",
+      home: "Je rentre",
+      myRound: "Ma tournée",
+      water: "Un verre d'eau",
+    },
+    title: "Autocollants du crew",
+    share: "Partager l'autocollant",
+    who: "Qui",
+    what: "Quoi",
+    howTo: "Dans WhatsApp, ouvre l'image partagée et choisis « Créer un autocollant ».",
   },
   addDrink: {
     quick: "Tape ce que tu bois",

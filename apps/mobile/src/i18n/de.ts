@@ -1482,6 +1482,21 @@ export const de: Messages = {
     proof: "Gleiche Bar: beide Check-ins sind bestätigt.",
     tap: "Per Tippen anstoßen (gleichzeitig)",
   },
+  stickers: {
+    lines: {
+      cheers: "Prost!",
+      lastOne: "Das letzte, versprochen",
+      whoComes: "Wer kommt?",
+      home: "Ich geh heim",
+      myRound: "Meine Runde",
+      water: "Ein Glas Wasser",
+    },
+    title: "Crew-Sticker",
+    share: "Sticker teilen",
+    who: "Wer",
+    what: "Was",
+    howTo: "Öffne in WhatsApp das geteilte Bild und wähle „Sticker erstellen“.",
+  },
   addDrink: {
     quick: "Tipp ein, was du trinkst",
     quickPlaceholder: "2 Bier und ein Shot",

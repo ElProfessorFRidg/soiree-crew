@@ -5,8 +5,8 @@ Generated from FEATURES.md on 2026-10-27 by `pnpm status`. Edit FEATURES.md, not
 | Status | Count |
 |---|---|
 | Built | 293 |
-| Partly built | 5 |
-| To do | 5 |
+| Partly built | 7 |
+| To do | 3 |
 | Proposed (not in the brief yet) | 6 |
 | Total | 309 |
 
@@ -14,15 +14,15 @@ Generated from FEATURES.md on 2026-10-27 by `pnpm status`. Edit FEATURES.md, not
 
 - **O-33** (P0, Widgets): iOS and Android home-screen widget in 3 sizes: live curve that falls on its own, back-to-zero, interactive but
 - **HUB-03** (P0, Party hub): Lock-screen widgets (BAC, next water, who is out tonight).
+- **QOL-06** (P0, Everyday polish): Native sharing: recap and story cards go straight to Instagram Stories, Snapchat (Creative Kit), TikTok and Wh
 - **QOL-22** (P2, Everyday polish): Last ride home: after midnight, the last night bus / metro departures near the venue on the Party screen, when
 - **QOL-27** (P0, Everyday polish): Discreet lock screen: by default lock screen, Live Activity, widget and notifications show no BAC figure or drink count (level icon and time to zero only); numb
 - **QOL-29** (P0, Everyday polish): Invite survives the install: a friend who installs from an invite link lands in the right crew or party (Play Install Referrer; invite code plus system Paste bu
+- **JOY-10** (P2, Delight): Sticker packs (iMessage / WhatsApp) made from crew avatars and moments.
 
 ## To do
 
 - **HUB-04** (P2, Party hub): Smartwatch: BAC, add drink and water from the wrist.
-- **QOL-06** (P0, Everyday polish): Native sharing: recap and story cards go straight to Instagram Stories, Snapchat (Creative Kit), TikTok and Wh
-- **JOY-10** (P2, Delight): Sticker packs (iMessage / WhatsApp) made from crew avatars and moments.
 - **MOT-11** (P1, Motion): Animated widgets and Live Activity, within each OS's limits.
 - **SLOP-06** (P1, Anti-slop (process)): Crew panel: before each release, the friends read the copy and the cards. Anything that "sounds like AI" or "d
 

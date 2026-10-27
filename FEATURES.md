@@ -254,7 +254,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-03 | P0 | Systeme.dc.html | build | Actionable notifications: answer "On my way" / "Not tonight" to "who's in?", add a drink, confirm a round or a... |
 | QOL-04 | P0 | Systeme.dc.html | build | System shortcuts for a drunk thumb: Siri / App Intents and Android App Actions ("Hey Siri, add a beer"), iPhon... |
 | QOL-05 | P0 | Systeme.dc.html | build | Deep links and universal links for every party, venue, profile, crew invite, recap and game card. Links pasted... |
-| QOL-06 | P0 | Soiree.dc.html | todo | Native sharing: recap and story cards go straight to Instagram Stories, Snapchat (Creative Kit), TikTok and Wh... |
+| QOL-06 | P0 | Soiree.dc.html | partial | Native sharing: recap and story cards go straight to Instagram Stories, Snapchat (Creative Kit), TikTok and Wh... |
 | QOL-07 | P0 | Etats.dc.html | build | Typed content is never lost: drafts (party name, review, expense, card) survive the app being killed, errors a... |
 | QOL-08 | P0 | Arrivee.dc.html | build | Forms done right: the right keyboard per field (numeric pad with the locale's decimal separator for amounts, e... |
 | QOL-09 | P0 | Etats.dc.html | build | Photos: compressed before upload, background upload with progress and retry, HEIC accepted, location metadata ... |
@@ -295,7 +295,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | JOY-07 | P1 | Reglages.dc.html | build | Easter eggs: a handful of hidden interactions (tap the logo ten times, shake on the recap...), documented only... |
 | JOY-08 | P1 | Radar.dc.html | build | Milestones: 10th, 50th, 100th night out together, crew anniversary, first venue conquered. Milestones count ni... |
 | JOY-09 | P1 | Recap.dc.html | build | Photo booth: at the end of a party, an automatic photo strip from the shared album, ready for stories. |
-| JOY-10 | P2 | Reglages.dc.html | todo | Sticker packs (iMessage / WhatsApp) made from crew avatars and moments. |
+| JOY-10 | P2 | Reglages.dc.html | partial | Sticker packs (iMessage / WhatsApp) made from crew avatars and moments. |
 | JOY-11 | P1 | Profil.dc.html | build | Member card: a shareable profile card with titles, venues ruled, favourite drink, nights out. |
 | JOY-12 | P1 | Soiree.dc.html | build | Dare of the night on the Party screen, different every night, taken from the crew's own cards when they exist ... |
 

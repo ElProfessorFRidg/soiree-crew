@@ -1484,6 +1484,21 @@ export const en: Messages = {
     proof: "Same bar: both check-ins are confirmed.",
     tap: "Tap to cheers (both at once)",
   },
+  stickers: {
+    lines: {
+      cheers: "Cheers!",
+      lastOne: "Last one, promise",
+      whoComes: "Who's coming?",
+      home: "Heading home",
+      myRound: "My round",
+      water: "Glass of water",
+    },
+    title: "Crew stickers",
+    share: "Share the sticker",
+    who: "Who",
+    what: "What",
+    howTo: "In WhatsApp, open the shared image and pick “Create sticker”.",
+  },
   addDrink: {
     quick: "Type what you're drinking",
     quickPlaceholder: "2 pints and a shot",

@@ -1483,6 +1483,21 @@ export const pt: Messages = {
     proof: "Mesmo bar: os dois check-ins ficam confirmados.",
     tap: "Brindar com um toque (ao mesmo tempo)",
   },
+  stickers: {
+    lines: {
+      cheers: "Saúde!",
+      lastOne: "O último, prometo",
+      whoComes: "Quem vem?",
+      home: "Vou para casa",
+      myRound: "Esta rodada é minha",
+      water: "Um copo de água",
+    },
+    title: "Autocolantes do crew",
+    share: "Partilhar o autocolante",
+    who: "Quem",
+    what: "O quê",
+    howTo: "No WhatsApp, abre a imagem partilhada e escolhe «Criar figurinha».",
+  },
   addDrink: {
     quick: "Escreve o que estás a beber",
     quickPlaceholder: "2 cocktails e 1 shot",

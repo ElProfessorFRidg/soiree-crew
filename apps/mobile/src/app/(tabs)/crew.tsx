@@ -158,6 +158,12 @@ function CrewCard({ crew }: { crew: Crew }) {
         onPress={() => router.push({ pathname: "/feed", params: { crewId: crew.id } })}
       />
       <Row
+        title={i18n.t("stickers.title")}
+        leading={<Icon name="image" color={theme.textMuted} />}
+        trailing={<Icon name="chev" color={theme.textMuted} />}
+        onPress={() => router.push({ pathname: "/stickers", params: { crewId: crew.id } })}
+      />
+      <Row
         title={i18n.t("polls.title")}
         leading={<Icon name="cal" color={theme.textMuted} />}
         trailing={<Icon name="chev" color={theme.textMuted} />}
