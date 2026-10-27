@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "NSLocationWhenInUseUsageDescription": "A tua localização serve para fazer check-in num bar com a tua crew e para a partilhares durante uma festa, se ativares essa opção. É verificada e depois apagada.",
+    "NSCameraUsageDescription": "A câmara serve para adicionar fotos ao álbum da festa, que só a tua crew vê.",
+    "NSPhotoLibraryUsageDescription": "As tuas fotos servem para encher o álbum da festa, que só a tua crew vê. A localização delas é removida."
+  }
+}

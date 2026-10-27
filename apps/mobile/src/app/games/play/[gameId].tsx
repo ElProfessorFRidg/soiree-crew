@@ -2,6 +2,7 @@ import { Redirect, useLocalSearchParams } from "expo-router";
 import { contentFor } from "@crew/games";
 import { GameUiProvider } from "@/games/GameUiProvider";
 import { GAME_SCREENS } from "@/games/play";
+import { deckLanguage } from "@/games/i18n";
 import { startSession, useGamesStore } from "@/games/store";
 import { useAppStore } from "@/state/store";
 
@@ -17,7 +18,7 @@ export default function GamePlayRoute() {
   return (
     <GameUiProvider>
       {/* A new session id remounts the game: "Play again" starts from a clean state. */}
-      <Game key={session.id} session={session} content={contentFor(language)} onAgain={() => startSession(session.gameId)} />
+      <Game key={session.id} session={session} content={contentFor(deckLanguage(language))} onAgain={() => startSession(session.gameId)} />
     </GameUiProvider>
   );
 }

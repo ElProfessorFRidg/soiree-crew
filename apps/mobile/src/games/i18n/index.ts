@@ -1,16 +1,21 @@
 import { useMemo } from "react";
 import type { UiLanguage } from "@crew/units";
 import { useAppStore } from "@/state/store";
+import { de } from "./de";
 import { en } from "./en";
+import { es } from "./es";
 import { fr } from "./fr";
+import { it } from "./it";
+import { pt } from "./pt";
+import { ru } from "./ru";
 import type { GameMessageKey, GameMessages, GamePluralKey, PluralForms } from "./types";
 
 export type { GameMessageKey, GamePluralKey } from "./types";
 
 // Same lookup, plural and interpolation rules as src/i18n/index.tsx, on the games catalogues.
 
-const catalogs: Record<UiLanguage, GameMessages> = { fr, en };
-const localeTags: Record<UiLanguage, string> = { fr: "fr-FR", en: "en-US" };
+const catalogs: Record<UiLanguage, GameMessages> = { fr, en, es, it, de, pt, ru };
+export const localeTags: Record<UiLanguage, string> = { fr: "fr-FR", en: "en-GB", es: "es-ES", it: "it-IT", de: "de-DE", pt: "pt-PT", ru: "ru-RU" };
 
 type Params = Record<string, string | number>;
 
@@ -50,7 +55,7 @@ export function createGameTranslator(language: UiLanguage): GameTranslator {
     plural(key, count, params) {
       const forms = lookup(messages, key) as PluralForms | undefined;
       if (!forms) return key;
-      return interpolate(rules.select(count) === "one" ? forms.one : forms.other, { count, ...params }, format);
+      return interpolate(forms[rules.select(count)] ?? forms.other, { count, ...params }, format);
     },
   };
 }
@@ -59,4 +64,13 @@ export function createGameTranslator(language: UiLanguage): GameTranslator {
 export function useGameT(): GameTranslator {
   const language = useAppStore((s) => s.preferences.language);
   return useMemo(() => createGameTranslator(language), [language]);
+}
+
+/**
+ * O-65: the decks are written in French and English only (500+ cards each, never
+ * machine-translated). Other interface languages play with the English decks,
+ * and the catalogue says so.
+ */
+export function deckLanguage(language: UiLanguage): "fr" | "en" {
+  return language === "fr" ? "fr" : "en";
 }

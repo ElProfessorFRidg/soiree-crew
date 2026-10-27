@@ -1,6 +1,6 @@
 import type { fr } from "./fr";
 
-type Widen<T> = T extends string ? string : { [K in keyof T]: Widen<T[K]> };
+type Widen<T> = T extends string ? string : T extends { one: string; other: string } ? PluralForms : { [K in keyof T]: Widen<T[K]> };
 
 /** French is the reference shape; the English catalogue must have the same keys. */
 export type GameMessages = Widen<typeof fr>;
@@ -8,6 +8,11 @@ export type GameMessages = Widen<typeof fr>;
 export interface PluralForms {
   one: string;
   other: string;
+  /** CLDR categories some languages need: Russian uses few and many. */
+  zero?: string;
+  two?: string;
+  few?: string;
+  many?: string;
 }
 
 type Join<K, P> = K extends string ? (P extends string ? `${K}.${P}` : never) : never;

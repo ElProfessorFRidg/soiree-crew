@@ -896,6 +896,11 @@ export const en: Messages = {
   languages: {
     fr: "Français",
     en: "English",
+    es: "Español",
+    it: "Italiano",
+    de: "Deutsch",
+    pt: "Português",
+    ru: "Русский",
   },
   countries: {
     FR: "France",

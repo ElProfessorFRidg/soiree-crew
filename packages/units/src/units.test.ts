@@ -106,10 +106,15 @@ describe("smart defaults (PREF-02, PREF-04)", () => {
     });
   });
   it("unknown language falls back to English, unknown region to France", () => {
-    expect(defaultPreferences({ languageTags: ["de-AT"], region: "AT", uses24HourClock: true })).toMatchObject({
+    expect(defaultPreferences({ languageTags: ["nl-AT"], region: "AT", uses24HourClock: true })).toMatchObject({
       language: "en",
       legalCountry: "FR",
     });
+  });
+  it("picks any of the seven interface languages from the phone (O-09)", () => {
+    expect(defaultPreferences({ languageTags: ["de-AT"], region: "AT", uses24HourClock: true }).language).toBe("de");
+    expect(defaultPreferences({ languageTags: ["pt-PT"], region: "PT", uses24HourClock: true }).language).toBe("pt");
+    expect(defaultPreferences({ languageTags: ["ru"], region: null, uses24HourClock: true }).language).toBe("ru");
   });
 });
 

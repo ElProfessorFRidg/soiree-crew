@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "NSLocationWhenInUseUsageDescription": "Mit deinem Standort checkst du mit deiner Crew in einer Bar ein und teilst ihn während eines Abends, wenn du das aktivierst. Er wird geprüft und danach gelöscht.",
+    "NSCameraUsageDescription": "Mit der Kamera fügst du Fotos zum Album des Abends hinzu. Nur deine Crew sieht sie.",
+    "NSPhotoLibraryUsageDescription": "Mit deinen Fotos füllst du das Album des Abends. Nur deine Crew sieht sie. Ihr Standort wird entfernt."
+  }
+}

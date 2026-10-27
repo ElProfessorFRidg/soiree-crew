@@ -41,4 +41,23 @@ describe("fuzzy input (ADP-05)", () => {
     expect(parseOrder("trois cocktails", drinks)).toEqual([{ quantity: 3, value: "cocktail" }]);
     expect(parseOrder("bonjour", drinks)).toEqual([]);
   });
+
+  it("reads orders in the other interface languages, Cyrillic included", () => {
+    const local = [
+      { value: "pint", names: ["Pinte", "Pint", "Caña", "Großes Bier", "Пинта"] },
+      { value: "shot", names: ["Shot", "Chupito", "Шот"] },
+    ];
+    expect(parseOrder("dos cañas y un chupito", local)).toEqual([
+      { quantity: 2, value: "pint" },
+      { quantity: 1, value: "shot" },
+    ]);
+    expect(parseOrder("zwei große Bier und ein Shot", local)).toEqual([
+      { quantity: 2, value: "pint" },
+      { quantity: 1, value: "shot" },
+    ]);
+    expect(parseOrder("две пинты и шот", local)).toEqual([
+      { quantity: 2, value: "pint" },
+      { quantity: 1, value: "shot" },
+    ]);
+  });
 });

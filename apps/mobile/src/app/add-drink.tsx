@@ -260,8 +260,9 @@ function QuickType({ presets, consumedAt, withFood, onPick }: { presets: DrinkPr
   const i18n = useT();
   const [text, setText] = useState("");
   const candidates = useMemo(
-    () => presets.map((p) => ({ value: p.id, names: p.kind === "custom" ? [p.name ?? ""] : [drinkLabel(p, FR), drinkLabel(p, EN)] })),
-    [presets],
+    // The user's own language first, then French and English, so any of them is understood.
+    () => presets.map((p) => ({ value: p.id, names: p.kind === "custom" ? [p.name ?? ""] : [drinkLabel(p, i18n), drinkLabel(p, FR), drinkLabel(p, EN)] })),
+    [presets, i18n],
   );
   const order = useMemo(() => (text.trim() ? parseOrder(text, candidates) : []), [text, candidates]);
   const suggestions = useMemo(() => (text.trim() && !order.length ? search(text, candidates, 4) : []), [text, order, candidates]);

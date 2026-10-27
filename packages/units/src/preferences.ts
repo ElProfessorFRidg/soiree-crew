@@ -1,8 +1,9 @@
 import type { BacUnit } from "./bac";
 import { COUNTRIES, countryRules, FALLBACK_COUNTRY, type DriverCategory, type UnitSystem } from "./countries";
 
-export type UiLanguage = "fr" | "en";
-export const UI_LANGUAGES: readonly UiLanguage[] = ["fr", "en"];
+export type UiLanguage = "fr" | "en" | "es" | "it" | "de" | "pt" | "ru";
+/** O-09: French and English are written first; the others follow them. */
+export const UI_LANGUAGES: readonly UiLanguage[] = ["fr", "en", "es", "it", "de", "pt", "ru"];
 
 /**
  * Server-side settings (PREF-01). Language, legal country and units are
@@ -46,7 +47,7 @@ export interface DeviceLocale {
 function pickLanguage(tags: readonly string[]): UiLanguage {
   for (const tag of tags) {
     const base = tag.toLowerCase().split(/[-_]/)[0];
-    if (base === "fr" || base === "en") return base;
+    if (base && (UI_LANGUAGES as readonly string[]).includes(base)) return base as UiLanguage;
   }
   return "en";
 }

@@ -30,7 +30,7 @@ export const profileSchema = z.object({
 
 export const preferencesPatchSchema = z
   .object({
-    language: z.enum(["fr", "en"]),
+    language: z.enum(["fr", "en", "es", "it", "de", "pt", "ru"]),
     legalCountry: z.string().min(2).max(8),
     driverCategory: z.enum(["standard", "novice", "professional"]),
     unitSystem: z.enum(["metric", "us_customary", "uk_imperial"]),

@@ -8,7 +8,8 @@ export function normalise(text: string): string {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9 ]+/g, " ")
+    // Letters and digits of any script stay (Cyrillic included); the rest is a word break.
+    .replace(/[^\p{L}\p{N} ]+/gu, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -77,10 +78,19 @@ export function search<T>(query: string, candidates: readonly Candidate<T>[], li
 }
 
 const NUMBER_WORDS: Record<string, number> = {
-  un: 1, une: 1, a: 1, an: 1, one: 1,
-  deux: 2, two: 2, trois: 3, three: 3, quatre: 4, four: 4, cinq: 5, five: 5, six: 6,
+  // fr, en
+  un: 1, une: 1, a: 1, an: 1, one: 1, deux: 2, two: 2, trois: 3, three: 3, quatre: 4, four: 4, cinq: 5, five: 5, six: 6,
+  // es, it, pt
+  uno: 1, una: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6, due: 2, tre: 3, quattro: 4, sei: 6, um: 1, uma: 1, dois: 2, duas: 2,
+  // de (accents already folded: funf)
+  ein: 1, eine: 1, einen: 1, zwei: 2, drei: 3, vier: 4, funf: 5, sechs: 6,
+  // ru (normalise turns й into и)
+  один: 1, одна: 1, одну: 1, два: 2, две: 2, три: 3, четыре: 4, пять: 5, шесть: 6,
 };
-const JOINERS = new Set(["et", "and", "puis", "then", "plus", "avec", "with", "de", "des", "of"]);
+const JOINERS = new Set([
+  "et", "and", "puis", "then", "plus", "avec", "with", "de", "des", "of",
+  "y", "e", "con", "und", "mit", "и", "с", "da", "di", "del",
+]);
 
 /**
  * "2 pintes et un shoot" → [{ quantity: 2, value: pint }, { quantity: 1, value: shot }].

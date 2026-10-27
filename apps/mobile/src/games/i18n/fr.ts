@@ -18,6 +18,7 @@ export const fr = {
     playerRange: "{min} à {max} joueurs",
     typical: "Partie type ici : {minutes} min",
     locked: "Verrouillé",
+    cardsInEnglish: "Les cartes sont en anglais pour l'instant.",
   },
   tags: {
     group: "Groupe",

@@ -20,6 +20,7 @@ export const en: GameMessages = {
     playerRange: "{min} to {max} players",
     typical: "Usually {minutes} min here",
     locked: "Locked",
+    cardsInEnglish: "The cards are in English for now.",
   },
   tags: {
     group: "Group",

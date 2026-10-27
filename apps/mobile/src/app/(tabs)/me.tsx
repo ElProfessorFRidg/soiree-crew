@@ -3,7 +3,7 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { duration } from "@crew/design-tokens";
-import { COUNTRIES, countryRules, drivingLimit, formatBacValue, breathRatio, type BacUnit, type UiLanguage } from "@crew/units";
+import { COUNTRIES, countryRules, drivingLimit, formatBacValue, breathRatio, type BacUnit, UI_LANGUAGES } from "@crew/units";
 import { useT } from "@/i18n";
 import { AccountSection } from "@/profile/AccountSection";
 import { ProfileFields, type ProfileDraft } from "@/profile/ProfileFields";
@@ -11,7 +11,7 @@ import { draftFromProfile, saveProfile } from "@/profile/saveProfile";
 import { useAppStore } from "@/state/store";
 import { setPreferences } from "@/state/preferences";
 import { useTheme } from "@/theme";
-import { Chip, Panel, Row, Segmented, Switch } from "@/ui/controls";
+import { Chip, Panel, Row, Switch } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
@@ -116,15 +116,11 @@ export default function MeScreen() {
 
       <Panel>
         <Text variant="label">{i18n.t("profile.language")}</Text>
-        <Segmented<UiLanguage>
-          accessibilityLabel={i18n.t("profile.language")}
-          value={preferences.language}
-          items={[
-            { value: "fr", label: i18n.t("languages.fr") },
-            { value: "en", label: i18n.t("languages.en") },
-          ]}
-          onChange={(language) => setPreferences({ language })}
-        />
+        <View style={styles.chips} accessibilityRole="radiogroup" accessibilityLabel={i18n.t("profile.language")}>
+          {UI_LANGUAGES.map((language) => (
+            <Chip key={language} label={i18n.t(`languages.${language}`)} selected={preferences.language === language} onPress={() => setPreferences({ language })} />
+          ))}
+        </View>
       </Panel>
       <Row
         title={i18n.t("people.myProfile")}

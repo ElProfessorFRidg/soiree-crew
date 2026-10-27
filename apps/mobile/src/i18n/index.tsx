@@ -1,13 +1,18 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 import type { UiLanguage } from "@crew/units";
+import { de } from "./de";
 import { en } from "./en";
+import { es } from "./es";
 import { fr } from "./fr";
+import { it } from "./it";
+import { pt } from "./pt";
+import { ru } from "./ru";
 import type { MessageKey, Messages, PluralForms, PluralKey } from "./types";
 
 export type { MessageKey, PluralKey } from "./types";
 
-const catalogs: Record<UiLanguage, Messages> = { fr, en };
-const localeTags: Record<UiLanguage, string> = { fr: "fr-FR", en: "en-US" };
+const catalogs: Record<UiLanguage, Messages> = { fr, en, es, it, de, pt, ru };
+export const localeTags: Record<UiLanguage, string> = { fr: "fr-FR", en: "en-GB", es: "es-ES", it: "it-IT", de: "de-DE", pt: "pt-PT", ru: "ru-RU" };
 
 type Params = Record<string, string | number>;
 
@@ -58,7 +63,7 @@ export function createTranslator(language: UiLanguage): Translator {
       const forms = lookup(messages, key) as PluralForms | undefined;
       if (!forms) return key;
       const category = rules.select(count);
-      const template = category === "one" ? forms.one : forms.other;
+      const template = forms[category] ?? forms.other;
       return interpolate(template, { count, ...params }, formatParam);
     },
   };

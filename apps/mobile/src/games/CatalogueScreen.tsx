@@ -126,6 +126,7 @@ export function CatalogueScreen() {
           {g.t("catalogue.title")}
         </Text>
         {games.length > 0 ? <Text variant="small">{g.t("catalogue.position", { index: Math.min(index, games.length - 1) + 1, count: games.length })}</Text> : null}
+        {g.language !== "fr" && g.language !== "en" ? <Text variant="small">{g.t("catalogue.cardsInEnglish")}</Text> : null}
       </View>
       <View style={styles.padded}>
         <Segmented

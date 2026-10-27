@@ -88,7 +88,12 @@
     },
     "locales": {
       "fr": "./locales/fr.json",
-      "en": "./locales/en.json"
+      "en": "./locales/en.json",
+      "es": "./locales/es.json",
+      "it": "./locales/it.json",
+      "de": "./locales/de.json",
+      "pt": "./locales/pt.json",
+      "ru": "./locales/ru.json"
     }
   }
 }
