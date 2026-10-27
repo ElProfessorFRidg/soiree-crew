@@ -6,5 +6,7 @@ export default defineConfig({
     // Server tests boot a PGlite database per test: slow on a loaded machine, so give them room.
     testTimeout: 30_000,
     hookTimeout: 60_000,
+    // Each server file runs its own PGlite instances: a few at a time keeps memory and boot times sane.
+    maxWorkers: 4,
   },
 });

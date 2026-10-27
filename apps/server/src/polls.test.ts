@@ -152,3 +152,17 @@ describe("crew wrapped (N-15)", () => {
     expect(october.nights).toBe(0);
   });
 });
+
+describe("crew feed (N-31)", () => {
+  it("groups what happened, newest first", async () => {
+    const { users, crewId } = await crew("jade", "malik", "ines");
+    const [jade] = users as [User, User, User];
+    await app.inject({ method: "POST", url: `/v1/crews/${crewId}/polls`, headers: jade.auth, payload: { id: randomUUID(), title: "Vendredi", slots: [{ id: randomUUID(), startsAt: clock + HOUR, endsAt: clock + 5 * HOUR }] } });
+    const feed = (await app.inject({ method: "GET", url: `/v1/crews/${crewId}/feed`, headers: jade.auth })).json() as { items: { kind: string; userIds?: string[] }[] };
+    // Two arrivals the same day are one line.
+    const joined = feed.items.filter((i) => i.kind === "joined");
+    expect(joined).toHaveLength(1);
+    expect(joined[0]!.userIds).toHaveLength(3);
+    expect(feed.items.map((i) => i.kind)).toContain("poll");
+  });
+});
