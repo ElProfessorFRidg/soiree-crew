@@ -58,7 +58,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | O-33 | P0 | Systeme.dc.html | todo | iOS and Android home-screen widget in 3 sizes: live curve that falls on its own, back-to-zero, interactive but... |
-| O-34 | P0 | Soiree.dc.html | todo | In-app home blocks: real-time BAC up front, "Party in progress" block, continuous refresh. |
+| O-34 | P0 | Soiree.dc.html | build | In-app home blocks: real-time BAC up front, "Party in progress" block, continuous refresh. |
 
 ## Parties and trips
 
@@ -320,8 +320,8 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | MOT-03 | P0 | Soiree.dc.html | build | Adding a drink: glass filling up, bubbles, BAC digits rolling to the new value, dedicated haptic. It is the mo... |
 | MOT-04 | P0 | Soiree.dc.html | build | Curve: the trace draws itself, smooth colour change when crossing a threshold, clearly marked peak point (no d... |
 | MOT-05 | P0 | Backstage | todo | Screen transitions: shared elements (a friend's avatar flies from the list to their profile, a game card grows... |
-| MOT-06 | P0 | JeuxCartes.dc.html | todo | Card games: dealing, 3D flip, swipe, drawing, a card that trembles before a penalty. |
-| MOT-07 | P0 | JeuxAction.dc.html | todo | Game physics: roulette with real deceleration and haptic clicks, a bomb that shakes harder and harder then bur... |
+| MOT-06 | P0 | JeuxCartes.dc.html | build | Card games: dealing, 3D flip, swipe, drawing, a card that trembles before a penalty. |
+| MOT-07 | P0 | JeuxAction.dc.html | build | Game physics: roulette with real deceleration and haptic clicks, a bomb that shakes harder and harder then bur... |
 | MOT-08 | P0 | Recap.dc.html | build | Cinematic recap: story format, counters rolling, podium rising, curves drawing, badges dropping with confetti,... |
 | MOT-09 | P0 | Bars.dc.html | build | Venue map: takeover (crown dropping, the new boss's colour washing over the venue); venues where the crew is r... |
 | MOT-10 | P0 | Etats.dc.html | todo | Micro-interactions: buttons, toggles, custom pull-to-refresh, skeletons, illustrated and animated empty states... |
