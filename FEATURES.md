@@ -489,7 +489,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | SEC-10 | P0 | Backstage | build | Export compliance for encryption: App Store encryption questions, US export rules, and the French ANSSI declar... |
 | SEC-11 | P0 | Backstage | build | BAC computed on the device; drinks, weight and sex stored on the server only when the user shares with their crew, with a "local only" mode. Tension with server-authoritative scoring, see `research/open-decisions.md`. Source: security.md §2.8, §5. |
 | SEC-12 | P0 | Backstage | build | No health data in iCloud: local DB and backups excluded from iCloud device backup; the MSG-08 archive never in iCloud Drive (App Store 5.1.3(ii)). Source: security.md §1 item 4, §5. |
-| SEC-13 | P0 | Backstage | proposed | Export compliance file: classification memo, ANSSI declaration, App Store key, annual review. security.md allows merging it into SEC-10. Source: security.md §2.9, §5. |
+| SEC-13 | P0 | Backstage | build | Export compliance file: classification memo, ANSSI declaration, App Store key, annual review. security.md allows merging it into SEC-10. Source: security.md §2.9, §5. |
 | SEC-14 | P1 | Backstage | proposed | External audit of the `crew-crypto` integration crate before the public release. Source: security.md §2.1, A-SEC-2, §5. |
 
 ## Changes to existing IDs
