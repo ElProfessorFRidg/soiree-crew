@@ -151,6 +151,12 @@ export default function MeScreen() {
         onPress={() => router.push("/friends")}
       />
       <Row
+        title={i18n.t("myStats.title")}
+        leading={<Icon name="trophy" color={theme.textMuted} />}
+        trailing={<Icon name="chev" color={theme.textMuted} />}
+        onPress={() => router.push("/my-stats")}
+      />
+      <Row
         title={i18n.t("privacy.open")}
         leading={<Icon name="shield" color={theme.textMuted} />}
         trailing={<Icon name="chev" color={theme.textMuted} />}
