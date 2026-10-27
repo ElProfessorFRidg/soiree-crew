@@ -177,8 +177,8 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | N-01 | P0 | Radar.dc.html | build | Evening status in one gesture: Going out / Down if something happens / Chilling at home / Not available, with ... |
 | N-02 | P0 | Radar.dc.html | build | Crew board: who is out tonight, this weekend, this week, as a list and as a calendar. |
 | N-03 | P0 | Radar.dc.html | build | "I'm going out, who's in?": broadcast to the crew with quick replies, turns into a party (O-35) in one tap. |
-| N-04 | P1 | Radar.dc.html | todo | Outing polls: date slots (When2Meet style), place, plan; vote, close, event created automatically. |
-| N-05 | P1 | Radar.dc.html | todo | Recurring availability ("I usually go out on Thursdays") to suggest slots that suit everyone. |
+| N-04 | P1 | Radar.dc.html | build | Outing polls: date slots (When2Meet style), place, plan; vote, close, event created automatically. |
+| N-05 | P1 | Radar.dc.html | build | Recurring availability ("I usually go out on Thursdays") to suggest slots that suit everyone. |
 | N-06 | P1 | Radar.dc.html | build | Sync with the phone calendar (add event / ICS subscription) + reminders. |
 | N-07 | P0 | Soirees.dc.html | build | Live location shared ONLY during a party and ONLY when the person turns it on: ghost mode, auto-expiry, no loc... |
 
