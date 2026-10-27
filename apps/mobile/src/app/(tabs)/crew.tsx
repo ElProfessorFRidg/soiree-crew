@@ -241,6 +241,7 @@ export default function CrewScreen() {
   return (
     <Screen
       title={i18n.t("crew.tab")}
+      trailing={<IconButton icon="search" accessibilityLabel={i18n.t("search.title")} onPress={() => router.push("/search")} />}
       withToasts
       onRefresh={() => Promise.all([refreshCrews(), refreshParties(), ...crews.map((c) => refreshRadar(c.id))])}
     >

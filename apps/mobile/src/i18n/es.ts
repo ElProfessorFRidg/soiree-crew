@@ -987,6 +987,21 @@ export const es: Messages = {
     someone: "alguien",
     reactions: { one: "{count} reacción en el resumen de «{party}»", other: "{count} reacciones en el resumen de «{party}»" },
   },
+  search: {
+    group: {
+      venues: "Bares",
+      people: "Amigos",
+      drinks: "Bebidas",
+      games: "Juegos",
+    },
+    title: "Buscar",
+    label: "Bar, amigo, bebida o juego",
+    placeholder: "El Zinc, Malik, pinta...",
+    recent: "Búsquedas recientes",
+    ideas: "Para empezar",
+    none: "No hay nada, ni con errores de tecleo.",
+    tapToAdd: "Toca para añadirla",
+  },
   addDrink: {
     quick: "Escribe lo que bebes",
     quickPlaceholder: "2 cañas y un chupito",

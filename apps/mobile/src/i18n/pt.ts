@@ -987,6 +987,21 @@ export const pt: Messages = {
     someone: "alguém",
     reactions: { one: "{count} reação ao resumo de «{party}»", other: "{count} reações ao resumo de «{party}»" },
   },
+  search: {
+    group: {
+      venues: "Bares",
+      people: "Amigos",
+      drinks: "Bebidas",
+      games: "Jogos",
+    },
+    title: "Procurar",
+    label: "Bar, amigo, bebida ou jogo",
+    placeholder: "O Zinc, Malik, caneca...",
+    recent: "Pesquisas recentes",
+    ideas: "Para começar",
+    none: "Nada encontrado, nem com gralhas.",
+    tapToAdd: "Toca para adicionar",
+  },
   addDrink: {
     quick: "Escreve o que estás a beber",
     quickPlaceholder: "2 cocktails e 1 shot",

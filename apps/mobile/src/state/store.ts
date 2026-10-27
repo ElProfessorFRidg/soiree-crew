@@ -50,6 +50,8 @@ export interface AppState {
   checkUpdates: boolean;
   updateCheckedAt: number | null;
   latestRelease: { build: number; url: string } | null;
+  /** QOL-23: the last few searches, newest first, on this phone only. */
+  recentSearches: string[];
 }
 
 export const useAppStore = create<AppState>()(
@@ -76,6 +78,7 @@ export const useAppStore = create<AppState>()(
       checkUpdates: true,
       updateCheckedAt: null,
       latestRelease: null,
+      recentSearches: [],
     }),
     {
       name: "crew-app-v1",

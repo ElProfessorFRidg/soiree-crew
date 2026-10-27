@@ -986,6 +986,21 @@ export const fr = {
     someone: "quelqu'un",
     reactions: { one: "{count} réaction sur le récap de « {party} »", other: "{count} réactions sur le récap de « {party} »" },
   },
+  search: {
+    group: {
+      venues: "Bars",
+      people: "Potes",
+      drinks: "Boissons",
+      games: "Jeux",
+    },
+    title: "Chercher",
+    label: "Bar, pote, boisson ou jeu",
+    placeholder: "Le Zinc, Malik, pinte...",
+    recent: "Recherches récentes",
+    ideas: "Pour commencer",
+    none: "Rien trouvé, même avec une faute de frappe.",
+    tapToAdd: "Toucher pour l'ajouter",
+  },
   addDrink: {
     quick: "Tape ce que tu bois",
     quickPlaceholder: "2 pintes et un shot",

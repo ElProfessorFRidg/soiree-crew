@@ -165,6 +165,7 @@ export default function RootLayout() {
               <Stack.Screen name="wrapped" />
               <Stack.Screen name="my-stats" />
               <Stack.Screen name="feed" />
+              <Stack.Screen name="search" />
               <Stack.Screen name="morning" options={{ animation: "fade" }} />
               <Stack.Screen name="quick/[action]" options={{ animation: "none" }} />
               <Stack.Screen name="sos" options={{ presentation: "fullScreenModal", animation: "fade" }} />

@@ -1012,6 +1012,21 @@ export const ru: Messages = {
     someone: "кто-то",
     reactions: { one: "{count} реакция на итоги «{party}»", few: "{count} реакции на итоги «{party}»", many: "{count} реакций на итоги «{party}»", other: "{count} реакции на итоги «{party}»" },
   },
+  search: {
+    group: {
+      venues: "Бары",
+      people: "Друзья",
+      drinks: "Напитки",
+      games: "Игры",
+    },
+    title: "Поиск",
+    label: "Бар, друг, напиток или игра",
+    placeholder: "Цинк, Малик, пинта...",
+    recent: "Недавние запросы",
+    ideas: "Для начала",
+    none: "Ничего не нашлось, даже с опечатками.",
+    tapToAdd: "Нажми, чтобы добавить",
+  },
   addDrink: {
     quick: "Напиши, что пьёшь",
     quickPlaceholder: "2 пинты и шот",
