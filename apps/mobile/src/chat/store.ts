@@ -19,7 +19,7 @@ export interface Conversation {
 }
 
 export interface ChatMedia {
-  kind: "photo" | "voice";
+  kind: "photo" | "voice" | "video";
   blob: string;
   key: string;
   mime: string;

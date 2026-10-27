@@ -3,7 +3,7 @@ import { utf8 } from "./bytes";
 
 export type ChatPayload =
   | { t: "text"; id: string; body: string; reply?: string; mentions?: string[] }
-  | { t: "media"; id: string; kind: "photo" | "voice"; blob: string; key: string; mime: string; width?: number; height?: number; durationMs?: number; thumb?: string; reply?: string }
+  | { t: "media"; id: string; kind: "photo" | "voice" | "video"; blob: string; key: string; mime: string; width?: number; height?: number; durationMs?: number; thumb?: string; reply?: string }
   /** An empty emoji takes the reaction back. */
   | { t: "react"; id: string; target: string; emoji: string }
   | { t: "edit"; id: string; target: string; body: string }
@@ -35,7 +35,7 @@ export function readPayload(data: Uint8Array): ChatPayload | null {
       if (v.mentions !== undefined && !(Array.isArray(v.mentions) && v.mentions.length <= 50 && v.mentions.every((m) => str(m, MAX_ID)))) return null;
       return { t: "text", id: v.id, body: v.body, ...(v.reply ? { reply: v.reply as string } : {}), ...(v.mentions ? { mentions: v.mentions as string[] } : {}) };
     case "media":
-      if ((v.kind !== "photo" && v.kind !== "voice") || !str(v.blob, MAX_ID) || !str(v.key, 64) || !str(v.mime, 40)) return null;
+      if ((v.kind !== "photo" && v.kind !== "voice" && v.kind !== "video") || !str(v.blob, MAX_ID) || !str(v.key, 64) || !str(v.mime, 40)) return null;
       if (!optNum(v.width) || !optNum(v.height) || !optNum(v.durationMs) || !optStr(v.thumb, 24_000) || !optStr(v.reply, MAX_ID)) return null;
       return {
         t: "media",

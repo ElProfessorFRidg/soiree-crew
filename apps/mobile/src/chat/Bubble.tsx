@@ -1,4 +1,5 @@
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
+import { useVideoPlayer, VideoView } from "expo-video";
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, View } from "react-native";
 import { palette } from "@crew/design-tokens";
@@ -63,6 +64,42 @@ function Photo({ media }: { media: ChatMedia }) {
       </Text>
     </View>
   );
+}
+
+/** MSG-03: opened on tap only, so nothing is downloaded or decrypted for a video nobody watches. */
+function VideoClip({ media }: { media: ChatMedia }) {
+  const i18n = useT();
+  const theme = useTheme();
+  const [uri, setUri] = useState<string | null>(null);
+  const [state, setState] = useState<"idle" | "loading" | "failed">("idle");
+  const ratio = media.width && media.height ? media.width / media.height : 16 / 9;
+  if (uri) return <PlayingVideo uri={uri} ratio={ratio} />;
+  return (
+    <View>
+      <ScalePressable
+        accessibilityRole="button"
+        accessibilityLabel={i18n.t("chat.playVideo", { time: clip(media.durationMs ?? 0) })}
+        onPress={() => {
+          setState("loading");
+          void openChatMedia(media)
+            .then(setUri)
+            .catch(() => setState("failed"));
+        }}
+        style={[styles.photo, styles.placeholder, { aspectRatio: ratio, backgroundColor: theme.surface }]}
+      >
+        <Icon name="x:play" size={40} color={theme.text} />
+        <Text variant="small">{state === "loading" ? i18n.t("common.sending") : clip(media.durationMs ?? 0)}</Text>
+      </ScalePressable>
+      <Text variant="small" style={styles.caption}>
+        {state === "failed" ? i18n.t("chat.mediaGone") : i18n.t("chat.videoNote")}
+      </Text>
+    </View>
+  );
+}
+
+function PlayingVideo({ uri, ratio }: { uri: string; ratio: number }) {
+  const player = useVideoPlayer(uri, (p) => p.play());
+  return <VideoView player={player} nativeControls contentFit="contain" style={[styles.photo, { aspectRatio: ratio }]} />;
 }
 
 function Voice({ media, tint }: { media: ChatMedia; tint: string }) {
@@ -146,7 +183,7 @@ export function Bubble({ message, mine, senderName, replyTo, mentionNames, statu
           styles.bubble,
           { backgroundColor: bg, borderColor: highlighted ? theme.water : "transparent" },
           mine ? styles.bubbleMine : styles.bubbleOther,
-          message.media?.kind === "photo" ? styles.bubblePhoto : null,
+          message.media?.kind === "photo" || message.media?.kind === "video" ? styles.bubblePhoto : null,
         ]}
       >
         {senderName && !mine ? (
@@ -167,6 +204,8 @@ export function Bubble({ message, mine, senderName, replyTo, mentionNames, statu
           </Text>
         ) : message.media?.kind === "photo" ? (
           <Photo media={message.media} />
+        ) : message.media?.kind === "video" ? (
+          <VideoClip media={message.media} />
         ) : message.media?.kind === "voice" ? (
           <Voice media={message.media} tint={mine ? fg : theme.amber} />
         ) : (

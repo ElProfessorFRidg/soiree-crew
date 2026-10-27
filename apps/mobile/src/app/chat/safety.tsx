@@ -1,8 +1,11 @@
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
+import QRCode from "react-native-qrcode-svg";
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import { palette } from "@crew/design-tokens";
 import { fromBase64, groupDigits, keySetTag, safetyNumber } from "@crew/mls";
 import { updateMeta } from "@/chat/engine";
+import { qrValue } from "@/chat/format";
 import { useNames } from "@/chat/names";
 import { useChat } from "@/chat/store";
 import { useT } from "@/i18n";
@@ -50,6 +53,10 @@ export default function SafetyNumberScreen() {
       {result === "none" ? <Text>{i18n.t("chat.noKeysYet", { name: who })}</Text> : null}
       {result && result !== "none" ? (
         <Panel style={styles.center}>
+          {/* MSG-05: the same 60 digits as a code the other phone scans. Identical on both sides. */}
+          <View style={[styles.qr, { backgroundColor: palette.dark.text }]} accessible accessibilityLabel={i18n.t("chat.qrLabel", { name: who })}>
+            <QRCode value={qrValue(result.number)} size={168} backgroundColor={palette.dark.text} color={palette.accent.onAccent} />
+          </View>
           <View accessible accessibilityLabel={groups.join(" ")} style={styles.grid}>
             {[0, 1, 2, 3].map((row) => (
               <Numeral key={row} size={22} style={styles.line}>
@@ -74,6 +81,15 @@ export default function SafetyNumberScreen() {
           />
         </Panel>
       ) : null}
+      {result && result !== "none" ? (
+        <Button
+          label={i18n.t("chat.scanCode", { name: who })}
+          icon="x:scan"
+          variant="secondary"
+          height={48}
+          onPress={() => router.push({ pathname: "/chat/scan", params: { userId, expected: result.number, tag: result.tag } })}
+        />
+      ) : null}
       <Text>{i18n.t("chat.safetyHow", { name: who })}</Text>
       <Text variant="small">{i18n.t("chat.safetyWhy")}</Text>
       {meta.keyChanged[userId] ? (
@@ -95,6 +111,7 @@ export default function SafetyNumberScreen() {
 
 const styles = StyleSheet.create({
   center: { alignItems: "center" },
+  qr: { padding: 12, borderRadius: 12 },
   grid: { alignItems: "center", gap: 6, paddingVertical: 8 },
   line: { letterSpacing: 2 },
 });

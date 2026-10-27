@@ -14,7 +14,7 @@ import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { sendText, sendTyping } from "./engine";
 import { clip } from "./format";
-import { sendPhoto, sendVoice } from "./media";
+import { sendPhoto, sendVoice, VideoTooLarge } from "./media";
 
 /** Shorter than this, a press on the record button was a slip, not a voice note. */
 const MIN_VOICE_MS = 700;
@@ -58,8 +58,8 @@ export function Composer({ conversationId, members, reply, onClearReply, big }: 
       const n = await sendPhoto(conversationId, "library", reply?.id);
       if (n === -1) showToast({ tone: "danger", message: i18n.t("chat.photoPermission") });
       if (n > 0) onClearReply();
-    } catch {
-      showToast({ tone: "danger", message: i18n.t("chat.mediaFailed") });
+    } catch (error) {
+      showToast({ tone: "danger", message: i18n.t(error instanceof VideoTooLarge ? "chat.videoTooBig" : "chat.mediaFailed") });
     }
   };
 

@@ -75,7 +75,7 @@ export default function ConversationScreen() {
     return [...list].reverse();
   }, [messages, query, i18n.locale]);
 
-  const preview = (m: ChatMessage) => (m.deleted ? i18n.t("chat.deleted") : m.media ? (m.media.kind === "voice" ? i18n.t("chat.voicePreview") : i18n.t("chat.photoPreview")) : (m.body ?? ""));
+  const preview = (m: ChatMessage) => (m.deleted ? i18n.t("chat.deleted") : m.media ? (m.media.kind === "voice" ? i18n.t("chat.voicePreview") : m.media.kind === "video" ? i18n.t("chat.videoPreview") : i18n.t("chat.photoPreview")) : (m.body ?? ""));
   const lastMine = [...messages].reverse().find((m) => m.senderId === me && m.kind !== "timer");
   const readers = lastMine ? Object.entries(readBy ?? {}).filter(([user, upTo]) => user !== me && (byId.get(upTo)?.at ?? 0) >= lastMine.at).length : 0;
   const statusOf = (m: ChatMessage): string | null => {

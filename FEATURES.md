@@ -404,9 +404,9 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 |---|---|---|---|---|
 | MSG-01 | P1 | Messages.dc.html | build | Conversations: one chat per crew, one chat per party (created with the party, archived after the recap), direc... |
 | MSG-02 | P1 | Backstage | build | End-to-end encryption for every conversation, with a vetted protocol and library: the Signal protocol (libsign... |
-| MSG-03 | P1 | Messages.dc.html | partial | Media in chats (photos, videos, voice notes) encrypted on the device with a key per file before upload; the se... |
+| MSG-03 | P1 | Messages.dc.html | build | Media in chats (photos, videos, voice notes) encrypted on the device with a key per file before upload; the se... |
 | MSG-04 | P1 | Systeme.dc.html | build | Push notifications never carry readable content: the payload is encrypted and decrypted on the device (iOS Not... |
-| MSG-05 | P1 | Messages.dc.html | partial | Key verification: compare safety numbers or scan a QR code with a friend; a clear notice when a contact's key ... |
+| MSG-05 | P1 | Messages.dc.html | build | Key verification: compare safety numbers or scan a QR code with a friend; a clear notice when a contact's key ... |
 | MSG-06 | P1 | Messages.dc.html | build | Disappearing messages, per conversation. |
 | MSG-07 | P1 | Messages.dc.html | build | Reporting without breaking encryption: reporting a message sends that message and a few around it, decrypted o... |
 | MSG-08 | P1 | Messages.dc.html | build | New phone and backups: optional encrypted backup protected by a recovery key or passphrase only the user knows... |

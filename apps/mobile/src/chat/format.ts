@@ -31,3 +31,6 @@ export function timerLabel(seconds: number, i18n: Translator): string {
   if (seconds <= 86_400) return i18n.t("chat.hours", { n: seconds / 3600 });
   return i18n.t("chat.days", { n: seconds / 86_400 });
 }
+
+/** MSG-05: what the safety QR code carries, a prefix and version, then the 60 digits. */
+export const qrValue = (number: string) => `crew-safety:1:${number}`;

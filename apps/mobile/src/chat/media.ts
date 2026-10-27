@@ -12,6 +12,9 @@ import type { ChatMedia } from "./store";
 
 const MAX_SIDE = 1600;
 const THUMB_SIDE = 48;
+/** The server takes 6 MB per file: about 30 s of phone video at the picker's medium quality. */
+const MAX_VIDEO_BYTES = 6 * 1024 * 1024 - 64;
+const MAX_VIDEO_S = 30;
 
 async function upload(conversationId: string, plain: Uint8Array): Promise<{ blob: string; key: string }> {
   const sealed = sealMedia(plain);
@@ -25,16 +28,38 @@ async function readBytes(uri: string, base64?: string): Promise<Uint8Array> {
   return fromBase64(await new File(uri).base64());
 }
 
-/** Opens the camera or the library, re-encodes (which drops the location), encrypts and sends. -1: no permission. */
+export class VideoTooLarge extends Error {}
+
+/** MSG-03: a short video, encrypted like everything else. Refused above the server's file size. */
+async function sendVideo(conversationId: string, asset: ImagePicker.ImagePickerAsset, reply?: string): Promise<void> {
+  if (asset.fileSize && asset.fileSize > MAX_VIDEO_BYTES) throw new VideoTooLarge();
+  const bytes = await readBytes(asset.uri);
+  if (bytes.length > MAX_VIDEO_BYTES) throw new VideoTooLarge();
+  const { blob, key } = await upload(conversationId, bytes);
+  sendMediaPayload(conversationId, {
+    kind: "video",
+    blob,
+    key,
+    mime: asset.mimeType ?? "video/mp4",
+    ...(asset.width ? { width: asset.width } : {}),
+    ...(asset.height ? { height: asset.height } : {}),
+    ...(asset.duration ? { durationMs: Math.round(asset.duration) } : {}),
+    ...(reply ? { reply } : {}),
+  });
+}
+
+/** Opens the camera or the library, re-encodes photos (which drops the location), encrypts and sends. -1: no permission. */
 export async function sendPhoto(conversationId: string, source: "camera" | "library", reply?: string): Promise<number> {
   const permission = source === "camera" ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
   if (!permission.granted) return -1;
-  const result =
-    source === "camera"
-      ? await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 1, exif: false })
-      : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], quality: 1, exif: false });
+  const options: ImagePicker.ImagePickerOptions = { mediaTypes: ["images", "videos"], quality: 1, exif: false, videoMaxDuration: MAX_VIDEO_S, videoQuality: ImagePicker.UIImagePickerControllerQualityType.Medium };
+  const result = source === "camera" ? await ImagePicker.launchCameraAsync(options) : await ImagePicker.launchImageLibraryAsync(options);
   if (result.canceled || !result.assets[0]) return 0;
   const asset = result.assets[0];
+  if (asset.type === "video") {
+    await sendVideo(conversationId, asset, reply);
+    return 1;
+  }
   const longest = Math.max(asset.width, asset.height);
   const context = ImageManipulator.manipulate(asset.uri);
   if (longest > MAX_SIDE) context.resize(asset.width >= asset.height ? { width: MAX_SIDE } : { height: MAX_SIDE });
@@ -92,7 +117,7 @@ export function openChatMedia(media: ChatMedia): Promise<string> {
       const { data } = await api<{ data: string }>(`/v1/chat/blobs/${media.blob}`);
       const plain = openMedia(fromBase64(data), media.key);
       if (media.kind === "photo" || Platform.OS === "web") return `data:${media.mime};base64,${toBase64(plain)}`;
-      const file = new File(Paths.cache, `voice-${media.blob}.m4a`);
+      const file = new File(Paths.cache, media.kind === "video" ? `video-${media.blob}.mp4` : `voice-${media.blob}.m4a`);
       if (!file.exists) await file.write(plain);
       return file.uri;
     })();

@@ -56,7 +56,9 @@ export default function MessagesScreen() {
       : last.media
         ? last.media.kind === "voice"
           ? i18n.t("chat.voicePreview")
-          : i18n.t("chat.photoPreview")
+          : last.media.kind === "video"
+            ? i18n.t("chat.videoPreview")
+            : i18n.t("chat.photoPreview")
         : (last.body ?? "");
     return c.kind === "direct" || last.senderId === me ? text : i18n.t("chat.fromName", { name: name(last.senderId), text });
   };

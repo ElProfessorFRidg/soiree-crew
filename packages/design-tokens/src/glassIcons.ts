@@ -30,6 +30,10 @@ export const extraIcons = {
   curve: "M3 20h18M4 16c2.5 0 3-8 6-8s3.5 6 6 6c1.8 0 2.6-2.3 4-2.3",
   /** Target for the personal limit. */
   target: "M12 3a9 9 0 1 1 0 18a9 9 0 1 1 0-18zM12 7.5a4.5 4.5 0 1 1 0 9a4.5 4.5 0 1 1 0-9zM12 11.5h.01",
+  /** Play a video. */
+  play: "M12 3a9 9 0 1 1 0 18a9 9 0 1 1 0-18zM10 8.5v7l6-3.5z",
+  /** Scan a code with the camera. */
+  scan: "M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10",
 } as const;
 
 export type ExtraIconName = keyof typeof extraIcons;
