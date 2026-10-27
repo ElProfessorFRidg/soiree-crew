@@ -57,10 +57,19 @@ From outside the server:
 6. Delete the throwaway account afterwards: `curl -s -X DELETE https://<domain>/v1/me -H "authorization: Bearer <token>"` (check the exact route in `apps/server/src/routes/accounts.ts`).
 7. Restart the stack and check data and photos are still there.
 
-## 7. Hand-over
+## 7. Android builds here
+
+The APK must also be built on this machine (the IPA cannot: iOS builds need macOS, they stay on GitHub). Follow "Android builds on this server" in `deploy/README.md`:
+- create `/srv/soiree-crew/downloads`, set `DOWNLOADS_HOST_DIR=/srv/soiree-crew/downloads` on the stack and redeploy;
+- create a **read-only** deploy key for the repository (ask me to add the public half in GitHub, Settings, Deploy keys), store it with `known_hosts` for github.com, set `ANDROID_DEPLOY_KEY_DIR`;
+- check RAM: Gradle wants about 6 GB; add swap if needed and tell me;
+- run the builder once by hand, then a systemd timer every 15 minutes (`--profile android run --rm android-builder`), with its logs kept;
+- check `https://<domain>/download/android.json` and that `https://<domain>/download/soiree-crew.apk` downloads and installs on a phone.
+
+## 8. Hand-over
 
 Tell me:
-- the public URL;
+- the public URL, and the APK link `https://<domain>/download/soiree-crew.apk`;
 - what you changed on the machine (firewall, proxy, jails, cron), so I can undo it;
 - where the secrets live and that `DATA_KEY` is saved by me;
 - how to see the logs and redeploy in Coolify.

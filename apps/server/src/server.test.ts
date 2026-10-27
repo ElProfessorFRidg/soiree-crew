@@ -290,3 +290,9 @@ describe("several crews per person, open crews, server info", () => {
     expect(info.openCrews).toBe(1);
   });
 });
+
+describe("APK downloads built on the server", () => {
+  it("serves the APK and its build info once a build exists, 404 before", async () => {
+    expect((await app.inject({ method: "GET", url: "/download/soiree-crew.apk" })).statusCode).toBe(404);
+  });
+});

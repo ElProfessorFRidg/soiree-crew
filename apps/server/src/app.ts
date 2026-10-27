@@ -13,6 +13,7 @@ import { pollRoutes } from "./routes/polls";
 import { cardRoutes } from "./routes/cards";
 import { chatRoutes } from "./routes/chat";
 import { claimRoutes } from "./routes/claims";
+import { downloadRoutes } from "./routes/downloads";
 import { feedRoutes } from "./routes/feed";
 import { aiOrderRoutes } from "./routes/aiOrder";
 import { communityRoutes } from "./routes/community";
@@ -24,7 +25,7 @@ import { leaderboardRoutes } from "./routes/leaderboards";
 import { syncRoutes } from "./routes/sync";
 import { venueRoutes } from "./routes/venues";
 
-const PUBLIC_ROUTES = new Set(["POST /v1/accounts", "POST /v1/sessions/claim", "POST /v1/sessions/password", "GET /v1/health", "GET /v1/info", "GET /v1/invites/:code", "GET /v1/live", "GET /i/:code", "GET /v1/photos/:id"]);
+const PUBLIC_ROUTES = new Set(["POST /v1/accounts", "POST /v1/sessions/claim", "POST /v1/sessions/password", "GET /v1/health", "GET /v1/info", "GET /download/android.json", "GET /download/soiree-crew.apk", "GET /v1/invites/:code", "GET /v1/live", "GET /i/:code", "GET /v1/photos/:id"]);
 
 export async function buildApp(ctx: Context, options: { logger?: boolean; trustProxy?: boolean | number } = {}): Promise<FastifyInstance> {
   const app = Fastify({
@@ -104,6 +105,7 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
   recapRoutes(app, ctx);
   chatRoutes(app, ctx);
   claimRoutes(app, ctx);
+  downloadRoutes(app, ctx);
   profileRoutes(app, ctx);
   photoRoutes(app, ctx);
   statsRoutes(app, ctx);

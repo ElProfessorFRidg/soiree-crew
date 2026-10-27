@@ -31,6 +31,17 @@
 
 Daily `pg_dump` of the `crew` database and a copy of the `uploads` volume, kept off the machine. Chat content and history backups are end-to-end encrypted: the server cannot open them, and neither can its backups.
 
+## Android builds on this server
+
+The APK can be built here instead of on GitHub (`deploy/android`): a Linux image with JDK 17, the Android SDK and NDK, and Node 22. **The iOS IPA cannot**: Xcode only runs on macOS, so it stays on GitHub Actions' macOS runners.
+
+1. Make a host folder for the result, for example `/srv/soiree-crew/downloads`, and set `DOWNLOADS_HOST_DIR` to it for the stack, so the API serves it read-only at `/download/soiree-crew.apk` (and `/download/android.json`).
+2. Give the builder read access to the private repository: a read-only GitHub deploy key in a folder (`ANDROID_DEPLOY_KEY_DIR`, containing `id_ed25519` and a `known_hosts` with github.com).
+3. Build: `docker compose -f deploy/docker-compose.yml --profile android run --rm android-builder` (about 15 to 25 minutes the first time, a few minutes after, thanks to the Gradle cache volume). It exits at once when the latest commit is already built.
+4. Run it from a systemd timer or cron every 15 minutes to follow `main`. Give the machine 8 GB of RAM or swap for Gradle.
+
+Server builds are numbered from 1001 up and check this server for updates (`CREW_UPDATE_SERVER`), not GitHub. They are signed with the same Expo template key as the GitHub builds, so either installs over the other; a real release key comes with the store release.
+
 ## After the first deploy
 
 Set the repository variable `CREW_SERVER_URL` to `PUBLIC_URL` (and `CREW_PUBLIC_SERVERS` for other public servers, comma-separated): the next app builds suggest that server on the connect screen.

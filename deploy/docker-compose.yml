@@ -16,8 +16,11 @@ services:
       AI_PROVIDER: ${AI_PROVIDER:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       SEASON_VARIANTS: ${SEASON_VARIANTS:-}
+      DOWNLOADS_DIR: /downloads
     volumes:
       - uploads:/data
+      # The APK built on this machine (android-builder below), served at /download/soiree-crew.apk.
+      - ${DOWNLOADS_HOST_DIR:-./downloads}:/downloads:ro
     depends_on:
       db:
         condition: service_healthy
@@ -40,6 +43,26 @@ services:
       timeout: 5s
       retries: 10
 
+  # Builds the Android APK here, on demand or from a timer (deploy/README.md). Not started with the stack:
+  #   docker compose --profile android run --rm android-builder
+  android-builder:
+    profiles: ["android"]
+    build:
+      context: ./android
+    environment:
+      REPO_URL: ${ANDROID_REPO_URL:-git@github.com:ElProfessorFRidg/soiree-crew.git}
+      BRANCH: ${ANDROID_BRANCH:-main}
+      CREW_SERVER_URL: ${PUBLIC_URL:-}
+      CREW_PUBLIC_SERVERS: ${CREW_PUBLIC_SERVERS:-}
+    volumes:
+      - ${DOWNLOADS_HOST_DIR:-./downloads}:/downloads
+      - android-work:/work
+      - android-cache:/cache
+      # A read-only deploy key for the private repository.
+      - ${ANDROID_DEPLOY_KEY_DIR:-./android/ssh}:/root/.ssh:ro
+
 volumes:
   uploads:
   pgdata:
+  android-work:
+  android-cache:

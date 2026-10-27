@@ -17,6 +17,8 @@ export interface Context {
   hashSecret: string;
   /** Where album photos are kept (N-21). Defaults to ./data/uploads. */
   uploadDir?: string;
+  /** Where the APK built on this machine lands (DOWNLOADS_DIR, deploy/android). */
+  downloadsDir?: string;
   /** Shown by GET /v1/info: SERVER_NAME, SERVER_DESCRIPTION, PUBLIC_SERVER. */
   serverInfo?: { name: string; description: string; public: boolean };
   /** COM-11: usernames of the server operators, who check venue claims (OPERATOR_USERNAMES). */

@@ -7,6 +7,8 @@ const DAY_MS = 86_400_000;
 interface Extra {
   buildNumber?: number;
   releasesApi?: string;
+  /** Set on APKs built by a crew's own server (deploy/android): updates come from there, not GitHub. */
+  updateServer?: string | null;
 }
 
 const extra = (Constants.expoConfig?.extra ?? {}) as Extra;
@@ -22,6 +24,15 @@ export async function checkForUpdate(force = false): Promise<void> {
   const state = useAppStore.getState();
   if (Platform.OS === "web" || !extra.releasesApi || currentBuild <= 1) return;
   if (!force && (!state.checkUpdates || (state.updateCheckedAt !== null && Date.now() - state.updateCheckedAt < DAY_MS))) return;
+  if (extra.updateServer && Platform.OS === "android") {
+    const res = await fetch(`${extra.updateServer}/download/android.json`);
+    if (!res.ok) return;
+    const info = (await res.json()) as { build?: number };
+    const build = Number(info.build ?? 0);
+    const url = `${extra.updateServer}/download/soiree-crew.apk`;
+    useAppStore.setState({ updateCheckedAt: Date.now(), latestRelease: build > currentBuild && url.startsWith("https://") ? { build, url } : null });
+    return;
+  }
   const res = await fetch(extra.releasesApi, { headers: { accept: "application/vnd.github+json" } });
   if (!res.ok) return;
   const release = (await res.json()) as { tag_name?: string; html_url?: string; assets?: { name: string; browser_download_url: string }[] };
