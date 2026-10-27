@@ -1475,6 +1475,15 @@ export const en: Messages = {
     pint: "Same again",
     water: "Water",
   },
+  cheers: {
+    title: "Cheers",
+    clink: "Cheers!",
+    with: "Cheers with {name}",
+    waiting: "Knock felt, waiting for the other phone…",
+    how: "Gently knock your phone against a crew friend's, at the same time.",
+    proof: "Same bar: both check-ins are confirmed.",
+    tap: "Tap to cheers (both at once)",
+  },
   addDrink: {
     quick: "Type what you're drinking",
     quickPlaceholder: "2 pints and a shot",

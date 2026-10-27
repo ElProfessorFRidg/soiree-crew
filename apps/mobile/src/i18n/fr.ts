@@ -1473,6 +1473,15 @@ export const fr = {
     pint: "Encore un verre",
     water: "Eau",
   },
+  cheers: {
+    title: "Trinquer",
+    clink: "Tchin \u0001",
+    with: "Tchin avec {name}",
+    waiting: "Choc reçu, on attend l'autre téléphone…",
+    how: "Cogne doucement ton téléphone contre celui d'un pote du crew, en même temps.",
+    proof: "Même bar : les deux check-ins sont confirmés.",
+    tap: "Tchin à la main (appuie en même temps)",
+  },
   addDrink: {
     quick: "Tape ce que tu bois",
     quickPlaceholder: "2 pintes et un shot",

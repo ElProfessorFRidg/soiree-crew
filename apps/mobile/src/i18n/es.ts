@@ -1474,6 +1474,15 @@ export const es: Messages = {
     pint: "Otra igual",
     water: "Agua",
   },
+  cheers: {
+    title: "Brindar",
+    clink: "¡Chin chin!",
+    with: "Chin chin con {name}",
+    waiting: "Golpe recibido, esperando al otro móvil…",
+    how: "Choca suavemente tu móvil con el de alguien del crew, a la vez.",
+    proof: "Mismo bar: los dos check-ins quedan confirmados.",
+    tap: "Brindar con un toque (a la vez)",
+  },
   addDrink: {
     quick: "Escribe lo que bebes",
     quickPlaceholder: "2 cañas y un chupito",

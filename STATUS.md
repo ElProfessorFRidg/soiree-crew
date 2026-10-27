@@ -4,9 +4,9 @@ Generated from FEATURES.md on 2026-10-27 by `pnpm status`. Edit FEATURES.md, not
 
 | Status | Count |
 |---|---|
-| Built | 292 |
+| Built | 293 |
 | Partly built | 5 |
-| To do | 6 |
+| To do | 5 |
 | Proposed (not in the brief yet) | 6 |
 | Total | 309 |
 
@@ -22,7 +22,6 @@ Generated from FEATURES.md on 2026-10-27 by `pnpm status`. Edit FEATURES.md, not
 
 - **HUB-04** (P2, Party hub): Smartwatch: BAC, add drink and water from the wrist.
 - **QOL-06** (P0, Everyday polish): Native sharing: recap and story cards go straight to Instagram Stories, Snapchat (Creative Kit), TikTok and Wh
-- **JOY-01** (P1, Delight): Cheers: bring two phones together (Bluetooth LE / NFC) and both screens play a clink with sound and haptic. It
 - **JOY-10** (P2, Delight): Sticker packs (iMessage / WhatsApp) made from crew avatars and moments.
 - **MOT-11** (P1, Motion): Animated widgets and Live Activity, within each OS's limits.
 - **SLOP-06** (P1, Anti-slop (process)): Crew panel: before each release, the friends read the copy and the cards. Anything that "sounds like AI" or "d
@@ -58,7 +57,7 @@ Generated from FEATURES.md on 2026-10-27 by `pnpm status`. Edit FEATURES.md, not
 - Crew safety: N-25, N-26, N-27, N-28, N-29, N-36
 - Crew life: N-30, N-31, N-32, N-33, N-34, N-35
 - Everyday polish: QOL-01, QOL-02, QOL-03, QOL-04, QOL-05, QOL-07, QOL-08, QOL-09, QOL-10, QOL-11, QOL-12, QOL-13, QOL-14, QOL-15, QOL-16, QOL-17, QOL-18, QOL-19, QOL-20, QOL-21, QOL-23, QOL-24, QOL-28, QOL-30, QOL-32
-- Delight: JOY-02, JOY-03, JOY-04, JOY-05, JOY-06, JOY-07, JOY-08, JOY-09, JOY-11, JOY-12
+- Delight: JOY-01, JOY-02, JOY-03, JOY-04, JOY-05, JOY-06, JOY-07, JOY-08, JOY-09, JOY-11, JOY-12
 - Adaptive drunk mode: ADP-01, ADP-02, ADP-03, ADP-04, ADP-05, ADP-06, ADP-07, ADP-08, ADP-09, ADP-10
 - Motion: MOT-01, MOT-02, MOT-03, MOT-04, MOT-05, MOT-06, MOT-07, MOT-08, MOT-09, MOT-10, MOT-12, MOT-13, MOT-14, MOT-15
 - Bar territories: TER-01, TER-02, TER-03, TER-04, TER-05, TER-06, TER-07, TER-08, TER-09, TER-10, TER-11, TER-12

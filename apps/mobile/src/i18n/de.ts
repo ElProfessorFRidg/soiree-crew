@@ -1473,6 +1473,15 @@ export const de: Messages = {
     pint: "Noch eins",
     water: "Wasser",
   },
+  cheers: {
+    title: "Anstoßen",
+    clink: "Prost!",
+    with: "Prost mit {name}",
+    waiting: "Stoß erkannt, warte auf das andere Handy…",
+    how: "Stoß dein Handy sanft gegen das von jemandem aus der Crew, gleichzeitig.",
+    proof: "Gleiche Bar: beide Check-ins sind bestätigt.",
+    tap: "Per Tippen anstoßen (gleichzeitig)",
+  },
   addDrink: {
     quick: "Tipp ein, was du trinkst",
     quickPlaceholder: "2 Bier und ein Shot",

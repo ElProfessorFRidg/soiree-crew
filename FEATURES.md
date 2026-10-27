@@ -286,7 +286,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| JOY-01 | P1 | Securite.dc.html | todo | Cheers: bring two phones together (Bluetooth LE / NFC) and both screens play a clink with sound and haptic. It... |
+| JOY-01 | P1 | Securite.dc.html | build | Cheers: bring two phones together (Bluetooth LE / NFC) and both screens play a clink with sound and haptic. It... |
 | JOY-02 | P1 | Soiree.dc.html | build | Lines that know the time: the Party screen header changes with the hour and the situation ("Still standing?" a... |
 | JOY-03 | P1 | Profil.dc.html | build | Alternate app icons unlocked through crew titles (N-34) and seasons. |
 | JOY-04 | P1 | Soirees.dc.html | build | Mood themes: the mood picked for a party (O-35) tints the Party screen, the widget and the recap. |

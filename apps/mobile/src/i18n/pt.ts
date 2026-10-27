@@ -1474,6 +1474,15 @@ export const pt: Messages = {
     pint: "Mais um",
     water: "Água",
   },
+  cheers: {
+    title: "Brindar",
+    clink: "Saúde!",
+    with: "Saúde com {name}",
+    waiting: "Toque sentido, à espera do outro telemóvel…",
+    how: "Bate devagar o teu telemóvel no de alguém do crew, ao mesmo tempo.",
+    proof: "Mesmo bar: os dois check-ins ficam confirmados.",
+    tap: "Brindar com um toque (ao mesmo tempo)",
+  },
   addDrink: {
     quick: "Escreve o que estás a beber",
     quickPlaceholder: "2 cocktails e 1 shot",

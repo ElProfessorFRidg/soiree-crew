@@ -1474,6 +1474,15 @@ export const it: Messages = {
     pint: "Un altro",
     water: "Acqua",
   },
+  cheers: {
+    title: "Brindare",
+    clink: "Cin cin!",
+    with: "Cin cin con {name}",
+    waiting: "Colpo ricevuto, si aspetta l'altro telefono…",
+    how: "Batti piano il telefono contro quello di qualcuno della crew, nello stesso momento.",
+    proof: "Stesso bar: i due check-in sono confermati.",
+    tap: "Brinda con un tocco (insieme)",
+  },
   addDrink: {
     quick: "Scrivi cosa bevi",
     quickPlaceholder: "2 pinte e uno shot",

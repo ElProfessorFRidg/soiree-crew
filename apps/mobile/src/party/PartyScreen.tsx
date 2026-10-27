@@ -519,6 +519,12 @@ function LevelZero(props: LevelProps) {
       <View>
         <CurrentVenueRow i18n={i18n} />
         <Row
+          title={i18n.t("cheers.title")}
+          leading={<Icon name="glass" color={theme.textMuted} />}
+          trailing={<Icon name="chev" color={theme.textMuted} />}
+          onPress={() => router.push("/cheers")}
+        />
+        <Row
           title={i18n.t("curve.open")}
           leading={<Icon name="x:curve" color={theme.textMuted} />}
           trailing={<Icon name="chev" color={theme.textMuted} />}
@@ -598,6 +604,7 @@ function LevelOne(props: LevelProps) {
         trailing={<Icon name="chev" size={22} color={theme.textMuted} />}
         onPress={() => router.push("/history")}
       />
+      <Row title={i18n.t("cheers.title")} trailing={<Icon name="chev" size={22} color={theme.textMuted} />} onPress={() => router.push("/cheers")} />
       <Button label={i18n.t("party.sos")} icon="alert" variant="danger" height={60} fontSize={18} onPress={() => router.push("/sos")} />
       <LevelPicker {...props} />
     </>

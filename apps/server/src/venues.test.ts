@@ -230,3 +230,28 @@ describe("leaderboard (RANK-01, RANK-06)", () => {
     expect((await app.inject({ method: "GET", url: `/v1/crews/${crewId}/leaderboard`, headers: users[0]!.auth })).json()).toMatchObject({ disabled: true });
   });
 });
+
+describe("cheers by knocking phones (JOY-01)", () => {
+  it("pairs two knocks from the same crew within 1.5 s and confirms both check-ins at the bar", async () => {
+    const { users, venueId, crewId } = await setup("jade", "malik", "ines");
+    const [jade, malik, ines] = users as [User, User, User];
+    const a = await checkIn(jade, venueId);
+    await checkIn(malik, venueId);
+    const knock = (u: User) => app.inject({ method: "POST", url: "/v1/cheers", headers: u.auth, payload: { crewId } }).then((r) => r.json() as { matched: boolean; withUserId?: string; proof?: boolean });
+    expect(await knock(jade)).toEqual({ matched: false });
+    clock += 800;
+    const second = await knock(malik);
+    expect(second.matched).toBe(true);
+    expect(second.withUserId).toBe(jade.id);
+    expect(second.proof).toBe(true);
+    const confirmed = await db.query<{ corroborated: boolean }>("select corroborated from check_ins where id = $1", [a.id]);
+    expect(confirmed[0]!.corroborated).toBe(true);
+    // Too far apart: no pair.
+    expect(await knock(ines)).toEqual({ matched: false });
+    clock += 5_000;
+    expect(await knock(jade)).toEqual({ matched: false });
+    // Someone outside the crew cannot knock into it.
+    const stranger = await account("stranger");
+    expect((await app.inject({ method: "POST", url: "/v1/cheers", headers: stranger.auth, payload: { crewId } })).statusCode).toBe(404);
+  });
+});

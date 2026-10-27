@@ -13,7 +13,9 @@ export type LiveEvent =
   /** MSG-01: a conversation's group changed (devices, timer); without an id, look at all of them. */
   | { type: "chat.roster"; conversationId?: string }
   | { type: "chat.message"; conversationId: string }
-  | { type: "chat.typing"; conversationId: string; userId: string };
+  | { type: "chat.typing"; conversationId: string; userId: string }
+  /** JOY-01: the other phone of a knock; `proof` when it also confirmed both check-ins. */
+  | { type: "cheers"; withUserId: string; withName: string; proof: boolean };
 
 /**
  * Pushes hints, never data: a device that hears "party.changed" refetches what
