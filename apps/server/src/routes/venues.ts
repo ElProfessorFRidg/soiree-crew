@@ -3,7 +3,7 @@ import { z } from "zod";
 import { challengers, seasonBounds, territoryTitles } from "@crew/territory";
 import { AC_CONFIG, distanceMeters, evaluateCheckIn, fixHash } from "../anticheat";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
-import { crewStandings, crewTimeZone, currentSeason, updateBoss } from "../territory";
+import { crewStandings, crewTimeZone, currentSeason, updateBoss, validatedVenues } from "../territory";
 import { nightOf, offsetMinutes } from "../time";
 
 const venueSchema = z.object({
@@ -157,6 +157,7 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
       [request.params.id],
     );
     const standings = await crewStandings(ctx, request.params.id, season);
+    const valid = await validatedVenues(ctx.db, request.params.id, timeZone);
     const visited = await ctx.db.query<{ venue_id: string }>(
       `select distinct c.venue_id from check_ins c join venues v on v.id = c.venue_id and v.crew_id = $1
        where c.verdict = 'accepted' and c.private = false`,
@@ -191,6 +192,8 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
           myPoints: standing?.scores.find((s) => s.memberId === user.id)?.points ?? 0,
           bossPoints: standing?.scores[0]?.points ?? 0,
           explored: visitedSet.has(v.id),
+          // TER-11: points start once two members came on two nights.
+          validated: valid.has(v.id),
           hereNow: here.find((h) => h.venue_id === v.id)?.n ?? 0,
         };
       }),
@@ -241,7 +244,9 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
       ).map((c) => nightOf(c.at, timeZone)),
     ).size;
     const rivalry = venue.kind === "home" ? null : await crewRivalry(ctx, venue, season, standing?.scores.reduce((sum, s) => sum + s.points, 0) ?? 0);
+    const validated = (await validatedVenues(ctx.db, venue.crew_id, timeZone)).has(venue.id);
     return {
+      validated,
       venue: { id: venue.id, crewId: venue.crew_id, name: venue.name, kind: venue.kind, lat: venue.lat, lng: venue.lng, address: venue.address },
       rivalry,
       myNights,

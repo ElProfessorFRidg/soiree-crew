@@ -359,6 +359,7 @@ export const es: Messages = {
     rivalryRank: "Tu crew: {rank} de {crews} aquí esta temporada.",
     rivalryLead: "En cabeza con {points} puntos. Las otras crews son anónimas.",
     rivalryBehind: "{gap} puntos por detrás de la crew líder.",
+    notValidated: "Bar nuevo: cuenta para los territorios cuando dos miembros hayan venido dos noches distintas.",
   },
   ranking: {
     bars: "Los bares",
@@ -610,6 +611,8 @@ export const es: Messages = {
     soundsHint: "Un vaso que se llena, un chinchín para las rondas, una fanfarria para una corona. Mudos si el móvil está en silencio.",
     crewPublicName: "Nombre de la crew en perfiles públicos",
     crewPublicNameHint: "Sin esto, el nombre de la crew queda entre sus miembros.",
+    haptics: "Vibraciones",
+    hapticsHint: "Una vibración por cada acción importante. Independiente de los sonidos, y nada se comunica solo con ella.",
   },
   vault: {
     queued: "Lo dejamos para mañana. Te lo volvemos a preguntar cuando te despiertes.",

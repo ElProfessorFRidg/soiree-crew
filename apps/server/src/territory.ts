@@ -25,6 +25,30 @@ export function currentSeason(at: number, timeZone: string): string {
 }
 
 /**
+ * TER-11: a venue someone added counts for territories once two members have checked in there on two
+ * different nights (or it is the crew's HQ). Until then nobody can farm points at a made-up bar.
+ */
+export async function validatedVenues(db: Db, crewId: string, timeZone: string): Promise<Set<string>> {
+  const rows = await db.query<{ venue_id: string; user_id: string; at: number; is_hq: boolean }>(
+    `select c.venue_id, c.user_id, c.at, v.is_hq from check_ins c join venues v on v.id = c.venue_id and v.crew_id = $1
+     where c.verdict = 'accepted' and c.private = false`,
+    [crewId],
+  );
+  const seen = new Map<string, { users: Set<string>; nights: Set<string> }>();
+  const valid = new Set<string>();
+  for (const r of rows) {
+    if (r.is_hq) valid.add(r.venue_id);
+    const entry = seen.get(r.venue_id) ?? { users: new Set<string>(), nights: new Set<string>() };
+    entry.users.add(r.user_id);
+    entry.nights.add(nightOf(r.at, timeZone));
+    seen.set(r.venue_id, entry);
+  }
+  for (const [venueId, entry] of seen) if (entry.users.size >= 2 && entry.nights.size >= 2) valid.add(venueId);
+  for (const hq of await db.query<{ id: string }>("select id from venues where crew_id = $1 and is_hq", [crewId])) valid.add(hq.id);
+  return valid;
+}
+
+/**
  * Season standings of every territory venue of a crew, replayed from the stored events
  * (AC-01): accepted, public check-ins of members who play, never homes, never drinks.
  */
@@ -53,7 +77,8 @@ export async function crewStandings(ctx: Context, crewId: string, season: string
     [crewId],
   );
   const now = Math.min(ctx.now(), end);
-  const checkIns: CountedCheckIn[] = rows.map((r) => {
+  const valid = await validatedVenues(ctx.db, crewId, timeZone);
+  const checkIns: CountedCheckIn[] = rows.filter((r) => valid.has(r.venue_id)).map((r) => {
     const night = nightOf(r.at, timeZone);
     return {
       id: r.id,

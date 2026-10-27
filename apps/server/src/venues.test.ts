@@ -120,6 +120,8 @@ describe("check-ins and territories", () => {
 
   it("crowns a boss once the check-in vests and reports the takeover", async () => {
     const { users, venueId, crewId } = await setup("jade", "malik", "ines");
+    // The crew's HQ counts from the first night (TER-11); other venues wait for a second night.
+    await db.query("update venues set is_hq = true where id = $1", [venueId]);
     const jade = await checkIn(users[0]!, venueId);
     const malik = await checkIn(users[1]!, venueId);
     clock += 170 * MIN;
@@ -144,6 +146,20 @@ describe("check-ins and territories", () => {
     expect(map.venues[0]!.bossId).toBe(users[0]!.id);
     const page = (await app.inject({ method: "GET", url: `/v1/venues/${venueId}`, headers: users[1]!.auth })).json() as { top: { points: number }[] };
     expect(page.top[0]!.points).toBe(60);
+  });
+
+  it("gives no territory points at a new venue until two members came on two nights (TER-11)", async () => {
+    const { users, venueId, crewId } = await setup("jade", "malik");
+    const points = async () =>
+      ((await app.inject({ method: "GET", url: `/v1/crews/${crewId}/venues`, headers: users[0]!.auth })).json() as { venues: { myPoints: number }[] }).venues[0]!.myPoints;
+    await checkIn(users[0]!, venueId);
+    await checkIn(users[1]!, venueId);
+    clock += 60 * MIN;
+    await checkIn(users[0]!, venueId);
+    expect(await points()).toBe(0);
+    clock += 24 * 60 * MIN;
+    await checkIn(users[1]!, venueId);
+    expect(await points()).toBeGreaterThan(0);
   });
 
   it("hides venues from other crews", async () => {

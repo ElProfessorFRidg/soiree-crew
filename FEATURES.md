@@ -107,7 +107,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-65 | P0 | Jeux.dc.html | build | More than 500 cards / questions / dares per language for FR and EN, all written by us (see <localization> and ... |
 | O-89 | P0 | Backstage (near Jeux.dc.html) | build | Penalty model shared by every game: N sips or a forfeit of the same size, per-player "no alcohol" switch, water-or-forfeit swap for a player at UI level 3, penalty counter never creates a drink. Source: games.md §2.0, §5 (proposed there as N-xx). |
 | O-90 | P0 | Backstage (near Jeux.dc.html) | build | Forfeit deck: forfeit cards in three sizes (small, medium, large), FR and EN, counted in the O-65 content budget. Source: games.md §5. |
-| O-91 | P1 | Backstage (near JeuxAction.dc.html) | proposed | Table style for passing games: the phone stays on the table and the holder taps their name; suggested automatically at UI levels 2 and 3. Source: games.md §2.2, §5. |
+| O-91 | P1 | Backstage (near JeuxAction.dc.html) | build | Table style for passing games: the phone stays on the table and the holder taps their name; suggested automatically at UI levels 2 and 3. Source: games.md §2.2, §5. |
 
 ## The Bar (recipes)
 
@@ -329,7 +329,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | MOT-12 | P0 | Backstage | build | Performance and motion accessibility: 60 / 120 fps without jank, tested on a modest phone, battery budget resp... |
 | MOT-13 | P0 | Classements.dc.html | build | Leaderboards: animated overtakes, podium, a dedicated effect when the leader changes. |
 | MOT-14 | P0 | Backstage | proposed | Global motion time scale (0.1x to 10x) and deterministic animation clock hooks in the motion module, exposed in a dev menu and to the test harness, so the frame-by-frame Motion review works across every animation engine. Source: motion.md §3.6, §5. |
-| MOT-15 | P0 | Backstage | proposed | Haptic capability matrix and fallbacks per platform, API level and device support level, plus an in-app haptics switch independent of sound. Source: motion.md §3.3, §5. |
+| MOT-15 | P0 | Backstage | build | Haptic capability matrix and fallbacks per platform, API level and device support level, plus an in-app haptics switch independent of sound. Source: motion.md §3.3, §5. |
 
 ## Bar territories
 
@@ -345,7 +345,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | TER-08 | P1 | Bars.dc.html | build | Fog of war: never-visited venues are "to conquer", conquest suggestions for the next night out (linked to N-11). |
 | TER-09 | P0 | Bars.dc.html | build | Privacy: only check-ins are shared (never continuous tracking for this game), anyone can opt out of the territ... |
 | TER-10 | P1 | Backstage (near Bars.dc.html) | build | Venue loyalty tiers (Bronze, Silver, Gold at 3, 10 and 25 lifetime counted nights), never lost, crew-visible, audience set by the profile. FR label must not reuse "habitué" (see GLOSSARY.md conflicts). Source: territories.md §2.5, §3.4, §5. |
-| TER-11 | P0 | Backstage (near Bars.dc.html) | proposed | Workplace exclusion ("I work here", admin-approved; 0 territory points there) and validation of new venues (external place ID or corroborated check-ins by 2 members on 2 nights) before they can be played. Source: territories.md §3.7 cases D and F, §5. |
+| TER-11 | P0 | Backstage (near Bars.dc.html) | build | Workplace exclusion ("I work here", admin-approved; 0 territory points there) and validation of new venues (external place ID or corroborated check-ins by 2 members on 2 nights) before they can be played. Source: territories.md §3.7 cases D and F, §5. |
 | TER-12 | P2 | Backstage (near Bars.dc.html) | proposed | Season variants: one rule modifier per month from remote config, never related to drinks, frozen into the season's rule version. Source: territories.md §3.6, §5. |
 
 ## Leaderboards

@@ -51,6 +51,7 @@ export default function SettingsScreen() {
   const followsPhone = useAppStore((state) => state.hourCycleFollowsPhone);
   const checkUpdates = useAppStore((state) => state.checkUpdates);
   const soundsOn = useAppStore((state) => state.soundsOn);
+  const hapticsOn = useAppStore((state) => state.hapticsOn);
   const crews = useCrewData((state) => state.crews);
   const hour = (h: number) => formatClock(new Date(2026, 0, 1, h).getTime(), i18n.language, preferences.hourCycle);
   const offline = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
@@ -113,6 +114,15 @@ export default function SettingsScreen() {
           onChange={(on) => {
             useAppStore.setState({ soundsOn: on });
             if (on) haptic.cheers();
+          }}
+        />
+        <SwitchRow
+          label={i18n.t("settings.haptics")}
+          hint={i18n.t("settings.hapticsHint")}
+          value={hapticsOn}
+          onChange={(on) => {
+            useAppStore.setState({ hapticsOn: on });
+            if (on) haptic.confirmed();
           }}
         />
         <AppIconPicker />

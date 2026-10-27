@@ -39,6 +39,18 @@ Functions in `apps/mobile/src/motion/haptics.ts`. One meaning per vibration, and
 | `heavy` | signature moment landing: crown, podium winner, roulette result, explosion |
 | `holdTick` | the SOS hold progressing |
 
+## Haptic capabilities (MOT-15)
+
+| Platform | Selection tick | Light, medium, heavy impact | Rigid tap | Success, warning |
+|---|---|---|---|---|
+| iOS, iPhone 8 and later (Taptic Engine) | yes | yes | yes | yes |
+| iOS, Low Power Mode | silenced by the system | silenced | silenced | silenced |
+| Android 10+ (API 29+) | yes | yes | yes | yes |
+| Android 8 and 9 (API 26 to 28) | falls back to a light impact | yes | falls back to a heavy impact | yes |
+| Web preview | none | none | none | none |
+
+Vibrations have their own switch in Settings, on by default and separate from the sound pack. Every haptic event also changes something on screen, so turning them off, Low Power Mode or a phone without a motor loses nothing.
+
 ## When motion steps back
 
 | Situation | What changes |

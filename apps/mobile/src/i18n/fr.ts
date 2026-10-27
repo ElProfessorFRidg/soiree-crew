@@ -358,6 +358,7 @@ export const fr = {
     rivalryRank: "Ton crew : {rank} sur {crews} ici cette saison.",
     rivalryLead: "En tête, avec {points} points. Les autres crews restent anonymes.",
     rivalryBehind: "{gap} points de retard sur le crew en tête.",
+    notValidated: "Nouveau bar : il compte pour les territoires dès que deux membres y sont venus deux soirs différents.",
   },
   ranking: {
     bars: "Les bars",
@@ -609,6 +610,8 @@ export const fr = {
     soundsHint: "Un verre qui se remplit, un tchin pour les tournées, une petite fanfare pour une couronne. Muets si le téléphone est en silencieux.",
     crewPublicName: "Nom du crew sur les profils publics",
     crewPublicNameHint: "Sans ça, le nom du crew reste entre les membres.",
+    haptics: "Vibrations",
+    hapticsHint: "Une vibration par geste important, réglée à part des sons. Aucune information ne passe seulement par une vibration.",
   },
   vault: {
     queued: "Mis de côté jusqu'à demain. On te redemande au réveil.",

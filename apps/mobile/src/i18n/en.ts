@@ -360,6 +360,7 @@ export const en: Messages = {
     rivalryRank: "Your crew: {rank} of {crews} here this season.",
     rivalryLead: "In the lead with {points} points. Other crews stay anonymous.",
     rivalryBehind: "{gap} points behind the leading crew.",
+    notValidated: "New bar: it counts for territories once two members have been here on two different nights.",
   },
   ranking: {
     bars: "Bars",
@@ -611,6 +612,8 @@ export const en: Messages = {
     soundsHint: "A glass filling up, a clink for rounds, a little fanfare for a crown. Silent when the phone is on silent.",
     crewPublicName: "Crew name on public profiles",
     crewPublicNameHint: "Without this, the crew's name stays among its members.",
+    haptics: "Vibrations",
+    hapticsHint: "One vibration per important action. Separate from sounds, and nothing is told by vibration alone.",
   },
   vault: {
     queued: "Put aside until tomorrow. We'll ask again when you're up.",

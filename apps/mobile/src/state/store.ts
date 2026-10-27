@@ -58,6 +58,8 @@ export interface AppState {
   barHave: string[];
   /** JOY-05: the sound pack, off until switched on. */
   soundsOn: boolean;
+  /** MOT-15: vibrations, on by default, switched separately from sounds. */
+  hapticsOn: boolean;
   /** QOL-32: when the logging nudge was last answered. */
   nudgeDismissedAt: number | null;
   /** QOL-30: party reminders muted until this morning time. */
@@ -92,6 +94,7 @@ export const useAppStore = create<AppState>()(
       privacySummarySeen: false,
       barHave: [],
       soundsOn: false,
+      hapticsOn: true,
       nudgeDismissedAt: null,
       remindersMutedUntil: null,
     }),

@@ -21,10 +21,13 @@ export interface VenueSummary {
   myPoints: number;
   bossPoints: number;
   explored: boolean;
+  /** TER-11: counts for territories (two members on two nights, or the HQ). */
+  validated?: boolean;
   hereNow: number;
 }
 
 export interface VenuePage {
+  validated?: boolean;
   venue: { id: string; crewId: string; name: string; kind: VenueKind; lat: number; lng: number; address: string };
   season: string;
   bossId: string | null;
