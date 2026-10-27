@@ -42,6 +42,8 @@ export interface AppState {
   recapNotified: string[];
   /** Sensitive actions waiting for the next morning (ADP-06). */
   vault: VaultItem[];
+  /** PREF-05: a country the user chose not to switch to; asked again only for another one. */
+  travelDismissed: string | null;
 }
 
 export const useAppStore = create<AppState>()(
@@ -63,6 +65,7 @@ export const useAppStore = create<AppState>()(
       morningShown: [],
       recapNotified: [],
       vault: [],
+      travelDismissed: null,
     }),
     {
       name: "crew-app-v1",

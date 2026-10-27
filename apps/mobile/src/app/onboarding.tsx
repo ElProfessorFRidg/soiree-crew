@@ -14,6 +14,7 @@ import { Button } from "@/ui/Button";
 import { Panel, Switch } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
+import { setPreferences } from "@/state/preferences";
 
 /** Legal drinking age of the country picked for the legal limit (O-02, decision D-04). */
 function legalAge(country: string): number {
@@ -28,6 +29,7 @@ export default function Onboarding() {
   const [refused, setRefused] = useState(false);
   const [draft, setDraft] = useState(() => draftFromProfile(useAppStore.getState().profile));
   const [consent, setConsent] = useState(false);
+  const preferences = useAppStore((state) => state.preferences);
   const age = legalAge(country);
 
   if (!ageConfirmed) {
@@ -78,6 +80,25 @@ export default function Onboarding() {
         <Text variant="small">{i18n.t("onboarding.consentHint")}</Text>
       </Panel>
       {consent ? <ProfileFields draft={draft} onChange={setDraft} /> : null}
+      {consent ? (
+        // O-03: the user picks what may notify them before the first night.
+        <Panel>
+          <Text variant="h3">{i18n.t("onboarding.notifTitle")}</Text>
+          {(
+            [
+              ["settings.water", preferences.waterReminderMinutes !== null, (on: boolean) => setPreferences({ waterReminderMinutes: on ? 45 : null })],
+              ["settings.limit", preferences.warnNearLimit, (on: boolean) => setPreferences({ warnNearLimit: on })],
+              ["settings.recap", preferences.notifyRecap, (on: boolean) => setPreferences({ notifyRecap: on })],
+            ] as const
+          ).map(([key, value, onChange]) => (
+            <View key={key} style={styles.consent}>
+              <Text style={styles.flex}>{i18n.t(key)}</Text>
+              <Switch value={value} onValueChange={onChange} accessibilityLabel={i18n.t(key)} />
+            </View>
+          ))}
+          <Text variant="small">{i18n.t("onboarding.notifBody")}</Text>
+        </Panel>
+      ) : null}
     </Screen>
   );
 }

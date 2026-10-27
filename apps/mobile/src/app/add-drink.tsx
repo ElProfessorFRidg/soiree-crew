@@ -25,6 +25,8 @@ import { Icon } from "@/ui/Icon";
 import { ScalePressable } from "@/ui/Pressable";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast, ToastHost } from "@/ui/Toast";
+import { addPhotos } from "@/photos/uploads";
+import { useLiveParty } from "@/server/crewData";
 
 
 const MINUTE_MS = 60_000;
@@ -56,6 +58,7 @@ export default function AddDrinkSheet() {
   const [withFood, setWithFood] = useState(false);
   const [editing, setEditing] = useState<Editing>(null);
   const [menuFor, setMenuFor] = useState<string | null>(null);
+  const live = useLiveParty();
 
   const selectedCustom = selection.type === "custom" ? customDrinks.find((d) => d.id === selection.id) : undefined;
   const preset: DrinkPreset = selectedCustom
@@ -235,6 +238,23 @@ export default function AddDrinkSheet() {
           <Switch value={withFood} onValueChange={setWithFood} accessibilityLabel={i18n.t("addDrink.withFood")} />
         </View>
 
+        {live ? (
+          // O-83: a photo of the drink goes to the party album, not to the drink itself.
+          <Button
+            label={i18n.t("addDrink.photo")}
+            icon="camera"
+            variant="outline"
+            height={44}
+            onPress={() =>
+              void addPhotos(live.party.id, "camera")
+                .then((n) => {
+                  if (n > 0) showToast({ message: i18n.t("addDrink.photoAdded") });
+                  else if (n < 0) showToast({ tone: "danger", message: i18n.t("album.denied") });
+                })
+                .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+            }
+          />
+        ) : null}
         <Button
           label={i18n.t("addDrink.add", { drink: drinkWithArticle(preset, i18n) })}
           height={56}

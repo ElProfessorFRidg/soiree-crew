@@ -26,6 +26,7 @@ import { AddDrinkButton } from "./AddDrinkButton";
 import { CrewStrip } from "./CrewStrip";
 import { SosBanner } from "@/crew/SosBanner";
 import { useEco } from "@/power/eco";
+import { TravelPrompt } from "@/travel/TravelPrompt";
 import { VaultPrompt } from "@/vault/VaultPrompt";
 import { useLiveParty } from "@/server/crewData";
 import { useVenueData } from "@/server/venueData";
@@ -130,6 +131,7 @@ export function PartyScreen() {
         <SosBanner />
         <VaultPrompt />
         <EcoNotice />
+        <TravelPrompt />
         {level === 0 ? <LevelZero {...common} /> : null}
         {level === 1 ? <LevelOne {...common} /> : null}
         {level === 2 ? <LevelTwo {...common} /> : null}

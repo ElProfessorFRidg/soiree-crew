@@ -781,6 +781,12 @@ export const ru: Messages = {
     bestNights: "Лучшие вечеринки здесь",
     bestNight: { one: "{date}: {count} человек", few: "{date}: {count} человека", many: "{date}: {count} человек", other: "{date}: {count} человека" },
   },
+  travel: {
+    title: "Ты за границей?",
+    body: "На телефоне выбрана страна: {country}. Лимит для водителей там может быть другим.",
+    switch: "Переключиться: {country}",
+    keep: "Оставить текущую страну",
+  },
   addDrink: {
     quick: "Напиши, что пьёшь",
     quickPlaceholder: "2 пинты и шот",
@@ -813,6 +819,8 @@ export const ru: Messages = {
     removed: "Напиток убран",
     more: "Действия: {name}",
     nameRequired: "Дай ему название.",
+    photo: "Добавить фото в альбом",
+    photoAdded: "Фото добавлено в альбом вечеринки.",
   },
   history: {
     title: "Что выпито",
@@ -875,6 +883,8 @@ export const ru: Messages = {
     consent: "Разрешаю сохранять мои бокалы и уровень алкоголя",
     consentHint: "Это данные о здоровье. Всё можно стереть в профиле.",
     start: "Начать",
+    notifTitle: "Какие уведомления присылать",
+    notifBody: "Всё это можно поменять потом в настройках.",
   },
   errors: {
     rejected: "Сервер отклонил {action}: {reason}.",

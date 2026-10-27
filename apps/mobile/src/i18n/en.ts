@@ -757,6 +757,12 @@ export const en: Messages = {
     bestNights: "Best nights here",
     bestNight: { one: "{date}: {count} person", other: "{date}: {count} people" },
   },
+  travel: {
+    title: "Are you abroad?",
+    body: "Your phone is set to {country}. The driving limit may be different there.",
+    switch: "Switch to {country}",
+    keep: "Keep the current country",
+  },
   addDrink: {
     quick: "Type what you're drinking",
     quickPlaceholder: "2 pints and a shot",
@@ -789,6 +795,8 @@ export const en: Messages = {
     removed: "Drink removed",
     more: "Options for {name}",
     nameRequired: "Give it a name.",
+    photo: "Add a photo to the album",
+    photoAdded: "Photo added to the party album.",
   },
   history: {
     title: "What you had",
@@ -851,6 +859,8 @@ export const en: Messages = {
     consent: "I agree that my drinks and BAC are stored",
     consentHint: "This is health data. You can erase all of it from Me.",
     start: "Start",
+    notifTitle: "What can notify you",
+    notifBody: "You can change all of this later in Settings.",
   },
   errors: {
     rejected: "The server refused {action}: {reason}.",

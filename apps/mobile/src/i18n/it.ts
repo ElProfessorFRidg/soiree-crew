@@ -756,6 +756,12 @@ export const it: Messages = {
     bestNights: "Le serate migliori qui",
     bestNight: { one: "{date}: {count} persona", other: "{date}: {count} persone" },
   },
+  travel: {
+    title: "Sei all'estero?",
+    body: "Il telefono è impostato su {country}. Lì il limite per guidare può essere diverso.",
+    switch: "Passa a {country}",
+    keep: "Tieni il paese attuale",
+  },
   addDrink: {
     quick: "Scrivi cosa bevi",
     quickPlaceholder: "2 pinte e uno shot",
@@ -788,6 +794,8 @@ export const it: Messages = {
     removed: "Bevanda tolta",
     more: "Opzioni per {name}",
     nameRequired: "Serve un nome.",
+    photo: "Aggiungi una foto all'album",
+    photoAdded: "Foto aggiunta all'album della serata.",
   },
   history: {
     title: "Cosa hai bevuto",
@@ -850,6 +858,8 @@ export const it: Messages = {
     consent: "Accetto che i miei bicchieri e il mio tasso vengano registrati",
     consentHint: "Sono dati sulla salute. Puoi cancellare tutto nella scheda Tu.",
     start: "Inizia",
+    notifTitle: "Cosa ti può avvisare",
+    notifBody: "Puoi cambiare tutto più tardi nelle Impostazioni.",
   },
   errors: {
     rejected: "Il server ha rifiutato {action}: {reason}.",

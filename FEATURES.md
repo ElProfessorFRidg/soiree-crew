@@ -13,7 +13,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 |---|---|---|---|---|
 | O-01 | P0 | Arrivee.dc.html | todo | Sign up / sign in with email and Google (first name and username kept separate). Add Sign in with Apple (requi... |
 | O-02 | P0 | Arrivee.dc.html | build | 18+ age gate on first launch. |
-| O-03 | P1 | Arrivee.dc.html | todo | Onboarding where the user picks their notifications. |
+| O-03 | P1 | Arrivee.dc.html | build | Onboarding where the user picks their notifications. |
 | O-04 | P0 | Arrivee.dc.html | build | Profile for the BAC model: weight, sex (check what the model really needs; S2M dropped height because the calc... |
 | O-05 | P0 | Arrivee.dc.html | build | Country (legal limit) + novice / probationary driver mode. |
 | O-06 | P2 | Reglages.dc.html | todo | Change password and email from settings. |
@@ -147,7 +147,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 |---|---|---|---|---|
 | O-81 | P1 | Soiree.dc.html | todo | Much more detailed charts. |
 | O-82 | P0 | Securite.dc.html | build | "Gone to bed / home" status. |
-| O-83 | P1 | Soiree.dc.html | todo | Photo when logging a drink. |
+| O-83 | P1 | Soiree.dc.html | build | Photo when logging a drink. |
 | O-84 | P1 | Recap.dc.html | build | Photos and videos shared that stay inside the group. |
 
 ## Party hub
@@ -167,7 +167,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | PREF-02 | P0 | Arrivee.dc.html | build | Smart defaults on first launch, from the device language and region (no location permission needed for this): ... |
 | PREF-03 | P0 | Reglages.dc.html | build | Settings page where all of it can be changed by hand: language, country for the legal limit, novice driver mod... |
 | PREF-04 | P0 | Arrivee.dc.html | build | Language, region and units are independent settings. A French speaker living in the US can have French UI, US ... |
-| PREF-05 | P1 | Reglages.dc.html | todo | Travel: when the phone's region or time zone changes (a trip abroad), the app suggests switching the legal-lim... |
+| PREF-05 | P1 | Reglages.dc.html | build | Travel: when the phone's region or time zone changes (a trip abroad), the app suggests switching the legal-lim... |
 | PREF-06 | P0 | Backstage | build | Canonical storage: the database stores one unit per quantity (ml, grams of ethanol, kg, g/L of blood, UTC time... |
 
 ## Radar: who is out, and when

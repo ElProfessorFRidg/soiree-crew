@@ -755,6 +755,12 @@ export const fr = {
     bestNights: "Meilleures soirées ici",
     bestNight: { one: "{date} : {count} personne", other: "{date} : {count} personnes" },
   },
+  travel: {
+    title: "Tu es à l'étranger ?",
+    body: "Ton téléphone est réglé sur : {country}. La limite de conduite peut y être différente.",
+    switch: "Passer à : {country}",
+    keep: "Garder le pays actuel",
+  },
   addDrink: {
     quick: "Tape ce que tu bois",
     quickPlaceholder: "2 pintes et un shot",
@@ -787,6 +793,8 @@ export const fr = {
     removed: "Boisson retirée",
     more: "Options de {name}",
     nameRequired: "Donne-lui un nom.",
+    photo: "Ajouter une photo à l'album",
+    photoAdded: "Photo ajoutée à l'album de la soirée.",
   },
   history: {
     title: "Ce que t'as bu",
@@ -849,6 +857,8 @@ export const fr = {
     consent: "J'accepte que mes verres et mon taux soient enregistrés",
     consentHint: "Ce sont des données de santé. Tu peux tout effacer dans Moi.",
     start: "Commencer",
+    notifTitle: "Ce qui peut te prévenir",
+    notifBody: "Tu peux tout changer plus tard dans les réglages.",
   },
   errors: {
     rejected: "Le serveur a refusé {action} : {reason}.",
