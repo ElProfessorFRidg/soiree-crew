@@ -24,7 +24,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-11 | P0 | Backstage | todo | Accessibility: large touch targets, respects Reduce Motion, text never truncated, nothing under the notch or c... |
 | O-12 | P2 | Reglages.dc.html | todo | In-app notice when a new version is available. |
 | O-13 | P2 | Reglages.dc.html | build | Per-account data isolation on the device (several accounts on one phone without leaks). |
-| O-14 | P0 | Backstage | todo | Opening the app never stops music already playing (Spotify, Deezer...). |
+| O-14 | P0 | Backstage | build | Opening the app never stops music already playing (Spotify, Deezer...). |
 
 ## BAC and drink tracking
 
@@ -250,7 +250,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-02 | P0 | Soiree.dc.html | build | A night belongs to the evening it started: a configurable day boundary (default 6 am) for stats, recaps, "toni... |
 | QOL-03 | P0 | Systeme.dc.html | build | Actionable notifications: answer "On my way" / "Not tonight" to "who's in?", add a drink, confirm a round or a... |
 | QOL-04 | P0 | Systeme.dc.html | todo | System shortcuts for a drunk thumb: Siri / App Intents and Android App Actions ("Hey Siri, add a beer"), iPhon... |
-| QOL-05 | P0 | Systeme.dc.html | todo | Deep links and universal links for every party, venue, profile, crew invite, recap and game card. Links pasted... |
+| QOL-05 | P0 | Systeme.dc.html | build | Deep links and universal links for every party, venue, profile, crew invite, recap and game card. Links pasted... |
 | QOL-06 | P0 | Soiree.dc.html | todo | Native sharing: recap and story cards go straight to Instagram Stories, Snapchat (Creative Kit), TikTok and Wh... |
 | QOL-07 | P0 | Etats.dc.html | build | Typed content is never lost: drafts (party name, review, expense, card) survive the app being killed, errors a... |
 | QOL-08 | P0 | Arrivee.dc.html | todo | Forms done right: the right keyboard per field (numeric pad with the locale's decimal separator for amounts, e... |
@@ -486,7 +486,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | SEC-07 | P0 | Reglages.dc.html | build | Accounts: passkeys first; passwords, if any, hashed with Argon2id; list of active sessions with remote sign-ou... |
 | SEC-08 | P0 | Arrivee.dc.html | build | GDPR: alcohol consumption and BAC may count as health data under GDPR article 9, which means explicit consent,... |
 | SEC-09 | P0 | Backstage | build | Secure development: a threat model (STRIDE) per major feature in `SECURITY.md`, secret scanning, static analys... |
-| SEC-10 | P0 | Backstage | todo | Export compliance for encryption: App Store encryption questions, US export rules, and the French ANSSI declar... |
+| SEC-10 | P0 | Backstage | build | Export compliance for encryption: App Store encryption questions, US export rules, and the French ANSSI declar... |
 | SEC-11 | P0 | Backstage | proposed | BAC computed on the device; drinks, weight and sex stored on the server only when the user shares with their crew, with a "local only" mode. Tension with server-authoritative scoring, see `research/open-decisions.md`. Source: security.md §2.8, §5. |
 | SEC-12 | P0 | Backstage | proposed | No health data in iCloud: local DB and backups excluded from iCloud device backup; the MSG-08 archive never in iCloud Drive (App Store 5.1.3(ii)). Source: security.md §1 item 4, §5. |
 | SEC-13 | P0 | Backstage | proposed | Export compliance file: classification memo, ANSSI declaration, App Store key, annual review. security.md allows merging it into SEC-10. Source: security.md §2.9, §5. |

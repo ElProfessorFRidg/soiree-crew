@@ -582,6 +582,14 @@ export const en: Messages = {
     result: "It's {venue}.",
     notVisited: "never been",
   },
+  join: {
+    title: "Invite",
+    accepting: "Adding you to the crew.",
+    joined: "Welcome to the crew.",
+    failed: "This invite doesn't work any more. Ask for a new link.",
+    connectFirst: "Create your account on the crew's server: the invite is accepted right after.",
+    otherServer: "This invite is from another server ({server}). Sign out first to join it.",
+  },
   addDrink: {
     title: "Add",
     myDrinks: "My drinks",

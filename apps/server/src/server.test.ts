@@ -155,6 +155,18 @@ describe("crews, parties and the live dashboard", () => {
     expect(page).toMatchObject({ crew: { name: "Les Quais", members: 2 } });
   });
 
+  it("serves the shared invite link as a page that opens the app (QOL-05)", async () => {
+    const { users, crewId } = await crewWith("jade", "malik");
+    const invite = (await app.inject({ method: "POST", url: `/v1/crews/${crewId}/invites`, headers: users[0]!.auth })).json() as { code: string; url: string };
+    expect(invite.url).toBe(`https://crew.test/i/${invite.code}`);
+    const fr = await app.inject({ method: "GET", url: `/i/${invite.code}`, headers: { "accept-language": "fr-FR,fr;q=0.9" } });
+    expect(fr.headers["content-type"]).toContain("text/html");
+    expect(fr.body).toContain("Rejoins Les Quais");
+    expect(fr.body).toContain(`soireecrew://join?code=${invite.code}&amp;server=https%3A%2F%2Fcrew.test`);
+    const gone = await app.inject({ method: "GET", url: "/i/NOPE1234" });
+    expect(gone.statusCode).toBe(404);
+  });
+
   it("computes members' BACs on the server and hides the party from other crews", async () => {
     const { users, crewId } = await crewWith("jade", "malik");
     const [jade, malik] = users as [Awaited<ReturnType<typeof account>>, Awaited<ReturnType<typeof account>>];

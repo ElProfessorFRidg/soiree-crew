@@ -580,6 +580,14 @@ export const fr = {
     result: "Ce sera {venue}.",
     notVisited: "jamais visité",
   },
+  join: {
+    title: "Invitation",
+    accepting: "On t'ajoute au crew.",
+    joined: "Bienvenue dans le crew.",
+    failed: "Cette invitation ne marche plus. Demande un nouveau lien.",
+    connectFirst: "Crée ton compte sur le serveur du crew : l'invitation sera acceptée juste après.",
+    otherServer: "Cette invitation vient d'un autre serveur ({server}). Déconnecte-toi d'abord pour la rejoindre.",
+  },
   addDrink: {
     title: "Ajouter",
     myDrinks: "Mes boissons",

@@ -1,6 +1,6 @@
 import * as Clipboard from "expo-clipboard";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, Share, StyleSheet, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { duration } from "@crew/design-tokens";
@@ -25,6 +25,7 @@ import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { guarded } from "@/vault/vault";
 import { useDraft } from "@/state/drafts";
+import { usePendingInvite } from "@/server/pendingInvite";
 
 function errorMessage(error: unknown, i18n: Translator): string {
   if (error instanceof ApiError && error.failure.kind === "http") {
@@ -164,6 +165,20 @@ export default function CrewScreen() {
   const [crewName, setCrewName, clearCrewName] = useDraft("crew:name");
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState<"create" | "join" | null>(null);
+  const pendingInvite = usePendingInvite((state) => state.invite);
+
+  // QOL-05: an invite link opened before signing up is accepted as soon as the account exists.
+  useEffect(() => {
+    if (!session || !pendingInvite) return;
+    usePendingInvite.setState({ invite: null });
+    if (session.url !== pendingInvite.server) return;
+    void acceptInvite(pendingInvite.code)
+      .then(() => {
+        haptic.confirmed();
+        showToast({ message: i18n.t("join.joined") });
+      })
+      .catch(() => showToast({ tone: "danger", message: i18n.t("join.failed") }));
+  }, [session, pendingInvite, i18n]);
 
   if (!session) {
     return (

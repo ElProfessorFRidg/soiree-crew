@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { newCode, newId } from "../crypto";
 import { crewSchema } from "../schemas";
+import { invitePage, pickLanguage } from "../invitePage";
 
 const INVITE_TTL_MS = 7 * 24 * 3_600_000;
 
@@ -80,6 +81,24 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
     const row = rows[0];
     if (!row || row.expires_at < ctx.now()) throw new HttpError(404, "not_found");
     return { crew: { name: row.name, members: row.members }, expiresAt: row.expires_at };
+  });
+
+  /** The link people share (N-30, QOL-05): a small page that opens the app on the invite. */
+  app.get<{ Params: { code: string } }>("/i/:code", async (request, reply) => {
+    const code = request.params.code.toUpperCase();
+    const rows = await ctx.db.query<{ name: string; members: number; expires_at: number }>(
+      `select c.name, (select count(*)::int from crew_members m where m.crew_id = c.id) as members, i.expires_at
+       from crew_invites i join crews c on c.id = i.crew_id where i.code = $1`,
+      [code],
+    );
+    const row = rows[0];
+    const language = pickLanguage(request.headers["accept-language"]);
+    const valid = row && row.expires_at >= ctx.now();
+    return reply
+      .status(valid ? 200 : 404)
+      .header("content-type", "text/html; charset=utf-8")
+      .header("cache-control", "no-store")
+      .send(invitePage(language, valid ? { code, crewName: row.name, members: row.members, serverUrl: ctx.publicUrl } : null));
   });
 
   app.post<{ Params: { code: string } }>("/v1/invites/:code/accept", async (request) => {

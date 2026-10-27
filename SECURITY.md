@@ -37,6 +37,10 @@ Threat model per major feature (STRIDE), then the checks that run on every chang
 - Dependencies: `pnpm audit --prod` in CI, reported, not blocking yet.
 - Secrets: nothing secret in the repo; `DATA_KEY` and tokens come from the environment. `apps/server/data` (local PGlite and its dev key) is git-ignored.
 
+## Export compliance (SEC-10)
+
+The app itself only uses the system's HTTPS: `ITSAppUsesNonExemptEncryption` is `false` in `app.json`. The AES-256-GCM sealing runs on the server, not in the app. A public release still needs the App Store questionnaire answered and the French ANSSI declaration checked by the publisher.
+
 ## Not done yet (before any public release)
 
 - Certificate pinning and app integrity (App Attest, Play Integrity) as anti-cheat signals (AC-05, SEC-03).

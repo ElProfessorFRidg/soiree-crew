@@ -10,6 +10,7 @@ import { Panel, Segmented } from "@/ui/controls";
 import { Text } from "@/ui/Text";
 import { Field } from "./Field";
 import { deviceName } from "@/server/device";
+import { usePendingInvite } from "@/server/pendingInvite";
 
 interface AccountResponse {
   user: { id: string; username: string; displayName: string };
@@ -20,7 +21,7 @@ interface AccountResponse {
 export function ConnectServer() {
   const i18n = useT();
   const theme = useTheme();
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState(() => usePendingInvite.getState().invite?.server ?? "");
   const [mode, setMode] = useState<"create" | "claim">("create");
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
