@@ -814,6 +814,14 @@ export const de: Messages = {
     rights: "Deine Rechte",
     rightsBody: "Unter Ich: alle Daten exportieren, alles löschen, festlegen, wer was sieht. Ohne Konto bleibt alles auf diesem Handy.",
   },
+  prices: {
+    title: "Preise hier",
+    empty: "Noch keine Preise. Trag ein, was du zahlst.",
+    reports: { one: "laut {count} Person", other: "laut {count} Personen" },
+    add: "Preis eintragen",
+    save: "Preis speichern",
+    saved: "Preis eingetragen.",
+  },
   addDrink: {
     quick: "Tipp ein, was du trinkst",
     quickPlaceholder: "2 Bier und ein Shot",

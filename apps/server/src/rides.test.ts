@@ -161,3 +161,19 @@ describe("shopping list (N-32)", () => {
     expect(((await app.inject({ method: "GET", url: `/v1/parties/${partyId}/items`, headers: jade.auth })).json() as { items: unknown[] }).items).toEqual([]);
   });
 });
+
+describe("drink prices per bar (N-09)", () => {
+  it("keeps one price per person and drink, and shows the crew's median", async () => {
+    const { users, crewId } = await crewWithParty("jade", "malik", "ines");
+    const [jade, malik, ines] = users as [User, User, User];
+    const venueId = randomUUID();
+    await app.inject({ method: "POST", url: `/v1/crews/${crewId}/venues`, headers: jade.auth, payload: { id: venueId, name: "Le Zinc", kind: "bar", lat: 48.85, lng: 2.35 } });
+    const put = (u: User, amount: number) => app.inject({ method: "PUT", url: `/v1/venues/${venueId}/prices`, headers: u.auth, payload: { kind: "pint", amount, currency: "EUR" } });
+    await put(jade, 600);
+    await put(jade, 700);
+    await put(malik, 750);
+    await put(ines, 900);
+    const prices = (await app.inject({ method: "GET", url: `/v1/venues/${venueId}/prices`, headers: malik.auth })).json() as { prices: { kind: string; amount: number; reports: number }[] };
+    expect(prices.prices).toEqual([{ kind: "pint", currency: "EUR", amount: 750, reports: 3 }]);
+  });
+});

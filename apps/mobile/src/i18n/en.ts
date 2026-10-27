@@ -816,6 +816,14 @@ export const en: Messages = {
     rights: "Your rights",
     rightsBody: "In Me: export all your data, delete everything, change who sees what. Without an account, everything stays on this phone.",
   },
+  prices: {
+    title: "Prices here",
+    empty: "No prices yet. Note what you pay.",
+    reports: { one: "from {count} person", other: "from {count} people" },
+    add: "Note a price",
+    save: "Save the price",
+    saved: "Price noted.",
+  },
   addDrink: {
     quick: "Type what you're drinking",
     quickPlaceholder: "2 pints and a shot",

@@ -1,4 +1,5 @@
 import type { FastifyInstance } from "fastify";
+import { z } from "zod";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { byMonth, byWeekday, crewStreak, milestones } from "../stats";
 import { crewTimeZone } from "../territory";
@@ -107,6 +108,48 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
       crewSince: crew.created_at,
       boards,
     };
+  });
+
+  /** N-09: the crew's prices at a bar: the median of each person's latest price, per drink, from the last 180 days. */
+  app.get<{ Params: { id: string } }>("/v1/venues/:id/prices", async (request) => {
+    const user = requireUser(request);
+    const venue = (await ctx.db.query<{ crew_id: string }>("select crew_id from venues where id = $1", [request.params.id]))[0];
+    if (!venue) throw new HttpError(404, "not_found");
+    await assertCrewMember(ctx, venue.crew_id, user.id);
+    const rows = await ctx.db.query<{ kind: string; amount: number; currency: string }>(
+      "select kind, amount, currency from venue_prices where venue_id = $1 and at > $2",
+      [request.params.id, ctx.now() - 180 * 86_400_000],
+    );
+    const groups = new Map<string, number[]>();
+    for (const r of rows) {
+      const key = `${r.kind}|${r.currency}`;
+      groups.set(key, [...(groups.get(key) ?? []), r.amount]);
+    }
+    return {
+      prices: [...groups.entries()].map(([key, amounts]) => {
+        const [kind, currency] = key.split("|") as [string, string];
+        const sorted = [...amounts].sort((a, b) => a - b);
+        const mid = Math.floor(sorted.length / 2);
+        const median = sorted.length % 2 ? sorted[mid]! : Math.round((sorted[mid - 1]! + sorted[mid]!) / 2);
+        return { kind, currency, amount: median, reports: amounts.length };
+      }),
+    };
+  });
+
+  app.put<{ Params: { id: string } }>("/v1/venues/:id/prices", async (request) => {
+    const user = requireUser(request);
+    const venue = (await ctx.db.query<{ crew_id: string }>("select crew_id from venues where id = $1", [request.params.id]))[0];
+    if (!venue) throw new HttpError(404, "not_found");
+    await assertCrewMember(ctx, venue.crew_id, user.id);
+    const input = z
+      .object({ kind: z.string().min(1).max(30), amount: z.number().int().positive().max(100_000), currency: z.string().regex(/^[A-Z]{3}$/) })
+      .parse(request.body);
+    await ctx.db.query(
+      `insert into venue_prices (venue_id, user_id, kind, amount, currency, at) values ($1, $2, $3, $4, $5, $6)
+       on conflict (venue_id, user_id, kind) do update set amount = excluded.amount, currency = excluded.currency, at = excluded.at`,
+      [request.params.id, user.id, input.kind, input.amount, input.currency, ctx.now()],
+    );
+    return { ok: true };
   });
 
   /** N-12: what a venue is to the crew: visits, nights, people, and its best nights. */

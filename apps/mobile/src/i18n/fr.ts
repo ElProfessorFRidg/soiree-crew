@@ -814,6 +814,14 @@ export const fr = {
     rights: "Tes droits",
     rightsBody: "Dans Moi : exporter toutes tes données, tout supprimer, changer qui voit quoi. Sans compte, tout reste sur ce téléphone.",
   },
+  prices: {
+    title: "Les prix ici",
+    empty: "Pas encore de prix. Note ce que tu paies.",
+    reports: { one: "d'après {count} personne", other: "d'après {count} personnes" },
+    add: "Noter un prix",
+    save: "Enregistrer le prix",
+    saved: "Prix noté.",
+  },
   addDrink: {
     quick: "Tape ce que tu bois",
     quickPlaceholder: "2 pintes et un shot",

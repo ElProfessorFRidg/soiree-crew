@@ -815,6 +815,14 @@ export const it: Messages = {
     rights: "I tuoi diritti",
     rightsBody: "In Tu: esportare tutti i tuoi dati, cancellare tutto, scegliere chi vede cosa. Senza account, tutto resta su questo telefono.",
   },
+  prices: {
+    title: "I prezzi qui",
+    empty: "Ancora nessun prezzo. Segna quanto paghi.",
+    reports: { one: "secondo {count} persona", other: "secondo {count} persone" },
+    add: "Segna un prezzo",
+    save: "Salva il prezzo",
+    saved: "Prezzo segnato.",
+  },
   addDrink: {
     quick: "Scrivi cosa bevi",
     quickPlaceholder: "2 pinte e uno shot",

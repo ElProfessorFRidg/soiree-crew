@@ -187,7 +187,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | N-08 | P0 | Bars.dc.html | build | Crew venue directory: bars, clubs, flats, spots, with address, opening hours, happy hours, vibe, crew ratings,... |
-| N-09 | P1 | Bars.dc.html | todo | Drink prices logged by the crew per venue (pint, half, shot, cocktail, soft drink), price history, flag when a... |
+| N-09 | P1 | Bars.dc.html | build | Drink prices logged by the crew per venue (pint, half, shot, cocktail, soft drink), price history, flag when a... |
 | N-10 | P0 | Bars.dc.html | build | Check-in at a venue, visible in the party and the recap (verification in <anti_cheat>). |
 | N-11 | P0 | Bars.dc.html | build | "Where to?": suggestion, vote or roulette between venues by availability, budget, distance, current happy hours. |
 | N-12 | P1 | Bars.dc.html | build | Venue stats: visits, average spend, average drinks, best nights there. |

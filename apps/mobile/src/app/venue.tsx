@@ -19,6 +19,7 @@ import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { ReportPanel } from "@/moderation/ReportPanel";
 import { fetchVenueStats, type VenueStats } from "@/server/statsData";
+import { VenuePrices } from "@/crew/VenuePrices";
 
 /** N-12: what this bar is to the crew. */
 function VenueNumbers({ venueId }: { venueId: string }) {
@@ -180,6 +181,7 @@ export default function VenueScreen() {
         />
       </Panel>
       <VenueNumbers venueId={page.venue.id} />
+      <VenuePrices venueId={page.venue.id} />
       <ReportPanel targetKind="venue" targetId={page.venue.id} />
     </Screen>
   );
