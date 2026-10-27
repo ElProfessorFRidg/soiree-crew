@@ -11,6 +11,10 @@ import { LiveHub } from "./live";
 //   DATA_KEY      32 random bytes, base64: encrypts health data (openssl rand -base64 32)
 //   PUBLIC_URL    https address phones use, for invite links
 //   PORT          default 8787
+//   UPLOAD_DIR    album photos, chat files and backups (default ./data/uploads; /data/uploads in the image)
+//   TRUST_PROXY   "1" (one proxy hop, e.g. Coolify's Traefik) or "true"; unset when exposed directly
+//   AI_PROVIDER, ANTHROPIC_API_KEY, AI_MODEL   optional, ADR 0004
+//   SEASON_VARIANTS   optional JSON, {"2026-12": "games"} (TER-12)
 
 const dataKey = process.env.DATA_KEY;
 if (!dataKey) {
@@ -22,6 +26,13 @@ const db = process.env.DATABASE_URL ? await connectPostgres(process.env.DATABASE
 await migrate(db);
 
 const port = Number(process.env.PORT ?? 8787);
+
+function trustProxy(value: string | undefined): boolean | number {
+  if (!value || value === "false" || value === "0") return false;
+  if (value === "true") return true;
+  const hops = Number.parseInt(value, 10);
+  return Number.isFinite(hops) && hops > 0 ? hops : false;
+}
 const app = await buildApp(
   {
     db,
@@ -33,7 +44,7 @@ const app = await buildApp(
     uploadDir: process.env.UPLOAD_DIR ?? "./data/uploads",
     ai: aiProvider(),
   },
-  { logger: true },
+  { logger: true, trustProxy: trustProxy(process.env.TRUST_PROXY) },
 );
 
 await app.listen({ port, host: "0.0.0.0" });

@@ -621,6 +621,8 @@ export const pt: Messages = {
     hapticsHint: "Uma vibração por cada ação importante. Separada dos sons, e nada é dito só pela vibração.",
     motionScale: "Velocidade das animações (dev)",
     motionScaleHint: "Abranda ou acelera todas as animações para a revisão fotograma a fotograma. Só em versões de desenvolvimento.",
+    lockNumbers: "Taxa visível no ecrã bloqueado",
+    lockNumbersHint: "Desligado, a notificação da noite mostra só a hora do regresso a 0, nunca a taxa.",
   },
   vault: {
     queued: "Guardado até amanhã. Voltamos a perguntar quando acordares.",

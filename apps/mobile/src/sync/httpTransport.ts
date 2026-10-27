@@ -1,4 +1,5 @@
 import { api, ApiError } from "@/server/api";
+import { refillNonces, wireEnvelope } from "./envelope";
 import type { PendingMutation, RejectionReason, Transport, TransportResult } from "./types";
 
 interface ServerResult {
@@ -16,11 +17,14 @@ export class HttpTransport implements Transport {
     try {
       const { results } = await api<{ results: ServerResult[] }>("/v1/mutations", {
         method: "POST",
-        body: { mutations: [{ key: pending.id, mutation: pending.mutation }] },
+        body: { mutations: [{ key: pending.id, mutation: pending.mutation, ...(pending.envelope ? { envelope: wireEnvelope(pending.envelope) } : {}) }] },
       });
       const result = results[0];
       if (!result) return { status: "temporary" };
-      if (result.status === "accepted") return { status: "accepted", serverTime: result.serverTime ?? Date.now() };
+      if (result.status === "accepted") {
+        void refillNonces().catch(() => undefined);
+        return { status: "accepted", serverTime: result.serverTime ?? Date.now() };
+      }
       const reason = KNOWN_REASONS.find((known) => known === result.reason) ?? "invalid";
       return { status: "rejected", reason };
     } catch (error) {

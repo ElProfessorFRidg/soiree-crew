@@ -95,6 +95,7 @@ let socket: WebSocket | null = null;
 let retry = 0;
 let retryTimer: ReturnType<typeof setTimeout> | null = null;
 let stopped = true;
+const FOREGROUND_REFRESH_MS = 15_000;
 
 function openSocket(session: ServerSession): void {
   if (stopped || socket) return;
@@ -175,8 +176,13 @@ export function connect(session: ServerSession | null): void {
   void refreshAll();
   openSocket(session);
 
+  let lastForeground = 0;
   const subscription = RNAppState.addEventListener("change", (status) => {
     if (status !== "active") return;
+    // Flicking between apps fires "active" again and again: one catch-up per 15 s is plenty,
+    // the live socket carries anything in between.
+    if (Date.now() - lastForeground < FOREGROUND_REFRESH_MS) return;
+    lastForeground = Date.now();
     void refreshAll();
     const current = useSession.getState().session;
     if (current && !socket) openSocket(current);

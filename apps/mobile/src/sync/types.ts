@@ -52,6 +52,8 @@ export interface PendingMutation {
   mutation: Mutation;
   createdAt: number;
   attempts: number;
+  /** AC-12, added when the write is queued. Older queued items have none. */
+  envelope?: import("./envelope").Envelope;
 }
 
 export type RejectionReason = "future_drink" | "invalid" | "party_closed";

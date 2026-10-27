@@ -1,3 +1,4 @@
+import Constants from "expo-constants";
 import { useRef, useState, type ComponentRef } from "react";
 import { View, type TextInput } from "react-native";
 import { useT } from "@/i18n";
@@ -22,7 +23,8 @@ interface AccountResponse {
 export function ConnectServer() {
   const i18n = useT();
   const theme = useTheme();
-  const [address, setAddress] = useState(() => usePendingInvite.getState().invite?.server ?? "");
+  // An invite's server first, else the public server this build was made for.
+  const [address, setAddress] = useState(() => usePendingInvite.getState().invite?.server ?? ((Constants.expoConfig?.extra?.defaultServerUrl as string | null | undefined) || ""));
   const [mode, setMode] = useState<"create" | "password" | "claim">("create");
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");

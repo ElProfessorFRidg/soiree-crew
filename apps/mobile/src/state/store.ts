@@ -60,6 +60,13 @@ export interface AppState {
   soundsOn: boolean;
   /** MOT-15: vibrations, on by default, switched separately from sounds. */
   hapticsOn: boolean;
+  /** AC-12: this install's event chain and the nonces fetched in advance for offline writes. */
+  installId: string | null;
+  eventSeq: number;
+  chainHead: string;
+  nonceBook: { nonce: string; expiresAt: number }[];
+  /** QOL-27: BAC figures on the lock screen and in notifications; off means time to zero only. */
+  lockScreenNumbers: boolean;
   /** SLOP-11: the last variant shown of each recurring line, and for which occasion. */
   copyVariants: Record<string, { index: number; occasion: string }>;
   /** QOL-32: when the logging nudge was last answered. */
@@ -98,6 +105,11 @@ export const useAppStore = create<AppState>()(
       soundsOn: false,
       hapticsOn: true,
       copyVariants: {},
+      lockScreenNumbers: false,
+      installId: null,
+      eventSeq: 0,
+      chainHead: "",
+      nonceBook: [],
       nudgeDismissedAt: null,
       remindersMutedUntil: null,
     }),
@@ -215,6 +227,11 @@ export function buildWater(at: number): WaterEntry {
 /** O-13: one account's history never shows under another account on the same phone. */
 export function clearAccountHistory(): void {
   useAppStore.setState({
+    // AC-12: the server ties an install's chain to one account; another account starts a new one.
+    installId: null,
+    eventSeq: 0,
+    chainHead: "",
+    nonceBook: [],
     drinks: [],
     water: [],
     customDrinks: [],

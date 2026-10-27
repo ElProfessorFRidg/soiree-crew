@@ -19,6 +19,7 @@ import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { checkForUpdate, currentBuild } from "@/system/updates";
 import { AppIconPicker } from "@/profile/AppIconPicker";
+import { refreshReminders } from "@/reminders/reminders";
 
 const CURRENCIES = ["EUR", "USD", "GBP", "CHF", "CAD", "AUD"] as const;
 const WATER_STEPS = [30, 45, 60, 90] as const;
@@ -53,6 +54,7 @@ export default function SettingsScreen() {
   const checkUpdates = useAppStore((state) => state.checkUpdates);
   const soundsOn = useAppStore((state) => state.soundsOn);
   const hapticsOn = useAppStore((state) => state.hapticsOn);
+  const lockScreenNumbers = useAppStore((state) => state.lockScreenNumbers);
   const crews = useCrewData((state) => state.crews);
   const hour = (h: number) => formatClock(new Date(2026, 0, 1, h).getTime(), i18n.language, preferences.hourCycle);
   const offline = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
@@ -132,6 +134,15 @@ export default function SettingsScreen() {
       </Section>
 
       <Section title={i18n.t("settings.notifications")}>
+        <SwitchRow
+          label={i18n.t("settings.lockNumbers")}
+          hint={i18n.t("settings.lockNumbersHint")}
+          value={lockScreenNumbers}
+          onChange={(on) => {
+            useAppStore.setState({ lockScreenNumbers: on });
+            void refreshReminders().catch(() => undefined);
+          }}
+        />
         <SwitchRow
           label={i18n.t("updates.check")}
           hint={i18n.t("updates.checkHint", { build: currentBuild || "dev" })}

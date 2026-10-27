@@ -5,6 +5,7 @@ import { buildApp } from "./app";
 import { Sealer } from "./crypto";
 import { connectPglite, migrate, type Db } from "./db";
 import { LiveHub } from "./live";
+import { eventHash } from "./routes/mutations";
 
 const clock = Date.UTC(2026, 10, 7, 21, 0);
 let db: Db;
@@ -146,5 +147,57 @@ describe("every mutation (SYNC-08)", () => {
       reason: "future_drink",
     });
     expect(await send(jade, randomUUID(), { kind: "drink.teleport" })).toMatchObject({ status: "rejected" });
+  });
+});
+
+describe("offline replay protection (AC-12)", () => {
+  async function nonces(auth: Auth) {
+    return ((await app.inject({ method: "POST", url: "/v1/nonces", headers: auth })).json() as { nonces: { nonce: string }[] }).nonces;
+  }
+  async function sendWith(auth: Auth, key: string, mutation: unknown, envelope: Record<string, unknown>) {
+    const res = await app.inject({ method: "POST", url: "/v1/mutations", headers: auth, payload: { mutations: [{ key, mutation, envelope }] } });
+    return (res.json() as { results: { status: string; reason?: string }[] }).results[0]!;
+  }
+  const trustOf = async (id: string) => (await db.query<{ envelope_trust: string; logged_at: number }>("select envelope_trust, logged_at from drinks where id = $1", [id]))[0]!;
+
+  it("chains events, dates them by monotonic age, refuses replays and spent nonces", async () => {
+    const jade = await account("jade");
+    const book = await nonces(jade);
+    expect(book).toHaveLength(50);
+    expect(await nonces(jade)).toHaveLength(0);
+
+    const k1 = randomUUID();
+    const d1 = { kind: "drink.add", drink: drink(randomUUID()) };
+    const h1 = eventHash("", k1, d1);
+    const base = { installId: "install-jade-1", bootId: "boot-1", prevHash: "" };
+    expect(await sendWith(jade, k1, d1, { ...base, seq: 1, ageMs: 30 * 60_000, hash: h1, nonce: book[0]!.nonce })).toMatchObject({ status: "accepted" });
+    expect(await trustOf(d1.drink.id)).toEqual({ envelope_trust: "ok", logged_at: clock - 30 * 60_000 });
+
+    // Same nonce again: a replay.
+    const k2 = randomUUID();
+    const d2 = { kind: "drink.add", drink: drink(randomUUID()) };
+    expect(await sendWith(jade, k2, d2, { ...base, seq: 2, ageMs: 0, prevHash: h1, hash: eventHash(h1, k2, d2), nonce: book[0]!.nonce })).toMatchObject({ reason: "replay" });
+    // A sequence number that goes back: a replay too.
+    const k3 = randomUUID();
+    expect(await sendWith(jade, k3, d2, { ...base, seq: 1, ageMs: 0, prevHash: h1, hash: eventHash(h1, k3, d2), nonce: book[1]!.nonce })).toMatchObject({ reason: "replay" });
+    // A gap in the chain is kept, with weaker proof; so is an event over 24 h old.
+    const k4 = randomUUID();
+    const d4 = { kind: "drink.add", drink: drink(randomUUID()) };
+    expect(await sendWith(jade, k4, d4, { ...base, seq: 5, ageMs: 0, prevHash: "lost", hash: eventHash("lost", k4, d4), nonce: book[2]!.nonce })).toMatchObject({ status: "accepted" });
+    expect((await trustOf(d4.drink.id)).envelope_trust).toBe("broken_chain");
+    const k5 = randomUUID();
+    const d5 = { kind: "drink.add", drink: drink(randomUUID()) };
+    const h4 = eventHash("lost", k4, d4);
+    expect(await sendWith(jade, k5, d5, { ...base, seq: 6, ageMs: 30 * 3_600_000, prevHash: h4, hash: eventHash(h4, k5, d5), nonce: null })).toMatchObject({ status: "accepted" });
+    expect((await trustOf(d5.drink.id)).envelope_trust).toBe("stale");
+  });
+
+  it("refuses another person's nonce or install", async () => {
+    const jade = await account("jade");
+    const malik = await account("malik");
+    const book = await nonces(jade);
+    const k = randomUUID();
+    const d = { kind: "drink.add", drink: drink(randomUUID()) };
+    expect(await sendWith(malik, k, d, { installId: "install-x-12", bootId: "b", prevHash: "", seq: 1, ageMs: 0, hash: eventHash("", k, d), nonce: book[0]!.nonce })).toMatchObject({ reason: "invalid" });
   });
 });

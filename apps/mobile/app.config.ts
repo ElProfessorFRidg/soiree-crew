@@ -9,6 +9,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ios: { ...config.ios, buildNumber: String(build) },
     android: { ...config.android, versionCode: build },
     // O-12: the app compares this with the latest GitHub release to say when a newer one exists.
-    extra: { ...config.extra, buildNumber: build, releasesApi: "https://api.github.com/repos/ElProfessorFRidg/soiree-crew/releases/latest" },
+    // The public server the connect screen suggests; CI passes the repository variable CREW_SERVER_URL.
+    extra: {
+      ...config.extra,
+      buildNumber: build,
+      releasesApi: "https://api.github.com/repos/ElProfessorFRidg/soiree-crew/releases/latest",
+      defaultServerUrl: process.env.CREW_SERVER_URL || null,
+    },
   };
 };

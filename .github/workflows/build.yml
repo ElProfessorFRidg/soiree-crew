@@ -48,6 +48,7 @@ jobs:
         working-directory: apps/mobile
         env:
           BUILD_NUMBER: ${{ github.run_number }}
+          CREW_SERVER_URL: ${{ vars.CREW_SERVER_URL }}
         run: npx expo prebuild --platform ios --clean
       - name: Build the app without signing
         working-directory: apps/mobile/ios
@@ -99,6 +100,7 @@ jobs:
         working-directory: apps/mobile
         env:
           BUILD_NUMBER: ${{ github.run_number }}
+          CREW_SERVER_URL: ${{ vars.CREW_SERVER_URL }}
         run: npx expo prebuild --platform android --clean
       - name: Build the APK
         working-directory: apps/mobile/android
@@ -109,7 +111,8 @@ jobs:
         run: |
           # gradle.properties has no final newline: start a new line before adding to it.
           printf '\norg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g\n' >> gradle.properties
-          ./gradlew assembleRelease --no-daemon
+          # The runner sometimes gets a truncated NDK download: one clean retry before giving up.
+          ./gradlew assembleRelease --no-daemon || { rm -rf "$ANDROID_HOME/ndk/"*.tmp "$HOME/.android/cache"; sleep 20; ./gradlew assembleRelease --no-daemon; }
       - name: Name the APK
         run: cp apps/mobile/android/app/build/outputs/apk/release/app-release.apk soiree-crew.apk
       - uses: actions/upload-artifact@v7

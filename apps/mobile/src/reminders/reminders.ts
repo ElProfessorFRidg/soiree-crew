@@ -102,13 +102,17 @@ async function updateNightNotification(estimate: BacEstimate, i18n: Translator, 
     vibrationPattern: null,
     enableVibrate: false,
     showBadge: false,
+    // QOL-27: on a locked phone the system shows the app name only.
+    lockscreenVisibility: Notifications.AndroidNotificationVisibility.PRIVATE,
   });
   const ratio = breathRatio(countryRules(preferences.legalCountry));
   const value = `${formatBacValue(estimate.bac, preferences.bacUnit, ratio, i18n.locale)} ${i18n.t(`units.${preferences.bacUnit}`)}`;
+  // QOL-27: discreet by default, no figure anyone glancing at the phone could read.
+  const numbers = useAppStore.getState().lockScreenNumbers;
   await Notifications.scheduleNotificationAsync({
     identifier: NIGHT_ID,
     content: {
-      title: i18n.t("reminders.nightTitle", { time: formatClock(estimate.at, preferences.language, preferences.hourCycle), value }),
+      title: numbers ? i18n.t("reminders.nightTitle", { time: formatClock(estimate.at, preferences.language, preferences.hourCycle), value }) : i18n.t("reminders.nightChannel"),
       body: i18n.t("reminders.nightBody", { time: formatClock(estimate.backToZeroAt, preferences.language, preferences.hourCycle) }),
       sticky: true,
       autoDismiss: false,

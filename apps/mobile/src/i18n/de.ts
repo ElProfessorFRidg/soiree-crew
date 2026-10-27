@@ -620,6 +620,8 @@ export const de: Messages = {
     hapticsHint: "Eine Vibration pro wichtiger Aktion. Unabhängig von den Tönen, und nichts wird nur per Vibration mitgeteilt.",
     motionScale: "Animationstempo (Dev)",
     motionScaleHint: "Verlangsamt oder beschleunigt alle Animationen für die Einzelbild-Prüfung. Nur in Entwicklungsversionen.",
+    lockNumbers: "Wert auf dem Sperrbildschirm",
+    lockNumbersHint: "Aus: Die Abend-Benachrichtigung zeigt nur, wann du wieder bei 0 bist, nie den Wert.",
   },
   vault: {
     queued: "Bis morgen zurückgelegt. Wir fragen dich nach dem Aufwachen nochmal.",

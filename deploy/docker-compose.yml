@@ -1,0 +1,45 @@
+# Soirée Crew server for Coolify (or plain Docker Compose). See deploy/README.md.
+# Coolify: new resource > Docker Compose > this repository, compose path deploy/docker-compose.yml,
+# then set the domain on the "server" service (port 8787) and fill the variables below.
+services:
+  server:
+    build:
+      context: ..
+      dockerfile: apps/server/Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://crew:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/crew
+      DATA_KEY: ${DATA_KEY:?set DATA_KEY (openssl rand -base64 32)}
+      PUBLIC_URL: ${PUBLIC_URL:?set PUBLIC_URL, e.g. https://crew.example.com}
+      UPLOAD_DIR: /data/uploads
+      TRUST_PROXY: "1"
+      AI_PROVIDER: ${AI_PROVIDER:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      SEASON_VARIANTS: ${SEASON_VARIANTS:-}
+    volumes:
+      - uploads:/data
+    depends_on:
+      db:
+        condition: service_healthy
+    # No published port: only the reverse proxy reaches the app (TRUST_PROXY relies on it).
+    expose:
+      - "8787"
+
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: crew
+      POSTGRES_DB: crew
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crew -d crew"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  uploads:
+  pgdata:

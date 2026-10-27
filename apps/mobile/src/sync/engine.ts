@@ -1,5 +1,6 @@
 import { applyMutation, newId, revertMutation, setSyncState, useAppStore } from "@/state/store";
 import { LocalTransport } from "./localTransport";
+import { makeEnvelope } from "./envelope";
 import type { Mutation, PendingMutation, RejectionReason, Transport } from "./types";
 
 // The one path for every write (engineering standards: no screen calls the backend on its own).
@@ -39,7 +40,8 @@ export function setTransport(next: Transport): void {
 /** Applies the change at once, queues it for the server and returns its idempotency key. */
 export function submit(mutation: Mutation): string {
   applyMutation(mutation);
-  const pending: PendingMutation = { id: newId(), mutation, createdAt: Date.now(), attempts: 0 };
+  const id = newId();
+  const pending: PendingMutation = { id, mutation, createdAt: Date.now(), attempts: 0, envelope: makeEnvelope(id, mutation) };
   useAppStore.setState((state) => ({ outbox: [...state.outbox, pending] }));
   void flush();
   return pending.id;

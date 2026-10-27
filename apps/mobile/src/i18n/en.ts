@@ -622,6 +622,8 @@ export const en: Messages = {
     hapticsHint: "One vibration per important action. Separate from sounds, and nothing is told by vibration alone.",
     motionScale: "Animation speed (dev)",
     motionScaleHint: "Slows down or speeds up every animation for the frame-by-frame review. Development builds only.",
+    lockNumbers: "Level shown on the lock screen",
+    lockNumbersHint: "Off, the night notification shows only when you are back to zero, never the level.",
   },
   vault: {
     queued: "Put aside until tomorrow. We'll ask again when you're up.",

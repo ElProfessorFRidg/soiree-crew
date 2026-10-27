@@ -74,7 +74,7 @@ export type MutationInput = z.infer<typeof mutationSchema>;
 
 export const mutationBatchSchema = z.object({
   mutations: z
-    .array(z.object({ key: z.string().min(8).max(80), mutation: z.unknown() }))
+    .array(z.object({ key: z.string().min(8).max(80), mutation: z.unknown(), envelope: z.unknown().optional() }))
     .min(1)
     .max(100),
 });
