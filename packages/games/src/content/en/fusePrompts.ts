@@ -1,0 +1,55 @@
+import type { FusePromptContent } from "../types";
+
+// Short Fuse, English prompts. Normal: a category. Hard: a sound the word must have.
+// Extreme: a category with a twist. One word each, no repeats, then pass the bomb.
+
+export const fusePrompts: FusePromptContent = {
+  normal: [
+    "A US state",
+    "A breakfast cereal",
+    "A fast food chain",
+    "A pizza topping",
+    "A Marvel character",
+    "A dog breed",
+    "Something in your junk drawer",
+    "A song every wedding DJ plays",
+    "An app you'd delete if you were braver",
+    "A sports team",
+    "A candy bar",
+    "A Thanksgiving side dish",
+    "A reality TV show",
+    "Something you bring to the beach",
+    "A celebrity known by one name",
+    "A kind of shoe",
+  ],
+  hard: [
+    "Ends in “-ing”",
+    "Starts with “th”",
+    "Has a double “o”",
+    "Rhymes with “cat”",
+    "Begins with “sp”",
+    "“ight” somewhere inside",
+    "Finishes with “-ly”",
+    "A “z” anywhere",
+    "Same letter at the start and the end",
+    "Comes with a silent letter",
+    "“qu” up front",
+    "The “-tion” ending",
+    "Double “e” in the middle",
+    "Exactly four letters",
+  ],
+  extreme: [
+    "A pickup line",
+    "A state capital",
+    "A word starting with the last letter of the previous word",
+    "Something you'd say at a funeral, but cheerfully",
+    "A brand, in a Southern accent",
+    "A movie title, asked as a question",
+    "An animal, plus the noise it makes",
+    "A lyric, sung",
+    "A word that rhymes with the last one said",
+    "An excuse to leave a party early",
+    "A thing you'd never say on a first date",
+    "Something in this room, while touching it",
+  ],
+};

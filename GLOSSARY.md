@@ -121,6 +121,24 @@ One word per concept, everywhere: code, database, API, docs, UI. Code and every 
 | Leaving the curve before the crash | `CurveExit` / get out | sortir | games.md §6, design-c.md §6 | O-64. design-c.md named it `CashOut`; games.md bans casino vocabulary, so `CurveExit`. Crash point: `CrashPoint` / crash. |
 | Hidden role and secret word | `HiddenRole` (impostor, double_agent), `SecretWord` | imposteur, agent double, mot | design-c.md §6 | O-61, O-62. |
 | Game records board | `HallOfFame` / hall of fame | Panthéon | design-b.md §6 | N-24. |
+| Game difficulty labels | `GameLevel` normal, hard, extreme / Normal, Hard, Extreme | Normal, Difficile, Extrême | games builder | O-45. One set for every game, from the Jeux board; settles C-03 for the labels. |
+| O-50 mixed deck game | `bigDeck` / The Big Deck | Le Grand Paquet | games builder | Our name, not S2M's. |
+| O-51 checkpoint card game | `tollRoad` / Toll Road | Le Péage | games builder | Checkpoint = booth / péage, customs = customs / douane. |
+| O-52 two-player card duel | `faceOff` / Face-off | Face-à-face | games builder | |
+| O-53 pointing game | `pointBlank` / Point Blank | À bout portant | games builder | Designation game (games.md §2.1). |
+| O-54 bomb game | `fuse` / Short Fuse | La Mèche | games builder | |
+| O-55 roulette | `wheel` / The Wheel | La Roue | games builder | |
+| O-56 never have I ever | `neverEver` / Not Once | Jamais de la vie | games builder | Extreme is the unfiltered deck. |
+| O-57 which of us two | `verdict` / The Verdict | Le Verdict | games builder | Card prompt: "Which of these two..." / « Qui des deux... ». |
+| O-58 truth or dare | `truthDare` / Spill or Dare | Vérité ou cap | games builder | Truth = spill / vérité, dare = dare / cap. |
+| O-59 mines game | `minefield` / Minefield | Terrain miné | games builder | |
+| O-60 finger chooser | `fingerPick` / Short Straw | Qui s'y colle | games builder | |
+| O-61 impostor game | `impostor` / Odd One Out | L'Intrus | games builder | Hidden role `impostor`: odd one out / intrus. |
+| O-62 double agent game | `doubleAgent` / Moles | Les Taupes | games builder | Hidden role `agent`: mole / taupe. |
+| O-63 drawing game | `quickDraw` / Quick Draw | Dessine vite | games builder | |
+| O-64 crash game | `crash` / Bail Out | Ça grimpe | games builder | `CurveExit` stays get out / sortir. |
+| Players around one phone for games | `TablePlayer` / players | joueurs | games builder | Includes guests; not a crew. |
+| Remote drawing link | `DrawingTransport` (local, remote) | (interne) | games builder | Seam for online Quick Draw. |
 | Recipe and "what can I make" tool | `Recipe`, `Mixer` / recipe, mixer | recette, mixeur (final name in branding) | design-c.md §6, app.md §6 | O-66, O-69. |
 | Shopping list item | `ShoppingItem` / list item | courses | design-c.md §6 | N-32. |
 | Next-morning alibi | `Alibi` / alibi | alibi | design-c.md §6 | O-76. |

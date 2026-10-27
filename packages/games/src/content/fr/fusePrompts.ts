@@ -1,0 +1,55 @@
+import type { FusePromptContent } from "../types";
+
+// Short Fuse, French prompts. Normal: a category. Hard: a sound the word must contain.
+// Extreme: a category with a twist. One word each, no repeats, then pass the bomb.
+
+export const fusePrompts: FusePromptContent = {
+  normal: [
+    "Une marque de bière",
+    "Un fromage",
+    "Une ville de France",
+    "Un plat de cantine",
+    "Un personnage Disney",
+    "Une appli sur ton téléphone",
+    "Un pays d'Europe",
+    "Une chanson qu'on entend à tous les mariages",
+    "Un truc qui traîne au fond d'un sac",
+    "Un sport olympique",
+    "Un dessert",
+    "Un métier",
+    "Une série",
+    "Un fruit",
+    "Une marque de voiture",
+    "Un jeu de société",
+  ],
+  hard: [
+    "Avec « ou » dedans",
+    "Ça finit en « tion »",
+    "Ça commence par « ch »",
+    "Deux « r » qui se suivent",
+    "Le son « oi », n'importe où",
+    "Fin en « age », comme fromage",
+    "Départ en « pr »",
+    "« eau » quelque part dans le mot",
+    "Terminé par « ette »",
+    "Les deux premières lettres : « gr »",
+    "Un « z », où tu veux",
+    "Ça se termine par « on »",
+    "Avec « ille », comme fille ou bille",
+    "Même lettre au début et à la fin",
+  ],
+  extreme: [
+    "Un pays qui commence par la dernière lettre du mot d'avant",
+    "Une marque, prononcée avec l'accent anglais",
+    "Un film, en mimant le titre en même temps",
+    "Un fruit ou un légume, en chantant",
+    "Un animal, suivi de son cri",
+    "Une chanson française, fredonnée deux secondes",
+    "Un mot qui rime avec le mot d'avant",
+    "Un objet de la pièce, en le touchant",
+    "Une célébrité, en l'imitant",
+    "Une excuse pour rentrer tôt",
+    "Un endroit où tu t'es déjà endormi par accident",
+    "Un prénom, avec l'accent de ta grand-mère",
+  ],
+};
