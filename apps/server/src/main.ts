@@ -1,4 +1,5 @@
 import { buildApp } from "./app";
+import { createHash } from "node:crypto";
 import { Sealer } from "./crypto";
 import { connectPglite, connectPostgres, migrate } from "./db";
 import { LiveHub } from "./live";
@@ -26,6 +27,7 @@ const app = await buildApp(
     live: new LiveHub(),
     now: () => Date.now(),
     publicUrl: process.env.PUBLIC_URL ?? `http://localhost:${port}`,
+    hashSecret: createHash("sha256").update(`fix-hash:${dataKey}`).digest("hex"),
   },
   { logger: true },
 );

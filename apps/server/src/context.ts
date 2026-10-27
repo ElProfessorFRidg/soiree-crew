@@ -12,6 +12,8 @@ export interface Context {
   now: () => number;
   /** Public base URL for invite links, e.g. https://crew.example.com */
   publicUrl: string;
+  /** Key for hashing location fixes; derived from DATA_KEY, never stored. */
+  hashSecret: string;
 }
 
 export class HttpError extends Error {

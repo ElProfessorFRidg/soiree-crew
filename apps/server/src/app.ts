@@ -7,7 +7,9 @@ import { accountRoutes } from "./routes/accounts";
 import { crewRoutes } from "./routes/crews";
 import { mutationRoutes } from "./routes/mutations";
 import { partyRoutes } from "./routes/parties";
+import { leaderboardRoutes } from "./routes/leaderboards";
 import { syncRoutes } from "./routes/sync";
+import { venueRoutes } from "./routes/venues";
 
 const PUBLIC_ROUTES = new Set(["POST /v1/accounts", "POST /v1/sessions/claim", "GET /v1/health", "GET /v1/invites/:code", "GET /v1/live"]);
 
@@ -50,5 +52,7 @@ export async function buildApp(ctx: Context, options: { logger?: boolean } = {})
   syncRoutes(app, ctx);
   crewRoutes(app, ctx);
   partyRoutes(app, ctx);
+  venueRoutes(app, ctx, ctx.hashSecret);
+  leaderboardRoutes(app, ctx);
   return app;
 }

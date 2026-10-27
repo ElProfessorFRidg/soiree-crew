@@ -114,6 +114,9 @@ importers:
       '@crew/bac':
         specifier: workspace:*
         version: link:../../packages/bac
+      '@crew/territory':
+        specifier: workspace:*
+        version: link:../../packages/territory
       '@crew/units':
         specifier: workspace:*
         version: link:../../packages/units
@@ -149,6 +152,8 @@ importers:
   packages/bac: {}
 
   packages/design-tokens: {}
+
+  packages/territory: {}
 
   packages/units: {}
 

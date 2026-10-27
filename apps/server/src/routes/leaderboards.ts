@@ -1,0 +1,227 @@
+import type { FastifyInstance } from "fastify";
+import { z } from "zod";
+import { DANGER_CAP, estimateBac, ethanolGrams, type BodyProfile, type DrinkIntake } from "@crew/bac";
+import { seasonBounds } from "@crew/territory";
+import { AC_CONFIG, verifyDrinks } from "../anticheat";
+import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
+import { crewTimeZone, currentSeason } from "../territory";
+import { nightOf, offsetMinutes } from "../time";
+
+const DAY_MS = 86_400_000;
+
+const querySchema = z.object({
+  period: z.enum(["party", "week", "month", "all"]).default("month"),
+  metric: z.enum(["drinks", "grams", "nights"]).default("drinks"),
+  partyId: z.string().uuid().optional(),
+});
+
+interface DrinkRow {
+  id: string;
+  user_id: string;
+  party_id: string | null;
+  sealed: string;
+  consumed_at: number;
+  logged_at: number;
+  confirmations: number;
+}
+
+/** RANK-09: the drinking leaderboard is on for the crew build and can be switched off for a public release. */
+function drinkingLeaderboardEnabled(): boolean {
+  return (process.env.DRINKING_LEADERBOARD ?? "on") !== "off";
+}
+
+async function periodBounds(ctx: Context, crewId: string, period: string, partyId: string | undefined, userId: string) {
+  const now = ctx.now();
+  const timeZone = await crewTimeZone(ctx.db, crewId);
+  if (period === "party") {
+    if (!partyId) throw new HttpError(400, "invalid");
+    const rows = await ctx.db.query<{ starts_at: number; ends_at: number; closed_at: number | null }>(
+      "select p.starts_at, p.ends_at, p.closed_at from parties p join crew_members m on m.crew_id = p.crew_id and m.user_id = $2 where p.id = $1 and p.crew_id = $3",
+      [partyId, userId, crewId],
+    );
+    const party = rows[0];
+    if (!party) throw new HttpError(404, "not_found");
+    return { from: party.starts_at - AC_CONFIG.drinks.partyPreMinutes * 60_000, to: party.closed_at ?? party.ends_at, timeZone };
+  }
+  if (period === "month") {
+    const { start, end } = seasonBounds(currentSeason(now, timeZone), offsetMinutes(now, timeZone));
+    return { from: start, to: end, timeZone };
+  }
+  if (period === "week") {
+    // Monday 06:00 local of the current week.
+    const night = nightOf(now, timeZone);
+    const date = new Date(`${night}T06:00:00Z`);
+    const day = date.getUTCDay() || 7;
+    const monday = date.getTime() - (day - 1) * DAY_MS - offsetMinutes(now, timeZone) * 60_000;
+    return { from: monday, to: monday + 7 * DAY_MS, timeZone };
+  }
+  return { from: 0, to: Number.MAX_SAFE_INTEGER, timeZone };
+}
+
+export function leaderboardRoutes(app: FastifyInstance, ctx: Context): void {
+  /** RANK-01, RANK-06, RANK-07, RANK-08: crew-only, verified drinks only, nothing above the danger cap. */
+  app.get<{ Params: { id: string } }>("/v1/crews/:id/leaderboard", async (request) => {
+    const user = requireUser(request);
+    await assertCrewMember(ctx, request.params.id, user.id);
+    const query = querySchema.parse(request.query);
+    const crew = await ctx.db.query<{ leaderboard_enabled: boolean }>("select leaderboard_enabled from crews where id = $1", [request.params.id]);
+    if (!crew[0]?.leaderboard_enabled || (!drinkingLeaderboardEnabled() && query.metric !== "nights")) {
+      return { disabled: true, rows: [] };
+    }
+    const { from, to, timeZone } = await periodBounds(ctx, request.params.id, query.period, query.partyId, user.id);
+
+    const members = await ctx.db.query<{ user_id: string; display_name: string; sealed: string | null }>(
+      `select m.user_id, u.display_name, b.sealed from crew_members m join users u on u.id = m.user_id
+       left join body_profiles b on b.user_id = m.user_id
+       where m.crew_id = $1 and m.leaderboard_opt_out = false`,
+      [request.params.id],
+    );
+    const ids = members.map((m) => m.user_id);
+    if (!ids.length) return { disabled: false, rows: [] };
+
+    // Drinks of the crew's parties only, plus a little before (verifyDrinks drops the rest).
+    const drinks = await ctx.db.query<DrinkRow>(
+      `select d.id, d.user_id, d.party_id, d.sealed, d.consumed_at, d.logged_at,
+              (select count(*)::int from drink_confirmations c where c.drink_id = d.id) as confirmations
+       from drinks d where d.user_id = any($1::uuid[]) and d.deleted_at is null and d.consumed_at >= $2 and d.consumed_at < $3`,
+      [ids, from - DAY_MS, to],
+    );
+    const parties = await ctx.db.query<{ id: string; starts_at: number; ends_at: number; closed_at: number | null }>(
+      "select id, starts_at, ends_at, closed_at from parties where crew_id = $1 and ends_at >= $2 and starts_at < $3",
+      [request.params.id, from - DAY_MS, to],
+    );
+    const partyById = new Map(parties.map((p) => [p.id, { startsAt: p.starts_at, endsAt: p.closed_at ?? p.ends_at }]));
+    const nightsOut = await ctx.db.query<{ user_id: string; starts_at: number }>(
+      `select m.user_id, p.starts_at from party_members m join parties p on p.id = m.party_id
+       where p.crew_id = $1 and m.response = 'going' and m.last_activity_at is not null and p.starts_at >= $2 and p.starts_at < $3`,
+      [request.params.id, from, to],
+    );
+
+    const rows = members.map((member) => {
+      const mine = drinks.filter((d) => d.user_id === member.user_id);
+      const decoded = mine.map((d) => ({ row: d, body: ctx.sealer.open<{ volumeMl: number; abv: number; withFood: boolean }>(d.sealed) }));
+      const profile = member.sealed ? ctx.sealer.open<BodyProfile>(member.sealed) : null;
+      let count = 0;
+      let grams = 0;
+      let unverified = 0;
+      const byParty = new Map<string | null, typeof decoded>();
+      for (const item of decoded) byParty.set(item.row.party_id, [...(byParty.get(item.row.party_id) ?? []), item]);
+      for (const [partyId, list] of byParty) {
+        const verdicts = verifyDrinks(
+          list.map((d) => ({ id: d.row.id, volumeMl: d.body.volumeMl, abv: d.body.abv, consumedAt: d.row.consumed_at, loggedAt: d.row.logged_at, confirmed: d.row.confirmations > 0 })),
+          partyId ? (partyById.get(partyId) ?? null) : null,
+        );
+        for (const d of list) {
+          if (d.row.consumed_at < from || d.body.abv <= 0) continue;
+          let verified = verdicts.get(d.row.id)?.status === "verified";
+          if (verified && profile) {
+            // RANK-07: past the danger cap, further drinks earn nothing.
+            const before: DrinkIntake[] = decoded
+              .filter((o) => o.row.consumed_at < d.row.consumed_at)
+              .map((o) => ({ id: o.row.id, volumeMl: o.body.volumeMl, abv: o.body.abv, consumedAt: o.row.consumed_at, withFood: o.body.withFood }));
+            if (estimateBac(before, profile, d.row.consumed_at).bac >= DANGER_CAP) verified = false;
+          }
+          if (verified) {
+            count += 1;
+            grams += ethanolGrams(d.body.volumeMl, d.body.abv);
+          } else unverified += 1;
+        }
+      }
+      const nights = new Set(nightsOut.filter((n) => n.user_id === member.user_id).map((n) => nightOf(n.starts_at, timeZone))).size;
+      const value = query.metric === "drinks" ? count : query.metric === "grams" ? Math.round(grams) : nights;
+      return { userId: member.user_id, name: member.display_name, value, unverified: member.user_id === user.id ? unverified : undefined };
+    });
+
+    rows.sort((a, b) => b.value - a.value || a.name.localeCompare(b.name));
+    let rank = 0;
+    let lastValue = Number.NaN;
+    return {
+      disabled: false,
+      rows: rows.map((row, index) => {
+        if (row.value !== lastValue) rank = index + 1;
+        lastValue = row.value;
+        return { ...row, rank };
+      }),
+    };
+  });
+
+  /**
+   * AC-07: a friend present confirms a drink. When the drinker checked in somewhere, the friend
+   * must have an accepted check-in at the same venue within 30 min; otherwise any member going
+   * to the same live party may confirm (ASSUMPTIONS A-ORCH-4).
+   */
+  app.post<{ Params: { id: string } }>("/v1/drinks/:id/confirm", async (request) => {
+    const user = requireUser(request);
+    const rows = await ctx.db.query<{ user_id: string; party_id: string | null; consumed_at: number }>(
+      "select user_id, party_id, consumed_at from drinks where id = $1 and deleted_at is null",
+      [request.params.id],
+    );
+    const drink = rows[0];
+    if (!drink || !drink.party_id || drink.user_id === user.id) throw new HttpError(404, "not_found");
+    const going = await ctx.db.query("select 1 from party_members where party_id = $1 and user_id = $2 and response = 'going'", [drink.party_id, user.id]);
+    if (!going.length) throw new HttpError(404, "not_found");
+    const now = ctx.now();
+    if (now - drink.consumed_at > 2 * 3_600_000) throw new HttpError(400, "too_late");
+
+    const window = AC_CONFIG.drinks.confirmWindowMinutes * 60_000;
+    const drinkerVenue = await ctx.db.query<{ venue_id: string }>(
+      "select venue_id from check_ins where user_id = $1 and verdict = 'accepted' and at between $2 and $3 order by at desc limit 1",
+      [drink.user_id, drink.consumed_at - 3 * 3_600_000, drink.consumed_at + window],
+    );
+    if (drinkerVenue[0]) {
+      const together = await ctx.db.query(
+        "select 1 from check_ins where user_id = $1 and venue_id = $2 and verdict = 'accepted' and at between $3 and $4",
+        [user.id, drinkerVenue[0].venue_id, drink.consumed_at - 3 * 3_600_000, drink.consumed_at + window],
+      );
+      if (!together.length) throw new HttpError(403, "not_together");
+    }
+    // At most 20 confirmations per confirmer per party.
+    const given = await ctx.db.query<{ n: number }>(
+      "select count(*)::int as n from drink_confirmations c join drinks d on d.id = c.drink_id where c.confirmer_id = $1 and d.party_id = $2",
+      [user.id, drink.party_id],
+    );
+    if ((given[0]?.n ?? 0) >= 20) throw new HttpError(429, "too_many");
+    await ctx.db.query("insert into drink_confirmations (drink_id, confirmer_id, at) values ($1, $2, $3) on conflict do nothing", [
+      request.params.id,
+      user.id,
+      now,
+    ]);
+    const members = await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1 and response = 'going'", [drink.party_id]);
+    ctx.live.notify(members.map((m) => m.user_id), { type: "party.changed", partyId: drink.party_id });
+    return { ok: true };
+  });
+
+  /** Drinks of a live party that a member can confirm (the confirmer's own drinks excluded). */
+  app.get<{ Params: { id: string } }>("/v1/parties/:id/confirmable", async (request) => {
+    const user = requireUser(request);
+    const going = await ctx.db.query("select 1 from party_members where party_id = $1 and user_id = $2 and response = 'going'", [request.params.id, user.id]);
+    if (!going.length) throw new HttpError(404, "not_found");
+    const rows = await ctx.db.query<{ id: string; user_id: string; display_name: string; kind: string; consumed_at: number; mine: number }>(
+      `select d.id, d.user_id, u.display_name, d.kind, d.consumed_at,
+              (select count(*)::int from drink_confirmations c where c.drink_id = d.id and c.confirmer_id = $2) as mine
+       from drinks d join users u on u.id = d.user_id
+       where d.party_id = $1 and d.user_id <> $2 and d.deleted_at is null and d.consumed_at > $3 order by d.consumed_at desc limit 30`,
+      [request.params.id, user.id, ctx.now() - 2 * 3_600_000],
+    );
+    return { drinks: rows.map((r) => ({ id: r.id, userId: r.user_id, name: r.display_name, kind: r.kind, consumedAt: r.consumed_at, confirmedByMe: r.mine > 0 })) };
+  });
+
+  app.patch<{ Params: { id: string } }>("/v1/crews/:id/settings", async (request) => {
+    const user = requireUser(request);
+    const { role } = await assertCrewMember(ctx, request.params.id, user.id);
+    if (role !== "admin") throw new HttpError(403, "forbidden");
+    const input = z.object({ leaderboardEnabled: z.boolean().optional(), timeZone: z.string().min(3).max(60).optional() }).parse(request.body);
+    if (input.leaderboardEnabled !== undefined) {
+      await ctx.db.query("update crews set leaderboard_enabled = $2 where id = $1", [request.params.id, input.leaderboardEnabled]);
+    }
+    if (input.timeZone !== undefined) {
+      try {
+        new Intl.DateTimeFormat("en-US", { timeZone: input.timeZone });
+      } catch {
+        throw new HttpError(400, "invalid");
+      }
+      await ctx.db.query("update crews set time_zone = $2 where id = $1", [request.params.id, input.timeZone]);
+    }
+    return { ok: true };
+  });
+}

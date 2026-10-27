@@ -17,7 +17,7 @@ beforeEach(async () => {
   db = await connectPglite();
   await migrate(db);
   live = new LiveHub();
-  app = await buildApp({ db, sealer: new Sealer(randomBytes(32).toString("base64")), live, now: () => clock, publicUrl: "https://crew.test" });
+  app = await buildApp({ db, sealer: new Sealer(randomBytes(32).toString("base64")), live, now: () => clock, publicUrl: "https://crew.test", hashSecret: "test-secret" });
 });
 
 afterEach(async () => {
