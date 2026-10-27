@@ -186,6 +186,8 @@ export function radarRoutes(app: FastifyInstance, ctx: Context): void {
   /** Open SOS alerts of my crews, with the location when it was shared. */
   app.get("/v1/sos", async (request) => {
     const user = requireUser(request);
+    // SEC-06: alerts only show for 12 hours, so their position is not kept longer either.
+    await ctx.db.query("update sos_alerts set sealed_location = null where sealed_location is not null and created_at <= $1", [ctx.now() - 12 * 3_600_000]);
     const rows = await ctx.db.query<{ id: string; user_id: string; display_name: string; sealed_location: string | null; created_at: number }>(
       `select a.id, a.user_id, u.display_name, a.sealed_location, a.created_at from sos_alerts a join users u on u.id = a.user_id
        join crew_members m on m.crew_id = a.crew_id and m.user_id = $1
@@ -206,7 +208,9 @@ export function radarRoutes(app: FastifyInstance, ctx: Context): void {
   app.post<{ Params: { id: string } }>("/v1/sos/:id/resolve", async (request) => {
     const user = requireUser(request);
     await ctx.db.query(
-      `update sos_alerts set resolved_at = $3 where id = $1 and (user_id = $2 or crew_id in (select crew_id from crew_members where user_id = $2))`,
+      // SEC-06: the position goes as soon as the alert is over.
+      `update sos_alerts set resolved_at = $3, sealed_location = null
+       where id = $1 and (user_id = $2 or crew_id in (select crew_id from crew_members where user_id = $2))`,
       [request.params.id, user.id, ctx.now()],
     );
     return { ok: true };

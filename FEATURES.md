@@ -482,7 +482,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | SEC-03 | P0 | Backstage | todo | Encryption in transit: TLS 1.2 minimum, 1.3 preferred, everywhere; certificate pinning for the API (AC-05); HS... |
 | SEC-04 | P0 | Backstage | build | Encryption at rest on the server: storage and database encryption, plus application-level envelope encryption ... |
 | SEC-05 | P0 | Backstage | build | Encryption on the device: tokens and keys in the iOS Keychain / Android Keystore, local database encrypted, se... |
-| SEC-06 | P0 | Backstage | todo | Retention: precise location points are deleted once the recap is built (N-07); raw GPS data of a check-in is d... |
+| SEC-06 | P0 | Backstage | build | Retention: precise location points are deleted once the recap is built (N-07); raw GPS data of a check-in is d... |
 | SEC-07 | P0 | Reglages.dc.html | build | Accounts: passkeys first; passwords, if any, hashed with Argon2id; list of active sessions with remote sign-ou... |
 | SEC-08 | P0 | Arrivee.dc.html | build | GDPR: alcohol consumption and BAC may count as health data under GDPR article 9, which means explicit consent,... |
 | SEC-09 | P0 | Backstage | build | Secure development: a threat model (STRIDE) per major feature in `SECURITY.md`, secret scanning, static analys... |

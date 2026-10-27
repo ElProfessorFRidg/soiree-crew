@@ -72,5 +72,9 @@ describe("SOS (N-28)", () => {
     expect(outside.alerts).toEqual([]);
     const raw = JSON.stringify(await db.query("select * from sos_alerts"));
     expect(raw).not.toContain("48.86");
+    const id = (sent.json() as { ids: string[] }).ids[0]!;
+    await app.inject({ method: "POST", url: `/v1/sos/${id}/resolve`, headers: malik.auth });
+    const [row] = await db.query<{ sealed_location: string | null }>("select sealed_location from sos_alerts where id = $1", [id]);
+    expect(row!.sealed_location).toBeNull();
   });
 });
