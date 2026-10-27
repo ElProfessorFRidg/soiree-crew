@@ -422,7 +422,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | AC-01 | P0 | Backstage | build | Server-authoritative scoring: the client only sends raw events (drink logged, check-in attempt, game result). ... |
 | AC-02 | P0 | Bars.dc.html | build | Location source flags, read but never trusted alone. Check the current official docs before implementing. |
 | AC-03 | P0 | Bars.dc.html | build | Server-side plausibility: impossible travel speed between events, accuracy values that are too perfect or froz... |
-| AC-04 | P0 | Bars.dc.html | todo | Physical-world corroboration, the hardest signals to fake alone: |
+| AC-04 | P0 | Bars.dc.html | build | Physical-world corroboration, the hardest signals to fake alone: |
 | AC-05 | P0 | Bars.dc.html | todo | Device and app integrity as one weighted signal: App Attest / DeviceCheck on iOS, Play Integrity on Android, j... |
 | AC-06 | P0 | Bars.dc.html | build | Risk score per event: all signals combine into accepted / unverified (needs peer confirmation) / rejected as c... |
 | AC-07 | P0 | Soiree.dc.html | build | Drink fraud: bursts that are physiologically implausible against the BAC model, large retroactive batches, dri... |

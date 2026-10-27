@@ -10,7 +10,8 @@ export const AC_CONFIG = {
   weights: { mocked: 50, speedStrong: 45, speedMedium: 20, coordsIdentical: 30, coordsOnPin: 25, clockDrift: 5, venueHopping: 20 },
   credits: { peerPassive: 20 },
   geo: { maxAccuracyM: 150, speedStrongKmh: 250, speedMediumKmh: 130 },
-  time: { clockDriftMin: 5, peerWindowMin: 20, hoppingWindowMin: 10 },
+  time: { clockDriftMin: 5, peerWindowMin: 20, peerActiveWindowMin: 30, hoppingWindowMin: 10 },
+  peers: { confirmsPerNight: 10 },
   drinks: { burst30Grams: 40, burst60Grams: 60, retroMinutes: 45, partyPreMinutes: 30, confirmWindowMinutes: 30 },
 } as const;
 

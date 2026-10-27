@@ -342,6 +342,11 @@ export const fr = {
     workHere: "Je bosse ici",
     workHereHint: "Tu ne gagnes plus de points dans ce bar.",
     territoryOut: "Ne pas jouer aux territoires",
+    toConfirm: "Pas encore confirmé",
+    toConfirmHint: "Tu es au bar. Confirme seulement les gens que tu vois.",
+    confirmHere: "Confirmer",
+    confirmHereA11y: "Confirmer que {name} est là",
+    confirmedHere: "Présence de {name} confirmée.",
   },
   ranking: {
     bars: "Les bars",

@@ -342,6 +342,11 @@ export const de: Messages = {
     workHere: "Ich arbeite hier",
     workHereHint: "In dieser Bar sammelst du keine Punkte mehr.",
     territoryOut: "Nicht beim Revierspiel mitmachen",
+    toConfirm: "Noch nicht bestätigt",
+    toConfirmHint: "Du bist in der Bar. Bestätige nur Leute, die du siehst.",
+    confirmHere: "Bestätigen",
+    confirmHereA11y: "Bestätigen, dass {name} da ist",
+    confirmedHere: "{name} ist in der Bar bestätigt.",
   },
   ranking: {
     bars: "Die Bars",

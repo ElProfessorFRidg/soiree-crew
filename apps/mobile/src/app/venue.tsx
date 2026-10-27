@@ -7,7 +7,7 @@ import { haptic } from "@/motion/haptics";
 import { api } from "@/server/api";
 import { useCrewData } from "@/server/crewData";
 import { useSession } from "@/server/session";
-import { fetchVenuePage, overturnCheckIn, setCrewParticipation, type VenuePage } from "@/server/venueData";
+import { confirmCheckIn, fetchVenuePage, overturnCheckIn, setCrewParticipation, type VenuePage } from "@/server/venueData";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
@@ -106,6 +106,33 @@ export default function VenueScreen() {
         height={56}
         onPress={() => router.push({ pathname: "/checkin", params: { venueId: page.venue.id, crewId: page.venue.crewId } })}
       />
+
+      {page.toConfirm?.length ? (
+        <Panel>
+          <Text variant="label">{i18n.t("venue.toConfirm")}</Text>
+          <Text variant="small">{i18n.t("venue.toConfirmHint")}</Text>
+          {page.toConfirm.map((c) => (
+            <View key={c.id} style={styles.cheat}>
+              <Avatar personId={c.userId} name={c.name} size={32} />
+              <Text style={styles.flex}>{c.name}</Text>
+              <Button
+                label={i18n.t("venue.confirmHere")}
+                accessibilityLabel={i18n.t("venue.confirmHereA11y", { name: c.name })}
+                height={44}
+                onPress={() =>
+                  void confirmCheckIn(c.id)
+                    .then(() => {
+                      haptic.confirmed();
+                      showToast({ message: i18n.t("venue.confirmedHere", { name: c.name }) });
+                      load();
+                    })
+                    .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+                }
+              />
+            </View>
+          ))}
+        </Panel>
+      ) : null}
 
       {page.pastMayors.length ? (
         <View>

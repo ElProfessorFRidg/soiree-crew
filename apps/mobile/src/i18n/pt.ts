@@ -343,6 +343,11 @@ export const pt: Messages = {
     workHere: "Trabalho aqui",
     workHereHint: "Deixas de ganhar pontos neste bar.",
     territoryOut: "Não jogar aos territórios",
+    toConfirm: "Ainda por confirmar",
+    toConfirmHint: "Estás no bar. Confirma só quem estás a ver.",
+    confirmHere: "Confirmar",
+    confirmHereA11y: "Confirmar que {name} está cá",
+    confirmedHere: "Presença de {name} confirmada.",
   },
   ranking: {
     bars: "Os bares",

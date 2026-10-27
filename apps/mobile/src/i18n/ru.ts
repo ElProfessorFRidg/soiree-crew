@@ -348,6 +348,11 @@ export const ru: Messages = {
     workHere: "Я здесь работаю",
     workHereHint: "В этом баре ты больше не получаешь очков.",
     territoryOut: "Не играть в территории",
+    toConfirm: "Ещё не подтверждено",
+    toConfirmHint: "Ты в баре. Подтверждай только тех, кого видишь.",
+    confirmHere: "Подтвердить",
+    confirmHereA11y: "Подтвердить, что {name} здесь",
+    confirmedHere: "{name} в баре: подтверждено.",
   },
   ranking: {
     bars: "Бары",

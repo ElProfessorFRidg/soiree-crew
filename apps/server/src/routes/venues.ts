@@ -36,6 +36,16 @@ async function venueForMember(ctx: Context, venueId: string, userId: string) {
   return rows[0];
 }
 
+/** The member's own accepted check-in at this bar, open now or ended in the last half hour. */
+async function presentAt(ctx: Context, venueId: string, userId: string, now: number): Promise<{ at: number } | null> {
+  const rows = await ctx.db.query<{ at: number; ended_at: number | null }>(
+    `select at, ended_at from check_ins where venue_id = $1 and user_id = $2 and verdict = 'accepted' and at > $3
+       and (ended_at is null or ended_at > $4) order by at desc limit 1`,
+    [venueId, userId, now - 12 * 3_600_000, now - AC_CONFIG.time.peerActiveWindowMin * 60_000],
+  );
+  return rows[0] ? { at: rows[0].at } : null;
+}
+
 async function notifyCrew(ctx: Context, crewId: string): Promise<void> {
   const members = await ctx.db.query<{ user_id: string }>("select user_id from crew_members where crew_id = $1", [crewId]);
   ctx.live.notify(members.map((m) => m.user_id), { type: "crew.changed", crewId });
@@ -183,6 +193,16 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
       [venue.id],
     );
     const mine = standing?.scores.find((s) => s.memberId === user.id);
+    // AC-04: someone checked in here can vouch for the unverified check-ins around their own.
+    const here = await presentAt(ctx, venue.id, user.id, now);
+    const toConfirm = here
+      ? await ctx.db.query<{ id: string; user_id: string; at: number }>(
+          `select c.id, c.user_id, c.at from check_ins c where c.venue_id = $1 and c.user_id <> $2 and c.verdict = 'unverified'
+             and c.at between $3 and $4 and not exists (select 1 from checkin_confirmations k where k.check_in_id = c.id and k.confirmer_id = $2)
+           order by c.at desc`,
+          [venue.id, user.id, here.at - AC_CONFIG.time.peerActiveWindowMin * 60_000, now],
+        )
+      : [];
     return {
       venue: { id: venue.id, crewId: venue.crew_id, name: venue.name, kind: venue.kind, lat: venue.lat, lng: venue.lng, address: venue.address },
       season,
@@ -193,6 +213,7 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
       pastMayors: mayors.map((m) => ({ season: m.season, userId: m.user_id, name: nameOf.get(m.user_id) ?? "" })),
       latestNights: nights.map((n) => ({ partyId: n.party_id, name: n.name, startsAt: n.starts_at, members: n.n })),
       cheatAttempts: rejected.map((r) => ({ id: r.id, userId: r.user_id, name: nameOf.get(r.user_id) ?? "", at: r.at, overturned: r.overturned_by !== null })),
+      toConfirm: toConfirm.map((c) => ({ id: c.id, userId: c.user_id, name: nameOf.get(c.user_id) ?? "", at: c.at })),
     };
   });
 
@@ -310,6 +331,41 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
   app.post<{ Params: { id: string } }>("/v1/checkins/:id/end", async (request) => {
     const user = requireUser(request);
     await ctx.db.query("update check_ins set ended_at = $3 where id = $1 and user_id = $2 and ended_at is null", [request.params.id, user.id, ctx.now()]);
+    return { ok: true };
+  });
+
+  /**
+   * AC-04 one-tap peer confirmation. It counts only from someone with their own accepted check-in
+   * at the same bar within the active window, and a confirmer vouches for a few people a night at most.
+   * A rejected check-in stays for the admin (AC-09): a friend cannot wash a cheat.
+   */
+  app.post<{ Params: { id: string } }>("/v1/checkins/:id/confirm", async (request) => {
+    const user = requireUser(request);
+    const now = ctx.now();
+    const target = (
+      await ctx.db.query<{ user_id: string; venue_id: string; crew_id: string; at: number; verdict: string; private: boolean }>(
+        "select c.user_id, c.venue_id, v.crew_id, c.at, c.verdict, c.private from check_ins c join venues v on v.id = c.venue_id where c.id = $1",
+        [request.params.id],
+      )
+    )[0];
+    if (!target) throw new HttpError(404, "not_found");
+    await assertCrewMember(ctx, target.crew_id, user.id);
+    if (target.user_id === user.id) throw new HttpError(403, "forbidden");
+    if (target.verdict !== "unverified") throw new HttpError(409, "conflict");
+    const here = await presentAt(ctx, target.venue_id, user.id, now);
+    // Arrived no more than the window before the confirmer, and the confirmer is still there or just left.
+    if (!here || target.at < here.at - AC_CONFIG.time.peerActiveWindowMin * 60_000) throw new HttpError(403, "not_together");
+    const recent = await ctx.db.query<{ n: number }>("select count(*)::int as n from checkin_confirmations where confirmer_id = $1 and at > $2", [
+      user.id,
+      now - 12 * 3_600_000,
+    ]);
+    if (recent[0]!.n >= AC_CONFIG.peers.confirmsPerNight) throw new HttpError(429, "too_many");
+    await ctx.db.transaction(async (tx) => {
+      await tx.query("insert into checkin_confirmations (check_in_id, confirmer_id, at) values ($1, $2, $3) on conflict do nothing", [request.params.id, user.id, now]);
+      await tx.query("update check_ins set verdict = 'accepted', corroborated = true where id = $1 and verdict = 'unverified'", [request.params.id]);
+    });
+    if (!target.private) await updateBoss(ctx, target.crew_id, target.venue_id);
+    await notifyCrew(ctx, target.crew_id);
     return { ok: true };
   });
 

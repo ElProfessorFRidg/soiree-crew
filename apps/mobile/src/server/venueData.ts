@@ -32,6 +32,8 @@ export interface VenuePage {
   pastMayors: { season: string; userId: string; name: string }[];
   latestNights: { partyId: string; name: string; startsAt: number; members: number }[];
   cheatAttempts: { id: string; userId: string; name: string; at: number; overturned: boolean }[];
+  /** AC-04: unverified check-ins around mine that I can vouch for. */
+  toConfirm?: { id: string; userId: string; name: string; at: number }[];
 }
 
 export type CheckInVerdict = "accepted" | "unverified" | "rejected" | "not_here";
@@ -116,6 +118,10 @@ export async function leaveVenue(): Promise<void> {
   if (!open) return;
   await api(`/v1/checkins/${open.id}/end`, { method: "POST" });
   useVenueData.setState({ openCheckIn: null });
+}
+
+export function confirmCheckIn(checkInId: string): Promise<unknown> {
+  return api(`/v1/checkins/${checkInId}/confirm`, { method: "POST" });
 }
 
 export function overturnCheckIn(checkInId: string): Promise<unknown> {

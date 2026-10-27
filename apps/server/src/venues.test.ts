@@ -73,6 +73,35 @@ describe("check-ins and territories", () => {
     expect(JSON.stringify(fake)).not.toContain("mocked");
   });
 
+  it("lets someone checked in at the same bar confirm an unverified check-in, and nobody else (AC-04)", async () => {
+    const { users, venueId } = await setup("jade", "malik", "theo");
+    const [jade, malik, theo] = users as [User, User, User];
+    const doubtful = await checkIn(malik, venueId, { mocked: true });
+    expect(doubtful.verdict).toBe("unverified");
+    const confirm = (user: User) => app.inject({ method: "POST", url: `/v1/checkins/${doubtful.id}/confirm`, headers: user.auth });
+
+    expect((await confirm(theo)).statusCode).toBe(403);
+    expect((await confirm(malik)).statusCode).toBe(403);
+
+    clock += 10 * MIN;
+    await checkIn(jade, venueId);
+    const venue = (await app.inject({ method: "GET", url: `/v1/venues/${venueId}`, headers: jade.auth })).json() as { toConfirm: { id: string; name: string }[] };
+    expect(venue.toConfirm.map((c) => c.id)).toEqual([doubtful.id]);
+    expect((await confirm(jade)).statusCode).toBe(200);
+    const row = await db.query<{ verdict: string; corroborated: boolean }>("select verdict, corroborated from check_ins where id = $1", [doubtful.id]);
+    expect(row[0]).toEqual({ verdict: "accepted", corroborated: true });
+    expect((await confirm(jade)).statusCode).toBe(409);
+  });
+
+  it("refuses a confirmation from someone who arrived long after (AC-04)", async () => {
+    const { users, venueId } = await setup("jade", "malik");
+    const [jade, malik] = users as [User, User];
+    const doubtful = await checkIn(malik, venueId, { mocked: true });
+    clock += 2 * 60 * MIN;
+    await checkIn(jade, venueId);
+    expect((await app.inject({ method: "POST", url: `/v1/checkins/${doubtful.id}/confirm`, headers: jade.auth })).statusCode).toBe(403);
+  });
+
   it("says 'not here' when the phone is far from the venue", async () => {
     const { users, venueId } = await setup("jade");
     expect((await checkIn(users[0]!, venueId, { lat: 48.9 })).verdict).toBe("not_here");
