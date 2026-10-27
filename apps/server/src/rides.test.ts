@@ -37,7 +37,7 @@ async function crewWithParty(...names: string[]) {
 }
 
 type Live = { members: { userId: string; homeWith: string | null; homeMode: string | null; homeOfferFrom: string | null }[] };
-const home = (u: User, partyId: string, payload: unknown) => app.inject({ method: "POST", url: `/v1/parties/${partyId}/home`, headers: u.auth, payload });
+const home = (u: User, partyId: string, payload: Record<string, unknown>) => app.inject({ method: "POST", url: `/v1/parties/${partyId}/home`, headers: u.auth, payload });
 const liveOf = async (u: User, partyId: string) => ((await app.inject({ method: "GET", url: `/v1/parties/${partyId}/live`, headers: u.auth })).json() as Live).members;
 
 describe("going home together (N-27)", () => {
