@@ -557,6 +557,10 @@ export const ru: Messages = {
     quoteVote: "Голосовать за эту фразу",
     quoteVotes: { one: "{count} голос", few: "{count} голоса", many: "{count} голосов", other: "{count} голоса" },
     quoteRemove: "Убрать",
+    selfie: "Добавить селфи",
+    selfieAgain: "Переснять селфи",
+    photoBack: "Фото места",
+    selfieRemove: "Убрать фото",
   },
   morning: {
     title: "Утро после",

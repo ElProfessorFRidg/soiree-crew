@@ -541,6 +541,10 @@ export const fr = {
     quoteVote: "Voter pour cette phrase",
     quoteVotes: { one: "{count} vote", other: "{count} votes" },
     quoteRemove: "Retirer",
+    selfie: "Ajouter un selfie",
+    selfieAgain: "Refaire le selfie",
+    photoBack: "Photo de la salle",
+    selfieRemove: "Enlever la photo",
   },
   morning: {
     title: "Mode lendemain",

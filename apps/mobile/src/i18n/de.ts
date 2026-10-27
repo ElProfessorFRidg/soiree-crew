@@ -541,6 +541,10 @@ export const de: Messages = {
     quoteVote: "Für diesen Spruch stimmen",
     quoteVotes: { one: "{count} Stimme", other: "{count} Stimmen" },
     quoteRemove: "Entfernen",
+    selfie: "Selfie hinzufügen",
+    selfieAgain: "Selfie neu machen",
+    photoBack: "Foto vom Raum",
+    selfieRemove: "Foto entfernen",
   },
   morning: {
     title: "Der Morgen danach",

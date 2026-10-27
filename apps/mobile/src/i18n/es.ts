@@ -542,6 +542,10 @@ export const es: Messages = {
     quoteVote: "Votar esta frase",
     quoteVotes: { one: "{count} voto", other: "{count} votos" },
     quoteRemove: "Quitar",
+    selfie: "Añadir un selfi",
+    selfieAgain: "Repetir el selfi",
+    photoBack: "Foto del sitio",
+    selfieRemove: "Quitar la foto",
   },
   morning: {
     title: "Modo día después",

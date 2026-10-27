@@ -1,3 +1,4 @@
+import * as ImagePicker from "expo-image-picker";
 import * as Sharing from "expo-sharing";
 import { router, useLocalSearchParams } from "expo-router";
 import {
@@ -7,7 +8,7 @@ import {
   useState,
   type ComponentRef,
 } from "react";
-import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Image, Platform, ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { captureRef } from "react-native-view-shot";
 import { radius, space } from "@crew/design-tokens";
@@ -169,6 +170,7 @@ export default function RecapScreen() {
   const [replay, setReplay] = useState(0);
   const [egg, setEgg] = useState(0);
   const [sharing, setSharing] = useState(false);
+  const [selfie, setSelfie] = useState<string | null>(null);
   const card = useRef<ComponentRef<typeof View>>(null);
 
   const rules = countryRules(preferences.legalCountry);
@@ -206,6 +208,25 @@ export default function RecapScreen() {
     if (clamped !== slide) haptic.select();
     setSlide(clamped);
     setReplay((r) => r + 1);
+  };
+
+  /** O-30: a photo for the top of the story, taken now; it stays on the phone and in the shared image. */
+  const takeSelfie = async (camera: "front" | "back") => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      showToast({ tone: "danger", message: i18n.t("album.denied") });
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ["images"],
+      quality: 0.8,
+      exif: false,
+      cameraType: camera === "front" ? ImagePicker.CameraType.front : ImagePicker.CameraType.back,
+    });
+    if (!result.canceled && result.assets[0]) {
+      haptic.select();
+      setSelfie(result.assets[0].uri);
+    }
   };
 
   const share = async () => {
@@ -472,9 +493,28 @@ export default function RecapScreen() {
           { backgroundColor: theme.surface, borderColor: theme.line },
         ]}
       >
+        {selfie ? <Image source={{ uri: selfie }} style={styles.selfie} resizeMode="cover" accessibilityIgnoresInvertColors /> : null}
         <Text variant="label">{partyDate(recap.party.startsAt, i18n)}</Text>
         <Text variant="h1">{recap.party.name}</Text>
         {figures}
+        {/* O-30: the night's curves travel with the story, drawn still. */}
+        {recap.participants.some((p) => p.curve.length > 1) ? (
+          <RecapCurves
+            participants={recap.participants}
+            from={recap.window.from}
+            legalLimit={legalLimit}
+            replay={0}
+            meId={me}
+            formatX={clock}
+            labels={{
+              range: (from, to) => i18n.t("recap.curvesRange", { from, to }),
+              hint: "",
+              legal: i18n.t("recap.legalLine"),
+              rangeEnd: i18n.t("recap.rangeEnd"),
+              you: i18n.t("common.you"),
+            }}
+          />
+        ) : null}
         {podium && !podium.disabled && podium.entries.length ? (
           <View style={styles.cardPodium}>
             {podium.entries.map((entry) => (
@@ -500,6 +540,18 @@ export default function RecapScreen() {
           {i18n.t("recap.storyFooter")}
         </Text>
       </View>
+      <View style={styles.selfieRow}>
+        <Button
+          label={selfie ? i18n.t("recap.selfieAgain") : i18n.t("recap.selfie")}
+          icon="camera"
+          variant="secondary"
+          height={48}
+          style={styles.flex}
+          onPress={() => void takeSelfie("front")}
+        />
+        <Button label={i18n.t("recap.photoBack")} icon="image" variant="secondary" height={48} style={styles.flex} onPress={() => void takeSelfie("back")} />
+      </View>
+      {selfie ? <Button label={i18n.t("recap.selfieRemove")} variant="outline" height={40} onPress={() => setSelfie(null)} /> : null}
       <Button
         label={i18n.t("recap.share")}
         icon="share"
@@ -589,6 +641,8 @@ export default function RecapScreen() {
 }
 
 const styles = StyleSheet.create({
+  selfie: { width: "100%", aspectRatio: 4 / 3, borderRadius: radius.tile },
+  selfieRow: { flexDirection: "row", gap: 12 },
   screen: { flex: 1 },
   flex: { flex: 1 },
   progress: { flexDirection: "row", gap: 4, paddingHorizontal: space.screenX },

@@ -45,7 +45,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-27 | P0 | Soiree.dc.html | build | Scheduled hydration reminders. |
 | O-28 | P1 | Soiree.dc.html | build | Stats in grams of pure alcohol (this month, total, average). |
 | O-29 | P0 | Soiree.dc.html | build | Friends' avatars on the graph + curve comparison between friends. |
-| O-30 | P1 | Soiree.dc.html | todo | Share: styled visual with photo / selfie (front or back camera) + stats + curve. |
+| O-30 | P1 | Soiree.dc.html | build | Share: styled visual with photo / selfie (front or back camera) + stats + curve. |
 | O-31 | P0 | Etats.dc.html | build | Offline: a drink added without network is kept and sent when the network returns, never counted twice; the app... |
 | O-32 | P0 | JeuxCartes.dc.html | build | Small floating button in every game to add a drink without leaving the game. |
 | O-85 | P1 | Backstage (near Soiree.dc.html) | proposed | Food input for the BAC model ("ate / light meal / empty stomach", per evening or per drink, changeable mid-party) feeding absorption and elimination within Recon-BAC bounds. Merges app.md O-85 and bac.md BAC-FOOD-01. Source: app.md §5, bac.md §5. |

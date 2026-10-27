@@ -543,6 +543,10 @@ export const en: Messages = {
     quoteVote: "Vote for this line",
     quoteVotes: { one: "{count} vote", other: "{count} votes" },
     quoteRemove: "Remove",
+    selfie: "Add a selfie",
+    selfieAgain: "Retake the selfie",
+    photoBack: "Photo of the room",
+    selfieRemove: "Remove the photo",
   },
   morning: {
     title: "Morning after",
