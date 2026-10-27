@@ -25,6 +25,7 @@ export interface Recap {
   badges: { kind: BadgeKind; userId: string; value?: number; venueName?: string }[];
   timeline: { at: number; kind: TimelineKind; userId?: string; venueName?: string; count?: number }[];
   reactions: { fromId: string; toId: string; emoji: RecapEmoji }[];
+  quotes: { id: string; saidBy: string | null; addedBy: string; text: string; votes: number; mine: boolean }[];
 }
 
 export interface RecapSummary {
@@ -48,4 +49,16 @@ export function fetchRecaps(): Promise<{ recaps: RecapSummary[] }> {
 
 export function react(partyId: string, toId: string, emoji: RecapEmoji | null): Promise<unknown> {
   return api(`/v1/parties/${partyId}/recap/reactions`, { method: "PUT", body: { toId, emoji } });
+}
+
+export function addQuote(partyId: string, input: { id: string; text: string; saidBy: string | null }): Promise<unknown> {
+  return api(`/v1/parties/${partyId}/quotes`, { method: "POST", body: input });
+}
+
+export function voteQuote(quoteId: string): Promise<{ voted: boolean }> {
+  return api(`/v1/quotes/${quoteId}/vote`, { method: "POST" });
+}
+
+export function removeQuote(quoteId: string): Promise<unknown> {
+  return api(`/v1/quotes/${quoteId}`, { method: "DELETE" });
 }

@@ -100,6 +100,13 @@ export function recapRoutes(app: FastifyInstance, ctx: Context): void {
       [party.id],
     );
     const reactions = await ctx.db.query<{ from_id: string; to_id: string; emoji: string }>("select from_id, to_id, emoji from recap_reactions where party_id = $1", [party.id]);
+    const quotes = await ctx.db.query<{ id: string; said_by: string | null; added_by: string; text: string; votes: number; mine: number }>(
+      `select q.id, q.said_by, q.added_by, q.text,
+              (select count(*)::int from party_quote_votes v where v.quote_id = q.id) as votes,
+              (select count(*)::int from party_quote_votes v where v.quote_id = q.id and v.user_id = $2) as mine
+       from party_quotes q where q.party_id = $1 order by votes desc, q.created_at`,
+      [party.id, user.id],
+    );
 
     const partyDrinks = drinkRows.filter((d) => d.party_id === party.id);
     const present = members.filter(
@@ -189,7 +196,43 @@ export function recapRoutes(app: FastifyInstance, ctx: Context): void {
       badges,
       timeline: timeline.filter((t) => !t.userId || presentIds.has(t.userId)),
       reactions: reactions.map((r) => ({ fromId: r.from_id, toId: r.to_id, emoji: r.emoji })),
+      quotes: quotes.map((q) => ({ id: q.id, saidBy: q.said_by, addedBy: q.added_by, text: q.text, votes: q.votes, mine: q.mine > 0 })),
     };
+  });
+
+  /** N-23: anyone who was there adds a line; it may name who said it, if that person was there too. */
+  app.post<{ Params: { id: string } }>("/v1/parties/:id/quotes", async (request, reply) => {
+    const user = requireUser(request);
+    const party = await partyForMember(ctx, request.params.id, user.id);
+    const input = z.object({ id: z.string().uuid(), text: z.string().trim().min(2).max(200), saidBy: z.string().uuid().nullable() }).parse(request.body);
+    const going = await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1 and response = 'going'", [party.id]);
+    const ids = new Set(going.map((g) => g.user_id));
+    if (!ids.has(user.id) || (input.saidBy && !ids.has(input.saidBy))) throw new HttpError(403, "not_going");
+    await ctx.db.query(
+      "insert into party_quotes (id, party_id, said_by, added_by, text, created_at) values ($1, $2, $3, $4, $5, $6) on conflict (id) do nothing",
+      [input.id, party.id, input.saidBy, user.id, input.text, ctx.now()],
+    );
+    ctx.live.notify(ids, { type: "party.changed", partyId: party.id });
+    return reply.status(201).send({ id: input.id });
+  });
+
+  /** N-23: one vote per person per line; voting again takes it back. */
+  app.post<{ Params: { id: string } }>("/v1/quotes/:id/vote", async (request) => {
+    const user = requireUser(request);
+    const quote = (await ctx.db.query<{ party_id: string }>("select party_id from party_quotes where id = $1", [request.params.id]))[0];
+    if (!quote) throw new HttpError(404, "not_found");
+    await partyForMember(ctx, quote.party_id, user.id);
+    const removed = await ctx.db.query("delete from party_quote_votes where quote_id = $1 and user_id = $2 returning user_id", [request.params.id, user.id]);
+    if (!removed.length) await ctx.db.query("insert into party_quote_votes (quote_id, user_id) values ($1, $2)", [request.params.id, user.id]);
+    return { voted: removed.length === 0 };
+  });
+
+  app.delete<{ Params: { id: string } }>("/v1/quotes/:id", async (request, reply) => {
+    const user = requireUser(request);
+    // The person who added it, or the person it is about, can take it down.
+    const rows = await ctx.db.query("delete from party_quotes where id = $1 and (added_by = $2 or said_by = $2) returning id", [request.params.id, user.id]);
+    if (!rows.length) throw new HttpError(404, "not_found");
+    return reply.status(204).send();
   });
 
   /** O-41: one reaction per person per participant; null removes it. */

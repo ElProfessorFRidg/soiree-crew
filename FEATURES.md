@@ -216,7 +216,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 |---|---|---|---|---|
 | N-21 | P1 | Recap.dc.html | build | Shared album per party (photos and videos private to the group, O-84) + optional photo when logging a drink (O... |
 | N-22 | P0 | Recap.dc.html | build | Party timeline: arrivals, check-ins, venue takeovers, games played, photos, highlights, built into the recap. |
-| N-23 | P1 | Recap.dc.html | todo | "Quote of the night": legendary lines, voted by the crew. |
+| N-23 | P1 | Recap.dc.html | build | "Quote of the night": legendary lines, voted by the crew. |
 | N-24 | P1 | Jeux.dc.html | todo | Hall of fame for games and game records. |
 | N-37 | P1 | Backstage (near Recap.dc.html) | proposed | Consent for exports outside the crew: before a recap story, photo strip or result card leaves the app, the people shown can opt out, and the export shows only the exporter's own curve and figures plus crew totals. Renumbered from design-b N-36. Source: design-b.md §2.9 item 7, §3 decision 6, §5. |
 

@@ -40,6 +40,7 @@ import { Panel } from "@/ui/controls";
 import { ScalePressable } from "@/ui/Pressable";
 import { Text } from "@/ui/Text";
 import { showToast, ToastHost } from "@/ui/Toast";
+import { Quotes } from "@/recap/Quotes";
 
 const SLIDES = 5;
 
@@ -449,6 +450,7 @@ export default function RecapScreen() {
           </View>
         </DropIn>
       ))}
+      <Quotes recap={recap} me={me} onChange={load} />
     </View>,
     <View key="share" style={styles.slide}>
       <View

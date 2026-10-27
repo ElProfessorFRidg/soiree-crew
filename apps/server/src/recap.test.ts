@@ -89,3 +89,23 @@ describe("recap (O-41, N-22)", () => {
     expect((await app.inject({ method: "GET", url: `/v1/parties/${partyId}/recap`, headers: stranger.auth })).statusCode).toBe(404);
   });
 });
+
+describe("quote of the night (N-23)", () => {
+  it("adds lines, votes once per person, and lets the quoted person remove theirs", async () => {
+    const [jade, malik] = (await Promise.all(["jade", "malik"].map(account))) as [User, User];
+    const crewId = ((await app.inject({ method: "POST", url: "/v1/crews", headers: jade.auth, payload: { name: "Crew" } })).json() as { crew: { id: string } }).crew.id;
+    const { code } = (await app.inject({ method: "POST", url: `/v1/crews/${crewId}/invites`, headers: jade.auth })).json() as { code: string };
+    await app.inject({ method: "POST", url: `/v1/invites/${code}/accept`, headers: malik.auth });
+    const partyId = randomUUID();
+    await app.inject({ method: "POST", url: "/v1/parties", headers: jade.auth, payload: { id: partyId, crewId, name: "Samedi", mood: "party", kind: "party", startsAt: clock, endsAt: clock + 6 * H } });
+    await app.inject({ method: "POST", url: `/v1/parties/${partyId}/response`, headers: malik.auth, payload: { response: "going" } });
+    const quoteId = randomUUID();
+    expect((await app.inject({ method: "POST", url: `/v1/parties/${partyId}/quotes`, headers: jade.auth, payload: { id: quoteId, text: "Je rentre après celle-là.", saidBy: malik.id } })).statusCode).toBe(201);
+    expect((await app.inject({ method: "POST", url: `/v1/quotes/${quoteId}/vote`, headers: jade.auth })).json()).toEqual({ voted: true });
+    expect((await app.inject({ method: "POST", url: `/v1/quotes/${quoteId}/vote`, headers: malik.auth })).json()).toEqual({ voted: true });
+    const recap = (await app.inject({ method: "GET", url: `/v1/parties/${partyId}/recap`, headers: malik.auth })).json() as { quotes: { votes: number; mine: boolean; saidBy: string }[] };
+    expect(recap.quotes[0]).toMatchObject({ votes: 2, mine: true, saidBy: malik.id });
+    expect((await app.inject({ method: "POST", url: `/v1/quotes/${quoteId}/vote`, headers: malik.auth })).json()).toEqual({ voted: false });
+    expect((await app.inject({ method: "DELETE", url: `/v1/quotes/${quoteId}`, headers: malik.auth })).statusCode).toBe(204);
+  });
+});
