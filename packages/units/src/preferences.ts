@@ -31,6 +31,8 @@ export interface UserPreferences {
   /** Quiet hours, local, for notifications that can wait (QOL-20). Safety alerts ignore them. */
   quietFromHour: number;
   quietToHour: number;
+  /** QOL-18: the ride app picked once and remembered. Null until chosen. */
+  rideApp: string | null;
 }
 
 export interface DeviceLocale {
@@ -75,6 +77,7 @@ export function defaultPreferences(device: DeviceLocale): UserPreferences {
     notifyRecap: true,
     quietFromHour: 22,
     quietToHour: 9,
+    rideApp: null,
   };
 }
 

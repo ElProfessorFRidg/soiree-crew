@@ -226,7 +226,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 |---|---|---|---|---|
 | N-25 | P0 | Securite.dc.html | build | "Home safe": status (O-82) + end-of-night check-in; the crew sees who has not confirmed yet. |
 | N-26 | P0 | Securite.dc.html | build | Designated driver per party: visible badge, reminder if they log a drink. |
-| N-27 | P0 | Securite.dc.html | todo | Who goes home with whom, walking each other home, shortcuts to ride-hailing / taxis / night transport. |
+| N-27 | P0 | Securite.dc.html | build | Who goes home with whom, walking each other home, shortcuts to ride-hailing / taxis / night transport. |
 | N-28 | P0 | Securite.dc.html | build | Discreet SOS button: alert to the crew with location (if allowed), shortcuts to 112 and local emergency number... |
 | N-29 | P0 | Soirees.dc.html | build | Gentle alert when a member has given no sign of life for X minutes during a party (extension of O-37). |
 | N-36 | P0 | Backstage (near Securite.dc.html) | proposed | "Not feeling well" status, private to the crew in the party: the crew is told quietly, nearest members first, one tap to SOS (N-28); clears when the user says they are fine or confirms home safe (N-25). Source: app.md §2.3 E, §3 decision 4, §5. |
@@ -263,7 +263,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-15 | P1 | Arrivee.dc.html | todo | Try before signing up: games and the Bar work without an account; sign-up is asked only when the user needs a ... |
 | QOL-16 | P1 | Soirees.dc.html | build | Defaults learned from habits: usual party end time, usual venue, usual drinks first in quick add, the friends ... |
 | QOL-17 | P1 | Soirees.dc.html | todo | Suggestions that save taps: when 3+ crew members check in at the same venue, offer to start a party; when the ... |
-| QOL-18 | P1 | Securite.dc.html | todo | The user's own apps: directions in Apple Maps, Google Maps or Waze, rides in Uber, Bolt or local taxi apps, ch... |
+| QOL-18 | P1 | Securite.dc.html | build | The user's own apps: directions in Apple Maps, Google Maps or Waze, rides in Uber, Bolt or local taxi apps, ch... |
 | QOL-19 | P1 | Argent.dc.html | build | Long-press copies what people copy (IBAN, codes, addresses), with a haptic and a short inline "Copied". |
 | QOL-20 | P1 | Recap.dc.html | build | Next-morning mode: the morning after, the app opens on a calm, dark, low-contrast screen with the recap, who o... |
 | QOL-21 | P1 | Radar.dc.html | todo | Calendar and birthdays: parties added to the phone calendar in one tap; a crew member's birthday reminds the o... |

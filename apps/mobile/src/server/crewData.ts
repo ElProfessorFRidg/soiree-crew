@@ -51,6 +51,20 @@ export interface LiveMember {
   drinks: number;
   water: number;
   quiet: boolean;
+  /** N-27: leader of the group this member goes home with (themself when leading). */
+  homeWith: string | null;
+  homeMode: HomeMode | null;
+  homeOfferFrom: string | null;
+}
+
+export type HomeMode = "walk" | "car" | "ride" | "transit";
+
+export async function setGoingHome(
+  partyId: string,
+  input: { withUserId?: string | null; mode?: HomeMode | null; offerTo?: string; answerOffer?: boolean },
+): Promise<void> {
+  await api(`/v1/parties/${partyId}/home`, { method: "POST", body: input });
+  await refreshLiveParty(partyId);
 }
 
 export interface LiveParty {

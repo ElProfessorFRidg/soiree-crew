@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
@@ -120,6 +120,7 @@ export default function LiveScreen() {
             <Text style={styles.flex}>{i18n.t("live.imDriver")}</Text>
             <Switch value={mine.designatedDriver} onValueChange={(on) => toggle({ designatedDriver: on })} accessibilityLabel={i18n.t("live.imDriver")} />
           </View>
+          <Button label={i18n.t("goingHome.open")} icon="car" variant="outline" height={48} onPress={() => router.push({ pathname: "/home", params: { id } })} />
         </Panel>
       ) : null}
       {live?.party.live ? (

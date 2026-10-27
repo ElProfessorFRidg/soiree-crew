@@ -90,6 +90,7 @@ describe("smart defaults (PREF-02, PREF-04)", () => {
       notifyRecap: true,
       quietFromHour: 22,
       quietToHour: 9,
+      rideApp: null,
     });
   });
   it("French speaker living in the US gets French UI with US rules", () => {

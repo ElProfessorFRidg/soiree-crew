@@ -142,6 +142,64 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
   });
 
   /**
+   * N-27: going home together. `withUserId` joins that person's group (their
+   * leader's, so groups never chain); null leaves any group. Only going members.
+   */
+  app.post<{ Params: { id: string } }>("/v1/parties/:id/home", async (request) => {
+    const user = requireUser(request);
+    const party = await loadPartyForMember(ctx, request.params.id, user.id);
+    const input = z
+      .object({
+        withUserId: z.string().uuid().nullable().optional(),
+        mode: z.enum(["walk", "car", "ride", "transit"]).nullable().optional(),
+        offerTo: z.string().uuid().optional(),
+        answerOffer: z.boolean().optional(),
+      })
+      .parse(request.body);
+    const going = await ctx.db.query<{ user_id: string; home_with: string | null; home_offer_from: string | null }>(
+      "select user_id, home_with, home_offer_from from party_members where party_id = $1 and response = 'going'",
+      [party.id],
+    );
+    const member = (id: string) => going.find((m) => m.user_id === id);
+    const me = member(user.id);
+    if (!me) throw new HttpError(403, "not_going");
+    const set = (userId: string, column: "home_with" | "home_mode" | "home_offer_from", value: string | null) =>
+      ctx.db.query(`update party_members set ${column} = $3 where party_id = $1 and user_id = $2`, [party.id, userId, value]);
+
+    const join = async (userId: string, otherId: string) => {
+      const other = member(otherId);
+      if (!other || otherId === userId) throw new HttpError(404, "not_found");
+      const leader = other.home_with ?? otherId;
+      if (!other.home_with) await set(otherId, "home_with", otherId);
+      await set(userId, "home_with", leader);
+      // Whoever followed me now follows my new leader.
+      await ctx.db.query("update party_members set home_with = $3 where party_id = $1 and home_with = $2 and user_id <> $2", [party.id, userId, leader]);
+    };
+
+    if (input.withUserId === null) {
+      await set(user.id, "home_with", null);
+      // Leaving a group I led: the next person leads it.
+      const followers = going.filter((m) => m.home_with === user.id && m.user_id !== user.id);
+      const next = followers[0];
+      for (const f of followers) await set(f.user_id, "home_with", followers.length > 1 && next ? next.user_id : null);
+    } else if (input.withUserId) {
+      await join(user.id, input.withUserId);
+    }
+    if (input.mode !== undefined) await set(user.id, "home_mode", input.mode);
+    if (input.offerTo) {
+      if (!member(input.offerTo) || input.offerTo === user.id) throw new HttpError(404, "not_found");
+      await set(input.offerTo, "home_offer_from", user.id);
+    }
+    if (input.answerOffer !== undefined) {
+      const from = me.home_offer_from;
+      await set(user.id, "home_offer_from", null);
+      if (input.answerOffer && from) await join(user.id, from);
+    }
+    ctx.live.notify(going.map((m) => m.user_id), { type: "party.changed", partyId: party.id });
+    return { ok: true };
+  });
+
+  /**
    * O-37 live dashboard. BACs are computed here with @crew/bac from each member's
    * own drinks, so every phone shows the same numbers. Only crew members reach it.
    */
@@ -160,9 +218,13 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
       home_safe_at: number | null;
       last_activity_at: number | null;
       battery_low: boolean;
+      home_with: string | null;
+      home_mode: string | null;
+      home_offer_from: string | null;
       sealed: string | null;
     }>(
-      `select m.user_id, u.display_name, m.response, m.designated_driver, m.home_safe_at, m.last_activity_at, m.battery_low, b.sealed
+      `select m.user_id, u.display_name, m.response, m.designated_driver, m.home_safe_at, m.last_activity_at, m.battery_low,
+              m.home_with, m.home_mode, m.home_offer_from, b.sealed
        from party_members m join users u on u.id = m.user_id left join body_profiles b on b.user_id = m.user_id
        where m.party_id = $1 order by u.display_name`,
       [party.id],
@@ -187,6 +249,9 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
         designatedDriver: m.designated_driver,
         homeSafeAt: m.home_safe_at,
         batteryLow: m.battery_low,
+        homeWith: m.home_with,
+        homeMode: m.home_mode,
+        homeOfferFrom: m.home_offer_from,
         lastActivityAt: m.last_activity_at,
       };
       if (m.response !== "going") return { ...base, bac: null, trend: null, drinks: 0, water: 0, quiet: false };

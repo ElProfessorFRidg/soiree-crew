@@ -311,6 +311,14 @@ function CurrentVenueRow({ i18n }: { i18n: Translator }) {
           onPress={() => router.push("/money")}
         />
       ) : null}
+      {live ? (
+        <Row
+          title={i18n.t("goingHome.open")}
+          leading={<Icon name="home" color={theme.textMuted} />}
+          trailing={<Icon name="chev" color={theme.textMuted} />}
+          onPress={() => router.push({ pathname: "/home", params: { id: live.party.id } })}
+        />
+      ) : null}
     </>
   );
 }
