@@ -21,6 +21,7 @@ const fixSchema = z.object({
   accuracy: z.number().min(0).max(10_000),
   mocked: z.boolean(),
   deviceNow: z.number().int().nonnegative(),
+  integrity: z.object({ rooted: z.boolean().optional(), emulator: z.boolean().optional() }).optional(),
 });
 
 const checkInSchema = fixSchema.extend({ id: z.string().uuid(), venueId: z.string().uuid(), private: z.boolean().default(false) });

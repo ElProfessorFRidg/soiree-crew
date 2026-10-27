@@ -2,12 +2,12 @@ import { createHmac } from "node:crypto";
 import { ethanolGrams } from "@crew/bac";
 
 // AC-03 and AC-06 (research/anticheat.md §2.2 to §2.5). Every number is a default of
-// ac_config_version 2 (2: city jumps under 5 km are flagged); verdicts store the version so scoring can be replayed (AC-01).
+// ac_config_version 3 (2: city jumps under 5 km are flagged; 3: device integrity weighs 15); verdicts store the version so scoring can be replayed (AC-01).
 
 export const AC_CONFIG = {
-  version: 2,
+  version: 3,
   bands: { acceptBelow: 30, rejectAt: 70, rejectMinCategories: 2 },
-  weights: { mocked: 50, speedStrong: 45, speedMedium: 20, speedCity: 30, coordsIdentical: 30, coordsOnPin: 25, clockDrift: 5, venueHopping: 20 },
+  weights: { mocked: 50, speedStrong: 45, speedMedium: 20, speedCity: 30, coordsIdentical: 30, coordsOnPin: 25, clockDrift: 5, venueHopping: 20, integrity: 15 },
   credits: { peerPassive: 20 },
   geo: { maxAccuracyM: 150, speedStrongKmh: 250, speedMediumKmh: 130, speedCityKmh: 90, cityMinKm: 1 },
   time: { clockDriftMin: 5, peerWindowMin: 20, peerActiveWindowMin: 30, hoppingWindowMin: 10 },
@@ -29,6 +29,8 @@ export interface Fix {
   /** Metres. */
   accuracy: number;
   mocked: boolean;
+  /** AC-05: what the phone says about itself. Easy to fake, so it only ever lowers trust. */
+  integrity?: { rooted?: boolean | undefined; emulator?: boolean | undefined } | undefined;
 }
 
 export interface PreviousCheckIn {
@@ -86,6 +88,8 @@ export function evaluateCheckIn(input: CheckInEvaluationInput): Evaluation {
   if (distance - fix.accuracy > venue.radiusM) return { verdict: "not_here", risk: 0, signals, corroborated: false, reason: "not_here" };
 
   if (fix.mocked) signals.push({ name: "mocked", points: cfg.weights.mocked, category: "F" });
+  // AC-05: a rooted or emulated phone weighs a little, never enough to reject on its own.
+  if (fix.integrity?.rooted || fix.integrity?.emulator) signals.push({ name: "device_integrity", points: cfg.weights.integrity, category: "I" });
 
   const last = input.previous[0];
   if (last && last.venueId !== venue.id) {

@@ -38,6 +38,14 @@ describe("check-in verdicts (research/anticheat.md §2.4 worked examples)", () =
     expect(ride.verdict).toBe("accepted");
   });
 
+  it("lets a rooted phone in, weighing a little more, and never rejects on that alone (AC-05)", () => {
+    const rooted = evaluateCheckIn(input({ fix: { integrity: { rooted: true } } }));
+    expect(rooted.signals.map((s) => s.name)).toContain("device_integrity");
+    expect(rooted.verdict).toBe("accepted");
+    const rootedAndMocked = evaluateCheckIn(input({ fix: { mocked: true, integrity: { rooted: true, emulator: true } } }));
+    expect(rootedAndMocked.verdict).not.toBe("accepted");
+  });
+
   it("asks a friend to confirm in a basement with a 180 m fix", () => {
     expect(evaluateCheckIn(input({ fix: { accuracy: 180 } }))).toMatchObject({ verdict: "unverified", reason: "imprecise" });
   });

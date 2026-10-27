@@ -1,3 +1,5 @@
+import * as Device from "expo-device";
+import { Platform } from "react-native";
 import * as Location from "expo-location";
 import { create } from "zustand";
 import { newId } from "@/state/store";
@@ -94,11 +96,21 @@ export async function currentFix(): Promise<
   }
 }
 
+/** AC-05: what the phone says about itself, read once. Only ever a weight on the server, never a gate. */
+let integrity: Promise<{ rooted: boolean; emulator: boolean }> | null = null;
+function deviceIntegrity(): Promise<{ rooted: boolean; emulator: boolean }> {
+  if (Platform.OS === "web") return Promise.resolve({ rooted: false, emulator: false });
+  integrity ??= Device.isRootedExperimentalAsync()
+    .catch(() => false)
+    .then((rooted) => ({ rooted, emulator: !Device.isDevice }));
+  return integrity;
+}
+
 export async function checkIn(venueId: string, fix: { lat: number; lng: number; accuracy: number; mocked: boolean }, isPrivate: boolean): Promise<CheckInResult> {
   const id = newId();
   const result = await api<CheckInResult>("/v1/checkins", {
     method: "POST",
-    body: { id, venueId, ...fix, deviceNow: Date.now(), private: isPrivate },
+    body: { id, venueId, ...fix, deviceNow: Date.now(), private: isPrivate, integrity: await deviceIntegrity() },
   });
   if (result.verdict === "accepted" || result.verdict === "unverified") {
     useVenueData.setState({ openCheckIn: { id, venueId, at: Date.now() } });
