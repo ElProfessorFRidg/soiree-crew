@@ -69,6 +69,8 @@ export const es: Messages = {
     againNamed: "Repetir: {name}",
     addedNamed: "Apuntado: {drink}, {time}",
     poisoningBody: "Signos de intoxicación grave: confusión, vómitos, respiración lenta, piel pálida o azulada. Si ves estos signos, llama al {number}. Quédate con alguien. Nada de duchas frías ni de café.",
+    dareTitle: "El reto de esta noche",
+    dareHint: "Para quien quiera. Uno nuevo cada noche, el mismo para toda la crew.",
   },
   curve: {
     title: "Tu curva",

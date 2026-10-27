@@ -70,6 +70,8 @@ export const en: Messages = {
     againNamed: "Another {name}",
     addedNamed: "Logged: {drink} at {time}",
     poisoningBody: "Signs of alcohol poisoning: confusion, vomiting, slow breathing, pale or blue skin. With these signs, call {number}. Stay with someone. No cold shower, no coffee.",
+    dareTitle: "Tonight's dare",
+    dareHint: "For whoever wants it. A new one every night, the same for the whole crew.",
   },
   curve: {
     title: "Your curve",

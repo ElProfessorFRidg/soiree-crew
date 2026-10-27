@@ -294,7 +294,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | JOY-09 | P1 | Recap.dc.html | todo | Photo booth: at the end of a party, an automatic photo strip from the shared album, ready for stories. |
 | JOY-10 | P2 | Reglages.dc.html | todo | Sticker packs (iMessage / WhatsApp) made from crew avatars and moments. |
 | JOY-11 | P1 | Profil.dc.html | todo | Member card: a shareable profile card with titles, venues ruled, favourite drink, nights out. |
-| JOY-12 | P1 | Soiree.dc.html | todo | Dare of the night on the Party screen, different every night, taken from the crew's own cards when they exist ... |
+| JOY-12 | P1 | Soiree.dc.html | build | Dare of the night on the Party screen, different every night, taken from the crew's own cards when they exist ... |
 
 ## Adaptive drunk mode
 

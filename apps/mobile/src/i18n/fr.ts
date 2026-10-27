@@ -68,6 +68,8 @@ export const fr = {
     againNamed: "Encore : {name}",
     addedNamed: "Noté : {drink} à {time}",
     poisoningBody: "Signes d'intoxication grave : confusion, vomissements, respiration lente, peau pâle ou bleutée. Avec ces signes, appelle le {number}. Reste avec quelqu'un. Pas de douche froide, pas de café.",
+    dareTitle: "Défi du soir",
+    dareHint: "Pour qui veut. Un nouveau chaque soir, le même pour tout le crew.",
   },
   curve: {
     title: "Ta courbe",

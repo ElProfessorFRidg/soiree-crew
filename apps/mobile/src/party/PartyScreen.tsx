@@ -31,6 +31,7 @@ import { VaultPrompt } from "@/vault/VaultPrompt";
 import { useLiveParty, type PartyMood } from "@/server/crewData";
 import { useVenueData } from "@/server/venueData";
 import { RollingNumber } from "./RollingNumber";
+import { DareOfTheNight } from "./DareOfTheNight";
 
 function greetingKey(hour: number) {
   if (hour < 5) return "greeting.lateNight" as const;
@@ -427,6 +428,7 @@ function LevelZero(props: LevelProps) {
       </View>
       <StatusRow {...props} />
       <CrewStrip />
+      <DareOfTheNight now={props.now} />
       <View>
         <CurrentVenueRow i18n={i18n} />
         <Row

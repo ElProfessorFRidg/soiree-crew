@@ -68,6 +68,8 @@ export const de: Messages = {
     againNamed: "Nochmal: {name}",
     addedNamed: "Notiert: {drink} um {time}",
     poisoningBody: "Anzeichen einer schweren Alkoholvergiftung: Verwirrung, Erbrechen, langsame Atmung, blasse oder bläuliche Haut. Bei diesen Anzeichen ruf {number} an. Bleib nicht allein. Keine kalte Dusche, kein Kaffee.",
+    dareTitle: "Mutprobe des Abends",
+    dareHint: "Für alle, die Lust haben. Jeden Abend eine neue, für die ganze Crew dieselbe.",
   },
   curve: {
     title: "Deine Kurve",
