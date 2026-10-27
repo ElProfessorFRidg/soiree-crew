@@ -8,6 +8,7 @@ import { crewRoutes } from "./routes/crews";
 import { moneyRoutes } from "./routes/money";
 import { mutationRoutes } from "./routes/mutations";
 import { partyRoutes } from "./routes/parties";
+import { photoRoutes } from "./routes/photos";
 import { profileRoutes } from "./routes/profiles";
 import { radarRoutes } from "./routes/radar";
 import { recapRoutes } from "./routes/recap";
@@ -15,7 +16,7 @@ import { leaderboardRoutes } from "./routes/leaderboards";
 import { syncRoutes } from "./routes/sync";
 import { venueRoutes } from "./routes/venues";
 
-const PUBLIC_ROUTES = new Set(["POST /v1/accounts", "POST /v1/sessions/claim", "GET /v1/health", "GET /v1/invites/:code", "GET /v1/live", "GET /i/:code"]);
+const PUBLIC_ROUTES = new Set(["POST /v1/accounts", "POST /v1/sessions/claim", "GET /v1/health", "GET /v1/invites/:code", "GET /v1/live", "GET /i/:code", "GET /v1/photos/:id"]);
 
 export async function buildApp(ctx: Context, options: { logger?: boolean } = {}): Promise<FastifyInstance> {
   const app = Fastify({
@@ -69,5 +70,6 @@ export async function buildApp(ctx: Context, options: { logger?: boolean } = {})
   moneyRoutes(app, ctx);
   recapRoutes(app, ctx);
   profileRoutes(app, ctx);
+  photoRoutes(app, ctx);
   return app;
 }

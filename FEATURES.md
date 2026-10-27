@@ -148,7 +148,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | O-81 | P1 | Soiree.dc.html | todo | Much more detailed charts. |
 | O-82 | P0 | Securite.dc.html | build | "Gone to bed / home" status. |
 | O-83 | P1 | Soiree.dc.html | todo | Photo when logging a drink. |
-| O-84 | P1 | Recap.dc.html | todo | Photos and videos shared that stay inside the group. |
+| O-84 | P1 | Recap.dc.html | build | Photos and videos shared that stay inside the group. |
 
 ## Party hub
 
@@ -214,7 +214,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| N-21 | P1 | Recap.dc.html | todo | Shared album per party (photos and videos private to the group, O-84) + optional photo when logging a drink (O... |
+| N-21 | P1 | Recap.dc.html | build | Shared album per party (photos and videos private to the group, O-84) + optional photo when logging a drink (O... |
 | N-22 | P0 | Recap.dc.html | build | Party timeline: arrivals, check-ins, venue takeovers, games played, photos, highlights, built into the recap. |
 | N-23 | P1 | Recap.dc.html | todo | "Quote of the night": legendary lines, voted by the crew. |
 | N-24 | P1 | Jeux.dc.html | todo | Hall of fame for games and game records. |
@@ -254,7 +254,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-06 | P0 | Soiree.dc.html | todo | Native sharing: recap and story cards go straight to Instagram Stories, Snapchat (Creative Kit), TikTok and Wh... |
 | QOL-07 | P0 | Etats.dc.html | build | Typed content is never lost: drafts (party name, review, expense, card) survive the app being killed, errors a... |
 | QOL-08 | P0 | Arrivee.dc.html | build | Forms done right: the right keyboard per field (numeric pad with the locale's decimal separator for amounts, e... |
-| QOL-09 | P0 | Etats.dc.html | todo | Photos: compressed before upload, background upload with progress and retry, HEIC accepted, location metadata ... |
+| QOL-09 | P0 | Etats.dc.html | build | Photos: compressed before upload, background upload with progress and retry, HEIC accepted, location metadata ... |
 | QOL-10 | P0 | Soirees.dc.html | build | Dying battery: when a member's battery drops under 10% during a party, the crew sees "low battery" next to the... |
 | QOL-11 | P0 | Etats.dc.html | build | Names that work: long names, emojis in names, two "Lucas" in one crew disambiguated automatically, initials av... |
 | QOL-12 | P0 | Etats.dc.html | build | Correct plurals and formats everywhere ("1 verre", "2 verres", decimal comma in French), relative times ("5 mi... |
@@ -306,7 +306,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ADP-04 | P0 | Soiree.dc.html | build | "Heavy fingers" ergonomics: giant targets, no essential action behind a long-press, a precise swipe or a small... |
 | ADP-05 | P0 | Soiree.dc.html | build | Forgiving input: fuzzy search that tolerates typos, suggestions, voice input (see AI-01). |
 | ADP-06 | P0 | ModeBourre.dc.html | build | "Next-morning vault": above a threshold, sensitive actions are locked or queued for confirmation the next day ... |
-| ADP-07 | P0 | ModeBourre.dc.html | todo | Legibility: text size, maximum contrast, readable under strobe or very low light, no disorienting motion (effe... |
+| ADP-07 | P0 | ModeBourre.dc.html | build | Legibility: text size, maximum contrast, readable under strobe or very low light, no disorienting motion (effe... |
 | ADP-08 | P0 | ModeBourre.dc.html | build | Battery: automatic eco mode during a party when the battery gets low (fewer refreshes, lighter effects; essent... |
 | ADP-09 | P0 | Backstage | todo | Drunk-mode test bench: a tester subagent runs EVERY P0 screen under simulated constraints (one hand, thumb onl... |
 | ADP-10 | P1 | Messages.dc.html | todo | Drunk-text guard: the user picks contacts (inside the app) whose messages are held at adaptive levels 2 and 3 ... |

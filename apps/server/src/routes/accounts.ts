@@ -3,6 +3,7 @@ import { z } from "zod";
 import { bearer, requireUser, HttpError, type Context } from "../context";
 import { hashToken, newCode, newId, newToken } from "../crypto";
 import { RateLimiter } from "../ratelimit";
+import { deletePhotoFiles } from "./photos";
 import { accountSchema } from "../schemas";
 
 const TRANSFER_TTL_MS = 10 * 60_000;
@@ -184,6 +185,7 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
   /** O-07: erases everything about the account. Crews it created stay for the others. */
   app.delete("/v1/me", async (request, reply) => {
     const user = requireUser(request);
+    await deletePhotoFiles(ctx, user.id);
     await ctx.db.transaction(async (tx) => {
       // Crews and parties nobody else is in go with the account; the others get a new owner.
       await tx.query(

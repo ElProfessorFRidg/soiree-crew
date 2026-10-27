@@ -19,6 +19,7 @@ import { ThemeProvider } from "@/theme";
 import { useEco, watchBattery } from "@/power/eco";
 import { logWater } from "@/drinks/actions";
 import { LOG_WATER_ACTION, refreshReminders } from "@/reminders/reminders";
+import { flushUploads } from "@/photos/uploads";
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -66,6 +67,7 @@ export default function RootLayout() {
     const subscription = RNAppState.addEventListener("change", (status) => {
       if (status === "active") {
         void flush();
+        void flushUploads();
         void refreshReminders();
       }
     });
@@ -145,6 +147,7 @@ export default function RootLayout() {
               <Stack.Screen name="edit-profile" />
               <Stack.Screen name="friends" />
               <Stack.Screen name="reports" />
+              <Stack.Screen name="album" />
               <Stack.Screen name="morning" options={{ animation: "fade" }} />
               <Stack.Screen name="sos" options={{ presentation: "fullScreenModal", animation: "fade" }} />
             </Stack>

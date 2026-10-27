@@ -13,7 +13,8 @@
       "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "UIBackgroundModes": []
+        "UIBackgroundModes": [],
+        "CFBundleAllowMixedLocalizations": true
       }
     },
     "android": {
@@ -67,15 +68,27 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Your position is used to check in at a bar with your crew. It is checked, then deleted.",
+          "locationWhenInUsePermission": "Your location is used to check in at a bar with your crew, and to share it during a party if you turn that on. It is checked, then deleted.",
           "isAndroidBackgroundLocationEnabled": false,
           "isIosBackgroundLocationEnabled": false
         }
       ],
-      "expo-sharing"
+      "expo-sharing",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Your photos fill the party album, seen by your crew only. Their location is removed.",
+          "cameraPermission": "The camera adds photos to the party album, seen by your crew only.",
+          "microphonePermission": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "locales": {
+      "fr": "./locales/fr.json",
+      "en": "./locales/en.json"
     }
   }
 }

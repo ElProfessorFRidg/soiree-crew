@@ -29,6 +29,7 @@ const app = await buildApp(
     now: () => Date.now(),
     publicUrl: process.env.PUBLIC_URL ?? `http://localhost:${port}`,
     hashSecret: createHash("sha256").update(`fix-hash:${dataKey}`).digest("hex"),
+    uploadDir: process.env.UPLOAD_DIR ?? "./data/uploads",
   },
   { logger: true },
 );

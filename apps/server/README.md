@@ -16,6 +16,7 @@ Build from the repository root with `apps/server/Dockerfile`, then set:
 
 - `DATABASE_URL`: a PostgreSQL 16 database
 - `DATA_KEY`: `openssl rand -base64 32`, kept secret and backed up (losing it makes health data unreadable)
-- `PUBLIC_URL`: the https address of the server, used in invite links
+- `PUBLIC_URL`: the https address of the server, used in invite links and photo links
+- `UPLOAD_DIR` (optional, default `./data/uploads`): where album photos are kept. Mount it as a volume so photos survive a redeploy
 
 Expose port 8787 behind HTTPS.

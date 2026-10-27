@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "NSLocationWhenInUseUsageDescription": "Your location is used to check in at a bar with your crew, and to share it during a party if you turn that on. It is checked, then deleted.",
+    "NSCameraUsageDescription": "The camera adds photos to the party album, seen by your crew only.",
+    "NSPhotoLibraryUsageDescription": "Your photos fill the party album, seen by your crew only. Their location is removed."
+  }
+}

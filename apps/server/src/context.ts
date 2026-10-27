@@ -14,6 +14,8 @@ export interface Context {
   publicUrl: string;
   /** Key for hashing location fixes; derived from DATA_KEY, never stored. */
   hashSecret: string;
+  /** Where album photos are kept (N-21). Defaults to ./data/uploads. */
+  uploadDir?: string;
 }
 
 export class HttpError extends Error {
