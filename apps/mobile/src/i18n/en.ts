@@ -29,6 +29,7 @@ export const en: Messages = {
     evening: "Things are warming up.",
   },
   party: {
+    eco: "Low battery: eco mode. Fewer animations and refreshes, SOS stays.",
     tonight: "Tonight",
     changeUnit: "Change unit",
     alternate: "or {value} {unit}",

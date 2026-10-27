@@ -14,13 +14,16 @@ import {
 } from "@crew/bac";
 import { breathRatio, countryRules, drivingLimit, type CountryRules } from "@crew/units";
 import { useAppStore } from "./store";
+import { useEcoInterval } from "@/power/eco";
 
 const TICK_MS = 15_000;
 const HOUR_MS = 3_600_000;
 
 /** Wall clock that refreshes every 15 s and whenever the app comes back to the foreground. */
-export function useNow(intervalMs = TICK_MS): number {
+export function useNow(base = TICK_MS): number {
   const [now, setNow] = useState(() => Date.now());
+  // ADP-08: the clock ticks less often on a low battery; coming back to the app still refreshes it.
+  const intervalMs = useEcoInterval(base);
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), intervalMs);
     const subscription = RNAppState.addEventListener("change", (status) => {

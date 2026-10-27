@@ -29,6 +29,7 @@ import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { useEcoInterval } from "@/power/eco";
 
 const REFRESH_MS = 30_000;
 
@@ -41,6 +42,7 @@ export default function LeaderboardScreen() {
   const live = useLiveParty();
   const me = useSession((state) => state.session?.userId);
   const hourCycle = useAppStore((state) => state.preferences.hourCycle);
+  const refreshMs = useEcoInterval(REFRESH_MS);
   const [period, setPeriod] = useState<LeaderboardPeriod>(live ? "party" : "month");
   const [metric, setMetric] = useState<LeaderboardMetric>("drinks");
   const [rows, setRows] = useState<LeaderboardRow[]>([]);
@@ -76,9 +78,9 @@ export default function LeaderboardScreen() {
   useEffect(() => {
     leaderRef.current = null;
     load();
-    const timer = setInterval(load, REFRESH_MS);
+    const timer = setInterval(load, refreshMs);
     return () => clearInterval(timer);
-  }, [load]);
+  }, [load, refreshMs]);
 
   const myRow = rows.find((r) => r.userId === me);
 

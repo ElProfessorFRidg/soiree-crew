@@ -307,7 +307,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ADP-05 | P0 | Soiree.dc.html | todo | Forgiving input: fuzzy search that tolerates typos, suggestions, voice input (see AI-01). |
 | ADP-06 | P0 | ModeBourre.dc.html | build | "Next-morning vault": above a threshold, sensitive actions are locked or queued for confirmation the next day ... |
 | ADP-07 | P0 | ModeBourre.dc.html | todo | Legibility: text size, maximum contrast, readable under strobe or very low light, no disorienting motion (effe... |
-| ADP-08 | P0 | ModeBourre.dc.html | todo | Battery: automatic eco mode during a party when the battery gets low (fewer refreshes, lighter effects; essent... |
+| ADP-08 | P0 | ModeBourre.dc.html | build | Battery: automatic eco mode during a party when the battery gets low (fewer refreshes, lighter effects; essent... |
 | ADP-09 | P0 | Backstage | todo | Drunk-mode test bench: a tester subagent runs EVERY P0 screen under simulated constraints (one hand, thumb onl... |
 | ADP-10 | P1 | Messages.dc.html | todo | Drunk-text guard: the user picks contacts (inside the app) whose messages are held at adaptive levels 2 and 3 ... |
 

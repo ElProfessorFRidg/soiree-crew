@@ -20,6 +20,7 @@ import { Panel, Switch, Tag } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { useEcoInterval } from "@/power/eco";
 
 /** Live dashboard refresh while the screen is open, on top of socket hints (O-37). */
 const REFRESH_MS = 20_000;
@@ -73,14 +74,15 @@ export default function LiveScreen() {
   const party = useCrewData((state) => state.parties.find((p) => p.id === id));
   const me = useSession((state) => state.session?.userId);
   const hourCycle = useAppStore((state) => state.preferences.hourCycle);
+  const refreshMs = useEcoInterval(REFRESH_MS);
 
   useEffect(() => {
     if (!id) return;
     const refresh = () => void refreshLiveParty(id).catch(() => undefined);
     refresh();
-    const timer = setInterval(refresh, REFRESH_MS);
+    const timer = setInterval(refresh, refreshMs);
     return () => clearInterval(timer);
-  }, [id]);
+  }, [id, refreshMs]);
 
   if (!id) return null;
   const mine = live?.members.find((m) => m.userId === me);

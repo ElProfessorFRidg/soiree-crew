@@ -27,6 +27,7 @@ export const fr = {
     evening: "Ça commence à chauffer.",
   },
   party: {
+    eco: "Batterie faible : mode éco. Moins d'animations et de mises à jour, le SOS reste là.",
     tonight: "Ce soir",
     changeUnit: "Changer d'unité",
     alternate: "soit {value} {unit}",

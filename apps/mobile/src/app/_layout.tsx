@@ -6,6 +6,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { AppState as RNAppState, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { ReducedMotionConfig, ReduceMotion } from "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { themes } from "@crew/design-tokens";
 import { I18nProvider } from "@/i18n";
@@ -15,6 +16,7 @@ import { useSyncFeedback } from "@/sync/feedback";
 import { flush } from "@/sync/engine";
 import { useAppStore } from "@/state/store";
 import { ThemeProvider } from "@/theme";
+import { useEco, watchBattery } from "@/power/eco";
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -42,8 +44,11 @@ export default function RootLayout() {
   const session = useSession((state) => state.session);
   const ready = fontsLoaded && hydrated && sessionReady;
 
+  const eco = useEco((state) => state.eco);
+
   useEffect(() => {
     void loadSession();
+    watchBattery();
   }, []);
 
   useEffect(() => {
@@ -78,6 +83,8 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: themes.dark.bg }}>
+      {/* ADP-08: lighter effects on a low battery. Animations jump to their end, nothing else changes. */}
+      {eco ? <ReducedMotionConfig mode={ReduceMotion.Always} /> : null}
       <SafeAreaProvider>
         <ThemeProvider>
           <I18nProvider language={language}>

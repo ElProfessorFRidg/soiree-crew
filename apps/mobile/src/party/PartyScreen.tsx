@@ -25,6 +25,7 @@ import { Numeral, Text } from "@/ui/Text";
 import { AddDrinkButton } from "./AddDrinkButton";
 import { CrewStrip } from "./CrewStrip";
 import { SosBanner } from "@/crew/SosBanner";
+import { useEco } from "@/power/eco";
 import { VaultPrompt } from "@/vault/VaultPrompt";
 import { useLiveParty } from "@/server/crewData";
 import { useVenueData } from "@/server/venueData";
@@ -53,6 +54,14 @@ function useTonight(now: number) {
       water: water.filter((w) => w.at >= from),
     };
   }, [drinks, water, boundary, now]);
+}
+
+/** ADP-08: says why the app looks calmer. */
+function EcoNotice() {
+  const i18n = useT();
+  const eco = useEco((state) => state.eco);
+  if (!eco) return null;
+  return <Tag label={i18n.t("party.eco")} icon="battery" tone="amber" />;
 }
 
 export function PartyScreen() {
@@ -120,6 +129,7 @@ export function PartyScreen() {
       >
         <SosBanner />
         <VaultPrompt />
+        <EcoNotice />
         {level === 0 ? <LevelZero {...common} /> : null}
         {level === 1 ? <LevelOne {...common} /> : null}
         {level === 2 ? <LevelTwo {...common} /> : null}
