@@ -3,6 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { BottomTabBarProps } from "expo-router/tabs";
 import { useT } from "@/i18n";
+import { useMorningAfter } from "@/recap/morning";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Icon, type AnyIconName } from "@/ui/Icon";
@@ -57,6 +58,7 @@ export default function TabsLayout() {
   const i18n = useT();
   const insets = useSafeAreaInsets();
   const onboarded = useAppStore((state) => state.ageConfirmedAt !== null && state.profile !== null);
+  useMorningAfter();
   if (!onboarded) return <Redirect href="/onboarding" />;
   return (
     <View style={{ flex: 1 }}>

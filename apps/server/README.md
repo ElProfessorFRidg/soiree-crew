@@ -8,7 +8,7 @@ API and live socket for crews and parties (ADR 0002).
 DATA_KEY=$(openssl rand -base64 32) pnpm --filter @crew/server dev
 ```
 
-Without `DATABASE_URL` it stores data in `apps/server/data` with PGlite.
+Without `DATABASE_URL` it stores data in `apps/server/data` with PGlite. Stop it with Ctrl+C, or by creating `apps/server/data/.shutdown`: a hard kill (common on Windows) can leave the PGlite files unreadable.
 
 ## Deploy (Coolify or any Docker host)
 

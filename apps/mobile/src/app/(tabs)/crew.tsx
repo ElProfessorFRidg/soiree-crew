@@ -115,6 +115,12 @@ function CrewCard({ crew }: { crew: Crew }) {
         leading={<Icon name="euro" color={theme.textMuted} />}
         trailing={<Icon name="chev" color={theme.textMuted} />}
         onPress={() => router.push({ pathname: "/money", params: { crewId: crew.id } })}
+      />
+      <Row
+        title={i18n.t("recap.list")}
+        leading={<Icon name="sparkdot" color={theme.textMuted} />}
+        trailing={<Icon name="chev" color={theme.textMuted} />}
+        onPress={() => router.push("/recaps")}
         last
       />
       {invite ? (

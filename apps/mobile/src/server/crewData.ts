@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { newId } from "@/state/store";
+import { notifyRecapReady } from "@/reminders/reminders";
 import { api } from "./api";
 
 export interface CrewMember {
@@ -79,6 +80,11 @@ export async function refreshCrews(): Promise<void> {
 export async function refreshParties(): Promise<void> {
   const { parties } = await api<{ parties: Party[] }>("/v1/parties");
   useCrewData.setState({ parties });
+  // O-41: a party I went to closed in the last day, its recap is ready.
+  const dayAgo = Date.now() - 24 * 3_600_000;
+  for (const party of parties) {
+    if (party.myResponse === "going" && party.closedAt !== null && party.closedAt > dayAgo) void notifyRecapReady(party).catch(() => undefined);
+  }
   // Keep the live view of the party in progress current.
   const live = parties.find((p) => p.live && p.myResponse === "going");
   if (live) await refreshLiveParty(live.id);

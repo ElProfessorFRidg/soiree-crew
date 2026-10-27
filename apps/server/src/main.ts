@@ -1,5 +1,6 @@
-import { buildApp } from "./app";
 import { createHash } from "node:crypto";
+import { existsSync, rmSync } from "node:fs";
+import { buildApp } from "./app";
 import { Sealer } from "./crypto";
 import { connectPglite, connectPostgres, migrate } from "./db";
 import { LiveHub } from "./live";
@@ -34,8 +35,15 @@ const app = await buildApp(
 
 await app.listen({ port, host: "0.0.0.0" });
 
-for (const signal of ["SIGINT", "SIGTERM"] as const) {
-  process.on(signal, () => {
-    void app.close().then(() => db.close()).then(() => process.exit(0));
-  });
+const shutdown = () => void app.close().then(() => db.close()).then(() => process.exit(0));
+for (const signal of ["SIGINT", "SIGTERM"] as const) process.on(signal, shutdown);
+
+// Windows kills processes without a signal, which leaves the local PGlite files dirty.
+// For local use only: creating data/.shutdown stops the server cleanly.
+if (!process.env.DATABASE_URL) {
+  setInterval(() => {
+    if (!existsSync("./data/.shutdown")) return;
+    rmSync("./data/.shutdown", { force: true });
+    shutdown();
+  }, 1_000).unref();
 }

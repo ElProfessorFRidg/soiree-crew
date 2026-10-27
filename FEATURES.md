@@ -70,7 +70,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-38 | P0 | Soirees.dc.html | todo | Live crew notifications at a controlled volume (S2M had to cut a third of theirs): whatever remains must be us... |
 | O-39 | P0 | Soirees.dc.html | todo | Participant profiles tappable from the party, add as friend in one tap. |
 | O-40 | P0 | Soirees.dc.html | build | Automatic closing (a party never stays open for days); trips keep correct group BACs for their whole duration. |
-| O-41 | P0 | Recap.dc.html | todo | Recap: saved and kept, notification as soon as it is ready, only people actually present (including non-friend... |
+| O-41 | P0 | Recap.dc.html | build | Recap: saved and kept, notification as soon as it is ready, only people actually present (including non-friend... |
 | O-42 | P0 | Soirees.dc.html | build | Squad mode: curves shared continuously between members. |
 
 ## Friends
@@ -215,7 +215,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | N-21 | P1 | Recap.dc.html | todo | Shared album per party (photos and videos private to the group, O-84) + optional photo when logging a drink (O... |
-| N-22 | P0 | Recap.dc.html | todo | Party timeline: arrivals, check-ins, venue takeovers, games played, photos, highlights, built into the recap. |
+| N-22 | P0 | Recap.dc.html | build | Party timeline: arrivals, check-ins, venue takeovers, games played, photos, highlights, built into the recap. |
 | N-23 | P1 | Recap.dc.html | todo | "Quote of the night": legendary lines, voted by the crew. |
 | N-24 | P1 | Jeux.dc.html | todo | Hall of fame for games and game records. |
 | N-37 | P1 | Backstage (near Recap.dc.html) | proposed | Consent for exports outside the crew: before a recap story, photo strip or result card leaves the app, the people shown can opt out, and the export shows only the exporter's own curve and figures plus crew totals. Renumbered from design-b N-36. Source: design-b.md §2.9 item 7, §3 decision 6, §5. |
@@ -265,7 +265,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-17 | P1 | Soirees.dc.html | todo | Suggestions that save taps: when 3+ crew members check in at the same venue, offer to start a party; when the ... |
 | QOL-18 | P1 | Securite.dc.html | todo | The user's own apps: directions in Apple Maps, Google Maps or Waze, rides in Uber, Bolt or local taxi apps, ch... |
 | QOL-19 | P1 | Argent.dc.html | build | Long-press copies what people copy (IBAN, codes, addresses), with a haptic and a short inline "Copied". |
-| QOL-20 | P1 | Recap.dc.html | todo | Next-morning mode: the morning after, the app opens on a calm, dark, low-contrast screen with the recap, who o... |
+| QOL-20 | P1 | Recap.dc.html | build | Next-morning mode: the morning after, the app opens on a calm, dark, low-contrast screen with the recap, who o... |
 | QOL-21 | P1 | Radar.dc.html | todo | Calendar and birthdays: parties added to the phone calendar in one tap; a crew member's birthday reminds the o... |
 | QOL-22 | P2 | Securite.dc.html | todo | Last ride home: after midnight, the last night bus / metro departures near the venue on the Party screen, when... |
 | QOL-23 | P1 | Etats.dc.html | todo | Search that helps: recent searches, typo tolerance (ADP-05), suggestions before typing, results grouped (venue... |
@@ -322,7 +322,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | MOT-05 | P0 | Backstage | todo | Screen transitions: shared elements (a friend's avatar flies from the list to their profile, a game card grows... |
 | MOT-06 | P0 | JeuxCartes.dc.html | todo | Card games: dealing, 3D flip, swipe, drawing, a card that trembles before a penalty. |
 | MOT-07 | P0 | JeuxAction.dc.html | todo | Game physics: roulette with real deceleration and haptic clicks, a bomb that shakes harder and harder then bur... |
-| MOT-08 | P0 | Recap.dc.html | todo | Cinematic recap: story format, counters rolling, podium rising, curves drawing, badges dropping with confetti,... |
+| MOT-08 | P0 | Recap.dc.html | build | Cinematic recap: story format, counters rolling, podium rising, curves drawing, badges dropping with confetti,... |
 | MOT-09 | P0 | Bars.dc.html | build | Venue map: takeover (crown dropping, the new boss's colour washing over the venue); venues where the crew is r... |
 | MOT-10 | P0 | Etats.dc.html | todo | Micro-interactions: buttons, toggles, custom pull-to-refresh, skeletons, illustrated and animated empty states... |
 | MOT-11 | P1 | Systeme.dc.html | todo | Animated widgets and Live Activity, within each OS's limits. |
@@ -354,7 +354,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 |---|---|---|---|---|
 | RANK-01 | P0 | Classements.dc.html | build | Drinking leaderboard per party, week, month, season and all time. Metrics: number of drinks, grams of pure alc... |
 | RANK-02 | P0 | Classements.dc.html | build | Live leaderboard on the Party screen (HUB-01): live positions, "X just overtook you" notification, animated ov... |
-| RANK-03 | P0 | Recap.dc.html | todo | Podium in the recap (O-41) and on the shareable story card. |
+| RANK-03 | P0 | Recap.dc.html | build | Podium in the recap (O-41) and on the shareable story card. |
 | RANK-04 | P1 | Classements.dc.html | todo | History and titles: champion of each week, month and season, winning streaks, titles tied to N-34. |
 | RANK-05 | P1 | Classements.dc.html | todo | Secondary leaderboards: most nights out, earliest first drink, last one home, most venues ruled (<bar_territor... |
 | RANK-06 | P0 | Classements.dc.html | build | Only verified drinks count (verification in AC-07). Unverified drinks still count in personal stats and BAC. |

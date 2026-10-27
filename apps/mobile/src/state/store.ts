@@ -35,6 +35,10 @@ export interface AppState {
   uploadedToServerAt: number | null;
   /** Account the local history belongs to; null while it only lives on this phone. */
   accountUserId: string | null;
+  /** Parties whose morning-after screen was already shown or dismissed (QOL-20). */
+  morningShown: string[];
+  /** Parties whose "recap ready" notification is already scheduled or sent (O-41). */
+  recapNotified: string[];
 }
 
 export const useAppStore = create<AppState>()(
@@ -53,6 +57,8 @@ export const useAppStore = create<AppState>()(
       syncCursor: null,
       uploadedToServerAt: null,
       accountUserId: null,
+      morningShown: [],
+      recapNotified: [],
     }),
     {
       name: "crew-app-v1",

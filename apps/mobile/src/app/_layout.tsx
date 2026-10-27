@@ -1,9 +1,10 @@
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import * as Notifications from "expo-notifications";
+import { router, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { AppState as RNAppState } from "react-native";
+import { AppState as RNAppState, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { themes } from "@crew/design-tokens";
@@ -61,6 +62,18 @@ export default function RootLayout() {
     return () => subscription.remove();
   }, [ready]);
 
+  useEffect(() => {
+    if (!ready || Platform.OS === "web") return;
+    // A tapped notification opens the screen it is about (the recap, O-41).
+    const open = (response: Notifications.NotificationResponse | null) => {
+      const url = response?.notification.request.content.data?.url;
+      if (typeof url === "string" && url.startsWith("/")) router.push(url as never);
+    };
+    void Notifications.getLastNotificationResponseAsync().then(open);
+    const subscription = Notifications.addNotificationResponseReceivedListener(open);
+    return () => subscription.remove();
+  }, [ready]);
+
   if (!ready) return null;
 
   return (
@@ -102,6 +115,9 @@ export default function RootLayout() {
               <Stack.Screen name="pool" />
               <Stack.Screen name="new-expense" />
               <Stack.Screen name="round" />
+              <Stack.Screen name="recap" options={{ presentation: "fullScreenModal", animation: "fade" }} />
+              <Stack.Screen name="recaps" />
+              <Stack.Screen name="morning" options={{ animation: "fade" }} />
               <Stack.Screen name="sos" options={{ presentation: "fullScreenModal", animation: "fade" }} />
             </Stack>
           </I18nProvider>
