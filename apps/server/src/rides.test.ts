@@ -67,3 +67,24 @@ describe("going home together (N-27)", () => {
     expect([leaderOf(ines.id), leaderOf(theo.id)]).toEqual([newLeader, newLeader]);
   });
 });
+
+describe("where to? (N-11)", () => {
+  it("counts one changeable vote per member, crew venues only", async () => {
+    const { users, crewId, partyId } = await crewWithParty("jade", "malik");
+    const [jade, malik] = users as [User, User];
+    const venue = async (name: string) => {
+      const id = randomUUID();
+      await app.inject({ method: "POST", url: `/v1/crews/${crewId}/venues`, headers: jade.auth, payload: { id, name, kind: "bar", lat: 48.85, lng: 2.35 } });
+      return id;
+    };
+    const zinc = await venue("Le Zinc");
+    const quai = await venue("Le Quai");
+    const vote = (u: User, venueId: string | null) => app.inject({ method: "PUT", url: `/v1/parties/${partyId}/where-to`, headers: u.auth, payload: { venueId } });
+    await vote(jade, zinc);
+    await vote(malik, zinc);
+    await vote(malik, quai);
+    const tally = (await app.inject({ method: "GET", url: `/v1/parties/${partyId}/where-to`, headers: jade.auth })).json() as { votes: { venueId: string; count: number; mine: boolean }[] };
+    expect(tally.votes).toEqual([expect.objectContaining({ venueId: zinc, count: 1, mine: true }), expect.objectContaining({ venueId: quai, count: 1, mine: false })]);
+    expect((await vote(jade, randomUUID())).statusCode).toBe(404);
+  });
+});

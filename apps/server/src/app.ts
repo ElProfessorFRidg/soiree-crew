@@ -17,7 +17,14 @@ import { venueRoutes } from "./routes/venues";
 const PUBLIC_ROUTES = new Set(["POST /v1/accounts", "POST /v1/sessions/claim", "GET /v1/health", "GET /v1/invites/:code", "GET /v1/live"]);
 
 export async function buildApp(ctx: Context, options: { logger?: boolean } = {}): Promise<FastifyInstance> {
-  const app = Fastify({ logger: options.logger ?? false, bodyLimit: 512 * 1024 });
+  const app = Fastify({
+    // SEC-01: the live channel carries the token in its query string; logs keep the path only.
+    logger: options.logger
+      ? { serializers: { req: (req) => ({ method: req.method, url: req.url.split("?")[0] ?? "", remoteAddress: req.ip }) } }
+      : false,
+    bodyLimit: 512 * 1024,
+    forceCloseConnections: true,
+  });
   // Tokens travel in the Authorization header, never in cookies, so any origin may call the API.
   await app.register(cors, { origin: true, methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], allowedHeaders: ["authorization", "content-type"] });
   await app.register(websocket);

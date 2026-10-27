@@ -313,6 +313,14 @@ function CurrentVenueRow({ i18n }: { i18n: Translator }) {
       ) : null}
       {live ? (
         <Row
+          title={i18n.t("whereTo.open")}
+          leading={<Icon name="pin" color={theme.textMuted} />}
+          trailing={<Icon name="chev" color={theme.textMuted} />}
+          onPress={() => router.push({ pathname: "/where-to", params: { id: live.party.id } })}
+        />
+      ) : null}
+      {live ? (
+        <Row
           title={i18n.t("goingHome.open")}
           leading={<Icon name="home" color={theme.textMuted} />}
           trailing={<Icon name="chev" color={theme.textMuted} />}

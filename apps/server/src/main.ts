@@ -35,7 +35,16 @@ const app = await buildApp(
 
 await app.listen({ port, host: "0.0.0.0" });
 
-const shutdown = () => void app.close().then(() => db.close()).then(() => process.exit(0));
+let closing = false;
+const shutdown = () => {
+  if (closing) return;
+  closing = true;
+  // Open sockets (the live channel) can hold app.close() forever: give it 3 s, then close the database anyway.
+  const grace = new Promise((resolve) => setTimeout(resolve, 3_000).unref());
+  void Promise.race([app.close(), grace])
+    .then(() => db.close())
+    .finally(() => process.exit(0));
+};
 for (const signal of ["SIGINT", "SIGTERM"] as const) process.on(signal, shutdown);
 
 // Windows kills processes without a signal, which leaves the local PGlite files dirty.

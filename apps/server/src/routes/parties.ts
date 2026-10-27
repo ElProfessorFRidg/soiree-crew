@@ -141,6 +141,42 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
     return { ok: true };
   });
 
+  /** N-11: the crew votes on where to go next; everyone sees the tally. */
+  app.get<{ Params: { id: string } }>("/v1/parties/:id/where-to", async (request) => {
+    const user = requireUser(request);
+    const party = await loadPartyForMember(ctx, request.params.id, user.id);
+    const rows = await ctx.db.query<{ venue_id: string; user_id: string }>("select venue_id, user_id from venue_votes where party_id = $1", [party.id]);
+    const tally = new Map<string, { venueId: string; count: number; mine: boolean; voters: string[] }>();
+    for (const r of rows) {
+      const entry = tally.get(r.venue_id) ?? { venueId: r.venue_id, count: 0, mine: false, voters: [] };
+      entry.count += 1;
+      entry.voters.push(r.user_id);
+      if (r.user_id === user.id) entry.mine = true;
+      tally.set(r.venue_id, entry);
+    }
+    return { votes: [...tally.values()].sort((a, b) => b.count - a.count) };
+  });
+
+  app.put<{ Params: { id: string } }>("/v1/parties/:id/where-to", async (request) => {
+    const user = requireUser(request);
+    const party = await loadPartyForMember(ctx, request.params.id, user.id);
+    const input = z.object({ venueId: z.string().uuid().nullable() }).parse(request.body);
+    if (input.venueId === null) {
+      await ctx.db.query("delete from venue_votes where party_id = $1 and user_id = $2", [party.id, user.id]);
+    } else {
+      const venue = await ctx.db.query("select 1 from venues where id = $1 and crew_id = $2", [input.venueId, party.crew_id]);
+      if (!venue.length) throw new HttpError(404, "not_found");
+      await ctx.db.query(
+        `insert into venue_votes (party_id, user_id, venue_id, at) values ($1, $2, $3, $4)
+         on conflict (party_id, user_id) do update set venue_id = excluded.venue_id, at = excluded.at`,
+        [party.id, user.id, input.venueId, ctx.now()],
+      );
+    }
+    const members = await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1 and response = 'going'", [party.id]);
+    ctx.live.notify(members.map((m) => m.user_id), { type: "party.changed", partyId: party.id });
+    return { ok: true };
+  });
+
   /**
    * N-27: going home together. `withUserId` joins that person's group (their
    * leader's, so groups never chain); null leaves any group. Only going members.
