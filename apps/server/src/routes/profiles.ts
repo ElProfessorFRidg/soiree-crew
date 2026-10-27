@@ -108,10 +108,11 @@ async function buildSections(ctx: Context, ownerId: string, relation: Relation, 
   }
 
   if (visible("venues")) {
-    const byVenue = new Map<string, { venueId: string; name: string; visits: number; lastAt: number; ruled: boolean }>();
+    const byVenue = new Map<string, { venueId: string; name: string; visits: number; nights: Set<string>; lastAt: number; ruled: boolean }>();
     for (const c of shown) {
-      const entry = byVenue.get(c.venue_id) ?? { venueId: c.venue_id, name: c.name, visits: 0, lastAt: 0, ruled: false };
+      const entry = byVenue.get(c.venue_id) ?? { venueId: c.venue_id, name: c.name, visits: 0, nights: new Set<string>(), lastAt: 0, ruled: false };
       entry.visits += 1;
+      entry.nights.add(nightOf(c.at, c.time_zone));
       entry.lastAt = Math.max(entry.lastAt, c.at);
       byVenue.set(c.venue_id, entry);
     }
@@ -123,7 +124,8 @@ async function buildSections(ctx: Context, ownerId: string, relation: Relation, 
     out.venues = [...byVenue.values()]
       .sort((a, b) => b.visits - a.visits)
       // PROF-05: strangers get venues and visit counts, never when.
-      .map((v) => ({ venueId: v.venueId, name: v.name, visits: v.visits, ruled: v.ruled, ...(dates ? { lastAt: v.lastAt } : {}), ...(relation.me ? { hidden: hidden.has(v.venueId) } : {}) }));
+      // TER-10: lifetime nights at the venue, for the loyalty tier the profile shows.
+      .map((v) => ({ venueId: v.venueId, name: v.name, visits: v.visits, nights: v.nights.size, ruled: v.ruled, ...(dates ? { lastAt: v.lastAt } : {}), ...(relation.me ? { hidden: hidden.has(v.venueId) } : {}) }));
   }
 
   if (visible("drinks")) {

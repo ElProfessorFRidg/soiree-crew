@@ -20,6 +20,7 @@ import { showToast } from "@/ui/Toast";
 import { ReportPanel } from "@/moderation/ReportPanel";
 import { fetchVenueStats, type VenueStats } from "@/server/statsData";
 import { VenuePrices } from "@/crew/VenuePrices";
+import { loyaltyTier, nextTier } from "@/crew/loyalty";
 
 /** N-12: what this bar is to the crew. */
 function VenueNumbers({ venueId }: { venueId: string }) {
@@ -109,6 +110,17 @@ export default function VenueScreen() {
         height={56}
         onPress={() => router.push({ pathname: "/checkin", params: { venueId: page.venue.id, crewId: page.venue.crewId } })}
       />
+
+      {typeof page.myNights === "number" && page.myNights > 0 ? (
+        <View style={styles.cheat}>
+          {loyaltyTier(page.myNights) ? <Tag label={i18n.t(`loyalty.${loyaltyTier(page.myNights)!}`)} tone="amber" icon="star" /> : null}
+          <Text variant="small" style={styles.flex}>
+            {nextTier(page.myNights)
+              ? i18n.plural("loyalty.next", nextTier(page.myNights)!.missing, { tier: i18n.t(`loyalty.short.${nextTier(page.myNights)!.tier}`) })
+              : i18n.t("loyalty.top")}
+          </Text>
+        </View>
+      ) : null}
 
       {page.rivalry ? (
         <Panel tint={page.rivalry.myRank === 1 ? "amber" : undefined}>

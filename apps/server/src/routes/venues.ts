@@ -234,10 +234,17 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
           [venue.id, user.id, here.at - AC_CONFIG.time.peerActiveWindowMin * 60_000, now],
         )
       : [];
+    // TER-10: my lifetime nights here, never lost, for the loyalty tier.
+    const myNights = new Set(
+      (
+        await ctx.db.query<{ at: number }>("select at from check_ins where venue_id = $1 and user_id = $2 and verdict = 'accepted'", [venue.id, user.id])
+      ).map((c) => nightOf(c.at, timeZone)),
+    ).size;
     const rivalry = venue.kind === "home" ? null : await crewRivalry(ctx, venue, season, standing?.scores.reduce((sum, s) => sum + s.points, 0) ?? 0);
     return {
       venue: { id: venue.id, crewId: venue.crew_id, name: venue.name, kind: venue.kind, lat: venue.lat, lng: venue.lng, address: venue.address },
       rivalry,
+      myNights,
       season,
       bossId: standing?.bossId ?? null,
       top: (standing?.scores ?? []).slice(0, 5).map((s) => ({ userId: s.memberId, name: nameOf.get(s.memberId) ?? "", points: s.points, nights: s.nights })),

@@ -1243,6 +1243,18 @@ export const fr = {
     body: "Rien de noté depuis un moment. Un verre oublié, de l'eau, ou rien du tout ?",
     nothing: "Rien, tout est à jour",
   },
+  loyalty: {
+    short: {
+      bronze: "Bronze",
+      silver: "Argent",
+      gold: "Or",
+    },
+    bronze: "Fidélité : bronze",
+    silver: "Fidélité : argent",
+    gold: "Fidélité : or",
+    next: { one: "Encore {count} soirée ici pour le palier {tier}.", other: "Encore {count} soirées ici pour le palier {tier}." },
+    top: "Le plus haut palier de fidélité, pour toujours.",
+  },
   addDrink: {
     quick: "Tape ce que tu bois",
     quickPlaceholder: "2 pintes et un shot",

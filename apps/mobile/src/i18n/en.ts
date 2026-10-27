@@ -1245,6 +1245,18 @@ export const en: Messages = {
     body: "Nothing logged for a while. A drink you forgot, some water, or nothing at all?",
     nothing: "Nothing, it's all up to date",
   },
+  loyalty: {
+    short: {
+      bronze: "bronze",
+      silver: "silver",
+      gold: "gold",
+    },
+    bronze: "Loyalty: bronze",
+    silver: "Loyalty: silver",
+    gold: "Loyalty: gold",
+    next: { one: "{count} more night here for {tier}.", other: "{count} more nights here for {tier}." },
+    top: "The top loyalty tier, for good.",
+  },
   addDrink: {
     quick: "Type what you're drinking",
     quickPlaceholder: "2 pints and a shot",

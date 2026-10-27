@@ -1243,6 +1243,18 @@ export const de: Messages = {
     body: "Seit einer Weile nichts eingetragen. Ein vergessenes Getränk, Wasser oder nichts?",
     nothing: "Nichts, alles ist aktuell",
   },
+  loyalty: {
+    short: {
+      bronze: "Bronze",
+      silver: "Silber",
+      gold: "Gold",
+    },
+    bronze: "Treue: Bronze",
+    silver: "Treue: Silber",
+    gold: "Treue: Gold",
+    next: { one: "Noch {count} Abend hier bis {tier}.", other: "Noch {count} Abende hier bis {tier}." },
+    top: "Die höchste Treuestufe, für immer.",
+  },
   addDrink: {
     quick: "Tipp ein, was du trinkst",
     quickPlaceholder: "2 Bier und ein Shot",

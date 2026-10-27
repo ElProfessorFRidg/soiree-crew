@@ -6,6 +6,7 @@ import { drinkLabel } from "@/drinks/display";
 import type { DrinkKind } from "@/drinks/presets";
 import { useT } from "@/i18n";
 import { HeroTarget } from "@/motion/hero";
+import { loyaltyTier } from "@/crew/loyalty";
 import { haptic } from "@/motion/haptics";
 import { ReportPanel } from "@/moderation/ReportPanel";
 import { befriend, block, fetchProfile, mute, unfriend, unmute, type ProfileView } from "@/server/profileData";
@@ -163,6 +164,7 @@ export default function ProfileScreen() {
                   {v.lastAt ? `, ${i18n.t("people.lastVisit", { date: date(v.lastAt) })}` : ""}
                 </Text>
               </View>
+              {v.nights && loyaltyTier(v.nights) ? <Tag label={i18n.t(`loyalty.${loyaltyTier(v.nights)!}`)} icon="star" /> : null}
               {v.ruled ? <Tag label={i18n.t("people.ruled")} tone="amber" icon="crown" /> : null}
               {v.hidden ? <Tag label={i18n.t("people.hiddenTag")} /> : null}
             </View>

@@ -38,6 +38,8 @@ export interface VenuePage {
   toConfirm?: { id: string; userId: string; name: string; at: number }[];
   /** TER-07: other crews playing this bar, anonymous. */
   rivalry?: { crews: number; myRank: number; myPoints: number; leaderPoints: number } | null;
+  /** TER-10: my lifetime nights at this venue. */
+  myNights?: number;
 }
 
 export type CheckInVerdict = "accepted" | "unverified" | "rejected" | "not_here";

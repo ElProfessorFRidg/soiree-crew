@@ -1244,6 +1244,18 @@ export const it: Messages = {
     body: "Niente segnato da un po'. Un bicchiere dimenticato, acqua o niente?",
     nothing: "Niente, è tutto aggiornato",
   },
+  loyalty: {
+    short: {
+      bronze: "Bronzo",
+      silver: "Argento",
+      gold: "Oro",
+    },
+    bronze: "Fedeltà: bronzo",
+    silver: "Fedeltà: argento",
+    gold: "Fedeltà: oro",
+    next: { one: "Ancora {count} serata qui per il livello {tier}.", other: "Ancora {count} serate qui per il livello {tier}." },
+    top: "Il livello di fedeltà più alto, per sempre.",
+  },
   addDrink: {
     quick: "Scrivi cosa bevi",
     quickPlaceholder: "2 pinte e uno shot",
