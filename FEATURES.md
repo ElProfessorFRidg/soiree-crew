@@ -136,8 +136,8 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | O-74 | retired | Bar.dc.html | retired | Built-in shop (catalogue, product page, cart, payment). |
 | O-75 | retired | none | retired | Subscriber-only community (Instagram link). |
 | O-76 | P1 | Bar.dc.html | todo | Next-morning alibi generator. |
-| O-77 | P1 | Reglages.dc.html | todo | Report content (user-generated content). |
-| O-78 | P0 | Backstage | todo | Visual direction. S2M uses a violet / cyan "aurora" background, liquid-glass effects and a neon home. Keep the... |
+| O-77 | P1 | Reglages.dc.html | build | Report content (user-generated content). |
+| O-78 | P0 | Backstage | build | Visual direction. S2M uses a violet / cyan "aurora" background, liquid-glass effects and a neon home. Keep the... |
 | O-79 | retired | Systeme.dc.html | retired | Bilingual marketing website (video, parallax, scroll reveals, store links, reviews). |
 | O-80 | retired | none (no ads) | retired | Ads. |
 
@@ -240,7 +240,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | N-32 | P1 | Bar.dc.html | todo | Shared shopping list for a party (who brings what), can be generated from the cocktails picked in the Bar. |
 | N-33 | P1 | Jeux.dc.html | todo | Crew-made cards in the games (inside jokes, home-made questions), moderated by the admin. |
 | N-34 | P1 | Profil.dc.html | todo | Crew titles and seniority; badges that also reward organising, hydration, designated driving, getting home saf... |
-| N-35 | P1 | Reglages.dc.html | todo | Notification centre with fine per-type settings and quiet hours. |
+| N-35 | P1 | Reglages.dc.html | build | Notification centre with fine per-type settings and quiet hours. |
 
 ## Everyday polish
 
@@ -269,7 +269,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-21 | P1 | Radar.dc.html | todo | Calendar and birthdays: parties added to the phone calendar in one tap; a crew member's birthday reminds the o... |
 | QOL-22 | P2 | Securite.dc.html | todo | Last ride home: after midnight, the last night bus / metro departures near the venue on the Party screen, when... |
 | QOL-23 | P1 | Etats.dc.html | todo | Search that helps: recent searches, typo tolerance (ADP-05), suggestions before typing, results grouped (venue... |
-| QOL-24 | P1 | Reglages.dc.html | todo | Respect the phone: Low Power Mode lowers refresh rates and effects, a data-saver option for photos, light and ... |
+| QOL-24 | P1 | Reglages.dc.html | build | Respect the phone: Low Power Mode lowers refresh rates and effects, a data-saver option for photos, light and ... |
 | QOL-25 | P0 | Backstage (near Systeme.dc.html) | proposed | Native fast path: every out-of-app action (widget, Live Activity / Live Update, notification action, Siri / Shortcut, Control, Quick Settings tile, launcher shortcut) is written natively to a shared queue with an idempotency key and sent natively within seconds, even with the app killed; the app reconciles on launch. Source: polish.md §1, §2.4 R1, §5. |
 | QOL-26 | P0 | Backstage (near Systeme.dc.html) | proposed | The Live Activity outlives the night: renewed by push-to-start before the 8 h cap, stale state when no update arrives, ended when the party ends; Android equivalent re-posted only if the user did not dismiss it. Source: polish.md §2.4 R2, §5; skills.md §5 (HUB-02 note). |
 | QOL-27 | P0 | Backstage (near Systeme.dc.html) | proposed | Discreet lock screen: by default lock screen, Live Activity, widget and notifications show no BAC figure or drink count (level icon and time to zero only); numbers are opt-in. Conflicts with the approved lock screen board, see `research/open-decisions.md`. Source: polish.md §2.4 R3, §5. |
@@ -284,7 +284,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | JOY-01 | P1 | Securite.dc.html | todo | Cheers: bring two phones together (Bluetooth LE / NFC) and both screens play a clink with sound and haptic. It... |
-| JOY-02 | P1 | Soiree.dc.html | todo | Lines that know the time: the Party screen header changes with the hour and the situation ("Still standing?" a... |
+| JOY-02 | P1 | Soiree.dc.html | build | Lines that know the time: the Party screen header changes with the hour and the situation ("Still standing?" a... |
 | JOY-03 | P1 | Profil.dc.html | todo | Alternate app icons unlocked through crew titles (N-34) and seasons. |
 | JOY-04 | P1 | Soirees.dc.html | todo | Mood themes: the mood picked for a party (O-35) tints the Party screen, the widget and the recap. |
 | JOY-05 | P2 | Reglages.dc.html | todo | Optional sound pack (pour, clink, crown), respects the silent switch, off by default. |
@@ -453,7 +453,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | SLOP-04 | P0 | Backstage | build | Automated CI lint on every localisation file: em and en dashes, blacklisted words, "successfully" / "avec succ... |
 | SLOP-05 | P0 | Backstage | todo | Fresh-eyes test: a screenshot or a text pasted into a blank model session with the question "which AI tool mad... |
 | SLOP-06 | P1 | Backstage | todo | Crew panel: before each release, the friends read the copy and the cards. Anything that "sounds like AI" or "d... |
-| SLOP-07 | P0 | Backstage | todo | Fresh context: subagents writing copy start a new session with `VOICE.md` + `SLOP.md`, because long contexts m... |
+| SLOP-07 | P0 | Backstage | build | Fresh context: subagents writing copy start a new session with `VOICE.md` + `SLOP.md`, because long contexts m... |
 | SLOP-08 | P0 | Backstage | todo | Design: `DESIGN.md` explicitly bans the <design_patterns> tells. If the stack allows it, an automated detector... |
 | SLOP-09 | P1 | Backstage | proposed | Deck lint (SLOP.md R-20): opening cap, length spread, near duplicates, moralising cards, expiry of topical cards. Source: voice.md §5. |
 | SLOP-10 | P1 | Backstage | proposed | Glossary synonym lint (SLOP.md R-19) generated from GLOSSARY.md. Source: voice.md §5. |

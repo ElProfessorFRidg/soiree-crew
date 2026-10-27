@@ -1,28 +1,48 @@
 # Soirée Crew
 
-Crew night-out app. Expo (React Native) + TypeScript, pnpm monorepo. Decisions in `docs/adr/`, spec in `PROMPT.md`, design in `design/`.
+Crew night-out app: BAC estimate and safety, the crew's live party, bars and territories, rounds and pools, recaps and party games. Expo (React Native) + TypeScript, pnpm monorepo, a small Fastify server. Decisions in `docs/adr/`, spec in `PROMPT.md`, progress per ID in `FEATURES.md`, design in `design/`.
+
+## Install on a phone
+
+Every push to `main` builds both apps and publishes them as the latest GitHub release:
+
+- Android: https://github.com/ElProfessorFRidg/soiree-crew/releases/latest/download/soiree-crew.apk (install it directly; allow unknown sources).
+- iOS: https://github.com/ElProfessorFRidg/soiree-crew/releases/latest/download/soiree-crew-unsigned.ipa (unsigned: sign it with a sideloading tool such as AltStore or Sideloadly).
+
+The app works alone on the phone. Crew features need a server (below): the first screen of the Crew tab asks for its address.
 
 ## Layout
 
-- `apps/mobile`: the app (Expo Router, screens in `src/app`).
-- `packages/bac`: BAC engine, adaptive UI levels. No UI, fully tested.
-- `packages/units`: countries, legal limits, BAC units, volumes, default settings.
+- `apps/mobile`: the app (Expo Router, screens in `src/app`, catalogues in `src/i18n`).
+- `apps/server`: the API (Fastify, PostgreSQL or a local PGlite file). See `apps/server/README.md` to run or deploy it.
+- `packages/bac`: BAC engine and adaptive UI levels.
+- `packages/units`: countries, legal limits, BAC units, volumes, preferences.
+- `packages/territory`: bar territories, seasons and titles.
+- `packages/money`: pools, splits and settling up.
+- `packages/games`: the 15 party games and their decks.
+- `packages/fuzzy`: forgiving text input for drink names.
 - `packages/design-tokens`: typed view of `design/tokens.json` and `design/icons.json`.
-- `tools/slop-lint`: SLOP-04 lint on the translation files.
+- `tools/slop-lint`: lint on every user-facing text; `tools/dev/seed.mjs`: fills a local server with a test crew.
 
-## Run
+## Run locally
 
 ```bash
 pnpm install
 pnpm check
+```
+
+`pnpm check` runs the type check, the tests and the copy lint. Then, in two terminals:
+
+```bash
+DATA_KEY=$(openssl rand -base64 32) pnpm --filter @crew/server dev
+```
+
+```bash
 pnpm --filter @crew/mobile web
 ```
 
-`pnpm check` runs the type check, the tests and the SLOP-04 lint.
+## Rules of the house
 
-## Builds
-
-GitHub Actions (`.github/workflows/build.yml`) builds on every push to `main`:
-
-- an unsigned iOS IPA (`soiree-crew-ios-unsigned` artifact), to sign with your sideloading tool;
-- an Android APK (`soiree-crew-android` artifact).
+- Everything in the repository is in English; user-facing text lives only in the catalogues.
+- The server is the source of truth; the app shows changes at once and confirms or rolls them back.
+- `VOICE.md` says how the app talks, `SLOP.md` what it never writes, `MOTION.md` how it moves, `SECURITY.md` and `docs/PRIVACY.md` how data is protected.

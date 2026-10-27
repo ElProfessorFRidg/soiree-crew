@@ -115,3 +115,31 @@ describe("live location (N-07)", () => {
     expect(await db.query("select * from party_locations")).toEqual([]);
   });
 });
+
+describe("crew and venue stats (N-12, N-14, JOY-06, JOY-08, RANK-05)", () => {
+  it("counts nights together, the streak, the boards and a venue's numbers", async () => {
+    const { users, crewId, partyId } = await crewWithParty("jade", "malik");
+    const [jade, malik] = users as [User, User];
+    await app.inject({ method: "POST", url: `/v1/parties/${partyId}/status`, headers: malik.auth, payload: { designatedDriver: true } });
+    const stats = (await app.inject({ method: "GET", url: `/v1/crews/${crewId}/stats`, headers: jade.auth })).json() as {
+      totalNights: number;
+      streak: { current: number };
+      milestones: { reached: number[] };
+      boards: { userId: string; nights: number; soberDriver: number }[];
+    };
+    expect(stats.totalNights).toBe(1);
+    expect(stats.streak.current).toBe(1);
+    expect(stats.milestones.reached).toEqual([1]);
+    expect(stats.boards.find((b) => b.userId === malik.id)).toMatchObject({ nights: 1, soberDriver: 1 });
+
+    const venueId = randomUUID();
+    await app.inject({ method: "POST", url: `/v1/crews/${crewId}/venues`, headers: jade.auth, payload: { id: venueId, name: "Le Zinc", kind: "bar", lat: 48.85, lng: 2.35 } });
+    await db.query(
+      `insert into check_ins (id, user_id, venue_id, party_id, at, last_proof_at, verdict, risk, signals, config_version, fix_hash, created_at)
+       values ($1, $2, $3, $4, $5, $6, 'accepted', 0, '[]', 1, 'h', $5)`,
+      [randomUUID(), jade.id, venueId, partyId, clock - 1_800_000, clock],
+    );
+    const venue = (await app.inject({ method: "GET", url: `/v1/venues/${venueId}/stats`, headers: malik.auth })).json() as { visits: number; people: number; nights: number };
+    expect(venue).toMatchObject({ visits: 1, people: 1, nights: 1 });
+  });
+});

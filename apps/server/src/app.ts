@@ -9,6 +9,7 @@ import { moneyRoutes } from "./routes/money";
 import { mutationRoutes } from "./routes/mutations";
 import { partyRoutes } from "./routes/parties";
 import { photoRoutes } from "./routes/photos";
+import { statsRoutes } from "./routes/stats";
 import { profileRoutes } from "./routes/profiles";
 import { radarRoutes } from "./routes/radar";
 import { recapRoutes } from "./routes/recap";
@@ -80,5 +81,6 @@ export async function buildApp(ctx: Context, options: { logger?: boolean } = {})
   recapRoutes(app, ctx);
   profileRoutes(app, ctx);
   photoRoutes(app, ctx);
+  statsRoutes(app, ctx);
   return app;
 }

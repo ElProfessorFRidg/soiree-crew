@@ -46,3 +46,9 @@ A friend in the crew who stayed sharp: quick, warm, a bit cheeky about the night
 - No em or en dashes, no "not just X but Y", no rhetorical questions in functional copy (`SLOP.md`).
 - Name things the same way everywhere (`GLOSSARY.md`): a "tournée" is always a round, a "cagnotte" always a pool.
 - Every new string lands in both `fr.ts` and `en.ts` in the same commit, and goes through `pnpm lint:slop`.
+
+## How copy gets written (SLOP-07)
+
+- Whoever writes copy, a person or a subagent, starts from a fresh context with this file, `SLOP.md` and `GLOSSARY.md` open, then the French and English catalogues as the reference.
+- Each language is written by a native-level writer for that language, from the meaning, never line by line from another language.
+- A separate reviewer rereads every string against `SLOP.md` and this file and reports defects; fixes go through the same catalogue edits (SLOP-02, SLOP-03).
