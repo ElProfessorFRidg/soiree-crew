@@ -17,13 +17,13 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-04 | P0 | Arrivee.dc.html | build | Profile for the BAC model: weight, sex (check what the model really needs; S2M dropped height because the calc... |
 | O-05 | P0 | Arrivee.dc.html | build | Country (legal limit) + novice / probationary driver mode. |
 | O-06 | P2 | Reglages.dc.html | todo | Change password and email from settings. |
-| O-07 | P1 | Reglages.dc.html | todo | In-app account deletion: states exactly what will be erased, confirms when done. |
+| O-07 | P1 | Reglages.dc.html | build | In-app account deletion: states exactly what will be erased, confirms when done. |
 | O-08 | P1 | Arrivee.dc.html | todo | Privacy policy readable without an account; analytics consent revocable at any time. |
 | O-09 | P0 | Reglages.dc.html | todo | 7 languages: FR, EN, ES, IT, DE, PT, RU. The whole app, not a few screens. See <localization>. |
 | O-10 | P2 | Reglages.dc.html | todo | 12 h / 24 h format following the phone setting. |
 | O-11 | P0 | Backstage | todo | Accessibility: large touch targets, respects Reduce Motion, text never truncated, nothing under the notch or c... |
 | O-12 | P2 | Reglages.dc.html | todo | In-app notice when a new version is available. |
-| O-13 | P2 | Reglages.dc.html | todo | Per-account data isolation on the device (several accounts on one phone without leaks). |
+| O-13 | P2 | Reglages.dc.html | build | Per-account data isolation on the device (several accounts on one phone without leaks). |
 | O-14 | P0 | Backstage | todo | Opening the app never stops music already playing (Spotify, Deezer...). |
 
 ## BAC and drink tracking
@@ -64,14 +64,14 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| O-35 | P0 | Soirees.dc.html | todo | Create a party: mood (about ten icons: party, birthday, champagne, sunset, costume, wine, fire, night, home, t... |
-| O-36 | P0 | Soirees.dc.html | todo | Invite the crew: invitations as cards, reply straight from the list, tab badge with the real number of invitat... |
-| O-37 | P0 | Soirees.dc.html | todo | Live dashboard: everyone's BAC in real time, who is speeding up, who is slowing down, who has gone missing for... |
+| O-35 | P0 | Soirees.dc.html | build | Create a party: mood (about ten icons: party, birthday, champagne, sunset, costume, wine, fire, night, home, t... |
+| O-36 | P0 | Soirees.dc.html | build | Invite the crew: invitations as cards, reply straight from the list, tab badge with the real number of invitat... |
+| O-37 | P0 | Soirees.dc.html | build | Live dashboard: everyone's BAC in real time, who is speeding up, who is slowing down, who has gone missing for... |
 | O-38 | P0 | Soirees.dc.html | todo | Live crew notifications at a controlled volume (S2M had to cut a third of theirs): whatever remains must be us... |
 | O-39 | P0 | Soirees.dc.html | todo | Participant profiles tappable from the party, add as friend in one tap. |
-| O-40 | P0 | Soirees.dc.html | todo | Automatic closing (a party never stays open for days); trips keep correct group BACs for their whole duration. |
+| O-40 | P0 | Soirees.dc.html | build | Automatic closing (a party never stays open for days); trips keep correct group BACs for their whole duration. |
 | O-41 | P0 | Recap.dc.html | todo | Recap: saved and kept, notification as soon as it is ready, only people actually present (including non-friend... |
-| O-42 | P0 | Soirees.dc.html | todo | Squad mode: curves shared continuously between members. |
+| O-42 | P0 | Soirees.dc.html | build | Squad mode: curves shared continuously between members. |
 
 ## Friends
 
@@ -146,7 +146,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | O-81 | P1 | Soiree.dc.html | todo | Much more detailed charts. |
-| O-82 | P0 | Securite.dc.html | todo | "Gone to bed / home" status. |
+| O-82 | P0 | Securite.dc.html | build | "Gone to bed / home" status. |
 | O-83 | P1 | Soiree.dc.html | todo | Photo when logging a drink. |
 | O-84 | P1 | Recap.dc.html | todo | Photos and videos shared that stay inside the group. |
 
@@ -224,18 +224,18 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| N-25 | P0 | Securite.dc.html | todo | "Home safe": status (O-82) + end-of-night check-in; the crew sees who has not confirmed yet. |
-| N-26 | P0 | Securite.dc.html | todo | Designated driver per party: visible badge, reminder if they log a drink. |
+| N-25 | P0 | Securite.dc.html | build | "Home safe": status (O-82) + end-of-night check-in; the crew sees who has not confirmed yet. |
+| N-26 | P0 | Securite.dc.html | build | Designated driver per party: visible badge, reminder if they log a drink. |
 | N-27 | P0 | Securite.dc.html | todo | Who goes home with whom, walking each other home, shortcuts to ride-hailing / taxis / night transport. |
 | N-28 | P0 | Securite.dc.html | build | Discreet SOS button: alert to the crew with location (if allowed), shortcuts to 112 and local emergency number... |
-| N-29 | P0 | Soirees.dc.html | todo | Gentle alert when a member has given no sign of life for X minutes during a party (extension of O-37). |
+| N-29 | P0 | Soirees.dc.html | build | Gentle alert when a member has given no sign of life for X minutes during a party (extension of O-37). |
 | N-36 | P0 | Backstage (near Securite.dc.html) | proposed | "Not feeling well" status, private to the crew in the party: the crew is told quietly, nearest members first, one tap to SOS (N-28); clears when the user says they are fine or confirms home safe (N-25). Source: app.md §2.3 E, §3 decision 4, §5. |
 
 ## Crew life
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| N-30 | P0 | Systeme.dc.html | todo | Several crews per user, roles (admin / member), invite by link or QR, clean invitation web page when the app i... |
+| N-30 | P0 | Systeme.dc.html | build | Several crews per user, roles (admin / member), invite by link or QR, clean invitation web page when the app i... |
 | N-31 | P1 | Radar.dc.html | todo | Crew feed: activity, reactions, mentions, with grouped digests instead of spam. |
 | N-32 | P1 | Bar.dc.html | todo | Shared shopping list for a party (who brings what), can be generated from the cocktails picked in the Bar. |
 | N-33 | P1 | Jeux.dc.html | todo | Crew-made cards in the games (inside jokes, home-made questions), moderated by the admin. |
@@ -255,13 +255,13 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-07 | P0 | Etats.dc.html | todo | Typed content is never lost: drafts (party name, review, expense, card) survive the app being killed, errors a... |
 | QOL-08 | P0 | Arrivee.dc.html | todo | Forms done right: the right keyboard per field (numeric pad with the locale's decimal separator for amounts, e... |
 | QOL-09 | P0 | Etats.dc.html | todo | Photos: compressed before upload, background upload with progress and retry, HEIC accepted, location metadata ... |
-| QOL-10 | P0 | Soirees.dc.html | todo | Dying battery: when a member's battery drops under 10% during a party, the crew sees "low battery" next to the... |
-| QOL-11 | P0 | Etats.dc.html | todo | Names that work: long names, emojis in names, two "Lucas" in one crew disambiguated automatically, initials av... |
+| QOL-10 | P0 | Soirees.dc.html | build | Dying battery: when a member's battery drops under 10% during a party, the crew sees "low battery" next to the... |
+| QOL-11 | P0 | Etats.dc.html | build | Names that work: long names, emojis in names, two "Lucas" in one crew disambiguated automatically, initials av... |
 | QOL-12 | P0 | Etats.dc.html | build | Correct plurals and formats everywhere ("1 verre", "2 verres", decimal comma in French), relative times ("5 mi... |
-| QOL-13 | P0 | Etats.dc.html | todo | Only destructive actions ask for confirmation, and the confirm button names the action ("Delete the party", ne... |
+| QOL-13 | P0 | Etats.dc.html | build | Only destructive actions ask for confirmation, and the confirm button names the action ("Delete the party", ne... |
 | QOL-14 | P0 | Backstage | todo | Navigation without traps: Android back and iOS swipe-back work everywhere, sheets close with a swipe, the app ... |
 | QOL-15 | P1 | Arrivee.dc.html | todo | Try before signing up: games and the Bar work without an account; sign-up is asked only when the user needs a ... |
-| QOL-16 | P1 | Soirees.dc.html | todo | Defaults learned from habits: usual party end time, usual venue, usual drinks first in quick add, the friends ... |
+| QOL-16 | P1 | Soirees.dc.html | build | Defaults learned from habits: usual party end time, usual venue, usual drinks first in quick add, the friends ... |
 | QOL-17 | P1 | Soirees.dc.html | todo | Suggestions that save taps: when 3+ crew members check in at the same venue, offer to start a party; when the ... |
 | QOL-18 | P1 | Securite.dc.html | todo | The user's own apps: directions in Apple Maps, Google Maps or Waze, rides in Uber, Bolt or local taxi apps, ch... |
 | QOL-19 | P1 | Argent.dc.html | todo | Long-press copies what people copy (IBAN, codes, addresses), with a haptic and a short inline "Copied". |
@@ -419,14 +419,14 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| AC-01 | P0 | Backstage | todo | Server-authoritative scoring: the client only sends raw events (drink logged, check-in attempt, game result). ... |
+| AC-01 | P0 | Backstage | build | Server-authoritative scoring: the client only sends raw events (drink logged, check-in attempt, game result). ... |
 | AC-02 | P0 | Bars.dc.html | todo | Location source flags, read but never trusted alone. Check the current official docs before implementing. |
 | AC-03 | P0 | Bars.dc.html | todo | Server-side plausibility: impossible travel speed between events, accuracy values that are too perfect or froz... |
 | AC-04 | P0 | Bars.dc.html | todo | Physical-world corroboration, the hardest signals to fake alone: |
 | AC-05 | P0 | Bars.dc.html | todo | Device and app integrity as one weighted signal: App Attest / DeviceCheck on iOS, Play Integrity on Android, j... |
 | AC-06 | P0 | Bars.dc.html | todo | Risk score per event: all signals combine into accepted / unverified (needs peer confirmation) / rejected as c... |
 | AC-07 | P0 | Soiree.dc.html | todo | Drink fraud: bursts that are physiologically implausible against the BAC model, large retroactive batches, dri... |
-| AC-08 | P0 | Backstage | todo | Replay and tampering protection: signed requests, nonces, server timestamps, idempotency keys, rate limits. Th... |
+| AC-08 | P0 | Backstage | build | Replay and tampering protection: signed requests, nonces, server timestamps, idempotency keys, rate limits. Th... |
 | AC-09 | P0 | Etats.dc.html | todo | Consequences: a rejected event earns nothing and is recorded as a "cheat attempt", visible to the crew (notifi... |
 | AC-10 | P0 | Backstage | todo | Red team: a dedicated subagent attacks our own app and backend (mock location, location simulated from a compu... |
 | AC-11 | P0 | Backstage | proposed | Verdicts only get kinder automatically: re-evaluation can only upgrade a verdict; "rejected" needs risk from 2 or more signal categories and no corroboration; shaming only on rejection. Source: anticheat.md §2.4, §5. |
@@ -467,8 +467,8 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | SYNC-01 | P0 | Etats.dc.html | build | Optimistic updates for every user action (add a drink, check in, react, vote, RSVP, change a setting, add an e... |
 | SYNC-02 | P0 | Etats.dc.html | build | Pending is not success. Optimistic items carry an internal "pending" state until the server answers. Outcomes ... |
 | SYNC-03 | P0 | Etats.dc.html | build | Reconciliation: on success, the optimistic item is replaced by the server's version (server IDs, server-comput... |
-| SYNC-04 | P0 | Etats.dc.html | todo | Error types, each with its own behaviour: |
-| SYNC-05 | P0 | Etats.dc.html | todo | The client state is a cache of the server. On reconnection and every time the app returns to the foreground, i... |
+| SYNC-04 | P0 | Etats.dc.html | build | Error types, each with its own behaviour: |
+| SYNC-05 | P0 | Etats.dc.html | build | The client state is a cache of the server. On reconnection and every time the app returns to the foreground, i... |
 | SYNC-06 | P0 | Etats.dc.html | build | Offline queue: queued mutations survive the app being killed, keep their order, are idempotent, and go through... |
 | SYNC-07 | P0 | Etats.dc.html | build | One feedback system for the whole app (toasts, inline errors, banners): success shows no toast unless it bring... |
 | SYNC-08 | P0 | Backstage | todo | Tests for every mutation: success, rejection, timeout, duplicate send, offline then rejected, app killed mid-r... |
@@ -477,11 +477,11 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| SEC-01 | P0 | Backstage | todo | Data minimisation in every response: each endpoint returns a shape built for its use case, never a whole datab... |
-| SEC-02 | P0 | Backstage | todo | Authorisation on every object and every field (OWASP API Security Top 10: broken object-level authorisation, b... |
+| SEC-01 | P0 | Backstage | build | Data minimisation in every response: each endpoint returns a shape built for its use case, never a whole datab... |
+| SEC-02 | P0 | Backstage | build | Authorisation on every object and every field (OWASP API Security Top 10: broken object-level authorisation, b... |
 | SEC-03 | P0 | Backstage | todo | Encryption in transit: TLS 1.2 minimum, 1.3 preferred, everywhere; certificate pinning for the API (AC-05); HS... |
-| SEC-04 | P0 | Backstage | todo | Encryption at rest on the server: storage and database encryption, plus application-level envelope encryption ... |
-| SEC-05 | P0 | Backstage | todo | Encryption on the device: tokens and keys in the iOS Keychain / Android Keystore, local database encrypted, se... |
+| SEC-04 | P0 | Backstage | build | Encryption at rest on the server: storage and database encryption, plus application-level envelope encryption ... |
+| SEC-05 | P0 | Backstage | build | Encryption on the device: tokens and keys in the iOS Keychain / Android Keystore, local database encrypted, se... |
 | SEC-06 | P0 | Backstage | todo | Retention: precise location points are deleted once the recap is built (N-07); raw GPS data of a check-in is d... |
 | SEC-07 | P0 | Reglages.dc.html | todo | Accounts: passkeys first; passwords, if any, hashed with Argon2id; list of active sessions with remote sign-ou... |
 | SEC-08 | P0 | Arrivee.dc.html | todo | GDPR: alcohol consumption and BAC may count as health data under GDPR article 9, which means explicit consent,... |

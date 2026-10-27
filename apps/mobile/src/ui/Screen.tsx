@@ -32,7 +32,7 @@ export function Screen({ title, back, trailing, children, footer, withToasts }: 
       >
         {back || trailing ? (
           <View style={styles.top}>
-            {back ? <IconButton icon="back" accessibilityLabel={i18n.t("common.back")} onPress={() => router.back()} /> : <View />}
+            {back ? <IconButton icon="back" accessibilityLabel={i18n.t("common.back")} onPress={() => (router.canGoBack() ? router.back() : router.replace("/(tabs)"))} /> : <View />}
             {trailing}
           </View>
         ) : null}

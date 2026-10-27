@@ -29,6 +29,12 @@ export interface AppState {
   manualLevel: UiLevel | null;
   levelState: UiLevelState | null;
   outbox: PendingMutation[];
+  /** Server time of the last delta sync. */
+  syncCursor: number | null;
+  /** Set once the history logged before the account was sent to the server. */
+  uploadedToServerAt: number | null;
+  /** Account the local history belongs to; null while it only lives on this phone. */
+  accountUserId: string | null;
 }
 
 export const useAppStore = create<AppState>()(
@@ -44,6 +50,9 @@ export const useAppStore = create<AppState>()(
       manualLevel: null,
       levelState: null,
       outbox: [],
+      syncCursor: null,
+      uploadedToServerAt: null,
+      accountUserId: null,
     }),
     {
       name: "crew-app-v1",
@@ -144,4 +153,17 @@ export function buildDrink(preset: DrinkPreset, consumedAt: number, withFood: bo
 
 export function buildWater(at: number): WaterEntry {
   return { id: newId(), at, sync: "pending" };
+}
+
+/** O-13: one account's history never shows under another account on the same phone. */
+export function clearAccountHistory(): void {
+  useAppStore.setState({
+    drinks: [],
+    water: [],
+    customDrinks: [],
+    outbox: [],
+    syncCursor: null,
+    uploadedToServerAt: null,
+    accountUserId: null,
+  });
 }

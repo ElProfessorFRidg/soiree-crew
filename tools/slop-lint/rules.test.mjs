@@ -32,5 +32,8 @@ describe("SLOP-04 lint", () => {
   it("does not flag hyphenated words or placeholders", () => {
     expect(rulesHit("check-in au Zinc, peut-être", "fr")).toEqual([]);
     expect(rulesHit("{count} drinks", "en")).toEqual([]);
+    expect(rulesHit("Letters, digits, dot or underscore.", "en")).toEqual([]);
+    expect(rulesHit("This underscores the point", "en")).toContain("R-10 English blacklist");
+    expect(rulesHit("We underscore the point", "en")).toContain("R-10 English blacklist");
   });
 });

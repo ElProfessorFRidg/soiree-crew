@@ -8,6 +8,8 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { themes } from "@crew/design-tokens";
 import { I18nProvider } from "@/i18n";
+import { connect } from "@/server/connection";
+import { loadSession, useSession } from "@/server/session";
 import { useSyncFeedback } from "@/sync/feedback";
 import { flush } from "@/sync/engine";
 import { useAppStore } from "@/state/store";
@@ -35,7 +37,18 @@ export default function RootLayout() {
   const [fontsLoaded] = useFonts(fonts);
   const hydrated = useAppStore((state) => state.hydrated);
   const language = useAppStore((state) => state.preferences.language);
-  const ready = fontsLoaded && hydrated;
+  const sessionReady = useSession((state) => state.ready);
+  const session = useSession((state) => state.session);
+  const ready = fontsLoaded && hydrated && sessionReady;
+
+  useEffect(() => {
+    void loadSession();
+  }, []);
+
+  useEffect(() => {
+    // Server transport, socket and delta sync follow the session (ADR 0002).
+    if (hydrated && sessionReady) connect(session);
+  }, [hydrated, sessionReady, session]);
 
   useEffect(() => {
     if (!ready) return;
@@ -79,6 +92,8 @@ export default function RootLayout() {
               <Stack.Screen name="history" />
               <Stack.Screen name="curve" />
               <Stack.Screen name="limits" />
+              <Stack.Screen name="new-party" />
+              <Stack.Screen name="live" />
               <Stack.Screen name="sos" options={{ presentation: "fullScreenModal", animation: "fade" }} />
             </Stack>
           </I18nProvider>

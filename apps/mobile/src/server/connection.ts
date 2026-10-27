@@ -1,0 +1,170 @@
+import { AppState as RNAppState } from "react-native";
+import type { CustomDrink } from "@/drinks/presets";
+import { clearAccountHistory, useAppStore } from "@/state/store";
+import { flush, onSyncEvent, setTransport, submit } from "@/sync/engine";
+import { HttpTransport } from "@/sync/httpTransport";
+import { LocalTransport } from "@/sync/localTransport";
+import type { DrinkEntry, StoredProfile } from "@/sync/types";
+import { api } from "./api";
+import { refreshCrews, refreshLiveParty, refreshParties } from "./crewData";
+import { useSession, type ServerSession } from "./session";
+
+type Deleted = { id: string; deleted: true };
+interface SyncResponse {
+  serverTime: number;
+  drinks: (Deleted | (Omit<DrinkEntry, "sync"> & { verified: boolean }))[];
+  water: (Deleted | { id: string; at: number })[];
+  customDrinks: (Deleted | CustomDrink)[];
+  preferences: Record<string, unknown> | null;
+  profile: StoredProfile | null;
+}
+
+const isDeleted = (item: object): item is Deleted => "deleted" in item;
+
+/** Ids with a write still in the queue: the server copy must not overwrite them (SYNC-03). */
+function pendingIds(): Set<string> {
+  const ids = new Set<string>();
+  for (const { mutation } of useAppStore.getState().outbox) {
+    if ("drink" in mutation) ids.add(mutation.drink.id);
+    if ("water" in mutation) ids.add(mutation.water.id);
+  }
+  return ids;
+}
+
+/** Delta sync (SYNC-05): the server copy wins for everything not waiting in the queue. */
+export async function pull(): Promise<void> {
+  const state = useAppStore.getState();
+  const since = state.syncCursor ?? 0;
+  const data = await api<SyncResponse>(`/v1/sync?since=${since}`);
+  const pending = pendingIds();
+
+  useAppStore.setState((current) => {
+    const drinks = new Map(current.drinks.map((d) => [d.id, d]));
+    for (const item of data.drinks) {
+      if (pending.has(item.id)) continue;
+      if (isDeleted(item)) drinks.delete(item.id);
+      else {
+        const { verified: _verified, ...drink } = item;
+        drinks.set(item.id, { ...drink, sync: "saved" });
+      }
+    }
+    const water = new Map(current.water.map((w) => [w.id, w]));
+    for (const item of data.water) {
+      if (pending.has(item.id)) continue;
+      if (isDeleted(item)) water.delete(item.id);
+      else water.set(item.id, { id: item.id, at: item.at, sync: "saved" });
+    }
+    const customDrinks = new Map(current.customDrinks.map((d) => [d.id, d]));
+    for (const item of data.customDrinks) {
+      if (isDeleted(item)) customDrinks.delete(item.id);
+      else customDrinks.set(item.id, item);
+    }
+    return {
+      drinks: [...drinks.values()],
+      water: [...water.values()],
+      customDrinks: [...customDrinks.values()],
+      preferences: data.preferences ? { ...current.preferences, ...data.preferences } : current.preferences,
+      profile: data.profile ?? current.profile,
+      syncCursor: data.serverTime,
+    };
+  });
+}
+
+/**
+ * First link with a server: everything logged before the account existed goes up once.
+ * Ids are the client's UUIDs, so a retry never duplicates anything.
+ */
+function uploadLocalHistory(): void {
+  const state = useAppStore.getState();
+  if (state.uploadedToServerAt) return;
+  if (state.profile) submit({ kind: "profile.set", profile: state.profile, previous: state.profile });
+  submit({ kind: "preferences.set", patch: state.preferences, previous: state.preferences });
+  for (const drink of state.drinks) submit({ kind: "drink.add", drink: { ...drink, sync: "pending" } });
+  for (const water of state.water) submit({ kind: "water.add", water: { ...water, sync: "pending" } });
+  for (const custom of state.customDrinks) submit({ kind: "customDrink.set", drink: custom, previous: custom });
+  useAppStore.setState({ uploadedToServerAt: Date.now() });
+}
+
+let socket: WebSocket | null = null;
+let retry = 0;
+let retryTimer: ReturnType<typeof setTimeout> | null = null;
+let stopped = true;
+
+function openSocket(session: ServerSession): void {
+  if (stopped || socket) return;
+  const url = `${session.url.replace(/^http/, "ws")}/v1/live?token=${encodeURIComponent(session.token)}`;
+  const ws = new WebSocket(url);
+  socket = ws;
+  ws.onopen = () => {
+    retry = 0;
+  };
+  ws.onmessage = (event) => {
+    try {
+      const message = JSON.parse(String(event.data)) as { type: string; partyId?: string };
+      if (message.type === "party.changed" && message.partyId) void refreshLiveParty(message.partyId).catch(() => undefined);
+      if (message.type === "party.changed" || message.type === "crew.changed") void refreshParties().catch(() => undefined);
+      if (message.type === "crew.changed") void refreshCrews().catch(() => undefined);
+      if (message.type === "sync") void pull().catch(() => undefined);
+    } catch {
+      // A malformed hint is ignored: the next foreground sync catches up anyway.
+    }
+  };
+  ws.onclose = () => {
+    socket = null;
+    if (stopped) return;
+    // Backoff with jitter, capped at 30 s.
+    const delay = Math.min(30_000, 1_000 * 2 ** retry) * (0.5 + Math.random() / 2);
+    retry += 1;
+    retryTimer = setTimeout(() => {
+      const current = useSession.getState().session;
+      if (current) openSocket(current);
+    }, delay);
+  };
+}
+
+async function refreshAll(): Promise<void> {
+  await flush();
+  await Promise.allSettled([pull(), refreshCrews(), refreshParties()]);
+}
+
+let unsubscribeAppState: (() => void) | null = null;
+let unsubscribeSync: (() => void) | null = null;
+
+/** Called whenever the session changes: picks the transport and keeps the socket alive. */
+export function connect(session: ServerSession | null): void {
+  stopped = true;
+  socket?.close();
+  socket = null;
+  if (retryTimer) clearTimeout(retryTimer);
+  unsubscribeAppState?.();
+  unsubscribeSync?.();
+
+  if (!session) {
+    setTransport(new LocalTransport());
+    return;
+  }
+  setTransport(new HttpTransport());
+  stopped = false;
+  const owner = useAppStore.getState().accountUserId;
+  if (owner && owner !== session.userId) clearAccountHistory();
+  // History that belonged to no account yet goes up to this one, once.
+  else if (!owner) useAppStore.setState({ uploadedToServerAt: null });
+  useAppStore.setState({ accountUserId: session.userId });
+  uploadLocalHistory();
+  void refreshAll();
+  openSocket(session);
+
+  const subscription = RNAppState.addEventListener("change", (status) => {
+    if (status !== "active") return;
+    void refreshAll();
+    const current = useSession.getState().session;
+    if (current && !socket) openSocket(current);
+  });
+  unsubscribeAppState = () => subscription.remove();
+  // A drink confirmed by the server may change the live party: refetch it.
+  unsubscribeSync = onSyncEvent((event) => {
+    if (event.type === "accepted" && (event.mutation.kind === "drink.add" || event.mutation.kind === "water.add")) {
+      void refreshParties().catch(() => undefined);
+    }
+  });
+}

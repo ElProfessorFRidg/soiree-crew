@@ -87,7 +87,7 @@ export default function AddDrinkSheet() {
           <Text variant="h2" accessibilityRole="header">
             {i18n.t("addDrink.title")}
           </Text>
-          <IconButton icon="x" accessibilityLabel={i18n.t("common.close")} onPress={() => router.back()} />
+          <IconButton icon="x" accessibilityLabel={i18n.t("common.close")} onPress={() => (router.canGoBack() ? router.back() : router.replace("/(tabs)"))} />
         </View>
 
         <View style={styles.grid} accessibilityRole="radiogroup">
@@ -232,7 +232,8 @@ export default function AddDrinkSheet() {
           onPress={() => {
             const drink = logDrink(preset, consumedAt, withFood);
             if (!drink) return;
-            router.back();
+            if (router.canGoBack()) router.back();
+            else router.replace("/(tabs)");
             offerUndo(drink, i18n, preferences.hourCycle);
           }}
         />

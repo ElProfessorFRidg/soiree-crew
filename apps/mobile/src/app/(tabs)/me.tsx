@@ -4,6 +4,7 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { duration } from "@crew/design-tokens";
 import { COUNTRIES, countryRules, drivingLimit, formatBacValue, breathRatio, type BacUnit, type UiLanguage } from "@crew/units";
 import { useT } from "@/i18n";
+import { AccountSection } from "@/profile/AccountSection";
 import { ProfileFields, type ProfileDraft } from "@/profile/ProfileFields";
 import { draftFromProfile, saveProfile } from "@/profile/saveProfile";
 import { useAppStore } from "@/state/store";
@@ -45,7 +46,7 @@ export default function MeScreen() {
   };
 
   return (
-    <Screen title={i18n.t("profile.title")}>
+    <Screen title={i18n.t("profile.title")} withToasts>
       <Text variant="label">{i18n.t("profile.body")}</Text>
       <ProfileFields draft={draft} onChange={onProfileChange} />
 
@@ -117,6 +118,7 @@ export default function MeScreen() {
           onChange={(language) => setPreferences({ language })}
         />
       </Panel>
+      <AccountSection />
     </Screen>
   );
 }

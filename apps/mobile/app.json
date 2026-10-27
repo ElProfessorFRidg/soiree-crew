@@ -62,7 +62,8 @@
           "enableRemoteNotifications": false,
           "color": "#F4B33D"
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true

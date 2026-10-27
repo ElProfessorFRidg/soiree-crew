@@ -23,6 +23,8 @@ import { Panel, Row, Segmented, Tag } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { Numeral, Text } from "@/ui/Text";
 import { AddDrinkButton } from "./AddDrinkButton";
+import { CrewStrip } from "./CrewStrip";
+import { useLiveParty } from "@/server/crewData";
 import { RollingNumber } from "./RollingNumber";
 
 function greetingKey(hour: number) {
@@ -254,6 +256,21 @@ function LevelPicker({ i18n, level, setLevel }: LevelProps) {
   );
 }
 
+function PartyTitle({ i18n }: { i18n: Translator }) {
+  const theme = useTheme();
+  const current = useLiveParty();
+  if (!current) return <Text variant="h3">{i18n.t("party.tonight")}</Text>;
+  return (
+    <View style={styles.titleRow}>
+      {/* The live dot only shows while a party is really live (DESIGN.md §5). */}
+      <View style={[styles.liveDot, { backgroundColor: theme.ok }]} />
+      <Text variant="h3" style={styles.flex} numberOfLines={1}>
+        {current.party.name}
+      </Text>
+    </View>
+  );
+}
+
 function LevelZero(props: LevelProps) {
   const { i18n, now } = props;
   const theme = useTheme();
@@ -263,7 +280,7 @@ function LevelZero(props: LevelProps) {
       <View style={styles.header}>
         <View style={styles.flex}>
           <Text variant="small">{i18n.t(greetingKey(new Date(now).getHours()))}</Text>
-          <Text variant="h3">{i18n.t("party.tonight")}</Text>
+          <PartyTitle i18n={i18n} />
         </View>
         <IconButton icon="clock" accessibilityLabel={i18n.t("party.history")} onPress={() => router.push("/history")} />
       </View>
@@ -293,6 +310,7 @@ function LevelZero(props: LevelProps) {
         />
       </View>
       <StatusRow {...props} />
+      <CrewStrip />
       <View>
         <Row
           title={i18n.t("curve.open")}
@@ -340,6 +358,7 @@ function LevelOne(props: LevelProps) {
         <Tag label={i18n.t("party.level", { level: 1 })} tone="amber" />
       </View>
       <BacHero {...props} size={140} />
+      <CrewStrip big />
       <Text style={{ fontSize: 18, lineHeight: 24 }}>
         {rising ? `${unitLabel}. ${i18n.t("party.stillRising")}` : trendLine(props, hourCycle)}
       </Text>
@@ -479,4 +498,6 @@ const styles = StyleSheet.create({
   bigGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
   bigCell: { flexBasis: "47%", flexGrow: 1 },
   levelThreeTitle: { fontSize: 20, lineHeight: 26, fontFamily: "Archivo-Bold" },
+  titleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  liveDot: { width: 8, height: 8, borderRadius: 4 },
 });

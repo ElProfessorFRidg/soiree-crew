@@ -13,6 +13,7 @@ import { ToastHost } from "@/ui/Toast";
 // Tabs appear as their features ship: no tab leads to an empty screen.
 const TAB_ICONS: Record<string, AnyIconName> = {
   index: "glass",
+  crew: "users",
   me: "user",
 };
 
@@ -60,6 +61,7 @@ export default function TabsLayout() {
     <View style={{ flex: 1 }}>
       <Tabs screenOptions={{ headerShown: false }} tabBar={(props) => <TabBar {...props} />}>
         <Tabs.Screen name="index" options={{ title: i18n.t("tabs.party") }} />
+        <Tabs.Screen name="crew" options={{ title: i18n.t("crew.tab") }} />
         <Tabs.Screen name="me" options={{ title: i18n.t("tabs.me") }} />
       </Tabs>
       <ToastHost bottomOffset={insets.bottom + 76} />

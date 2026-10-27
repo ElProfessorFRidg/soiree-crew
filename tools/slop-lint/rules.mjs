@@ -28,7 +28,9 @@ const EN_BLACKLIST = [
   "showcas(?:e|es|ed|ing)",
   "tapestry",
   "testament",
-  "underscor(?:e|es|ed|ing)",
+  // The verb only: "underscore" as the name of the _ character is fine.
+  "underscor(?:es|ed|ing)",
+  "underscore(?=\\s+(?:the|its|their|your|how|that|a|an)(?![\\p{L}]))",
   "valuable",
   "vibrant",
   "quietly",
