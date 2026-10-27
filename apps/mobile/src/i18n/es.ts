@@ -1111,6 +1111,11 @@ export const es: Messages = {
     nameRequired: "Ponle un nombre.",
     photo: "Añadir una foto al álbum",
     photoAdded: "Foto añadida al álbum de la fiesta.",
+    aiRead: "Entender con IA",
+    aiFailed: "La IA no lo ha entendido. Elige en la lista.",
+    aiAgo: "Hace {minutes} min.",
+    aiVenue: "Bar: {venue}.",
+    aiPay: "Invitas tú a la ronda.",
   },
   history: {
     title: "Lo que has bebido",

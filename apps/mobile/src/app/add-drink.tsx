@@ -18,6 +18,8 @@ import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
 import { useNow } from "@/state/hooks";
 import { useAppStore } from "@/state/store";
+import { api } from "@/server/api";
+import { useCrewData } from "@/server/crewData";
 import { useTheme } from "@/theme";
 import { Button, IconButton } from "@/ui/Button";
 import { Chip, Switch } from "@/ui/controls";
@@ -287,7 +289,25 @@ function QuickType({ presets, consumedAt, withFood, onPick }: { presets: DrinkPr
     () => presets.map((p) => ({ value: p.id, names: p.kind === "custom" ? [p.name ?? ""] : [drinkLabel(p, i18n), drinkLabel(p, FR), drinkLabel(p, EN)] })),
     [presets, i18n],
   );
-  const order = useMemo(() => (text.trim() ? parseOrder(text, candidates) : []), [text, candidates]);
+  const localOrder = useMemo(() => (text.trim() ? parseOrder(text, candidates) : []), [text, candidates]);
+  // AI-01: when the crew turned AI on, a sentence the local parser misses can go to the server.
+  const aiCrew = useCrewData((state) => state.crews.find((c) => c.aiAvailable));
+  const [ai, setAi] = useState<{ text: string; items: { value: string; quantity: number }[]; minutesAgo: number | null; venue: string | null; iPay: boolean } | null>(null);
+  const [asking, setAsking] = useState(false);
+  const fromAi = ai !== null && ai.text === text;
+  const order = fromAi ? ai.items : localOrder;
+  const askAi = () => {
+    if (!aiCrew) return;
+    setAsking(true);
+    void api<{ items: { id: string; quantity: number }[]; minutesAgo: number | null; venue: string | null; iPay: boolean }>("/v1/ai/order", {
+      method: "POST",
+      body: { crewId: aiCrew.id, text: text.trim(), drinks: presets.slice(0, 60).map((p) => ({ id: p.id, name: drinkLabel(p, i18n) })) },
+    })
+      .then((res) => setAi({ text, items: res.items.map((i) => ({ value: i.id, quantity: i.quantity })), minutesAgo: res.minutesAgo, venue: res.venue, iPay: res.iPay }))
+      .catch(() => showToast({ tone: "danger", message: i18n.t("addDrink.aiFailed") }))
+      .finally(() => setAsking(false));
+  };
+  const at = fromAi && ai.minutesAgo ? Date.now() - ai.minutesAgo * 60_000 : consumedAt;
   const suggestions = useMemo(() => (text.trim() && !order.length ? search(text, candidates, 4) : []), [text, order, candidates]);
   const byId = (id: string) => presets.find((p) => p.id === id)!;
   const summary = order.map((o) => `${o.quantity} × ${drinkLabel(byId(o.value), i18n)}`).join(", ");
@@ -311,7 +331,7 @@ function QuickType({ presets, consumedAt, withFood, onPick }: { presets: DrinkPr
           onPress={() => {
             let count = 0;
             for (const o of order) {
-              for (let n = 0; n < o.quantity; n++) if (logDrink(byId(o.value), consumedAt, withFood)) count += 1;
+              for (let n = 0; n < o.quantity; n++) if (logDrink(byId(o.value), at, withFood, count > 0)) count += 1;
             }
             if (!count) return;
             haptic.drinkAdded();
@@ -320,6 +340,20 @@ function QuickType({ presets, consumedAt, withFood, onPick }: { presets: DrinkPr
             else router.replace("/(tabs)");
           }}
         />
+      ) : null}
+      {fromAi && (ai.venue || ai.iPay || ai.minutesAgo) ? (
+        <Text variant="small">
+          {[
+            ai.minutesAgo ? i18n.t("addDrink.aiAgo", { minutes: ai.minutesAgo }) : null,
+            ai.venue ? i18n.t("addDrink.aiVenue", { venue: ai.venue }) : null,
+            ai.iPay ? i18n.t("addDrink.aiPay") : null,
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        </Text>
+      ) : null}
+      {aiCrew && text.trim().split(/\s+/).length >= 3 && !fromAi ? (
+        <Button label={i18n.t("addDrink.aiRead")} variant="outline" height={48} loading={asking} onPress={askAi} />
       ) : null}
       {suggestions.length ? (
         <View style={styles.grid}>

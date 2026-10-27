@@ -1110,6 +1110,11 @@ export const fr = {
     nameRequired: "Donne-lui un nom.",
     photo: "Ajouter une photo à l'album",
     photoAdded: "Photo ajoutée à l'album de la soirée.",
+    aiRead: "Comprendre avec l'IA",
+    aiFailed: "L'IA n'a pas compris. Choisis dans la liste.",
+    aiAgo: "Il y a {minutes} min.",
+    aiVenue: "Bar : {venue}.",
+    aiPay: "Tu paies la tournée.",
   },
   history: {
     title: "Ce que t'as bu",

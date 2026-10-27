@@ -50,6 +50,7 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
         role: crew.role,
         leaderboardEnabled: crew.leaderboard_enabled,
         aiEnabled: crew.ai_enabled,
+        aiAvailable: Boolean(ctx.ai) && crew.ai_enabled,
         // My own participation (RANK-08, TER-07): only ever sent to me.
         me: { leaderboardOptOut: crew.leaderboard_opt_out, territoryOptOut: crew.territory_opt_out },
         members: members

@@ -1110,6 +1110,11 @@ export const de: Messages = {
     nameRequired: "Gib ihm einen Namen.",
     photo: "Foto zum Album hinzufügen",
     photoAdded: "Foto zum Album des Abends hinzugefügt.",
+    aiRead: "Mit KI verstehen",
+    aiFailed: "Die KI hat es nicht verstanden. Wähl aus der Liste.",
+    aiAgo: "Vor {minutes} Min.",
+    aiVenue: "Bar: {venue}.",
+    aiPay: "Du gibst die Runde aus.",
   },
   history: {
     title: "Was du getrunken hast",

@@ -143,3 +143,25 @@ describe("narrated recap (AI-02)", () => {
     expect(recap.aiAvailable).toBe(true);
   });
 });
+
+describe("AI order (AI-01)", () => {
+  it("keeps only the drinks the phone knows, and refuses without the crew's opt-in", async () => {
+    await app.close();
+    app = await buildApp({
+      db,
+      sealer: new Sealer(randomBytes(32).toString("base64")),
+      live: new LiveHub(),
+      now: () => clock,
+      publicUrl: "https://crew.test",
+      hashSecret: "s",
+      ai: { name: "fake", complete: async () => 'Sure: {"items":[{"id":"pint","quantity":2},{"id":"ghost","quantity":1}],"minutesAgo":60,"venue":"Le Zinc","iPay":true}' },
+    });
+    const jade = await account("jade");
+    const crewId = ((await app.inject({ method: "POST", url: "/v1/crews", headers: jade.auth, payload: { name: "Crew" } })).json() as { crew: { id: string } }).crew.id;
+    const ask = () =>
+      app.inject({ method: "POST", url: "/v1/ai/order", headers: jade.auth, payload: { crewId, text: "deux pintes au Zinc il y a une heure, je paie", drinks: [{ id: "pint", name: "Pinte" }] } });
+    expect((await ask()).statusCode).toBe(403);
+    await app.inject({ method: "PATCH", url: `/v1/crews/${crewId}/settings`, headers: jade.auth, payload: { aiEnabled: true } });
+    expect((await ask()).json()).toEqual({ items: [{ id: "pint", quantity: 2 }], minutesAgo: 60, venue: "Le Zinc", iPay: true });
+  });
+});

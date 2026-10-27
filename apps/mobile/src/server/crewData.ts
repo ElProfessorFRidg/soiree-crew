@@ -20,6 +20,8 @@ export interface Crew {
   leaderboardEnabled: boolean;
   /** <ai_features>: opt-in per crew, off by default. */
   aiEnabled?: boolean;
+  /** The server has a provider and the crew opted in. */
+  aiAvailable?: boolean;
   me: { leaderboardOptOut: boolean; territoryOptOut: boolean };
   members: CrewMember[];
 }

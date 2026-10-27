@@ -1112,6 +1112,11 @@ export const en: Messages = {
     nameRequired: "Give it a name.",
     photo: "Add a photo to the album",
     photoAdded: "Photo added to the party album.",
+    aiRead: "Read it with AI",
+    aiFailed: "The AI didn't get it. Pick from the list.",
+    aiAgo: "{minutes} min ago.",
+    aiVenue: "Bar: {venue}.",
+    aiPay: "You're buying the round.",
   },
   history: {
     title: "What you had",

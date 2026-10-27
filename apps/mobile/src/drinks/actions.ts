@@ -9,9 +9,13 @@ import type { DrinkPreset } from "./presets";
 const DOUBLE_TAP_MS = 900;
 let lastAddAt = 0;
 
-export function logDrink(preset: DrinkPreset, consumedAt: number, withFood: boolean): DrinkEntry | null {
+/**
+ * A second tap within the double-tap window is ignored. An order of several drinks at once
+ * (« 2 pintes et un shot ») passes `batch` for the drinks after the first.
+ */
+export function logDrink(preset: DrinkPreset, consumedAt: number, withFood: boolean, batch = false): DrinkEntry | null {
   const now = Date.now();
-  if (now - lastAddAt < DOUBLE_TAP_MS) return null;
+  if (!batch && now - lastAddAt < DOUBLE_TAP_MS) return null;
   lastAddAt = now;
   const drink = buildDrink(preset, Math.min(consumedAt, now), withFood);
   haptic.drinkAdded();

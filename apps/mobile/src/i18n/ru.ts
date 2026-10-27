@@ -1136,6 +1136,11 @@ export const ru: Messages = {
     nameRequired: "Дай ему название.",
     photo: "Добавить фото в альбом",
     photoAdded: "Фото добавлено в альбом вечеринки.",
+    aiRead: "Понять с ИИ",
+    aiFailed: "ИИ не понял. Выбери из списка.",
+    aiAgo: "{minutes} мин назад.",
+    aiVenue: "Бар: {venue}.",
+    aiPay: "Раунд за тобой.",
   },
   history: {
     title: "Что выпито",
