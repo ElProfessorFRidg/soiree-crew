@@ -390,6 +390,10 @@ export const ru: Messages = {
     notTogether: "Чтобы подтвердить, нужно быть в одном баре.",
     noConfirmable: "Пока нечего подтверждать.",
     noParty: "Рейтинг вечеринки виден во время вечеринки.",
+    honours: "Зал славы",
+    weekOf: "Неделя с {date}",
+    streakNow: { one: "{name}: {count} неделю впереди", few: "{name}: {count} недели подряд впереди", many: "{name}: {count} недель подряд впереди", other: "{name}: {count} недели подряд впереди" },
+    streakBest: { one: "{name}: рекорд, {count} неделя впереди", few: "{name}: рекорд, {count} недели подряд впереди", many: "{name}: рекорд, {count} недель подряд впереди", other: "{name}: рекорд, {count} недели подряд впереди" },
   },
   radar: {
     tonight: "Сегодня",

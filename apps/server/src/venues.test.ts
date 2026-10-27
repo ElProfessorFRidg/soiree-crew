@@ -171,6 +171,23 @@ describe("leaderboard (RANK-01, RANK-06)", () => {
     expect(row.rank).toBe(1);
   });
 
+  it("keeps last week's champion and their streak in the honours list (RANK-04)", async () => {
+    const { users, crewId } = await setup("jade", "malik");
+    const [jade, malik] = users as [User, User];
+    const confirmed = await drink(malik);
+    await app.inject({ method: "POST", url: `/v1/drinks/${confirmed}/confirm`, headers: jade.auth });
+    clock += 7 * 24 * 60 * MIN;
+    const history = (await app.inject({ method: "GET", url: `/v1/crews/${crewId}/leaderboard/history?metric=drinks`, headers: jade.auth })).json() as {
+      weeks: { champions: { name: string; value: number }[] }[];
+      months: unknown[];
+      streaks: { name: string; current: number; best: number }[];
+    };
+    expect(history.weeks).toHaveLength(8);
+    expect(history.months).toHaveLength(6);
+    expect(history.weeks[0]!.champions).toEqual([{ userId: malik.id, name: "malik", value: 1 }]);
+    expect(history.streaks).toEqual([{ userId: malik.id, name: "malik", current: 1, best: 1 }]);
+  });
+
   it("never lets someone confirm their own drink", async () => {
     const { users } = await setup("jade");
     const id = await drink(users[0]!);

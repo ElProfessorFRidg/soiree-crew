@@ -58,6 +58,82 @@ async function periodBounds(ctx: Context, crewId: string, period: string, partyI
   return { from: 0, to: Number.MAX_SAFE_INTEGER, timeZone };
 }
 
+type Metric = z.infer<typeof querySchema>["metric"];
+
+/** One board over [from, to): verified drinks only, nothing past the danger cap (RANK-06, RANK-07). */
+async function computeBoard(ctx: Context, crewId: string, from: number, to: number, timeZone: string, metric: Metric, viewerId: string) {
+  const members = await ctx.db.query<{ user_id: string; display_name: string; sealed: string | null }>(
+    `select m.user_id, u.display_name, b.sealed from crew_members m join users u on u.id = m.user_id
+     left join body_profiles b on b.user_id = m.user_id
+     where m.crew_id = $1 and m.leaderboard_opt_out = false`,
+    [crewId],
+  );
+  const ids = members.map((m) => m.user_id);
+  if (!ids.length) return [];
+
+  // Drinks of the crew's parties only, plus a little before (verifyDrinks drops the rest).
+  const drinks = await ctx.db.query<DrinkRow>(
+    `select d.id, d.user_id, d.party_id, d.sealed, d.consumed_at, d.logged_at,
+            (select count(*)::int from drink_confirmations c where c.drink_id = d.id) as confirmations
+     from drinks d where d.user_id = any($1::uuid[]) and d.deleted_at is null and d.consumed_at >= $2 and d.consumed_at < $3`,
+    [ids, from - DAY_MS, to],
+  );
+  const parties = await ctx.db.query<{ id: string; starts_at: number; ends_at: number; closed_at: number | null }>(
+    "select id, starts_at, ends_at, closed_at from parties where crew_id = $1 and ends_at >= $2 and starts_at < $3",
+    [crewId, from - DAY_MS, to],
+  );
+  const partyById = new Map(parties.map((p) => [p.id, { startsAt: p.starts_at, endsAt: p.closed_at ?? p.ends_at }]));
+  const nightsOut = await ctx.db.query<{ user_id: string; starts_at: number }>(
+    `select m.user_id, p.starts_at from party_members m join parties p on p.id = m.party_id
+     where p.crew_id = $1 and m.response = 'going' and m.last_activity_at is not null and p.starts_at >= $2 and p.starts_at < $3`,
+    [crewId, from, to],
+  );
+
+  const rows = members.map((member) => {
+    const mine = drinks.filter((d) => d.user_id === member.user_id);
+    const decoded = mine.map((d) => ({ row: d, body: ctx.sealer.open<{ volumeMl: number; abv: number; withFood: boolean }>(d.sealed) }));
+    const profile = member.sealed ? ctx.sealer.open<BodyProfile>(member.sealed) : null;
+    let count = 0;
+    let grams = 0;
+    let unverified = 0;
+    const byParty = new Map<string | null, typeof decoded>();
+    for (const item of decoded) byParty.set(item.row.party_id, [...(byParty.get(item.row.party_id) ?? []), item]);
+    for (const [partyId, list] of byParty) {
+      const verdicts = verifyDrinks(
+        list.map((d) => ({ id: d.row.id, volumeMl: d.body.volumeMl, abv: d.body.abv, consumedAt: d.row.consumed_at, loggedAt: d.row.logged_at, confirmed: d.row.confirmations > 0 })),
+        partyId ? (partyById.get(partyId) ?? null) : null,
+      );
+      for (const d of list) {
+        if (d.row.consumed_at < from || d.body.abv <= 0) continue;
+        let verified = verdicts.get(d.row.id)?.status === "verified";
+        if (verified && profile) {
+          // RANK-07: past the danger cap, further drinks earn nothing.
+          const before: DrinkIntake[] = decoded
+            .filter((o) => o.row.consumed_at < d.row.consumed_at)
+            .map((o) => ({ id: o.row.id, volumeMl: o.body.volumeMl, abv: o.body.abv, consumedAt: o.row.consumed_at, withFood: o.body.withFood }));
+          if (estimateBac(before, profile, d.row.consumed_at).bac >= DANGER_CAP) verified = false;
+        }
+        if (verified) {
+          count += 1;
+          grams += ethanolGrams(d.body.volumeMl, d.body.abv);
+        } else unverified += 1;
+      }
+    }
+    const nights = new Set(nightsOut.filter((n) => n.user_id === member.user_id).map((n) => nightOf(n.starts_at, timeZone))).size;
+    const value = metric === "drinks" ? count : metric === "grams" ? Math.round(grams) : nights;
+    return { userId: member.user_id, name: member.display_name, value, unverified: member.user_id === viewerId ? unverified : undefined };
+  });
+
+  rows.sort((a, b) => b.value - a.value || a.name.localeCompare(b.name));
+  let rank = 0;
+  let lastValue = Number.NaN;
+  return rows.map((row, index) => {
+    if (row.value !== lastValue) rank = index + 1;
+    lastValue = row.value;
+    return { ...row, rank };
+  });
+}
+
 export function leaderboardRoutes(app: FastifyInstance, ctx: Context): void {
   /** RANK-01, RANK-06, RANK-07, RANK-08: crew-only, verified drinks only, nothing above the danger cap. */
   app.get<{ Params: { id: string } }>("/v1/crews/:id/leaderboard", async (request) => {
@@ -70,78 +146,62 @@ export function leaderboardRoutes(app: FastifyInstance, ctx: Context): void {
     }
     const { from, to, timeZone } = await periodBounds(ctx, request.params.id, query.period, query.partyId, user.id);
 
-    const members = await ctx.db.query<{ user_id: string; display_name: string; sealed: string | null }>(
-      `select m.user_id, u.display_name, b.sealed from crew_members m join users u on u.id = m.user_id
-       left join body_profiles b on b.user_id = m.user_id
-       where m.crew_id = $1 and m.leaderboard_opt_out = false`,
-      [request.params.id],
-    );
-    const ids = members.map((m) => m.user_id);
-    if (!ids.length) return { disabled: false, rows: [] };
+    return { disabled: false, rows: await computeBoard(ctx, request.params.id, from, to, timeZone, query.metric, user.id) };
+  });
 
-    // Drinks of the crew's parties only, plus a little before (verifyDrinks drops the rest).
-    const drinks = await ctx.db.query<DrinkRow>(
-      `select d.id, d.user_id, d.party_id, d.sealed, d.consumed_at, d.logged_at,
-              (select count(*)::int from drink_confirmations c where c.drink_id = d.id) as confirmations
-       from drinks d where d.user_id = any($1::uuid[]) and d.deleted_at is null and d.consumed_at >= $2 and d.consumed_at < $3`,
-      [ids, from - DAY_MS, to],
-    );
-    const parties = await ctx.db.query<{ id: string; starts_at: number; ends_at: number; closed_at: number | null }>(
-      "select id, starts_at, ends_at, closed_at from parties where crew_id = $1 and ends_at >= $2 and starts_at < $3",
-      [request.params.id, from - DAY_MS, to],
-    );
-    const partyById = new Map(parties.map((p) => [p.id, { startsAt: p.starts_at, endsAt: p.closed_at ?? p.ends_at }]));
-    const nightsOut = await ctx.db.query<{ user_id: string; starts_at: number }>(
-      `select m.user_id, p.starts_at from party_members m join parties p on p.id = m.party_id
-       where p.crew_id = $1 and m.response = 'going' and m.last_activity_at is not null and p.starts_at >= $2 and p.starts_at < $3`,
-      [request.params.id, from, to],
-    );
-
-    const rows = members.map((member) => {
-      const mine = drinks.filter((d) => d.user_id === member.user_id);
-      const decoded = mine.map((d) => ({ row: d, body: ctx.sealer.open<{ volumeMl: number; abv: number; withFood: boolean }>(d.sealed) }));
-      const profile = member.sealed ? ctx.sealer.open<BodyProfile>(member.sealed) : null;
-      let count = 0;
-      let grams = 0;
-      let unverified = 0;
-      const byParty = new Map<string | null, typeof decoded>();
-      for (const item of decoded) byParty.set(item.row.party_id, [...(byParty.get(item.row.party_id) ?? []), item]);
-      for (const [partyId, list] of byParty) {
-        const verdicts = verifyDrinks(
-          list.map((d) => ({ id: d.row.id, volumeMl: d.body.volumeMl, abv: d.body.abv, consumedAt: d.row.consumed_at, loggedAt: d.row.logged_at, confirmed: d.row.confirmations > 0 })),
-          partyId ? (partyById.get(partyId) ?? null) : null,
-        );
-        for (const d of list) {
-          if (d.row.consumed_at < from || d.body.abv <= 0) continue;
-          let verified = verdicts.get(d.row.id)?.status === "verified";
-          if (verified && profile) {
-            // RANK-07: past the danger cap, further drinks earn nothing.
-            const before: DrinkIntake[] = decoded
-              .filter((o) => o.row.consumed_at < d.row.consumed_at)
-              .map((o) => ({ id: o.row.id, volumeMl: o.body.volumeMl, abv: o.body.abv, consumedAt: o.row.consumed_at, withFood: o.body.withFood }));
-            if (estimateBac(before, profile, d.row.consumed_at).bac >= DANGER_CAP) verified = false;
-          }
-          if (verified) {
-            count += 1;
-            grams += ethanolGrams(d.body.volumeMl, d.body.abv);
-          } else unverified += 1;
+  /**
+   * RANK-04: the crew's honours list. Champions of the last 8 finished weeks and 6 finished months,
+   * ties shared, and the weekly winning streaks they make. Same switches as the live board.
+   */
+  app.get<{ Params: { id: string } }>("/v1/crews/:id/leaderboard/history", async (request) => {
+    const user = requireUser(request);
+    await assertCrewMember(ctx, request.params.id, user.id);
+    const metric = querySchema.shape.metric.parse((request.query as { metric?: string }).metric);
+    const crewId = request.params.id;
+    const crew = await ctx.db.query<{ leaderboard_enabled: boolean }>("select leaderboard_enabled from crews where id = $1", [crewId]);
+    if (!crew[0]?.leaderboard_enabled || (!drinkingLeaderboardEnabled() && metric !== "nights")) return { disabled: true, weeks: [], months: [], streaks: [] };
+    const now = ctx.now();
+    const { from: thisWeek, timeZone } = await periodBounds(ctx, crewId, "week", undefined, user.id);
+    const champions = async (from: number, to: number) => {
+      const rows = await computeBoard(ctx, crewId, from, to, timeZone, metric, user.id);
+      return rows.filter((r) => r.rank === 1 && r.value > 0).map((r) => ({ userId: r.userId, name: r.name, value: r.value }));
+    };
+    const weeks = [];
+    for (let k = 1; k <= 8; k++) {
+      const from = thisWeek - k * 7 * DAY_MS;
+      weeks.push({ from, champions: await champions(from, from + 7 * DAY_MS) });
+    }
+    const months = [];
+    const [year, month] = currentSeason(now, timeZone).split("-").map(Number) as [number, number];
+    for (let k = 1; k <= 6; k++) {
+      const date = new Date(Date.UTC(year, month - 1 - k, 15, 12));
+      const key = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+      const { start, end } = seasonBounds(key, offsetMinutes(date.getTime(), timeZone));
+      months.push({ season: key, champions: await champions(start, end) });
+    }
+    // Weeks in a row as champion, counted back from last week, and the longest run in the window.
+    const streaks = new Map<string, { name: string; current: number; best: number; run: number; broken: boolean }>();
+    for (const week of weeks) {
+      const ids = new Set(week.champions.map((c) => c.userId));
+      for (const c of week.champions) if (!streaks.has(c.userId)) streaks.set(c.userId, { name: c.name, current: 0, best: 0, run: 0, broken: false });
+      for (const [id, st] of streaks) {
+        if (ids.has(id)) {
+          st.run += 1;
+          if (!st.broken) st.current = st.run;
+        } else {
+          st.broken = true;
+          st.run = 0;
         }
+        st.best = Math.max(st.best, st.run);
       }
-      const nights = new Set(nightsOut.filter((n) => n.user_id === member.user_id).map((n) => nightOf(n.starts_at, timeZone))).size;
-      const value = query.metric === "drinks" ? count : query.metric === "grams" ? Math.round(grams) : nights;
-      return { userId: member.user_id, name: member.display_name, value, unverified: member.user_id === user.id ? unverified : undefined };
-    });
-
-    rows.sort((a, b) => b.value - a.value || a.name.localeCompare(b.name));
-    let rank = 0;
-    let lastValue = Number.NaN;
+    }
     return {
       disabled: false,
-      rows: rows.map((row, index) => {
-        if (row.value !== lastValue) rank = index + 1;
-        lastValue = row.value;
-        return { ...row, rank };
-      }),
+      weeks,
+      months,
+      streaks: [...streaks.entries()]
+        .map(([userId, st]) => ({ userId, name: st.name, current: st.current, best: st.best }))
+        .sort((a, b) => b.best - a.best || b.current - a.current),
     };
   });
 

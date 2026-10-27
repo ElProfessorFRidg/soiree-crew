@@ -355,7 +355,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | RANK-01 | P0 | Classements.dc.html | build | Drinking leaderboard per party, week, month, season and all time. Metrics: number of drinks, grams of pure alc... |
 | RANK-02 | P0 | Classements.dc.html | build | Live leaderboard on the Party screen (HUB-01): live positions, "X just overtook you" notification, animated ov... |
 | RANK-03 | P0 | Recap.dc.html | build | Podium in the recap (O-41) and on the shareable story card. |
-| RANK-04 | P1 | Classements.dc.html | todo | History and titles: champion of each week, month and season, winning streaks, titles tied to N-34. |
+| RANK-04 | P1 | Classements.dc.html | build | History and titles: champion of each week, month and season, winning streaks, titles tied to N-34. |
 | RANK-05 | P1 | Classements.dc.html | build | Secondary leaderboards: most nights out, earliest first drink, last one home, most venues ruled (<bar_territor... |
 | RANK-06 | P0 | Classements.dc.html | build | Only verified drinks count (verification in AC-07). Unverified drinks still count in personal stats and BAC. |
 | RANK-07 | P0 | Classements.dc.html | build | Danger cap: above a very high estimated BAC (threshold set by Recon-BAC on the severe-intoxication risk zone),... |

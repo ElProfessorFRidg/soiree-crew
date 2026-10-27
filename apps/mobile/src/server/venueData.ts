@@ -163,6 +163,24 @@ export function fetchLeaderboard(
   return api(`/v1/crews/${crewId}/leaderboard?${params.toString()}`);
 }
 
+export interface Champion {
+  userId: string;
+  name: string;
+  value: number;
+}
+
+export interface LeaderboardHistory {
+  disabled: boolean;
+  weeks: { from: number; champions: Champion[] }[];
+  months: { season: string; champions: Champion[] }[];
+  streaks: { userId: string; name: string; current: number; best: number }[];
+}
+
+/** RANK-04: champions of past weeks and months, and their streaks. */
+export function fetchLeaderboardHistory(crewId: string, metric: LeaderboardMetric): Promise<LeaderboardHistory> {
+  return api(`/v1/crews/${crewId}/leaderboard/history?metric=${metric}`);
+}
+
 export interface ConfirmableDrink {
   id: string;
   userId: string;

@@ -380,6 +380,10 @@ export const it: Messages = {
     notTogether: "Per confermare bisogna essere nello stesso bar.",
     noConfirmable: "Niente da confermare per ora.",
     noParty: "La classifica della serata compare durante una serata.",
+    honours: "Albo d'oro",
+    weekOf: "Settimana del {date}",
+    streakNow: { one: "{name}: {count} settimana in testa", other: "{name}: {count} settimane di fila in testa" },
+    streakBest: { one: "{name}: record di {count} settimana in testa", other: "{name}: record di {count} settimane di fila in testa" },
   },
   radar: {
     tonight: "Stasera",

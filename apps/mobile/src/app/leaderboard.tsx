@@ -13,7 +13,10 @@ import {
   confirmDrink,
   fetchConfirmable,
   fetchLeaderboard,
+  fetchLeaderboardHistory,
   setCrewParticipation,
+  type Champion,
+  type LeaderboardHistory,
   fetchTitles,
   type TitlesRow,
   type ConfirmableDrink,
@@ -26,7 +29,7 @@ import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
 import { Button } from "@/ui/Button";
-import { Chip, Panel, Segmented, Switch, Tag } from "@/ui/controls";
+import { Chip, Panel, Row, Segmented, Switch, Tag } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { Numeral, Text } from "@/ui/Text";
@@ -36,6 +39,44 @@ import { DANGER_CAP } from "@crew/bac";
 import { breathRatio, countryRules, formatBacValue } from "@crew/units";
 
 const REFRESH_MS = 30_000;
+
+/** RANK-04: who won the last weeks and months, and who keeps winning. */
+function Honours({ crewId, metric }: { crewId: string; metric: LeaderboardMetric }) {
+  const i18n = useT();
+  const theme = useTheme();
+  const [history, setHistory] = useState<LeaderboardHistory | null>(null);
+  useEffect(() => {
+    void fetchLeaderboardHistory(crewId, metric)
+      .then(setHistory)
+      .catch(() => undefined);
+  }, [crewId, metric]);
+  if (!history || history.disabled) return null;
+  const won = (list: Champion[]) => list.map((c) => `${c.name} (${metric === "grams" ? `${c.value} g` : c.value})`).join(", ");
+  const months = history.months.filter((m) => m.champions.length);
+  const weeks = history.weeks.filter((w) => w.champions.length);
+  if (!months.length && !weeks.length) return null;
+  const monthName = (season: string) => new Intl.DateTimeFormat(i18n.locale, { month: "long", year: "numeric" }).format(new Date(`${season}-15T12:00:00`));
+  const weekOf = (from: number) => new Intl.DateTimeFormat(i18n.locale, { day: "numeric", month: "short" }).format(new Date(from));
+  return (
+    <Panel>
+      <Text variant="label">{i18n.t("ranking.honours")}</Text>
+      {history.streaks
+        .filter((st) => st.best >= 2)
+        .slice(0, 3)
+        .map((st) => (
+          <Text key={st.userId} variant="h3">
+            {st.current >= 2 ? i18n.plural("ranking.streakNow", st.current, { name: st.name }) : i18n.plural("ranking.streakBest", st.best, { name: st.name })}
+          </Text>
+        ))}
+      {months.map((m) => (
+        <Row key={m.season} title={monthName(m.season)} subtitle={won(m.champions)} leading={<Icon name="crown" color={theme.amber} />} />
+      ))}
+      {weeks.map((w, index) => (
+        <Row key={w.from} title={i18n.t("ranking.weekOf", { date: weekOf(w.from) })} subtitle={won(w.champions)} last={index === weeks.length - 1} />
+      ))}
+    </Panel>
+  );
+}
 
 export default function LeaderboardScreen() {
   const i18n = useT();
@@ -181,6 +222,8 @@ export default function LeaderboardScreen() {
           ))}
         </Panel>
       ) : null}
+
+      {crewId && !disabled ? <Honours crewId={crewId} metric={metric} /> : null}
 
       {crewId ? <BarTitles crewId={crewId} /> : null}
 

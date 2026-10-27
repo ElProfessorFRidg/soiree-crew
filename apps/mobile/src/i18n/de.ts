@@ -379,6 +379,10 @@ export const de: Messages = {
     notTogether: "Zum Bestätigen müsst ihr in derselben Bar sein.",
     noConfirmable: "Gerade gibt es nichts zu bestätigen.",
     noParty: "Die Rangliste des Abends erscheint, während ein Abend läuft.",
+    honours: "Ehrentafel",
+    weekOf: "Woche vom {date}",
+    streakNow: { one: "{name}: {count} Woche vorne", other: "{name}: {count} Wochen in Folge vorne" },
+    streakBest: { one: "{name}: Rekord, {count} Woche vorne", other: "{name}: Rekord, {count} Wochen in Folge vorne" },
   },
   radar: {
     tonight: "Heute Abend",

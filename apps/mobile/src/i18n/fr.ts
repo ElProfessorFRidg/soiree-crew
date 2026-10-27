@@ -379,6 +379,10 @@ export const fr = {
     notTogether: "Il faut être au même bar pour confirmer.",
     noConfirmable: "Rien à confirmer pour l'instant.",
     noParty: "Le classement de la soirée s'affiche pendant une soirée.",
+    honours: "Palmarès",
+    weekOf: "Semaine du {date}",
+    streakNow: { one: "{name} : {count} semaine en tête", other: "{name} : {count} semaines de suite en tête" },
+    streakBest: { one: "{name} : record de {count} semaine en tête", other: "{name} : record de {count} semaines de suite en tête" },
   },
   radar: {
     tonight: "Ce soir",

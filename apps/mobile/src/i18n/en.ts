@@ -381,6 +381,10 @@ export const en: Messages = {
     notTogether: "You need to be at the same bar to confirm.",
     noConfirmable: "Nothing to confirm right now.",
     noParty: "The party leaderboard shows during a party.",
+    honours: "Honours",
+    weekOf: "Week of {date}",
+    streakNow: { one: "{name}: top for {count} week", other: "{name}: top {count} weeks running" },
+    streakBest: { one: "{name}: best run, {count} week on top", other: "{name}: best run, {count} weeks on top" },
   },
   radar: {
     tonight: "Tonight",
