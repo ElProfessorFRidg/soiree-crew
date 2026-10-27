@@ -448,8 +448,8 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | SLOP-01 | P0 | Backstage | build | `VOICE.md` (a FR voice and an EN voice, examples to do / not to do for every type of text, linked to <glossary... |
-| SLOP-02 | P0 | Backstage | todo | Anti-slop review per ID: a subagent rereads copy, screenshots and code against `SLOP.md` with one question: "d... |
-| SLOP-03 | P0 | Backstage | todo | Pass on every text in every language: a translation that reads machine-made counts as a defect; each language ... |
+| SLOP-02 | P0 | Backstage | build | Anti-slop review per ID: a subagent rereads copy, screenshots and code against `SLOP.md` with one question: "d... |
+| SLOP-03 | P0 | Backstage | build | Pass on every text in every language: a translation that reads machine-made counts as a defect; each language ... |
 | SLOP-04 | P0 | Backstage | build | Automated CI lint on every localisation file: em and en dashes, blacklisted words, "successfully" / "avec succ... |
 | SLOP-05 | P0 | Backstage | todo | Fresh-eyes test: a screenshot or a text pasted into a blank model session with the question "which AI tool mad... |
 | SLOP-06 | P1 | Backstage | todo | Crew panel: before each release, the friends read the copy and the cards. Anything that "sounds like AI" or "d... |

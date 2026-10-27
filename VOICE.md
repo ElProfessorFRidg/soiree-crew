@@ -9,14 +9,15 @@ A friend in the crew who stayed sharp: quick, warm, a bit cheeky about the night
 ## French
 
 - Tutoiement everywhere. Never « vous », never « on vous ».
+- Épicène wording wherever French offers it: « Je suis chez moi », « quelqu'un du crew », « les personnes présentes ».
 - Spoken French, written correctly: « T'as », « Ça » are fine in light copy; full forms in safety and legal copy.
 - Short sentences. One idea each. A full stop is better than a comma chain.
-- French typography: a space before « : », « ? » and « ! », quotes as « » with spaces inside.
+- French typography: a thin no-break space (U+202F) before « ? », « ! » and « ; », a no-break space (U+00A0) before « : » and inside « ». Never a plain space there: it lets the sign wrap onto its own line.
 - Numbers, times and money through the formatters (`21 h 30`, `12,40 €`), never written by hand.
 
 | Kind of text | Do | Don't |
 |---|---|---|
-| Button | « Noter la tournée », « Je suis bien rentré » | « Cliquez ici pour enregistrer votre tournée » |
+| Button | « Noter la tournée », « Je suis chez moi » | « Cliquez ici pour enregistrer votre tournée » |
 | Empty state | « Pas encore de récap. Il arrive à la fin de la soirée. » | « Oups ! Rien à afficher pour le moment 😅 » |
 | Error | « Montant invalide. » « Impossible de joindre le serveur. » | « Une erreur inattendue s'est produite. » |
 | Safety | « Le poids se change demain : il sert au calcul de ce soir. » | jokes, emojis, exclamation marks |
@@ -26,7 +27,7 @@ A friend in the crew who stayed sharp: quick, warm, a bit cheeky about the night
 
 ## English
 
-- Plain, friendly British-neutral English ("pints", "mates" only in game decks). Contractions are fine: "You're owed", "Can't".
+- Plain, friendly British English spelling (breathalyser, centre) ("pints", "mates" only in game decks). Contractions are fine: "You're owed", "Can't".
 - Functional text follows Simplified Technical English: short sentences, active voice, one meaning per word.
 - Sentence case for buttons and titles: "Log the round", not "Log The Round".
 

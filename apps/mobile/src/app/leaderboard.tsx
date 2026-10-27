@@ -32,6 +32,8 @@ import { Screen } from "@/ui/Screen";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { useEcoInterval } from "@/power/eco";
+import { DANGER_CAP } from "@crew/bac";
+import { breathRatio, countryRules, formatBacValue } from "@crew/units";
 
 const REFRESH_MS = 30_000;
 
@@ -43,7 +45,8 @@ export default function LeaderboardScreen() {
   const crewId = params.crewId ?? crews[0]?.id;
   const live = useLiveParty();
   const me = useSession((state) => state.session?.userId);
-  const hourCycle = useAppStore((state) => state.preferences.hourCycle);
+  const preferences = useAppStore((state) => state.preferences);
+  const hourCycle = preferences.hourCycle;
   const refreshMs = useEcoInterval(REFRESH_MS);
   const [period, setPeriod] = useState<LeaderboardPeriod>(live ? "party" : "month");
   const [metric, setMetric] = useState<LeaderboardMetric>("drinks");
@@ -135,7 +138,10 @@ export default function LeaderboardScreen() {
       </View>
 
       <Text variant="small">
-        {i18n.t("ranking.verifiedOnly")} {i18n.t("ranking.dangerCap")}
+        {i18n.t("ranking.verifiedOnly")}{" "}
+        {i18n.t("ranking.dangerCap", {
+          value: `${formatBacValue(DANGER_CAP, preferences.bacUnit, breathRatio(countryRules(preferences.legalCountry)), i18n.locale)} ${i18n.t(`units.${preferences.bacUnit}`)}`,
+        })}
       </Text>
       {myRow?.unverified ? <Text variant="small">{i18n.plural("ranking.myUnverified", myRow.unverified)}</Text> : null}
 

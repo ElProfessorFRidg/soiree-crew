@@ -19,6 +19,7 @@ Status values: `open`, `confirmed`, `overturned`.
 | A-ORCH-9 | No passwords, passkeys or 2FA in the private build: accounts sign in with a device token, and new phones join with a one-time code from a signed-in phone. | Nothing to phish or reuse; the server never holds a password. | Add passkeys before a public release (SEC-07). | open |
 | A-ORCH-10 | Territory titles: Mayor per bar held, Empire from 3 bars held, Globetrotter from 8 bars ever visited, Nomad from 3 bars in one night this season. French names are épicène (« Maire », « Empire », « Globe-trotter », « Nomade ») instead of « Conquérant » and « Explorateur ». | Titles must read right for everyone. | Thresholds live in `TITLE_RULES`. | open |
 | A-ORCH-11 | COM-06 presence privacy holds by construction in the private build: venues, check-ins and who is where are crew-only, so strangers see no presence at all, not even counts. | There is no public venue page yet. | When public venue pages exist, show busy levels only from 5 users, rounded. | open |
+| A-ORCH-12 | French home-safe wording is épicène: « Je suis chez moi » and « à la maison » replace « Je suis bien rentré » and « rentré ». | The copy review (SLOP-02) found gendered forms where French has neutral ones. | Back to « rentré(e) » only if the crew prefers it. | open |
 
 ## From recon reports
 

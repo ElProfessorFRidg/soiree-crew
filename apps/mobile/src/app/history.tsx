@@ -66,11 +66,11 @@ export default function HistoryScreen() {
     });
   };
 
-  const boundary = preferences.dayBoundaryHour;
+  const boundary = formatClock(new Date(2026, 0, 1, preferences.dayBoundaryHour).getTime(), i18n.language, preferences.hourCycle);
   return (
-    <Screen back title={i18n.t("history.title")} trailing={<Tag label={i18n.t("history.nightUntil", { hour: boundary })} />} withToasts>
+    <Screen back title={i18n.t("history.title")} trailing={<Tag label={i18n.t("history.nightUntil", { time: boundary })} />} withToasts>
       <Text variant="small">
-        {i18n.t("history.boundaryNote", { hour: boundary })} {i18n.t("history.swipeHint")}
+        {i18n.t("history.boundaryNote", { time: boundary })} {i18n.t("history.swipeHint")}
       </Text>
       {groups.length === 0 && tonightWater.length === 0 ? <Text>{i18n.t("history.empty")}</Text> : null}
       {groups.map((group) => {

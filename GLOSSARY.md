@@ -43,7 +43,7 @@ One word per concept, everywhere: code, database, API, docs, UI. Code and every 
 | Contact whose messages are held at high levels | `HeldContact` / held contact | « Messages retenus jusqu'au lendemain » | design-a.md §6 | ADP-10. |
 | Message held by the drunk-text guard | `HeldMessage` / held message | message retenu | design-b.md §6 | ADP-10. |
 | Designated driver | `DesignatedDriver` / designated driver | SAM | design-a.md §6 | N-26. |
-| Home-safe confirmation | `HomeSafeConfirmation` / home safe | « Je suis bien rentré », rentré | design-a.md §6 | N-25, O-82. |
+| Home-safe confirmation | `HomeSafeConfirmation` / home safe | « Je suis chez moi », à la maison (épicène, A-ORCH-12) | design-a.md §6 | N-25, O-82. |
 | Feeling-unwell status | `NightStatus.unwell` / not feeling well | pas bien | app.md §6 | Proposed N-36. |
 | Ghost mode for live location | `GhostMode` / ghost mode | mode fantôme | design-a.md §6 | N-07. |
 | Shared live curves within a party | `SquadMode` / Squad | Squad | design-a.md §6 | O-42. See conflict C-12. |
@@ -82,8 +82,8 @@ One word per concept, everywhere: code, database, API, docs, UI. Code and every 
 | Discrete event proving presence | `ProofOfPresence` / (internal) | (interne) | territories.md §6 | TER-02. |
 | First check-in of the crew at a venue | `FirstDiscovery` / discovery | découverte | territories.md §6 | TER-02. Holder title: Discoverer / découvreur. |
 | Venue that can be played | `TerritoryVenue` / (internal) | bar en jeu | territories.md §6 | TER-01, TER-11. |
-| Days as boss summed over venues | `VenueDays` / reign days | jours de règne | territories.md §6 | Conqueror title. |
-| Titles Conqueror, Explorer, Nomad | `Title.conqueror`, `Title.explorer`, `Title.nomad` | conquérant, explorateur, nomade | territories.md §6 | TER-06. |
+| Days as boss summed over venues | `VenueDays` / reign days | jours de règne | territories.md §6 | Empire title. |
+| Titles Empire, Globetrotter, Nomad (code keys conqueror, explorer, nomad) | `Title.conqueror`, `Title.explorer`, `Title.nomad` | Empire, Globe-trotter, Nomade (épicène, A-ORCH-10) | territories.md §6 | TER-06. |
 | Lifetime loyalty tier at a venue | `LoyaltyTier` (bronze, silver, gold) / tier | (to set in VOICE.md, not « habitué ») | territories.md §6 | Proposed TER-10. See conflict C-14. |
 | Top public regular at a venue | `Title.legend` / Legend of X | légende de X | territories.md §6 | COM-03. |
 | Crew score at a venue for crew vs crew | `CrewPresenceScore` / (internal) | (interne) | territories.md §6 | TER-07. |

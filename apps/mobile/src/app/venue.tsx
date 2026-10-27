@@ -48,7 +48,7 @@ export default function VenueScreen() {
 
       {myChallenger ? (
         <Panel tint="amber">
-          <Text variant="h3">{i18n.t("venue.challenger", { name: myChallenger.name, gap: bossPoints - myChallenger.points, venue: page.venue.name })}</Text>
+          <Text variant="h3">{i18n.plural("venue.challenger", bossPoints - myChallenger.points, { name: myChallenger.name, venue: page.venue.name })}</Text>
         </Panel>
       ) : null}
 

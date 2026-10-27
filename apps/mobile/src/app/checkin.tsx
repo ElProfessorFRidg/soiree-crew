@@ -17,6 +17,7 @@ import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { serverMessage } from "@/server/errors";
 
 /** DESIGN.md §5: check-in steps appear one by one, every 650 ms. They show progress, never which signal decided. */
 const STEP_MS = 650;
@@ -89,7 +90,7 @@ export default function CheckInScreen() {
       clearInterval(timer);
       setPhase("idle");
       haptic.error();
-      setMessage(error instanceof ApiError && error.failure.kind === "http" ? i18n.t("crew.serverError", { code: error.failure.code }) : i18n.t("crew.offline"));
+      setMessage(error instanceof ApiError && error.failure.kind === "http" ? serverMessage(error.failure.code, i18n) : i18n.t("crew.offline"));
     }
   };
 

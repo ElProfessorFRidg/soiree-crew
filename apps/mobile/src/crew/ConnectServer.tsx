@@ -11,6 +11,7 @@ import { Text } from "@/ui/Text";
 import { Field } from "./Field";
 import { deviceName } from "@/server/device";
 import { usePendingInvite } from "@/server/pendingInvite";
+import { serverMessage } from "@/server/errors";
 
 interface AccountResponse {
   user: { id: string; username: string; displayName: string };
@@ -74,7 +75,7 @@ export function ConnectServer() {
               ? { field: "code", message: i18n.t("crew.transferInvalid") }
               : { field: "username", message: i18n.t("crew.usernameHint") },
           );
-        else setError({ field: "form", message: i18n.t("crew.serverError", { code: err.failure.code }) });
+        else setError({ field: "form", message: serverMessage(err.failure.code, i18n) });
       } else setError({ field: "form", message: i18n.t("crew.offline") });
     } finally {
       setBusy(false);

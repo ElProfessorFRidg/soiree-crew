@@ -55,7 +55,7 @@ export function VaultPrompt() {
           <View style={styles.actions}>
             <Button label={i18n.t("vault.forget")} variant="outline" height={44} style={styles.flex} onPress={() => dropVaultItem(item.id)} />
             <Button
-              label={i18n.t("vault.confirm")}
+              label={i18n.t(item.kind === "leaveCrew" ? "vault.confirmLeave" : item.kind === "deleteAccount" ? "vault.confirmDelete" : "vault.confirmExpense")}
               variant="secondary"
               height={44}
               style={styles.flex}

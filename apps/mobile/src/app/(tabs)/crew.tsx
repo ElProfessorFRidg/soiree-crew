@@ -28,11 +28,12 @@ import { useDraft } from "@/state/drafts";
 import { usePendingInvite } from "@/server/pendingInvite";
 import { ScalePressable } from "@/ui/Pressable";
 import { refreshRadar } from "@/server/radarData";
+import { serverMessage } from "@/server/errors";
 
 function errorMessage(error: unknown, i18n: Translator): string {
   if (error instanceof ApiError && error.failure.kind === "http") {
     if (error.failure.status === 404) return i18n.t("crew.inviteInvalid");
-    return i18n.t("crew.serverError", { code: error.failure.code });
+    return serverMessage(error.failure.code, i18n);
   }
   return i18n.t("crew.offline");
 }

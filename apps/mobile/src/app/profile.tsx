@@ -194,7 +194,6 @@ export default function ProfileScreen() {
             </Text>
           ) : null}
           <Text>{i18n.plural("people.biggestNight", s.records.biggestNight)}</Text>
-          <Text variant="small">{i18n.t("people.recordsNote")}</Text>
         </Panel>
       ) : null}
 

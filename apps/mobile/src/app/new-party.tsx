@@ -16,6 +16,7 @@ import { Stepper } from "@/ui/Stepper";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { useDraft } from "@/state/drafts";
+import { serverMessage } from "@/server/errors";
 
 const MOODS: readonly PartyMood[] = ["party", "birthday", "champagne", "sunset", "costume", "wine", "fire", "night", "home", "tropical"];
 const STEP_MIN = 30;
@@ -106,7 +107,7 @@ export default function NewPartyScreen() {
                   tone: "danger",
                   message:
                     error instanceof ApiError && error.failure.kind === "http"
-                      ? i18n.t("crew.serverError", { code: error.failure.code })
+                      ? serverMessage(error.failure.code, i18n)
                       : i18n.t("crew.offline"),
                 });
               })

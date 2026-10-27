@@ -7,8 +7,8 @@ const copy = {
     title: (crew: string) => `Rejoins ${crew} sur Soirée Crew`,
     members: (n: number) => (n === 1 ? "1 membre" : `${n} membres`),
     open: "Ouvrir dans l'app",
-    code: "Ou tape ce code dans l'onglet Crew :",
-    noApp: "Pas encore l'app ? Demande le lien d'installation à ton crew.",
+    code: "Ou tape ce code dans l'onglet Crew :",
+    noApp: "Pas encore l'app ? Demande le lien d'installation à ton crew.",
     expired: "Cette invitation n'existe plus. Demande un nouveau lien.",
   },
   en: {
