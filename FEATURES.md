@@ -190,14 +190,14 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | N-09 | P1 | Bars.dc.html | todo | Drink prices logged by the crew per venue (pint, half, shot, cocktail, soft drink), price history, flag when a... |
 | N-10 | P0 | Bars.dc.html | build | Check-in at a venue, visible in the party and the recap (verification in <anti_cheat>). |
 | N-11 | P0 | Bars.dc.html | build | "Where to?": suggestion, vote or roulette between venues by availability, budget, distance, current happy hours. |
-| N-12 | P1 | Bars.dc.html | todo | Venue stats: visits, average spend, average drinks, best nights there. |
+| N-12 | P1 | Bars.dc.html | build | Venue stats: visits, average spend, average drinks, best nights there. |
 
 ## Drinking and going-out habits
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | N-13 | P1 | Profil.dc.html | todo | Each member's drinking profile: favourite drinks, usual pace, time of first drink, usual leaving time. |
-| N-14 | P1 | Profil.dc.html | todo | Crew habits: nights and hours out, frequency, venues, seasonality, calendar heatmap. |
+| N-14 | P1 | Profil.dc.html | build | Crew habits: nights and hours out, frequency, venues, seasonality, calendar heatmap. |
 | N-15 | P1 | Profil.dc.html | todo | Monthly recap + yearly crew "Wrapped" (Spotify Wrapped spirit), as shareable stories. |
 | N-16 | P1 | Soiree.dc.html | todo | Detailed charts (O-81) filterable by period, venue, drink type, person. |
 | N-17 | P2 | Reglages.dc.html | build | Personal data export (CSV / JSON) and selective deletion. |
@@ -288,9 +288,9 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | JOY-03 | P1 | Profil.dc.html | todo | Alternate app icons unlocked through crew titles (N-34) and seasons. |
 | JOY-04 | P1 | Soirees.dc.html | todo | Mood themes: the mood picked for a party (O-35) tints the Party screen, the widget and the recap. |
 | JOY-05 | P2 | Reglages.dc.html | todo | Optional sound pack (pour, clink, crown), respects the silent switch, off by default. |
-| JOY-06 | P1 | Radar.dc.html | todo | Crew streak: consecutive weeks where the crew went out together (any night out counts, drinking or not), with ... |
+| JOY-06 | P1 | Radar.dc.html | build | Crew streak: consecutive weeks where the crew went out together (any night out counts, drinking or not), with ... |
 | JOY-07 | P1 | Reglages.dc.html | todo | Easter eggs: a handful of hidden interactions (tap the logo ten times, shake on the recap...), documented only... |
-| JOY-08 | P1 | Radar.dc.html | todo | Milestones: 10th, 50th, 100th night out together, crew anniversary, first venue conquered. Milestones count ni... |
+| JOY-08 | P1 | Radar.dc.html | build | Milestones: 10th, 50th, 100th night out together, crew anniversary, first venue conquered. Milestones count ni... |
 | JOY-09 | P1 | Recap.dc.html | todo | Photo booth: at the end of a party, an automatic photo strip from the shared album, ready for stories. |
 | JOY-10 | P2 | Reglages.dc.html | todo | Sticker packs (iMessage / WhatsApp) made from crew avatars and moments. |
 | JOY-11 | P1 | Profil.dc.html | todo | Member card: a shareable profile card with titles, venues ruled, favourite drink, nights out. |
@@ -356,7 +356,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | RANK-02 | P0 | Classements.dc.html | build | Live leaderboard on the Party screen (HUB-01): live positions, "X just overtook you" notification, animated ov... |
 | RANK-03 | P0 | Recap.dc.html | build | Podium in the recap (O-41) and on the shareable story card. |
 | RANK-04 | P1 | Classements.dc.html | todo | History and titles: champion of each week, month and season, winning streaks, titles tied to N-34. |
-| RANK-05 | P1 | Classements.dc.html | todo | Secondary leaderboards: most nights out, earliest first drink, last one home, most venues ruled (<bar_territor... |
+| RANK-05 | P1 | Classements.dc.html | build | Secondary leaderboards: most nights out, earliest first drink, last one home, most venues ruled (<bar_territor... |
 | RANK-06 | P0 | Classements.dc.html | build | Only verified drinks count (verification in AC-07). Unverified drinks still count in personal stats and BAC. |
 | RANK-07 | P0 | Classements.dc.html | build | Danger cap: above a very high estimated BAC (threshold set by Recon-BAC on the severe-intoxication risk zone),... |
 | RANK-08 | P0 | Classements.dc.html | build | Settings: leaderboard on by default, the crew admin can switch it off, any member can go "off the board" witho... |

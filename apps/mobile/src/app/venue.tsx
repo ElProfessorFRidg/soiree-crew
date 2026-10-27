@@ -18,6 +18,33 @@ import { Screen } from "@/ui/Screen";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { ReportPanel } from "@/moderation/ReportPanel";
+import { fetchVenueStats, type VenueStats } from "@/server/statsData";
+
+/** N-12: what this bar is to the crew. */
+function VenueNumbers({ venueId }: { venueId: string }) {
+  const i18n = useT();
+  const [stats, setStats] = useState<VenueStats | null>(null);
+  useEffect(() => {
+    void fetchVenueStats(venueId).then(setStats).catch(() => undefined);
+  }, [venueId]);
+  if (!stats || stats.visits === 0) return null;
+  const date = (night: string) => new Intl.DateTimeFormat(i18n.locale, { day: "numeric", month: "long" }).format(new Date(`${night}T12:00:00`));
+  return (
+    <Panel>
+      <Text variant="label">{i18n.t("crewStats.venueTitle")}</Text>
+      <Text>
+        {[i18n.plural("crewStats.venueVisits", stats.visits), i18n.plural("crewStats.venueNights", stats.nights), i18n.plural("crewStats.venuePeople", stats.people)].join(", ")}
+      </Text>
+      {stats.averageDrinks !== null ? <Text variant="small">{i18n.t("crewStats.venueAverage", { value: i18n.number(stats.averageDrinks, 1) })}</Text> : null}
+      {stats.bestNights.length ? <Text variant="label">{i18n.t("crewStats.bestNights")}</Text> : null}
+      {stats.bestNights.map((n) => (
+        <Text key={n.night} variant="small">
+          {i18n.plural("crewStats.bestNight", n.people, { date: date(n.night) })}
+        </Text>
+      ))}
+    </Panel>
+  );
+}
 
 export default function VenueScreen() {
   const i18n = useT();
@@ -152,6 +179,7 @@ export default function VenueScreen() {
           }
         />
       </Panel>
+      <VenueNumbers venueId={page.venue.id} />
       <ReportPanel targetKind="venue" targetId={page.venue.id} />
     </Screen>
   );
