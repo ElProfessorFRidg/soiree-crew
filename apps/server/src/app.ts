@@ -12,6 +12,7 @@ import { photoRoutes } from "./routes/photos";
 import { pollRoutes } from "./routes/polls";
 import { cardRoutes } from "./routes/cards";
 import { chatRoutes } from "./routes/chat";
+import { claimRoutes } from "./routes/claims";
 import { feedRoutes } from "./routes/feed";
 import { aiOrderRoutes } from "./routes/aiOrder";
 import { communityRoutes } from "./routes/community";
@@ -95,6 +96,7 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
   moneyRoutes(app, ctx);
   recapRoutes(app, ctx);
   chatRoutes(app, ctx);
+  claimRoutes(app, ctx);
   profileRoutes(app, ctx);
   photoRoutes(app, ctx);
   statsRoutes(app, ctx);

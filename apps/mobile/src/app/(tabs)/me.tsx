@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Linking, StyleSheet, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { duration } from "@crew/design-tokens";
@@ -10,6 +10,8 @@ import { AccountSection } from "@/profile/AccountSection";
 import { ProfileFields, type ProfileDraft } from "@/profile/ProfileFields";
 import { draftFromProfile, saveProfile } from "@/profile/saveProfile";
 import { useAppStore } from "@/state/store";
+import { fetchOperatorClaims } from "@/server/placeData";
+import { useSession } from "@/server/session";
 import { setPreferences } from "@/state/preferences";
 import { useTheme } from "@/theme";
 import { Button } from "@/ui/Button";
@@ -50,6 +52,15 @@ export default function MeScreen() {
   const preferences = useAppStore((state) => state.preferences);
   const [draft, setDraft] = useState<ProfileDraft>(() => draftFromProfile(profile));
   const [pickingCountry, setPickingCountry] = useState(false);
+  // COM-11: the venue-claim queue shows only for the server's operators (the server answers 403 otherwise).
+  const session = useSession((s) => s.session);
+  const [operator, setOperator] = useState(false);
+  useEffect(() => {
+    if (!session) return setOperator(false);
+    void fetchOperatorClaims()
+      .then(() => setOperator(true))
+      .catch(() => setOperator(false));
+  }, [session]);
 
   const rules = countryRules(preferences.legalCountry);
   const ratio = breathRatio(rules);
@@ -167,8 +178,17 @@ export default function MeScreen() {
         leading={<Icon name="gear" color={theme.textMuted} />}
         trailing={<Icon name="chev" color={theme.textMuted} />}
         onPress={() => router.push("/settings")}
-        last
+        last={!operator}
       />
+      {operator ? (
+        <Row
+          title={i18n.t("place.operatorTitle")}
+          leading={<Icon name="flag" color={theme.textMuted} />}
+          trailing={<Icon name="chev" color={theme.textMuted} />}
+          onPress={() => router.push("/operator")}
+          last
+        />
+      ) : null}
       <AccountSection />
     </Screen>
   );

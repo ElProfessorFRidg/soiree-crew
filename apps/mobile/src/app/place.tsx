@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { formatMoney } from "@crew/money";
 import { Field } from "@/crew/Field";
+import { OwnerSection, ReviewReply } from "@/place/OwnerSection";
 import { drinkLabel } from "@/drinks/display";
 import type { DrinkKind } from "@/drinks/presets";
 import { useT } from "@/i18n";
@@ -104,6 +105,7 @@ export default function PlaceScreen() {
   return (
     <Screen back title={page.place.name} withToasts onRefresh={async () => load()}>
       {page.place.address ? <Text variant="small">{page.place.address}</Text> : null}
+      <OwnerSection page={page} onChanged={load} />
       <View style={styles.figures}>
         <View style={styles.figure}>
           <Numeral size={32} color={theme.amber}>
@@ -185,7 +187,7 @@ export default function PlaceScreen() {
       {page.events.map((e) => (
         <Row
           key={e.id}
-          title={e.title}
+          title={e.official ? i18n.t("place.officialEvent", { title: e.title }) : e.title}
           subtitle={`${new Intl.DateTimeFormat(i18n.locale, { weekday: "short", day: "numeric", month: "short" }).format(new Date(e.startsAt))}, ${formatClock(e.startsAt, i18n.language, hourCycle)} · ${i18n.plural("place.going", e.going)}${e.friendsGoing ? `, ${i18n.plural("place.friendsGoing", e.friendsGoing)}` : ""}`}
           trailing={<Button label={e.mine ? i18n.t("place.imGoing") : i18n.t("place.join")} variant={e.mine ? "outline" : "secondary"} height={40} onPress={() => void rsvp(e.id, !e.mine).then(load).catch(offline)} />}
         />
@@ -264,6 +266,7 @@ export default function PlaceScreen() {
               .join(", ")}
           </Text>
           {r.text ? <Text>{r.text}</Text> : null}
+          <ReviewReply review={r} isOwner={Boolean(page.isOwner)} onChanged={load} />
           {!r.mine ? (
             <Button
               label={r.markedUseful ? i18n.plural("place.usefulMarked", r.useful) : i18n.plural("place.useful", r.useful)}

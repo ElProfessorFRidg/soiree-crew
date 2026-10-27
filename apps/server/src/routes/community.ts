@@ -7,6 +7,7 @@ import { currentSeason } from "../territory";
 import { nightOf, offsetMinutes } from "../time";
 import { newId } from "../crypto";
 import { seasonBounds } from "@crew/territory";
+import { placeOwner } from "./claims";
 
 const uuid = z.string().uuid();
 const DAY_MS = 86_400_000;
@@ -31,7 +32,7 @@ interface VenueRow {
 }
 
 /** Every crew's venue at the same spot as this one, homes never included. */
-async function placeOf(ctx: Context, venueId: string): Promise<{ venue: VenueRow; ids: string[] }> {
+export async function placeOf(ctx: Context, venueId: string): Promise<{ venue: VenueRow; ids: string[] }> {
   const venue = (await ctx.db.query<VenueRow>("select id, crew_id, name, kind, lat, lng, address from venues where id = $1", [uuid.parse(venueId)]))[0];
   if (!venue || venue.kind === "home") throw new HttpError(404, "not_found");
   const box = SAME_PLACE_M / 111_000;
@@ -122,8 +123,8 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
     const doorCount = (key: string) => door.filter((d) => d.id_check === key).reduce((s, d) => s + d.n, 0);
     const reports = door.reduce((s, d) => s + d.n, 0);
 
-    const events = await ctx.db.query<{ id: string; title: string; kind: string; starts_at: number; going: number; mine: number }>(
-      `select e.id, e.title, e.kind, e.starts_at, (select count(*)::int from event_rsvps r where r.event_id = e.id) as going,
+    const events = await ctx.db.query<{ id: string; title: string; kind: string; starts_at: number; going: number; mine: number; official: boolean }>(
+      `select e.id, e.title, e.kind, e.starts_at, e.official, (select count(*)::int from event_rsvps r where r.event_id = e.id) as going,
               (select count(*)::int from event_rsvps r where r.event_id = e.id and r.user_id = $2) as mine
        from place_events e where e.venue_id = any($1::uuid[]) and e.starts_at > $3 order by e.starts_at limit 10`,
       [ids, user.id, now - 6 * 3_600_000],
@@ -153,6 +154,15 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
       .slice(0, 5);
 
     const lastVisit = await hasVerifiedVisit(ctx, ids, user.id);
+    // COM-11: a claimed page says so; the owner's hours and replies come with it.
+    const owner = await placeOwner(ctx, ids);
+    const info = (await ctx.db.query<{ hours: string; happy_hours: string }>("select hours, happy_hours from place_info where venue_id = any($1::uuid[]) order by updated_at desc limit 1", [ids]))[0];
+    const replies = new Map(
+      (await ctx.db.query<{ review_id: string; text: string; at: number }>("select review_id, text, at from review_replies where review_id = any($1::uuid[])", [reviews.map((r) => r.id)])).map((r) => [
+        r.review_id,
+        { text: r.text, at: r.at },
+      ]),
+    );
     return {
       place: { venueId: venue.id, name: venue.name, address: venue.address, lat: venue.lat, lng: venue.lng },
       prices: [...priceGroups.entries()].map(([key, amounts]) => {
@@ -174,18 +184,23 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
         audience: r.audience,
         ratings: JSON.parse(r.ratings) as Record<string, number>,
         text: r.text,
+        reply: replies.get(r.id) ?? null,
         visitedAt: r.visited_at,
         useful: r.useful,
         markedUseful: r.mine > 0,
         mine: r.user_id === user.id,
       })),
       canReview: lastVisit !== null,
+      claimed: owner !== null,
+      isOwner: owner === user.id,
+      info: info && (info.hours || info.happy_hours) ? { hours: info.hours, happyHours: info.happy_hours } : null,
       door: { always: doorCount("always"), sometimes: doorCount("sometimes"), never: doorCount("never"), adultsOnly: door.filter((d) => d.age_policy === "adults").reduce((s, d) => s + d.n, 0), reports },
       events: events.map((e) => ({
         id: e.id,
         title: e.title,
         kind: e.kind,
         startsAt: e.starts_at,
+        official: e.official,
         going: e.going,
         friendsGoing: eventFriends.filter((f) => f.event_id === e.id && friends.has(f.user_id)).length,
         mine: e.mine > 0,
@@ -280,15 +295,16 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
   app.post<{ Params: { id: string } }>("/v1/places/:id/events", async (request, reply) => {
     const user = requireUser(request);
     writes.check(user.id);
-    const { venue } = await placeOf(ctx, request.params.id);
+    const { venue, ids } = await placeOf(ctx, request.params.id);
     const now = ctx.now();
+    const official = (await placeOwner(ctx, ids)) === user.id;
     const input = z
       .object({ id: uuid, title: z.string().trim().min(3).max(60), kind: z.enum(["dj", "student", "match", "concert", "quiz", "other"]), startsAt: z.number().int() })
       .parse(request.body);
     if (input.startsAt < now - 3_600_000 || input.startsAt > now + 120 * DAY_MS) throw new HttpError(400, "invalid_dates");
     await ctx.db.query(
-      "insert into place_events (id, venue_id, created_by, title, kind, starts_at, created_at) values ($1, $2, $3, $4, $5, $6, $7) on conflict (id) do nothing",
-      [input.id, venue.id, user.id, input.title, input.kind, input.startsAt, now],
+      "insert into place_events (id, venue_id, created_by, title, kind, starts_at, created_at, official) values ($1, $2, $3, $4, $5, $6, $7, $8) on conflict (id) do nothing",
+      [input.id, venue.id, user.id, input.title, input.kind, input.startsAt, now, official],
     );
     await ctx.db.query("insert into event_rsvps (event_id, user_id) values ($1, $2) on conflict do nothing", [input.id, user.id]);
     return reply.status(201).send({ id: input.id });

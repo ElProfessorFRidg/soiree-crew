@@ -376,7 +376,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | COM-08 | P0 | Bars.dc.html | build | Safety and moderation: report any review, photo, profile or party; block and mute; automatic filters for insul... |
 | COM-09 | P1 | Bars.dc.html | build | Venue events: community-submitted events (DJ set, student night, match screening) with date, RSVP, how many fr... |
 | COM-10 | P1 | Bars.dc.html | build | Discovery: venues nearby ranked by reviews and check-ins, filters (open now, pint under a set price, strict 18... |
-| COM-11 | P2 | Bars.dc.html | todo | Venue owners can claim their page to post hours, happy hours and events and to answer reviews. They can never ... |
+| COM-11 | P2 | Bars.dc.html | build | Venue owners can claim their page to post hours, happy hours and events and to answer reviews. They can never ... |
 | COM-12 | P0 (before COM-02) | Backstage (near Bars.dc.html) | proposed | "How reviews work" page and the review-law notices next to every review list (check method, publication and experience dates, ranking criteria, no reward, retention). Source: community.md §2.1.3, §2.3, §5. |
 | COM-13 | P0 (before any public feature) | Backstage | proposed | Statement of reasons and contest flow (DSA art. 17 and 20) for every moderation decision, plus the notifier's decision notice. Source: community.md §2.1.2, §5. |
 | COM-14 | P0 (before any public feature) | Backstage | proposed | Legal and safety pages readable without an account: Terms, Community rules with misuse policy, CSAE standards page (Play), contact points for users and authorities (DSA art. 11, 12, 14). Source: community.md §2.1, §2.7, §5. |

@@ -16,7 +16,7 @@ beforeEach(async () => {
   clock = Date.UTC(2026, 10, 6, 21, 0);
   db = await connectPglite();
   await migrate(db);
-  app = await buildApp({ db, sealer: new Sealer(randomBytes(32).toString("base64")), live: new LiveHub(), now: () => clock, publicUrl: "https://crew.test", hashSecret: "s" });
+  app = await buildApp({ db, sealer: new Sealer(randomBytes(32).toString("base64")), live: new LiveHub(), now: () => clock, publicUrl: "https://crew.test", hashSecret: "s", operators: ["boss"] });
 });
 afterEach(async () => {
   await app.close();
@@ -100,5 +100,42 @@ describe("who can ask to be friends (COM-05)", () => {
     const ask = await app.inject({ method: "POST", url: `/v1/users/${jade.id}/friend`, headers: theo.auth });
     expect(ask.statusCode).toBe(403);
     expect(ask.json()).toEqual({ error: "requests_closed" });
+  });
+});
+
+describe("claimed venue pages (COM-11)", () => {
+  it("lets the checked owner post hours, official events and replies, never remove a review", async () => {
+    const a = await crewAtZinc("jade");
+    const owner = await crewAtZinc("patron");
+    const operator = await account("boss");
+    await checkIn(a.user, a.venueId);
+    await app.inject({ method: "PUT", url: `/v1/places/${a.venueId}/review`, headers: a.user.auth, payload: { ratings: { vibe: 2 }, text: "Service lent", audience: "public" } });
+
+    expect((await app.inject({ method: "PUT", url: `/v1/places/${owner.venueId}/info`, headers: owner.user.auth, payload: { hours: "18 h - 2 h", happyHours: "" } })).statusCode).toBe(403);
+    const claim = await app.inject({ method: "POST", url: `/v1/places/${owner.venueId}/claim`, headers: owner.user.auth, payload: { role: "Gérant", contact: "01 23 45 67 89" } });
+    expect(claim.statusCode).toBe(201);
+    expect((await app.inject({ method: "GET", url: "/v1/operator/claims", headers: a.user.auth })).statusCode).toBe(403);
+    const pending = (await app.inject({ method: "GET", url: "/v1/operator/claims", headers: operator.auth })).json() as { claims: { id: string; contact: string }[] };
+    expect(pending.claims[0]!.contact).toBe("01 23 45 67 89");
+    expect((await db.query<{ proof: string }>("select proof from place_claims"))[0]!.proof).not.toContain("45 67");
+    await app.inject({ method: "POST", url: `/v1/operator/claims/${pending.claims[0]!.id}`, headers: operator.auth, payload: { decision: "approved" } });
+
+    expect((await app.inject({ method: "PUT", url: `/v1/places/${owner.venueId}/info`, headers: owner.user.auth, payload: { hours: "18 h - 2 h", happyHours: "18 h - 20 h" } })).statusCode).toBe(200);
+    const seen = (await place(a.user, a.venueId)) as { claimed: boolean; info: { hours: string }; reviews: { id: string; reply: unknown }[] };
+    expect(seen.claimed).toBe(true);
+    expect(seen.info.hours).toBe("18 h - 2 h");
+    const reviewId = seen.reviews[0]!.id;
+    expect((await app.inject({ method: "PUT", url: `/v1/reviews/${reviewId}/reply`, headers: owner.user.auth, payload: { text: "Merci, on renforce l'équipe le samedi." } })).statusCode).toBe(200);
+    expect((await app.inject({ method: "PUT", url: `/v1/reviews/${reviewId}/reply`, headers: a.user.auth, payload: { text: "moi aussi" } })).statusCode).toBe(403);
+    const after = (await place(a.user, a.venueId)) as { reviews: { text: string; reply: { text: string } }[] };
+    expect(after.reviews[0]!.text).toBe("Service lent");
+    expect(after.reviews[0]!.reply.text).toContain("samedi");
+    // No route deletes someone else's review: the owner's DELETE on the review is refused.
+    expect((await app.inject({ method: "DELETE", url: `/v1/places/${owner.venueId}/review`, headers: owner.user.auth })).statusCode).not.toBe(500);
+    expect(((await place(a.user, a.venueId)) as { reviews: unknown[] }).reviews).toHaveLength(1);
+
+    await app.inject({ method: "POST", url: `/v1/places/${owner.venueId}/events`, headers: owner.user.auth, payload: { id: randomUUID(), title: "Soirée quiz", kind: "quiz", startsAt: clock + 86_400_000 } });
+    const events = ((await place(a.user, a.venueId)) as { events: { official: boolean }[] }).events;
+    expect(events[0]!.official).toBe(true);
   });
 });
