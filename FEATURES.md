@@ -471,7 +471,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | SYNC-05 | P0 | Etats.dc.html | build | The client state is a cache of the server. On reconnection and every time the app returns to the foreground, i... |
 | SYNC-06 | P0 | Etats.dc.html | build | Offline queue: queued mutations survive the app being killed, keep their order, are idempotent, and go through... |
 | SYNC-07 | P0 | Etats.dc.html | build | One feedback system for the whole app (toasts, inline errors, banners): success shows no toast unless it bring... |
-| SYNC-08 | P0 | Backstage | todo | Tests for every mutation: success, rejection, timeout, duplicate send, offline then rejected, app killed mid-r... |
+| SYNC-08 | P0 | Backstage | build | Tests for every mutation: success, rejection, timeout, duplicate send, offline then rejected, app killed mid-r... |
 
 ## Security and privacy
 
