@@ -29,6 +29,8 @@ import { useEco } from "@/power/eco";
 import { TravelPrompt } from "@/travel/TravelPrompt";
 import { VaultPrompt } from "@/vault/VaultPrompt";
 import { useLiveParty, type PartyMood } from "@/server/crewData";
+import { useSession } from "@/server/session";
+import { BubbleField } from "./BubbleField";
 import { useVenueData } from "@/server/venueData";
 import { RollingNumber } from "./RollingNumber";
 import { DareOfTheNight } from "./DareOfTheNight";
@@ -79,6 +81,14 @@ const MOOD_COLOURS: Record<PartyMood, string> = {
   home: palette.avatar[1]!,
   tropical: palette.avatar[1]!,
 };
+
+/** MOT-02: the crew's drinks tonight, mine counted from the phone so the field answers at once. */
+function LivingBackground({ mine, level }: { mine: number; level: number }) {
+  const live = useLiveParty();
+  const me = useSession((state) => state.session?.userId);
+  const others = live?.live?.members.filter((m) => m.userId !== me).reduce((sum, m) => sum + m.drinks, 0) ?? 0;
+  return <BubbleField drinks={mine + others} mood={(live?.party.mood as PartyMood | undefined) ?? "party"} level={level} />;
+}
 
 function MoodBand() {
   const insets = useSafeAreaInsets();
@@ -147,6 +157,7 @@ export function PartyScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.bg }]}>
+      <LivingBackground mine={tonight.drinks.length} level={level} />
       <MoodBand />
       <ScrollView
         contentContainerStyle={[styles.content, { paddingTop: insets.top + space.screenTop }]}
