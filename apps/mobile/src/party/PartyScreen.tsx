@@ -22,6 +22,7 @@ import { useTheme } from "@/theme";
 import { Button, IconButton } from "@/ui/Button";
 import { Panel, Row, Segmented, Tag } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
+import { LiveDot } from "@/ui/LiveDot";
 import { Numeral, Text } from "@/ui/Text";
 import { AddDrinkButton } from "./AddDrinkButton";
 import { CrewStrip } from "./CrewStrip";
@@ -422,13 +423,12 @@ function CurrentVenueRow({ i18n }: { i18n: Translator }) {
 }
 
 function PartyTitle({ i18n }: { i18n: Translator }) {
-  const theme = useTheme();
   const current = useLiveParty();
   if (!current) return <Text variant="h3">{i18n.t("party.tonight")}</Text>;
   return (
     <View style={styles.titleRow}>
       {/* The live dot only shows while a party is really live (DESIGN.md §5). */}
-      <View style={[styles.liveDot, { backgroundColor: theme.ok }]} />
+      <LiveDot />
       <Text variant="h3" style={styles.flex}>
         {current.party.name}
       </Text>
@@ -476,11 +476,11 @@ function LevelZero(props: LevelProps) {
       </View>
       <StatusRow {...props} />
       <CrewStrip />
-      <DareOfTheNight now={props.now} />
       <QuickTiles i18n={i18n} />
       <View>
         <CurrentVenueRow i18n={i18n} />
       </View>
+      <DareOfTheNight now={props.now} />
       <MoreChips i18n={i18n} />
       <LevelPicker {...props} />
     </>
@@ -672,5 +672,4 @@ const styles = StyleSheet.create({
   bigCell: { flexBasis: "44%", flexGrow: 1 },
   levelThreeTitle: { fontSize: 20, lineHeight: 26, fontFamily: "Archivo-Bold" },
   titleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  liveDot: { width: 8, height: 8, borderRadius: 4 },
 });

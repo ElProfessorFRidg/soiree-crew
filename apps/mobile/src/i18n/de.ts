@@ -138,6 +138,7 @@ export const de: Messages = {
     mute: "Bis morgen stumm",
   },
   crew: {
+    addAnother: "Weitere Crew erstellen oder beitreten",
     tab: "Crew",
     connectTitle: "Deine Crew",
     connectBody: "Die Crew läuft über einen Server. Gib seine Adresse ein: Wer ihn betreibt, gibt sie dir.",

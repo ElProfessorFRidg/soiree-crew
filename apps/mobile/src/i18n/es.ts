@@ -139,6 +139,7 @@ export const es: Messages = {
     mute: "Silenciar hasta mañana",
   },
   crew: {
+    addAnother: "Crear o unirse a otro crew",
     tab: "Crew",
     connectTitle: "Tu crew",
     connectBody: "La crew funciona a través de un servidor. Escribe su dirección: te la da quien lo aloja.",

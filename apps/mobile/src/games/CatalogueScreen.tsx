@@ -10,7 +10,7 @@ import { haptic } from "@/motion/haptics";
 import { flyHero, HeroSource } from "@/motion/hero";
 import { useTheme } from "@/theme";
 import { Button, IconButton } from "@/ui/Button";
-import { Segmented } from "@/ui/controls";
+import { Chip, Segmented } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { Numeral, Text } from "@/ui/Text";
 import { useGameUi } from "./hooks";
@@ -37,7 +37,8 @@ function GameCardView({ game, width, height }: { game: GameDefinition; width: nu
   const tablePlayers = useGamesStore((s) => s.table.length);
   const durations = useGamesStore((s) => s.durations[game.id]);
   const minutes = typicalMinutes(durations ?? []);
-  const lock = lockReason(game, tablePlayers);
+  // No table yet (first launch): nothing is locked, the players are picked on the game sheet.
+  const lock = tablePlayers > 0 ? lockReason(game, tablePlayers) : null;
   const players = game.minPlayers === game.maxPlayers ? g.plural("catalogue.players", game.minPlayers) : g.t("catalogue.playerRange", { min: game.minPlayers, max: game.maxPlayers });
   const ink = palette.accent.onAccent;
   return (
@@ -143,10 +144,10 @@ export function CatalogueScreen() {
         {games.length > 0 ? <Text variant="small">{g.t("catalogue.position", { index: Math.min(index, games.length - 1) + 1, count: games.length })}</Text> : null}
         {g.language !== "fr" && g.language !== "en" ? <Text variant="small">{g.t("catalogue.cardsInEnglish")}</Text> : null}
         <View style={styles.headerButtons}>
-          <Button label={g.t("hall.open")} icon="trophy" variant="outline" height={44} style={styles.flex} onPress={() => router.push("/games/hall")} />
-          <Button label={g.t("crewCards.open")} icon="edit" variant="outline" height={44} style={styles.flex} onPress={() => router.push("/games/cards")} />
+          <Chip label={i18n.t("bar.title")} icon="wine" onPress={() => router.push("/bar")} />
+          <Chip label={g.t("crewCards.open")} icon="edit" onPress={() => router.push("/games/cards")} />
+          <Chip label={g.t("hall.open")} icon="trophy" onPress={() => router.push("/games/hall")} />
         </View>
-        <Button label={i18n.t("bar.title")} icon="wine" variant="secondary" height={44} onPress={() => router.push("/bar")} />
       </View>
       <View style={styles.padded}>
         <Segmented
@@ -231,7 +232,7 @@ export function CatalogueScreen() {
 }
 
 const styles = StyleSheet.create({
-  headerButtons: { flexDirection: "row", gap: 12 },
+  headerButtons: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   screen: { flex: 1, gap: space.sectionGap },
   header: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", paddingHorizontal: space.screenX },
   padded: { paddingHorizontal: space.screenX },

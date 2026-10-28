@@ -1,9 +1,9 @@
 import * as Clipboard from "expo-clipboard";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert, Platform, Share, StyleSheet, View } from "react-native";
+import { Alert, Platform, ScrollView, Share, StyleSheet, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { duration } from "@crew/design-tokens";
+import { duration, space } from "@crew/design-tokens";
 import { ConnectServer } from "@/crew/ConnectServer";
 import { Field } from "@/crew/Field";
 import { crewErrorMessage, inviteCodeFrom } from "@/crew/invite";
@@ -21,6 +21,7 @@ import { Avatar } from "@/ui/Avatar";
 import { Button, IconButton } from "@/ui/Button";
 import { Chip, Panel, Row, Segmented, Tag } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
+import { LiveDot } from "@/ui/LiveDot";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
@@ -130,52 +131,22 @@ function CrewCard({ crew }: { crew: Crew }) {
           </ScalePressable>
         ))}
       </View>
-      <Row
-        title={i18n.t("money.pools")}
-        leading={<Icon name="euro" color={theme.textMuted} />}
-        trailing={<Icon name="chev" color={theme.textMuted} />}
-        onPress={() => router.push({ pathname: "/money", params: { crewId: crew.id } })}
-      />
-      <Row
-        title={i18n.t("feed.title")}
-        leading={<Icon name="bell" color={theme.textMuted} />}
-        trailing={<Icon name="chev" color={theme.textMuted} />}
-        onPress={() => router.push({ pathname: "/feed", params: { crewId: crew.id } })}
-      />
-      <Row
-        title={i18n.t("stickers.title")}
-        leading={<Icon name="image" color={theme.textMuted} />}
-        trailing={<Icon name="chev" color={theme.textMuted} />}
-        onPress={() => router.push({ pathname: "/stickers", params: { crewId: crew.id } })}
-      />
-      <Row
-        title={i18n.t("polls.title")}
-        leading={<Icon name="cal" color={theme.textMuted} />}
-        trailing={<Icon name="chev" color={theme.textMuted} />}
-        onPress={() => router.push({ pathname: "/polls", params: { crewId: crew.id } })}
-      />
-      <Row
-        title={i18n.t("crewStats.open")}
-        leading={<Icon name="trophy" color={theme.textMuted} />}
-        trailing={<Icon name="chev" color={theme.textMuted} />}
-        onPress={() => router.push({ pathname: "/crew-stats", params: { crewId: crew.id } })}
-      />
-      <Row
-        title={i18n.t("recap.list")}
-        leading={<Icon name="sparkdot" color={theme.textMuted} />}
-        trailing={<Icon name="chev" color={theme.textMuted} />}
-        onPress={() => router.push("/recaps")}
-        last={crew.role !== "admin"}
-      />
-      {crew.role === "admin" ? (
-        <Row
-          title={i18n.t("people.reports")}
-          leading={<Icon name="flag" color={theme.textMuted} />}
-          trailing={<Icon name="chev" color={theme.textMuted} />}
-          onPress={() => router.push({ pathname: "/reports", params: { crewId: crew.id } })}
-          last
-        />
-      ) : null}
+      {/* One scrolling row instead of a list of links (Radar board). */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipRow} contentContainerStyle={styles.chips}>
+        {(
+          [
+            ["money.pools", "euro", () => router.push({ pathname: "/money", params: { crewId: crew.id } })],
+            ["feed.title", "bell", () => router.push({ pathname: "/feed", params: { crewId: crew.id } })],
+            ["polls.title", "cal", () => router.push({ pathname: "/polls", params: { crewId: crew.id } })],
+            ["crewStats.open", "trophy", () => router.push({ pathname: "/crew-stats", params: { crewId: crew.id } })],
+            ["recap.list", "sparkdot", () => router.push("/recaps")],
+            ["stickers.title", "image", () => router.push({ pathname: "/stickers", params: { crewId: crew.id } })],
+            ...(crew.role === "admin" ? ([["people.reports", "flag", () => router.push({ pathname: "/reports", params: { crewId: crew.id } })]] as const) : []),
+          ] as const
+        ).map(([key, icon, go]) => (
+          <Chip key={key} label={i18n.t(key)} icon={icon} onPress={go} />
+        ))}
+      </ScrollView>
       {invite ? (
         <Animated.View entering={FadeIn.duration(duration.enter)} style={styles.inviteRow}>
           <Text style={styles.flex}>{i18n.t("crew.inviteCodeIs", { code: invite.code })}</Text>
@@ -192,10 +163,8 @@ function CrewCard({ crew }: { crew: Crew }) {
           />
         </Animated.View>
       ) : null}
-      <View style={styles.actions}>
-        <Button label={i18n.t("crew.invite")} icon="share" height={44} style={styles.flex} onPress={() => void onInvite()} />
-        <Button label={i18n.t("crew.leave")} variant="outline" height={44} style={styles.flex} onPress={onLeave} />
-      </View>
+      <Button label={i18n.t("crew.invite")} icon="share" height={48} onPress={() => void onInvite()} />
+      <Button label={i18n.t("crew.leave")} variant="outline" height={40} onPress={onLeave} />
     </Panel>
   );
 }
@@ -214,6 +183,7 @@ export default function CrewScreen() {
   const radarId = crews.find((c) => c.id === radarCrew)?.id ?? crews[0]?.id;
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState<"create" | "join" | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
   const pendingInvite = usePendingInvite((state) => state.invite);
 
   // QOL-05: an invite link opened before signing up is accepted as soon as the account exists.
@@ -280,7 +250,7 @@ export default function CrewScreen() {
               key={party.id}
               title={party.name || i18n.t(`newParty.moods.${party.mood}`)}
               subtitle={`${crewNameOf(party.crewId)}, ${partyWhen(party, i18n, hourCycle)}`}
-              leading={party.live ? <View style={[styles.liveDot, { backgroundColor: theme.ok }]} /> : <Icon name="cal" color={theme.textMuted} />}
+              leading={party.live ? <LiveDot size={10} /> : <Icon name="cal" color={theme.textMuted} />}
               trailing={
                 !party.live && Platform.OS !== "web" ? (
                   <IconButton icon="cal" accessibilityLabel={i18n.t("crew.addToCalendar")} onPress={() => void addPartyToCalendar(party, crewNameOf(party.crewId), i18n)} />
@@ -303,74 +273,87 @@ export default function CrewScreen() {
         <CrewCard key={crew.id} crew={crew} />
       ))}
 
-      <Panel>
-        <Field
-          label={i18n.t("crew.joinCrew")}
-          placeholder={i18n.t("crew.inviteCode")}
-          value={code}
-          onChangeText={(text) => setCode(text.toUpperCase())}
-          autoCapitalize="characters"
-          autoCorrect={false}
-          maxLength={8}
+      {crews.length ? (
+        <Row
+          title={i18n.t("crew.addAnother")}
+          leading={<Icon name="plus" color={theme.textMuted} />}
+          trailing={<Icon name={addOpen ? "arrowup" : "arrowdn"} color={theme.textMuted} />}
+          onPress={() => setAddOpen((open) => !open)}
+          last
         />
-        <Button
-          label={i18n.t("crew.pasteInvite")}
-          variant="outline"
-          icon="link"
-          height={44}
-          onPress={() =>
-            void Clipboard.getStringAsync().then((text) => {
-              // QOL-29: a friend who installed from a link pastes it here; the code is taken from the link or as typed.
-              const found = inviteCodeFrom(text);
-              if (found) setCode(found);
-              else showToast({ message: i18n.t("crew.pasteNothing") });
-            })
-          }
-        />
-        <Button
-          label={i18n.t("crew.join")}
-          variant="secondary"
-          height={44}
-          disabled={code.trim().length !== 8}
-          loading={busy === "join"}
-          onPress={() => {
-            setBusy("join");
-            acceptInvite(code)
-              .then(() => {
-                haptic.confirmed();
-                setCode("");
-              })
-              .catch((error: unknown) => showToast({ tone: "danger", message: crewErrorMessage(error, i18n) }))
-              .finally(() => setBusy(null));
-          }}
-        />
-      </Panel>
+      ) : null}
+      {!crews.length || addOpen ? (
+        <Animated.View entering={FadeIn.duration(duration.enter)} style={styles.addBlock}>
+          <Panel>
+            <Field
+              label={i18n.t("crew.joinCrew")}
+              placeholder={i18n.t("crew.inviteCode")}
+              value={code}
+              onChangeText={(text) => setCode(text.toUpperCase())}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              maxLength={8}
+            />
+            <Button
+              label={i18n.t("crew.pasteInvite")}
+              variant="outline"
+              icon="link"
+              height={44}
+              onPress={() =>
+                void Clipboard.getStringAsync().then((text) => {
+                  // QOL-29: a friend who installed from a link pastes it here; the code is taken from the link or as typed.
+                  const found = inviteCodeFrom(text);
+                  if (found) setCode(found);
+                  else showToast({ message: i18n.t("crew.pasteNothing") });
+                })
+              }
+            />
+            <Button
+              label={i18n.t("crew.join")}
+              variant="secondary"
+              height={44}
+              disabled={code.trim().length !== 8}
+              loading={busy === "join"}
+              onPress={() => {
+                setBusy("join");
+                acceptInvite(code)
+                  .then(() => {
+                    haptic.confirmed();
+                    setCode("");
+                  })
+                  .catch((error: unknown) => showToast({ tone: "danger", message: crewErrorMessage(error, i18n) }))
+                  .finally(() => setBusy(null));
+              }}
+            />
+          </Panel>
 
-      <Panel>
-        <Field label={i18n.t("crew.newCrew")} placeholder={i18n.t("crew.crewName")} value={crewName} onChangeText={setCrewName} maxLength={40} />
-        <View style={styles.kinds}>
-          {CREW_KINDS.map((k) => (
-            <Chip key={k} label={i18n.t(`crew.kinds.${k}`)} selected={crewKind === k} onPress={() => setCrewKind(k)} />
-          ))}
-        </View>
-        <Button
-          label={i18n.t("crew.create")}
-          variant="secondary"
-          height={44}
-          disabled={!crewName.trim()}
-          loading={busy === "create"}
-          onPress={() => {
-            setBusy("create");
-            createCrew(crewName.trim(), crewKind)
-              .then(() => {
-                haptic.confirmed();
-                clearCrewName();
-              })
-              .catch((error: unknown) => showToast({ tone: "danger", message: crewErrorMessage(error, i18n) }))
-              .finally(() => setBusy(null));
-          }}
-        />
-      </Panel>
+          <Panel>
+            <Field label={i18n.t("crew.newCrew")} placeholder={i18n.t("crew.crewName")} value={crewName} onChangeText={setCrewName} maxLength={40} />
+            <View style={styles.kinds}>
+              {CREW_KINDS.map((k) => (
+                <Chip key={k} label={i18n.t(`crew.kinds.${k}`)} selected={crewKind === k} onPress={() => setCrewKind(k)} />
+              ))}
+            </View>
+            <Button
+              label={i18n.t("crew.create")}
+              variant="secondary"
+              height={44}
+              disabled={!crewName.trim()}
+              loading={busy === "create"}
+              onPress={() => {
+                setBusy("create");
+                createCrew(crewName.trim(), crewKind)
+                  .then(() => {
+                    haptic.confirmed();
+                    clearCrewName();
+                  })
+                  .catch((error: unknown) => showToast({ tone: "danger", message: crewErrorMessage(error, i18n) }))
+                  .finally(() => setBusy(null));
+              }}
+            />
+          </Panel>
+        </Animated.View>
+      ) : null}
       <OpenCrews />
     </Screen>
   );
@@ -432,5 +415,7 @@ const styles = StyleSheet.create({
   member: { width: 60, alignItems: "center", gap: 4 },
   inviteRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   actions: { flexDirection: "row", gap: 10 },
-  liveDot: { width: 10, height: 10, borderRadius: 5 },
+  chipRow: { marginHorizontal: -space.cardPadding },
+  chips: { gap: 8, paddingHorizontal: space.cardPadding, paddingVertical: 4 },
+  addBlock: { gap: space.blockGap },
 });

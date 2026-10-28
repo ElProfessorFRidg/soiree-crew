@@ -138,6 +138,7 @@ export const fr = {
     mute: "Couper jusqu'à demain",
   },
   crew: {
+    addAnother: "Créer ou rejoindre un autre crew",
     tab: "Crew",
     connectTitle: "Ton crew",
     connectBody: "Le crew passe par un serveur. Tape son adresse : la personne qui l'héberge te la donne.",
