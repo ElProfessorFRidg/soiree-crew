@@ -6,13 +6,13 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { duration } from "@crew/design-tokens";
 import { ConnectServer } from "@/crew/ConnectServer";
 import { Field } from "@/crew/Field";
+import { crewErrorMessage, inviteCodeFrom } from "@/crew/invite";
 import { RadarSection } from "@/crew/RadarSection";
 import { SosBanner } from "@/crew/SosBanner";
 import { useT, type Translator } from "@/i18n";
 import { flyHero, HeroSource } from "@/motion/hero";
 import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
-import { ApiError } from "@/server/api";
 import { acceptInvite, createCrew, createInvite, CREW_KINDS, fetchOpenCrews, joinOpenCrew, leaveCrew, refreshCrews, refreshParties, respondToParty, useCrewData, type Crew, type CrewKind, type OpenCrew, type Party } from "@/server/crewData";
 import { useSession } from "@/server/session";
 import { useAppStore } from "@/state/store";
@@ -29,17 +29,8 @@ import { useDraft } from "@/state/drafts";
 import { usePendingInvite } from "@/server/pendingInvite";
 import { ScalePressable } from "@/ui/Pressable";
 import { refreshRadar } from "@/server/radarData";
-import { serverMessage } from "@/server/errors";
 import { StartHereBanner } from "@/crew/StartHereBanner";
 import { addPartyToCalendar } from "@/crew/calendar";
-
-function errorMessage(error: unknown, i18n: Translator): string {
-  if (error instanceof ApiError && error.failure.kind === "http") {
-    if (error.failure.status === 404) return i18n.t("crew.inviteInvalid");
-    return serverMessage(error.failure.code, i18n);
-  }
-  return i18n.t("crew.offline");
-}
 
 function partyWhen(party: Party, i18n: Translator, hourCycle: "h12" | "h23"): string {
   const day = new Intl.DateTimeFormat(i18n.locale, { weekday: "long", day: "numeric", month: "long" }).format(new Date(party.startsAt));
@@ -65,19 +56,13 @@ function InvitationCard({ party, crewName }: { party: Party; crewName: string })
         onChange={(response) => {
           if (response === "invited") return;
           haptic.select();
-          respondToParty(party.id, response).catch((error: unknown) => showToast({ tone: "danger", message: errorMessage(error, i18n) }));
+          respondToParty(party.id, response).catch((error: unknown) => showToast({ tone: "danger", message: crewErrorMessage(error, i18n) }));
         }}
       />
     </Panel>
   );
 }
 
-/** An invite code from what was copied: a link ending in /i/CODE, or the 8 characters alone. */
-function inviteCodeFrom(text: string): string | null {
-  const fromLink = /\/i\/([A-Za-z0-9]{8})\b/.exec(text)?.[1];
-  const alone = /^\s*([A-Za-z0-9]{8})\s*$/.exec(text)?.[1];
-  return (fromLink ?? alone)?.toUpperCase() ?? null;
-}
 
 function CrewCard({ crew }: { crew: Crew }) {
   const i18n = useT();
@@ -92,7 +77,7 @@ function CrewCard({ crew }: { crew: Crew }) {
       setInvite(created);
       await Share.share({ message: i18n.t("crew.inviteShare", { crew: crew.name, url: created.url }) });
     } catch (error) {
-      showToast({ tone: "danger", message: errorMessage(error, i18n) });
+      showToast({ tone: "danger", message: crewErrorMessage(error, i18n) });
     }
   };
 
@@ -104,7 +89,7 @@ function CrewCard({ crew }: { crew: Crew }) {
         style: "destructive",
         onPress: () => {
           const ran = guarded({ kind: "leaveCrew", crewId: crew.id, crewName: crew.name }, () =>
-            void leaveCrew(crew.id).catch((error: unknown) => showToast({ tone: "danger", message: errorMessage(error, i18n) })),
+            void leaveCrew(crew.id).catch((error: unknown) => showToast({ tone: "danger", message: crewErrorMessage(error, i18n) })),
           );
           if (!ran) showToast({ message: i18n.t("vault.queued") });
         },
@@ -355,7 +340,7 @@ export default function CrewScreen() {
                 haptic.confirmed();
                 setCode("");
               })
-              .catch((error: unknown) => showToast({ tone: "danger", message: errorMessage(error, i18n) }))
+              .catch((error: unknown) => showToast({ tone: "danger", message: crewErrorMessage(error, i18n) }))
               .finally(() => setBusy(null));
           }}
         />
@@ -381,7 +366,7 @@ export default function CrewScreen() {
                 haptic.confirmed();
                 clearCrewName();
               })
-              .catch((error: unknown) => showToast({ tone: "danger", message: errorMessage(error, i18n) }))
+              .catch((error: unknown) => showToast({ tone: "danger", message: crewErrorMessage(error, i18n) }))
               .finally(() => setBusy(null));
           }}
         />

@@ -191,7 +191,7 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
     const drinks = await all<{ id: string; party_id: string | null; kind: string; preset_id: string; sealed: string; consumed_at: number; logged_at: number; verified: boolean; deleted_at: number | null }>(
       "select id, party_id, kind, preset_id, sealed, consumed_at, logged_at, verified, deleted_at from drinks where user_id = $1 order by consumed_at",
     );
-    const water = await all("select id, party_id, at, deleted_at from water where user_id = $1 order by at");
+    const water = await all("select id, party_id, at, deleted_at from water where user_id = $1 and at > 0 order by at");
     const customDrinks = await all<{ id: string; data: string; deleted_at: number | null }>("select id, data, deleted_at from custom_drinks where user_id = $1");
     const crews = await all("select c.id, c.name, m.role, m.nickname, m.joined_at, m.leaderboard_opt_out, m.territory_opt_out from crew_members m join crews c on c.id = m.crew_id where m.user_id = $1");
     const parties = await all(
@@ -221,7 +221,8 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
       preferences: preferences ? JSON.parse(preferences.data) : null,
       bodyProfile: open(profile?.sealed),
       paymentDetails: open(payment?.sealed),
-      drinks: drinks.map(({ sealed, ...d }) => ({ ...d, ...open<Record<string, unknown>>(sealed) })),
+      // Erased drinks (consent withdrawn) are empty tombstones: there is nothing left to export.
+      drinks: drinks.filter((d) => d.sealed !== "").map(({ sealed, ...d }) => ({ ...d, ...open<Record<string, unknown>>(sealed) })),
       water,
       customDrinks: customDrinks.map((d) => ({ id: d.id, deletedAt: d.deleted_at, ...JSON.parse(d.data) })),
       crews,
@@ -244,6 +245,25 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
   app.delete<{ Params: { id: string } }>("/v1/sessions/:id", async (request, reply) => {
     const user = requireUser(request);
     await ctx.db.query("delete from sessions where user_id = $1 and token_hash like $2", [user.id, `${request.params.id}%`]);
+    return reply.status(204).send();
+  });
+
+  /**
+   * SEC-08: withdrawing the health-data consent. The body profile goes; drinks and water stay only
+   * as empty tombstones (no content, no times) so the other phones drop them on their next sync.
+   */
+  app.delete("/v1/me/health", async (request, reply) => {
+    const user = requireUser(request);
+    const now = ctx.now();
+    await ctx.db.transaction(async (tx) => {
+      await tx.query("delete from body_profiles where user_id = $1", [user.id]);
+      await tx.query("delete from drink_confirmations where drink_id in (select id from drinks where user_id = $1)", [user.id]);
+      await tx.query(
+        "update drinks set kind = 'erased', preset_id = 'erased', sealed = '', consumed_at = 0, logged_at = 0, verified = false, deleted_at = $2, updated_at = $2 where user_id = $1",
+        [user.id, now],
+      );
+      await tx.query("update water set at = 0, deleted_at = $2, updated_at = $2 where user_id = $1", [user.id, now]);
+    });
     return reply.status(204).send();
   });
 

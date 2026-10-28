@@ -1,6 +1,6 @@
 # Status
 
-Generated from FEATURES.md on 2026-10-27 by `pnpm status`. Edit FEATURES.md, not this file.
+Generated from FEATURES.md on 2026-10-28 by `pnpm status`. Edit FEATURES.md, not this file.
 
 | Status | Count |
 |---|---|

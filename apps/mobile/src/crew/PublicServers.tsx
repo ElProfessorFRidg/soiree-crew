@@ -1,7 +1,7 @@
-import Constants from "expo-constants";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useT } from "@/i18n";
+import { extraString, extraStrings } from "@/system/extra";
 import { Chip } from "@/ui/controls";
 import { Text } from "@/ui/Text";
 
@@ -14,8 +14,8 @@ interface ServerInfo {
 
 /** Public servers this build knows (CREW_SERVER_URL and CREW_PUBLIC_SERVERS at build time). */
 function knownServers(): string[] {
-  const extra = (Constants.expoConfig?.extra ?? {}) as { defaultServerUrl?: string | null; publicServers?: string[] };
-  return [...new Set([extra.defaultServerUrl, ...(extra.publicServers ?? [])].filter((u): u is string => Boolean(u)))];
+  const first = extraString("defaultServerUrl");
+  return [...new Set([...(first ? [first] : []), ...extraStrings("publicServers")])];
 }
 
 /** Each known server says who it is (GET /v1/info); only the ones that answer and call themselves public are offered. */

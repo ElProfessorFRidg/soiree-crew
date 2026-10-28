@@ -156,3 +156,32 @@ describe("error answers (red team AC-10)", () => {
     expect(bad.statusCode).toBe(404);
   });
 });
+
+describe("health consent withdrawal (SEC-08)", () => {
+  it("drops the body profile and leaves drinks as empty tombstones the other phones sync away", async () => {
+    const jade = await signUp("jade");
+    const drinkId = randomUUID();
+    await app.inject({
+      method: "POST",
+      url: "/v1/mutations",
+      headers: jade.auth,
+      payload: {
+        mutations: [
+          { key: randomUUID(), mutation: { kind: "profile.set", profile: { weightKg: 60, bodyModel: "female", declaredBody: "female", healthConsentAt: clock } } },
+          { key: randomUUID(), mutation: { kind: "drink.add", drink: { id: drinkId, presetId: "m-pint", kind: "pint", volumeMl: 500, abv: 0.05, consumedAt: clock, loggedAt: clock, withFood: false } } },
+        ],
+      },
+    });
+    expect((await app.inject({ method: "DELETE", url: "/v1/me/health", headers: jade.auth })).statusCode).toBe(204);
+
+    const rows = await db.query<{ sealed: string; consumed_at: number; deleted_at: number | null }>("select sealed, consumed_at, deleted_at from drinks where id = $1", [drinkId]);
+    expect(rows[0]).toMatchObject({ sealed: "", consumed_at: 0, deleted_at: clock });
+    expect(await db.query("select 1 from body_profiles")).toHaveLength(0);
+
+    const sync = (await app.inject({ method: "GET", url: "/v1/sync?since=0", headers: jade.auth })).json() as { drinks: { id: string; deleted?: boolean }[]; profile: unknown };
+    expect(sync.drinks).toEqual([{ id: drinkId, deleted: true }]);
+    expect(sync.profile).toBeNull();
+    const exported = (await app.inject({ method: "GET", url: "/v1/me/export", headers: jade.auth })).json() as { drinks: unknown[] };
+    expect(exported.drinks).toEqual([]);
+  });
+});

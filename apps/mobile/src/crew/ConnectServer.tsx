@@ -1,4 +1,3 @@
-import Constants from "expo-constants";
 import { LinkScanner } from "./LinkScanner";
 import { PublicServers } from "./PublicServers";
 import { useRef, useState, type ComponentRef } from "react";
@@ -15,6 +14,7 @@ import { Field } from "./Field";
 import { deviceName } from "@/server/device";
 import { usePendingInvite } from "@/server/pendingInvite";
 import { serverMessage } from "@/server/errors";
+import { extraString } from "@/system/extra";
 
 interface AccountResponse {
   user: { id: string; username: string; displayName: string };
@@ -22,12 +22,12 @@ interface AccountResponse {
 }
 
 /** First crew step: server address, then a new account or the code from another phone (ADR 0002). */
-export function ConnectServer() {
+export function ConnectServer({ initialMode = "create" }: { initialMode?: "create" | "password" | "claim" } = {}) {
   const i18n = useT();
   const theme = useTheme();
   // An invite's server first, else the public server this build was made for.
-  const [address, setAddress] = useState(() => usePendingInvite.getState().invite?.server ?? ((Constants.expoConfig?.extra?.defaultServerUrl as string | null | undefined) || ""));
-  const [mode, setMode] = useState<"create" | "password" | "claim">("create");
+  const [address, setAddress] = useState(() => usePendingInvite.getState().invite?.server ?? (extraString("defaultServerUrl") ?? ""));
+  const [mode, setMode] = useState<"create" | "password" | "claim">(initialMode);
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [code, setCode] = useState("");

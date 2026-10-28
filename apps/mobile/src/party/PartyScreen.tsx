@@ -25,6 +25,7 @@ import { Icon } from "@/ui/Icon";
 import { Numeral, Text } from "@/ui/Text";
 import { AddDrinkButton } from "./AddDrinkButton";
 import { CrewStrip } from "./CrewStrip";
+import { MoreChips, QuickTiles } from "./QuickTiles";
 import { SosBanner } from "@/crew/SosBanner";
 import { useEco } from "@/power/eco";
 import { TravelPrompt } from "@/travel/TravelPrompt";
@@ -416,46 +417,6 @@ function CurrentVenueRow({ i18n }: { i18n: Translator }) {
           onPress={() => router.push({ pathname: "/leaderboard", params: { crewId: live.party.crewId } })}
         />
       ) : null}
-      {live ? (
-        <Row
-          title={i18n.t("money.open")}
-          leading={<Icon name="euro" color={theme.textMuted} />}
-          trailing={<Icon name="chev" color={theme.textMuted} />}
-          onPress={() => router.push("/money")}
-        />
-      ) : null}
-      {live ? (
-        <Row
-          title={i18n.t("items.open")}
-          leading={<Icon name="check" color={theme.textMuted} />}
-          trailing={<Icon name="chev" color={theme.textMuted} />}
-          onPress={() => router.push({ pathname: "/items", params: { partyId: live.party.id } })}
-        />
-      ) : null}
-      {live ? (
-        <Row
-          title={i18n.t("album.open")}
-          leading={<Icon name="camera" color={theme.textMuted} />}
-          trailing={<Icon name="chev" color={theme.textMuted} />}
-          onPress={() => router.push({ pathname: "/album", params: { partyId: live.party.id } })}
-        />
-      ) : null}
-      {live ? (
-        <Row
-          title={i18n.t("whereTo.open")}
-          leading={<Icon name="pin" color={theme.textMuted} />}
-          trailing={<Icon name="chev" color={theme.textMuted} />}
-          onPress={() => router.push({ pathname: "/where-to", params: { id: live.party.id } })}
-        />
-      ) : null}
-      {live ? (
-        <Row
-          title={i18n.t("goingHome.open")}
-          leading={<Icon name="home" color={theme.textMuted} />}
-          trailing={<Icon name="chev" color={theme.textMuted} />}
-          onPress={() => router.push({ pathname: "/home", params: { id: live.party.id } })}
-        />
-      ) : null}
     </>
   );
 }
@@ -516,40 +477,11 @@ function LevelZero(props: LevelProps) {
       <StatusRow {...props} />
       <CrewStrip />
       <DareOfTheNight now={props.now} />
+      <QuickTiles i18n={i18n} />
       <View>
         <CurrentVenueRow i18n={i18n} />
-        <Row
-          title={i18n.t("cheers.title")}
-          leading={<Icon name="glass" color={theme.textMuted} />}
-          trailing={<Icon name="chev" color={theme.textMuted} />}
-          onPress={() => router.push("/cheers")}
-        />
-        <Row
-          title={i18n.t("curve.open")}
-          leading={<Icon name="x:curve" color={theme.textMuted} />}
-          trailing={<Icon name="chev" color={theme.textMuted} />}
-          onPress={() => router.push("/curve")}
-        />
-        <Row
-          title={i18n.t("party.history")}
-          leading={<Icon name="clock" color={theme.textMuted} />}
-          trailing={<Icon name="chev" color={theme.textMuted} />}
-          onPress={() => router.push("/history")}
-        />
-        <Row
-          title={i18n.t("limits.open")}
-          leading={<Icon name="x:target" color={theme.textMuted} />}
-          trailing={<Icon name="chev" color={theme.textMuted} />}
-          onPress={() => router.push("/limits")}
-        />
-        <Row
-          title={i18n.t("party.sos")}
-          leading={<Icon name="alert" color={palette.tint.dangerText} />}
-          trailing={<Icon name="chev" color={theme.textMuted} />}
-          onPress={() => router.push("/sos")}
-          last
-        />
       </View>
+      <MoreChips i18n={i18n} />
       <LevelPicker {...props} />
     </>
   );

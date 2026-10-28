@@ -1,17 +1,15 @@
-import Constants from "expo-constants";
 import { Platform } from "react-native";
 import { useAppStore } from "@/state/store";
+import { extraNumber, extraString } from "./extra";
 
 const DAY_MS = 86_400_000;
 
-interface Extra {
-  buildNumber?: number;
-  releasesApi?: string;
+const extra = {
+  buildNumber: extraNumber("buildNumber"),
+  releasesApi: extraString("releasesApi"),
   /** Set on APKs built by a crew's own server (deploy/android): updates come from there, not GitHub. */
-  updateServer?: string | null;
-}
-
-const extra = (Constants.expoConfig?.extra ?? {}) as Extra;
+  updateServer: extraString("updateServer"),
+};
 
 /** The build running now, as numbered by CI; 0 for a local or web build, which never asks. */
 export const currentBuild = typeof extra.buildNumber === "number" ? extra.buildNumber : 0;

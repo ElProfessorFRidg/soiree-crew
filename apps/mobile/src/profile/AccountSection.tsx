@@ -57,6 +57,25 @@ export async function deleteAccount(i18n: Translator): Promise<void> {
   }
 }
 
+/** SEC-08: withdrawing the health-data consent erases the body profile, drinks and water, here and on the server. */
+export async function withdrawHealthConsent(i18n: Translator): Promise<void> {
+  try {
+    if (useSession.getState().session) await api("/v1/me/health", { method: "DELETE" });
+    const health = new Set(["drink.add", "drink.remove", "water.add", "water.remove", "profile.set"]);
+    useAppStore.setState((state) => ({
+      profile: null,
+      drinks: [],
+      water: [],
+      levelState: null,
+      outbox: state.outbox.filter((item) => !health.has(item.mutation.kind)),
+    }));
+    showToast({ message: i18n.t("account.withdrawn") });
+    router.replace("/onboarding");
+  } catch {
+    showToast({ tone: "danger", message: i18n.t("crew.offline") });
+  }
+}
+
 interface DeviceSession {
   id: string;
   deviceLabel: string;
@@ -240,6 +259,13 @@ export function AccountSection() {
     ]);
   };
 
+  const onWithdraw = () => {
+    Alert.alert(i18n.t("account.withdrawTitle"), i18n.t("account.withdrawBody"), [
+      { text: i18n.t("account.deleteKeep"), style: "cancel" },
+      { text: i18n.t("account.withdrawConfirm"), style: "destructive", onPress: () => void withdrawHealthConsent(i18n) },
+    ]);
+  };
+
   return (
     <Panel>
       <Text variant="label">{i18n.t("account.title")}</Text>
@@ -299,6 +325,7 @@ export function AccountSection() {
       ) : (
         <Text variant="small">{i18n.t("account.notConnected")}</Text>
       )}
+      <Button label={i18n.t("account.withdraw")} variant="outline" height={44} onPress={onWithdraw} />
       <Button label={i18n.t("account.delete")} variant="danger" height={44} onPress={onDelete} />
     </Panel>
   );
