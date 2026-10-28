@@ -725,6 +725,9 @@ export const pt: Messages = {
     otherServer: "Este convite vem de outro servidor ({server}). Termina sessão primeiro para o aceitar.",
   },
   people: {
+    cheatTag: "Tentou fazer batota",
+    cheatLine: "Check-in recusado em {venue}, {date}. 0 pontos.",
+    cheatRepeat: { one: "{count} check-in recusado esta semana.", other: "{count} check-ins recusados esta semana." },
     mute: "Silenciar os convites para sair",
     unmute: "Deixar de silenciar",
     mutedList: "Silenciados",
@@ -1660,6 +1663,8 @@ export const pt: Messages = {
   },
   errors: {
     rejected: "O servidor recusou {action}: {reason}.",
+    rejectedMany: { one: "Não foi possível guardar {count} ação:", other: "Não foi possível guardar {count} ações:" },
+    rejectedLine: "{action}: {reason}.",
     offline: { one: "Sem rede. {count} ação sai assim que apanhares rede.", other: "Sem rede. {count} ações saem assim que apanhares rede." },
     slow: "O servidor não está a responder. A app tenta de novo sozinha.",
     change: "a alteração",

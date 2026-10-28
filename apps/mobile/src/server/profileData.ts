@@ -17,6 +17,8 @@ export interface ProfileView {
   openToMeet?: boolean;
   requestsFrom?: "nobody" | "friendsOfFriends" | "everyone";
   mutualFriends?: number;
+  /** AC-09: a rejected check-in this week, shown to crew mates only. */
+  cheat?: { at: number; venue: string; count: number } | null;
   storyOptOut?: boolean;
   sections: {
     identity?: { displayName: string; username: string; bio: string; country: string };

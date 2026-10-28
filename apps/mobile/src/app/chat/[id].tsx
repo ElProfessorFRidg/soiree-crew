@@ -1,5 +1,5 @@
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { radius, space, type } from "@crew/design-tokens";
@@ -49,6 +49,7 @@ export default function ConversationScreen() {
   const [searching, setSearching] = useState(false);
   const [query, setQuery] = useState("");
   const [, tick] = useState(0);
+  const openedAt = useRef(Date.now());
 
   useFocusEffect(
     useCallback(() => {
@@ -185,6 +186,7 @@ export default function ConversationScreen() {
               mentionNames={mentionNames}
               status={mine ? statusOf(item) : null}
               highlighted={item.id === focus}
+              fresh={item.at > openedAt.current}
               myReaction={item.reactions[me]}
               onReactionPress={(emoji) => {
                 if (conversation.readOnly) return;

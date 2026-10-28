@@ -724,6 +724,9 @@ export const de: Messages = {
     otherServer: "Diese Einladung kommt von einem anderen Server ({server}). Melde dich zuerst ab, um sie anzunehmen.",
   },
   people: {
+    cheatTag: "Hat versucht zu schummeln",
+    cheatLine: "Check-in in {venue} abgelehnt, {date}. 0 Punkte.",
+    cheatRepeat: { one: "{count} abgelehnter Check-in diese Woche.", other: "{count} abgelehnte Check-ins diese Woche." },
     mute: "Ausgeh-Aufrufe dieser Person ausblenden",
     unmute: "Wieder einblenden",
     mutedList: "Ausgeblendet",
@@ -1659,6 +1662,8 @@ export const de: Messages = {
   },
   errors: {
     rejected: "Der Server hat {action} abgelehnt: {reason}.",
+    rejectedMany: { one: "{count} Aktion konnte nicht gespeichert werden:", other: "{count} Aktionen konnten nicht gespeichert werden:" },
+    rejectedLine: "{action}: {reason}.",
     offline: { one: "Kein Netz. {count} Aktion wird gesendet, sobald du Empfang hast.", other: "Kein Netz. {count} Aktionen werden gesendet, sobald du Empfang hast." },
     slow: "Der Server antwortet nicht. Wir versuchen es automatisch weiter.",
     change: "die Änderung",

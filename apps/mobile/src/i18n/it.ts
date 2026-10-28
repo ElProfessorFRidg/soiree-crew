@@ -725,6 +725,9 @@ export const it: Messages = {
     otherServer: "Questo invito viene da un altro server ({server}). Prima esci dal tuo account per accettarlo.",
   },
   people: {
+    cheatTag: "Ha provato a barare",
+    cheatLine: "Check-in rifiutato a {venue}, {date}. 0 punti.",
+    cheatRepeat: { one: "{count} check-in rifiutato questa settimana.", other: "{count} check-in rifiutati questa settimana." },
     mute: "Nascondi i suoi inviti a uscire",
     unmute: "Non nascondere più",
     mutedList: "Persone nascoste",
@@ -1660,6 +1663,8 @@ export const it: Messages = {
   },
   errors: {
     rejected: "Il server ha rifiutato {action}: {reason}.",
+    rejectedMany: { one: "Non è stato possibile salvare {count} azione:", other: "Non è stato possibile salvare {count} azioni:" },
+    rejectedLine: "{action}: {reason}.",
     offline: { one: "Niente rete. {count} azione partirà appena hai campo.", other: "Niente rete. {count} azioni partiranno appena hai campo." },
     slow: "Il server non risponde. Riproviamo noi in automatico.",
     change: "la modifica",

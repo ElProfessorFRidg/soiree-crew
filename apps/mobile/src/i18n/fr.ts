@@ -724,6 +724,9 @@ export const fr = {
     otherServer: "Cette invitation vient d'un autre serveur ({server}). Déconnecte-toi d'abord pour l'accepter.",
   },
   people: {
+    cheatTag: "A tenté de tricher",
+    cheatLine: "Check-in refusé à {venue}, {date}. 0 point.",
+    cheatRepeat: { one: "{count} check-in refusé cette semaine.", other: "{count} check-ins refusés cette semaine." },
     mute: "Masquer ses appels à sortir",
     unmute: "Ne plus masquer",
     mutedList: "Masqués",
@@ -1659,6 +1662,8 @@ export const fr = {
   },
   errors: {
     rejected: "Le serveur a refusé {action} : {reason}.",
+    rejectedMany: { one: "{count} action n'a pas pu être enregistrée :", other: "{count} actions n'ont pas pu être enregistrées :" },
+    rejectedLine: "{action} : {reason}.",
     offline: { one: "Pas de réseau. {count} action partira dès que tu captes.", other: "Pas de réseau. {count} actions partiront dès que tu captes." },
     slow: "Le serveur ne répond pas. L'app continue d'essayer.",
     change: "la modification",

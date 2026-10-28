@@ -204,6 +204,25 @@ async function buildSections(ctx: Context, ownerId: string, relation: Relation, 
   return out;
 }
 
+/** AC-09: the shame badge lasts a week, like the line on the venue page. */
+const CHEAT_VISIBLE_MS = 7 * 24 * HOUR_MS;
+
+/**
+ * AC-09: rejected check-ins not overturned by an admin, at venues of crews the viewer belongs to.
+ * Only crew mates (and the person) see it; strangers and friends outside the crew never do.
+ */
+async function cheatFlag(ctx: Context, ownerId: string, viewerId: string, now: number): Promise<{ at: number; venue: string; count: number } | null> {
+  const rows = await ctx.db.query<{ at: number; name: string }>(
+    `select c.at, v.name from check_ins c join venues v on v.id = c.venue_id
+     where c.user_id = $1 and c.verdict = 'rejected' and c.overturned_by is null and c.at > $2
+       and v.crew_id in (select crew_id from crew_members where user_id = $3)
+     order by c.at desc`,
+    [ownerId, now - CHEAT_VISIBLE_MS, viewerId],
+  );
+  const last = rows[0];
+  return last ? { at: last.at, venue: last.name, count: rows.length } : null;
+}
+
 export function profileRoutes(app: FastifyInstance, ctx: Context): void {
   /**
    * O-39, PROF-02, PROF-07, PROF-08. `as` previews my own profile as someone else sees it.
@@ -238,6 +257,7 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
       sections,
       ...(mine ? { audiences: audiencesOf(stored ? (JSON.parse(stored.audiences) as Record<string, unknown>) : {}), findable: stored?.findable ?? "username", regularOptIn: stored?.regular_opt_in ?? false, openToMeet: stored?.open_to_meet ?? false, requestsFrom: stored?.requests_from ?? "everyone", storyOptOut: stored?.story_opt_out ?? false } : {}),
       mutualFriends: ownerId === user.id ? 0 : await mutualFriends(ctx, user.id, ownerId),
+      cheat: relation.me || relation.crewMate ? await cheatFlag(ctx, ownerId, as ? ownerId : user.id, ctx.now()) : null,
     };
   });
 

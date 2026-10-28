@@ -159,3 +159,25 @@ describe("search and findability (O-43, PROF-09)", () => {
     expect((await db.query("select * from friendships")).length).toBe(2);
   });
 });
+
+describe("cheat attempt badge (AC-09)", () => {
+  it("shows a rejected check-in this week to crew mates only, and drops it once an admin overturns it", async () => {
+    const { owner, crewMate, friend, stranger, crewId } = await setup();
+    const venueId = randomUUID();
+    await app.inject({ method: "POST", url: `/v1/crews/${crewId}/venues`, headers: owner.auth, payload: { id: venueId, name: "La Capsule", kind: "bar", lat: 48.85, lng: 2.35 } });
+    const checkIn = randomUUID();
+    await db.query(
+      `insert into check_ins (id, user_id, venue_id, at, last_proof_at, verdict, risk, signals, config_version, fix_hash, created_at)
+       values ($1, $2, $3, $4, $4, 'rejected', 90, '[]', 1, 'h', $4)`,
+      [checkIn, crewMate.id, venueId, clock - 2 * 3_600_000],
+    );
+    const cheat = async (viewer: User) => ((await view(viewer, crewMate.id)) as unknown as { cheat: unknown }).cheat;
+    expect(await cheat(owner)).toEqual({ at: clock - 2 * 3_600_000, venue: "La Capsule", count: 1 });
+    expect(await cheat(crewMate)).toEqual(expect.objectContaining({ count: 1 }));
+    expect(await cheat(friend)).toBeNull();
+    expect(await cheat(stranger)).toBeNull();
+    const overturned = await app.inject({ method: "POST", url: `/v1/checkins/${checkIn}/overturn`, headers: owner.auth });
+    expect(overturned.statusCode).toBe(200);
+    expect(await cheat(owner)).toBeNull();
+  });
+});

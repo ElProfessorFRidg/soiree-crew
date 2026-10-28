@@ -2,7 +2,8 @@ import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, View } from "react-native";
-import { palette } from "@crew/design-tokens";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { duration, palette } from "@crew/design-tokens";
 import { useT } from "@/i18n";
 import { useTheme } from "@/theme";
 import { Icon } from "@/ui/Icon";
@@ -154,9 +155,11 @@ interface Props {
   onLongPress: () => void;
   onReactionPress: (emoji: string) => void;
   myReaction: string | undefined;
+  /** Arrived while the conversation is open: it fades in (the list is inverted, so "down" rises on screen). */
+  fresh?: boolean;
 }
 
-export function Bubble({ message, mine, senderName, replyTo, mentionNames, status, highlighted, onLongPress, onReactionPress, myReaction }: Props) {
+export function Bubble({ message, mine, senderName, replyTo, mentionNames, status, highlighted, onLongPress, onReactionPress, myReaction, fresh }: Props) {
   const i18n = useT();
   const theme = useTheme();
   if (message.kind === "timer") {
@@ -177,7 +180,7 @@ export function Bubble({ message, mine, senderName, replyTo, mentionNames, statu
   const counts = new Map<string, number>();
   for (const e of Object.values(message.reactions)) counts.set(e, (counts.get(e) ?? 0) + 1);
   return (
-    <View style={[styles.wrap, mine ? styles.right : styles.left]}>
+    <Animated.View entering={fresh ? FadeInDown.duration(duration.enter).withInitialValues({ opacity: 0, transform: [{ translateY: -14 }] }) : undefined} style={[styles.wrap, mine ? styles.right : styles.left]}>
       <ScalePressable
         onLongPress={onLongPress}
         delayLongPress={350}
@@ -234,7 +237,7 @@ export function Bubble({ message, mine, senderName, replyTo, mentionNames, statu
           ))}
         </View>
       ) : null}
-    </View>
+    </Animated.View>
   );
 }
 

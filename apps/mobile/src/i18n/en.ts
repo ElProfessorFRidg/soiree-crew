@@ -726,6 +726,9 @@ export const en: Messages = {
     otherServer: "This invite is from another server ({server}). Sign out first to accept it.",
   },
   people: {
+    cheatTag: "Tried to cheat",
+    cheatLine: "Check-in refused at {venue}, {date}. 0 points.",
+    cheatRepeat: { one: "{count} check-in refused this week.", other: "{count} check-ins refused this week." },
     mute: "Hide their going-out calls",
     unmute: "Stop hiding",
     mutedList: "Hidden",
@@ -1661,6 +1664,8 @@ export const en: Messages = {
   },
   errors: {
     rejected: "The server refused {action}: {reason}.",
+    rejectedMany: { one: "{count} action couldn't be saved:", other: "{count} actions couldn't be saved:" },
+    rejectedLine: "{action}: {reason}.",
     offline: { one: "No signal. {count} action will go out once you're back online.", other: "No signal. {count} actions will go out once you're back online." },
     slow: "The server isn't answering. The app keeps trying.",
     change: "the change",

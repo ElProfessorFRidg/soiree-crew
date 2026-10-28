@@ -64,6 +64,7 @@ export default function ProfileScreen() {
   const date = (at: number) => new Intl.DateTimeFormat(i18n.locale, { day: "numeric", month: "long" }).format(new Date(at));
   const titleLabel = (t: NonNullable<typeof s.titles>[number]) => (t.kind === "mayor" ? i18n.t("ranking.mayor", { venue: t.venueName ?? "" }) : i18n.t(`ranking.${t.kind}`));
   const empty = Object.keys(s).length === 0;
+  const whenLong = (at: number) => `${new Intl.DateTimeFormat(i18n.locale, { weekday: "long" }).format(new Date(at))} ${formatClock(at, i18n.language, preferences.hourCycle)}`;
 
   const friendButton = () => {
     if (mine) return null;
@@ -94,16 +95,27 @@ export default function ProfileScreen() {
   return (
     <Screen back withToasts>
       <View style={styles.head}>
-        {profile.mutualFriends ? <Text variant="small">{i18n.plural("people.mutual", profile.mutualFriends)}</Text> : null}
         <HeroTarget heroKey={`avatar:${profile.userId}`}>
           <Avatar personId={profile.userId} name={name || "?"} size={72} />
         </HeroTarget>
         <View style={styles.flex}>
           {name ? <Text variant="h1">{name}</Text> : null}
           {s.identity ? <Text variant="small">@{s.identity.username}</Text> : null}
-          {profile.relation.friend ? <Tag label={i18n.t("people.friends")} tone="ok" /> : null}
+          {profile.mutualFriends ? <Text variant="small">{i18n.plural("people.mutual", profile.mutualFriends)}</Text> : null}
+          <View style={styles.tags}>
+            {profile.relation.friend ? <Tag label={i18n.t("people.friends")} tone="ok" /> : null}
+            {profile.cheat ? <Tag label={i18n.t("people.cheatTag")} tone="danger" icon="alert" /> : null}
+          </View>
         </View>
       </View>
+      {profile.cheat ? (
+        <Panel tint="danger">
+          <Text variant="small">
+            {i18n.t("people.cheatLine", { venue: profile.cheat.venue, date: whenLong(profile.cheat.at) })}
+            {profile.cheat.count > 1 ? ` ${i18n.plural("people.cheatRepeat", profile.cheat.count)}` : ""}
+          </Text>
+        </Panel>
+      ) : null}
       {s.identity?.bio ? <Text>{s.identity.bio}</Text> : null}
       {s.identity?.country ? <Text variant="small">{s.identity.country}</Text> : null}
 
