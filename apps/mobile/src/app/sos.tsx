@@ -63,10 +63,11 @@ export default function SosScreen() {
       return;
     }
     haptic.heavy();
+    // Whatever the location does, the alert leaves: a failed fix is just an alert without a position.
     const fix = Promise.race([
       currentFix(),
       new Promise<null>((resolve) => setTimeout(() => resolve(null), 4_000)),
-    ]);
+    ]).catch(() => null);
     void fix.then(async (result) => {
       const location =
         result && result.ok

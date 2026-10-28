@@ -15,6 +15,7 @@ import { SkeletonRows } from "@/ui/Skeleton";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { showFailure } from "@/server/errors";
+import { canShareImages } from "@/system/share";
 
 interface Wrapped {
   period: "month" | "year";
@@ -97,7 +98,7 @@ export default function WrappedScreen() {
       back
       title={i18n.t("wrapped.title")}
       withToasts
-      footer={data && data.nights > 0 ? <Button label={i18n.t("wrapped.share")} icon="share" height={56} loading={sharing} onPress={() => void share()} /> : undefined}
+      footer={canShareImages && data && data.nights > 0 ? <Button label={i18n.t("wrapped.share")} icon="share" height={56} loading={sharing} onPress={() => void share()} /> : undefined}
     >
       <Segmented<Choice>
         accessibilityLabel={i18n.t("wrapped.title")}

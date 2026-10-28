@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useState, type ReactNode } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Platform } from "react-native";
 import { getMotionScale, setMotionScale } from "@crew/design-tokens";
 import type { UnitSystem } from "@crew/units";
 import { useT } from "@/i18n";
@@ -192,49 +192,56 @@ export default function SettingsScreen() {
                 if (on) void checkForUpdate(true).catch(() => undefined);
               }}
             />
-            <SwitchRow
-              label={i18n.t("settings.water")}
-              value={preferences.waterReminderMinutes !== null}
-              onChange={(on) => setPreferences({ waterReminderMinutes: on ? 45 : null })}
-            />
-            {preferences.waterReminderMinutes !== null ? (
-              <Segmented<number>
-                accessibilityLabel={i18n.t("settings.water")}
-                value={preferences.waterReminderMinutes}
-                items={WATER_STEPS.map((minutes) => ({ value: minutes, label: minutes === 60 ? i18n.t("limits.waterHour") : i18n.t("limits.waterEvery", { minutes }) }))}
-                onChange={(waterReminderMinutes) => setPreferences({ waterReminderMinutes })}
-              />
-            ) : null}
-            <SwitchRow label={i18n.t("settings.limit")} value={preferences.warnNearLimit} onChange={(warnNearLimit) => setPreferences({ warnNearLimit })} />
-            <SwitchRow label={i18n.t("settings.recap")} value={preferences.notifyRecap} onChange={(notifyRecap) => setPreferences({ notifyRecap })} />
-            <Text variant="label">{i18n.t("settings.quiet")}</Text>
-            <View style={styles.pair}>
-              <View style={styles.flex}>
-                <Text variant="small">{i18n.t("settings.quietFrom")}</Text>
-                <Stepper
-                  value={preferences.quietFromHour}
-                  min={0}
-                  max={23}
-                  onChange={(quietFromHour) => setPreferences({ quietFromHour })}
-                  format={hour}
-                  decreaseLabel={`${i18n.t("settings.quietFrom")}, ${i18n.t("settings.earlier")}`}
-                  increaseLabel={`${i18n.t("settings.quietFrom")}, ${i18n.t("settings.later")}`}
+            {/* Reminders are local notifications: a browser tab cannot send them (reminders.ts). */}
+            {Platform.OS === "web" ? (
+              <Text variant="small">{i18n.t("settings.remindersAppOnly")}</Text>
+            ) : (
+              <>
+                <SwitchRow
+                  label={i18n.t("settings.water")}
+                  value={preferences.waterReminderMinutes !== null}
+                  onChange={(on) => setPreferences({ waterReminderMinutes: on ? 45 : null })}
                 />
-              </View>
-              <View style={styles.flex}>
-                <Text variant="small">{i18n.t("settings.quietTo")}</Text>
-                <Stepper
-                  value={preferences.quietToHour}
-                  min={0}
-                  max={23}
-                  onChange={(quietToHour) => setPreferences({ quietToHour })}
-                  format={hour}
-                  decreaseLabel={`${i18n.t("settings.quietTo")}, ${i18n.t("settings.earlier")}`}
-                  increaseLabel={`${i18n.t("settings.quietTo")}, ${i18n.t("settings.later")}`}
-                />
-              </View>
-            </View>
-            <Text variant="small">{i18n.t("settings.quietHint")}</Text>
+                {preferences.waterReminderMinutes !== null ? (
+                  <Segmented<number>
+                    accessibilityLabel={i18n.t("settings.water")}
+                    value={preferences.waterReminderMinutes}
+                    items={WATER_STEPS.map((minutes) => ({ value: minutes, label: minutes === 60 ? i18n.t("limits.waterHour") : i18n.t("limits.waterEvery", { minutes }) }))}
+                    onChange={(waterReminderMinutes) => setPreferences({ waterReminderMinutes })}
+                  />
+                ) : null}
+                <SwitchRow label={i18n.t("settings.limit")} value={preferences.warnNearLimit} onChange={(warnNearLimit) => setPreferences({ warnNearLimit })} />
+                <SwitchRow label={i18n.t("settings.recap")} value={preferences.notifyRecap} onChange={(notifyRecap) => setPreferences({ notifyRecap })} />
+                <Text variant="label">{i18n.t("settings.quiet")}</Text>
+                <View style={styles.pair}>
+                  <View style={styles.flex}>
+                    <Text variant="small">{i18n.t("settings.quietFrom")}</Text>
+                    <Stepper
+                      value={preferences.quietFromHour}
+                      min={0}
+                      max={23}
+                      onChange={(quietFromHour) => setPreferences({ quietFromHour })}
+                      format={hour}
+                      decreaseLabel={`${i18n.t("settings.quietFrom")}, ${i18n.t("settings.earlier")}`}
+                      increaseLabel={`${i18n.t("settings.quietFrom")}, ${i18n.t("settings.later")}`}
+                    />
+                  </View>
+                  <View style={styles.flex}>
+                    <Text variant="small">{i18n.t("settings.quietTo")}</Text>
+                    <Stepper
+                      value={preferences.quietToHour}
+                      min={0}
+                      max={23}
+                      onChange={(quietToHour) => setPreferences({ quietToHour })}
+                      format={hour}
+                      decreaseLabel={`${i18n.t("settings.quietTo")}, ${i18n.t("settings.earlier")}`}
+                      increaseLabel={`${i18n.t("settings.quietTo")}, ${i18n.t("settings.later")}`}
+                    />
+                  </View>
+                </View>
+                <Text variant="small">{i18n.t("settings.quietHint")}</Text>
+              </>
+            )}
           </Section>
 
         </>

@@ -5,6 +5,7 @@ import { join } from "node:path";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { HttpError, requireUser, type Context } from "../context";
+import { RateLimiter } from "../ratelimit";
 
 const uuid = z.string().uuid();
 /** Decoded size cap; the app sends about 300 KB once resized to 1600 px. */
@@ -34,6 +35,8 @@ async function assertGoing(ctx: Context, partyId: string, userId: string): Promi
 }
 
 export function photoRoutes(app: FastifyInstance, ctx: Context): void {
+  // A storage budget per account: a long night is a few dozen photos, not thousands.
+  const uploads = new RateLimiter(200, 24 * 3_600_000, ctx.now);
   /**
    * QOL-09: the app resizes and re-encodes before sending, which also drops the
    * location in the photo's metadata. The server only accepts JPEG and checks it.
@@ -41,6 +44,7 @@ export function photoRoutes(app: FastifyInstance, ctx: Context): void {
   app.post<{ Params: { id: string } }>("/v1/parties/:id/photos", { bodyLimit: 8 * 1024 * 1024 }, async (request, reply) => {
     const user = requireUser(request);
     await assertGoing(ctx, request.params.id, user.id);
+    uploads.check(user.id);
     const input = z
       .object({ id: uuid, data: z.string().min(100).max(7_000_000), width: z.number().int().min(1).max(8000), height: z.number().int().min(1).max(8000) })
       .parse(request.body);

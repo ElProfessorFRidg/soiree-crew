@@ -1,9 +1,10 @@
 import { RecordingPresets, requestRecordingPermissionsAsync, setAudioModeAsync, useAudioRecorder } from "expo-audio";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 import { radius, type } from "@crew/design-tokens";
 import { MAX_BODY } from "@crew/mls";
 import { useT } from "@/i18n";
+import { showPermissionDenied } from "@/system/permissions";
 import { haptic } from "@/motion/haptics";
 import { useTheme } from "@/theme";
 import { Button, IconButton } from "@/ui/Button";
@@ -56,40 +57,26 @@ export function Composer({ conversationId, members, reply, onClearReply, big }: 
   const photo = async () => {
     try {
       const n = await sendPhoto(conversationId, "library", reply?.id);
-      if (n === -1) showToast({ tone: "danger", message: i18n.t("chat.photoPermission") });
+      if (n < 0) showPermissionDenied(i18n, i18n.t("chat.photoPermission"), n === -1);
       if (n > 0) onClearReply();
     } catch (error) {
       showToast({ tone: "danger", message: i18n.t(error instanceof VideoTooLarge ? "chat.videoTooBig" : "chat.mediaFailed") });
     }
   };
 
-  const startRecording = async () => {
-    const permission = await requestRecordingPermissionsAsync();
-    if (!permission.granted) {
-      showToast({ tone: "danger", message: i18n.t("chat.micPermission") });
-      return;
-    }
-    await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
-    await recorder.prepareToRecordAsync();
-    recorder.record();
-    haptic.select();
-    const started = Date.now();
-    setRecording(started);
-    setElapsed(0);
-    ticker.current = setInterval(() => {
-      const ms = Date.now() - started;
-      setElapsed(ms);
-      if (ms >= MAX_VOICE_MS) void stopRecording(true);
-    }, 200);
-  };
+  // Refs, not state: the timer and the permission prompt outlive the render that started them.
+  const holding = useRef(false);
+  const startedAt = useRef<number | null>(null);
 
   const stopRecording = async (keep: boolean) => {
+    holding.current = false;
     if (ticker.current) clearInterval(ticker.current);
     ticker.current = null;
-    const started = recording;
+    const started = startedAt.current;
+    startedAt.current = null;
     setRecording(null);
     if (started === null) return;
-    await recorder.stop();
+    await recorder.stop().catch(() => undefined);
     await setAudioModeAsync({ allowsRecording: false }).catch(() => undefined);
     const duration = Date.now() - started;
     const uri = recorder.uri;
@@ -105,6 +92,44 @@ export function Composer({ conversationId, members, reply, onClearReply, big }: 
       showToast({ tone: "danger", message: i18n.t("chat.mediaFailed") });
     }
   };
+
+  const startRecording = async () => {
+    holding.current = true;
+    const permission = await requestRecordingPermissionsAsync();
+    if (!permission.granted) {
+      holding.current = false;
+      showPermissionDenied(i18n, i18n.t("chat.micPermission"), permission.canAskAgain);
+      return;
+    }
+    // The prompt took the finger away: the press is over, so nothing records.
+    if (!holding.current) return;
+    await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
+    await recorder.prepareToRecordAsync();
+    if (!holding.current) {
+      await setAudioModeAsync({ allowsRecording: false }).catch(() => undefined);
+      return;
+    }
+    recorder.record();
+    haptic.select();
+    const started = Date.now();
+    startedAt.current = started;
+    setRecording(started);
+    setElapsed(0);
+    ticker.current = setInterval(() => {
+      const ms = Date.now() - started;
+      setElapsed(ms);
+      if (ms >= MAX_VOICE_MS) void stopRecording(true);
+    }, 200);
+  };
+
+  // Leaving the conversation mid-recording turns the microphone off.
+  useEffect(
+    () => () => {
+      if (startedAt.current !== null) void stopRecording(false);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   const recordButton = (
     <ScalePressable

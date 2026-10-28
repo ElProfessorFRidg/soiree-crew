@@ -13,6 +13,7 @@ import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { useDraft } from "@/state/drafts";
 import { showFailure } from "@/server/errors";
+import { OpenSettingsButton } from "@/system/OpenSettingsButton";
 
 /** N-08: a venue is placed where the user stands; no address search, no third-party geocoder. */
 export default function AddVenueScreen() {
@@ -23,12 +24,16 @@ export default function AddVenueScreen() {
   const [kind, setKind] = useState<VenueKind>("bar");
   const [position, setPosition] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [blocked, setBlocked] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     void currentFix().then((result) => {
       if (result.ok) setPosition({ lat: result.fix.lat, lng: result.fix.lng });
-      else setLocationError(result.failure === "denied" ? i18n.t("addVenue.locationDenied") : i18n.t("addVenue.locationUnavailable"));
+      else {
+        setLocationError(result.failure === "denied" ? i18n.t("addVenue.locationDenied") : i18n.t("addVenue.locationUnavailable"));
+        setBlocked(result.failure === "denied" && result.canAskAgain === false);
+      }
     });
   }, [i18n]);
 
@@ -71,7 +76,10 @@ export default function AddVenueScreen() {
       </Panel>
       <View style={styles.status}>
         {locationError ? (
-          <Text color={theme.danger}>{locationError}</Text>
+          <>
+            <Text color={theme.danger}>{locationError}</Text>
+            {blocked ? <OpenSettingsButton /> : null}
+          </>
         ) : !position ? (
           <Text variant="small">{i18n.t("addVenue.locating")}</Text>
         ) : null}

@@ -84,11 +84,12 @@ export type LocationFailure = "denied" | "unavailable";
 
 /** One fresh fix, never a cached one (anticheat.md §2.2 stale fix). */
 export async function currentFix(): Promise<
-  { ok: true; fix: { lat: number; lng: number; accuracy: number; mocked: boolean } } | { ok: false; failure: LocationFailure }
+  { ok: true; fix: { lat: number; lng: number; accuracy: number; mocked: boolean } } | { ok: false; failure: LocationFailure; canAskAgain?: boolean }
 > {
-  const permission = await Location.requestForegroundPermissionsAsync();
-  if (!permission.granted) return { ok: false, failure: "denied" };
+  // Never throws: the SOS waits on this, and a browser without the permissions API throws on the request.
   try {
+    const permission = await Location.requestForegroundPermissionsAsync();
+    if (!permission.granted) return { ok: false, failure: "denied", canAskAgain: permission.canAskAgain };
     const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
     return {
       ok: true,
@@ -119,7 +120,8 @@ export async function checkIn(venueId: string, fix: { lat: number; lng: number; 
   const id = newId();
   const result = await api<CheckInResult>("/v1/checkins", {
     method: "POST",
-    body: { id, venueId, ...fix, deviceNow: Date.now(), private: isPrivate, integrity: await deviceIntegrity() },
+    // AC-05: the server weighs a browser check-in differently, since devtools can fake its position.
+    body: { id, venueId, ...fix, deviceNow: Date.now(), private: isPrivate, integrity: await deviceIntegrity(), platform: Platform.OS },
   });
   if (result.verdict === "accepted" || result.verdict === "unverified") {
     useVenueData.setState({ openCheckIn: { id, venueId, at: Date.now() } });

@@ -148,6 +148,9 @@ export function radarRoutes(app: FastifyInstance, ctx: Context): void {
     const input = z.object({ partyId: z.string().uuid() }).parse(request.body);
     const rows = await ctx.db.query<{ crew_id: string }>("select crew_id from out_calls where id = $1 and user_id = $2", [request.params.id, user.id]);
     if (!rows[0]) throw new HttpError(404, "not_found");
+    // Only a party of the same crew: a call cannot sign people up to another crew's night.
+    const party = await ctx.db.query("select 1 from parties where id = $1 and crew_id = $2", [input.partyId, rows[0].crew_id]);
+    if (!party.length) throw new HttpError(404, "not_found");
     await ctx.db.query("update out_calls set party_id = $2 where id = $1", [request.params.id, input.partyId]);
     // Everyone who said "in" is already going.
     await ctx.db.query(

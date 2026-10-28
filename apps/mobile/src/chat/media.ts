@@ -48,10 +48,11 @@ async function sendVideo(conversationId: string, asset: ImagePicker.ImagePickerA
   });
 }
 
-/** Opens the camera or the library, re-encodes photos (which drops the location), encrypts and sends. -1: no permission. */
+/** Opens the camera or the library, re-encodes photos (which drops the location), encrypts and sends. -1 or -2: no permission. */
 export async function sendPhoto(conversationId: string, source: "camera" | "library", reply?: string): Promise<number> {
   const permission = source === "camera" ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
-  if (!permission.granted) return -1;
+  // -1: refused, the system may ask again; -2: refused for good, only the settings can help.
+  if (!permission.granted) return permission.canAskAgain ? -1 : -2;
   const options: ImagePicker.ImagePickerOptions = { mediaTypes: ["images", "videos"], quality: 1, exif: false, videoMaxDuration: MAX_VIDEO_S, videoQuality: ImagePicker.UIImagePickerControllerQualityType.Medium };
   const result = source === "camera" ? await ImagePicker.launchCameraAsync(options) : await ImagePicker.launchImageLibraryAsync(options);
   if (result.canceled || !result.assets[0]) return 0;
@@ -125,4 +126,22 @@ export function openChatMedia(media: ChatMedia): Promise<string> {
     opened.set(media.blob, promise);
   }
   return promise;
+}
+
+/**
+ * SEC-05: a decrypted voice note or video never stays on disk longer than needed. Called when the
+ * conversation closes (every blob) and when a disappearing message expires (its blob).
+ */
+export function releaseChatMedia(blobs?: readonly string[]): void {
+  for (const blob of blobs ?? [...opened.keys()]) {
+    const promise = opened.get(blob);
+    if (!promise) continue;
+    opened.delete(blob);
+    if (Platform.OS === "web") continue;
+    void promise
+      .then((uri) => {
+        if (uri.startsWith("file:")) new File(uri).delete();
+      })
+      .catch(() => undefined);
+  }
 }

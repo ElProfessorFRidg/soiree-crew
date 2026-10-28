@@ -30,6 +30,7 @@ import { showToast, ToastHost } from "@/ui/Toast";
 import { addPhotos } from "@/photos/uploads";
 import { useLiveParty } from "@/server/crewData";
 import { showFailure } from "@/server/errors";
+import { showPermissionDenied } from "@/system/permissions";
 
 
 const MINUTE_MS = 60_000;
@@ -252,7 +253,7 @@ export default function AddDrinkSheet() {
               void addPhotos(live.party.id, "camera")
                 .then((n) => {
                   if (n > 0) showToast({ message: i18n.t("addDrink.photoAdded") });
-                  else if (n < 0) showToast({ tone: "danger", message: i18n.t("album.denied") });
+                  else if (n < 0) showPermissionDenied(i18n, i18n.t("album.denied"), n === -1);
                 })
                 .catch(showFailure(i18n))
             }

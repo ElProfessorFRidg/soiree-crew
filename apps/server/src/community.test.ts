@@ -55,7 +55,8 @@ describe("public places (COM-01, COM-02, PROF-04)", () => {
     expect(seen.reviews).toHaveLength(1);
     expect(seen.reviews[0]!.author).toBeNull();
     expect(seen.ratings.vibe).toBe(5);
-    expect(seen.usersThisMonth).toBe(1);
+    // COM-06: one visitor is a person, not a crowd. Strangers see nothing until there are five.
+    expect(seen.usersThisMonth).toBe(0);
 
     // "Only me" leaves the rating and the page.
     await review(a.user, a.venueId, "me");

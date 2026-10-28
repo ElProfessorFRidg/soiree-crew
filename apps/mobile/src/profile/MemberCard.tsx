@@ -13,6 +13,7 @@ import { Button } from "@/ui/Button";
 import { Tag } from "@/ui/controls";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { canShareImages } from "@/system/share";
 
 /**
  * JOY-11: a card to share. It is built from the profile as a stranger sees it,
@@ -71,7 +72,7 @@ export function MemberCard() {
           {i18n.t("recap.storyFooter")}
         </Text>
       </View>
-      <Button label={i18n.t("people.shareCard")} icon="share" variant="secondary" height={48} loading={busy} onPress={() => void share()} />
+      {canShareImages ? <Button label={i18n.t("people.shareCard")} icon="share" variant="secondary" height={48} loading={busy} onPress={() => void share()} /> : null}
     </View>
   );
 }

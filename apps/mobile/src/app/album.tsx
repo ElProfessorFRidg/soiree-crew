@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Alert, Image, Modal, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
+import { Image, Modal, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
 import { radius } from "@crew/design-tokens";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
@@ -13,6 +13,8 @@ import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { showFailure } from "@/server/errors";
+import { confirmAction } from "@/ui/confirm";
+import { showPermissionDenied } from "@/system/permissions";
 
 const COLUMNS = 3;
 const GAP = 6;
@@ -42,7 +44,7 @@ export default function AlbumScreen() {
   const add = (source: "camera" | "library") =>
     void addPhotos(partyId, source)
       .then((n) => {
-        if (n < 0) showToast({ tone: "danger", message: i18n.t("album.denied") });
+        if (n < 0) showPermissionDenied(i18n, i18n.t("album.denied"), n === -1);
         else if (n > 0) haptic.confirmed();
       })
       .catch(showFailure(i18n));
@@ -98,20 +100,15 @@ export default function AlbumScreen() {
               variant="outline"
               height={48}
               onPress={() =>
-                Alert.alert(i18n.t("album.deleteConfirm"), undefined, [
-                  { text: i18n.t("album.keep"), style: "cancel" },
-                  {
-                    text: i18n.t("album.delete"),
-                    style: "destructive",
-                    onPress: () =>
-                      void deletePhoto(open.id)
-                        .then(() => {
-                          setOpen(null);
-                          load();
-                        })
-                        .catch(showFailure(i18n)),
-                  },
-                ])
+                void confirmAction({ title: i18n.t("album.deleteConfirm"), confirmLabel: i18n.t("album.delete"), cancelLabel: i18n.t("album.keep") }).then((ok) => {
+                  if (!ok) return;
+                  void deletePhoto(open.id)
+                    .then(() => {
+                      setOpen(null);
+                      load();
+                    })
+                    .catch(showFailure(i18n));
+                })
               }
             />
           ) : null}

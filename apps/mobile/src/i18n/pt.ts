@@ -4,6 +4,11 @@ import type { Messages } from "./types";
 
 export const pt: Messages = {
   common: {
+    openSettings: "Abrir definições",
+    permissionWeb: "Autoriza o acesso nas definições do site, no teu navegador.",
+    crashTitle: "Este ecrã falhou.",
+    crashBody: "O resto da app funciona. Tenta outra vez ou volta ao início.",
+    crashHome: "Voltar ao início",
     you: "tu",
     close: "Fechar",
     back: "Voltar",
@@ -139,6 +144,7 @@ export const pt: Messages = {
     mute: "Silenciar até amanhã",
   },
   crew: {
+    calendarFailed: "O calendário não abriu.",
     timeout: "O servidor não responde. Tenta daqui a pouco.",
     addAnother: "Criar ou entrar noutro crew",
     tab: "Crew",
@@ -609,6 +615,7 @@ export const pt: Messages = {
     alibiLanguage: "Álibis em inglês por agora.",
   },
   settings: {
+    remindersAppOnly: "Os lembretes (água, limite, resumo) só funcionam na app instalada, não no navegador.",
     sections: { region: "Idioma, região e unidades", notifications: "Notificações", security: "Segurança e dados", appearance: "Privacidade e aparência" },
     notificationsSummary: "Água, limite, resumo, horas de silêncio",
     securitySummary: "Conta, dispositivos, exportar, apagar",

@@ -63,6 +63,37 @@ A dedicated agent attacked the local dev server with throwaway accounts (mock an
 
 Known and accepted: a modified client that sends a plausible fix with `mocked: false` gets an accepted check-in. Location alone cannot prove presence; that is why points need corroboration over time (AC-04, AC-06) and why the admin can overturn.
 
+## Second audit (28 October 2026)
+
+Two fresh reviewers went through every server route and every platform path (iOS, Android, web). Fixed, each with a regression test in `apps/server/src/security.test.ts` where it is server-side:
+
+- A cheers between two accounts lifted two unverified check-ins into points. A cheers now vouches like a one-tap confirmation: only a check-in that stood on its own signals can vouch, and the nightly cap applies.
+- Re-sending a known pool id added the sender to that pool: an existing id is now a replay of my own request or a 409.
+- A crew admin could overturn their own rejected check-in: refused now.
+- Someone could say "going" to a finished night and get it counted: closed nights refuse sign-ups, and status needs "going".
+- Someone who walked into an open crew could join a night already under way and read live levels and positions: refused, and their live view shows no levels. An invite still works.
+- A confirmed drink could be edited and stay confirmed: changing volume, strength or time drops the confirmation.
+- Leaving a crew kept its live and coming nights, and their chats: they go with it now.
+- Public place pages showed presence in real time: COM-06 applied (a day late, at least five people, rounded to five, private check-ins excluded).
+- Crew mates who were not at a night saw everyone's BAC curve in the recap: curves are for the people who were there.
+- Five wrong passwords from anywhere locked the owner out: the limit is per login and address, with a looser one per login.
+- Sessions never expired and a new password left other devices signed in: 90 days idle ends a session, and a new password signs the other devices out. scrypt raised to 2^17.
+- Invite codes, uploads and payment links: rate limits on invite lookups, a daily upload budget per account, https payment links only.
+- Account deletion left the sealed chat backup on disk: it goes with the account.
+- Operators can be listed by account id (`OPERATOR_IDS`), so an unclaimed username cannot become an operator.
+- Web check-ins never count on their own (a browser can fake its position).
+- App side: confirmation dialogs work on web; an SOS goes out even when the location fails; the microphone always stops; decrypted voice and video files are deleted; http to a server is limited to localhost and real private addresses; a crash shows a retry screen instead of a blank app.
+
+Known and still open:
+
+- The app's local store (profile, drinks) is not encrypted at rest (SEC-05 asks for it), and the app-switcher snapshot is not hidden.
+- The live socket carries the session token in its URL, which can end up in proxy logs.
+- Drink kind, times and water times are stored in clear on the server; only volume, strength and the body profile are sealed. The sealing key does not rotate.
+- The offline envelope trust (AC-12) is stored but not used by scoring yet.
+- Report evidence in chat is what the reporter's phone sends; admins should read it as unverified.
+- Voice notes recorded in a desktop browser (webm) may not play on iPhone. The web photo queue lives in localStorage, and two web tabs share one chat state.
+- `TRUST_PROXY=true` must only be set when the port is not reachable directly, or IP rate limits can be dodged.
+
 ## Not done yet (before any public release)
 
 - An independent review of `packages/mls` and of ts-mls, which has had no formal audit (ADR 0005), or a move to OpenMLS behind the same interface.

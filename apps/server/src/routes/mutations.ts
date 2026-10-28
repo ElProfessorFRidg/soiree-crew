@@ -99,8 +99,15 @@ async function apply(ctx: Context, db: Db, userId: string, mutation: MutationInp
     case "drink.add": {
       const d = mutation.drink;
       if (d.consumedAt > now + FUTURE_TOLERANCE_MS) throw new Rejection("future_drink");
-      const owner = await db.query<{ user_id: string }>("select user_id from drinks where id = $1", [d.id]);
+      const owner = await db.query<{ user_id: string; sealed: string; consumed_at: number }>("select user_id, sealed, consumed_at from drinks where id = $1", [d.id]);
       if (owner[0] && owner[0].user_id !== userId) throw new Rejection("invalid");
+      if (owner[0]?.sealed) {
+        // RANK-06: a friend confirmed this drink as it was. Changing it drops the confirmation.
+        const before = ctx.sealer.open<{ volumeMl: number; abv: number }>(owner[0].sealed);
+        if (before.volumeMl !== d.volumeMl || before.abv !== d.abv || owner[0].consumed_at !== d.consumedAt) {
+          await db.query("delete from drink_confirmations where drink_id = $1", [d.id]);
+        }
+      }
       const partyId = await partyAt(db, userId, d.consumedAt);
       const sealed = ctx.sealer.seal({ volumeMl: d.volumeMl, abv: d.abv, withFood: d.withFood, name: d.name ?? null });
       await db.query(

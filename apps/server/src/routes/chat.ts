@@ -5,6 +5,7 @@ import { join } from "node:path";
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { bearer, HttpError, requireUser, type Context } from "../context";
+import { RateLimiter } from "../ratelimit";
 import { hashToken } from "../crypto";
 import type { Db } from "../db";
 
@@ -49,6 +50,11 @@ function chatDir(ctx: Context, sub: string): string {
 }
 const blobPath = (ctx: Context, id: string) => join(chatDir(ctx, "chat"), `${id}.bin`);
 const backupPath = (ctx: Context, userId: string) => join(chatDir(ctx, "chat-backups"), `${userId}.bin`);
+
+/** O-07: the sealed chat backup goes with the account. */
+export async function deleteChatBackup(ctx: Context, userId: string): Promise<void> {
+  await unlink(backupPath(ctx, userId)).catch(() => undefined);
+}
 
 /** The MLS client of the device making the request, found by its session. */
 async function deviceOf(ctx: Context, request: FastifyRequest): Promise<{ id: string; userId: string } | null> {
@@ -164,6 +170,8 @@ function notify(ctx: Context, userIds: string[], event: Parameters<Context["live
 }
 
 export function chatRoutes(app: FastifyInstance, ctx: Context): void {
+  // A storage budget per account, so one account cannot fill the disk with encrypted files.
+  const blobUploads = new RateLimiter(300, 24 * 3_600_000, ctx.now);
   /** Registers this device's MLS client. The signature key never changes for a device. */
   app.put("/v1/chat/device", async (request) => {
     const user = requireUser(request);
@@ -523,6 +531,7 @@ export function chatRoutes(app: FastifyInstance, ctx: Context): void {
     const user = requireUser(request);
     const { conversation } = await conversationFor(ctx, request.params.id, user.id);
     if (await readOnly(ctx, conversation)) throw new HttpError(403, "read_only");
+    blobUploads.check(user.id);
     const input = z.object({ data: b64(Math.ceil(MAX_BLOB * 1.37)) }).parse(request.body);
     const bytes = Buffer.from(input.data, "base64");
     if (bytes.length > MAX_BLOB) throw new HttpError(413, "too_large");

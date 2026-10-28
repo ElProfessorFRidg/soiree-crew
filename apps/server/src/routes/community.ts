@@ -61,6 +61,11 @@ async function friendIds(ctx: Context, userId: string): Promise<Set<string>> {
   return new Set(rows.map((r) => r.other));
 }
 
+/** COM-06: strangers see presence a day late, rounded, and only once this many people are behind it. */
+const PRESENCE_MIN_USERS = 5;
+const PRESENCE_DELAY_MS = 24 * 3_600_000;
+const presenceCount = (n: number): number => (n < PRESENCE_MIN_USERS ? 0 : Math.round(n / 5) * 5);
+
 export function communityRoutes(app: FastifyInstance, ctx: Context): void {
   const writes = new RateLimiter(60, 60 * 60_000, ctx.now);
 
@@ -85,17 +90,20 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
       "select tag, count(distinct user_id)::int as n from place_tags where venue_id = any($1::uuid[]) group by tag order by n desc",
       [ids],
     );
+    // COM-06: past visits only (a day late, so nobody reads tonight off the page), and nothing at all
+    // until enough different people make one of them impossible to pick out.
     const checkIns = await ctx.db.query<{ user_id: string; at: number }>(
-      "select user_id, at from check_ins where venue_id = any($1::uuid[]) and verdict = 'accepted' and private = false and at > $2",
-      [ids, now - 90 * DAY_MS],
+      "select user_id, at from check_ins where venue_id = any($1::uuid[]) and verdict = 'accepted' and private = false and at > $2 and at < $3",
+      [ids, now - 90 * DAY_MS, now - PRESENCE_DELAY_MS],
     );
+    const enough = new Set(checkIns.map((c) => c.user_id)).size >= PRESENCE_MIN_USERS;
     const weekdays = [0, 0, 0, 0, 0, 0, 0];
     const hours = new Array<number>(24).fill(0);
-    for (const c of checkIns) {
+    for (const c of enough ? checkIns : []) {
       weekdays[(new Date(`${nightOf(c.at, PLACE_TZ)}T12:00:00Z`).getUTCDay() + 6) % 7]! += 1;
       hours[Number(new Intl.DateTimeFormat("en-GB", { hour: "numeric", hourCycle: "h23", timeZone: PLACE_TZ }).format(new Date(c.at)))]! += 1;
     }
-    const usersThisMonth = new Set(checkIns.filter((c) => c.at > now - 30 * DAY_MS).map((c) => c.user_id)).size;
+    const usersThisMonth = presenceCount(new Set(checkIns.filter((c) => c.at > now - 30 * DAY_MS).map((c) => c.user_id)).size);
 
     const reviews = await ctx.db.query<{ id: string; user_id: string; display_name: string; ratings: string; text: string; audience: string; visited_at: number; useful: number; mine: number }>(
       `select r.id, r.user_id, u.display_name, r.ratings, r.text, r.audience, r.visited_at,
@@ -351,7 +359,14 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
     const now = ctx.now();
     const out = [];
     for (const p of places.slice(0, 60)) {
-      const checkIns = (await ctx.db.query<{ n: number }>("select count(*)::int as n from check_ins where venue_id = any($1::uuid[]) and verdict = 'accepted' and at > $2", [p.ids, now - 30 * DAY_MS]))[0]!.n;
+      const checkIns = presenceCount(
+        (
+          await ctx.db.query<{ n: number }>(
+            "select count(distinct user_id)::int as n from check_ins where venue_id = any($1::uuid[]) and verdict = 'accepted' and private = false and at > $2 and at < $3",
+            [p.ids, now - 30 * DAY_MS, now - PRESENCE_DELAY_MS],
+          )
+        )[0]!.n,
+      );
       const rated = await ctx.db.query<{ ratings: string }>("select ratings from place_reviews where venue_id = any($1::uuid[]) and audience in ('public', 'anonymous')", [p.ids]);
       const scores = rated.flatMap((r) => Object.values(JSON.parse(r.ratings) as Record<string, number>));
       const rating = scores.length ? Math.round((scores.reduce((s, v) => s + v, 0) / scores.length) * 10) / 10 : null;

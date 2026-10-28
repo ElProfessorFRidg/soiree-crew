@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { duration } from "@crew/design-tokens";
 import { breathRatio, countryRules, formatBacValue } from "@crew/units";
@@ -24,6 +24,7 @@ import { useEcoInterval } from "@/power/eco";
 import { ScalePressable } from "@/ui/Pressable";
 import { startSharing, stopSharing, useLiveShare } from "@/location/liveShare";
 import { showFailure } from "@/server/errors";
+import { confirmAction } from "@/ui/confirm";
 
 /** Live dashboard refresh while the screen is open, on top of socket hints (O-37). */
 const REFRESH_MS = 20_000;
@@ -161,10 +162,9 @@ export default function LiveScreen() {
           variant="outline"
           height={48}
           onPress={() =>
-            Alert.alert(i18n.t("live.closeConfirm", { party: live.party.name }), undefined, [
-              { text: i18n.t("live.closeKeep"), style: "cancel" },
-              { text: i18n.t("live.close"), style: "destructive", onPress: () => void closeParty(id).catch(() => undefined) },
-            ])
+            void confirmAction({ title: i18n.t("live.closeConfirm", { party: live.party.name }), confirmLabel: i18n.t("live.close"), cancelLabel: i18n.t("live.closeKeep") }).then((ok) => {
+              if (ok) void closeParty(id).catch(showFailure(i18n));
+            })
           }
         />
       ) : null}

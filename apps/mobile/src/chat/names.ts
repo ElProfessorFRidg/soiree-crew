@@ -12,7 +12,8 @@ export function useNames(): (userId: string) => string {
   const session = useSession((s) => s.session);
   return useCallback(
     (userId: string) => {
-      if (userId === session?.userId) return session.displayName;
+      // Signed out, an undefined id must not match the missing session.
+      if (session && userId === session.userId) return session.displayName;
       for (const crew of crews) {
         const member = crew.members.find((m) => m.id === userId);
         if (member) return member.nickname || member.displayName;

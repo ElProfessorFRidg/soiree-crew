@@ -21,7 +21,7 @@ export interface Context {
   downloadsDir?: string;
   /** Shown by GET /v1/info: SERVER_NAME, SERVER_DESCRIPTION, PUBLIC_SERVER. */
   serverInfo?: { name: string; description: string; public: boolean };
-  /** COM-11: usernames of the server operators, who check venue claims (OPERATOR_USERNAMES). */
+  /** COM-11: account ids (OPERATOR_IDS, preferred) or usernames (OPERATOR_USERNAMES) of the operators, who check venue claims. */
   operators?: string[];
   /** <ai_features>: the language model, when the server is configured for one. */
   ai?: AiProvider | null;
@@ -48,15 +48,26 @@ declare module "fastify" {
   }
 }
 
+/** SEC-07: a session unused this long is gone; the phone signs in again. */
+export const SESSION_IDLE_MS = 90 * 24 * 3_600_000;
+/** last_seen_at only needs to be roughly right, so it is not written on every request. */
+const SEEN_GRANULARITY_MS = 3_600_000;
+
 export async function userFromToken(ctx: Context, token: string | undefined): Promise<AuthedUser | null> {
   if (!token) return null;
-  const rows = await ctx.db.query<{ id: string; username: string; display_name: string }>(
-    `select u.id, u.username, u.display_name from sessions s join users u on u.id = s.user_id where s.token_hash = $1`,
-    [hashToken(token)],
+  const hash = hashToken(token);
+  const rows = await ctx.db.query<{ id: string; username: string; display_name: string; last_seen_at: number }>(
+    `select u.id, u.username, u.display_name, s.last_seen_at from sessions s join users u on u.id = s.user_id where s.token_hash = $1`,
+    [hash],
   );
   const row = rows[0];
   if (!row) return null;
-  await ctx.db.query("update sessions set last_seen_at = $1 where token_hash = $2", [ctx.now(), hashToken(token)]);
+  const now = ctx.now();
+  if (now - row.last_seen_at > SESSION_IDLE_MS) {
+    await ctx.db.query("delete from sessions where token_hash = $1", [hash]);
+    return null;
+  }
+  if (now - row.last_seen_at > SEEN_GRANULARITY_MS) await ctx.db.query("update sessions set last_seen_at = $1 where token_hash = $2", [now, hash]);
   return { id: row.id, username: row.username, displayName: row.display_name };
 }
 

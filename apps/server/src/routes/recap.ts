@@ -128,6 +128,9 @@ export function recapRoutes(app: FastifyInstance, ctx: Context): void {
         await ctx.db.query<{ user_id: string }>("select user_id from profiles where user_id = any($1::uuid[]) and story_opt_out = true", [present.map((m) => m.user_id)])
       ).map((r) => r.user_id),
     );
+    // N-07: levels and curves are for the people who were there. A crew mate who stayed home sees
+    // the night (names, drinks, photos) but not anyone's blood alcohol.
+    const attended = present.some((m) => m.user_id === user.id);
     const participants = present.map((m) => {
       const mine = drinkRows.filter((d) => d.user_id === m.user_id);
       const intakes: DrinkIntake[] = mine.map((d) => {
@@ -137,7 +140,7 @@ export function recapRoutes(app: FastifyInstance, ctx: Context): void {
       const profile = m.sealed ? ctx.sealer.open<BodyProfile>(m.sealed) : null;
       let curve: [number, number][] = [];
       let peak: number | null = null;
-      if (profile && intakes.length) {
+      if (profile && intakes.length && (attended || m.user_id === user.id)) {
         const sim = new BacSimulation(intakes, distributionVolume(profile), Math.max(to, now));
         const samples = sim.sample(from, curveEnd, CURVE_STEP_MS);
         let last = samples.length - 1;

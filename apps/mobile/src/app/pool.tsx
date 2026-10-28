@@ -1,7 +1,7 @@
 import * as Clipboard from "expo-clipboard";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
-import { Alert, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { formatMoney } from "@crew/money";
 import { Field } from "@/crew/Field";
 import { useT } from "@/i18n";
@@ -16,6 +16,7 @@ import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { SkeletonRows } from "@/ui/Skeleton";
 import { showFailure } from "@/server/errors";
+import { confirmAction } from "@/ui/confirm";
 
 export default function PoolScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -109,17 +110,9 @@ export default function PoolScreen() {
             subtitle={expense.payerId === me ? i18n.t("money.youPaid") : i18n.t("money.paidBy", { name: nameOf(expense.payerId) })}
             leading={<Avatar personId={expense.payerId} name={detail.members.find((m) => m.userId === expense.payerId)?.name ?? "?"} size={34} />}
             onPress={() =>
-              Alert.alert(i18n.t("money.deleteConfirm", { name: expense.description }), undefined, [
-                { text: i18n.t("money.keep"), style: "cancel" },
-                {
-                  text: i18n.t("money.deleteExpense"),
-                  style: "destructive",
-                  onPress: () =>
-                    void deleteExpense(detail.pool.id, expense.id)
-                      .then(load)
-                      .catch(showFailure(i18n)),
-                },
-              ])
+              void confirmAction({ title: i18n.t("money.deleteConfirm", { name: expense.description }), confirmLabel: i18n.t("money.deleteExpense"), cancelLabel: i18n.t("money.keep") }).then((ok) => {
+                if (ok) void deleteExpense(detail.pool.id, expense.id).then(load).catch(showFailure(i18n));
+              })
             }
             last={index === detail.expenses.length - 1}
           />

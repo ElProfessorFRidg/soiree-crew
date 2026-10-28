@@ -10,6 +10,8 @@ const INVITE_TTL_MS = 7 * 24 * 3_600_000;
 
 export function crewRoutes(app: FastifyInstance, ctx: Context): void {
   const joins = new RateLimiter(20, 60 * 60_000, ctx.now);
+  // An invite code is 8 characters: guessing needs volume, so every lookup counts per address.
+  const inviteLookups = new RateLimiter(30, 10 * 60_000, ctx.now);
   app.post("/v1/crews", async (request, reply) => {
     const user = requireUser(request);
     const input = crewSchema.parse(request.body);
@@ -87,6 +89,7 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
 
   /** Public preview of an invite for the web page (N-30): crew name and member count, nothing else. */
   app.get<{ Params: { code: string } }>("/v1/invites/:code", async (request) => {
+    inviteLookups.check(request.ip);
     const rows = await ctx.db.query<{ name: string; members: number; expires_at: number }>(
       `select c.name, (select count(*)::int from crew_members m where m.crew_id = c.id) as members, i.expires_at
        from crew_invites i join crews c on c.id = i.crew_id where i.code = $1`,
@@ -99,6 +102,7 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
 
   /** The link people share (N-30, QOL-05): a small page that opens the app on the invite. */
   app.get<{ Params: { code: string } }>("/i/:code", async (request, reply) => {
+    inviteLookups.check(request.ip);
     const code = request.params.code.toUpperCase();
     const rows = await ctx.db.query<{ name: string; members: number; expires_at: number }>(
       `select c.name, (select count(*)::int from crew_members m where m.crew_id = c.id) as members, i.expires_at
@@ -135,7 +139,11 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
     joins.check(user.id);
     const crew = (await ctx.db.query<{ open: boolean }>("select open from crews where id = $1", [z.string().uuid().parse(request.params.id)]))[0];
     if (!crew?.open) throw new HttpError(404, "not_found");
-    await ctx.db.query("insert into crew_members (crew_id, user_id, role, joined_at) values ($1, $2, 'member', $3) on conflict do nothing", [request.params.id, user.id, ctx.now()]);
+    await ctx.db.query("insert into crew_members (crew_id, user_id, role, joined_at, via_open) values ($1, $2, 'member', $3, true) on conflict do nothing", [
+      request.params.id,
+      user.id,
+      ctx.now(),
+    ]);
     const members = await ctx.db.query<{ user_id: string }>("select user_id from crew_members where crew_id = $1", [request.params.id]);
     ctx.live.notify(members.map((m) => m.user_id), { type: "crew.changed", crewId: request.params.id });
     return { crewId: request.params.id };
@@ -143,6 +151,8 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
 
   app.post<{ Params: { code: string } }>("/v1/invites/:code/accept", async (request) => {
     const user = requireUser(request);
+    inviteLookups.check(request.ip);
+    joins.check(user.id);
     const rows = await ctx.db.query<{ crew_id: string; expires_at: number }>("select crew_id, expires_at from crew_invites where code = $1", [
       request.params.code.toUpperCase(),
     ]);
@@ -162,6 +172,11 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
     const user = requireUser(request);
     await assertCrewMember(ctx, request.params.id, user.id);
     await ctx.db.query("delete from crew_members where crew_id = $1 and user_id = $2", [request.params.id, user.id]);
+    // Leaving the crew also leaves its live and coming nights, so their chats drop me (MSG-07).
+    await ctx.db.query(
+      "delete from party_members where user_id = $2 and party_id in (select id from parties where crew_id = $1 and closed_at is null and ends_at > $3)",
+      [request.params.id, user.id, ctx.now()],
+    );
     const remaining = await ctx.db.query<{ user_id: string; role: string }>("select user_id, role from crew_members where crew_id = $1 order by joined_at", [
       request.params.id,
     ]);

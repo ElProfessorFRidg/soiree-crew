@@ -17,6 +17,7 @@ export async function addPartyToCalendar(party: Party, crewName: string, i18n: T
     });
     if (result.action === "saved") showToast({ message: i18n.t("crew.calendarAdded") });
   } catch {
-    showToast({ tone: "danger", message: i18n.t("crew.offline") });
+    // A local failure (no calendar app, refused): nothing to do with the network.
+    showToast({ tone: "danger", message: i18n.t("crew.calendarFailed") });
   }
 }

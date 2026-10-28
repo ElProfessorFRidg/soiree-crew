@@ -29,16 +29,16 @@ Notifications.setNotificationHandler({
   }),
 });
 
-let permission: boolean | null = null;
+/** Asked at most once a session; the answer itself is read again each time, so a change in the settings counts at once. */
+let asked = false;
 
 async function allowed(): Promise<boolean> {
   if (!supported) return false;
-  if (permission !== null) return permission;
   const current = await Notifications.getPermissionsAsync();
-  if (current.granted) return (permission = true);
-  if (!current.canAskAgain) return (permission = false);
-  const asked = await Notifications.requestPermissionsAsync();
-  return (permission = asked.granted);
+  if (current.granted) return true;
+  if (!current.canAskAgain || asked) return false;
+  asked = true;
+  return (await Notifications.requestPermissionsAsync()).granted;
 }
 
 function intakes(): DrinkIntake[] {

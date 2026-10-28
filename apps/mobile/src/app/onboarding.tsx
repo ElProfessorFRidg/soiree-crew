@@ -1,7 +1,7 @@
 import * as Clipboard from "expo-clipboard";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Image, Share, StyleSheet, View } from "react-native";
+import { Image, Share, StyleSheet, View, Platform } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import Animated, { FadeIn, SlideInLeft, SlideInRight, useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { duration, palette } from "@crew/design-tokens";
@@ -117,7 +117,8 @@ export default function Onboarding() {
   const [crewMade, setCrewMade] = useState(false);
 
   // The steps shown depend on the account: without one there is no account form and no crew.
-  const flow = FLOW.filter((s) => (s === "crew" ? session !== null : s !== "account" || step === "account"));
+  // Reminders are local notifications: a browser tab cannot send them, so the web skips that step.
+  const flow = FLOW.filter((s) => (s === "crew" ? session !== null : s === "notifications" ? Platform.OS !== "web" : s !== "account" || step === "account"));
   const index = flow.indexOf(step);
 
   const go = (next: Step | "done", isForward = true) => {

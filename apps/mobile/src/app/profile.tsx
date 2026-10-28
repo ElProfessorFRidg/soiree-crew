@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { breathRatio, countryRules, formatBacValue } from "@crew/units";
 import { drinkLabel } from "@/drinks/display";
 import type { DrinkKind } from "@/drinks/presets";
@@ -22,6 +22,7 @@ import { SkeletonRows } from "@/ui/Skeleton";
 import { formatClock } from "@/i18n/format";
 import { MemberCard } from "@/profile/MemberCard";
 import { showFailure } from "@/server/errors";
+import { confirmAction } from "@/ui/confirm";
 
 type ViewAs = "me" | "stranger" | "friend" | "crew";
 
@@ -243,20 +244,15 @@ export default function ProfileScreen() {
           variant="outline"
           height={44}
           onPress={() =>
-            Alert.alert(i18n.t("people.blockConfirm", { name }), undefined, [
-              { text: i18n.t("people.blockKeep"), style: "cancel" },
-              {
-                text: i18n.t("people.block"),
-                style: "destructive",
-                onPress: () =>
-                  void block(profile.userId)
-                    .then(() => {
-                      showToast({ message: i18n.t("people.blocked", { name }) });
-                      router.back();
-                    })
-                    .catch(offline),
-              },
-            ])
+            void confirmAction({ title: i18n.t("people.blockConfirm", { name }), confirmLabel: i18n.t("people.block"), cancelLabel: i18n.t("people.blockKeep") }).then((ok) => {
+              if (!ok) return;
+              void block(profile.userId)
+                .then(() => {
+                  showToast({ message: i18n.t("people.blocked", { name }) });
+                  router.back();
+                })
+                .catch(offline);
+            })
           }
         />
       ) : null}

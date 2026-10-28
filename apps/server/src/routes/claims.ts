@@ -15,8 +15,10 @@ export async function placeOwner(ctx: Context, ids: string[]): Promise<string | 
   return row?.user_id ?? null;
 }
 
-function isOperator(ctx: Context, username: string): boolean {
-  return (ctx.operators ?? []).includes(username.toLowerCase());
+/** By account id (OPERATOR_IDS). A username is accepted too, but a name nobody holds yet could be registered by anyone. */
+function isOperator(ctx: Context, user: { id: string; username: string }): boolean {
+  const operators = ctx.operators ?? [];
+  return operators.includes(user.id) || operators.includes(user.username.toLowerCase());
 }
 
 export function claimRoutes(app: FastifyInstance, ctx: Context): void {
@@ -88,7 +90,7 @@ export function claimRoutes(app: FastifyInstance, ctx: Context): void {
   /** The server operator (OPERATOR_USERNAMES) reviews claims. Everyone else gets 403. */
   app.get("/v1/operator/claims", async (request) => {
     const user = requireUser(request);
-    if (!isOperator(ctx, user.username)) throw new HttpError(403, "forbidden");
+    if (!isOperator(ctx, user)) throw new HttpError(403, "forbidden");
     const rows = await ctx.db.query<{ id: string; venue_id: string; name: string; address: string | null; display_name: string; username: string; proof: string; requested_at: number }>(
       `select c.id, c.venue_id, v.name, v.address, u.display_name, u.username, c.proof, c.requested_at
        from place_claims c join venues v on v.id = c.venue_id join users u on u.id = c.user_id
@@ -110,7 +112,7 @@ export function claimRoutes(app: FastifyInstance, ctx: Context): void {
 
   app.post<{ Params: { id: string } }>("/v1/operator/claims/:id", async (request) => {
     const user = requireUser(request);
-    if (!isOperator(ctx, user.username)) throw new HttpError(403, "forbidden");
+    if (!isOperator(ctx, user)) throw new HttpError(403, "forbidden");
     const { decision } = z.object({ decision: z.enum(["approved", "rejected"]) }).parse(request.body);
     const claim = (await ctx.db.query<{ venue_id: string }>("select venue_id from place_claims where id = $1 and status = 'pending'", [uuid.parse(request.params.id)]))[0];
     if (!claim) throw new HttpError(404, "not_found");

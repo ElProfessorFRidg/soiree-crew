@@ -106,6 +106,15 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
     const user = requireUser(request);
     const party = await loadPartyForMember(ctx, request.params.id, user.id);
     const { response } = responseSchema.parse(request.body);
+    const now = ctx.now();
+    // A finished night is history: nobody signs up to it afterwards (nights count, album, recap).
+    if (party.closed_at !== null || party.ends_at < now) throw new HttpError(409, "party_closed");
+    // Someone who walked into an open crew cannot jump into a night already under way: its live
+    // positions and levels belong to the people who were there. An invite still works.
+    if (party.starts_at <= now) {
+      const joined = (await ctx.db.query<{ joined_at: number; via_open: boolean }>("select joined_at, via_open from crew_members where crew_id = $1 and user_id = $2", [party.crew_id, user.id]))[0];
+      if (joined?.via_open && joined.joined_at > party.starts_at) throw new HttpError(403, "too_late");
+    }
     await ctx.db.query(
       `insert into party_members (party_id, user_id, response) values ($1, $2, $3)
        on conflict (party_id, user_id) do update set response = $3`,
@@ -124,6 +133,9 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
       .object({ homeSafe: z.boolean().optional(), designatedDriver: z.boolean().optional(), batteryLow: z.boolean().optional(), unwell: z.boolean().optional() })
       .parse(request.body);
     const now = ctx.now();
+    // Status is for people at the night; it also marks activity, which counts the night as theirs.
+    const going = await ctx.db.query("select 1 from party_members where party_id = $1 and user_id = $2 and response = 'going'", [party.id, user.id]);
+    if (!going.length) throw new HttpError(403, "not_going");
     if (input.homeSafe !== undefined) {
       // Home safe also means fine: it clears "not feeling well" (N-36).
       await ctx.db.query(
@@ -368,6 +380,10 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
       [party.id],
     );
     const going = members.filter((m) => m.response === "going").map((m) => m.user_id);
+    // The crew watches over the night from home too, but levels are not for someone who walked in
+    // through an open crew and is not there.
+    const viewer = (await ctx.db.query<{ via_open: boolean }>("select via_open from crew_members where crew_id = $1 and user_id = $2", [party.crew_id, user.id]))[0];
+    const seesLevels = going.includes(user.id) || !viewer?.via_open;
     const drinkRows = going.length
       ? await ctx.db.query<{ id: string; user_id: string; sealed: string; consumed_at: number; party_id: string | null }>(
           `select id, user_id, sealed, consumed_at, party_id from drinks
@@ -400,7 +416,7 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
         return { id: d.id, volumeMl: body.volumeMl, abv: body.abv, consumedAt: d.consumed_at, withFood: body.withFood };
       });
       const profile = m.sealed ? ctx.sealer.open<BodyProfile>(m.sealed) : null;
-      const estimate = profile ? estimateBac(intakes, profile, at) : null;
+      const estimate = profile && seesLevels ? estimateBac(intakes, profile, at) : null;
       const quiet =
         party.closed_at === null &&
         m.home_safe_at === null &&

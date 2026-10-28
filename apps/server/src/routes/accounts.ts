@@ -3,6 +3,7 @@ import { z } from "zod";
 import { bearer, requireUser, HttpError, type Context } from "../context";
 import { DUMMY_PASSWORD_HASH, hashPassword, hashToken, newCode, newId, newToken, verifyPassword } from "../crypto";
 import { RateLimiter } from "../ratelimit";
+import { deleteChatBackup } from "./chat";
 import { deletePhotoFiles } from "./photos";
 import { accountSchema, passwordSchema } from "../schemas";
 
@@ -25,7 +26,10 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
   const claims = new RateLimiter(10, 10 * 60_000, ctx.now);
   // O-01: per address and per login, so spreading guesses over many addresses does not help either.
   const passwordTries = new RateLimiter(10, 10 * 60_000, ctx.now);
+  // Per login and address, so a stranger cannot lock the owner out; per login overall, looser, so
+  // spreading guesses over many addresses still gets nowhere.
   const loginTries = new RateLimiter(5, 10 * 60_000, ctx.now);
+  const loginTriesAnywhere = new RateLimiter(50, 10 * 60_000, ctx.now);
 
   const saveCredentials = async (userId: string, email: string | null, password: string) => {
     if (email) {
@@ -67,7 +71,8 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
     const input = z
       .object({ login: z.string().trim().toLowerCase().min(3).max(254), password: z.string().min(1).max(200), deviceLabel: z.string().max(60).optional() })
       .parse(request.body);
-    loginTries.check(input.login);
+    loginTries.check(`${input.login}|${request.ip}`);
+    loginTriesAnywhere.check(input.login);
     const rows = await ctx.db.query<{ id: string; username: string; display_name: string; password_hash: string }>(
       `select u.id, u.username, u.display_name, c.password_hash from credentials c join users u on u.id = c.user_id
        where c.email_lookup = $1 or u.username = $2`,
@@ -101,6 +106,8 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
     const existing = (await ctx.db.query<{ password_hash: string }>("select password_hash from credentials where user_id = $1", [user.id]))[0];
     if (existing && !(await verifyPassword(input.currentPassword ?? "", existing.password_hash))) throw new HttpError(403, "credentials_invalid");
     await saveCredentials(user.id, input.email, input.password);
+    // A new password signs every other device out: whoever knew the old one loses access.
+    if (existing) await ctx.db.query("delete from sessions where user_id = $1 and token_hash <> $2", [user.id, hashToken(bearer(request) ?? "")]);
     return { hasPassword: true, email: input.email };
   });
 
@@ -271,6 +278,7 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
   app.delete("/v1/me", async (request, reply) => {
     const user = requireUser(request);
     await deletePhotoFiles(ctx, user.id);
+    await deleteChatBackup(ctx, user.id);
     await ctx.db.transaction(async (tx) => {
       // Crews and parties nobody else is in go with the account; the others get a new owner.
       await tx.query(

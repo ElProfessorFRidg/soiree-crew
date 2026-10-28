@@ -1,7 +1,7 @@
 import * as Clipboard from "expo-clipboard";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert, Platform, ScrollView, Share, StyleSheet, View } from "react-native";
+import { Platform, ScrollView, Share, StyleSheet, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { duration, space } from "@crew/design-tokens";
 import { ConnectServer } from "@/crew/ConnectServer";
@@ -33,6 +33,7 @@ import { refreshRadar } from "@/server/radarData";
 import { StartHereBanner } from "@/crew/StartHereBanner";
 import { addPartyToCalendar } from "@/crew/calendar";
 import { showFailure } from "@/server/errors";
+import { confirmAction } from "@/ui/confirm";
 
 function partyWhen(party: Party, i18n: Translator, hourCycle: "h12" | "h23"): string {
   const day = new Intl.DateTimeFormat(i18n.locale, { weekday: "long", day: "numeric", month: "long" }).format(new Date(party.startsAt));
@@ -84,19 +85,13 @@ function CrewCard({ crew }: { crew: Crew }) {
   };
 
   const onLeave = () => {
-    Alert.alert(i18n.t("crew.leaveConfirm", { crew: crew.name }), undefined, [
-      { text: i18n.t("crew.leaveKeep"), style: "cancel" },
-      {
-        text: i18n.t("crew.leave"),
-        style: "destructive",
-        onPress: () => {
-          const ran = guarded({ kind: "leaveCrew", crewId: crew.id, crewName: crew.name }, () =>
-            void leaveCrew(crew.id).catch((error: unknown) => showToast({ tone: "danger", message: crewErrorMessage(error, i18n) })),
-          );
-          if (!ran) showToast({ message: i18n.t("vault.queued") });
-        },
-      },
-    ]);
+    void confirmAction({ title: i18n.t("crew.leaveConfirm", { crew: crew.name }), confirmLabel: i18n.t("crew.leave"), cancelLabel: i18n.t("crew.leaveKeep") }).then((ok) => {
+      if (!ok) return;
+      const ran = guarded({ kind: "leaveCrew", crewId: crew.id, crewName: crew.name }, () =>
+        void leaveCrew(crew.id).catch((error: unknown) => showToast({ tone: "danger", message: crewErrorMessage(error, i18n) })),
+      );
+      if (!ran) showToast({ message: i18n.t("vault.queued") });
+    });
   };
 
   return (

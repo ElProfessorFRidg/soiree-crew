@@ -22,6 +22,7 @@ const fixSchema = z.object({
   mocked: z.boolean(),
   deviceNow: z.number().int().nonnegative(),
   integrity: z.object({ rooted: z.boolean().optional(), emulator: z.boolean().optional() }).optional(),
+  platform: z.enum(["ios", "android", "web", "windows", "macos"]).optional(),
 });
 
 const checkInSchema = fixSchema.extend({ id: z.string().uuid(), venueId: z.string().uuid(), private: z.boolean().default(false) });
@@ -296,6 +297,9 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
       peersAtVenue: peers,
       fixHash: hash,
     });
+    // A browser can fake its position from the developer tools and reports no integrity: on its own
+    // a web check-in never counts, someone at the bar has to vouch for it (AC-04).
+    if (input.platform === "web" && evaluation.verdict === "accepted") evaluation.verdict = "unverified";
 
     if (evaluation.verdict === "not_here") {
       return reply.status(200).send({ id: input.id, verdict: "not_here", takeover: null });
@@ -419,14 +423,15 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
   /** AC-09: the crew admin can overturn a false positive. */
   app.post<{ Params: { id: string } }>("/v1/checkins/:id/overturn", async (request) => {
     const user = requireUser(request);
-    const rows = await ctx.db.query<{ crew_id: string; venue_id: string }>(
-      "select v.crew_id, c.venue_id from check_ins c join venues v on v.id = c.venue_id where c.id = $1",
+    const rows = await ctx.db.query<{ crew_id: string; venue_id: string; user_id: string }>(
+      "select v.crew_id, c.venue_id, c.user_id from check_ins c join venues v on v.id = c.venue_id where c.id = $1",
       [request.params.id],
     );
     const row = rows[0];
     if (!row) throw new HttpError(404, "not_found");
     const { role } = await assertCrewMember(ctx, row.crew_id, user.id);
-    if (role !== "admin") throw new HttpError(403, "forbidden");
+    // Nobody washes their own cheat, admin or not: another admin has to look at it.
+    if (role !== "admin" || row.user_id === user.id) throw new HttpError(403, "forbidden");
     await ctx.db.query("update check_ins set verdict = 'accepted', overturned_by = $2 where id = $1 and verdict = 'rejected'", [request.params.id, user.id]);
     await updateBoss(ctx, row.crew_id, row.venue_id);
     await notifyCrew(ctx, row.crew_id);

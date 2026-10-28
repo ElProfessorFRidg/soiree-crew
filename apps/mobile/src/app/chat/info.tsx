@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert } from "react-native";
+import {  } from "react-native";
 import { View } from "react-native";
 import { CIPHERSUITE } from "@crew/mls";
 import { setDisappearing, updateMeta } from "@/chat/engine";
@@ -19,6 +19,7 @@ import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { showFailure } from "@/server/errors";
+import { confirmAction } from "@/ui/confirm";
 
 /** MSG-12, MSG-06, MSG-10: who is in the conversation, its timer, my receipts and typing, the group's key state. */
 export default function ConversationInfoScreen() {
@@ -115,21 +116,19 @@ export default function ConversationInfoScreen() {
           variant="danger"
           height={48}
           onPress={() =>
-            Alert.alert(conversation.kind === "crew" ? i18n.t("crew.leaveConfirm", { crew: conversation.title }) : i18n.t("chat.leavePartyConfirm"), undefined, [
-              { text: i18n.t("crew.leaveKeep"), style: "cancel" },
-              {
-                text: i18n.t("crew.leave"),
-                style: "destructive",
-                onPress: () => {
-                  // Leaving the crew or the party is what takes this phone out of the group (MLS remove).
-                  if (conversation.kind === "crew" && conversation.crewId) {
-                    const ran = guarded({ kind: "leaveCrew", crewId: conversation.crewId, crewName: conversation.title }, () => void leaveCrew(conversation.crewId!).catch(() => undefined));
-                    if (!ran) showToast({ message: i18n.t("vault.queued") });
-                  } else if (conversation.partyId) void respondToParty(conversation.partyId, "declined").catch(() => undefined);
-                  router.back();
-                },
-              },
-            ])
+            void confirmAction({
+              title: conversation.kind === "crew" ? i18n.t("crew.leaveConfirm", { crew: conversation.title }) : i18n.t("chat.leavePartyConfirm"),
+              confirmLabel: i18n.t("crew.leave"),
+              cancelLabel: i18n.t("crew.leaveKeep"),
+            }).then((ok) => {
+              if (!ok) return;
+              // Leaving the crew or the party is what takes this phone out of the group (MLS remove).
+              if (conversation.kind === "crew" && conversation.crewId) {
+                const ran = guarded({ kind: "leaveCrew", crewId: conversation.crewId, crewName: conversation.title }, () => void leaveCrew(conversation.crewId!).catch(() => undefined));
+                if (!ran) showToast({ message: i18n.t("vault.queued") });
+              } else if (conversation.partyId) void respondToParty(conversation.partyId, "declined").catch(() => undefined);
+              router.back();
+            })
           }
         />
       ) : null}

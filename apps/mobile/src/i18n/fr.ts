@@ -3,6 +3,11 @@
 
 export const fr = {
   common: {
+    openSettings: "Ouvrir les réglages",
+    permissionWeb: "Autorise l'accès dans les réglages du site, dans ton navigateur.",
+    crashTitle: "Cet écran a planté.",
+    crashBody: "Le reste de l'app marche. Réessaie, ou repars de l'accueil.",
+    crashHome: "Retour à l'accueil",
     you: "toi",
     close: "Fermer",
     back: "Retour",
@@ -138,6 +143,7 @@ export const fr = {
     mute: "Couper jusqu'à demain",
   },
   crew: {
+    calendarFailed: "L'agenda ne s'est pas ouvert.",
     timeout: "Le serveur ne répond pas. Réessaie dans un moment.",
     addAnother: "Créer ou rejoindre un autre crew",
     tab: "Crew",
@@ -608,6 +614,7 @@ export const fr = {
     alibiLanguage: "Alibis en anglais pour l'instant.",
   },
   settings: {
+    remindersAppOnly: "Les rappels (eau, limite, récap) ne marchent que dans l'app installée, pas dans le navigateur.",
     sections: { region: "Langue, région et unités", notifications: "Notifications", security: "Sécurité et données", appearance: "Confidentialité et apparence" },
     notificationsSummary: "Eau, limite, récap, heures calmes",
     securitySummary: "Compte, appareils, export, suppression",

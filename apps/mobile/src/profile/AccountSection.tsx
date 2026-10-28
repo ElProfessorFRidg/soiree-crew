@@ -4,7 +4,7 @@ import { linkValue } from "@/crew/LinkScanner";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Alert, View } from "react-native";
+import { View } from "react-native";
 import { Field } from "@/crew/Field";
 import { useT, type Translator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
@@ -20,6 +20,7 @@ import { Panel, Row } from "@/ui/controls";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { guarded } from "@/vault/vault";
+import { confirmAction } from "@/ui/confirm";
 
 /** Wipes everything this phone holds about the user, then sends them back to the age gate. */
 async function wipeDevice(): Promise<void> {
@@ -247,23 +248,25 @@ export function AccountSection() {
   const [transfer, setTransfer] = useState<string | null>(null);
 
   const onDelete = () => {
-    Alert.alert(i18n.t("account.deleteTitle"), i18n.t("account.deleteBody"), [
-      { text: i18n.t("account.deleteKeep"), style: "cancel" },
-      {
-        text: i18n.t("account.deleteConfirm"),
-        style: "destructive",
-        onPress: () => {
-          if (!guarded({ kind: "deleteAccount" }, () => void deleteAccount(i18n))) showToast({ message: i18n.t("vault.queued") });
-        },
-      },
-    ]);
+    void confirmAction({
+      title: i18n.t("account.deleteTitle"),
+      body: i18n.t("account.deleteBody"),
+      confirmLabel: i18n.t("account.deleteConfirm"),
+      cancelLabel: i18n.t("account.deleteKeep"),
+    }).then((ok) => {
+      if (ok && !guarded({ kind: "deleteAccount" }, () => void deleteAccount(i18n))) showToast({ message: i18n.t("vault.queued") });
+    });
   };
 
   const onWithdraw = () => {
-    Alert.alert(i18n.t("account.withdrawTitle"), i18n.t("account.withdrawBody"), [
-      { text: i18n.t("account.deleteKeep"), style: "cancel" },
-      { text: i18n.t("account.withdrawConfirm"), style: "destructive", onPress: () => void withdrawHealthConsent(i18n) },
-    ]);
+    void confirmAction({
+      title: i18n.t("account.withdrawTitle"),
+      body: i18n.t("account.withdrawBody"),
+      confirmLabel: i18n.t("account.withdrawConfirm"),
+      cancelLabel: i18n.t("account.deleteKeep"),
+    }).then((ok) => {
+      if (ok) void withdrawHealthConsent(i18n);
+    });
   };
 
   return (

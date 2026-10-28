@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { randomUUID } from "expo-crypto";
+import { Platform } from "react-native";
 import { getCalendars, getLocales } from "expo-localization";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -130,7 +131,19 @@ export const useAppStore = create<AppState>()(
   ),
 );
 
-export const newId = (): string => randomUUID();
+/**
+ * A v4 UUID. A browser on plain http (a LAN preview) has no crypto.randomUUID, only getRandomValues,
+ * so the web falls back to building one from random bytes.
+ */
+export const newId = (): string => {
+  const web = (globalThis as { crypto?: { randomUUID?: () => string; getRandomValues?: (bytes: Uint8Array) => Uint8Array } }).crypto;
+  if (Platform.OS !== "web" || web?.randomUUID) return randomUUID();
+  const bytes = web!.getRandomValues!(new Uint8Array(16));
+  bytes[6] = (bytes[6]! & 0x0f) | 0x40;
+  bytes[8] = (bytes[8]! & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+};
 
 /** O-10: the phone's current 12 h / 24 h setting, read again whenever the app comes back. */
 export function followPhoneHourCycle(): void {

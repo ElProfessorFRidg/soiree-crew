@@ -7,6 +7,7 @@ import { Bubble } from "@/chat/Bubble";
 import { Composer } from "@/chat/Composer";
 import { canChange, deleteForEveryone, editMessage, markRead, purgeExpired, react, reportMessage, startChat, syncConversation } from "@/chat/engine";
 import { timerLabel } from "@/chat/format";
+import { releaseChatMedia } from "@/chat/media";
 import { useNames } from "@/chat/names";
 import { useChat, type ChatMessage } from "@/chat/store";
 import { Sheet } from "@/games/ui/Sheet";
@@ -56,7 +57,10 @@ export default function ConversationScreen() {
       // Someone is looking: this device may do the group's membership work right away.
       void startChat().then(() => syncConversation(id, true).catch(() => undefined));
       const timer = setInterval(() => {
-        purgeExpired();
+        const now = Date.now();
+        const expired = (useChat.getState().messages[id] ?? []).filter((m) => m.media && m.expiresAt !== undefined && m.expiresAt <= now).map((m) => m.media!.blob);
+        if (expired.length) releaseChatMedia(expired);
+        purgeExpired(now);
         tick((n) => n + 1);
         void syncConversation(id).catch(() => undefined);
       }, 20_000);
@@ -66,6 +70,8 @@ export default function ConversationScreen() {
   useEffect(() => {
     markRead(id);
   }, [id, messages.length]);
+  // Leaving the conversation deletes the decrypted voice notes and videos written for the player.
+  useEffect(() => () => releaseChatMedia(), [id]);
 
   const members = useMemo(() => (conversation?.members ?? []).filter((m) => m !== me).map((m) => ({ id: m, name: name(m) })), [conversation, me, name]);
   const mentionNames = useMemo(() => members.map((m) => m.name), [members]);

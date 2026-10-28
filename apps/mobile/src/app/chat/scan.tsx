@@ -12,6 +12,7 @@ import { Button } from "@/ui/Button";
 import { Panel } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
+import { OpenSettingsButton } from "@/system/OpenSettingsButton";
 
 /** MSG-05: scan the other phone's safety code. A match marks them verified; anything else is said plainly. */
 export default function ScanSafetyScreen() {
@@ -44,7 +45,7 @@ export default function ScanSafetyScreen() {
       {!permission ? null : !permission.granted ? (
         <>
           <Text>{i18n.t("chat.scanPermission")}</Text>
-          <Button label={i18n.t("chat.scanAllow")} height={48} onPress={() => void requestPermission()} />
+          {permission.canAskAgain ? <Button label={i18n.t("chat.scanAllow")} height={48} onPress={() => void requestPermission()} /> : <OpenSettingsButton />}
         </>
       ) : outcome ? (
         <Panel tint={outcome === "match" ? "ok" : "danger"}>

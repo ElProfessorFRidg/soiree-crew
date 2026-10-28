@@ -17,6 +17,7 @@ interface ShareState {
 export const useLiveShare = create<ShareState>(() => ({ partyId: null, lastSentAt: null, error: null }));
 
 let watcher: Location.LocationSubscription | null = null;
+const WATCH_INTERVAL_MS = 60_000;
 
 function partyIsLive(partyId: string): boolean {
   const now = Date.now();
@@ -47,12 +48,15 @@ export async function startSharing(partyId: string): Promise<boolean> {
   try {
     const first = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
     await send(partyId, first.coords);
-    if (Platform.OS !== "web") {
-      watcher = await Location.watchPositionAsync(
-        { accuracy: Location.Accuracy.Balanced, timeInterval: 60_000, distanceInterval: 40 },
-        (position) => void send(partyId, position.coords).catch(() => undefined),
-      );
-    }
+    watcher = await Location.watchPositionAsync(
+      { accuracy: Location.Accuracy.Balanced, timeInterval: WATCH_INTERVAL_MS, distanceInterval: 40 },
+      (position) => {
+        // A browser ignores timeInterval and may fire every second: the same pace by hand.
+        const last = useLiveShare.getState().lastSentAt;
+        if (Platform.OS === "web" && last !== null && Date.now() - last < WATCH_INTERVAL_MS) return;
+        void send(partyId, position.coords).catch(() => undefined);
+      },
+    );
     return true;
   } catch {
     useLiveShare.setState({ partyId: null, error: "unavailable" });

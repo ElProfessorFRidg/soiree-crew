@@ -15,6 +15,7 @@ import { Screen } from "@/ui/Screen";
 import { SkeletonRows } from "@/ui/Skeleton";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { canShareImages } from "@/system/share";
 
 const FRAMES = 4;
 
@@ -67,7 +68,7 @@ export default function PhotoStripScreen() {
       back
       title={i18n.t("strip.title")}
       withToasts
-      footer={frames.length ? <Button label={i18n.t("strip.share")} icon="share" height={56} loading={sharing} onPress={() => void share()} /> : undefined}
+      footer={canShareImages && frames.length ? <Button label={i18n.t("strip.share")} icon="share" height={56} loading={sharing} onPress={() => void share()} /> : undefined}
     >
       {frames.length === 0 ? <Text>{i18n.t("strip.empty")}</Text> : null}
       {frames.length ? (

@@ -12,7 +12,7 @@
 | `SERVER_NAME` | no | Shown on the connect screen (default "Soirée Crew"). |
 | `SERVER_DESCRIPTION` | no | One sentence under the name. |
 | `PUBLIC_SERVER` | no | `true` lists the server as public in the apps that know it. |
-| `OPERATOR_USERNAMES` | no | Comma-separated app usernames who review venue claims (COM-11). |
+| `OPERATOR_IDS` | no | Comma-separated account ids who review venue claims (COM-11). Get one with `select id from users where username = '<name>'`. `OPERATOR_USERNAMES` still works but is weaker: a name nobody holds can be registered by anyone. |
 | `TRUST_PROXY` | set | `1` in the compose file: one reverse proxy in front. Keep port 8787 unpublished, or a client could fake its address. |
 | `AI_PROVIDER`, `ANTHROPIC_API_KEY`, `AI_MODEL` | no | ADR 0004. Off without them. |
 | `SEASON_VARIANTS` | no | JSON, e.g. `{"2026-12":"games"}` (TER-12). |

@@ -73,13 +73,21 @@ export function moneyRoutes(app: FastifyInstance, ctx: Context): void {
       request.params.id,
       [...new Set([...input.memberIds, user.id])],
     ]);
-    await ctx.db.transaction(async (tx) => {
-      await tx.query(
-        "insert into pools (id, crew_id, party_id, name, currency, created_by, created_at) values ($1, $2, $3, $4, $5, $6, $7) on conflict (id) do nothing",
+    const created = await ctx.db.transaction(async (tx) => {
+      const inserted = await tx.query(
+        "insert into pools (id, crew_id, party_id, name, currency, created_by, created_at) values ($1, $2, $3, $4, $5, $6, $7) on conflict (id) do nothing returning id",
         [input.id, request.params.id, input.partyId ?? null, input.name, input.currency, user.id, ctx.now()],
       );
+      // An existing id is a replay of my own request (the id is the idempotency key) or a refusal:
+      // members are only added by the call that created the pool.
+      if (!inserted.length) {
+        const existing = await tx.query<{ crew_id: string; created_by: string }>("select crew_id, created_by from pools where id = $1", [input.id]);
+        return existing[0]?.created_by === user.id && existing[0].crew_id === request.params.id;
+      }
       for (const member of valid) await tx.query("insert into pool_members (pool_id, user_id) values ($1, $2) on conflict do nothing", [input.id, member.user_id]);
+      return true;
     });
+    if (!created) throw new HttpError(409, "exists");
     return reply.status(201).send({ id: input.id });
   });
 
@@ -173,7 +181,7 @@ export function moneyRoutes(app: FastifyInstance, ctx: Context): void {
   /** N-19 payment shortcuts: my IBAN or payment link, sealed, shown to my pools only. */
   app.put("/v1/me/payment", async (request) => {
     const user = requireUser(request);
-    const input = z.object({ iban: z.string().trim().max(40).optional(), link: z.string().trim().url().max(200).optional() }).parse(request.body);
+    const input = z.object({ iban: z.string().trim().max(40).optional(), link: z.string().trim().url().max(200).refine((value) => value.startsWith("https://"), "https only").optional() }).parse(request.body);
     await ctx.db.query(
       "insert into payment_details (user_id, sealed, updated_at) values ($1, $2, $3) on conflict (user_id) do update set sealed = $2, updated_at = $3",
       [user.id, ctx.sealer.seal(input), ctx.now()],

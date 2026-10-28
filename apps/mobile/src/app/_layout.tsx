@@ -25,6 +25,10 @@ import { logWater } from "@/drinks/actions";
 import { LOG_WATER_ACTION, MUTE_ACTION, muteUntilMorning, refreshReminders } from "@/reminders/reminders";
 import { flushUploads } from "@/photos/uploads";
 import { watchWidget } from "@/widgets/sync";
+import { CrashScreen } from "@/ui/CrashScreen";
+
+/** Expo Router shows this instead of a crashed screen (any route below this layout). */
+export { CrashScreen as ErrorBoundary };
 
 // MOT-14: the test harness drives the motion time scale in dev builds.
 if (__DEV__) (globalThis as { __crewMotion?: unknown }).__crewMotion = { setScale: setMotionScale, getScale: getMotionScale };

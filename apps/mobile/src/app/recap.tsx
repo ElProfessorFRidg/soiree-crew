@@ -45,6 +45,8 @@ import { Text } from "@/ui/Text";
 import { showToast, ToastHost } from "@/ui/Toast";
 import { Quotes } from "@/recap/Quotes";
 import { failureMessage } from "@/server/errors";
+import { showPermissionDenied } from "@/system/permissions";
+import { canShareImages } from "@/system/share";
 
 const SLIDES = 5;
 
@@ -217,7 +219,7 @@ export default function RecapScreen() {
   const takeSelfie = async (camera: "front" | "back") => {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
-      showToast({ tone: "danger", message: i18n.t("album.denied") });
+      showPermissionDenied(i18n, i18n.t("album.denied"), permission.canAskAgain);
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
@@ -556,13 +558,7 @@ export default function RecapScreen() {
         <Button label={i18n.t("recap.photoBack")} icon="image" variant="secondary" height={48} style={styles.flex} onPress={() => void takeSelfie("back")} />
       </View>
       {selfie ? <Button label={i18n.t("recap.selfieRemove")} variant="outline" height={40} onPress={() => setSelfie(null)} /> : null}
-      <Button
-        label={i18n.t("recap.share")}
-        icon="share"
-        height={56}
-        loading={sharing}
-        onPress={() => void share()}
-      />
+      {canShareImages ? <Button label={i18n.t("recap.share")} icon="share" height={56} loading={sharing} onPress={() => void share()} /> : null}
       <Button
         label={i18n.t("album.open")}
         icon="image"

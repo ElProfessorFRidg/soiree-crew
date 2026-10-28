@@ -5,6 +5,7 @@ import { radius } from "@crew/design-tokens";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
 import { Button } from "@/ui/Button";
+import { OpenSettingsButton } from "@/system/OpenSettingsButton";
 
 /** MSG-11: what the signed-in phone shows and the new one scans: the server and a one-time code. */
 export const linkValue = (url: string, code: string) => `soireecrew-link:1:${url}|${code}`;
@@ -53,6 +54,8 @@ export function LinkScanner({ onLink }: { onLink: (link: { url: string; code: st
             }}
           />
         </View>
+      ) : permission && !permission.canAskAgain ? (
+        <OpenSettingsButton />
       ) : null}
       <Button label={i18n.t("chat.cancel")} variant="outline" height={44} onPress={() => setOpen(false)} />
     </View>

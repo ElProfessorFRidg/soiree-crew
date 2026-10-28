@@ -13,6 +13,7 @@ import { Chip } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { canShareImages } from "@/system/share";
 
 /** The crew's catchphrases: the moments a sticker answers in a chat. */
 const LINES = ["stickers.lines.cheers", "stickers.lines.lastOne", "stickers.lines.whoComes", "stickers.lines.home", "stickers.lines.myRound", "stickers.lines.water"] as const;
@@ -59,7 +60,7 @@ export default function StickersScreen() {
       back
       title={i18n.t("stickers.title")}
       withToasts
-      footer={<Button label={i18n.t("stickers.share")} icon="share" height={56} loading={busy} onPress={() => void share()} />}
+      footer={canShareImages ? <Button label={i18n.t("stickers.share")} icon="share" height={56} loading={busy} onPress={() => void share()} /> : undefined}
     >
       <View style={styles.center}>
         <View ref={sticker} collapsable={false} style={styles.sticker}>

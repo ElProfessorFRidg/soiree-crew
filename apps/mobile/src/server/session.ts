@@ -66,14 +66,25 @@ export async function saveSession(session: ServerSession | null): Promise<void> 
   useSession.setState({ session });
 }
 
+/** A real private IPv4 literal: four numbers, not a name that merely starts like one ("10.evil.com"). */
+function privateIpv4(host: string): boolean {
+  const parts = host.split(".");
+  if (parts.length !== 4 || !parts.every((p) => /^\d{1,3}$/.test(p) && Number(p) <= 255)) return false;
+  const [a, b] = parts.map(Number) as [number, number];
+  return a === 10 || a === 127 || (a === 192 && b === 168) || (a === 172 && b >= 16 && b <= 31);
+}
+
+function isLocalHost(host: string): boolean {
+  return host === "localhost" || host === "[::1]" || host.endsWith(".local") || privateIpv4(host);
+}
+
 /** https only, except for a phone talking to a dev server on the local network. */
 export function normaliseServerUrl(input: string): string | null {
   const trimmed = input.trim().replace(/\/+$/, "");
   const withScheme = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
   try {
     const url = new URL(withScheme);
-    const local = /^(localhost|127\.0\.0\.1|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(url.hostname) || url.hostname.endsWith(".local");
-    if (url.protocol === "http:" && !local) return null;
+    if (url.protocol === "http:" && !isLocalHost(url.hostname)) return null;
     return url.origin;
   } catch {
     return null;

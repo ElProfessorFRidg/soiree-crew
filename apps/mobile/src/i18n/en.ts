@@ -5,6 +5,11 @@ import type { Messages } from "./types";
 
 export const en: Messages = {
   common: {
+    openSettings: "Open settings",
+    permissionWeb: "Allow it in this site's settings, in your browser.",
+    crashTitle: "This screen crashed.",
+    crashBody: "The rest of the app works. Try again, or start from home.",
+    crashHome: "Back to home",
     you: "you",
     close: "Close",
     back: "Back",
@@ -140,6 +145,7 @@ export const en: Messages = {
     mute: "Mute until morning",
   },
   crew: {
+    calendarFailed: "The calendar didn't open.",
     timeout: "The server isn't answering. Try again in a moment.",
     addAnother: "Create or join another crew",
     tab: "Crew",
@@ -610,6 +616,7 @@ export const en: Messages = {
     alibiLanguage: "Alibis in English for now.",
   },
   settings: {
+    remindersAppOnly: "Reminders (water, limit, recap) only work in the installed app, not in the browser.",
     sections: { region: "Language, region and units", notifications: "Notifications", security: "Security and data", appearance: "Privacy and look" },
     notificationsSummary: "Water, limit, recap, quiet hours",
     securitySummary: "Account, devices, export, deletion",

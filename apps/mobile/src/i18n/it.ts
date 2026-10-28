@@ -4,6 +4,11 @@ import type { Messages } from "./types";
 
 export const it: Messages = {
   common: {
+    openSettings: "Apri le impostazioni",
+    permissionWeb: "Consenti l'accesso nelle impostazioni del sito, nel tuo browser.",
+    crashTitle: "Questa schermata si è bloccata.",
+    crashBody: "Il resto dell'app funziona. Riprova o riparti dalla home.",
+    crashHome: "Torna alla home",
     you: "tu",
     close: "Chiudi",
     back: "Indietro",
@@ -139,6 +144,7 @@ export const it: Messages = {
     mute: "Silenzia fino a domattina",
   },
   crew: {
+    calendarFailed: "Il calendario non si è aperto.",
     timeout: "Il server non risponde. Riprova tra poco.",
     addAnother: "Crea o unisciti a un altro crew",
     tab: "Crew",
@@ -609,6 +615,7 @@ export const it: Messages = {
     alibiLanguage: "Alibi in inglese per ora.",
   },
   settings: {
+    remindersAppOnly: "I promemoria (acqua, limite, riepilogo) funzionano solo nell'app installata, non nel browser.",
     sections: { region: "Lingua, regione e unità", notifications: "Notifiche", security: "Sicurezza e dati", appearance: "Privacy e aspetto" },
     notificationsSummary: "Acqua, limite, riepilogo, ore di quiete",
     securitySummary: "Account, dispositivi, esporta, elimina",

@@ -48,7 +48,11 @@ const app = await buildApp(
     ai: aiProvider(),
     ...(process.env.DOWNLOADS_DIR ? { downloadsDir: process.env.DOWNLOADS_DIR } : {}),
     serverInfo: { name: process.env.SERVER_NAME ?? "", description: process.env.SERVER_DESCRIPTION ?? "", public: process.env.PUBLIC_SERVER === "true" },
-    operators: (process.env.OPERATOR_USERNAMES ?? "").split(",").map((u) => u.trim().toLowerCase()).filter(Boolean),
+    operators: [process.env.OPERATOR_IDS, process.env.OPERATOR_USERNAMES]
+      .join(",")
+      .split(",")
+      .map((u) => u.trim().toLowerCase())
+      .filter(Boolean),
   },
   { logger: true, trustProxy: trustProxy(process.env.TRUST_PROXY) },
 );

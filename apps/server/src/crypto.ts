@@ -29,7 +29,8 @@ export function newCode(length = 10): string {
   return code;
 }
 
-const SCRYPT = { N: 1 << 15, r: 8, p: 1, maxmem: 64 * 1024 * 1024 };
+// OWASP's floor for scrypt (2^17, r 8, p 1): about 128 MiB per hash. Older hashes keep their own parameters.
+const SCRYPT = { N: 1 << 17, r: 8, p: 1, maxmem: 256 * 1024 * 1024 };
 
 function scryptAsync(password: string, salt: Buffer, length: number, options: typeof SCRYPT): Promise<Buffer> {
   return new Promise((resolve, reject) => scrypt(password, salt, length, options, (err, key) => (err ? reject(err) : resolve(key))));
@@ -56,7 +57,7 @@ export async function verifyPassword(password: string, stored: string): Promise<
 }
 
 /** A hash to compare against when no account matches, so both paths cost the same. */
-export const DUMMY_PASSWORD_HASH = "scrypt$32768$8$1$AAAAAAAAAAAAAAAAAAAAAA==$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+export const DUMMY_PASSWORD_HASH = "scrypt$131072$8$1$AAAAAAAAAAAAAAAAAAAAAA==$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
 
 /** Application-level envelope for health data: AES-256-GCM, key from the environment. */
 export class Sealer {

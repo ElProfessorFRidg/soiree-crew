@@ -3,6 +3,11 @@ import type { Messages } from "./types";
 // German copy, written for German speakers rather than translated from French.
 export const de: Messages = {
   common: {
+    openSettings: "Einstellungen öffnen",
+    permissionWeb: "Erlaube es in den Website-Einstellungen deines Browsers.",
+    crashTitle: "Dieser Bildschirm ist abgestürzt.",
+    crashBody: "Der Rest der App läuft. Versuch es noch mal oder fang auf der Startseite an.",
+    crashHome: "Zur Startseite",
     you: "du",
     close: "Schließen",
     back: "Zurück",
@@ -138,6 +143,7 @@ export const de: Messages = {
     mute: "Bis morgen stumm",
   },
   crew: {
+    calendarFailed: "Der Kalender hat sich nicht geöffnet.",
     timeout: "Der Server antwortet nicht. Versuch es gleich noch mal.",
     addAnother: "Weitere Crew erstellen oder beitreten",
     tab: "Crew",
@@ -608,6 +614,7 @@ export const de: Messages = {
     alibiLanguage: "Alibis vorerst auf Englisch.",
   },
   settings: {
+    remindersAppOnly: "Erinnerungen (Wasser, Grenze, Rückblick) gibt es nur in der installierten App, nicht im Browser.",
     sections: { region: "Sprache, Region und Einheiten", notifications: "Benachrichtigungen", security: "Sicherheit und Daten", appearance: "Privatsphäre und Aussehen" },
     notificationsSummary: "Wasser, Grenze, Rückblick, Ruhezeiten",
     securitySummary: "Konto, Geräte, Export, Löschen",

@@ -17,6 +17,7 @@ import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { failureMessage } from "@/server/errors";
+import { OpenSettingsButton } from "@/system/OpenSettingsButton";
 
 /** DESIGN.md §5: check-in steps appear one by one, every 650 ms. They show progress, never which signal decided. */
 const STEP_MS = 650;
@@ -59,6 +60,7 @@ export default function CheckInScreen() {
   const [steps, setSteps] = useState(0);
   const [result, setResult] = useState<CheckInResult | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [blocked, setBlocked] = useState(false);
   const venueName = venue?.name ?? "";
   const alreadyHere = open?.venueId === venueId;
 
@@ -72,6 +74,7 @@ export default function CheckInScreen() {
       clearInterval(timer);
       setPhase("idle");
       setMessage(fix.failure === "denied" ? i18n.t("addVenue.locationDenied") : i18n.t("addVenue.locationUnavailable"));
+      setBlocked(fix.failure === "denied" && fix.canAskAgain === false);
       return;
     }
     try {
@@ -133,6 +136,7 @@ export default function CheckInScreen() {
       ) : null}
 
       {message ? <Text color={theme.danger}>{message}</Text> : null}
+      {message && blocked ? <OpenSettingsButton /> : null}
 
       {phase === "idle" && !alreadyHere ? (
         <>

@@ -61,7 +61,8 @@ async function prepare(asset: ImagePicker.ImagePickerAsset): Promise<{ uri: stri
 /** Opens the camera or the library, then queues the photos for this party. Returns how many were added. */
 export async function addPhotos(partyId: string, source: "camera" | "library"): Promise<number> {
   const permission = source === "camera" ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
-  if (!permission.granted) return -1;
+  // -1: refused, the system may ask again; -2: refused for good, only the settings can help.
+  if (!permission.granted) return permission.canAskAgain ? -1 : -2;
   const result =
     source === "camera"
       ? await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 1, exif: false })

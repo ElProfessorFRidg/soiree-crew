@@ -4,6 +4,11 @@ import type { Messages } from "./types";
 
 export const ru: Messages = {
   common: {
+    openSettings: "Открыть настройки",
+    permissionWeb: "Разреши доступ в настройках сайта в браузере.",
+    crashTitle: "Этот экран сломался.",
+    crashBody: "Остальное приложение работает. Попробуй ещё раз или начни с главной.",
+    crashHome: "На главную",
     you: "ты",
     close: "Закрыть",
     back: "Назад",
@@ -139,6 +144,7 @@ export const ru: Messages = {
     mute: "Тихо до утра",
   },
   crew: {
+    calendarFailed: "Календарь не открылся.",
     timeout: "Сервер не отвечает. Попробуй чуть позже.",
     addAnother: "Создать или вступить в другой крю",
     tab: "Тусовка",
@@ -624,6 +630,7 @@ export const ru: Messages = {
     alibiLanguage: "Пока алиби только на английском.",
   },
   settings: {
+    remindersAppOnly: "Напоминания (вода, лимит, итоги) работают только в установленном приложении, не в браузере.",
     sections: { region: "Язык, регион и единицы", notifications: "Уведомления", security: "Безопасность и данные", appearance: "Приватность и вид" },
     notificationsSummary: "Вода, лимит, итоги, тихие часы",
     securitySummary: "Аккаунт, устройства, экспорт, удаление",

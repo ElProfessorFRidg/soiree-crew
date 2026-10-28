@@ -25,7 +25,7 @@ Ask me for the domain (for example `crew.mydomain.tld`). Check the DNS A/AAAA re
   - `DATA_KEY`: `openssl rand -base64 32`. Show it to me once so I store it offline, and tell me plainly that losing it makes the sealed data unreadable for good. Never rotate it afterwards.
   - `PUBLIC_URL=https://<the domain>` (no trailing slash).
   - `SERVER_NAME`, `SERVER_DESCRIPTION`: ask me. `PUBLIC_SERVER=true`.
-  - `OPERATOR_USERNAMES`: leave empty for now (see step 7).
+  - `OPERATOR_IDS`: leave empty for now (see step 7).
   - Leave the AI variables empty unless I give you a key.
 - Make sure nothing publishes port 8787 or 5432 on the host: only the proxy reaches the API, and PostgreSQL is reachable from the API container only.
 - Persistent volumes: `pgdata` and `uploads` must survive redeploys.
@@ -75,7 +75,7 @@ Tell me:
 - how to see the logs and redeploy in Coolify.
 
 Then remind me to:
-- create my own account in the app on this server and send you my username, so you set `OPERATOR_USERNAMES=<it>` and redeploy (it lets me review venue claims);
+- create my own account in the app on this server and send you my username, so you look up its id (`select id from users where username = '<it>'`), set `OPERATOR_IDS=<that id>` and redeploy (it lets me review venue claims);
 - set the GitHub variable so the next app builds suggest this server:
   `gh variable set CREW_SERVER_URL --body "https://<domain>" --repo ElProfessorFRidg/soiree-crew`
 
