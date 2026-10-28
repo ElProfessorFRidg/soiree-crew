@@ -151,7 +151,7 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
 
   app.post<{ Params: { code: string } }>("/v1/invites/:code/accept", async (request) => {
     const user = requireUser(request);
-    inviteLookups.check(request.ip);
+    // Per account, not per address: a whole bar on one wifi joins with the same link.
     joins.check(user.id);
     const rows = await ctx.db.query<{ crew_id: string; expires_at: number }>("select crew_id, expires_at from crew_invites where code = $1", [
       request.params.code.toUpperCase(),
@@ -159,7 +159,8 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
     const invite = rows[0];
     if (!invite || invite.expires_at < ctx.now()) throw new HttpError(404, "not_found");
     await ctx.db.query(
-      "insert into crew_members (crew_id, user_id, role, joined_at) values ($1, $2, 'member', $3) on conflict do nothing",
+      // An invite vouches for the person, even if they first walked in through the open crew.
+      "insert into crew_members (crew_id, user_id, role, joined_at) values ($1, $2, 'member', $3) on conflict (crew_id, user_id) do update set via_open = false",
       [invite.crew_id, user.id, ctx.now()],
     );
     await ctx.db.query("update crew_invites set uses = uses + 1 where code = $1", [request.params.code.toUpperCase()]);

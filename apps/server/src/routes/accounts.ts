@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { bearer, requireUser, HttpError, type Context } from "../context";
-import { DUMMY_PASSWORD_HASH, hashPassword, hashToken, newCode, newId, newToken, verifyPassword } from "../crypto";
+import { DUMMY_PASSWORD_HASH, hashPassword, needsRehash, hashToken, newCode, newId, newToken, verifyPassword } from "../crypto";
 import { RateLimiter } from "../ratelimit";
 import { deleteChatBackup } from "./chat";
 import { deletePhotoFiles } from "./photos";
@@ -29,7 +29,7 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
   // Per login and address, so a stranger cannot lock the owner out; per login overall, looser, so
   // spreading guesses over many addresses still gets nowhere.
   const loginTries = new RateLimiter(5, 10 * 60_000, ctx.now);
-  const loginTriesAnywhere = new RateLimiter(50, 10 * 60_000, ctx.now);
+  const loginTriesAnywhere = new RateLimiter(100, 10 * 60_000, ctx.now);
 
   const saveCredentials = async (userId: string, email: string | null, password: string) => {
     if (email) {
@@ -81,6 +81,8 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
     const user = rows[0];
     const ok = await verifyPassword(input.password, user?.password_hash ?? DUMMY_PASSWORD_HASH);
     if (!user || !ok) throw new HttpError(401, "credentials_invalid");
+    // A hash made with older, cheaper parameters is redone now that the password is at hand.
+    if (needsRehash(user.password_hash)) await ctx.db.query("update credentials set password_hash = $2 where user_id = $1", [user.id, await hashPassword(input.password)]);
     const token = await createSession(ctx, user.id, input.deviceLabel ?? "");
     ctx.live.notify([user.id], { type: "security.newDevice" });
     return reply.status(201).send({ user: { id: user.id, username: user.username, displayName: user.display_name }, token });

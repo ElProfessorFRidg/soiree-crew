@@ -71,7 +71,10 @@ export default function ConversationScreen() {
     markRead(id);
   }, [id, messages.length]);
   // Leaving the conversation deletes the decrypted voice notes and videos written for the player.
-  useEffect(() => () => releaseChatMedia(), [id]);
+  useEffect(
+    () => () => releaseChatMedia((useChat.getState().messages[id] ?? []).flatMap((m) => (m.media ? [m.media.blob] : []))),
+    [id],
+  );
 
   const members = useMemo(() => (conversation?.members ?? []).filter((m) => m !== me).map((m) => ({ id: m, name: name(m) })), [conversation, me, name]);
   const mentionNames = useMemo(() => members.map((m) => m.name), [members]);

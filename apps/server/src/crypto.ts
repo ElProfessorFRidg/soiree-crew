@@ -32,8 +32,27 @@ export function newCode(length = 10): string {
 // OWASP's floor for scrypt (2^17, r 8, p 1): about 128 MiB per hash. Older hashes keep their own parameters.
 const SCRYPT = { N: 1 << 17, r: 8, p: 1, maxmem: 256 * 1024 * 1024 };
 
-function scryptAsync(password: string, salt: Buffer, length: number, options: typeof SCRYPT): Promise<Buffer> {
-  return new Promise((resolve, reject) => scrypt(password, salt, length, options, (err, key) => (err ? reject(err) : resolve(key))));
+// Each hash takes about 128 MiB: a few at a time, the rest wait, so a burst of sign-ins cannot
+// exhaust the server's memory.
+const MAX_HASHES_AT_ONCE = 2;
+let running = 0;
+const waiting: (() => void)[] = [];
+
+async function scryptAsync(password: string, salt: Buffer, length: number, options: typeof SCRYPT): Promise<Buffer> {
+  // A finished hash hands its slot straight to the next one waiting, so the count never overshoots.
+  if (running >= MAX_HASHES_AT_ONCE) await new Promise<void>((resolve) => waiting.push(resolve));
+  else running += 1;
+  try {
+    return await new Promise((resolve, reject) => scrypt(password, salt, length, options, (err, key) => (err ? reject(err) : resolve(key))));
+  } finally {
+    const next = waiting.shift();
+    if (next) next();
+    else running -= 1;
+  }
+}
+
+export function needsRehash(stored: string): boolean {
+  return Number(stored.split("$")[1]) < SCRYPT.N;
 }
 
 /** O-01: scrypt with a random salt; the parameters travel with the hash so they can be raised later. */

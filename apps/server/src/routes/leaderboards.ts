@@ -86,7 +86,8 @@ async function computeBoard(ctx: Context, crewId: string, from: number, to: numb
   const partyById = new Map(parties.map((p) => [p.id, { startsAt: p.starts_at, endsAt: p.closed_at ?? p.ends_at }]));
   const nightsOut = await ctx.db.query<{ user_id: string; starts_at: number }>(
     `select m.user_id, p.starts_at from party_members m join parties p on p.id = m.party_id
-     where p.crew_id = $1 and m.response = 'going' and m.last_activity_at is not null and p.starts_at >= $2 and p.starts_at < $3`,
+     where p.crew_id = $1 and m.response = 'going' and m.last_activity_at is not null and p.starts_at >= $2 and p.starts_at < $3
+       and m.last_activity_at between p.starts_at and coalesce(p.closed_at, p.ends_at)`,
     [crewId, from, to],
   );
 

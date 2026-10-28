@@ -26,6 +26,7 @@ import { LOG_WATER_ACTION, MUTE_ACTION, muteUntilMorning, refreshReminders } fro
 import { flushUploads } from "@/photos/uploads";
 import { watchWidget } from "@/widgets/sync";
 import { CrashScreen } from "@/ui/CrashScreen";
+import { purgePlainFiles } from "@/chat/media";
 
 /** Expo Router shows this instead of a crashed screen (any route below this layout). */
 export { CrashScreen as ErrorBoundary };
@@ -65,6 +66,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     void loadSession();
+    purgePlainFiles();
     watchBattery();
     watchWidget();
   }, []);

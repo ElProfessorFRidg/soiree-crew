@@ -1,4 +1,4 @@
-import { File, Paths } from "expo-file-system";
+import { Directory, File, Paths } from "expo-file-system";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { Platform } from "react-native";
@@ -126,6 +126,21 @@ export function openChatMedia(media: ChatMedia): Promise<string> {
     opened.set(media.blob, promise);
   }
   return promise;
+}
+
+/**
+ * SEC-05: at launch, whatever a killed app left behind goes: decrypted voice notes and videos,
+ * and a data export that a share target may have still been reading when the sheet closed.
+ */
+export function purgePlainFiles(): void {
+  if (Platform.OS === "web") return;
+  try {
+    for (const entry of new Directory(Paths.cache).list()) {
+      if (entry instanceof File && /^(voice-|video-|soiree-crew-.*\.json$)/.test(entry.name)) entry.delete();
+    }
+  } catch {
+    // Nothing to clean, or the cache is not readable yet: next launch.
+  }
 }
 
 /**

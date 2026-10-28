@@ -22,8 +22,8 @@ export function CrashScreen({ retry }: ErrorBoundaryProps) {
       <Pressable
         accessibilityRole="button"
         onPress={() => {
-          router.replace("/");
-          void retry();
+          // The screens come back first; only then is there a router to move.
+          void Promise.resolve(retry()).then(() => router.replace("/"));
         }}
         style={[styles.button, styles.outline, { borderColor: theme.textMuted }]}
       >

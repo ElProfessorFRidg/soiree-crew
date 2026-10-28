@@ -227,11 +227,15 @@ export function chatRoutes(app: FastifyInstance, ctx: Context): void {
 
   /** Signature keys of devices, for checking the leaves of a group (the MLS authentication service). */
   app.post("/v1/chat/directory", async (request) => {
-    requireUser(request);
+    const user = requireUser(request);
     const input = z.object({ deviceIds: z.array(uuid).min(1).max(500) }).parse(request.body);
+    // Only devices of people I could share a conversation with: a crew mate or a friend.
     const rows = await ctx.db.query<{ id: string; user_id: string; signature_key: string; session_hash: string | null }>(
-      "select id, user_id, signature_key, session_hash from chat_devices where id = any($1::uuid[])",
-      [input.deviceIds],
+      `select d.id, d.user_id, d.signature_key, d.session_hash from chat_devices d where d.id = any($1::uuid[]) and (
+         d.user_id = $2
+         or exists (select 1 from crew_members a join crew_members b on a.crew_id = b.crew_id where a.user_id = $2 and b.user_id = d.user_id)
+         or exists (select 1 from friendships f where f.user_a = least($2::uuid, d.user_id) and f.user_b = greatest($2::uuid, d.user_id) and f.status = 'accepted'))`,
+      [input.deviceIds, user.id],
     );
     return { devices: rows.map((r) => ({ deviceId: r.id, userId: r.user_id, signatureKey: r.signature_key, active: r.session_hash !== null })) };
   });

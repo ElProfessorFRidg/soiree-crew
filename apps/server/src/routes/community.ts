@@ -147,8 +147,9 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
     const visits = await ctx.db.query<{ user_id: string; display_name: string; at: number; open: boolean | null }>(
       `select c.user_id, u.display_name, c.at, p.open_to_meet as open from check_ins c join users u on u.id = c.user_id
        join profiles p on p.user_id = c.user_id and p.regular_opt_in = true
-       where c.venue_id = any($1::uuid[]) and c.verdict = 'accepted' and c.private = false and c.at >= $2`,
-      [ids, start],
+       where c.venue_id = any($1::uuid[]) and c.verdict = 'accepted' and c.private = false and c.at >= $2 and c.at < $3`,
+      // COM-06: regulars come from past visits; tonight shows up tomorrow.
+      [ids, start, now - PRESENCE_DELAY_MS],
     );
     const nightsBy = new Map<string, { name: string; nights: Set<string>; open: boolean }>();
     for (const v of visits) {

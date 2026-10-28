@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Platform } from "react-native";
 import { breathRatio, formatBacValue } from "@crew/units";
 import { useT } from "@/i18n";
 import { formatClock } from "@/i18n/format";
@@ -70,16 +70,18 @@ export default function LimitsScreen() {
               decreaseLabel={i18n.t("limits.lower")}
               increaseLabel={i18n.t("limits.higher")}
             />
-            <View style={styles.switchRow}>
-              <Text style={styles.flex}>{i18n.t("limits.warn")}</Text>
-              <Switch
-                value={preferences.warnNearLimit}
-                onValueChange={(warnNearLimit) =>
-                  setPreferences({ warnNearLimit })
-                }
-                accessibilityLabel={i18n.t("limits.warn")}
-              />
-            </View>
+            {Platform.OS === "web" ? null : (
+              <View style={styles.switchRow}>
+                <Text style={styles.flex}>{i18n.t("limits.warn")}</Text>
+                <Switch
+                  value={preferences.warnNearLimit}
+                  onValueChange={(warnNearLimit) =>
+                    setPreferences({ warnNearLimit })
+                  }
+                  accessibilityLabel={i18n.t("limits.warn")}
+                />
+              </View>
+            )}
             <Button
               label={i18n.t("limits.removeLimit")}
               variant="outline"
@@ -90,27 +92,31 @@ export default function LimitsScreen() {
         )}
       </Panel>
 
-      <Panel>
-        <Text variant="h3">{i18n.t("limits.water")}</Text>
-        <Segmented<number>
-          accessibilityLabel={i18n.t("limits.water")}
-          value={preferences.waterReminderMinutes ?? 0}
-          items={WATER_OPTIONS.map((minutes) => ({
-            value: minutes,
-            label:
-              minutes === 0
-                ? i18n.t("limits.waterOff")
-                : minutes === 60
-                  ? i18n.t("limits.waterHour")
-                  : i18n.t("limits.waterEvery", { minutes }),
-          }))}
-          onChange={(minutes) =>
-            setPreferences({
-              waterReminderMinutes: minutes === 0 ? null : minutes,
-            })
-          }
-        />
-      </Panel>
+      {Platform.OS === "web" ? (
+        <Text variant="small">{i18n.t("settings.remindersAppOnly")}</Text>
+      ) : (
+        <Panel>
+          <Text variant="h3">{i18n.t("limits.water")}</Text>
+          <Segmented<number>
+            accessibilityLabel={i18n.t("limits.water")}
+            value={preferences.waterReminderMinutes ?? 0}
+            items={WATER_OPTIONS.map((minutes) => ({
+              value: minutes,
+              label:
+                minutes === 0
+                  ? i18n.t("limits.waterOff")
+                  : minutes === 60
+                    ? i18n.t("limits.waterHour")
+                    : i18n.t("limits.waterEvery", { minutes }),
+            }))}
+            onChange={(minutes) =>
+              setPreferences({
+                waterReminderMinutes: minutes === 0 ? null : minutes,
+              })
+            }
+          />
+        </Panel>
+      )}
 
       <Panel>
         <Text variant="h3">{i18n.t("limits.driving")}</Text>
@@ -131,8 +137,8 @@ export default function LimitsScreen() {
         <Text variant="small">{i18n.t("limits.changeInMe")}</Text>
       </Panel>
       <Text variant="disclaimer">{i18n.t("party.notice")}</Text>
-      {/* QOL-30: one tap for a quiet night, back on its own in the morning. */}
-      {mutedUntil !== null && mutedUntil > Date.now() ? (
+      {/* QOL-30: one tap for a quiet night, back on its own in the morning. No reminders on web. */}
+      {Platform.OS === "web" ? null : mutedUntil !== null && mutedUntil > Date.now() ? (
         <>
           <Text variant="small">
             {i18n.t("limits.muted", {

@@ -76,6 +76,10 @@ describe("public places (COM-01, COM-02, PROF-04)", () => {
     expect(page.events[0]).toMatchObject({ going: 1, mine: true });
     expect(page.regulars).toEqual([]);
     await app.inject({ method: "PUT", url: "/v1/me/profile", headers: a.user.auth, payload: { regularOptIn: true } });
+    // COM-06: tonight never shows; the visit counts from the next day.
+    page = (await place(a.user, a.venueId)) as typeof page;
+    expect(page.regulars).toEqual([]);
+    clock += 25 * 60 * MIN;
     page = (await place(a.user, a.venueId)) as typeof page;
     expect(page.regulars).toMatchObject([{ name: "jade", nights: 1, legend: true }]);
   });

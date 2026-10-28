@@ -191,3 +191,32 @@ describe("sessions", () => {
     expect((await app.inject({ method: "GET", url: "/v1/me", headers: first.auth })).statusCode).toBe(401);
   });
 });
+
+describe("audit follow-up", () => {
+  it("lets a whole bar join from one address, and an invite clears the open-crew mark", async () => {
+    const { users, crewId, partyId } = await crew("jade");
+    const { code } = (await app.inject({ method: "POST", url: `/v1/crews/${crewId}/invites`, headers: users[0]!.auth })).json() as { code: string };
+    await app.inject({ method: "PATCH", url: `/v1/crews/${crewId}/settings`, headers: users[0]!.auth, payload: { open: true } });
+    const walkIn = await account("walkin");
+    await app.inject({ method: "POST", url: `/v1/crews/${crewId}/join`, headers: walkIn.auth });
+    expect((await respond(walkIn, partyId)).statusCode).toBe(403);
+    expect((await app.inject({ method: "POST", url: `/v1/invites/${code}/accept`, headers: walkIn.auth, remoteAddress: "198.51.100.1" })).statusCode).toBe(200);
+    expect((await respond(walkIn, partyId)).statusCode).toBe(200);
+    for (let i = 0; i < 35; i++) {
+      // Each guest signed up on their own phone; they all join on the bar's wifi.
+      const body = (await app.inject({ method: "POST", url: "/v1/accounts", remoteAddress: `203.0.113.${i + 1}`, payload: { username: `guest${i}`, displayName: "g" } })).json() as { token: string };
+      const guest = { auth: { authorization: `Bearer ${body.token}` } };
+      expect((await app.inject({ method: "POST", url: `/v1/invites/${code}/accept`, headers: guest.auth, remoteAddress: "198.51.100.1" })).statusCode).toBe(200);
+    }
+  });
+
+  it("counts a night only for activity during it", async () => {
+    const { users, crewId, partyId } = await crew("jade", "malik");
+    const [, malik] = users as [User, User];
+    await respond(malik, partyId);
+    clock += 7 * 60 * MIN;
+    await app.inject({ method: "POST", url: `/v1/parties/${partyId}/status`, headers: malik.auth, payload: { homeSafe: true } });
+    const board = (await app.inject({ method: "GET", url: `/v1/crews/${crewId}/leaderboard?period=month&metric=nights`, headers: malik.auth })).json() as { rows: { userId: string; value: number }[] };
+    expect(board.rows.find((r) => r.userId === malik.id)?.value ?? 0).toBe(0);
+  });
+});

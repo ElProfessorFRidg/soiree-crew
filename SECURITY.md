@@ -84,8 +84,16 @@ Two fresh reviewers went through every server route and every platform path (iOS
 - Web check-ins never count on their own (a browser can fake its position).
 - App side: confirmation dialogs work on web; an SOS goes out even when the location fails; the microphone always stops; decrypted voice and video files are deleted; http to a server is limited to localhost and real private addresses; a crash shows a retry screen instead of a blank app.
 
+A second look by the same reviewers found regressions from these fixes, now fixed: a bar full of guests on one wifi was blocked from accepting an invite, an invite did not clear the open-crew mark, any status write after the night still counted the night, the regulars list showed tonight, the chat device directory answered for anyone, and many sign-ins at once could exhaust memory (two hashes at a time now, older hashes redone at sign-in). Decrypted media is deleted per conversation and at launch.
+
 Known and still open:
 
+- An open crew is public: someone who joins it before a night can say "going" and then sees that night like any member. The crew admin chooses to open it; the app should warn the members when that happens.
+- A crew's only admin cannot have their own false positive overturned: there is no second admin to ask.
+- Login: a guess limit per login (100 per 10 minutes) can still be used by many addresses together to slow the owner down. Sessions have no absolute lifetime, and deleting the account does not ask for the password again.
+- Invite codes have no use cap and last 7 days. Upload limits are daily rates, not storage quotas. Chat files whose rows were dropped by a cascade (account or crew deleted) stay on disk.
+- `OPERATOR_USERNAMES` is still honoured; deployments should use `OPERATOR_IDS`.
+- The web marker on check-ins is sent by the client, so a modified browser can leave it out.
 - The app's local store (profile, drinks) is not encrypted at rest (SEC-05 asks for it), and the app-switcher snapshot is not hidden.
 - The live socket carries the session token in its URL, which can end up in proxy logs.
 - Drink kind, times and water times are stored in clear on the server; only volume, strength and the body profile are sealed. The sealing key does not rotate.

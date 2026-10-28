@@ -19,14 +19,7 @@ export async function exportMyData(): Promise<void> {
   }
   const file = new File(Paths.cache, name);
   await file.write(json);
-  try {
-    await Sharing.shareAsync(file.uri, { mimeType: "application/json", UTI: "public.json" });
-  } finally {
-    // The share sheet has made its own copy: the plain export does not stay in the cache.
-    try {
-      file.delete();
-    } catch {
-      // Already gone.
-    }
-  }
+  // Some share targets read the file after the sheet closes: it is deleted at the next launch
+  // (purgePlainFiles), not right away.
+  await Sharing.shareAsync(file.uri, { mimeType: "application/json", UTI: "public.json" });
 }
