@@ -232,10 +232,11 @@ describe("leaderboard (RANK-01, RANK-06)", () => {
 });
 
 describe("cheers by knocking phones (JOY-01)", () => {
-  it("pairs two knocks from the same crew within 1.5 s and confirms both check-ins at the bar", async () => {
+  it("pairs two knocks from the same crew within 1.5 s and lets a verified check-in vouch for an unverified one", async () => {
     const { users, venueId, crewId } = await setup("jade", "malik", "ines");
     const [jade, malik, ines] = users as [User, User, User];
-    const a = await checkIn(jade, venueId);
+    const a = await checkIn(jade, venueId, { mocked: true });
+    expect(a.verdict).toBe("unverified");
     await checkIn(malik, venueId);
     const knock = (u: User) => app.inject({ method: "POST", url: "/v1/cheers", headers: u.auth, payload: { crewId } }).then((r) => r.json() as { matched: boolean; withUserId?: string; proof?: boolean });
     expect(await knock(jade)).toEqual({ matched: false });
@@ -253,5 +254,21 @@ describe("cheers by knocking phones (JOY-01)", () => {
     // Someone outside the crew cannot knock into it.
     const stranger = await account("stranger");
     expect((await app.inject({ method: "POST", url: "/v1/cheers", headers: stranger.auth, payload: { crewId } })).statusCode).toBe(404);
+  });
+});
+
+describe("cheers cannot launder check-ins (AC-04)", () => {
+  it("never lets two unverified check-ins lift each other", async () => {
+    const { users, venueId, crewId } = await setup("jade", "malik");
+    const [jade, malik] = users as [User, User];
+    const a = await checkIn(jade, venueId, { mocked: true });
+    const b = await checkIn(malik, venueId, { mocked: true });
+    expect([a.verdict, b.verdict]).toEqual(["unverified", "unverified"]);
+    await app.inject({ method: "POST", url: "/v1/cheers", headers: jade.auth, payload: { crewId } });
+    clock += 500;
+    const second = (await app.inject({ method: "POST", url: "/v1/cheers", headers: malik.auth, payload: { crewId } })).json() as { matched: boolean };
+    expect(second.matched).toBe(true);
+    const rows = await db.query<{ verdict: string }>("select verdict from check_ins where id = any($1::uuid[])", [[a.id, b.id]]);
+    expect(rows.map((r) => r.verdict)).toEqual(["unverified", "unverified"]);
   });
 });

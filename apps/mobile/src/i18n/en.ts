@@ -140,6 +140,7 @@ export const en: Messages = {
     mute: "Mute until morning",
   },
   crew: {
+    timeout: "The server isn't answering. Try again in a moment.",
     addAnother: "Create or join another crew",
     tab: "Crew",
     connectTitle: "Your crew",

@@ -15,6 +15,7 @@ import { Screen } from "@/ui/Screen";
 import { SkeletonRows } from "@/ui/Skeleton";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure } from "@/server/errors";
 
 const WEEKDAYS = [1, 2, 3, 4, 5, 6, 7] as const;
 
@@ -33,7 +34,7 @@ export default function PollsScreen() {
   const crew = useCrewData((state) => state.crews.find((c) => c.id === crewId));
   const [polls, setPolls] = useState<Poll[] | null>(null);
   const [usual, setUsual] = useState<UsualNights | null>(null);
-  const offline = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
+  const offline = showFailure(i18n);
 
   const load = useCallback(() => {
     void fetchPolls(crewId)

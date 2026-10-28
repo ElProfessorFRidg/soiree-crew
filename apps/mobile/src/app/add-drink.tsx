@@ -29,6 +29,7 @@ import { Numeral, Text } from "@/ui/Text";
 import { showToast, ToastHost } from "@/ui/Toast";
 import { addPhotos } from "@/photos/uploads";
 import { useLiveParty } from "@/server/crewData";
+import { showFailure } from "@/server/errors";
 
 
 const MINUTE_MS = 60_000;
@@ -253,7 +254,7 @@ export default function AddDrinkSheet() {
                   if (n > 0) showToast({ message: i18n.t("addDrink.photoAdded") });
                   else if (n < 0) showToast({ tone: "danger", message: i18n.t("album.denied") });
                 })
-                .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+                .catch(showFailure(i18n))
             }
           />
         ) : null}

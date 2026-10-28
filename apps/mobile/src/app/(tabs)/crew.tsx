@@ -32,6 +32,7 @@ import { ScalePressable } from "@/ui/Pressable";
 import { refreshRadar } from "@/server/radarData";
 import { StartHereBanner } from "@/crew/StartHereBanner";
 import { addPartyToCalendar } from "@/crew/calendar";
+import { showFailure } from "@/server/errors";
 
 function partyWhen(party: Party, i18n: Translator, hourCycle: "h12" | "h23"): string {
   const day = new Intl.DateTimeFormat(i18n.locale, { weekday: "long", day: "numeric", month: "long" }).format(new Date(party.startsAt));
@@ -395,7 +396,7 @@ function OpenCrews() {
                     haptic.confirmed();
                     setList((l) => l?.filter((x) => x.id !== c.id) ?? null);
                   })
-                  .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+                  .catch(showFailure(i18n))
               }
             />
           }

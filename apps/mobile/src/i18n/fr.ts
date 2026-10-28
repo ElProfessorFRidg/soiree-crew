@@ -138,6 +138,7 @@ export const fr = {
     mute: "Couper jusqu'à demain",
   },
   crew: {
+    timeout: "Le serveur ne répond pas. Réessaie dans un moment.",
     addAnother: "Créer ou rejoindre un autre crew",
     tab: "Crew",
     connectTitle: "Ton crew",

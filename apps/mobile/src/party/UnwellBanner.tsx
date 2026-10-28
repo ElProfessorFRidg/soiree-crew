@@ -8,6 +8,7 @@ import { Button } from "@/ui/Button";
 import { Panel } from "@/ui/controls";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure } from "@/server/errors";
 
 /**
  * N-36: "not feeling well", told quietly to the crew of the live party. Mine shows how to say it's
@@ -21,7 +22,7 @@ export function UnwellBanner() {
   const mine = members.find((m) => m.userId === me);
   const others = members.filter((m) => m.userId !== me && m.unwellAt && !m.homeSafeAt);
   if (!live) return null;
-  const offline = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
+  const offline = showFailure(i18n);
 
   return (
     <>
@@ -71,7 +72,7 @@ export function UnwellButton() {
         haptic.confirmed();
         void setPartyStatus(live.party.id, { unwell: true })
           .then(() => showToast({ message: i18n.t("unwell.told") }))
-          .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }));
+          .catch(showFailure(i18n));
       }}
     />
   );

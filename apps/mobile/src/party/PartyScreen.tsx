@@ -41,6 +41,7 @@ import { useVenueData } from "@/server/venueData";
 import { RollingNumber } from "./RollingNumber";
 import { DareOfTheNight } from "./DareOfTheNight";
 import { variantKey } from "@/i18n/variants";
+import { showFailure } from "@/server/errors";
 
 function greetingKey(hour: number) {
   if (hour < 5) return "greeting.lateNight" as const;
@@ -596,7 +597,7 @@ function LevelThree(props: LevelProps) {
   const rideApp = useAppStore((state) => state.preferences.rideApp);
   const ride = RIDE_APPS.find((a) => a.id === rideApp) ?? RIDE_APPS[0];
   const mine = live?.live?.members.find((m) => m.userId === me);
-  const offline = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
+  const offline = showFailure(i18n);
   const markHome = () => {
     if (!live) return;
     haptic.confirmed();

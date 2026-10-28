@@ -9,6 +9,7 @@ import { Button } from "@/ui/Button";
 import { Panel, Tag } from "@/ui/controls";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure } from "@/server/errors";
 
 /** COM-11: the "managed by the venue" label, its hours, and for the owner the editor; else the claim form. */
 export function OwnerSection({ page, onChanged }: { page: PlacePage; onChanged: () => void }) {
@@ -26,7 +27,7 @@ export function OwnerSection({ page, onChanged }: { page: PlacePage; onChanged: 
     if (!page.claimed) void fetchClaim(venueId).then((c) => setClaim(c.status)).catch(() => undefined);
   }, [venueId, page.claimed]);
 
-  const failed = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
+  const failed = showFailure(i18n);
 
   return (
     <>
@@ -127,7 +128,7 @@ export function ReviewReply({ review, isOwner, onChanged }: { review: PlacePage[
                   setEditing(false);
                   onChanged();
                 })
-                .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+                .catch(showFailure(i18n))
             }
           />
         </>

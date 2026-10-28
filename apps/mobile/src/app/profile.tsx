@@ -21,6 +21,7 @@ import { showToast } from "@/ui/Toast";
 import { SkeletonRows } from "@/ui/Skeleton";
 import { formatClock } from "@/i18n/format";
 import { MemberCard } from "@/profile/MemberCard";
+import { showFailure } from "@/server/errors";
 
 type ViewAs = "me" | "stranger" | "friend" | "crew";
 
@@ -35,7 +36,7 @@ export default function ProfileScreen() {
   const [viewAs, setViewAs] = useState<ViewAs>(mine && params.as ? params.as : "me");
   const [profile, setProfile] = useState<ProfileView | null>(null);
   const [gone, setGone] = useState(false);
-  const offline = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
+  const offline = showFailure(i18n);
 
   const load = useCallback(() => {
     void fetchProfile(mine ? "me" : id, mine && viewAs !== "me" ? viewAs : undefined)

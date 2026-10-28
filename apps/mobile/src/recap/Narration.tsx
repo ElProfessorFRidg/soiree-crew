@@ -11,6 +11,7 @@ import { Panel, Segmented } from "@/ui/controls";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { narrate, TONES, type NightFacts, type Tone } from "./nightStory";
+import { showFailure } from "@/server/errors";
 
 /**
  * AI-02: the night as a short story. Written from templates on the phone, or drafted by the AI when
@@ -49,7 +50,7 @@ export function Narration({ recap, facts, onPublished }: { recap: Recap; facts: 
         showToast({ message: i18n.t("narration.published") });
         onPublished();
       })
-      .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+      .catch(showFailure(i18n))
       .finally(() => setBusy(false));
   };
 

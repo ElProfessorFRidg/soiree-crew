@@ -15,6 +15,7 @@ import { Panel, Tag } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure } from "@/server/errors";
 
 interface Vote {
   venueId: string;
@@ -82,7 +83,7 @@ export default function WhereToScreen() {
     haptic.select();
     void api(`/v1/parties/${id}/where-to`, { method: "PUT", body: { venueId: mine === venueId ? null : venueId } })
       .then(load)
-      .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }));
+      .catch(showFailure(i18n));
   };
 
   const spin = () => {

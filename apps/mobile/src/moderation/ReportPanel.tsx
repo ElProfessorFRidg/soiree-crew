@@ -8,6 +8,7 @@ import { Button } from "@/ui/Button";
 import { Chip, Panel } from "@/ui/controls";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure } from "@/server/errors";
 
 const REASONS: { value: ReportReason; key: "people.reasonHarassment" | "people.reasonFake" | "people.reasonInappropriate" | "people.reasonOther" }[] = [
   { value: "harassment", key: "people.reasonHarassment" },
@@ -51,7 +52,7 @@ export function ReportPanel({ targetKind, targetId }: { targetKind: "profile" | 
               setReason(null);
               setNote("");
             })
-            .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+            .catch(showFailure(i18n))
             .finally(() => setSending(false));
         }}
       />

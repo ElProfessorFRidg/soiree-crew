@@ -21,6 +21,7 @@ import { ReportPanel } from "@/moderation/ReportPanel";
 import { fetchVenueStats, type VenueStats } from "@/server/statsData";
 import { VenuePrices } from "@/crew/VenuePrices";
 import { loyaltyTier, nextTier } from "@/crew/loyalty";
+import { showFailure } from "@/server/errors";
 
 /** N-12: what this bar is to the crew. */
 function VenueNumbers({ venueId }: { venueId: string }) {
@@ -62,7 +63,7 @@ export default function VenueScreen() {
     if (!id) return;
     void fetchVenuePage(id)
       .then(setPage)
-      .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }));
+      .catch(showFailure(i18n));
   }, [id, i18n]);
   useEffect(load, [load]);
 
@@ -159,7 +160,7 @@ export default function VenueScreen() {
                       showToast({ message: i18n.t("venue.confirmedHere", { name: c.name }) });
                       load();
                     })
-                    .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+                    .catch(showFailure(i18n))
                 }
               />
             </View>

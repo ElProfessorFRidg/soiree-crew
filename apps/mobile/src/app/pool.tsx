@@ -15,6 +15,7 @@ import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { SkeletonRows } from "@/ui/Skeleton";
+import { showFailure } from "@/server/errors";
 
 export default function PoolScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -26,7 +27,7 @@ export default function PoolScreen() {
   const load = useCallback(() => {
     void fetchPool(id)
       .then(setDetail)
-      .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }));
+      .catch(showFailure(i18n));
   }, [id, i18n]);
   useFocusEffect(load);
 
@@ -88,7 +89,7 @@ export default function PoolScreen() {
                         showToast({ tone: "info", message: i18n.t("money.paid") });
                         load();
                       })
-                      .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+                      .catch(showFailure(i18n))
                   }
                 />
               ) : null}
@@ -116,7 +117,7 @@ export default function PoolScreen() {
                   onPress: () =>
                     void deleteExpense(detail.pool.id, expense.id)
                       .then(load)
-                      .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") })),
+                      .catch(showFailure(i18n)),
                 },
               ])
             }
@@ -147,7 +148,7 @@ export default function PoolScreen() {
                 showToast({ tone: "info", message: i18n.t("common.saved") });
                 load();
               })
-              .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+              .catch(showFailure(i18n))
           }
         />
       </Panel>

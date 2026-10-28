@@ -15,6 +15,7 @@ import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { openRide, RIDE_APPS } from "@/party/rides";
+import { showFailure } from "@/server/errors";
 
 const MODES: HomeMode[] = ["walk", "car", "ride", "transit"];
 
@@ -37,7 +38,7 @@ export default function GoingHomeScreen() {
   const home = going.filter((m) => m.homeSafeAt !== null).length;
   const driver = going.find((m) => m.designatedDriver);
   const nameOf = (userId: string | null) => (userId === me ? i18n.t("common.you") : (going.find((m) => m.userId === userId)?.displayName ?? "?"));
-  const offline = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
+  const offline = showFailure(i18n);
   const act = (input: Parameters<typeof setGoingHome>[1]) => {
     haptic.select();
     void setGoingHome(id, input).catch(offline);

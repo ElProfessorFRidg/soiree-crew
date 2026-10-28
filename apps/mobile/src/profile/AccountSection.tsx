@@ -10,7 +10,7 @@ import { useT, type Translator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
 import { exportMyData } from "./exportData";
 import { api, ApiError } from "@/server/api";
-import { serverMessage } from "@/server/errors";
+import { serverMessage, showFailure, failureMessage } from "@/server/errors";
 import { useCrewData } from "@/server/crewData";
 import { forgetChat } from "@/chat/engine";
 import { saveSession, useSession } from "@/server/session";
@@ -52,8 +52,8 @@ export async function deleteAccount(i18n: Translator): Promise<void> {
     await wipeDevice();
     showToast({ message: i18n.t("account.deleted") });
     router.replace("/onboarding");
-  } catch {
-    showToast({ tone: "danger", message: i18n.t("crew.offline") });
+  } catch (error) {
+    showToast({ tone: "danger", message: failureMessage(error, i18n) });
   }
 }
 
@@ -71,8 +71,8 @@ export async function withdrawHealthConsent(i18n: Translator): Promise<void> {
     }));
     showToast({ message: i18n.t("account.withdrawn") });
     router.replace("/onboarding");
-  } catch {
-    showToast({ tone: "danger", message: i18n.t("crew.offline") });
+  } catch (error) {
+    showToast({ tone: "danger", message: failureMessage(error, i18n) });
   }
 }
 
@@ -117,7 +117,7 @@ function Devices() {
                       showToast({ message: i18n.t("account.signedOutDevice") });
                       load();
                     })
-                    .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+                    .catch(showFailure(i18n))
                 }
               />
             )
@@ -172,7 +172,7 @@ function Credentials() {
                 ? i18n.t("crew.emailTaken")
                 : serverMessage(err.failure.code, i18n),
           );
-        } else setError(i18n.t("crew.offline"));
+        } else setError(failureMessage(err, i18n));
       })
       .finally(() => setBusy(false));
   };
@@ -290,7 +290,7 @@ export function AccountSection() {
             onPress={() =>
               api<{ code: string }>("/v1/sessions/transfer-code", { method: "POST" })
                 .then(({ code }) => setTransfer(code))
-                .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+                .catch(showFailure(i18n))
             }
           />
           <Credentials />
@@ -303,7 +303,7 @@ export function AccountSection() {
             onPress={() =>
               void exportMyData()
                 .then(() => showToast({ message: i18n.t("account.exportReady") }))
-                .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+                .catch(showFailure(i18n))
             }
           />
           <Button

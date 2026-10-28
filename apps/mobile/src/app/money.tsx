@@ -18,6 +18,7 @@ import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { useDraft } from "@/state/drafts";
+import { showFailure } from "@/server/errors";
 
 /** N-20: tonight's spending is my share of the party pool's expenses. */
 function useTonightSpent(partyPoolId: string | undefined, me: string | undefined): number | null {
@@ -161,7 +162,7 @@ export default function MoneyScreen() {
                   clearPoolName();
                   router.push({ pathname: "/pool", params: { id } });
                 })
-                .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+                .catch(showFailure(i18n))
             }
           />
         </Panel>

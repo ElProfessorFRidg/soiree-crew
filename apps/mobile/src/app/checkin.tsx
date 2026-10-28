@@ -6,7 +6,6 @@ import { duration, palette, scaled } from "@crew/design-tokens";
 import { useT } from "@/i18n";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
-import { ApiError } from "@/server/api";
 import { refreshCrews } from "@/server/crewData";
 import { checkIn, currentFix, leaveVenue, refreshVenues, stillHere, useVenueData, type CheckInResult } from "@/server/venueData";
 import { useSession } from "@/server/session";
@@ -17,7 +16,7 @@ import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
-import { serverMessage } from "@/server/errors";
+import { failureMessage } from "@/server/errors";
 
 /** DESIGN.md §5: check-in steps appear one by one, every 650 ms. They show progress, never which signal decided. */
 const STEP_MS = 650;
@@ -90,7 +89,7 @@ export default function CheckInScreen() {
       clearInterval(timer);
       setPhase("idle");
       haptic.error();
-      setMessage(error instanceof ApiError && error.failure.kind === "http" ? serverMessage(error.failure.code, i18n) : i18n.t("crew.offline"));
+      setMessage(failureMessage(error, i18n));
     }
   };
 

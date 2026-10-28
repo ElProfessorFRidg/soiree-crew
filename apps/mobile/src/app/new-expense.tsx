@@ -16,6 +16,7 @@ import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { BIG_EXPENSE, guarded } from "@/vault/vault";
 import { useDraft } from "@/state/drafts";
+import { showFailure, failureMessage } from "@/server/errors";
 
 type Mode = Split["kind"];
 
@@ -41,7 +42,7 @@ export default function NewExpenseScreen() {
         setDetail(data);
         setIncluded(new Set(data.members.map((m) => m.userId)));
       })
-      .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }));
+      .catch(showFailure(i18n));
   }, [poolId, i18n]);
 
   const currency = detail?.pool.currency ?? "EUR";
@@ -99,9 +100,9 @@ export default function NewExpenseScreen() {
         clearAmount();
         router.back();
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         setSending(false);
-        showToast({ tone: "danger", message: i18n.t("crew.offline") });
+        showToast({ tone: "danger", message: failureMessage(error, i18n) });
       });
   };
 

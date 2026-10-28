@@ -15,6 +15,7 @@ import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { Field } from "./Field";
 import { useDraft } from "@/state/drafts";
+import { showFailure } from "@/server/errors";
 
 const STATUSES: readonly NightStatus[] = ["going_out", "maybe", "home", "unavailable"];
 
@@ -53,7 +54,7 @@ export function RadarSection({ crewId }: { crewId: string }) {
               accessibilityLabel={i18n.t(`radar.${status}`)}
               onPress={() => {
                 haptic.select();
-                setNightStatus(crewId, tonight, status, me).catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }));
+                setNightStatus(crewId, tonight, status, me).catch(showFailure(i18n));
               }}
               style={[styles.tile, { backgroundColor: on ? theme.text : theme.surface2 }]}
             >
@@ -94,7 +95,7 @@ export function RadarSection({ crewId }: { crewId: string }) {
                 onChange={(reply) => {
                   if (reply === "none") return;
                   haptic.select();
-                  replyToCall(crewId, call.id, reply).catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }));
+                  replyToCall(crewId, call.id, reply).catch(showFailure(i18n));
                 }}
               />
             )}
@@ -133,7 +134,7 @@ export function RadarSection({ crewId }: { crewId: string }) {
                   clearNote();
                   showToast({ message: i18n.t("radar.sent") });
                 })
-                .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+                .catch(showFailure(i18n))
                 .finally(() => setCalling(false));
             }}
           />

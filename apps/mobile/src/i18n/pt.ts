@@ -139,6 +139,7 @@ export const pt: Messages = {
     mute: "Silenciar até amanhã",
   },
   crew: {
+    timeout: "O servidor não responde. Tenta daqui a pouco.",
     addAnother: "Criar ou entrar noutro crew",
     tab: "Crew",
     connectTitle: "A tua crew",

@@ -12,6 +12,7 @@ import { Chip, Segmented } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure } from "@/server/errors";
 
 const MAX_SLOTS = 10;
 const STARTS = [19, 20, 21, 22] as const;
@@ -58,7 +59,7 @@ export default function NewPollScreen() {
         haptic.confirmed();
         router.back();
       })
-      .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+      .catch(showFailure(i18n))
       .finally(() => setBusy(false));
   };
 

@@ -9,6 +9,7 @@ import { Screen } from "@/ui/Screen";
 import { SkeletonRows } from "@/ui/Skeleton";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure } from "@/server/errors";
 
 /** COM-11: the server operator checks who claims a venue page (a call, the website) and decides. */
 export default function OperatorScreen() {
@@ -23,7 +24,7 @@ export default function OperatorScreen() {
   const decide = (id: string, decision: "approved" | "rejected") =>
     void decideClaim(id, decision)
       .then(load)
-      .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }));
+      .catch(showFailure(i18n));
 
   return (
     <Screen back title={i18n.t("place.operatorTitle")} withToasts onRefresh={async () => load()}>

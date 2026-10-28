@@ -44,6 +44,7 @@ import { ScalePressable } from "@/ui/Pressable";
 import { Text } from "@/ui/Text";
 import { showToast, ToastHost } from "@/ui/Toast";
 import { Quotes } from "@/recap/Quotes";
+import { failureMessage } from "@/server/errors";
 
 const SLIDES = 5;
 
@@ -112,8 +113,8 @@ function Reactions({
     setOpen(false);
     void react(recap.party.id, toId, mine === emoji ? null : emoji)
       .then(onChange)
-      .catch(() =>
-        showToast({ tone: "danger", message: i18n.t("crew.offline") }),
+      .catch((error: unknown) =>
+        showToast({ tone: "danger", message: failureMessage(error, i18n) }),
       );
   };
   return (
@@ -199,8 +200,8 @@ export default function RecapScreen() {
           }),
         );
       })
-      .catch(() =>
-        showToast({ tone: "danger", message: i18n.t("crew.offline") }),
+      .catch((error: unknown) =>
+        showToast({ tone: "danger", message: failureMessage(error, i18n) }),
       );
   }, [id, i18n]);
   useEffect(load, [load]);

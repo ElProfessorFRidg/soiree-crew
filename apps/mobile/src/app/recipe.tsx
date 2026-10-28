@@ -16,6 +16,7 @@ import { Stepper } from "@/ui/Stepper";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { RecipeArt } from "@/bar/RecipeArt";
+import { showFailure } from "@/server/errors";
 
 const OZ_PER_CL = 0.338;
 
@@ -50,7 +51,7 @@ export default function RecipeScreen() {
         haptic.confirmed();
         showToast({ message: i18n.plural("bar.addedToList", labels.length, { party: party.name }) });
       })
-      .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+      .catch(showFailure(i18n))
       .finally(() => setBusy(false));
   };
 

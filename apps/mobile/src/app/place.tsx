@@ -40,6 +40,7 @@ import { Screen } from "@/ui/Screen";
 import { SkeletonRows } from "@/ui/Skeleton";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure } from "@/server/errors";
 
 const EVENT_KINDS: EventKind[] = ["dj", "student", "match", "concert", "quiz", "other"];
 
@@ -60,7 +61,7 @@ export default function PlaceScreen() {
   const [eventTitle, setEventTitle] = useState("");
   const [eventKind, setEventKind] = useState<EventKind>("dj");
   const [eventDay, setEventDay] = useState(0);
-  const offline = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
+  const offline = showFailure(i18n);
 
   const load = useCallback(() => {
     void fetchPlace(venueId)

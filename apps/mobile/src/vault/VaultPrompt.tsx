@@ -11,6 +11,7 @@ import { Panel } from "@/ui/controls";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { dropVaultItem, dueVaultItems, type VaultItem } from "./vault";
+import { failureMessage } from "@/server/errors";
 
 function describe(item: VaultItem, i18n: Translator): string {
   switch (item.kind) {
@@ -61,9 +62,9 @@ export function VaultPrompt() {
               style={styles.flex}
               onPress={() => {
                 dropVaultItem(item.id);
-                void run(item, i18n).catch(() => {
+                void run(item, i18n).catch((error: unknown) => {
                   useAppStore.setState((state) => ({ vault: [...state.vault, item] }));
-                  showToast({ tone: "danger", message: i18n.t("crew.offline") });
+                  showToast({ tone: "danger", message: failureMessage(error, i18n) });
                 });
               }}
             />

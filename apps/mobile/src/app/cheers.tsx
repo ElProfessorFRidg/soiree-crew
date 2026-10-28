@@ -15,6 +15,7 @@ import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure } from "@/server/errors";
 
 /** A knock is a jolt well above gravity; two in a row closer than this are one knock. */
 const KNOCK_G = 2.4;
@@ -40,7 +41,7 @@ export default function CheersScreen() {
     haptic.select();
     setWaiting(true);
     void knock(crewId)
-      .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+      .catch(showFailure(i18n))
       .finally(() => setTimeout(() => setWaiting(false), KNOCK_GAP_MS));
   };
 

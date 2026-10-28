@@ -10,6 +10,7 @@ import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { SkeletonRows } from "@/ui/Skeleton";
+import { showFailure } from "@/server/errors";
 
 /** O-41: every recap is kept. */
 export default function RecapsScreen() {
@@ -21,7 +22,7 @@ export default function RecapsScreen() {
     () =>
       fetchRecaps()
         .then((data) => setRecaps(data.recaps))
-        .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") })),
+        .catch(showFailure(i18n)),
     [i18n],
   );
   useFocusEffect(

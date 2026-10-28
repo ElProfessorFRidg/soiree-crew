@@ -12,6 +12,7 @@ import { Button } from "@/ui/Button";
 import { Chip, Panel } from "@/ui/controls";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure } from "@/server/errors";
 
 interface Price {
   kind: string;
@@ -70,7 +71,7 @@ export function VenuePrices({ venueId }: { venueId: string }) {
                   setAmountText("");
                   load();
                 })
-                .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+                .catch(showFailure(i18n))
             }
           />
         </>

@@ -15,6 +15,7 @@ import { Screen } from "@/ui/Screen";
 import { SkeletonRows } from "@/ui/Skeleton";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure } from "@/server/errors";
 
 interface Item {
   id: string;
@@ -33,7 +34,7 @@ export default function ItemsScreen() {
   const crews = useCrewData((state) => state.crews);
   const [items, setItems] = useState<Item[] | null>(null);
   const [label, setLabel] = useState("");
-  const offline = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
+  const offline = showFailure(i18n);
 
   const load = useCallback(
     () =>

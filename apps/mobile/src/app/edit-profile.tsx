@@ -11,6 +11,7 @@ import { Chip, Panel, Segmented, Switch } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure } from "@/server/errors";
 
 const AUDIENCES: Audience[] = ["me", "crews", "friends", "everyone"];
 
@@ -21,7 +22,7 @@ export default function EditProfileScreen() {
   const [bio, setBio] = useState("");
   const [country, setCountry] = useState("");
   const [busy, setBusy] = useState(false);
-  const offline = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
+  const offline = showFailure(i18n);
 
   useEffect(() => {
     void fetchProfile("me")

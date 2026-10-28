@@ -13,7 +13,7 @@ import { Text } from "@/ui/Text";
 import { Field } from "./Field";
 import { deviceName } from "@/server/device";
 import { usePendingInvite } from "@/server/pendingInvite";
-import { serverMessage } from "@/server/errors";
+import { serverMessage, failureMessage } from "@/server/errors";
 import { extraString } from "@/system/extra";
 
 interface AccountResponse {
@@ -101,7 +101,7 @@ export function ConnectServer({ initialMode = "create" }: { initialMode?: "creat
               : { field: "username", message: i18n.t("crew.usernameHint") },
           );
         else setError({ field: "form", message: serverMessage(err.failure.code, i18n) });
-      } else setError({ field: "form", message: i18n.t("crew.offline") });
+      } else setError({ field: "form", message: failureMessage(err, i18n) });
     } finally {
       setBusy(false);
     }

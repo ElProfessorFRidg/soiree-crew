@@ -17,6 +17,7 @@ import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { useT } from "@/i18n";
+import { showFailure } from "@/server/errors";
 
 const NO_CARDS: never[] = [];
 
@@ -35,7 +36,7 @@ export default function CrewCardsScreen() {
   const [jokes, setJokes] = useState("");
   const [ideas, setIdeas] = useState<string[]>([]);
   const [suggesting, setSuggesting] = useState(false);
-  const offline = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
+  const offline = showFailure(i18n);
   const isAdmin = crew?.role === "admin";
 
   const load = useCallback(() => {

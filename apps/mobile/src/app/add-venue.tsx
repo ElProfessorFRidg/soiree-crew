@@ -12,6 +12,7 @@ import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { useDraft } from "@/state/drafts";
+import { showFailure } from "@/server/errors";
 
 /** N-08: a venue is placed where the user stands; no address search, no third-party geocoder. */
 export default function AddVenueScreen() {
@@ -51,7 +52,7 @@ export default function AddVenueScreen() {
                 clearName();
                 router.back();
               })
-              .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }))
+              .catch(showFailure(i18n))
               .finally(() => setBusy(false));
           }}
         />

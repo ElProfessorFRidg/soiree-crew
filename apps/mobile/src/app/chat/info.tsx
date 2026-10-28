@@ -18,6 +18,7 @@ import { Panel, Row, Segmented, Switch, Tag } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure } from "@/server/errors";
 
 /** MSG-12, MSG-06, MSG-10: who is in the conversation, its timer, my receipts and typing, the group's key state. */
 export default function ConversationInfoScreen() {
@@ -78,7 +79,7 @@ export default function ConversationInfoScreen() {
         accessibilityLabel={i18n.t("chat.disappearing")}
         onChange={(seconds) => {
           if (conversation.readOnly) return;
-          void setDisappearing(id, seconds).catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }));
+          void setDisappearing(id, seconds).catch(showFailure(i18n));
         }}
       />
 

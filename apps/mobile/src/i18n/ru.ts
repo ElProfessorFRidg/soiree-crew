@@ -139,6 +139,7 @@ export const ru: Messages = {
     mute: "Тихо до утра",
   },
   crew: {
+    timeout: "Сервер не отвечает. Попробуй чуть позже.",
     addAnother: "Создать или вступить в другой крю",
     tab: "Тусовка",
     connectTitle: "Твоя тусовка",

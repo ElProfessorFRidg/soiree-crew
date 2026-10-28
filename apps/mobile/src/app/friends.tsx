@@ -14,13 +14,14 @@ import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure } from "@/server/errors";
 
 /** O-39: friends, requests to answer, and people I blocked. */
 export default function FriendsScreen() {
   const i18n = useT();
   const theme = useTheme();
   const [list, setList] = useState<FriendsList | null>(null);
-  const offline = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
+  const offline = showFailure(i18n);
   const load = useCallback(() => {
     void fetchFriends().then(setList).catch(() => undefined);
   }, []);

@@ -17,6 +17,7 @@ import { Screen } from "@/ui/Screen";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { vaultClosed } from "@/vault/vault";
+import { failureMessage } from "@/server/errors";
 
 /** MSG-08 and ADP-10: the encrypted backup and its recovery key, then the messages held overnight. */
 export default function ChatBackupScreen() {
@@ -47,8 +48,8 @@ export default function ChatBackupScreen() {
       await work();
       haptic.confirmed();
       showToast({ message: done });
-    } catch {
-      showToast({ tone: "danger", message: i18n.t("crew.offline") });
+    } catch (error) {
+      showToast({ tone: "danger", message: failureMessage(error, i18n) });
     } finally {
       setBusy(false);
     }

@@ -17,6 +17,7 @@ import { Chip } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure, failureMessage } from "@/server/errors";
 
 /** N-18: one tap logs a drink for everyone in the round and the expense in the party pool. */
 export default function RoundScreen() {
@@ -40,7 +41,7 @@ export default function RoundScreen() {
         setPayer(data.nextPayerId ?? me);
         setWho(new Set(data.present.map((p) => p.userId)));
       })
-      .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }));
+      .catch(showFailure(i18n));
   }, [partyId, me, i18n]);
 
   const amount = amountText.trim() ? parseAmount(amountText) : 0;
@@ -64,9 +65,9 @@ export default function RoundScreen() {
         showToast({ tone: "info", message: i18n.t("money.roundLogged") });
         router.back();
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         setSending(false);
-        showToast({ tone: "danger", message: i18n.t("crew.offline") });
+        showToast({ tone: "danger", message: failureMessage(error, i18n) });
       });
   };
 

@@ -14,6 +14,7 @@ import { Screen } from "@/ui/Screen";
 import { SkeletonRows } from "@/ui/Skeleton";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure } from "@/server/errors";
 
 interface Wrapped {
   period: "month" | "year";
@@ -62,7 +63,7 @@ export default function WrappedScreen() {
     const { period, key } = periodOf(choice);
     void api<Wrapped>(`/v1/crews/${crewId}/wrapped?period=${period}&key=${key}`)
       .then(setData)
-      .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }));
+      .catch(showFailure(i18n));
     // offline only shows a toast.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [crewId, choice]);

@@ -10,6 +10,7 @@ import { Panel, Tag } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure } from "@/server/errors";
 
 const REASON_KEYS = {
   harassment: "people.reasonHarassment",
@@ -27,7 +28,7 @@ export default function ReportsScreen() {
   const load = useCallback(() => {
     void fetchReports(crewId)
       .then((data) => setReports(data.reports))
-      .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }));
+      .catch(showFailure(i18n));
   }, [crewId, i18n]);
   useEffect(load, [load]);
   const when = (at: number) => `${new Intl.DateTimeFormat(i18n.locale, { day: "numeric", month: "short" }).format(new Date(at))}, ${formatClock(at, i18n.language, hourCycle)}`;

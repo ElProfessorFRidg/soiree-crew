@@ -37,6 +37,7 @@ import { showToast } from "@/ui/Toast";
 import { useEcoInterval } from "@/power/eco";
 import { DANGER_CAP } from "@crew/bac";
 import { breathRatio, countryRules, formatBacValue } from "@crew/units";
+import { failureMessage } from "@/server/errors";
 
 const REFRESH_MS = 30_000;
 
@@ -85,6 +86,7 @@ export default function LeaderboardScreen() {
   const crews = useCrewData((state) => state.crews);
   const crewId = params.crewId ?? crews[0]?.id;
   const live = useLiveParty();
+  const livePartyId = live?.party.id;
   const me = useSession((state) => state.session?.userId);
   const preferences = useAppStore((state) => state.preferences);
   const hourCycle = preferences.hourCycle;
@@ -100,7 +102,7 @@ export default function LeaderboardScreen() {
 
   const load = useCallback(() => {
     if (!crewId) return;
-    const partyId = period === "party" ? live?.party.id : undefined;
+    const partyId = period === "party" ? livePartyId : undefined;
     if (period === "party" && !partyId) {
       setRows([]);
       return;
@@ -118,8 +120,8 @@ export default function LeaderboardScreen() {
         leaderRef.current = leader;
       })
       .catch(() => undefined);
-    if (live) void fetchConfirmable(live.party.id).then((data) => setConfirmable(data.drinks)).catch(() => undefined);
-  }, [crewId, period, metric, live]);
+    if (livePartyId) void fetchConfirmable(livePartyId).then((data) => setConfirmable(data.drinks)).catch(() => undefined);
+  }, [crewId, period, metric, livePartyId]);
 
   useEffect(() => {
     leaderRef.current = null;
@@ -213,7 +215,7 @@ export default function LeaderboardScreen() {
                         message:
                           error instanceof ApiError && error.failure.kind === "http" && error.failure.code === "not_together"
                             ? i18n.t("ranking.notTogether")
-                            : i18n.t("crew.offline"),
+                            : failureMessage(error, i18n),
                       }),
                     )
                 }

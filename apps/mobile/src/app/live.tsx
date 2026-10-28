@@ -23,6 +23,7 @@ import { showToast } from "@/ui/Toast";
 import { useEcoInterval } from "@/power/eco";
 import { ScalePressable } from "@/ui/Pressable";
 import { startSharing, stopSharing, useLiveShare } from "@/location/liveShare";
+import { showFailure } from "@/server/errors";
 
 /** Live dashboard refresh while the screen is open, on top of socket hints (O-37). */
 const REFRESH_MS = 20_000;
@@ -105,7 +106,7 @@ export default function LiveScreen() {
 
   const toggle = (status: { homeSafe?: boolean; designatedDriver?: boolean }) => {
     haptic.select();
-    setPartyStatus(id, status).catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }));
+    setPartyStatus(id, status).catch(showFailure(i18n));
   };
 
   return (

@@ -23,6 +23,7 @@ import { refreshReminders } from "@/reminders/reminders";
 import { AccountSection } from "@/profile/AccountSection";
 import { RegionRules } from "@/profile/RegionRules";
 import { UpdateNotice } from "@/system/UpdateNotice";
+import { showFailure } from "@/server/errors";
 
 const CURRENCIES = ["EUR", "USD", "GBP", "CHF", "CAD", "AUD"] as const;
 const WATER_STEPS = [30, 45, 60, 90] as const;
@@ -113,7 +114,7 @@ export default function SettingsScreen() {
   const lockScreenNumbers = useAppStore((state) => state.lockScreenNumbers);
   const crews = useCrewData((state) => state.crews);
   const hour = (h: number) => formatClock(new Date(2026, 0, 1, h).getTime(), i18n.language, preferences.hourCycle);
-  const offline = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
+  const offline = showFailure(i18n);
   const currencies = CURRENCIES.includes(preferences.currency as (typeof CURRENCIES)[number]) ? CURRENCIES : [preferences.currency, ...CURRENCIES];
 
   return (

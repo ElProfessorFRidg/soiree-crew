@@ -12,6 +12,7 @@ import { Chip, Panel } from "@/ui/controls";
 import { ScalePressable } from "@/ui/Pressable";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure } from "@/server/errors";
 
 const NB = " ";
 /** Each language's own quotation marks. */
@@ -31,7 +32,7 @@ export function Quotes({ recap, me, onChange }: { recap: Recap; me: string | und
   const theme = useTheme();
   const [text, setText] = useState("");
   const [saidBy, setSaidBy] = useState<string | null>(null);
-  const offline = () => showToast({ tone: "danger", message: i18n.t("crew.offline") });
+  const offline = showFailure(i18n);
   const quote = (s: string) => {
     const [open, close] = QUOTES[i18n.language];
     return `${open}${s}${close}`;

@@ -12,6 +12,7 @@ import { Tag } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { showFailure } from "@/server/errors";
 
 const COLUMNS = 3;
 const GAP = 6;
@@ -44,7 +45,7 @@ export default function AlbumScreen() {
         if (n < 0) showToast({ tone: "danger", message: i18n.t("album.denied") });
         else if (n > 0) haptic.confirmed();
       })
-      .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") }));
+      .catch(showFailure(i18n));
 
   return (
     <Screen back title={i18n.t("album.title")} withToasts>
@@ -108,7 +109,7 @@ export default function AlbumScreen() {
                           setOpen(null);
                           load();
                         })
-                        .catch(() => showToast({ tone: "danger", message: i18n.t("crew.offline") })),
+                        .catch(showFailure(i18n)),
                   },
                 ])
               }

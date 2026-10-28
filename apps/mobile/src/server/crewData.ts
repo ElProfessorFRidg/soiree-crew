@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -195,8 +196,9 @@ export function useLiveParty(): { party: Party; live: LiveParty | undefined } | 
   const liveMap = useCrewData((state) => state.live);
   const now = Date.now();
   const party = parties.find((p) => p.myResponse === "going" && p.closedAt === null && p.startsAt <= now && p.endsAt >= now);
-  if (!party) return null;
-  return { party, live: liveMap[party.id] };
+  const partyLive = party ? liveMap[party.id] : undefined;
+  // Same object while nothing changed, so effects that depend on it do not refetch on every render.
+  return useMemo(() => (party ? { party, live: partyLive } : null), [party, partyLive]);
 }
 
 /** <ai_features>: the crew admin turns AI drafts on or off for the whole crew. */

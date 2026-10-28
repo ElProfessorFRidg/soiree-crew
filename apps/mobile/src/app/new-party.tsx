@@ -5,7 +5,6 @@ import { Field } from "@/crew/Field";
 import { useT } from "@/i18n";
 import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
-import { ApiError } from "@/server/api";
 import { createParty, useCrewData, type PartyMood } from "@/server/crewData";
 import { linkCallToParty } from "@/server/radarData";
 import { useAppStore } from "@/state/store";
@@ -16,7 +15,7 @@ import { Stepper } from "@/ui/Stepper";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { useDraft } from "@/state/drafts";
-import { serverMessage } from "@/server/errors";
+import { failureMessage } from "@/server/errors";
 
 const MOODS: readonly PartyMood[] = ["party", "birthday", "champagne", "sunset", "costume", "wine", "fire", "night", "home", "tropical"];
 const STEP_MIN = 30;
@@ -106,9 +105,7 @@ export default function NewPartyScreen() {
                 showToast({
                   tone: "danger",
                   message:
-                    error instanceof ApiError && error.failure.kind === "http"
-                      ? serverMessage(error.failure.code, i18n)
-                      : i18n.t("crew.offline"),
+                    failureMessage(error, i18n),
                 });
               })
               .finally(() => setBusy(false));
