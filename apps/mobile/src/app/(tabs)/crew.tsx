@@ -9,11 +9,12 @@ import { Field } from "@/crew/Field";
 import { crewErrorMessage, inviteCodeFrom } from "@/crew/invite";
 import { RadarSection } from "@/crew/RadarSection";
 import { SosBanner } from "@/crew/SosBanner";
+import { NightAlerts } from "@/party/NightAlerts";
 import { useT, type Translator } from "@/i18n";
 import { flyHero, HeroSource } from "@/motion/hero";
 import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
-import { acceptInvite, createCrew, createInvite, CREW_KINDS, fetchOpenCrews, joinOpenCrew, leaveCrew, refreshCrews, refreshParties, respondToParty, useCrewData, type Crew, type CrewKind, type OpenCrew, type Party } from "@/server/crewData";
+import { acceptInvite, createCrew, createInvite, CREW_KINDS, fetchOpenCrews, deleteCrew, joinOpenCrew, leaveCrew, refreshCrews, refreshParties, respondToParty, useCrewData, type Crew, type CrewKind, type OpenCrew, type Party } from "@/server/crewData";
 import { useSession } from "@/server/session";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
@@ -94,6 +95,23 @@ function CrewCard({ crew }: { crew: Crew }) {
     });
   };
 
+  /** ADP-06: deleting the crew for everyone waits for the morning when the estimate is high. */
+  const onDelete = () => {
+    void confirmAction({
+      title: i18n.t("crew.deleteConfirm", { crew: crew.name }),
+      body: i18n.t("crew.deleteBody"),
+      confirmLabel: i18n.t("crew.delete"),
+      cancelLabel: i18n.t("crew.leaveKeep"),
+      destructive: true,
+    }).then((ok) => {
+      if (!ok) return;
+      const ran = guarded({ kind: "deleteCrew", crewId: crew.id, crewName: crew.name }, () =>
+        void deleteCrew(crew.id).catch((error: unknown) => showToast({ tone: "danger", message: crewErrorMessage(error, i18n) })),
+      );
+      if (!ran) showToast({ message: i18n.t("vault.queued") });
+    });
+  };
+
   return (
     <Panel>
       <StartHereBanner crew={crew} />
@@ -161,6 +179,7 @@ function CrewCard({ crew }: { crew: Crew }) {
       ) : null}
       <Button label={i18n.t("crew.invite")} icon="share" height={48} onPress={() => void onInvite()} />
       <Button label={i18n.t("crew.leave")} variant="outline" height={40} onPress={onLeave} />
+      {crew.role === "admin" ? <Button label={i18n.t("crew.delete")} variant="outline" height={40} onPress={onDelete} /> : null}
     </Panel>
   );
 }
@@ -221,6 +240,7 @@ export default function CrewScreen() {
       onRefresh={() => Promise.all([refreshCrews(), refreshParties(), ...crews.map((c) => refreshRadar(c.id))])}
     >
       <SosBanner />
+      <NightAlerts />
       {crews.length > 1 ? (
         <View style={styles.kinds}>
           {crews.map((c) => (

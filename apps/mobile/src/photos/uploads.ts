@@ -6,7 +6,9 @@ import { Platform } from "react-native";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { api } from "@/server/api";
+import { useSession } from "@/server/session";
 import { newId } from "@/state/store";
+import { guarded } from "@/vault/vault";
 
 /** Longest side sent to the server. Enough for a phone screen, about 300 KB in JPEG. */
 const MAX_SIDE = 1600;
@@ -16,11 +18,14 @@ const MAX_ATTEMPTS = 6;
 export interface PendingPhoto {
   id: string;
   partyId: string;
+  /** O-13: the account that took it; another account on this phone never sends it. */
+  ownerId?: string;
   /** The re-encoded copy on this phone, kept until the server has it. */
   uri: string;
   width: number;
   height: number;
-  status: "pending" | "sending" | "failed";
+  /** `held`: picked while the next-morning vault was closed (ADP-06), sent only once confirmed. */
+  status: "pending" | "sending" | "failed" | "held";
   attempts: number;
   /** Web keeps the data itself: there is no file to read back later. */
   data?: string;
@@ -58,7 +63,10 @@ async function prepare(asset: ImagePicker.ImagePickerAsset): Promise<{ uri: stri
   return { uri: saved.uri, width: saved.width, height: saved.height, ...(saved.base64 ? { data: saved.base64 } : {}) };
 }
 
-/** Opens the camera or the library, then queues the photos for this party. Returns how many were added. */
+/**
+ * Opens the camera or the library, then queues the photos for this party. Returns how many were
+ * added. With the vault closed (ADP-06) they wait on the phone until the morning asks again.
+ */
 export async function addPhotos(partyId: string, source: "camera" | "library"): Promise<number> {
   const permission = source === "camera" ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
   // -1: refused, the system may ask again; -2: refused for good, only the settings can help.
@@ -68,12 +76,42 @@ export async function addPhotos(partyId: string, source: "camera" | "library"): 
       ? await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 1, exif: false })
       : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], allowsMultipleSelection: true, selectionLimit: 10, quality: 1, exif: false });
   if (result.canceled) return 0;
+  const ownerId = useSession.getState().session?.userId;
+  const ids: string[] = [];
   for (const asset of result.assets) {
     const ready = await prepare(asset);
-    useUploads.setState((s) => ({ queue: [...s.queue, { id: newId(), partyId, ...ready, status: "pending", attempts: 0 }] }));
+    const id = newId();
+    ids.push(id);
+    useUploads.setState((s) => ({ queue: [...s.queue, { id, partyId, ...ready, ...(ownerId ? { ownerId } : {}), status: "held", attempts: 0 }] }));
   }
-  void flushUploads();
+  const release = () => releaseUploads(ids);
+  if (!guarded({ kind: "albumPost", partyId, photoIds: ids }, release)) return -3;
   return result.assets.length;
+}
+
+/** ADP-06: photos held for the morning go out now. */
+export function releaseUploads(ids: readonly string[]): void {
+  useUploads.setState((s) => ({ queue: s.queue.map((p) => (ids.includes(p.id) && p.status === "held" ? { ...p, status: "pending" as const } : p)) }));
+  void flushUploads();
+}
+
+/** Drops photos from the queue and their re-encoded copies on this phone. */
+export function dropUploads(ids: readonly string[]): void {
+  const gone = useUploads.getState().queue.filter((p) => ids.includes(p.id));
+  useUploads.setState((s) => ({ queue: s.queue.filter((p) => !ids.includes(p.id)) }));
+  if (Platform.OS === "web") return;
+  for (const photo of gone) {
+    try {
+      new File(photo.uri).delete();
+    } catch {
+      // Already gone.
+    }
+  }
+}
+
+/** O-13: another account signed in; photos queued by anyone else never leave under its name. */
+export function dropForeignUploads(userId: string): void {
+  dropUploads(useUploads.getState().queue.filter((p) => p.ownerId !== userId).map((p) => p.id));
 }
 
 let running = false;
@@ -83,8 +121,11 @@ export async function flushUploads(): Promise<void> {
   if (running) return;
   running = true;
   try {
+    const me = useSession.getState().session?.userId;
     for (;;) {
-      const next = useUploads.getState().queue.find((p) => p.status === "pending" || (p.status === "failed" && p.attempts < MAX_ATTEMPTS));
+      const next = useUploads
+        .getState()
+        .queue.find((p) => (p.ownerId === undefined || p.ownerId === me) && (p.status === "pending" || (p.status === "failed" && p.attempts < MAX_ATTEMPTS)));
       if (!next) return;
       patch(next.id, { status: "sending" });
       try {

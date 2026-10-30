@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { useT } from "@/i18n";
 import { UpdateNotice } from "@/system/UpdateNotice";
+import { EmergencyContact } from "@/profile/EmergencyContact";
 import { ProfileFields, type ProfileDraft } from "@/profile/ProfileFields";
 import { draftFromProfile, saveProfile } from "@/profile/saveProfile";
 import { useAppStore } from "@/state/store";
@@ -46,6 +47,7 @@ export default function MeScreen() {
       <UpdateNotice />
       <Text variant="label">{i18n.t("profile.body")}</Text>
       <ProfileFields draft={draft} onChange={onProfileChange} />
+      <EmergencyContact />
 
       <Row
         title={i18n.t("people.myProfile")}

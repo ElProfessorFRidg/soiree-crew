@@ -1,8 +1,9 @@
+import { router } from "expo-router";
 import { useMemo, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
-import { duration, radius, scaled } from "@crew/design-tokens";
+import { duration, radius, scaled, space } from "@crew/design-tokens";
 import { removeDrink, removeWater, restoreDrink } from "@/drinks/actions";
 import { drinkLabel } from "@/drinks/display";
 import { useT } from "@/i18n";
@@ -14,13 +15,16 @@ import { useNow } from "@/state/hooks";
 import type { DrinkEntry } from "@/sync/types";
 import { useTheme } from "@/theme";
 import { Button, IconButton } from "@/ui/Button";
-import { Tag } from "@/ui/controls";
+import { Chip, Tag } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { ScalePressable } from "@/ui/Pressable";
 import { Screen } from "@/ui/Screen";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
-import { formatVolume, drinkVolumeUnit } from "@crew/units";
+import { formatVolume, drinkVolumeUnit, nightKey } from "@crew/units";
+
+/** O-23: nights listed in the history, most recent first. */
+const MAX_NIGHTS = 30;
 
 interface Group {
   key: string;
@@ -36,15 +40,22 @@ export default function HistoryScreen() {
   const preferences = useAppStore((state) => state.preferences);
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const unit = drinkVolumeUnit(preferences.unitSystem);
+  const nightOf = (at: number) => nightKey(at, -new Date(at).getTimezoneOffset(), preferences.dayBoundaryHour);
+  const tonight = nightOf(now);
+  const [night, setNight] = useState(tonight);
+
+  // Every night with something logged, tonight first even when empty.
+  const nights = useMemo(() => {
+    const keys = new Set<string>([tonight]);
+    for (const drink of drinks) keys.add(nightOf(drink.consumedAt));
+    return [...keys].sort((a, b) => (a < b ? 1 : -1)).slice(0, MAX_NIGHTS);
+    // nightOf only depends on the day boundary.
+  }, [drinks, tonight, preferences.dayBoundaryHour]);
 
   const { groups, tonightWater } = useMemo(() => {
-    const start = new Date(now);
-    if (start.getHours() < preferences.dayBoundaryHour) start.setDate(start.getDate() - 1);
-    start.setHours(preferences.dayBoundaryHour, 0, 0, 0);
-    const from = start.getTime();
     const byKey = new Map<string, DrinkEntry[]>();
     for (const drink of drinks) {
-      if (drink.consumedAt < from) continue;
+      if (nightOf(drink.consumedAt) !== night) continue;
       const key = `${drink.kind}:${drink.name ?? ""}:${drink.volumeMl}`;
       byKey.set(key, [...(byKey.get(key) ?? []), drink]);
     }
@@ -53,8 +64,18 @@ export default function HistoryScreen() {
       drinks: items.sort((a, b) => a.consumedAt - b.consumedAt),
     }));
     list.sort((a, b) => (b.drinks.at(-1)?.consumedAt ?? 0) - (a.drinks.at(-1)?.consumedAt ?? 0));
-    return { groups: list, tonightWater: water.filter((w) => w.at >= from) };
-  }, [drinks, water, now, preferences.dayBoundaryHour]);
+    return { groups: list, tonightWater: water.filter((w) => nightOf(w.at) === night) };
+  }, [drinks, water, night, preferences.dayBoundaryHour]);
+
+  const nightLabel = (key: string) => {
+    if (key === tonight) return i18n.t("history.tonight");
+    const [y, m, d] = key.split("-").map(Number) as [number, number, number];
+    return new Intl.DateTimeFormat(i18n.locale, { weekday: "short", day: "numeric", month: "short" }).format(new Date(y, m - 1, d, 12));
+  };
+  const onEdit = (drink: DrinkEntry) => {
+    haptic.select();
+    router.push({ pathname: "/edit-drink", params: { id: drink.id } });
+  };
 
   const onRemove = (drink: DrinkEntry) => {
     haptic.select();
@@ -69,8 +90,15 @@ export default function HistoryScreen() {
   const boundary = formatClock(new Date(2026, 0, 1, preferences.dayBoundaryHour).getTime(), i18n.language, preferences.hourCycle);
   return (
     <Screen back title={i18n.t("history.title")} trailing={<Tag label={i18n.t("history.nightUntil", { time: boundary })} />} withToasts>
+      {nights.length > 1 ? (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.nightScroller} contentContainerStyle={styles.nights}>
+          {nights.map((key) => (
+            <Chip key={key} label={nightLabel(key)} selected={key === night} onPress={() => setNight(key)} />
+          ))}
+        </ScrollView>
+      ) : null}
       <Text variant="small">
-        {i18n.t("history.boundaryNote", { time: boundary })} {i18n.t("history.swipeHint")}
+        {i18n.t("history.boundaryNote", { time: boundary })} {i18n.t("history.swipeEditHint")}
       </Text>
       {groups.length === 0 && tonightWater.length === 0 ? <Text>{i18n.t("history.empty")}</Text> : null}
       {groups.map((group) => {
@@ -115,13 +143,10 @@ export default function HistoryScreen() {
                       rightThreshold={60}
                       overshootRight={false}
                       renderRightActions={() => (
-                        <Button
-                          label={i18n.t("history.remove")}
-                          variant="danger"
-                          height={54}
-                          style={styles.swipeAction}
-                          onPress={() => onRemove(drink)}
-                        />
+                        <View style={styles.swipeActions}>
+                          <Button label={i18n.t("history.edit")} variant="secondary" height={54} style={styles.swipeAction} onPress={() => onEdit(drink)} />
+                          <Button label={i18n.t("history.remove")} variant="danger" height={54} style={styles.swipeAction} onPress={() => onRemove(drink)} />
+                        </View>
                       )}
                     >
                       <View style={[styles.item, { backgroundColor: theme.surface }]}>
@@ -129,7 +154,8 @@ export default function HistoryScreen() {
                         <View style={styles.flex}>
                           {drink.sync !== "saved" ? <Tag label={i18n.t("common.sending")} icon="clock" /> : null}
                         </View>
-                        {/* The swipe is a shortcut: the button stays for a drunk thumb (ADP-04). */}
+                        {/* The swipe is a shortcut: the buttons stay for a drunk thumb (ADP-04). */}
+                        <IconButton icon="edit" accessibilityLabel={`${i18n.t("history.edit")} ${title}`} onPress={() => onEdit(drink)} />
                         <IconButton icon="trash" accessibilityLabel={`${i18n.t("history.remove")} ${title}`} onPress={() => onRemove(drink)} />
                       </View>
                     </ReanimatedSwipeable>
@@ -164,6 +190,9 @@ const styles = StyleSheet.create({
   groupHeader: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 54 },
   itemWrap: { marginLeft: 12 },
   item: { flexDirection: "row", alignItems: "center", gap: 12, borderRadius: radius.button, paddingVertical: 8, paddingHorizontal: 14 },
-  swipeAction: { marginLeft: 8, minWidth: 110 },
+  swipeActions: { flexDirection: "row" },
+  swipeAction: { marginLeft: 8, minWidth: 100 },
+  nightScroller: { marginHorizontal: -space.screenX },
+  nights: { gap: 8, paddingHorizontal: space.screenX },
   flex: { flex: 1 },
 });

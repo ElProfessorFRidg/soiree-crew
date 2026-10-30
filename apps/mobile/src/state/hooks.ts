@@ -60,6 +60,7 @@ export function useIntakes(): DrinkIntake[] {
           abv: drink.abv,
           consumedAt: drink.consumedAt,
           withFood: drink.withFood,
+          ...(drink.food ? { food: drink.food } : {}),
         })),
     [drinks],
   );

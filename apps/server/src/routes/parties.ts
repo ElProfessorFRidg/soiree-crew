@@ -36,6 +36,7 @@ function partyView(row: PartyRow, now: number) {
     endsAt: row.ends_at,
     closedAt: row.closed_at,
     quietAfterMinutes: row.quiet_after_minutes,
+    createdBy: row.created_by,
     live: row.closed_at === null && row.starts_at <= now && row.ends_at >= now,
   };
 }

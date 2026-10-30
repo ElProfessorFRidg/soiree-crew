@@ -3,13 +3,17 @@ import { AppState as RNAppState } from "react-native";
 import type { CustomDrink } from "@/drinks/presets";
 import { createTranslator } from "@/i18n";
 import { clearAccountHistory, useAppStore } from "@/state/store";
+import { useCrewCards } from "@/games/crewCards";
+import { dropForeignUploads } from "@/photos/uploads";
+import { usePendingInvite } from "./pendingInvite";
+import { onPartyAlert } from "@/party/alerts";
 import { flush, onSyncEvent, setTransport, submit } from "@/sync/engine";
 import { HttpTransport } from "@/sync/httpTransport";
 import { LocalTransport } from "@/sync/localTransport";
 import type { DrinkEntry, StoredProfile } from "@/sync/types";
 import { api } from "./api";
 import { refreshCrews, refreshLiveParty, refreshParties, useCrewData } from "./crewData";
-import { refreshRadar, refreshSos } from "./radarData";
+import { refreshRadar, refreshSos, useRadar } from "./radarData";
 import { useSession, type ServerSession } from "./session";
 import { showToast } from "@/ui/Toast";
 import { backupIfDue } from "@/chat/backup";
@@ -92,6 +96,20 @@ function uploadLocalHistory(): void {
   useAppStore.setState({ uploadedToServerAt: Date.now() });
 }
 
+/**
+ * O-13: another account signs in on this phone, or this one signs out. Everything the previous one left goes: history,
+ * body profile, vault, level, crews and their cards, alerts, an invite it had opened, and any photo
+ * it queued.
+ */
+export function wipePreviousAccount(userId: string | null): void {
+  clearAccountHistory();
+  useCrewData.setState({ crews: [], parties: [], live: {} });
+  useCrewCards.setState({ byCrew: {} });
+  useRadar.setState({ byCrew: {}, sos: [], mine: [] });
+  usePendingInvite.setState({ invite: null });
+  dropForeignUploads(userId ?? "");
+}
+
 let socket: WebSocket | null = null;
 let retry = 0;
 let retryTimer: ReturnType<typeof setTimeout> | null = null;
@@ -122,9 +140,9 @@ function openSocket(session: ServerSession): void {
         if (message.crewId) void refreshRadar(message.crewId).catch(() => undefined);
       }
       if (message.type === "sync") void pull().catch(() => undefined);
-      if (message.type === "party.unwell" && message.partyId) {
-        // N-36: a quiet heads-up; the banner on the party screen says who.
-        haptic.error();
+      if ((message.type === "party.unwell" || message.type === "party.quiet" || message.type === "party.danger" || message.type === "party.homeCheck") && message.partyId) {
+        // N-36, N-29, O-88, N-25: a heads-up; the banners on the party screen say who and what to do.
+        onPartyAlert(message.type, message.partyId, message.userId);
         void refreshLiveParty(message.partyId).catch(() => undefined);
       }
       if (message.type === "security.newDevice") showToast({ message: createTranslator(useAppStore.getState().preferences.language).t("account.newDevice") });
@@ -170,7 +188,7 @@ export function connect(session: ServerSession | null): void {
   setTransport(new HttpTransport());
   stopped = false;
   const owner = useAppStore.getState().accountUserId;
-  if (owner && owner !== session.userId) clearAccountHistory();
+  if (owner && owner !== session.userId) wipePreviousAccount(session.userId);
   // History that belonged to no account yet goes up to this one, once.
   else if (!owner) useAppStore.setState({ uploadedToServerAt: null });
   useAppStore.setState({ accountUserId: session.userId });

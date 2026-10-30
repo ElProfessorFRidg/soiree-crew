@@ -1,4 +1,4 @@
-import { estimateBac, UI_LEVEL_ENTRY } from "@crew/bac";
+import { BacSimulation, distributionVolume, estimateBac, isVaultLocked, UI_LEVEL_ENTRY } from "@crew/bac";
 import type { Split } from "@crew/money";
 import { nightKey } from "@crew/units";
 import { newId, useAppStore } from "@/state/store";
@@ -8,10 +8,16 @@ import { newId, useAppStore } from "@/state/store";
  * the actions below are not run: they wait, and the next day the app asks once more.
  */
 export const VAULT_FROM_G_PER_L = UI_LEVEL_ENTRY[2];
+const HOUR_MS = 3_600_000;
 
 export type VaultItem =
   | { id: string; at: number; night: string; kind: "leaveCrew"; crewId: string; crewName: string }
   | { id: string; at: number; night: string; kind: "deleteAccount" }
+  | { id: string; at: number; night: string; kind: "deleteCrew"; crewId: string; crewName: string }
+  /** Photos picked for the album, held on this phone until the morning. */
+  | { id: string; at: number; night: string; kind: "albumPost"; partyId: string; photoIds: string[] }
+  /** Erasing the drink history (the health-data withdrawal). */
+  | { id: string; at: number; night: string; kind: "deleteHistory" }
   | {
       id: string;
       at: number;
@@ -37,8 +43,12 @@ export function vaultClosed(now = Date.now()): boolean {
   if (!profile) return false;
   const intakes = drinks
     .filter((d) => d.abv > 0)
-    .map((d) => ({ id: d.id, volumeMl: d.volumeMl, abv: d.abv, consumedAt: d.consumedAt, withFood: d.withFood }));
-  return estimateBac(intakes, profile, now).bac >= VAULT_FROM_G_PER_L;
+    .map((d) => ({ id: d.id, volumeMl: d.volumeMl, abv: d.abv, consumedAt: d.consumedAt, withFood: d.withFood, ...(d.food ? { food: d.food } : {}) }));
+  // The projected peak of the next hour counts too: a drink just swallowed locks the vault already.
+  const bac = estimateBac(intakes, profile, now).bac;
+  let peak = bac;
+  for (const point of new BacSimulation(intakes, distributionVolume(profile), now).sample(now, now + HOUR_MS, 60_000)) peak = Math.max(peak, point.bac);
+  return isVaultLocked(bac, peak);
 }
 
 /** Runs `action` now, or puts it in the vault and returns false. */

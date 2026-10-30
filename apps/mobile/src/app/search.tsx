@@ -103,7 +103,7 @@ export default function SearchScreen() {
     else if (hit.group === "people") router.push({ pathname: "/profile", params: { id: hit.id } });
     else if (hit.group === "games") router.push({ pathname: "/games/[gameId]", params: { gameId: hit.id } });
     else {
-      const drink = logDrink(hit.preset, Date.now(), false);
+      const drink = logDrink(hit.preset, Date.now());
       if (drink) {
         router.back();
         offerUndo(drink, i18n, hourCycle);

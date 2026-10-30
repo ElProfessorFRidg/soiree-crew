@@ -3,8 +3,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { newId } from "@/state/store";
-import { notifyRecapReady } from "@/reminders/reminders";
+import { cancelHomeCheck, notifyRecapReady, scheduleHomeCheck } from "@/reminders/reminders";
 import { api } from "./api";
+import { useSession } from "./session";
 
 export interface CrewMember {
   id: string;
@@ -51,6 +52,9 @@ export interface Party {
   closedAt: number | null;
   live: boolean;
   myResponse: PartyResponse;
+  /** N-29: minutes without a sign of life before the party is told. */
+  quietAfterMinutes?: number;
+  createdBy?: string;
 }
 
 export interface LiveMember {
@@ -72,6 +76,16 @@ export interface LiveMember {
   homeWith: string | null;
   homeMode: HomeMode | null;
   homeOfferFrom: string | null;
+  /** O-37: first sign of life at the party. */
+  arrivedAt?: number | null;
+  /** QOL-10: since when the battery is under 10 %. */
+  batteryLowAt?: number | null;
+  /** QOL-10: the last position shared before the phone ran low, for the people at the party. */
+  lastKnown?: { lat: number; lng: number; accuracy: number; at: number } | null;
+  /** HUB-01: the venue this member is checked in at. */
+  venue?: { id: string; name: string } | null;
+  /** O-37: drinks in the last hour and in the hour before. */
+  pace?: { lastHour: number; previousHour: number } | null;
 }
 
 export type HomeMode = "walk" | "car" | "ride" | "transit";
@@ -121,6 +135,11 @@ export async function refreshParties(): Promise<void> {
   // Keep the live view of the party in progress current.
   const live = parties.find((p) => p.live && p.myResponse === "going");
   if (live) await refreshLiveParty(live.id);
+  // N-25: the "are you home?" question waits for the end of the night I go to.
+  if (live && live.kind === "party") {
+    const me = useCrewData.getState().live[live.id]?.members.find((m) => m.userId === useSession.getState().session?.userId);
+    if (!me?.homeSafeAt) void scheduleHomeCheck(live).catch(() => undefined);
+  }
 }
 
 export async function refreshLiveParty(partyId: string): Promise<void> {
@@ -182,7 +201,48 @@ export async function setPartyStatus(
   status: { homeSafe?: boolean; designatedDriver?: boolean; batteryLow?: boolean; unwell?: boolean },
 ): Promise<void> {
   await api(`/v1/parties/${partyId}/status`, { method: "POST", body: status });
+  if (status.homeSafe) void cancelHomeCheck(partyId);
   await refreshLiveParty(partyId);
+}
+
+/** N-29: the creator or an admin changes how long a silence lasts before the party is told. */
+export async function setQuietAfter(partyId: string, quietAfterMinutes: number): Promise<void> {
+  await api(`/v1/parties/${partyId}/settings`, { method: "PATCH", body: { quietAfterMinutes } });
+  await refreshParties();
+}
+
+/** ADP-06: the admin deletes the crew for everyone. */
+export async function deleteCrew(crewId: string): Promise<void> {
+  await api(`/v1/crews/${crewId}`, { method: "DELETE" });
+  await refreshCrews();
+  await refreshParties();
+}
+
+/** QOL-16: how this crew's nights usually go. */
+export interface CrewHabits {
+  nights: number;
+  /** Minutes after midnight of the start day; past 24 h means after midnight. */
+  endMinutes: number | null;
+  venue: { id: string; name: string } | null;
+  friends: { userId: string; name: string }[];
+}
+
+export const fetchHabits = (crewId: string) => api<CrewHabits>(`/v1/crews/${crewId}/habits`);
+
+/** N-25: home check lasts this long after a night ends. */
+const HOME_CHECK_MS = 12 * 3_600_000;
+
+/** N-25: the night I went to that ended in the last hours, while someone may still be on the way home. */
+export function useEndedParty(now: number): Party | null {
+  const parties = useCrewData((state) => state.parties);
+  return useMemo(() => {
+    const ended = parties
+      .filter((p) => p.myResponse === "going" && p.kind === "party")
+      .map((p) => ({ party: p, endedAt: p.closedAt ?? p.endsAt }))
+      .filter(({ endedAt }) => endedAt <= now && now - endedAt < HOME_CHECK_MS)
+      .sort((a, b) => b.endedAt - a.endedAt);
+    return ended[0]?.party ?? null;
+  }, [parties, now]);
 }
 
 export async function closeParty(partyId: string): Promise<void> {

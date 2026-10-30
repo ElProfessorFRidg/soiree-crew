@@ -26,7 +26,7 @@ export function DrinkFab({ style }: { style?: StyleProp<ViewStyle> }) {
   const onPress = () => {
     const last = lastDrink();
     const preset = last ? presetFromEntry(last) : defaultPreset(preferences.unitSystem);
-    const drink = logDrink(preset, Date.now(), false);
+    const drink = logDrink(preset, Date.now());
     if (drink) offerUndo(drink, i18n, preferences.hourCycle);
   };
 

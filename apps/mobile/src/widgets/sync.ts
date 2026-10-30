@@ -18,7 +18,7 @@ export async function drainWidgetQueue(): Promise<void> {
     if (tap.kind === "water") submit({ kind: "water.add", water: buildWater(tap.at) });
     else {
       const last = lastDrink();
-      logDrink(last ? presetFromEntry(last) : defaultPreset(useAppStore.getState().preferences.unitSystem), tap.at, false, true);
+      logDrink(last ? presetFromEntry(last) : defaultPreset(useAppStore.getState().preferences.unitSystem), tap.at, null, true);
     }
   }
 }

@@ -154,7 +154,7 @@ export function Composer({ conversationId, members, reply, onClearReply, big }: 
     <View style={[styles.bar, { borderTopColor: theme.line, backgroundColor: theme.bg }]}>
       {reply ? (
         <View style={[styles.reply, { borderLeftColor: theme.amber }]}>
-          <Text variant="small" numberOfLines={1} style={styles.flex}>
+          <Text variant="small" style={styles.flex}>
             {reply.label}
           </Text>
           <IconButton icon="x" accessibilityLabel={i18n.t("chat.cancelReply")} onPress={onClearReply} />

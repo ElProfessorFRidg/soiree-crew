@@ -44,7 +44,9 @@ export default function AlbumScreen() {
   const add = (source: "camera" | "library") =>
     void addPhotos(partyId, source)
       .then((n) => {
-        if (n < 0) showPermissionDenied(i18n, i18n.t("album.denied"), n === -1);
+        // ADP-06: picked, held on the phone until the morning asks again.
+        if (n === -3) showToast({ message: i18n.t("vault.queued") });
+        else if (n < 0) showPermissionDenied(i18n, i18n.t("album.denied"), n === -1);
         else if (n > 0) haptic.confirmed();
       })
       .catch(showFailure(i18n));
@@ -67,7 +69,9 @@ export default function AlbumScreen() {
           <View key={p.id} style={{ width: tile, height: tile }}>
             <Image source={{ uri: p.data ? `data:image/jpeg;base64,${p.data}` : p.uri }} style={[styles.image, styles.faded]} />
             <View style={styles.overlay}>
-              {p.status === "failed" ? (
+              {p.status === "held" ? (
+                <Tag label={i18n.t("album.held")} tone="amber" />
+              ) : p.status === "failed" ? (
                 <>
                   <Tag label={i18n.t("album.failed")} tone="danger" />
                   <Button label={i18n.t("album.retry")} variant="secondary" height={32} onPress={() => retryUpload(p.id)} />

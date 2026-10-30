@@ -13,7 +13,8 @@ export class LocalTransport implements Transport {
     await Promise.resolve();
     const now = Date.now();
     switch (mutation.kind) {
-      case "drink.add": {
+      case "drink.add":
+      case "drink.edit": {
         const { drink } = mutation;
         if (drink.consumedAt > now + FUTURE_TOLERANCE_MS) return { status: "rejected", reason: "future_drink" };
         if (!(drink.volumeMl > 0) || drink.abv < 0 || drink.abv > 1) return { status: "rejected", reason: "invalid" };

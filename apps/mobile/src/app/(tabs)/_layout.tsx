@@ -54,7 +54,8 @@ function TabItem({ label, icon, focused, onPress }: { label: string; icon: AnyIc
       <Animated.View style={iconStyle}>
         <Icon name={icon} size={22} color={color} />
       </Animated.View>
-      <Text variant="tab" color={color} numberOfLines={1}>
+      {/* O-11: a long label wraps under the icon instead of being cut. */}
+      <Text variant="tab" color={color} align="center">
         {label}
       </Text>
     </ScalePressable>
