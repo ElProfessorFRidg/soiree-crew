@@ -10,6 +10,7 @@ import { Dealt } from "../ui/motion";
 import { PenaltyList } from "../ui/PenaltyList";
 import { PlayerGrid } from "../ui/PlayerGrid";
 import { RoundTimer } from "../ui/RoundTimer";
+import { SwipeCard } from "../ui/SwipeCard";
 import { CardText, GameCard, cardColours, ids, useTable, type GameScreenProps } from "./common";
 
 export function NeverEverScreen({ session, content, onAgain }: GameScreenProps) {
@@ -48,14 +49,16 @@ export function NeverEverScreen({ session, content, onAgain }: GameScreenProps) 
       footer={<Button label={g.t("games.neverEver.next")} height={ui.action} onPress={() => dispatch({ type: "next" })} />}
     >
       <RoundTimer seconds={session.timerSeconds} roundKey={state.card.id} />
-      <Dealt dealKey={state.card.id}>
-        <GameCard minHeight={ui.big ? 220 : 280} style={{ backgroundColor: cardColours.peach }}>
-          <Text variant="h3" color={cardColours.muted}>
-            {g.t("games.neverEver.prompt")}
-          </Text>
-          <CardText>{state.card.value}</CardText>
-        </GameCard>
-      </Dealt>
+      <SwipeCard cardKey={state.card.id} either={{ label: g.t("games.neverEver.next"), onCommit: () => dispatch({ type: "next" }) }}>
+        <Dealt dealKey={state.card.id}>
+          <GameCard minHeight={ui.big ? 220 : 280} style={{ backgroundColor: cardColours.peach }}>
+            <Text variant="h3" color={cardColours.muted}>
+              {g.t("games.neverEver.prompt")}
+            </Text>
+            <CardText>{state.card.value}</CardText>
+          </GameCard>
+        </Dealt>
+      </SwipeCard>
       <Text variant="label">{g.t("games.neverEver.guilty")}</Text>
       <PlayerGrid players={state.order.players} selected={new Set(state.guilty)} onPress={(id) => dispatch({ type: "toggle", playerId: id })} />
       <PenaltyList lines={state.lastPenalties} players={table.all} wasted={wasted} forfeits={content.forfeits} />

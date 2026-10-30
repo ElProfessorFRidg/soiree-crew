@@ -3,6 +3,7 @@ import { z } from "zod";
 import { BacSimulation, distributionVolume, type BodyProfile, type DrinkIntake } from "@crew/bac";
 import { HttpError, requireUser, type Context } from "../context";
 import { RateLimiter } from "../ratelimit";
+import { signedPhotoUrl } from "./photos";
 
 const HOUR_MS = 3_600_000;
 const PRE_PARTY_MS = 12 * HOUR_MS;
@@ -11,7 +12,25 @@ const CURVE_STEP_MS = 10 * 60_000;
 export const RECAP_EMOJIS = ["🔥", "😂", "🥴", "👑", "💧", "❤️"] as const;
 
 type BadgeKind = "camel" | "goldenDriver" | "newBoss" | "firstIn" | "nightOwl";
-type TimelineKind = "start" | "arrival" | "checkIn" | "takeover" | "round" | "homeSafe" | "end";
+type TimelineKind = "start" | "arrival" | "checkIn" | "takeover" | "round" | "homeSafe" | "end" | "game" | "photos" | "allHere" | "cheers";
+
+interface TimelineEvent {
+  at: number;
+  kind: TimelineKind;
+  userId?: string;
+  venueName?: string;
+  count?: number;
+  /** "game": which game, and the record set in it, if any. */
+  gameId?: string;
+  record?: { key: string; userId: string; count: number } | null;
+  /** "cheers": the other glass. */
+  otherId?: string;
+  /** "photos": up to three photos of that half hour, as signed links. */
+  photos?: { id: string; url: string }[];
+}
+
+/** Photos taken within this long of each other make one line of the timeline. */
+const PHOTO_BURST_MS = 30 * 60_000;
 
 interface PartyRow {
   id: string;
@@ -109,12 +128,22 @@ export function recapRoutes(app: FastifyInstance, ctx: Context): void {
       [party.id, user.id],
     );
 
+    // Playing a game of the party is a sign of the night too (N-22).
+    const gamePlayers = new Set(
+      (
+        await ctx.db.query<{ user_id: string }>(
+          "select distinct gm.user_id from game_result_members gm join game_results r on r.id = gm.result_id where r.party_id = $1",
+          [party.id],
+        )
+      ).map((r) => r.user_id),
+    );
     const partyDrinks = drinkRows.filter((d) => d.party_id === party.id);
     const present = members.filter(
       (m) =>
         partyDrinks.some((d) => d.user_id === m.user_id) ||
         waterRows.some((w) => w.user_id === m.user_id) ||
         checkIns.some((c) => c.user_id === m.user_id) ||
+        gamePlayers.has(m.user_id) ||
         (m.last_activity_at !== null && m.last_activity_at >= party.starts_at),
     );
 
@@ -178,7 +207,7 @@ export function recapRoutes(app: FastifyInstance, ctx: Context): void {
     const lastHome = participants.filter((p) => p.homeSafeAt !== null).sort((a, b) => b.homeSafeAt! - a.homeSafeAt!)[0];
     if (lastHome && participants.length > 1) badges.push({ kind: "nightOwl", userId: lastHome.userId });
 
-    const timeline: { at: number; kind: TimelineKind; userId?: string; venueName?: string; count?: number }[] = [{ at: party.starts_at, kind: "start" }];
+    const timeline: TimelineEvent[] = [{ at: party.starts_at, kind: "start" }];
     const presentIds = new Set(participants.map((p) => p.userId));
     const narration = (
       await ctx.db.query<{ text: string; tone: string; author_id: string; at: number }>("select text, tone, author_id, at from party_narrations where party_id = $1", [party.id])
@@ -194,6 +223,49 @@ export function recapRoutes(app: FastifyInstance, ctx: Context): void {
     for (const c of checkIns) timeline.push({ at: c.at, kind: "checkIn", userId: c.user_id, venueName: c.venue_name });
     for (const t of takeovers) timeline.push({ at: t.started_at, kind: "takeover", userId: t.user_id, venueName: t.venue_name });
     for (const r of rounds) timeline.push({ at: r.created_at, kind: "round", userId: r.payer_id, count: (JSON.parse(r.member_ids) as string[]).length });
+    // N-22: games played, photos and the night's highlights.
+    const games = await ctx.db.query<{ game_id: string; winner_id: string | null; played_at: number; record_key: string | null; record_user_id: string | null; record_count: number | null }>(
+      "select game_id, winner_id, played_at, record_key, record_user_id, record_count from game_results where party_id = $1 order by played_at",
+      [party.id],
+    );
+    for (const g of games) {
+      timeline.push({
+        at: g.played_at,
+        kind: "game",
+        gameId: g.game_id,
+        ...(g.winner_id ? { userId: g.winner_id } : {}),
+        record: g.record_key && g.record_user_id && presentIds.has(g.record_user_id) ? { key: g.record_key, userId: g.record_user_id, count: g.record_count ?? 0 } : null,
+      });
+    }
+    // Photos follow the album's rule: only people who were going see them.
+    const viewerGoing = (await ctx.db.query("select 1 from party_members where party_id = $1 and user_id = $2 and response = 'going'", [party.id, user.id])).length > 0;
+    if (viewerGoing) {
+      const photos = await ctx.db.query<{ id: string; created_at: number }>(
+        "select id, created_at from photos where party_id = $1 and created_at between $2 and $3 order by created_at",
+        [party.id, party.starts_at, to + 2 * HOUR_MS],
+      );
+      let burst: TimelineEvent | null = null;
+      for (const photo of photos) {
+        if (!burst || photo.created_at - burst.at > PHOTO_BURST_MS) {
+          burst = { at: photo.created_at, kind: "photos", count: 0, photos: [] };
+          timeline.push(burst);
+        }
+        burst.count = (burst.count ?? 0) + 1;
+        if (burst.photos!.length < 3) burst.photos!.push({ id: photo.id, url: signedPhotoUrl(ctx, photo.id) });
+      }
+    }
+    // Highlights: the moment the last of at least three people arrived, and the first cheers.
+    const arrivals = timeline.filter((t) => t.kind === "arrival");
+    if (arrivals.length >= 3 && arrivals.length === participants.length) {
+      timeline.push({ at: Math.max(...arrivals.map((a) => a.at)), kind: "allHere", count: arrivals.length });
+    }
+    const cheers = presentIds.size
+      ? await ctx.db.query<{ user_a: string; user_b: string; at: number }>(
+          "select user_a, user_b, at from cheers where crew_id = $1 and at between $2 and $3 and user_a = any($4::uuid[]) and user_b = any($4::uuid[]) order by at",
+          [party.crew_id, party.starts_at, to, [...presentIds]],
+        )
+      : [];
+    if (cheers[0]) timeline.push({ at: cheers[0].at, kind: "cheers", userId: cheers[0].user_a, otherId: cheers[0].user_b, count: cheers.length });
     if (party.closed_at !== null) timeline.push({ at: party.closed_at, kind: "end" });
     timeline.sort((a, b) => a.at - b.at);
 

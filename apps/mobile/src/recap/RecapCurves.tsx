@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet, View, type GestureResponderEvent, type LayoutChangeEvent } from "react-native";
-import Animated, { useAnimatedProps, useReducedMotion, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
-import Svg, { Circle, G, Line, Path, Text as SvgText } from "react-native-svg";
-import { avatarColor, duration, radius } from "@crew/design-tokens";
+import Animated, { useAnimatedProps, useAnimatedStyle, useReducedMotion, useSharedValue, withSpring, withTiming, type SharedValue } from "react-native-reanimated";
+import Svg, { Line, Path } from "react-native-svg";
+import { avatarColor, duration, radius, spring } from "@crew/design-tokens";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
+import { pointAlong, polylineLength, type Polyline } from "@/motion/math/path";
+import { Avatar } from "@/ui/Avatar";
 import type { Recap } from "@/server/recapData";
 import { useTheme } from "@/theme";
 import { Chip } from "@/ui/controls";
@@ -37,6 +39,39 @@ function DrawnLine({ d, length, color, faded, progress }: { d: string; length: n
       strokeDasharray={[length, length]}
       animatedProps={props}
     />
+  );
+}
+
+const DOT = 22;
+
+/**
+ * MOT-04: a friend's avatar travels along their curve as it draws, then glides to each new point
+ * (spring.settle, no overshoot) instead of jumping every minute. Reduce Motion places it directly.
+ */
+function GlidingAvatar({ userId, name, trail, replay, still }: { userId: string; name: string; trail: Polyline; replay: number; still: boolean }) {
+  const target = polylineLength(trail);
+  const distance = useSharedValue(still ? target : 0);
+  const drawn = useRef<number | null>(null);
+  useEffect(() => {
+    if (still) {
+      distance.value = target;
+      return;
+    }
+    if (drawn.current !== replay) {
+      // First showing (or "Rejouer"): ride along with the line drawing itself.
+      drawn.current = replay;
+      distance.value = 0;
+      distance.value = withTiming(target, { duration: duration.enter * 4, easing: easings.out });
+    } else distance.value = withSpring(target, spring.settle);
+  }, [target, replay, still, distance]);
+  const style = useAnimatedStyle(() => {
+    const point = pointAlong(trail, distance.value);
+    return { transform: [{ translateX: point.x - DOT / 2 }, { translateY: point.y - DOT / 2 }] };
+  }, [trail]);
+  return (
+    <Animated.View pointerEvents="none" style={[styles.glide, style]}>
+      <Avatar personId={userId} name={name} size={DOT} />
+    </Animated.View>
   );
 }
 
@@ -82,12 +117,17 @@ export function RecapCurves({ participants, from, legalLimit, replay, meId, form
     const x = (at: number) => PAD.left + ((at - from) / (to - from)) * innerW;
     const y = (v: number) => PAD.top + innerH - (Math.min(v, max) / max) * innerH;
     return withCurves.map((p) => {
-      const xy = p.curve.filter(([at]) => at >= from && at <= to).map(([at, v]) => ({ x: x(at), y: y(v) }));
+      const inRange = p.curve.filter(([at]) => at >= from && at <= to);
+      const xy = inRange.map(([at, v]) => ({ x: x(at), y: y(v) }));
       const nearest = nowAt === undefined ? undefined : p.curve.reduce((best, pt) => (Math.abs(pt[0] - nowAt) < Math.abs(best[0] - nowAt) ? pt : best), p.curve[0]!);
+      const dotOn = nearest && nearest[0] >= from && nearest[0] <= to ? nearest : null;
+      // MOT-04: the part of the curve the avatar travels, from the start to where the person is now.
+      const trail = dotOn ? inRange.filter(([at]) => at <= dotOn[0]) : [];
       return {
         userId: p.userId,
-        initial: p.name.trim().charAt(0).toLocaleUpperCase(),
-        dot: nearest && nearest[0] >= from && nearest[0] <= to ? { x: x(nearest[0]), y: y(nearest[1]) } : null,
+        name: p.name,
+        dot: dotOn ? { x: x(dotOn[0]), y: y(dotOn[1]) } : null,
+        trail: { xs: trail.map(([at]) => x(at)), ys: trail.map(([, v]) => y(v)) },
         nowX: nowAt !== undefined && nowAt >= from && nowAt <= to ? x(nowAt) : null,
         d: xy.map((pt, i) => `${i === 0 ? "M" : "L"}${pt.x.toFixed(1)},${pt.y.toFixed(1)}`).join(" "),
         length: Math.max(1, lengthOf(xy)),
@@ -128,18 +168,13 @@ export function RecapCurves({ participants, from, legalLimit, replay, meId, form
                 progress={progress}
               />
             ))}
-            {lines.map((line) =>
-              line.dot && (isolated === null || isolated === line.userId) ? (
-                <G key={`dot-${line.userId}`}>
-                  <Circle cx={line.dot.x} cy={line.dot.y} r={9} fill={avatarColor(line.userId)} stroke={theme.bg} strokeWidth={2} />
-                  <SvgText x={line.dot.x} y={line.dot.y + 4} fontSize={10} fontWeight="700" fill={theme.bg} textAnchor="middle">
-                    {line.initial}
-                  </SvgText>
-                </G>
-              ) : null,
-            )}
           </Svg>
         ) : null}
+        {lines.map((line) =>
+          line.dot && line.trail.xs.length && (isolated === null || isolated === line.userId) ? (
+            <GlidingAvatar key={`dot-${line.userId}`} userId={line.userId} name={line.name} trail={line.trail} replay={replay} still={reduceMotion} />
+          ) : null,
+        )}
       </View>
       <View
         accessible
@@ -179,6 +214,7 @@ export function RecapCurves({ participants, from, legalLimit, replay, meId, form
 const styles = StyleSheet.create({
   gap: { gap: 10 },
   chart: { height: HEIGHT, borderRadius: radius.card, overflow: "hidden" },
+  glide: { position: "absolute", left: 0, top: 0 },
   sliderHit: { height: 36, justifyContent: "center" },
   track: { height: 6, borderRadius: 3, overflow: "hidden" },
   fill: { height: "100%" },

@@ -109,6 +109,18 @@
           },
           "nomad": {
             "image": "./assets/icons/icon-nomad.png"
+          },
+          "winter": {
+            "image": "./assets/icons/icon-winter.png"
+          },
+          "spring": {
+            "image": "./assets/icons/icon-spring.png"
+          },
+          "summer": {
+            "image": "./assets/icons/icon-summer.png"
+          },
+          "autumn": {
+            "image": "./assets/icons/icon-autumn.png"
           }
         }
       ],

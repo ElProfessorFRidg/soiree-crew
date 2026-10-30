@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
-import { duration } from "@crew/design-tokens";
+import { duration, scaled } from "@crew/design-tokens";
 import { easings } from "@/motion/easing";
 import { Numeral } from "@/ui/Text";
 
@@ -42,7 +42,7 @@ export function RollingNumber({ value, format, size, color, accessibilityLabel }
       shownRef.current = next;
       setShown(next);
       if (step >= ROLL_STEPS) clearInterval(timer);
-    }, ROLL_STEP_MS);
+    }, scaled(ROLL_STEP_MS));
     return () => clearInterval(timer);
   }, [value, reduceMotion, scale]);
 

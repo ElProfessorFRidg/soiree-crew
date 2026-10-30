@@ -39,6 +39,11 @@ export const neverEver: NeverEverContent = {
     "bu.",
     "fait une sieste de quatre heures en pensant dormir vingt minutes.",
     "oublié le prénom de quelqu'un pendant qu'on me le disait.",
+    "appris une chorégraphie TikTok en entier.",
+    "rapporté un galet de vacances, puis oublié de quelle plage il venait.",
+    "fait deux fois le tour d'un rond-point parce que j'avais raté la sortie.",
+    "fait la bise à quelqu'un qui me tendait la main.",
+    "cherché mes lunettes alors qu'elles étaient sur ma tête.",
   ],
   hard: [
     "regardé le profil de l'ex de mon ex.",
@@ -73,6 +78,10 @@ export const neverEver: NeverEverContent = {
     "inventé un empêchement pendant que j'étais déjà en pyjama.",
     "dit à mes parents que je dormais chez une amie.",
     "vomi dans un sac de courses.",
+    "fait croire que j'avais lu un mail pour ne pas avouer que je l'avais ignoré.",
+    "gardé la monnaie d'une course qu'on m'avait demandé de faire.",
+    "souhaité un anniversaire en retard en accusant mes notifications.",
+    "inventé une allergie pour ne pas manger le plat de quelqu'un.",
   ],
   extreme: [
     "passé la nuit avec quelqu'un le premier soir et regretté le lendemain. Ou pas regretté.",
@@ -103,5 +112,7 @@ export const neverEver: NeverEverContent = {
     "couché avec quelqu'un pour une raison dont je ne suis pas fier ou fière.",
     "envoyé une photo à la mauvaise personne, puis prétendu qu'on m'avait piraté.",
     "fait croire que j'avais une copine ou un copain imaginaire pour me débarrasser de quelqu'un.",
+    "envoyé « tu dors ? » à plus d'une personne la même nuit.",
+    "passé la nuit chez quelqu'un surtout pour éviter de payer le taxi.",
   ],
 };

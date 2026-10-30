@@ -1,12 +1,17 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import { Celebration, momentText } from "@/crew/Celebration";
 import { useT, type Translator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
 import { fetchCrewStats, type CrewBoardRow, type CrewStats } from "@/server/statsData";
+import { useSession } from "@/server/session";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
+import { BadgeUnlock, useBadgeCelebrations } from "@/ui/BadgeUnlock";
+import { badgeKey } from "@/ui/pure/badgeUnlocks";
+import { EmptyState } from "@/ui/EmptyState";
 import { Button } from "@/ui/Button";
 import { Panel, Tag } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
@@ -29,6 +34,10 @@ export default function CrewStatsScreen() {
   useEffect(() => {
     void load().catch(() => undefined);
   }, [load]);
+  const viewerId = useSession((state) => state.session?.userId ?? null);
+  // MOT-10: badges this phone has not shown yet pop in, one after the other.
+  const celebrate = useBadgeCelebrations(crewId ?? null, viewerId, stats?.honours ?? null);
+  const celebrated = [...celebrate];
 
   if (!stats) {
     return (
@@ -56,6 +65,7 @@ export default function CrewStatsScreen() {
   };
   board(i18n.t("crewStats.boardNights"), (r) => r.nights, (v) => i18n.number(v));
   board(i18n.t("crewStats.boardRuled"), (r) => r.venuesRuled, (v) => i18n.number(v));
+  board(i18n.t("crewStats.boardGames"), (r) => r.gamesWon, (v) => i18n.number(v));
   board(i18n.t("crewStats.boardDriver"), (r) => r.soberDriver, (v) => i18n.number(v));
   board(i18n.t("crewStats.boardLastHome"), (r) => r.lastHome, (v) => clockFromNoon(v, i18n, hourCycle));
   board(i18n.t("crewStats.boardFirstDrink"), (r) => r.firstDrink, (v) => clockFromNoon(v, i18n, hourCycle), true);
@@ -63,7 +73,7 @@ export default function CrewStatsScreen() {
 
   return (
     <Screen back title={i18n.t("crewStats.title")} onRefresh={load}>
-      {stats.totalNights === 0 ? <Text>{i18n.t("crewStats.empty")}</Text> : null}
+      {stats.totalNights === 0 ? <EmptyState icon="cal" text={i18n.t("crewStats.empty")} /> : null}
       {stats.totalNights > 0 ? (
         <Button label={i18n.t("wrapped.open")} icon="sparkdot" variant="secondary" height={52} onPress={() => router.push({ pathname: "/wrapped", params: { crewId } })} />
       ) : null}
@@ -75,6 +85,11 @@ export default function CrewStatsScreen() {
         <Text variant="h3">{i18n.plural("crewStats.streak", stats.streak.current)}</Text>
         <Text variant="small">{i18n.t("crewStats.streakHint")}</Text>
         {stats.streak.best > stats.streak.current ? <Text variant="small">{i18n.plural("crewStats.best", stats.streak.best)}</Text> : null}
+        {/* JOY-06: one quiet week a month is frozen instead of breaking the streak. */}
+        {stats.streak.frozenWeeks?.length ? <Text variant="small">{i18n.plural("crewStats.frozen", stats.streak.frozenWeeks.length)}</Text> : null}
+        {stats.streak.freezeAvailable !== undefined && stats.streak.current > 0 ? (
+          <Tag label={i18n.t(stats.streak.freezeAvailable ? "crewStats.freezeReady" : "crewStats.freezeUsed")} tone={stats.streak.freezeAvailable ? "water" : "amber"} icon="clock" />
+        ) : null}
       </Panel>
 
       <Panel>
@@ -88,6 +103,20 @@ export default function CrewStatsScreen() {
         ) : null}
         {stats.milestones.next ? <Text variant="small">{i18n.t("crewStats.nextMilestone", { count: stats.milestones.next })}</Text> : null}
       </Panel>
+
+      {/* JOY-08: milestones, anniversaries and the first venue conquered, newest first. */}
+      {stats.moments?.length ? (
+        <Panel>
+          <Text variant="label">{i18n.t("crewStats.moments")}</Text>
+          {[...stats.moments].reverse().map((m) => (
+            <View key={m.id} style={styles.line}>
+              <Text style={styles.flex}>{momentText(m, i18n)}</Text>
+              <Text variant="small">{new Intl.DateTimeFormat(i18n.locale, { day: "numeric", month: "short", year: "numeric" }).format(new Date(`${m.night}T12:00:00`))}</Text>
+            </View>
+          ))}
+        </Panel>
+      ) : null}
+      {stats.moments ? <Celebration crewId={crewId} moments={stats.moments} /> : null}
 
       {stats.totalNights > 0 ? (
         <>
@@ -120,11 +149,22 @@ export default function CrewStatsScreen() {
               <Text variant="small">
                 {i18n.t("crewStats.since", { date: new Intl.DateTimeFormat(i18n.locale, { day: "numeric", month: "long", year: "numeric" }).format(new Date(h.joinedAt)) })}
               </Text>
+              {(h.titles ?? []).map((title) => (
+                <Text key={`${title.period}-${title.board}`} variant="small" color={theme.amberText}>
+                  {i18n.t(`crewStats.titles.${title.period}`, { board: i18n.t(`crewStats.titleBoard.${title.board}`) })}
+                </Text>
+              ))}
               {h.badges.length ? (
                 <View style={styles.tags}>
-                  {h.badges.map((b) => (
-                    <Tag key={b} label={i18n.t(`crewStats.badge.${b}`)} tone={b === "boss" ? "amber" : "ok"} />
-                  ))}
+                  {h.badges.map((b) => {
+                    const key = badgeKey(crewId, h.userId, b);
+                    const order = celebrated.indexOf(key);
+                    return (
+                      <BadgeUnlock key={b} celebrate={order >= 0} order={order} withHaptic={order === 0}>
+                        <Tag label={i18n.t(`crewStats.badge.${b}`)} tone={b === "boss" || b === "champion" ? "amber" : "ok"} />
+                      </BadgeUnlock>
+                    );
+                  })}
                 </View>
               ) : null}
             </View>

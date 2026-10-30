@@ -14,6 +14,7 @@ import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { showFailure } from "@/server/errors";
 import { confirmAction } from "@/ui/confirm";
+import { EmptyState } from "@/ui/EmptyState";
 import { showPermissionDenied } from "@/system/permissions";
 
 const COLUMNS = 3;
@@ -60,7 +61,7 @@ export default function AlbumScreen() {
         <Button label={i18n.t("strip.open")} icon="sparkdot" variant="outline" height={48} onPress={() => router.push({ pathname: "/photo-strip", params: { partyId } })} />
       ) : null}
       {photos.length ? <Text variant="label">{i18n.plural("album.count", photos.length)}</Text> : null}
-      {!photos.length && !pending.length ? <Text>{i18n.t("album.empty")}</Text> : null}
+      {!photos.length && !pending.length ? <EmptyState icon="camera" text={i18n.t("album.empty")} /> : null}
 
       <View style={styles.grid}>
         {pending.map((p) => (

@@ -68,7 +68,7 @@ export default function CheckInScreen() {
     if (!venueId) return;
     setPhase("working");
     setSteps(1);
-    const timer = setInterval(() => setSteps((s) => Math.min(3, s + 1)), STEP_MS);
+    const timer = setInterval(() => setSteps((s) => Math.min(3, s + 1)), scaled(STEP_MS));
     const fix = await currentFix();
     if (!fix.ok) {
       clearInterval(timer);
@@ -80,7 +80,7 @@ export default function CheckInScreen() {
     try {
       const answer = await checkIn(venueId, fix.fix, isPrivate);
       // The verdict animation plays on the server's answer, never on the tap (SYNC-02).
-      await new Promise((resolve) => setTimeout(resolve, Math.max(0, STEP_MS * 3 - 200)));
+      await new Promise((resolve) => setTimeout(resolve, Math.max(0, scaled(STEP_MS * 3 - 200))));
       clearInterval(timer);
       setResult(answer);
       setPhase("done");

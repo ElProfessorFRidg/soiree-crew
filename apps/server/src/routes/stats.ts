@@ -1,8 +1,10 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
-import { byMonth, byWeekday, crewStreak, milestones } from "../stats";
+import { anniversary, byMonth, byWeekday, crewStreak, milestoneMoments, milestones, type Moment } from "../stats";
 import { crewTimeZone } from "../territory";
+import { GAME_WINNER_BADGE, gameWins } from "./games";
+import { lastChampions } from "./leaderboards";
 import { nightOf, offsetMinutes } from "../time";
 import { seasonBounds } from "@crew/territory";
 
@@ -16,6 +18,32 @@ function minutesAfterNoon(at: number, timeZone: string): number {
 }
 
 const average = (values: number[]) => (values.length ? Math.round(values.reduce((s, v) => s + v, 0) / values.length) : null);
+
+/**
+ * JOY-08: milestones (nights together, anniversaries) and the crew's first venue conquered:
+ * the earliest reign at one of its bars. Moments count nights and moments, never drinks.
+ */
+async function crewMoments(ctx: Context, crewId: string, nights: string[], createdNight: string, tonight: string, timeZone: string): Promise<Moment[]> {
+  const moments = milestoneMoments(nights, createdNight, tonight);
+  const first = await ctx.db.query<{ started_at: number; user_id: string; display_name: string; name: string }>(
+    `select r.started_at, r.user_id, u.display_name, v.name from reigns r join venues v on v.id = r.venue_id and v.crew_id = $1
+     join users u on u.id = r.user_id order by r.started_at limit 1`,
+    [crewId],
+  );
+  if (first[0]) {
+    moments.push({
+      id: "first-conquest",
+      kind: "firstConquest",
+      value: null,
+      night: nightOf(first[0].started_at, timeZone),
+      venueName: first[0].name,
+      userId: first[0].user_id,
+      name: first[0].display_name,
+    });
+  }
+  // push: crew.milestone (once, on the night a moment is reached)
+  return moments.sort((a, b) => a.night.localeCompare(b.night));
+}
 
 export function statsRoutes(app: FastifyInstance, ctx: Context): void {
   /** N-14 habits, JOY-06 streak, JOY-08 milestones and RANK-05 secondary boards for one crew. */
@@ -83,6 +111,11 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
           [crewId, ids],
         )
       : [];
+    // RANK-05, N-34: games won in the crew; RANK-04: champions of last week and last month.
+    const wins = await gameWins(ctx.db, crewId);
+    const champions = crew.leaderboard_enabled
+      ? { nights: await lastChampions(ctx, crewId, user.id, "nights"), games: await lastChampions(ctx, crewId, user.id, "games") }
+      : null;
 
     const boards = members.map((m) => {
       const mine = going.filter((g) => g.user_id === m.user_id);
@@ -101,6 +134,7 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
         venuesRuled: reigns.find((r) => r.user_id === m.user_id)?.n ?? 0,
         lastHome: average(homes),
         soberDriver: drove,
+        gamesWon: wins.get(m.user_id) ?? 0,
         ...(drinkingBoards() && crew.leaderboard_enabled
           ? { firstDrink: average(firsts), hydration: myDrinks >= 5 ? Math.round((myWater / myDrinks) * 100) / 100 : null }
           : {}),
@@ -115,6 +149,8 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
       topVenues: topVenues.map((v) => ({ venueId: v.venue_id, name: v.name, visits: v.visits })),
       streak: crewStreak(nights, tonight),
       milestones: milestones(nights.length),
+      anniversary: anniversary(nightOf(crew.created_at, timeZone), tonight),
+      moments: await crewMoments(ctx, crewId, nights, nightOf(crew.created_at, timeZone), tonight, timeZone),
       crewSince: crew.created_at,
       boards,
       honours: everyone.map((m) => {
@@ -125,7 +161,13 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
         if ((board?.soberDriver ?? 0) >= 3) badges.push("soberDriver");
         if (typeof board?.hydration === "number" && board.hydration >= 0.5) badges.push("hydrated");
         if ((board?.venuesRuled ?? 0) >= 1) badges.push("boss");
-        return { userId: m.user_id, name: m.display_name, joinedAt: m.joined_at, organised: m.organised, homeSafe: m.home_safe, badges };
+        if ((wins.get(m.user_id) ?? 0) >= GAME_WINNER_BADGE) badges.push("gameWinner");
+        const titles: { period: "week" | "month"; board: "nights" | "games" }[] = [];
+        for (const boardName of ["nights", "games"] as const) {
+          for (const period of ["week", "month"] as const) if (champions?.[boardName][period].includes(m.user_id)) titles.push({ period, board: boardName });
+        }
+        if (titles.length) badges.push("champion");
+        return { userId: m.user_id, name: m.display_name, joinedAt: m.joined_at, organised: m.organised, homeSafe: m.home_safe, badges, titles };
       }),
     };
   });

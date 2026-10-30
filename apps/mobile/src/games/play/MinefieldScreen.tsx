@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, { FadeIn, ZoomIn } from "react-native-reanimated";
-import { duration, palette, radius } from "@crew/design-tokens";
+import { duration, palette, radius, scaled } from "@crew/design-tokens";
 import { GRID_SIDE, GRID_TILES, createMinefield, hiddenTiles, mathRandom, minefieldReducer, minesLeft, touchingMines } from "@crew/games";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
@@ -95,7 +95,7 @@ export function MinefieldScreen({ session, content, onAgain }: GameScreenProps) 
           const count = touchingMines(grid, index);
           const state_ = !unveiled ? g.t("games.minefield.tileClosed") : mine ? g.t("games.minefield.tileMine") : showNumbers ? g.plural("games.minefield.tileSafe", count) : g.t("games.minefield.tileSafeNoCount");
           const bg = !unveiled ? theme.surfaceRaised : mine ? (open ? theme.danger : palette.tint.dangerBg) : theme.ok;
-          const mineDelay = gridOver && mine && !open ? grid.mines.indexOf(index) * 160 : 0;
+          const mineDelay = gridOver && mine && !open ? scaled(grid.mines.indexOf(index) * 160) : 0;
           return (
             <Tremble key={`${state.gridNumber}-${index}`} trigger={state.phase === "boom" && state.lastTile === index ? index : null} calm={ui.calmMotion} style={styles.cellWrap}>
               <ScalePressable

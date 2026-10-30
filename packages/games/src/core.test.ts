@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { GAMES, filterGames, gameById, lockReason, typicalMinutes } from "./catalogue";
+import { GAMES, filterGames, gameById, isUnlocked, lockReason, typicalMinutes } from "./catalogue";
 import { addPenalties, forfeitSize, mergePenalties, penaltyOffer, removeFromOrder, standings } from "./core";
 import { distinctIndices, seededRandom, shuffle } from "./random";
 import { players } from "./testing";
@@ -71,6 +71,16 @@ describe("catalogue", () => {
     expect(lockReason(gameById("doubleAgent"), 4)).toEqual({ kind: "needsPlayers", min: 5, missing: 1 });
     expect(lockReason(gameById("doubleAgent"), 5)).toBeNull();
     expect(lockReason(gameById("faceOff"), 3)).toEqual({ kind: "tooManyPlayers", max: 2 });
+  });
+
+  it("opens the Moles at four friends in the app, the friends lock first (O-48)", () => {
+    expect(lockReason(gameById("doubleAgent"), 6, 2)).toEqual({ kind: "needsFriends", friends: 4, missing: 2 });
+    expect(lockReason(gameById("doubleAgent"), 4, 4)).toEqual({ kind: "needsPlayers", min: 5, missing: 1 });
+    expect(lockReason(gameById("doubleAgent"), 5, 4)).toBeNull();
+    expect(isUnlocked(gameById("impostor"), 2)).toBe(false);
+    expect(isUnlocked(gameById("impostor"), 3)).toBe(true);
+    // Games without an unlock never ask for friends.
+    expect(lockReason(gameById("bigDeck"), 3, 0)).toBeNull();
   });
 
   it("filters by play mode", () => {

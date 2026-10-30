@@ -141,6 +141,16 @@ describe("crew and venue stats (N-12, N-14, JOY-06, JOY-08, RANK-05)", () => {
     );
     const venue = (await app.inject({ method: "GET", url: `/v1/venues/${venueId}/stats`, headers: malik.auth })).json() as { visits: number; people: number; nights: number };
     expect(venue).toMatchObject({ visits: 1, people: 1, nights: 1 });
+
+    // JOY-08: the first reign of the crew is its first venue conquered.
+    await db.query("insert into reigns (id, venue_id, user_id, season, started_at) values ($1, $2, $3, '2026-11', $4)", [randomUUID(), venueId, jade.id, clock]);
+    const again = (await app.inject({ method: "GET", url: `/v1/crews/${crewId}/stats`, headers: malik.auth })).json() as {
+      moments: { id: string; kind: string; venueName?: string; userId?: string }[];
+      streak: { freezeAvailable: boolean };
+    };
+    expect(again.moments.map((m) => m.id)).toEqual(["nights-1", "first-conquest"]);
+    expect(again.moments[1]).toMatchObject({ kind: "firstConquest", venueName: "Le Zinc", userId: jade.id });
+    expect(again.streak.freezeAvailable).toBe(true);
   });
 });
 

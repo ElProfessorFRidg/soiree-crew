@@ -5,6 +5,7 @@ import { seasonBounds } from "@crew/territory";
 import { AC_CONFIG, verifyDrinks } from "../anticheat";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { crewTimeZone, currentSeason } from "../territory";
+import { gameWins } from "./games";
 import { nightOf, offsetMinutes } from "../time";
 import { CREW_KINDS } from "../schemas";
 
@@ -12,7 +13,7 @@ const DAY_MS = 86_400_000;
 
 const querySchema = z.object({
   period: z.enum(["party", "week", "month", "all"]).default("month"),
-  metric: z.enum(["drinks", "grams", "nights"]).default("drinks"),
+  metric: z.enum(["drinks", "grams", "nights", "games"]).default("drinks"),
   partyId: z.string().uuid().optional(),
 });
 
@@ -30,6 +31,9 @@ interface DrinkRow {
 function drinkingLeaderboardEnabled(): boolean {
   return (process.env.DRINKING_LEADERBOARD ?? "on") !== "off";
 }
+
+/** Boards that never count drinks stay on when the drinking boards are switched off. */
+const soberMetric = (metric: string) => metric === "nights" || metric === "games";
 
 async function periodBounds(ctx: Context, crewId: string, period: string, partyId: string | undefined, userId: string) {
   const now = ctx.now();
@@ -90,6 +94,8 @@ async function computeBoard(ctx: Context, crewId: string, from: number, to: numb
        and m.last_activity_at between p.starts_at and coalesce(p.closed_at, p.ends_at)`,
     [crewId, from, to],
   );
+  // RANK-05: games won, counted from two members up (routes/games.ts).
+  const wins = metric === "games" ? await gameWins(ctx.db, crewId, from, to) : new Map<string, number>();
 
   const rows = members.map((member) => {
     const mine = drinks.filter((d) => d.user_id === member.user_id);
@@ -122,7 +128,7 @@ async function computeBoard(ctx: Context, crewId: string, from: number, to: numb
       }
     }
     const nights = new Set(nightsOut.filter((n) => n.user_id === member.user_id).map((n) => nightOf(n.starts_at, timeZone))).size;
-    const value = metric === "drinks" ? count : metric === "grams" ? Math.round(grams) : nights;
+    const value = metric === "drinks" ? count : metric === "grams" ? Math.round(grams) : metric === "games" ? (wins.get(member.user_id) ?? 0) : nights;
     return { userId: member.user_id, name: member.display_name, value, unverified: member.user_id === viewerId ? unverified : undefined };
   });
 
@@ -136,6 +142,22 @@ async function computeBoard(ctx: Context, crewId: string, from: number, to: numb
   });
 }
 
+/**
+ * RANK-04, N-34: champions of the last finished week and month on one board, for the titles
+ * shown with the crew's honours. Ties share the title; a board with nobody above zero has none.
+ */
+export async function lastChampions(ctx: Context, crewId: string, viewerId: string, metric: Metric): Promise<{ week: string[]; month: string[] }> {
+  const now = ctx.now();
+  const { from: thisWeek, timeZone } = await periodBounds(ctx, crewId, "week", undefined, viewerId);
+  const top = async (from: number, to: number) =>
+    (await computeBoard(ctx, crewId, from, to, timeZone, metric, viewerId)).filter((r) => r.rank === 1 && r.value > 0).map((r) => r.userId);
+  const [year, month] = currentSeason(now, timeZone).split("-").map(Number) as [number, number];
+  const last = new Date(Date.UTC(year, month - 2, 15, 12));
+  const key = `${last.getUTCFullYear()}-${String(last.getUTCMonth() + 1).padStart(2, "0")}`;
+  const { start, end } = seasonBounds(key, offsetMinutes(last.getTime(), timeZone));
+  return { week: await top(thisWeek - 7 * DAY_MS, thisWeek), month: await top(start, end) };
+}
+
 export function leaderboardRoutes(app: FastifyInstance, ctx: Context): void {
   /** RANK-01, RANK-06, RANK-07, RANK-08: crew-only, verified drinks only, nothing above the danger cap. */
   app.get<{ Params: { id: string } }>("/v1/crews/:id/leaderboard", async (request) => {
@@ -143,7 +165,7 @@ export function leaderboardRoutes(app: FastifyInstance, ctx: Context): void {
     await assertCrewMember(ctx, request.params.id, user.id);
     const query = querySchema.parse(request.query);
     const crew = await ctx.db.query<{ leaderboard_enabled: boolean }>("select leaderboard_enabled from crews where id = $1", [request.params.id]);
-    if (!crew[0]?.leaderboard_enabled || (!drinkingLeaderboardEnabled() && query.metric !== "nights")) {
+    if (!crew[0]?.leaderboard_enabled || (!drinkingLeaderboardEnabled() && !soberMetric(query.metric))) {
       return { disabled: true, rows: [] };
     }
     const { from, to, timeZone } = await periodBounds(ctx, request.params.id, query.period, query.partyId, user.id);
@@ -161,7 +183,7 @@ export function leaderboardRoutes(app: FastifyInstance, ctx: Context): void {
     const metric = querySchema.shape.metric.parse((request.query as { metric?: string }).metric);
     const crewId = request.params.id;
     const crew = await ctx.db.query<{ leaderboard_enabled: boolean }>("select leaderboard_enabled from crews where id = $1", [crewId]);
-    if (!crew[0]?.leaderboard_enabled || (!drinkingLeaderboardEnabled() && metric !== "nights")) return { disabled: true, weeks: [], months: [], streaks: [] };
+    if (!crew[0]?.leaderboard_enabled || (!drinkingLeaderboardEnabled() && !soberMetric(metric))) return { disabled: true, weeks: [], months: [], streaks: [] };
     const now = ctx.now();
     const { from: thisWeek, timeZone } = await periodBounds(ctx, crewId, "week", undefined, user.id);
     const champions = async (from: number, to: number) => {

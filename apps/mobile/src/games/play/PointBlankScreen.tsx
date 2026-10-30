@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, { ZoomIn } from "react-native-reanimated";
-import { duration } from "@crew/design-tokens";
+import { duration, scaled } from "@crew/design-tokens";
 import { createPointBlank, mathRandom, pointBlankReducer } from "@crew/games";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
@@ -18,6 +18,7 @@ import { Dealt } from "../ui/motion";
 import { PenaltyList } from "../ui/PenaltyList";
 import { PlayerGrid } from "../ui/PlayerGrid";
 import { RoundTimer } from "../ui/RoundTimer";
+import { SwipeCard } from "../ui/SwipeCard";
 import { CardTag, CardText, GameCard, cardColours, ids, useTable, type GameScreenProps } from "./common";
 
 const BEAT_MS = 700;
@@ -73,10 +74,10 @@ export function PointBlankScreen({ session, content, onAgain }: GameScreenProps)
             haptic.heavy();
             dispatch({ type: "startRecording" });
           } else haptic.holdTick();
-        }, i * BEAT_MS),
+        }, scaled(i * BEAT_MS)),
       );
     });
-    timers.current.push(setTimeout(() => setBeat(null), 4 * BEAT_MS));
+    timers.current.push(setTimeout(() => setBeat(null), scaled(4 * BEAT_MS)));
   };
 
   const card = state.card;
@@ -116,6 +117,11 @@ export function PointBlankScreen({ session, content, onAgain }: GameScreenProps)
     >
       <RoundTimer seconds={session.timerSeconds} roundKey={card?.id ?? "idle"} paused={state.phase !== "read" && state.phase !== "record"} />
       {card ? (
+        // MOT-06: a played card (result shown) can be swiped away for the next one.
+        <SwipeCard
+          cardKey={`${card.id}-${state.phase}`}
+          either={state.phase === "result" ? { label: g.t("games.pointBlank.nextCard"), onCommit: () => dispatch({ type: "next" }) } : undefined}
+        >
         <Dealt dealKey={card.id}>
           <GameCard minHeight={ui.big ? 200 : 220} style={card.secret ? { backgroundColor: theme.surfaceRaised } : undefined}>
             {card.secret ? <CardTag label={g.t("games.pointBlank.secretTag")} colour={cardColours.coral} /> : null}
@@ -135,6 +141,7 @@ export function PointBlankScreen({ session, content, onAgain }: GameScreenProps)
             ) : null}
           </GameCard>
         </Dealt>
+        </SwipeCard>
       ) : null}
 
       {counting ? (

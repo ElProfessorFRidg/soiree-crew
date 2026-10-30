@@ -18,6 +18,7 @@ import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { SkeletonRows } from "@/ui/Skeleton";
 import { Text } from "@/ui/Text";
+import { EmptyState } from "@/ui/EmptyState";
 
 /** Groups get a rounded square, people a circle, as in the prototype. */
 function ConversationMark({ conversation }: { conversation: Conversation }) {
@@ -143,7 +144,7 @@ export default function MessagesScreen() {
         </View>
       ) : null}
 
-      {!results && ready && !conversations.length && !problem ? <Text>{i18n.t("chat.empty")}</Text> : null}
+      {!results && ready && !conversations.length && !problem ? <EmptyState icon="chat" text={i18n.t("chat.empty")} /> : null}
 
       {!results ? (
         <View style={styles.actions}>

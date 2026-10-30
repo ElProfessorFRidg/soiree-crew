@@ -10,7 +10,7 @@ const COLOURS = palette.avatar;
 function Piece({ index, radius }: { index: number; radius: number }) {
   const t = useSharedValue(0);
   useEffect(() => {
-    t.value = withDelay((index % 5) * 50, withTiming(1, { duration: duration.confetti, easing: Easing.bezier(0.3, 0.6, 0.4, 1) }));
+    t.value = withDelay(scaled((index % 5) * 50), withTiming(1, { duration: duration.confetti, easing: Easing.bezier(0.3, 0.6, 0.4, 1) }));
   }, [index, t]);
   const angle = (index / PIECES) * Math.PI * 2;
   const reach = radius * (0.9 + (index % 3) * 0.25);

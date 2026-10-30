@@ -32,6 +32,7 @@ import { ScalePressable } from "@/ui/Pressable";
 import { refreshRadar } from "@/server/radarData";
 import { StartHereBanner } from "@/crew/StartHereBanner";
 import { addPartyToCalendar } from "@/crew/calendar";
+import { CrewCelebration } from "@/crew/Celebration";
 import { showFailure } from "@/server/errors";
 import { confirmAction } from "@/ui/confirm";
 
@@ -105,6 +106,8 @@ function CrewCard({ crew }: { crew: Crew }) {
         {crew.open ? <Tag tone="ok" label={i18n.t("crew.openTag")} /> : null}
         {crew.role === "admin" ? <Tag label={i18n.t("crew.admin")} /> : null}
       </View>
+      {/* JOY-08: a milestone, anniversary or first conquest celebrated once, here. */}
+      <CrewCelebration crewId={crew.id} />
 
       <View style={styles.members}>
         {crew.members.map((member) => (

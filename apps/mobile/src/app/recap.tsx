@@ -21,6 +21,7 @@ import {
 import { useT, type Translator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
+import { moodColour } from "@/party/mood";
 import { RollingNumber } from "@/party/RollingNumber";
 import { Confetti, DropIn, Podium, type PodiumEntry } from "@/recap/Podium";
 import { Narration } from "@/recap/Narration";
@@ -42,6 +43,8 @@ import { Button, IconButton } from "@/ui/Button";
 import { Panel } from "@/ui/controls";
 import { ScalePressable } from "@/ui/Pressable";
 import { Text } from "@/ui/Text";
+import { isGameId } from "@crew/games";
+import { useGameT, type GamePluralKey } from "@/games/i18n";
 import { showToast, ToastHost } from "@/ui/Toast";
 import { Quotes } from "@/recap/Quotes";
 import { failureMessage } from "@/server/errors";
@@ -162,6 +165,7 @@ function Reactions({
 export default function RecapScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const i18n = useT();
+  const g = useGameT();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const me = useSession((state) => state.session?.userId);
@@ -341,8 +345,21 @@ export default function RecapScreen() {
         return i18n.plural("recap.event.round", event.count ?? 1, { name });
       case "homeSafe":
         return i18n.t("recap.event.homeSafe", { name });
+      case "game": {
+        const game = event.gameId && isGameId(event.gameId) ? g.t(`games.${event.gameId}.name`) : "";
+        return event.userId ? i18n.t("recap.event.game", { game, name }) : i18n.t("recap.event.gameTie", { game });
+      }
+      case "photos":
+        return i18n.plural("recap.event.photos", event.count ?? 1);
+      case "allHere":
+        return i18n.plural("recap.event.allHere", event.count ?? 0);
+      case "cheers":
+        return i18n.plural("recap.event.cheers", event.count ?? 1, { name, other: nameOf(event.otherId) });
     }
   };
+  /** N-22: the record set in a game, under its line. */
+  const recordText = (event: Recap["timeline"][number]) =>
+    event.record ? g.plural(event.record.key as GamePluralKey, event.record.count, { name: nameOf(event.record.userId) }) : null;
 
   const slides = [
     <View key="figures" style={styles.slide}>
@@ -478,12 +495,19 @@ export default function RecapScreen() {
                 },
               ]}
             />
-            <Text
-              style={styles.flex}
-              color={event.kind === "takeover" ? theme.amber : undefined}
-            >
-              {timelineText(event)}
-            </Text>
+            <View style={styles.flex}>
+              <Text color={event.kind === "takeover" ? theme.amber : undefined}>
+                {timelineText(event)}
+              </Text>
+              {recordText(event) ? <Text variant="small">{recordText(event)}</Text> : null}
+              {event.photos?.length ? (
+                <View style={styles.eventPhotos}>
+                  {event.photos.map((photo) => (
+                    <Image key={photo.id} source={{ uri: photo.url }} style={[styles.eventPhoto, { backgroundColor: theme.surface2 }]} accessibilityIgnoresInvertColors />
+                  ))}
+                </View>
+              ) : null}
+            </View>
           </View>
         </DropIn>
       ))}
@@ -496,7 +520,7 @@ export default function RecapScreen() {
         collapsable={false}
         style={[
           styles.card,
-          { backgroundColor: theme.surface, borderColor: theme.line },
+          { backgroundColor: theme.surface, borderColor: theme.line, borderTopWidth: 6, borderTopColor: moodColour(recap.party.mood) },
         ]}
       >
         {selfie ? <Image source={{ uri: selfie }} style={styles.selfie} resizeMode="cover" accessibilityIgnoresInvertColors /> : null}
@@ -566,6 +590,14 @@ export default function RecapScreen() {
         height={48}
         onPress={() => router.push({ pathname: "/album", params: { partyId: recap.party.id } })}
       />
+      {/* JOY-09: the photo strip, offered with the recap. */}
+      <Button
+        label={i18n.t("strip.open")}
+        icon="sparkdot"
+        variant="outline"
+        height={48}
+        onPress={() => router.push({ pathname: "/photo-strip", params: { partyId: recap.party.id } })}
+      />
     </View>,
   ];
 
@@ -583,7 +615,8 @@ export default function RecapScreen() {
             style={[
               styles.segment,
               {
-                backgroundColor: i <= slide ? theme.text : theme.surfaceRaised,
+                // JOY-04: the party's mood colours the progress of the story.
+                backgroundColor: i <= slide ? moodColour(recap.party.mood) : theme.surfaceRaised,
               },
             ]}
           />
@@ -685,6 +718,8 @@ const styles = StyleSheet.create({
   event: { flexDirection: "row", alignItems: "center", gap: 10, minHeight: 40 },
   time: { width: 56 },
   dot: { width: 10, height: 10, borderRadius: 5 },
+  eventPhotos: { flexDirection: "row", gap: 6, marginTop: 6, marginBottom: 4 },
+  eventPhoto: { width: 64, height: 64, borderRadius: radius.tile },
   card: {
     aspectRatio: 9 / 16,
     borderRadius: radius.card,

@@ -20,6 +20,7 @@ import { ScalePressable } from "@/ui/Pressable";
 import { Screen } from "@/ui/Screen";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { EmptyState } from "@/ui/EmptyState";
 import { formatVolume, drinkVolumeUnit } from "@crew/units";
 
 interface Group {
@@ -72,7 +73,7 @@ export default function HistoryScreen() {
       <Text variant="small">
         {i18n.t("history.boundaryNote", { time: boundary })} {i18n.t("history.swipeHint")}
       </Text>
-      {groups.length === 0 && tonightWater.length === 0 ? <Text>{i18n.t("history.empty")}</Text> : null}
+      {groups.length === 0 && tonightWater.length === 0 ? <EmptyState icon="glass" text={i18n.t("history.empty")} /> : null}
       {groups.map((group) => {
         const first = group.drinks[0]!;
         const open = !collapsed.has(group.key);

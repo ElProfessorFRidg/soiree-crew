@@ -5,6 +5,7 @@ import { palette } from "@crew/design-tokens";
 import { breathRatio, countryRules, formatBacValue, type UiLanguage, type UserPreferences } from "@crew/units";
 import { createTranslator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
+import { liveMood, moodColour } from "@/party/mood";
 import { readQueue } from "./queue";
 
 // O-33 (Android): the home-screen widget. It runs in a headless task, outside the app, so it reads
@@ -14,12 +15,16 @@ export const NIGHT_WIDGET = "Night";
 /** Tokens are hex strings; the widget renderer wants them typed as such. */
 const c = (hex: string) => hex as `#${string}`;
 const STORE_KEY = "crew-app-v1";
+/** useCrewData's storage key (server/crewData.ts). */
+const CREW_DATA_KEY = "crew-data-v1";
 
 interface Snapshot {
   title: string;
   line: string;
   water: string;
   pint: string;
+  /** JOY-04: mood colour of the party going on, for the band at the top. */
+  mood: string | null;
 }
 
 interface StoredState {
@@ -27,6 +32,17 @@ interface StoredState {
   profile?: BodyProfile | null;
   preferences?: UserPreferences;
   lockScreenNumbers?: boolean;
+}
+
+/** JOY-04: the mood of the party going on now, from the cached party list, or null outside a party. */
+async function readMood(now: number): Promise<string | null> {
+  try {
+    const stored = JSON.parse((await AsyncStorage.getItem(CREW_DATA_KEY)) ?? "{}") as { state?: { parties?: Parameters<typeof liveMood>[0] } };
+    const mood = liveMood(stored.state?.parties ?? [], now);
+    return mood ? moodColour(mood) : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function readSnapshot(now = Date.now()): Promise<Snapshot> {
@@ -38,7 +54,7 @@ export async function readSnapshot(now = Date.now()): Promise<Snapshot> {
   }
   const language = (state.preferences?.language ?? "fr") as UiLanguage;
   const i18n = createTranslator(language);
-  const base = { title: i18n.t("widget.title"), water: i18n.t("widget.water"), pint: i18n.t("widget.pint") };
+  const base = { title: i18n.t("widget.title"), water: i18n.t("widget.water"), pint: i18n.t("widget.pint"), mood: await readMood(now) };
   // Taps on the widget the app has not taken yet count too: "same again" repeats the latest drink.
   const queue = await readQueue();
   const stored = state.drinks ?? [];
@@ -82,6 +98,7 @@ export function NightWidget({ snapshot }: { snapshot: Snapshot }) {
       style={{ height: "match_parent", width: "match_parent", backgroundColor: c(palette.dark.bg), borderRadius: 22, padding: 14, flexDirection: "column", justifyContent: "space-between" }}
     >
       <FlexWidget style={{ flexDirection: "column" }}>
+        {snapshot.mood ? <FlexWidget style={{ width: 36, height: 4, borderRadius: 2, marginBottom: 6, backgroundColor: c(snapshot.mood) }} /> : null}
         <TextWidget text={snapshot.title} style={{ fontSize: 13, color: c(palette.dark.textMuted) }} />
         <TextWidget text={snapshot.line} style={{ fontSize: 18, fontWeight: "700", color: c(palette.dark.text) }} maxLines={2} />
       </FlexWidget>

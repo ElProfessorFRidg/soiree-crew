@@ -1,7 +1,8 @@
 """App icons: two pints meeting in a cheers, in the design system's colours (design/tokens.json).
 
-Usage: python tools/dev/icons.py apps/mobile/assets
-Writes icon.png, the Android adaptive layers, splash-icon.png, favicon.png and the JOY-03 alternates.
+Usage: python tools/dev/icons.py apps/mobile/assets [seasons]
+Writes icon.png, the Android adaptive layers, splash-icon.png, favicon.png and the JOY-03 alternates;
+with "seasons", only the four seasonal alternates.
 """
 import math
 import sys
@@ -128,6 +129,20 @@ def full_icon(name, inner, outer, line, beer_top, beer_bottom, foam, spark, glyp
     save(img, name, size)
 
 
+def seasons():
+    """JOY-03 seasonal alternates, unlocked by a night out together in that season (checked by the server)."""
+    full_icon("icons/icon-winter", (214, 228, 236), (168, 194, 212), line=SLATE, beer_top=AMBER, beer_bottom=AMBER_DEEP, foam=(255, 255, 255), spark=(255, 255, 255))
+    full_icon("icons/icon-spring", (200, 228, 192), (148, 198, 150), line=SLATE, beer_top=AMBER, beer_bottom=AMBER_DEEP, foam=CREAM, spark=(232, 120, 150))
+    full_icon("icons/icon-summer", (250, 156, 112), (222, 98, 78), line=SLATE, beer_top=AMBER, beer_bottom=AMBER_DEEP, foam=CREAM, spark=CREAM)
+    full_icon("icons/icon-autumn", (172, 94, 46), (116, 58, 30), line=AMBER, beer_top=AMBER, beer_bottom=AMBER_DARK, foam=CREAM, spark=AMBER)
+
+
+if len(sys.argv) > 2 and sys.argv[2] == "seasons":
+    # Only the seasonal set, so the other icons stay byte for byte as they are.
+    seasons()
+    print("ok")
+    sys.exit(0)
+
 night = dict(line=AMBER, beer_top=AMBER, beer_bottom=AMBER_DARK, foam=CREAM, spark=CREAM)
 full_icon("icon", SLATE_LIGHT, SLATE, **night)
 full_icon("favicon", SLATE_LIGHT, SLATE, size=48, **night)
@@ -143,4 +158,5 @@ save(cheers(SIZE, 0.66, **night), "splash-icon", SIZE, rgb=False)
 full_icon("icons/icon-boss", AMBER, AMBER_DEEP, line=SLATE, beer_top=(70, 58, 30), beer_bottom=SLATE, foam=CREAM, spark=SLATE)
 full_icon("icons/icon-globetrotter", (52, 66, 62), (34, 44, 41), line=GREEN, beer_top=GREEN, beer_bottom=GREEN_DEEP, foam=CREAM, spark=CREAM)
 full_icon("icons/icon-nomad", CREAM, (224, 219, 206), line=SLATE, beer_top=AMBER, beer_bottom=AMBER_DEEP, foam=(255, 255, 255), spark=AMBER_DEEP)
+seasons()
 print("ok")

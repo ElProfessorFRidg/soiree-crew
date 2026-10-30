@@ -37,6 +37,8 @@ interface GamesState {
   session: GameSession | null;
   /** N-24: hall of fame on this phone: wins by player name and the best record, per game. */
   hall: Partial<Record<GameId, HallEntry>>;
+  /** O-48: games opened by the friends unlock stay open, even if someone leaves a crew later. */
+  unlocked?: GameId[];
 }
 
 export interface HallEntry {
@@ -50,7 +52,7 @@ export const DEFAULT_SETTINGS: GameSettings = { level: "normal", timerSeconds: 0
 
 /** Players, their order and per-game settings survive between nights; nothing here leaves the phone. */
 export const useGamesStore = create<GamesState>()(
-  persist((): GamesState => ({ table: [], settings: {}, durations: {}, session: null, hall: {} }), {
+  persist((): GamesState => ({ table: [], settings: {}, durations: {}, session: null, hall: {}, unlocked: [] }), {
     name: "games-v1",
     storage: createJSONStorage(() => AsyncStorage),
   }),

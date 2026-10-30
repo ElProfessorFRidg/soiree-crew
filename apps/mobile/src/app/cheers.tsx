@@ -3,7 +3,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
-import { duration, scaled } from "@crew/design-tokens";
+import { duration, scaled, spring } from "@crew/design-tokens";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
 import { knock, useCheers } from "@/party/cheers";
@@ -59,7 +59,7 @@ export default function CheersScreen() {
   useEffect(() => {
     if (!last || last.at < shownAt.current) return;
     haptic.cheers();
-    swing.value = withSequence(withTiming(1, { duration: scaled(260) }), withSpring(0, { damping: 9 }));
+    swing.value = withSequence(withTiming(1, { duration: scaled(260) }), withSpring(0, spring.swing));
     pop.value = withSequence(withTiming(1, { duration: duration.pop }), withTiming(1, { duration: scaled(1200) }), withTiming(0, { duration: duration.toggle }));
   }, [last, swing, pop]);
 

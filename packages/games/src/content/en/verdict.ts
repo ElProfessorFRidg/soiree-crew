@@ -27,6 +27,10 @@ export const verdict: VerdictContent = {
     "would last longer without coffee?",
     "falls asleep first at a sleepover?",
     "would join a cult at a wellness retreat and come home with a new name, a new diet and a timeshare?",
+    "would get thrown out of a museum for touching the art?",
+    "has a junk drawer that could survive the apocalypse?",
+    "actually reads the terms and conditions?",
+    "talks to Siri like a coworker?",
   ],
   hard: [
     "has the more embarrassing dating profile bio?",
@@ -51,6 +55,9 @@ export const verdict: VerdictContent = {
     "has an embarrassing photo of the other saved somewhere?",
     "cheats?",
     "would fake their own death to get out of a group trip they planned, then get caught by posting a beach photo?",
+    "has blocked a family member on social media?",
+    "would sell the other's secrets for a year of free rent?",
+    "has given an Uber driver one star out of spite?",
   ],
   extreme: [
     "would be better at phone sex?",
@@ -70,5 +77,7 @@ export const verdict: VerdictContent = {
     "says yes to a threesome first?",
     "has the dirtier search history?",
     "flirts more?",
+    "has a hookup they've never told this table about?",
+    "would get caught sneaking out of someone's place by their parents?",
   ],
 };

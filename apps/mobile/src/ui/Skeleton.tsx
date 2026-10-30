@@ -1,10 +1,8 @@
 import { useEffect } from "react";
 import { StyleSheet, View, type DimensionValue } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
-import { radius } from "@crew/design-tokens";
+import { duration, radius } from "@crew/design-tokens";
 import { useTheme } from "@/theme";
-
-const SHIMMER_MS = 1400;
 
 /** MOT-10, DESIGN.md §4: a shimmering block where content will be, replaced in place. */
 export function Skeleton({ width = "100%", height = 18, round = false }: { width?: DimensionValue; height?: number; round?: boolean }) {
@@ -13,7 +11,7 @@ export function Skeleton({ width = "100%", height = 18, round = false }: { width
   const t = useSharedValue(0);
   useEffect(() => {
     if (reduceMotion) return;
-    t.value = withRepeat(withTiming(1, { duration: SHIMMER_MS, easing: Easing.linear }), -1, false);
+    t.value = withRepeat(withTiming(1, { duration: duration.shimmer, easing: Easing.linear }), -1, false);
   }, [reduceMotion, t]);
   const style = useAnimatedStyle(() => ({ opacity: 0.45 + 0.35 * Math.sin(t.value * Math.PI) }));
   return (

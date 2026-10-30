@@ -15,6 +15,7 @@ import { Screen } from "@/ui/Screen";
 import { SkeletonRows } from "@/ui/Skeleton";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { EmptyState } from "@/ui/EmptyState";
 import { showFailure } from "@/server/errors";
 
 const WEEKDAYS = [1, 2, 3, 4, 5, 6, 7] as const;
@@ -74,7 +75,7 @@ export default function PollsScreen() {
       <Text variant="small">{i18n.t("polls.usualHint")}</Text>
 
       {polls === null ? <SkeletonRows /> : null}
-      {polls?.length === 0 ? <Text>{i18n.t("polls.empty")}</Text> : null}
+      {polls?.length === 0 ? <EmptyState icon="check" text={i18n.t("polls.empty")} /> : null}
       {polls?.map((poll) => {
         const canClose = poll.createdBy === me || crew?.role === "admin";
         const best = [...poll.slots].sort((a, b) => count(b, "yes") - count(a, "yes"))[0];

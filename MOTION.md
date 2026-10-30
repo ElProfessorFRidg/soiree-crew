@@ -16,6 +16,31 @@ The per-element table lives in `design/DESIGN.md` §5. This file is the system b
 | `overshoot` | signature moments only: venue takeover, crown, podium, new leader |
 | `spin` | roulette and wheels, long deceleration |
 
+## Springs
+
+`design/tokens.json` → `motion.springs`, exposed as `spring.*` (`@crew/design-tokens`) and passed straight to Reanimated's `withSpring`. A spring is for something the finger let go of or that must follow a moving target; anything with a known start and end uses a duration and a curve.
+
+| Spring | Mass, stiffness, damping | Damping ratio | Use |
+|---|---|---|---|
+| `settle` | 1, 260, 32 | 0.99 | a view finding its place after a layout change, an avatar gliding to a new point |
+| `snap` | 1, 420, 41 | 1.0 | a released swipe or drag returning or leaving, pull-to-refresh letting go, a pinch ending out of bounds |
+| `signature` | 1, 180, 12 | 0.45 | overshoot moments only: crown landing, podium winner, badge unlocked |
+| `swing` | 1, 100, 9 | 0.45 | the two glasses of Cheers settling after the clink |
+
+`settle` and `snap` never overshoot (ratio ≥ 0.98, checked by `packages/design-tokens/src/motion.test.ts`). With Reduce Motion a spring is replaced by its end value, like any other animation.
+
+## Sound (optional)
+
+Off by default, its own switch in Settings, separate from vibrations (JOY-05). `apps/mobile/src/motion/sounds.ts` plays them; each sound rides on a haptic event and never says anything the screen does not.
+
+| Sound | Plays with | Moment |
+|---|---|---|
+| `pour` | `drinkAdded` | a drink was logged |
+| `clink` | `cheers` | a round bought, two phones together |
+| `crown` | `heavy` | crown, podium winner, new leader, explosion |
+
+Rules: under 600 ms, volume 0.6, mixed with music already playing (never stops it); on iOS the silent switch wins; no sound loops, no sound on routine taps, scrolling or typing; at UI level 3 and in eco mode the pack stays as chosen, because a sound costs no attention. A new sound needs a row here before it ships.
+
 ## Choreography
 
 1. One thing moves at a time per area. A screen entering does not also animate its list.
@@ -68,9 +93,19 @@ Vibrations have their own switch in Settings, on by default and separate from th
 
 `apps/mobile/src/motion/hero.tsx`: a source registers what it shows (`HeroSource`), `flyHero(key)` runs right before `router.push`, the target reports where it lands (`HeroTarget`) and an overlay above the navigator flies between the two on `duration.enter`. Screens reached this way fade in instead of sliding, so the element lands where it stays. Today: a crew member's or a friend's avatar flies to their profile; the catalogue card grows into the game setup and fades over it. With Reduce Motion nothing flies, the screen fades.
 
+## Micro-interactions (MOT-10)
+
+| Element | Where | Motion | Reduce Motion |
+|---|---|---|---|
+| Pull to refresh | `ui/PullGlass.tsx`, any `Screen` with `onRefresh` | an amber pint fills with the pull (full at 96 pt); while reloading the level breathes on `duration.pulse`; it leaves on `spring.snap`. Android keeps the native spinner, tinted amber, because its lists do not scroll past the top | fills and fades, no breathing |
+| Empty list | `ui/EmptyState.tsx` | the icon traces itself once (`duration.rise`), then the line and its action fade up (`duration.enter`); nothing loops | drawn, static |
+| Badge unlocked | `ui/BadgeUnlock.tsx`, crew honours | pops on `spring.signature` with 16 pieces of confetti (`duration.confetti`), 180 ms apart, one `heavy` haptic per screen; once per badge and phone, and on a first visit only the viewer's own | fades in, no confetti |
+| Launch | `ui/LaunchCurtain.tsx` | a copy of the native splash replaces it seamlessly, the mark grows 18 % while the curtain fades (`duration.launch`) | plain fade |
+| Skeleton, live dot | `ui/Skeleton.tsx`, `ui/LiveDot.tsx` | `duration.shimmer`, `duration.pulse` | static |
+
 ## Time scale (MOT-14)
 
-Every duration goes through one scale, 0.1x to 10x: the tokens (`duration.*`) read it when an animation starts, and a duration written as a number goes through `scaled(ms)`, read on the JS thread (never inside a worklet). Dev builds show the control in Settings and expose `globalThis.__crewMotion.setScale(x)` to the test harness; release builds stay at 1.
+Every duration goes through one scale, 0.1x to 10x: the tokens (`duration.*`) read it when an animation starts, and a duration written as a number goes through `scaled(ms)`, read on the JS thread (never inside a worklet). Springs (`spring.*`) follow the same scale: stiffness divided by the square of the scale, damping by the scale, so a slowed spring keeps its shape. Timers that pace an animation (stagger, steps, ticks, pulses) go through `scaled` too; timers that count real time (polling, a 5 s undo, a game round) do not. Dev builds show the control in Settings and expose `globalThis.__crewMotion.setScale(x)` to the test harness; release builds stay at 1.
 
 ## Review checklist
 

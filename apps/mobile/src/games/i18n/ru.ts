@@ -53,6 +53,9 @@ export const ru: GameMessages = {
     wins: { one: "{count} победа", few: "{count} победы", many: "{count} побед", other: "{count} победы" },
     played: { one: "{count} игра сыграна", few: "{count} игры сыграно", many: "{count} игр сыграно", other: "{count} игры сыграно" },
     note: "Хранится на этом телефоне. Побеждает тот, у кого меньше всего штрафов.",
+    crewNote: "Видно всей компании. Победа засчитывается, если за столом двое из компании.",
+    offline: "Нет сети: вот игры с этого телефона.",
+    top: "Кто выигрывает чаще",
   },
   catalogue: {
     title: "Игры",
@@ -71,6 +74,7 @@ export const ru: GameMessages = {
     typical: "Обычная партия здесь: {minutes} мин",
     locked: "Закрыто",
     cardsInEnglish: "Карточки пока на английском.",
+    friends: { one: "{count} друг", few: "{count} друга", many: "{count} друзей", other: "{count} друга" },
   },
   tags: {
     group: "Групповая",
@@ -99,6 +103,7 @@ export const ru: GameMessages = {
       other: "Не хватает {count} игрока, нужно минимум {min}.",
     },
     tooMany: "Максимум игроков в этой игре: {max}.",
+    friends: { one: "Откроется при {friends} друзьях в приложении: осталось {count}.", few: "Откроется при {friends} друзьях в приложении: осталось {count}.", many: "Откроется при {friends} друзьях в приложении: осталось {count}.", other: "Откроется при {friends} друзьях в приложении: осталось {count}." },
   },
   setup: {
     rulesPosition: "Правило {index} из {count}",
@@ -141,6 +146,7 @@ export const ru: GameMessages = {
     roundOpen: "Раунд {round}",
     timeLeft: "{seconds} с",
     timerLabel: "Время раунда",
+    swipeHint: "Смахни карту, чтобы продолжить.",
   },
   penalty: {
     sipsOrForfeit: { one: "{count} глоток или фант", few: "{count} глотка или фант", many: "{count} глотков или фант", other: "{count} глотка или фант" },
@@ -160,6 +166,9 @@ export const ru: GameMessages = {
     otherGames: "Другие игры",
     shareTitle: "{game}: итоги",
     shareLine: "{name}: {penalties}",
+    winner: "Побеждает {name}",
+    noWinner: "Ничья наверху, победителя нет",
+    takeover: "{name} забирает бар этой победой",
   },
   records: {
     tollRoad: {

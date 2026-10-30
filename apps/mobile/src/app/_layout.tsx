@@ -39,8 +39,10 @@ import {
   refreshReminders,
 } from "@/reminders/reminders";
 import { flushUploads } from "@/photos/uploads";
+import { flushGameResults } from "@/server/gameData";
 import { watchWidget } from "@/widgets/sync";
 import { CrashScreen } from "@/ui/CrashScreen";
+import { LaunchCurtain } from "@/ui/LaunchCurtain";
 import { purgePlainFiles } from "@/chat/media";
 import { watchLiveActivity } from "@/system/liveActivity";
 import { PrivacyCover } from "@/ui/PrivacyCover";
@@ -56,6 +58,7 @@ if (__DEV__)
   };
 
 void SplashScreen.preventAutoHideAsync();
+const hideSplash = () => void SplashScreen.hideAsync().catch(() => undefined);
 
 const fonts = {
   "Archivo-Numeral": require("../../assets/fonts/Archivo-Numeral.ttf"),
@@ -115,9 +118,10 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (!ready) return;
-    void SplashScreen.hideAsync();
+    // The native splash is hidden by LaunchCurtain, once its copy is on screen (MOT-10).
     // Whatever was queued before the app was killed goes out now (SYNC-06).
     void flush();
+    void flushGameResults();
     void checkForUpdate().catch(() => undefined);
     const subscription = RNAppState.addEventListener("change", (status) => {
       if (status === "active") {
@@ -125,6 +129,7 @@ export default function RootLayout() {
         void checkForUpdate().catch(() => undefined);
         void flush();
         void flushUploads();
+        void flushGameResults();
         void refreshReminders();
       }
     });
@@ -274,6 +279,7 @@ export default function RootLayout() {
           </NavigationThemeProvider>
         </ThemeProvider>
       </SafeAreaProvider>
+      <LaunchCurtain onShown={hideSplash} />
     </GestureHandlerRootView>
   );
 }

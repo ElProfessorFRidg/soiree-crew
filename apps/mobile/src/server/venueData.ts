@@ -172,7 +172,7 @@ export async function setCrewParticipation(crewId: string, input: { territoryOpt
 }
 
 export type LeaderboardPeriod = "party" | "week" | "month" | "all";
-export type LeaderboardMetric = "drinks" | "grams" | "nights";
+export type LeaderboardMetric = "drinks" | "grams" | "nights" | "games";
 
 export interface LeaderboardRow {
   userId: string;

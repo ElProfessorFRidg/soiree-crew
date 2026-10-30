@@ -16,6 +16,7 @@ import { cheersRoutes } from "./routes/cheers";
 import { claimRoutes } from "./routes/claims";
 import { downloadRoutes } from "./routes/downloads";
 import { feedRoutes } from "./routes/feed";
+import { gameRoutes } from "./routes/games";
 import { aiOrderRoutes } from "./routes/aiOrder";
 import { communityRoutes } from "./routes/community";
 import { statsRoutes } from "./routes/stats";
@@ -111,5 +112,6 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
   profileRoutes(app, ctx);
   photoRoutes(app, ctx);
   statsRoutes(app, ctx);
+  gameRoutes(app, ctx);
   return app;
 }

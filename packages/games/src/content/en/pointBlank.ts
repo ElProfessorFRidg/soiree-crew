@@ -34,6 +34,10 @@ export const pointBlank: PointBlankContent = {
       "Worst cook here?",
       "Biggest baby when sick?",
       "Who would show up to a nine o'clock job interview still wearing last night's wristband, and somehow get the job anyway?",
+      "Who gets lost in their own neighborhood without GPS?",
+      "Who would go to Disney World as an adult with no kids, and buy the ears?",
+      "Whose wallet is mostly loyalty cards?",
+      "Who answers the group chat a day late with one thumbs up?",
     ],
     hard: [
       "Whose screenshots land in the group chat within seconds?",
@@ -60,6 +64,9 @@ export const pointBlank: PointBlankContent = {
       "Who could cry their way out of a speeding ticket?",
       "Messiest car?",
       "Who has written a three-paragraph text to an ex, deleted it, rewritten it, sent the shortest possible version, then turned their phone off for the night?",
+      "Lied about their age at a bar, in either direction: who?",
+      "Pretended to know a band to impress a date: who?",
+      "Who checks what their ex is listening to on Spotify?",
     ],
     extreme: [
       "Who has hooked up with someone whose name they couldn't spell?",
@@ -82,6 +89,8 @@ export const pointBlank: PointBlankContent = {
       "Who would get disowned if their parents saw their camera roll?",
       "Best in bed? Point.",
       "Who has woken up next to someone, checked their phone to figure out where they were, and ordered an Uber from a neighborhood they'd never heard of?",
+      "Hooked up with a coworker, then sat across from them in a nine o'clock meeting. Who?",
+      "Whose phone is full of saved voice notes from someone they're not dating?",
     ],
   },
   secret: [
@@ -98,5 +107,8 @@ export const pointBlank: PointBlankContent = {
     "Name the person here you could see yourself marrying.",
     "Who here would ruin a vacation?",
     "Who gets to babysit your future kids?",
+    "Who here do you call if you get arrested tonight?",
+    "Whose opinion of you matters most at this table?",
+    "Who here would you trust to pick your next tattoo?",
   ],
 };

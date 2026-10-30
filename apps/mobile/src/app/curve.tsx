@@ -73,6 +73,8 @@ export default function CurveScreen() {
       />
       <Panel style={styles.chartPanel}>
         <BacChart
+          key={period}
+          zoomLabels={{ reset: i18n.t("curve.resetZoom"), hint: i18n.t("curve.zoomHint") }}
           series={series}
           now={now}
           legalLimit={legalLimit}

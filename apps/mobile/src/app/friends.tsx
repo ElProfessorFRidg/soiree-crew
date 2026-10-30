@@ -14,6 +14,7 @@ import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { EmptyState } from "@/ui/EmptyState";
 import { showFailure } from "@/server/errors";
 
 /** O-39: friends, requests to answer, and people I blocked. */
@@ -126,7 +127,7 @@ export default function FriendsScreen() {
           <Text variant="small">{i18n.t("people.searchEmpty")}</Text>
         )
       ) : null}
-      {list && !list.friends.length && !list.incoming.length ? <Text>{i18n.t("people.noFriends")}</Text> : null}
+      {list && !list.friends.length && !list.incoming.length ? <EmptyState icon="users" text={i18n.t("people.noFriends")} /> : null}
       {/* Profil board: accepting moves the request into the list, refusing just removes it. */}
       {section(i18n.t("people.incoming"), list?.incoming ?? [], (userId) => (
         <View style={styles.requestActions}>

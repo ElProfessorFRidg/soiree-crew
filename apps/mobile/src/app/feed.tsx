@@ -12,6 +12,7 @@ import { Icon, type AnyIconName } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { SkeletonRows } from "@/ui/Skeleton";
 import { Text } from "@/ui/Text";
+import { EmptyState } from "@/ui/EmptyState";
 
 type FeedItem =
   | { kind: "checkins"; at: number; venueName: string; userIds: string[] }
@@ -104,7 +105,7 @@ export default function FeedScreen() {
   return (
     <Screen back title={i18n.t("feed.title")} onRefresh={load}>
       {items === null ? <SkeletonRows /> : null}
-      {items?.length === 0 ? <Text>{i18n.t("feed.empty")}</Text> : null}
+      {items?.length === 0 ? <EmptyState icon="flame" text={i18n.t("feed.empty")} /> : null}
       {items?.map((item, index) => {
         const { title, onPress } = line(item);
         return (

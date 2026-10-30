@@ -1,6 +1,7 @@
 import { AppState, Platform } from "react-native";
 import { lastDrink, logDrink } from "@/drinks/actions";
 import { defaultPreset, presetFromEntry } from "@/drinks/presets";
+import { useCrewData } from "@/server/crewData";
 import { buildWater, useAppStore } from "@/state/store";
 import { submit } from "@/sync/engine";
 import { refreshWidget } from "./handler";
@@ -32,6 +33,12 @@ export function watchWidget(): void {
   });
   useAppStore.subscribe((state, previous) => {
     if (state.drinks === previous.drinks && state.water === previous.water && state.lockScreenNumbers === previous.lockScreenNumbers && state.preferences === previous.preferences) return;
+    clearTimeout(timer);
+    timer = setTimeout(() => void refreshWidget().catch(() => undefined), 1500);
+  });
+  // JOY-04: a party starting, ending or changing mood re-tints the widget.
+  useCrewData.subscribe((state, previous) => {
+    if (state.parties === previous.parties) return;
     clearTimeout(timer);
     timer = setTimeout(() => void refreshWidget().catch(() => undefined), 1500);
   });

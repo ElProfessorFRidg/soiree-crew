@@ -15,6 +15,7 @@ import { Dealt } from "../ui/motion";
 import { PenaltyList } from "../ui/PenaltyList";
 import { PlayerGrid } from "../ui/PlayerGrid";
 import { RoundTimer } from "../ui/RoundTimer";
+import { SwipeCard } from "../ui/SwipeCard";
 import { CardText, GameCard, cardColours, ids, useTable, type GameScreenProps } from "./common";
 
 export function VerdictScreen({ session, content, onAgain }: GameScreenProps) {
@@ -75,14 +76,20 @@ export function VerdictScreen({ session, content, onAgain }: GameScreenProps) {
       }
     >
       <RoundTimer seconds={session.timerSeconds} roundKey={state.card.id} paused={!voting} />
-      <Dealt dealKey={state.card.id}>
-        <GameCard minHeight={ui.big ? 160 : 190} style={{ backgroundColor: cardColours.mint }}>
-          <Text variant="h3" color={cardColours.muted}>
-            {g.t("games.verdict.prompt")}
-          </Text>
-          <CardText>{state.card.value}</CardText>
-        </GameCard>
-      </Dealt>
+      {/* MOT-06: once the verdict is in, the card can be swiped away; never during the vote. */}
+      <SwipeCard
+        cardKey={`${state.card.id}-${state.phase}`}
+        either={voting ? undefined : { label: g.t("games.verdict.next"), onCommit: () => dispatch({ type: "next" }) }}
+      >
+        <Dealt dealKey={state.card.id}>
+          <GameCard minHeight={ui.big ? 160 : 190} style={{ backgroundColor: cardColours.mint }}>
+            <Text variant="h3" color={cardColours.muted}>
+              {g.t("games.verdict.prompt")}
+            </Text>
+            <CardText>{state.card.value}</CardText>
+          </GameCard>
+        </Dealt>
+      </SwipeCard>
       <PlayerGrid
         players={pairPlayers}
         counts={counts}

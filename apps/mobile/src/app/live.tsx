@@ -99,6 +99,7 @@ export default function LiveScreen() {
 
   if (!id) return null;
   const mine = live?.members.find((m) => m.userId === me);
+  const ended = party ? party.closedAt !== null || party.endsAt < Date.now() : live ? !live.party.live && live.party.closedAt !== null : false;
   // Going first, then by name; people at home sink to the bottom.
   const members = [...(live?.members ?? [])].sort((a, b) => {
     const rank = (m: LiveMember) => (m.response !== "going" ? 2 : m.homeSafeAt !== null ? 1 : 0);
@@ -167,6 +168,14 @@ export default function LiveScreen() {
             })
           }
         />
+      ) : null}
+      {ended ? (
+        // JOY-09: once the party is over, the photo strip is offered right here.
+        <Panel>
+          <Text>{i18n.t("strip.ended")}</Text>
+          <Button label={i18n.t("strip.open")} icon="sparkdot" height={52} onPress={() => router.push({ pathname: "/photo-strip", params: { partyId: id } })} />
+          <Button label={i18n.t("strip.seeRecap")} variant="outline" height={48} onPress={() => router.push({ pathname: "/recap", params: { id } })} />
+        </Panel>
       ) : null}
       <Text variant="disclaimer">{i18n.t("party.notice")}</Text>
     </Screen>

@@ -9,7 +9,10 @@ function leveledCount<T>(deck: Leveled<T>): number {
   return GAME_LEVELS.reduce((sum, level) => sum + deck[level].length, 0);
 }
 
-/** Cards, questions, dares, word pairs and words of the card games counted by O-65. */
+/**
+ * Cards, questions and dares counted by O-65: the written prompts of the card games. Word pairs and
+ * drawing words are single words, so they do not count towards the 500.
+ */
 function countO65(content: GameContent): number {
   const bigDeck = Object.values(content.bigDeck).reduce((sum, deck) => sum + leveledCount(deck), 0);
   return (
@@ -19,9 +22,7 @@ function countO65(content: GameContent): number {
     leveledCount(content.neverEver) +
     leveledCount(content.verdict) +
     leveledCount(content.truthDare.truth) +
-    leveledCount(content.truthDare.dare) +
-    leveledCount(content.wordPairs) +
-    leveledCount(content.drawWords)
+    leveledCount(content.truthDare.dare)
   );
 }
 
@@ -39,7 +40,7 @@ function allTexts(content: GameContent): string[] {
 describe.each(LANGUAGES)("%s content", (language) => {
   const content = contentFor(language);
 
-  it("has more than 500 cards for the card games (O-65)", () => {
+  it("has more than 500 cards, questions and dares (O-65)", () => {
     expect(countO65(content)).toBeGreaterThan(500);
   });
 

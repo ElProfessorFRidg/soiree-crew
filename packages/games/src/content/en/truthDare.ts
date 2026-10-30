@@ -26,6 +26,9 @@ export const truthDare: TruthDareContent = {
       "Guilty-pleasure TV show?",
       "Biggest pet peeve?",
       "Celebrity crush?",
+      "What's a movie everyone loves that you've never seen?",
+      "What was your first email address? All of it.",
+      "Most you've ever paid for a concert ticket, and was it worth it?",
     ],
     hard: [
       "Who here would you trust least with a secret?",
@@ -45,6 +48,9 @@ export const truthDare: TruthDareContent = {
       "Who here gets rich first, and who peaks tonight?",
       "What are you insecure about that nobody would guess?",
       "Tell us about the last time you got caught in a lie: who caught you, how they figured it out, and whether you doubled down or confessed on the spot.",
+      "What's a text you sent this week that you'd hate this table to read?",
+      "What friendship did you let die, and whose fault was it?",
+      "When did you last cry, and why?",
     ],
     extreme: [
       "Best sex you've ever had, and where?",
@@ -61,6 +67,8 @@ export const truthDare: TruthDareContent = {
       "Have you ever faked it? With who?",
       "Most awkward hookup story. Go.",
       "Most people you've kissed in one night?",
+      "What's the boldest thing sitting in your drafts right now?",
+      "Worst place you've ever been walked in on?",
     ],
   },
   dare: {
@@ -82,6 +90,9 @@ export const truthDare: TruthDareContent = {
       "Show the last meme you saved.",
       "Balance a spoon on your nose for ten seconds.",
       "Do the worm.",
+      "Read the last receipt in your email like a closing argument.",
+      "Explain your job to {other} like they're five.",
+      "Do your best impression of a GPS that has given up on you.",
     ],
     hard: [
       "Let {other} send one GIF to your family group chat.",
@@ -99,6 +110,8 @@ export const truthDare: TruthDareContent = {
       "Imitate how {other} acts around a crush.",
       "Show how many unread messages you have, then open the oldest one.",
       "FaceTime someone who isn't here and convince them, completely straight-faced, that the whole table is outside their place right now. You win if they come to the door. You lose if they hang up first.",
+      "Call your own voicemail and play your greeting for the table.",
+      "Let {other} pick a contact. You text them a compliment, no context.",
     ],
     extreme: [
       "{other} picks one of your DMs and replies however they want.",
@@ -114,6 +127,7 @@ export const truthDare: TruthDareContent = {
       "Tell {other} what you'd change about their love life.",
       "Let {other} post a thirst trap from your camera roll. You don't get a say in which.",
       "Show your last match.",
+      "Read your last three Google searches in your most seductive voice.",
     ],
   },
 };

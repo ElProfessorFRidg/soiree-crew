@@ -15,6 +15,7 @@ import { Screen } from "@/ui/Screen";
 import { SkeletonRows } from "@/ui/Skeleton";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { EmptyState } from "@/ui/EmptyState";
 import { showFailure } from "@/server/errors";
 
 interface Item {
@@ -78,7 +79,7 @@ export default function ItemsScreen() {
         />
       </View>
       {items === null ? <SkeletonRows rows={3} /> : null}
-      {items && items.length === 0 ? <Text>{i18n.t("items.empty")}</Text> : null}
+      {items && items.length === 0 ? <EmptyState icon="check" text={i18n.t("items.empty")} /> : null}
       {items?.map((item) => (
         <View key={item.id} style={[styles.item, { borderBottomColor: theme.line }]}>
           <Switch value={item.done} onValueChange={(done) => change({ id: item.id, done })} accessibilityLabel={`${i18n.t("items.done")}, ${item.label}`} />

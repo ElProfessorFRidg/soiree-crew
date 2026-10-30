@@ -4,6 +4,8 @@ import { themes } from "@crew/design-tokens";
 import { breathRatio, countryRules, formatBacValue } from "@crew/units";
 import { createTranslator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
+import { liveMood, moodColour } from "@/party/mood";
+import { useCrewData } from "@/server/crewData";
 import { useAppStore } from "@/state/store";
 
 // HUB-02 on iOS: the night on the lock screen and in the Dynamic Island. The countdown to zero
@@ -25,17 +27,22 @@ function live(): LiveActivityModule | null {
   return module;
 }
 
-const CONFIG = {
-  backgroundColor: themes.dark.bg,
-  titleColor: themes.dark.text,
-  subtitleColor: themes.dark.textMuted,
-  progressViewTint: themes.dark.amber,
-  progressViewLabelColor: themes.dark.text,
-  deepLinkUrl: "/",
-  timerType: "digital" as const,
-};
+/** JOY-04: during a party the bar takes the party's mood colour; otherwise the app's amber. */
+function configFor(mood: string | null) {
+  return {
+    backgroundColor: themes.dark.bg,
+    titleColor: themes.dark.text,
+    subtitleColor: themes.dark.textMuted,
+    progressViewTint: mood ? moodColour(mood) : themes.dark.amber,
+    progressViewLabelColor: themes.dark.text,
+    deepLinkUrl: "/",
+    timerType: "digital" as const,
+  };
+}
 
 let timer: ReturnType<typeof setTimeout> | undefined;
+/** The mood the running activity was started with: colours are set at start only. */
+let startedMood: string | null = null;
 
 export function syncLiveActivity(): void {
   const mod = live();
@@ -63,9 +70,17 @@ export function syncLiveActivity(): void {
       subtitle: lockScreenNumbers ? i18n.t("reminders.nightTitle", { time: clock(now), value }) : undefined,
       progressBar: { date: estimate.backToZeroAt },
     };
-    if (liveActivityId) mod.updateActivity(liveActivityId, state);
+    const mood = liveMood(useCrewData.getState().parties, now);
+    if (liveActivityId && mood !== startedMood) {
+      // A party started, ended or changed mood: the colours only change with a new activity.
+      mod.stopActivity(liveActivityId, state);
+      useAppStore.setState({ liveActivityId: null });
+    }
+    const running = useAppStore.getState().liveActivityId;
+    if (running) mod.updateActivity(running, state);
     else {
-      const id = mod.startActivity(state, CONFIG);
+      const id = mod.startActivity(state, configFor(mood));
+      startedMood = mood;
       if (id) useAppStore.setState({ liveActivityId: id });
     }
   } catch {
@@ -88,5 +103,8 @@ export function watchLiveActivity(): void {
   useAppStore.subscribe((state, previous) => {
     if (state.drinks === previous.drinks && state.profile === previous.profile && state.lockScreenNumbers === previous.lockScreenNumbers && state.preferences === previous.preferences) return;
     schedule();
+  });
+  useCrewData.subscribe((state, previous) => {
+    if (state.parties !== previous.parties) schedule();
   });
 }

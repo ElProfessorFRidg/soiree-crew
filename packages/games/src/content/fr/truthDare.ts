@@ -26,6 +26,9 @@ export const truthDare: TruthDareContent = {
       "Le plat de la cantine qui te manque, avoue.",
       "Ton pire tic ?",
       "Ton plus gros caprice ?",
+      "La série que tu as abandonnée au dernier épisode, et pourquoi ?",
+      "Ton premier concert. Assume.",
+      "Le mot que tu prononces mal depuis toujours ?",
     ],
     hard: [
       "Qui de la table appellerais-tu en premier en cas de galère, et qui en dernier ?",
@@ -45,6 +48,9 @@ export const truthDare: TruthDareContent = {
       "Qui de la table a la meilleure vie, selon toi ?",
       "Le compliment que tu aimerais entendre plus souvent ?",
       "Raconte la dernière fois que tu as prétexté une montagne de boulot pour éviter quelqu'un de cette table : l'excuse exacte que tu as donnée, et ce que tu faisais vraiment à ce moment-là.",
+      "Qui ici t'a déjà déçu ou déçue sans le savoir ?",
+      "Le plus gros mensonge que tu as raconté pour décrocher un job ?",
+      "La conversation que tu relis encore, et avec qui ?",
     ],
     extreme: [
       "Ton meilleur souvenir au lit ?",
@@ -61,6 +67,8 @@ export const truthDare: TruthDareContent = {
       "Ta pire honte de lendemain de soirée ?",
       "Tu as déjà couché avec quelqu'un pour te venger ?",
       "Le pire prénom que tu as dit au mauvais moment, si c'est arrivé ?",
+      "Le message le plus osé que tu as envoyé cette année ? Dis-en un mot, un seul.",
+      "Quelqu'un de ton passé que tu ne veux surtout pas croiser ce soir ? Pourquoi ?",
     ],
   },
   dare: {
@@ -82,6 +90,9 @@ export const truthDare: TruthDareContent = {
       "Lis ta dernière notification à voix haute.",
       "Fais un tour de magie. Même raté, ça compte.",
       "Fais le chat.",
+      "Fais la voix off de la table comme dans un documentaire animalier.",
+      "Tiens une minute de conversation avec {other} uniquement en titres de films.",
+      "Décris ta chambre comme une annonce immobilière.",
     ],
     hard: [
       "Laisse {other} envoyer un emoji à la personne de son choix dans tes contacts.",
@@ -99,6 +110,8 @@ export const truthDare: TruthDareContent = {
       "Imite la façon dont {other} drague.",
       "Montre le nombre de photos dans ton dossier masqué. Juste le nombre.",
       "Appelle un pote absent, mets le haut-parleur et annonce-lui très sérieusement que la table a voté : c'est lui ou elle qui organise le prochain week-end. Tout ce qui sera dit pour se défiler pourra être retenu contre lui ou elle.",
+      "Montre la dernière photo que tu as envoyée à ta mère et explique-la.",
+      "Appelle un pote absent et réclame-lui un truc que tu ne lui as jamais prêté. Tu tiens jusqu'à ce qu'il ou elle s'excuse.",
     ],
     extreme: [
       "{other} choisit une de tes conversations et la lit à voix haute.",
@@ -114,6 +127,7 @@ export const truthDare: TruthDareContent = {
       "Dis à {other} ta toute première impression. La vraie, pas la version polie.",
       "Laisse {other} choisir ta tenue de demain. Tu envoies la photo au groupe à midi.",
       "Montre ton dernier match.",
+      "Raconte ton dernier baiser à {other} comme un commentateur de foot.",
     ],
   },
 };
