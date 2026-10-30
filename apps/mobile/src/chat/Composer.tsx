@@ -16,6 +16,7 @@ import { showToast } from "@/ui/Toast";
 import { sendText, sendTyping } from "./engine";
 import { clip } from "./format";
 import { sendPhoto, sendVoice, VideoTooLarge } from "./media";
+import { useDraft } from "@/state/drafts";
 
 /** Shorter than this, a press on the record button was a slip, not a voice note. */
 const MIN_VOICE_MS = 700;
@@ -33,7 +34,8 @@ interface Props {
 export function Composer({ conversationId, members, reply, onClearReply, big }: Props) {
   const i18n = useT();
   const theme = useTheme();
-  const [draft, setDraft] = useState("");
+  // QOL-07: an unsent message survives the app being killed, per conversation.
+  const [draft, setDraft, clearDraft] = useDraft(`chat:${conversationId}`);
   const [recording, setRecording] = useState<number | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
@@ -49,7 +51,7 @@ export function Composer({ conversationId, members, reply, onClearReply, big }: 
     const mentions = members.filter((m) => body.includes(`@${m.name}`)).map((m) => m.id);
     const outcome = sendText(conversationId, body, { ...(reply ? { reply: reply.id } : {}), mentions });
     haptic.confirmed();
-    setDraft("");
+    clearDraft();
     onClearReply();
     if (outcome === "held") showToast({ message: i18n.t("chat.heldToast") });
   };
@@ -163,7 +165,7 @@ export function Composer({ conversationId, members, reply, onClearReply, big }: 
       {suggestions.length ? (
         <View style={styles.suggestions}>
           {suggestions.map((m) => (
-            <Chip key={m.id} label={`@${m.name}`} onPress={() => setDraft((d) => d.replace(/@([^\s@]*)$/, `@${m.name} `))} />
+            <Chip key={m.id} label={`@${m.name}`} onPress={() => setDraft(draft.replace(/@([^\s@]*)$/, `@${m.name} `))} />
           ))}
         </View>
       ) : null}

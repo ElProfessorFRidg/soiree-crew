@@ -4,8 +4,8 @@ Generated from FEATURES.md on 2026-10-30 by `pnpm status`. Edit FEATURES.md, not
 
 | Status | Count |
 |---|---|
-| Built | 212 |
-| Partly built | 91 |
+| Built | 213 |
+| Partly built | 90 |
 | To do | 2 |
 | Proposed (not in the brief yet) | 4 |
 | Total | 309 |
@@ -48,7 +48,6 @@ Generated from FEATURES.md on 2026-10-30 by `pnpm status`. Edit FEATURES.md, not
 - **QOL-04** (P0, Everyday polish): System shortcuts for a drunk thumb: Siri / App Intents and Android App Actions ("Hey Siri, add a beer"), iPhon
 - **QOL-05** (P0, Everyday polish): Deep links and universal links for every party, venue, profile, crew invite, recap and game card. Links pasted
 - **QOL-06** (P0, Everyday polish): Native sharing: recap and story cards go straight to Instagram Stories, Snapchat (Creative Kit), TikTok and Wh
-- **QOL-07** (P0, Everyday polish): Typed content is never lost: drafts (party name, review, expense, card) survive the app being killed, errors a
 - **QOL-09** (P0, Everyday polish): Photos: compressed before upload, background upload with progress and retry, HEIC accepted, location metadata 
 - **QOL-10** (P0, Everyday polish): Dying battery: when a member's battery drops under 10% during a party, the crew sees "low battery" next to the
 - **QOL-14** (P0, Everyday polish): Navigation without traps: Android back and iOS swipe-back work everywhere, sheets close with a swipe, the app 
@@ -136,7 +135,7 @@ Generated from FEATURES.md on 2026-10-30 by `pnpm status`. Edit FEATURES.md, not
 - Crew memory: N-22, N-23, N-24, N-37, N-38, N-39, N-40
 - Crew safety: N-27
 - Crew life: N-30, N-31, N-32, N-33, N-34
-- Everyday polish: QOL-02, QOL-08, QOL-11, QOL-12, QOL-13, QOL-18, QOL-19, QOL-20, QOL-21, QOL-23, QOL-28, QOL-32
+- Everyday polish: QOL-02, QOL-07, QOL-08, QOL-11, QOL-12, QOL-13, QOL-18, QOL-19, QOL-20, QOL-21, QOL-23, QOL-28, QOL-32
 - Delight: JOY-03, JOY-04, JOY-05, JOY-06, JOY-07, JOY-08, JOY-09, JOY-11
 - Adaptive drunk mode: ADP-02, ADP-03, ADP-04, ADP-05, ADP-08, ADP-10
 - Motion: MOT-01, MOT-02, MOT-03, MOT-04, MOT-05, MOT-06, MOT-07, MOT-09, MOT-10, MOT-13, MOT-14, MOT-15

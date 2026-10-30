@@ -19,6 +19,7 @@ import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { useT } from "@/i18n";
 import { showFailure } from "@/server/errors";
+import { useDraft } from "@/state/drafts";
 
 const NO_CARDS: never[] = [];
 
@@ -32,7 +33,8 @@ export default function CrewCardsScreen() {
   const cards = useCrewCards((state) => (crew ? state.byCrew[crew.id] : undefined)) ?? NO_CARDS;
   const [kind, setKind] = useState<CrewCardKind>("neverEver");
   const [level, setLevel] = useState<GameLevel>("normal");
-  const [text, setText] = useState("");
+  // QOL-07: a crew card being written survives the app being killed.
+  const [text, setText, clearText] = useDraft("crewCard");
   const [busy, setBusy] = useState(false);
   const [jokes, setJokes] = useState("");
   const [ideas, setIdeas] = useState<string[]>([]);
@@ -71,7 +73,7 @@ export default function CrewCardsScreen() {
     void writeCrewCard(crew.id, { id: newId(), kind, level, text: text.trim() })
       .then((res) => {
         haptic.confirmed();
-        setText("");
+        clearText();
         showToast({ message: res.status === "approved" ? g.t("crewCards.added") : g.t("crewCards.waiting") });
         load();
       })

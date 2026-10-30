@@ -49,6 +49,7 @@ import { StaffRequests } from "@/place/StaffRequests";
 import { Copyable } from "@/ui/Copyable";
 import { DirectionsButton } from "@/venues/DirectionsButton";
 import { HoursPanel } from "@/venues/HoursPanel";
+import { useDraft } from "@/state/drafts";
 
 const EVENT_KINDS: EventKind[] = ["dj", "student", "match", "concert", "quiz", "other"];
 
@@ -64,7 +65,8 @@ export default function PlaceScreen() {
   const [wanted, setWanted] = useState(false);
   const [writing, setWriting] = useState(false);
   const [ratings, setRatings] = useState<Partial<Record<Criterion, number>>>({});
-  const [text, setText] = useState("");
+  // QOL-07: a review being written survives the app being killed.
+  const [text, setText] = useDraft(`review:${venueId}`);
   const [audience, setAudience] = useState<ReviewAudience>("public");
   const [reviewError, setReviewError] = useState<string | null>(null);
   const [eventTitle, setEventTitle] = useState("");

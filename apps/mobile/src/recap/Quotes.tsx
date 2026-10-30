@@ -14,6 +14,7 @@ import { ScalePressable } from "@/ui/Pressable";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { showFailure } from "@/server/errors";
+import { useDraft } from "@/state/drafts";
 
 const NB = " ";
 /** Each language's own quotation marks. */
@@ -31,7 +32,8 @@ const QUOTES: Record<UiLanguage, [string, string]> = {
 export function Quotes({ recap, me, onChange }: { recap: Recap; me: string | undefined; onChange: () => void }) {
   const i18n = useT();
   const theme = useTheme();
-  const [text, setText] = useState("");
+  // QOL-07: a half-typed quote survives the app being killed.
+  const [text, setText, clearText] = useDraft(`quote:${recap.party.id}`);
   const [saidBy, setSaidBy] = useState<string | null>(null);
   const offline = showFailure(i18n);
   const quote = (s: string) => {
@@ -90,7 +92,7 @@ export function Quotes({ recap, me, onChange }: { recap: Recap; me: string | und
           void addQuote(recap.party.id, { id: newId(), text: text.trim(), saidBy })
             .then(() => {
               haptic.confirmed();
-              setText("");
+              clearText();
               setSaidBy(null);
               onChange();
             })
