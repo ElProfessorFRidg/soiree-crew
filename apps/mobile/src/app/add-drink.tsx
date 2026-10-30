@@ -9,7 +9,7 @@ import { drinkVolumeUnit, formatVolume, type VolumeUnit } from "@crew/units";
 import { Field } from "@/crew/Field";
 import { logDrink } from "@/drinks/actions";
 import { CustomDrinkEditor } from "@/drinks/CustomDrinkEditor";
-import { removeCustomDrink, restoreCustomDrink, saveCustomDrink, sortedCustomDrinks } from "@/drinks/customDrinks";
+import { moveCustomDrink, removeCustomDrink, restoreCustomDrink, saveCustomDrink, sortedCustomDrinks } from "@/drinks/customDrinks";
 import { drinkLabel, drinkWithArticle } from "@/drinks/display";
 import { offerUndo } from "@/drinks/undoToast";
 import { presetFromCustom, presetsFor, type CustomDrink, type DrinkPreset } from "@/drinks/presets";
@@ -132,7 +132,7 @@ export default function AddDrinkSheet() {
         </View>
 
         <Text variant="label">{i18n.t("addDrink.myDrinks")}</Text>
-        {customDrinks.map((drink) => {
+        {customDrinks.map((drink, index) => {
           const asPreset = presetFromCustom(drink);
           const on = selection.type === "custom" && selection.id === drink.id;
           const strength = `${i18n.number(drink.abv * 100, Math.round(drink.abv * 1000) % 10 === 0 ? 0 : 1)} %`;
@@ -196,6 +196,33 @@ export default function AddDrinkSheet() {
                     }}
                   />
                   <Button label={i18n.t("addDrink.remove")} icon="trash" variant="danger" height={44} style={styles.flex} onPress={() => onRemove(drink)} />
+                </Animated.View>
+              ) : null}
+              {/* O-21: the user's own order, one step at a time; the menu stays open to keep moving. */}
+              {menuFor === drink.id && customDrinks.length > 1 ? (
+                <Animated.View entering={FadeIn.duration(duration.enter)} style={styles.menu}>
+                  <Button
+                    label={i18n.t("addDrink.moveUp")}
+                    icon="arrowup"
+                    variant="outline"
+                    height={44}
+                    style={styles.flex}
+                    disabled={index === 0}
+                    onPress={() => {
+                      if (moveCustomDrink(drink.id, -1)) haptic.select();
+                    }}
+                  />
+                  <Button
+                    label={i18n.t("addDrink.moveDown")}
+                    icon="arrowdn"
+                    variant="outline"
+                    height={44}
+                    style={styles.flex}
+                    disabled={index === customDrinks.length - 1}
+                    onPress={() => {
+                      if (moveCustomDrink(drink.id, 1)) haptic.select();
+                    }}
+                  />
                 </Animated.View>
               ) : null}
             </View>

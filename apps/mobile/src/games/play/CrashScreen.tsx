@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { StyleSheet, View, type GestureResponderEvent, type LayoutChangeEvent } from "react-native";
 import Animated, { ZoomIn } from "react-native-reanimated";
 import Svg, { Polyline } from "react-native-svg";
-import { duration, palette, radius } from "@crew/design-tokens";
+import { duration, palette, radius, scaled } from "@crew/design-tokens";
 import { crashReducer, createCrash, mathRandom, stakeAt, stillIn } from "@crew/games";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
@@ -90,14 +90,14 @@ export function CrashScreen({ session, content, onAgain }: GameScreenProps) {
         setTimeout(() => {
           setBeat(n);
           haptic.holdTick();
-        }, i * BEAT_MS),
+        }, scaled(i * BEAT_MS)),
       ),
     );
     timers.current.push(
       setTimeout(() => {
         setBeat(null);
         dispatch({ type: "start" });
-      }, 3 * BEAT_MS),
+      }, scaled(3 * BEAT_MS)),
     );
   };
 

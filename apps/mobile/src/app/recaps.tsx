@@ -10,6 +10,7 @@ import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { SkeletonRows } from "@/ui/Skeleton";
+import { EmptyState } from "@/ui/EmptyState";
 import { showFailure } from "@/server/errors";
 
 /** O-41: every recap is kept. */
@@ -36,7 +37,7 @@ export default function RecapsScreen() {
   return (
     <Screen back title={i18n.t("recap.list")} withToasts onRefresh={load}>
       {recaps === null ? <SkeletonRows /> : null}
-      {recaps && recaps.length === 0 ? <Text>{i18n.t("recap.none")}</Text> : null}
+      {recaps && recaps.length === 0 ? <EmptyState icon="moon" text={i18n.t("recap.none")} /> : null}
       <View>
         {recaps?.map((recap, index) => (
           <Row

@@ -3,10 +3,11 @@ import { Children, isValidElement, useState, type ReactNode } from "react";
 import { KeyboardAvoidingView, Platform, RefreshControl, StyleSheet, View } from "react-native";
 import Animated, { FadeInUp, interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { duration, space } from "@crew/design-tokens";
+import { duration, scaled, space } from "@crew/design-tokens";
 import { useT } from "@/i18n";
 import { useTheme } from "@/theme";
 import { IconButton } from "./Button";
+import { PullGlass } from "./PullGlass";
 import { Text } from "./Text";
 import { ToastHost } from "./Toast";
 
@@ -18,7 +19,7 @@ interface Props {
   /** Pinned under the scroll view, above the home indicator. */
   footer?: ReactNode;
   withToasts?: boolean;
-  /** MOT-10: pull to refresh. The screen shows the spinner until the promise settles. */
+  /** MOT-10: pull to refresh. The screen shows the filling glass until the promise settles. */
   onRefresh?: () => Promise<unknown>;
   /** Off while a hold is running, so a small slide of the finger does not turn into a scroll. */
   scrollEnabled?: boolean;
@@ -35,6 +36,9 @@ export function Screen({ title, back, trailing, children, footer, withToasts, on
     scrollY.value = event.contentOffset.y;
   });
   const band = useAnimatedStyle(() => ({ opacity: interpolate(scrollY.value, [0, 16], [0, 1], "clamp") }));
+  // MOT-10: on iOS the pull shows as a filling glass and the system spinner stays hidden. Android's
+  // list does not scroll past its top, so it keeps the native spinner, tinted amber.
+  const customPull = Platform.OS === "ios";
   return (
     // QOL-08: the keyboard never covers the field being typed, and the footer button rides above it.
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={[styles.screen, { backgroundColor: theme.bg }]}>
@@ -48,7 +52,7 @@ export function Screen({ title, back, trailing, children, footer, withToasts, on
           onRefresh ? (
             <RefreshControl
               refreshing={refreshing}
-              tintColor={theme.amber}
+              tintColor={customPull ? "transparent" : theme.amber}
               colors={[theme.amber]}
               progressBackgroundColor={theme.surface}
               onRefresh={() => {
@@ -77,7 +81,7 @@ export function Screen({ title, back, trailing, children, footer, withToasts, on
         {Children.toArray(children).map((child, index) => (
           <Animated.View
             key={isValidElement(child) && child.key != null ? child.key : index}
-            entering={FadeInUp.delay(Math.min(index, 8) * 45)
+            entering={FadeInUp.delay(scaled(Math.min(index, 8) * 45))
               .duration(duration.enter)
               .withInitialValues({ opacity: 0, transform: [{ translateY: 12 }] })}
           >
@@ -85,6 +89,7 @@ export function Screen({ title, back, trailing, children, footer, withToasts, on
           </Animated.View>
         ))}
       </Animated.ScrollView>
+      {onRefresh && customPull ? <PullGlass scrollY={scrollY} refreshing={refreshing} top={insets.top + 10} /> : null}
       <Animated.View
         pointerEvents="none"
         style={[styles.band, { height: insets.top, backgroundColor: theme.bg, borderBottomColor: theme.line }, band]}

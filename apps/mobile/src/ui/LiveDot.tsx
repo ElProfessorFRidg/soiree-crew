@@ -1,9 +1,7 @@
 import { useEffect } from "react";
 import Animated, { cancelAnimation, Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
-import { scaled } from "@crew/design-tokens";
+import { duration } from "@crew/design-tokens";
 import { useTheme } from "@/theme";
-
-const PULSE_MS = 1600;
 
 /** DESIGN.md §5: shown only while something is really live; the opacity pulses (static under Reduce Motion). */
 export function LiveDot({ size = 8 }: { size?: number }) {
@@ -12,7 +10,7 @@ export function LiveDot({ size = 8 }: { size?: number }) {
   const opacity = useSharedValue(1);
   useEffect(() => {
     if (reduceMotion) return;
-    opacity.value = withRepeat(withTiming(0.35, { duration: scaled(PULSE_MS) / 2, easing: Easing.inOut(Easing.quad) }), -1, true);
+    opacity.value = withRepeat(withTiming(0.35, { duration: duration.pulse / 2, easing: Easing.inOut(Easing.quad) }), -1, true);
     return () => cancelAnimation(opacity);
   }, [reduceMotion, opacity]);
   const style = useAnimatedStyle(() => ({ opacity: opacity.value }));

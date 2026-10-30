@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, { FadeIn, runOnJS, useAnimatedReaction, useAnimatedStyle, useReducedMotion, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 import Svg, { Path, Text as SvgText } from "react-native-svg";
-import { duration, palette } from "@crew/design-tokens";
+import { duration, palette, scaled } from "@crew/design-tokens";
 import { WHEEL_SPIN_MS, createWheel, wheelReducer } from "@crew/games";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
@@ -60,7 +60,7 @@ export function WheelScreen({ session, content, onAgain }: GameScreenProps) {
       rotation.value = state.targetDeg;
       return;
     }
-    rotation.value = withTiming(state.targetDeg, { duration: ui.calmMotion ? CALM_SPIN_MS : WHEEL_SPIN_MS, easing: easings.spin }, (done) => {
+    rotation.value = withTiming(state.targetDeg, { duration: scaled(ui.calmMotion ? CALM_SPIN_MS : WHEEL_SPIN_MS), easing: easings.spin }, (done) => {
       if (done) runOnJS(settle)();
     });
   }, [state.phase, state.targetDeg, reduceMotion, ui.calmMotion, dispatch, rotation, fade]);

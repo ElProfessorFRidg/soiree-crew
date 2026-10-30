@@ -3,6 +3,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useReducedMotion } from "react-native-reanimated";
+import { scaled } from "@crew/design-tokens";
 import { useT, type Translator } from "@/i18n";
 import { haptic } from "@/motion/haptics";
 import { api } from "@/server/api";
@@ -111,7 +112,7 @@ export default function WhereToScreen() {
             setPicked(winner.id);
             haptic.heavy();
           } else haptic.select();
-        }, delay),
+        }, scaled(delay)),
       );
     }
   };

@@ -104,7 +104,7 @@ export function FuseScreen({ session, content, onAgain }: GameScreenProps) {
     setTimeout(() => {
       setResuming(false);
       dispatch({ type: "resume" });
-    }, RESUME_COUNT_MS);
+    }, scaled(RESUME_COUNT_MS));
   };
 
   let footer = null;

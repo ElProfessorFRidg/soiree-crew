@@ -160,7 +160,7 @@ export function usePop(trigger: unknown) {
 export function FadeInAfter({ delayMs, children, style }: { delayMs: number; children: ReactNode; style?: StyleProp<ViewStyle> }) {
   const opacity = useSharedValue(0);
   useEffect(() => {
-    opacity.value = withDelay(delayMs, withTiming(1, { duration: duration.enter, easing: easings.out }));
+    opacity.value = withDelay(scaled(delayMs), withTiming(1, { duration: duration.enter, easing: easings.out }));
   }, [delayMs, opacity]);
   const animated = useAnimatedStyle(() => ({ opacity: opacity.value }));
   return <Animated.View style={[style, animated]}>{children}</Animated.View>;
