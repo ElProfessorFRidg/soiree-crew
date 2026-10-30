@@ -52,6 +52,9 @@ export const de: GameMessages = {
     wins: { one: "{count} Sieg", other: "{count} Siege" },
     played: { one: "{count} Partie gespielt", other: "{count} Partien gespielt" },
     note: "Auf diesem Handy gespeichert. Es gewinnt, wer die wenigsten Aufgaben hat.",
+    crewNote: "Mit der Crew geteilt. Ein Sieg zählt, sobald zwei Crew-Mitglieder mitspielen.",
+    offline: "Offline: Das sind die Partien auf diesem Handy.",
+    top: "Wer am meisten gewinnt",
   },
   catalogue: {
     title: "Spiele",
@@ -70,6 +73,7 @@ export const de: GameMessages = {
     typical: "Typische Partie hier: {minutes} Min.",
     locked: "Gesperrt",
     cardsInEnglish: "Die Karten sind vorerst auf Englisch.",
+    friends: { one: "{count} Kontakt", other: "{count} Kontakte" },
   },
   tags: {
     group: "Gruppe",
@@ -93,6 +97,7 @@ export const de: GameMessages = {
   lock: {
     needs: { one: "Es fehlt noch {count} Person, mindestens {min}.", other: "Es fehlen noch {count} Personen, mindestens {min}." },
     tooMany: "Dieses Spiel geht mit höchstens {max} Personen.",
+    friends: { one: "Ab {friends} Kontakten in der App frei: noch {count}.", other: "Ab {friends} Kontakten in der App frei: noch {count}." },
   },
   setup: {
     rulesPosition: "Regel {index} von {count}",
@@ -130,6 +135,7 @@ export const de: GameMessages = {
     roundOpen: "Runde {round}",
     timeLeft: "{seconds} s",
     timerLabel: "Restzeit der Runde",
+    swipeHint: "Wisch die Karte weg, um weiterzuspielen.",
   },
   penalty: {
     sipsOrForfeit: { one: "{count} Schluck oder eine Aufgabe", other: "{count} Schlucke oder eine Aufgabe" },
@@ -149,6 +155,9 @@ export const de: GameMessages = {
     otherGames: "Andere Spiele",
     shareTitle: "{game}: die Bilanz",
     shareLine: "{name}: {penalties}",
+    winner: "Sieg für {name}",
+    noWinner: "Gleichstand an der Spitze, kein Sieg",
+    takeover: "{name} übernimmt die Bar mit diesem Sieg",
   },
   records: {
     tollRoad: { one: "Die meisten Fehler: {name}, {count}-mal", other: "Die meisten Fehler: {name}, {count}-mal" },

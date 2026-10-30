@@ -93,6 +93,16 @@ Vibrations have their own switch in Settings, on by default and separate from th
 
 `apps/mobile/src/motion/hero.tsx`: a source registers what it shows (`HeroSource`), `flyHero(key)` runs right before `router.push`, the target reports where it lands (`HeroTarget`) and an overlay above the navigator flies between the two on `duration.enter`. Screens reached this way fade in instead of sliding, so the element lands where it stays. Today: a crew member's or a friend's avatar flies to their profile; the catalogue card grows into the game setup and fades over it. With Reduce Motion nothing flies, the screen fades.
 
+## Micro-interactions (MOT-10)
+
+| Element | Where | Motion | Reduce Motion |
+|---|---|---|---|
+| Pull to refresh | `ui/PullGlass.tsx`, any `Screen` with `onRefresh` | an amber pint fills with the pull (full at 96 pt); while reloading the level breathes on `duration.pulse`; it leaves on `spring.snap`. Android keeps the native spinner, tinted amber, because its lists do not scroll past the top | fills and fades, no breathing |
+| Empty list | `ui/EmptyState.tsx` | the icon traces itself once (`duration.rise`), then the line and its action fade up (`duration.enter`); nothing loops | drawn, static |
+| Badge unlocked | `ui/BadgeUnlock.tsx`, crew honours | pops on `spring.signature` with 16 pieces of confetti (`duration.confetti`), 180 ms apart, one `heavy` haptic per screen; once per badge and phone, and on a first visit only the viewer's own | fades in, no confetti |
+| Launch | `ui/LaunchCurtain.tsx` | a copy of the native splash replaces it seamlessly, the mark grows 18 % while the curtain fades (`duration.launch`) | plain fade |
+| Skeleton, live dot | `ui/Skeleton.tsx`, `ui/LiveDot.tsx` | `duration.shimmer`, `duration.pulse` | static |
+
 ## Time scale (MOT-14)
 
 Every duration goes through one scale, 0.1x to 10x: the tokens (`duration.*`) read it when an animation starts, and a duration written as a number goes through `scaled(ms)`, read on the JS thread (never inside a worklet). Springs (`spring.*`) follow the same scale: stiffness divided by the square of the scale, damping by the scale, so a slowed spring keeps its shape. Timers that pace an animation (stagger, steps, ticks, pulses) go through `scaled` too; timers that count real time (polling, a 5 s undo, a game round) do not. Dev builds show the control in Settings and expose `globalThis.__crewMotion.setScale(x)` to the test harness; release builds stay at 1.

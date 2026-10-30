@@ -6,6 +6,9 @@ import { duration } from "@crew/design-tokens";
 import { useT } from "@/i18n";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
+import { leaderChanged as isNewLeader, splitPodium } from "@/motion/math/podium";
+import { Confetti, Podium, podiumCrownDelay } from "@/recap/Podium";
+import { useLevelNow } from "@/state/levelNow";
 import { ApiError } from "@/server/api";
 import { useCrewData, useLiveParty } from "@/server/crewData";
 import { useSession } from "@/server/session";
@@ -99,6 +102,10 @@ export default function LeaderboardScreen() {
   const [confirmable, setConfirmable] = useState<ConfirmableDrink[]>([]);
   const leaderRef = useRef<string | null>(null);
   const [leaderChanged, setLeaderChanged] = useState(0);
+  /** MOT-13: the podium rises for each board's first answer and again for a new leader. */
+  const [podiumReplay, setPodiumReplay] = useState(0);
+  const freshBoard = useRef(true);
+  const calm = useLevelNow((state) => state.level) >= 2;
 
   const load = useCallback(() => {
     if (!crewId) return;
@@ -112,10 +119,14 @@ export default function LeaderboardScreen() {
         setDisabled(data.disabled);
         setRows(data.rows);
         const leader = data.rows[0]?.value ? data.rows[0].userId : null;
-        // MOT-13: a new leader gets its own moment, and only from the server's answer.
-        if (leaderRef.current && leader && leader !== leaderRef.current) {
-          haptic.heavy();
+        // MOT-13: a new leader gets its own moment, and only from the server's answer. The podium
+        // drops the crown and plays the heavy haptic when it lands.
+        if (freshBoard.current) {
+          freshBoard.current = false;
+          setPodiumReplay((n) => n + 1);
+        } else if (isNewLeader(leaderRef.current, leader)) {
           setLeaderChanged((n) => n + 1);
+          setPodiumReplay((n) => n + 1);
         }
         leaderRef.current = leader;
       })
@@ -125,12 +136,16 @@ export default function LeaderboardScreen() {
 
   useEffect(() => {
     leaderRef.current = null;
+    freshBoard.current = true;
     load();
     const timer = setInterval(load, refreshMs);
     return () => clearInterval(timer);
   }, [load, refreshMs]);
 
   const myRow = rows.find((r) => r.userId === me);
+  const { podium, rest } = splitPodium(rows);
+  const displayName = (row: { userId: string; name: string }) => (row.userId === me ? `${row.name} (${i18n.t("crew.you")})` : row.name);
+  const shownValue = (value: number) => (metric === "grams" ? `${value} g` : String(value));
 
   return (
     <Screen back title={i18n.t("ranking.title")} withToasts>
@@ -142,15 +157,28 @@ export default function LeaderboardScreen() {
       <Segmented<LeaderboardMetric>
         accessibilityLabel={i18n.t("ranking.title")}
         value={metric}
-        items={(["drinks", "grams", "nights"] as const).map((value) => ({ value, label: i18n.t(`ranking.${value}`) }))}
+        items={(["drinks", "grams", "nights", "games"] as const).map((value) => ({ value, label: i18n.t(`ranking.${value}`) }))}
         onChange={setMetric}
       />
 
       {disabled ? <Text>{i18n.t("ranking.disabled")}</Text> : null}
       {period === "party" && !live ? <Text>{i18n.t("ranking.noParty")}</Text> : null}
 
+      {podium.length ? (
+        <View style={styles.podium}>
+          <Podium
+            entries={podium.map((row) => ({ userId: row.userId, name: displayName(row), rank: row.rank, value: row.value }))}
+            replay={podiumReplay}
+            calm={calm}
+            valueLabel={(entry) => shownValue(entry.value)}
+            a11yLabel={(entry) => i18n.t("ranking.a11y", { rank: entry.rank, name: entry.name, value: entry.value })}
+          />
+          <Confetti replay={podiumReplay} delayMs={podiumCrownDelay()} calm={calm} />
+        </View>
+      ) : null}
+
       <View>
-        {rows.map((row) => (
+        {rest.map((row) => (
           <Animated.View key={row.userId} layout={LinearTransition.duration(duration.reorder).easing(easings.reorder)}>
             <View
               style={[styles.row, { borderBottomColor: theme.line }]}
@@ -170,10 +198,10 @@ export default function LeaderboardScreen() {
               </View>
               <Avatar personId={row.userId} name={row.name} size={40} />
               <Text variant="h3" style={styles.flex}>
-                {row.userId === me ? `${row.name} (${i18n.t("crew.you")})` : row.name}
+                {displayName(row)}
               </Text>
               <Numeral size={30} color={row.userId === me ? theme.amber : theme.text}>
-                {metric === "grams" ? `${row.value} g` : row.value}
+                {shownValue(row.value)}
               </Numeral>
             </View>
           </Animated.View>
@@ -286,6 +314,7 @@ function BarTitles({ crewId }: { crewId: string }) {
 }
 
 const styles = StyleSheet.create({
+  podium: { position: "relative" },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   row: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 60, borderBottomWidth: 1 },
   rank: { width: 30, alignItems: "center" },

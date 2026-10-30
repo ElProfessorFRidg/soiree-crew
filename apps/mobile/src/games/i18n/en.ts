@@ -54,6 +54,9 @@ export const en: GameMessages = {
     wins: { one: "{count} win", other: "{count} wins" },
     played: { one: "{count} game played", other: "{count} games played" },
     note: "Kept on this phone. The fewest forfeits wins.",
+    crewNote: "Shared with the crew. A win counts once two crew members are at the table.",
+    offline: "Offline: these are the games played on this phone.",
+    top: "Who wins most",
   },
   catalogue: {
     title: "Games",
@@ -72,6 +75,7 @@ export const en: GameMessages = {
     typical: "Usually {minutes} min here",
     locked: "Locked",
     cardsInEnglish: "The cards are in English for now.",
+    friends: { one: "{count} friend", other: "{count} friends" },
   },
   tags: {
     group: "Group",
@@ -95,6 +99,7 @@ export const en: GameMessages = {
   lock: {
     needs: { one: "{count} more player needed, {min} at least.", other: "{count} more players needed, {min} at least." },
     tooMany: "This game takes {max} players at most.",
+    friends: { one: "Opens at {friends} friends in the app: {count} to go.", other: "Opens at {friends} friends in the app: {count} to go." },
   },
   setup: {
     rulesPosition: "Rule {index} of {count}",
@@ -132,6 +137,7 @@ export const en: GameMessages = {
     roundOpen: "Round {round}",
     timeLeft: "{seconds} s",
     timerLabel: "Time left in the round",
+    swipeHint: "Swipe the card to move on.",
   },
   penalty: {
     sipsOrForfeit: { one: "{count} sip or a forfeit", other: "{count} sips or a forfeit" },
@@ -151,6 +157,9 @@ export const en: GameMessages = {
     otherGames: "Other games",
     shareTitle: "{game}: the damage",
     shareLine: "{name}: {penalties}",
+    winner: "{name} wins",
+    noWinner: "Tied at the top, nobody wins",
+    takeover: "{name} takes the bar with this win",
   },
   records: {
     tollRoad: { one: "Most misses: {name}, {count} time", other: "Most misses: {name}, {count} times" },

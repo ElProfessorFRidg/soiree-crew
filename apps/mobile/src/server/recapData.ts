@@ -4,7 +4,23 @@ export const RECAP_EMOJIS = ["🔥", "😂", "🥴", "👑", "💧", "❤️"] a
 export type RecapEmoji = (typeof RECAP_EMOJIS)[number];
 
 export type BadgeKind = "camel" | "goldenDriver" | "newBoss" | "firstIn" | "nightOwl";
-export type TimelineKind = "start" | "arrival" | "checkIn" | "takeover" | "round" | "homeSafe" | "end";
+export type TimelineKind = "start" | "arrival" | "checkIn" | "takeover" | "round" | "homeSafe" | "end" | "game" | "photos" | "allHere" | "cheers";
+
+/** N-22: one line of the night's timeline. */
+export interface TimelineEvent {
+  at: number;
+  kind: TimelineKind;
+  userId?: string;
+  venueName?: string;
+  count?: number;
+  /** "game": the game played, and the record set in it. */
+  gameId?: string;
+  record?: { key: string; userId: string; count: number } | null;
+  /** "cheers": the other glass. */
+  otherId?: string;
+  /** "photos": up to three photos of that half hour (signed links, valid an hour). */
+  photos?: { id: string; url: string }[];
+}
 
 export interface Recap {
   party: { id: string; crewId: string; name: string; mood: string; startsAt: number; endsAt: number; closedAt: number | null };
@@ -25,7 +41,7 @@ export interface Recap {
     storyOptOut?: boolean;
   }[];
   badges: { kind: BadgeKind; userId: string; value?: number; venueName?: string }[];
-  timeline: { at: number; kind: TimelineKind; userId?: string; venueName?: string; count?: number }[];
+  timeline: TimelineEvent[];
   reactions: { fromId: string; toId: string; emoji: RecapEmoji }[];
   quotes: { id: string; saidBy: string | null; addedBy: string; text: string; votes: number; mine: boolean }[];
   /** AI-02: the story published by someone who was there. */

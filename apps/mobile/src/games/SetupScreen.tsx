@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { palette, radius, size, space } from "@crew/design-tokens";
-import { GAME_LEVELS, gameById, lockReason, type GameId } from "@crew/games";
+import { GAME_LEVELS, gameById, type GameId } from "@crew/games";
+import { useGameLock } from "./unlocks";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
 import { useCrewData } from "@/server/crewData";
@@ -51,7 +52,7 @@ export function SetupScreen({ gameId }: { gameId: GameId }) {
     // Only on first open; later edits of the table are the user's.
   }, []);
 
-  const lock = lockReason(game, table.length);
+  const lock = useGameLock(game, table.length);
   const add = () => {
     if (addTablePlayer(name)) {
       haptic.select();
@@ -155,7 +156,11 @@ export function SetupScreen({ gameId }: { gameId: GameId }) {
         {lock ? (
           <View style={[styles.lock, { backgroundColor: palette.tint.amberBg }]} accessibilityLiveRegion="polite">
             <Text color={palette.tint.amberTextStrong}>
-              {lock.kind === "needsPlayers" ? g.plural("lock.needs", lock.missing, { min: lock.min }) : g.t("lock.tooMany", { max: lock.max })}
+              {lock.kind === "needsFriends"
+                ? g.plural("lock.friends", lock.missing, { friends: lock.friends })
+                : lock.kind === "needsPlayers"
+                  ? g.plural("lock.needs", lock.missing, { min: lock.min })
+                  : g.t("lock.tooMany", { max: lock.max })}
             </Text>
           </View>
         ) : null}

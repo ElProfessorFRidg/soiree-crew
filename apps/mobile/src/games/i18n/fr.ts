@@ -52,6 +52,9 @@ export const fr = {
     wins: { one: "{count} victoire", other: "{count} victoires" },
     played: { one: "{count} partie jouée", other: "{count} parties jouées" },
     note: "Gardé sur ce téléphone. Gagne qui a le moins de gages.",
+    crewNote: "Partagé avec le crew. Une victoire compte à partir de deux membres du crew à la table.",
+    offline: "Hors ligne : voici les parties jouées sur ce téléphone.",
+    top: "Qui gagne le plus",
   },
   catalogue: {
     title: "Jeux",
@@ -70,6 +73,7 @@ export const fr = {
     typical: "Partie type ici : {minutes} min",
     locked: "Verrouillé",
     cardsInEnglish: "Les cartes sont en anglais pour l'instant.",
+    friends: { one: "{count} pote", other: "{count} potes" },
   },
   tags: {
     group: "Groupe",
@@ -93,6 +97,7 @@ export const fr = {
   lock: {
     needs: { one: "Il manque {count} joueur, {min} au minimum.", other: "Il manque {count} joueurs, {min} au minimum." },
     tooMany: "Ce jeu se joue à {max} au plus.",
+    friends: { one: "Se débloque à {friends} potes dans l'appli : encore {count}.", other: "Se débloque à {friends} potes dans l'appli : encore {count}." },
   },
   setup: {
     rulesPosition: "Règle {index} sur {count}",
@@ -130,6 +135,7 @@ export const fr = {
     roundOpen: "Manche {round}",
     timeLeft: "{seconds} s",
     timerLabel: "Temps de la manche",
+    swipeHint: "Glisse la carte pour continuer.",
   },
   penalty: {
     sipsOrForfeit: { one: "{count} gorgée ou un gage", other: "{count} gorgées ou un gage" },
@@ -149,6 +155,9 @@ export const fr = {
     otherGames: "Autres jeux",
     shareTitle: "{game} : le bilan",
     shareLine: "{name} : {penalties}",
+    winner: "{name} gagne",
+    noWinner: "Égalité en tête, personne ne gagne",
+    takeover: "{name} prend le bar avec cette victoire",
   },
   records: {
     tollRoad: { one: "Le plus de ratés : {name}, {count} fois", other: "Le plus de ratés : {name}, {count} fois" },

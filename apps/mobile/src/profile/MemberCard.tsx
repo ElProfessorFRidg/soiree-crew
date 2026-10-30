@@ -66,12 +66,15 @@ export function MemberCard() {
           </View>
         ) : null}
         {held ? <Text>{i18n.plural("people.cardBars", held)}</Text> : null}
+        {s.nights && s.nights.total > 0 ? <Text>{i18n.plural("people.cardNights", s.nights.total)}</Text> : null}
         {favourite ? <Text variant="small">{i18n.t("people.favourites", { list: drinkLabel({ kind: favourite.kind as DrinkKind }, i18n) })}</Text> : null}
         {s.crews?.length ? <Text variant="small">{s.crews.map((c) => c.name).join(", ")}</Text> : null}
         <Text variant="label" align="center">
           {i18n.t("recap.storyFooter")}
         </Text>
       </View>
+      {/* Outside the captured card: why nights out are missing, when the profile keeps them for the crew. */}
+      {!s.nights ? <Text variant="small">{i18n.t("people.cardNightsHidden")}</Text> : null}
       {canShareImages ? <Button label={i18n.t("people.shareCard")} icon="share" variant="secondary" height={48} loading={busy} onPress={() => void share()} /> : null}
     </View>
   );

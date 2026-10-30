@@ -36,6 +36,7 @@ import { useSession } from "@/server/session";
 import { useLevelNow } from "@/state/levelNow";
 import { openRide, openTransit, RIDE_APPS } from "./rides";
 import { BubbleField } from "./BubbleField";
+import { moodColour } from "./mood";
 import { UnwellBanner } from "./UnwellBanner";
 import { useVenueData } from "@/server/venueData";
 import { RollingNumber } from "./RollingNumber";
@@ -75,20 +76,6 @@ function EcoNotice() {
   if (!eco) return null;
   return <Tag label={i18n.t("party.eco")} icon="battery" tone="amber" />;
 }
-
-/** JOY-04: the mood picked for the party tints the top of the screen, nothing more. */
-const MOOD_COLOURS: Record<PartyMood, string> = {
-  party: palette.avatar[0]!,
-  birthday: palette.avatar[5]!,
-  champagne: palette.avatar[6]!,
-  sunset: palette.avatar[3]!,
-  costume: palette.avatar[4]!,
-  wine: palette.avatar[4]!,
-  fire: palette.avatar[5]!,
-  night: palette.avatar[2]!,
-  home: palette.avatar[1]!,
-  tropical: palette.avatar[1]!,
-};
 
 /** MOT-02: the crew's drinks tonight, mine counted from the phone so the field answers at once. */
 function LivingBackground({ mine, level }: { mine: number; level: number }) {
@@ -145,7 +132,8 @@ function MoodBand() {
   const insets = useSafeAreaInsets();
   const live = useLiveParty();
   if (!live) return null;
-  const colour = MOOD_COLOURS[live.party.mood as PartyMood] ?? palette.avatar[0]!;
+  // JOY-04: the mood picked for the party tints the top of the screen (and the widget, Live Activity, recap).
+  const colour = moodColour(live.party.mood);
   return <View pointerEvents="none" style={[styles.moodBand, { top: insets.top, backgroundColor: colour }]} />;
 }
 

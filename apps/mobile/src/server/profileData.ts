@@ -121,3 +121,10 @@ export function fetchReports(crewId: string): Promise<{ reports: CrewReport[] }>
 export function markReportHandled(crewId: string, reportId: string): Promise<unknown> {
   return api(`/v1/crews/${crewId}/reports/${reportId}/handled`, { method: "POST" });
 }
+
+export type AppIconId = "boss" | "globetrotter" | "nomad" | "winter" | "spring" | "summer" | "autumn";
+
+/** JOY-03: icons this account has unlocked, as the server computed them. */
+export async function fetchAppIcons(): Promise<AppIconId[]> {
+  return (await api<{ unlocked: AppIconId[] }>("/v1/me/app-icons")).unlocked;
+}

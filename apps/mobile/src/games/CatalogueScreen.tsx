@@ -4,7 +4,8 @@ import { FlatList, StyleSheet, View, useWindowDimensions, type NativeScrollEvent
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { palette, radius, space, scaled } from "@crew/design-tokens";
-import { filterGames, lockReason, typicalMinutes, type CatalogueFilter, type GameDefinition } from "@crew/games";
+import { filterGames, typicalMinutes, type CatalogueFilter, type GameDefinition } from "@crew/games";
+import { useGameLock } from "./unlocks";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
 import { flyHero, HeroSource } from "@/motion/hero";
@@ -37,8 +38,9 @@ function GameCardView({ game, width, height }: { game: GameDefinition; width: nu
   const tablePlayers = useGamesStore((s) => s.table.length);
   const durations = useGamesStore((s) => s.durations[game.id]);
   const minutes = typicalMinutes(durations ?? []);
-  // No table yet (first launch): nothing is locked, the players are picked on the game sheet.
-  const lock = tablePlayers > 0 ? lockReason(game, tablePlayers) : null;
+  // No table yet (first launch): only the friends unlock (O-48) shows, players are picked on the game sheet.
+  const gameLock = useGameLock(game, tablePlayers);
+  const lock = gameLock?.kind === "needsFriends" || tablePlayers > 0 ? gameLock : null;
   const players = game.minPlayers === game.maxPlayers ? g.plural("catalogue.players", game.minPlayers) : g.t("catalogue.playerRange", { min: game.minPlayers, max: game.maxPlayers });
   const ink = palette.accent.onAccent;
   return (
@@ -51,11 +53,11 @@ function GameCardView({ game, width, height }: { game: GameDefinition; width: nu
             </Text>
           </View>
         ))}
-        {lock?.kind === "needsPlayers" ? (
+        {lock?.kind === "needsPlayers" || lock?.kind === "needsFriends" ? (
           <View style={[styles.tag, styles.lockTag]}>
             <Icon name="lock" size={13} color={palette.dark.text} />
             <Text variant="tag" color={palette.dark.text}>
-              {g.plural("catalogue.players", lock.min)}
+              {lock.kind === "needsFriends" ? g.plural("catalogue.friends", lock.friends) : g.plural("catalogue.players", lock.min)}
             </Text>
           </View>
         ) : null}

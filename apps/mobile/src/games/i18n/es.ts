@@ -54,6 +54,9 @@ export const es: GameMessages = {
     wins: { one: "{count} victoria", other: "{count} victorias" },
     played: { one: "{count} partida jugada", other: "{count} partidas jugadas" },
     note: "Se guarda en este móvil. Gana quien tiene menos castigos.",
+    crewNote: "Compartido con el crew. Una victoria cuenta a partir de dos miembros del crew en la mesa.",
+    offline: "Sin conexión: estas son las partidas de este móvil.",
+    top: "Quién gana más",
   },
   catalogue: {
     title: "Juegos",
@@ -72,6 +75,7 @@ export const es: GameMessages = {
     typical: "Partida típica aquí: {minutes} min",
     locked: "Bloqueado",
     cardsInEnglish: "De momento, las cartas están en inglés.",
+    friends: { one: "{count} colega", other: "{count} colegas" },
   },
   tags: {
     group: "Grupo",
@@ -95,6 +99,7 @@ export const es: GameMessages = {
   lock: {
     needs: { one: "Falta {count} participante, mínimo {min}.", other: "Faltan {count} participantes, mínimo {min}." },
     tooMany: "A este juego se juega con {max} como máximo.",
+    friends: { one: "Se desbloquea con {friends} colegas en la app: falta {count}.", other: "Se desbloquea con {friends} colegas en la app: faltan {count}." },
   },
   setup: {
     rulesPosition: "Regla {index} de {count}",
@@ -132,6 +137,7 @@ export const es: GameMessages = {
     roundOpen: "Ronda {round}",
     timeLeft: "{seconds} s",
     timerLabel: "Tiempo de la ronda",
+    swipeHint: "Desliza la carta para seguir.",
   },
   penalty: {
     sipsOrForfeit: { one: "{count} trago o una prenda", other: "{count} tragos o una prenda" },
@@ -151,6 +157,9 @@ export const es: GameMessages = {
     otherGames: "Otros juegos",
     shareTitle: "{game}: parte de daños",
     shareLine: "{name}: {penalties}",
+    winner: "Gana {name}",
+    noWinner: "Empate arriba, no gana nadie",
+    takeover: "{name} se queda el bar con esta victoria",
   },
   records: {
     tollRoad: { one: "Más fallos: {name}, {count} vez", other: "Más fallos: {name}, {count} veces" },
