@@ -4,7 +4,7 @@ import { useT } from "@/i18n";
 import { runQuickAction } from "@/system/quickActions";
 import { useAppStore } from "@/state/store";
 
-/** QOL-04: soireecrew://quick/again or /quick/water does the action, then lands on the party screen. */
+/** QOL-04: soireecrew://quick/again, /quick/water or /quick/home (HUB-02) does the action, then lands on the party screen. */
 export default function QuickActionRoute() {
   const { action } = useLocalSearchParams<{ action: string }>();
   const i18n = useT();
@@ -13,7 +13,7 @@ export default function QuickActionRoute() {
   useEffect(() => {
     if (done.current || !onboarded) return;
     done.current = true;
-    if (action === "again" || action === "water") runQuickAction(action, i18n);
+    if (action === "again" || action === "water" || action === "home") runQuickAction(action, i18n);
   }, [action, i18n, onboarded]);
   return <Redirect href={onboarded ? "/" : "/onboarding"} />;
 }

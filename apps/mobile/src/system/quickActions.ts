@@ -6,15 +6,24 @@ import { lastDrink, logDrink, logWater } from "@/drinks/actions";
 import { defaultPreset, presetFromEntry } from "@/drinks/presets";
 import { offerUndo, offerWaterUndo } from "@/drinks/undoToast";
 import type { Translator } from "@/i18n";
+import { haptic } from "@/motion/haptics";
+import { setPartyStatus, useCrewData } from "@/server/crewData";
 import { useAppStore } from "@/state/store";
 
-export type QuickAction = "again" | "water";
+export type QuickAction = "again" | "water" | "home";
 
 /**
  * QOL-04: the same thing as the big buttons on the party screen, from outside the app. A long
  * press on the icon, a deep link (soireecrew://quick/again) for the Action Button or a Shortcut.
  */
 export function runQuickAction(action: QuickAction, i18n: Translator): void {
+  if (action === "home") {
+    // HUB-02: "I'm home" from the Live Activity, for the party going on now.
+    const now = Date.now();
+    const party = useCrewData.getState().parties.find((p) => p.myResponse === "going" && p.closedAt === null && p.startsAt <= now && p.endsAt >= now);
+    if (party) void setPartyStatus(party.id, { homeSafe: true }).then(() => haptic.confirmed()).catch(() => undefined);
+    return;
+  }
   if (action === "water") {
     const water = logWater();
     if (water) offerWaterUndo(water, i18n);
