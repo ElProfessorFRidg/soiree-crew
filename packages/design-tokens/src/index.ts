@@ -203,6 +203,30 @@ export const duration: Durations = Object.defineProperties(
   Object.fromEntries(Object.keys(baseDurations).map((key) => [key, { enumerable: true, get: () => scaled(baseDurations[key as keyof Durations]) }])),
 ) as Durations;
 
+export interface SpringConfig {
+  mass: number;
+  stiffness: number;
+  damping: number;
+}
+type Springs = Record<keyof typeof tokens.motion.springs, SpringConfig>;
+
+/**
+ * MOT-01 springs, scaled by the same time scale (MOT-14). A spring slowed s times keeps its shape
+ * when stiffness is divided by s² and damping by s; the mass stays. Read when an animation starts.
+ * `settle` and `snap` are critically damped (no overshoot, routine moves); `signature` and `swing`
+ * overshoot and are reserved for the signature moments of MOTION.md.
+ */
+export function springOf(config: SpringConfig, scale = motionScale): SpringConfig {
+  return { mass: config.mass, stiffness: config.stiffness / (scale * scale), damping: config.damping / scale };
+}
+
+export const spring: Springs = Object.defineProperties(
+  {},
+  Object.fromEntries(
+    Object.entries(tokens.motion.springs).map(([key, config]) => [key, { enumerable: true, get: () => springOf(config) }]),
+  ),
+) as Springs;
+
 export const icons = iconsJson.icons as Record<string, string>;
 export type IconName = keyof typeof iconsJson.icons;
 export const iconStroke = iconsJson.stroke;

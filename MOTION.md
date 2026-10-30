@@ -16,6 +16,31 @@ The per-element table lives in `design/DESIGN.md` §5. This file is the system b
 | `overshoot` | signature moments only: venue takeover, crown, podium, new leader |
 | `spin` | roulette and wheels, long deceleration |
 
+## Springs
+
+`design/tokens.json` → `motion.springs`, exposed as `spring.*` (`@crew/design-tokens`) and passed straight to Reanimated's `withSpring`. A spring is for something the finger let go of or that must follow a moving target; anything with a known start and end uses a duration and a curve.
+
+| Spring | Mass, stiffness, damping | Damping ratio | Use |
+|---|---|---|---|
+| `settle` | 1, 260, 32 | 0.99 | a view finding its place after a layout change, an avatar gliding to a new point |
+| `snap` | 1, 420, 41 | 1.0 | a released swipe or drag returning or leaving, pull-to-refresh letting go, a pinch ending out of bounds |
+| `signature` | 1, 180, 12 | 0.45 | overshoot moments only: crown landing, podium winner, badge unlocked |
+| `swing` | 1, 100, 9 | 0.45 | the two glasses of Cheers settling after the clink |
+
+`settle` and `snap` never overshoot (ratio ≥ 0.98, checked by `packages/design-tokens/src/motion.test.ts`). With Reduce Motion a spring is replaced by its end value, like any other animation.
+
+## Sound (optional)
+
+Off by default, its own switch in Settings, separate from vibrations (JOY-05). `apps/mobile/src/motion/sounds.ts` plays them; each sound rides on a haptic event and never says anything the screen does not.
+
+| Sound | Plays with | Moment |
+|---|---|---|
+| `pour` | `drinkAdded` | a drink was logged |
+| `clink` | `cheers` | a round bought, two phones together |
+| `crown` | `heavy` | crown, podium winner, new leader, explosion |
+
+Rules: under 600 ms, volume 0.6, mixed with music already playing (never stops it); on iOS the silent switch wins; no sound loops, no sound on routine taps, scrolling or typing; at UI level 3 and in eco mode the pack stays as chosen, because a sound costs no attention. A new sound needs a row here before it ships.
+
 ## Choreography
 
 1. One thing moves at a time per area. A screen entering does not also animate its list.
@@ -70,7 +95,7 @@ Vibrations have their own switch in Settings, on by default and separate from th
 
 ## Time scale (MOT-14)
 
-Every duration goes through one scale, 0.1x to 10x: the tokens (`duration.*`) read it when an animation starts, and a duration written as a number goes through `scaled(ms)`, read on the JS thread (never inside a worklet). Dev builds show the control in Settings and expose `globalThis.__crewMotion.setScale(x)` to the test harness; release builds stay at 1.
+Every duration goes through one scale, 0.1x to 10x: the tokens (`duration.*`) read it when an animation starts, and a duration written as a number goes through `scaled(ms)`, read on the JS thread (never inside a worklet). Springs (`spring.*`) follow the same scale: stiffness divided by the square of the scale, damping by the scale, so a slowed spring keeps its shape. Timers that pace an animation (stagger, steps, ticks, pulses) go through `scaled` too; timers that count real time (polling, a 5 s undo, a game round) do not. Dev builds show the control in Settings and expose `globalThis.__crewMotion.setScale(x)` to the test harness; release builds stay at 1.
 
 ## Review checklist
 
