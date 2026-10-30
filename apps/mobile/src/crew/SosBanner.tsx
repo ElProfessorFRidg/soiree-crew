@@ -1,9 +1,8 @@
 import { Linking, StyleSheet, View } from "react-native";
 import { palette } from "@crew/design-tokens";
 import { useT } from "@/i18n";
-import { formatClock } from "@/i18n/format";
+import { RelativeTime } from "@/ui/RelativeTime";
 import { resolveSos, useRadar } from "@/server/radarData";
-import { useAppStore } from "@/state/store";
 import { Button } from "@/ui/Button";
 import { Panel } from "@/ui/controls";
 import { Text } from "@/ui/Text";
@@ -12,7 +11,6 @@ import { Text } from "@/ui/Text";
 export function SosBanner() {
   const i18n = useT();
   const alerts = useRadar((state) => state.sos);
-  const hourCycle = useAppStore((state) => state.preferences.hourCycle);
   if (!alerts.length) return null;
   return (
     <>
@@ -21,7 +19,7 @@ export function SosBanner() {
           <Text variant="h2" color={palette.tint.dangerTextStrong} accessibilityLiveRegion="assertive">
             {i18n.t("sosAlert.received", { name: alert.name })}
           </Text>
-          <Text color={palette.tint.dangerText}>{formatClock(alert.at, i18n.language, hourCycle)}</Text>
+          <RelativeTime at={alert.at} variant="body" color={palette.tint.dangerText} />
           <View style={styles.actions}>
             {alert.location ? (
               <Button

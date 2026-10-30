@@ -31,17 +31,50 @@ export async function refreshRadar(crewId: string): Promise<void> {
   useRadar.setState((state) => ({ byCrew: { ...state.byCrew, [crewId]: radar } }));
 }
 
-/** Optimistic status change: the tile flips at once and comes back if the server refuses. */
-export async function setNightStatus(crewId: string, night: string, status: NightStatus, me: string): Promise<void> {
-  const before = useRadar.getState().byCrew[crewId];
-  if (before) {
-    const statuses = [...before.statuses.filter((s) => !(s.userId === me && s.night === night)), { userId: me, night, status, fromMinute: null, toMinute: null, place: "" }];
-    useRadar.setState((state) => ({ byCrew: { ...state.byCrew, [crewId]: { ...before, statuses } } }));
-  }
+/**
+ * N-01: when and where, for going out (or maybe). Minutes count from midnight of the night's date
+ * and go past 24 h after midnight; the server drops them for staying in.
+ */
+export interface StatusDetails {
+  fromMinute: number | null;
+  toMinute: number | null;
+  place: string;
+}
+
+const NO_DETAILS: StatusDetails = { fromMinute: null, toMinute: null, place: "" };
+
+/** Optimistic status change, for tonight or another night of the week: the tile flips at once and comes back if the server refuses. */
+export async function setNightStatus(crewId: string, night: string, status: NightStatus, me: string, details: StatusDetails = NO_DETAILS): Promise<void> {
+  const out = status === "going_out" || status === "maybe";
+  const kept = out ? details : NO_DETAILS;
+  // A status is the same for every crew: each board shows it at once.
+  const before = useRadar.getState().byCrew;
+  const byCrew = Object.fromEntries(
+    Object.entries(before).map(([id, radar]) => [
+      id,
+      radar.nights.includes(night) ? { ...radar, statuses: [...radar.statuses.filter((s) => !(s.userId === me && s.night === night)), { userId: me, night, status, ...kept }] } : radar,
+    ]),
+  );
+  useRadar.setState({ byCrew });
   try {
-    await api("/v1/status", { method: "PUT", body: { night, status } });
+    await api("/v1/status", { method: "PUT", body: { night, status, ...kept, place: kept.place.trim() || undefined } });
   } catch (error) {
-    if (before) useRadar.setState((state) => ({ byCrew: { ...state.byCrew, [crewId]: before } }));
+    useRadar.setState({ byCrew: before });
+    throw error;
+  } finally {
+    void refreshRadar(crewId).catch(() => undefined);
+  }
+}
+
+export async function clearNightStatus(crewId: string, night: string, me: string): Promise<void> {
+  const before = useRadar.getState().byCrew;
+  useRadar.setState({
+    byCrew: Object.fromEntries(Object.entries(before).map(([id, radar]) => [id, { ...radar, statuses: radar.statuses.filter((s) => !(s.userId === me && s.night === night)) }])),
+  });
+  try {
+    await api(`/v1/status/${night}`, { method: "DELETE" });
+  } catch (error) {
+    useRadar.setState({ byCrew: before });
     throw error;
   }
 }
