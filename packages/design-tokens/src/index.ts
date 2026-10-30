@@ -125,11 +125,25 @@ export interface TextStyleToken {
   fontSize: number;
   lineHeight?: number;
   letterSpacing?: number;
+  marginVertical?: number;
+}
+
+/**
+ * iOS clips glyphs that rise above a line box shorter than the font: the top of big figures and
+ * the accent of "É" disappear (web and Android let them overflow). A tight design line height
+ * becomes a line box tall enough for the glyphs, and a negative margin gives the space back,
+ * so the layout is the one DESIGN.md sets on every platform.
+ */
+function tightLine(fontSize: number, ratio: number): Pick<TextStyleToken, "lineHeight" | "marginVertical"> {
+  const safe = 1.2;
+  if (ratio >= safe) return { lineHeight: Math.round(fontSize * ratio) };
+  const lineHeight = Math.round(fontSize * safe);
+  return { lineHeight, marginVertical: -Math.round((lineHeight - fontSize * ratio) / 2) };
 }
 
 export const type = {
-  h1: { fontFamily: fontFiles.title, fontSize: 32, lineHeight: 33 },
-  h2: { fontFamily: fontFiles.heading, fontSize: 22, lineHeight: 25 },
+  h1: { fontFamily: fontFiles.title, fontSize: 32, ...tightLine(32, 33 / 32) },
+  h2: { fontFamily: fontFiles.heading, fontSize: 22, ...tightLine(22, 25 / 22) },
   h3: { fontFamily: fontFiles.bold, fontSize: 16, lineHeight: 20 },
   body: { fontFamily: fontFiles.body, fontSize: 15, lineHeight: 22 },
   small: { fontFamily: fontFiles.body, fontSize: 13, lineHeight: 18 },
@@ -144,7 +158,7 @@ export const type = {
 
 /** Numeral style at any size of the DESIGN.md scale: line height 0.86, tracking -1. */
 export function numeral(fontSize: number): TextStyleToken {
-  return { fontFamily: fontFiles.numeral, fontSize, lineHeight: Math.round(fontSize * 0.86), letterSpacing: -1 };
+  return { fontFamily: fontFiles.numeral, fontSize, ...tightLine(fontSize, 0.86), letterSpacing: -1 };
 }
 
 type Bezier = readonly [number, number, number, number];

@@ -1,9 +1,13 @@
 import { Redirect, Tabs } from "expo-router";
+import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
+import { duration } from "@crew/design-tokens";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { BottomTabBarProps } from "expo-router/tabs";
 import { useGameT } from "@/games/i18n";
 import { useT } from "@/i18n";
+import { easings } from "@/motion/easing";
 import { useMorningAfter } from "@/recap/morning";
 import { useHomeScreenActions } from "@/system/quickActions";
 import { useLevelNow } from "@/state/levelNow";
@@ -23,37 +27,74 @@ const TAB_ICONS: Record<string, AnyIconName> = {
   me: "user",
 };
 
+/** One tab: the icon pops when it becomes the active one (DESIGN.md §5 pop), static under Reduce Motion. */
+function TabItem({ label, icon, focused, onPress }: { label: string; icon: AnyIconName; focused: boolean; onPress: () => void }) {
+  const theme = useTheme();
+  const reduceMotion = useReducedMotion();
+  const scale = useSharedValue(1);
+  useEffect(() => {
+    if (!focused || reduceMotion) return;
+    scale.value = withSequence(
+      withTiming(1.14, { duration: duration.pop * 0.45, easing: easings.out }),
+      withTiming(1, { duration: duration.pop * 0.55, easing: easings.out }),
+    );
+  }, [focused, reduceMotion, scale]);
+  const iconStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  const color = focused ? theme.amber : theme.tabInactive;
+  return (
+    <ScalePressable
+      accessibilityRole="tab"
+      accessibilityState={{ selected: focused }}
+      accessibilityLabel={label}
+      pressedScale={0.94}
+      onPress={onPress}
+      style={styles.item}
+    >
+      <Animated.View style={iconStyle}>
+        <Icon name={icon} size={22} color={color} />
+      </Animated.View>
+      <Text variant="tab" color={color} numberOfLines={1}>
+        {label}
+      </Text>
+    </ScalePressable>
+  );
+}
+
 function TabBar({ state, descriptors, navigateToTab }: BottomTabBarProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const reduceMotion = useReducedMotion();
+  const [width, setWidth] = useState(0);
+  const slot = width / Math.max(1, state.routes.length);
+  // A short amber line slides to the active tab.
+  const x = useSharedValue(0);
+  useEffect(() => {
+    const target = state.index * slot;
+    x.value = reduceMotion || slot === 0 ? target : withTiming(target, { duration: duration.toggle, easing: easings.toggle });
+  }, [state.index, slot, reduceMotion, x]);
+  const indicator = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }] }));
   return (
     <View
       accessibilityRole="tablist"
+      onLayout={(event) => setWidth(event.nativeEvent.layout.width - 12)}
       style={[styles.bar, { backgroundColor: theme.bg, borderTopColor: theme.line, paddingBottom: Math.max(insets.bottom, 10) }]}
     >
-      {state.routes.map((route, index) => {
-        const focused = state.index === index;
-        const color = focused ? theme.amber : theme.tabInactive;
-        const label = descriptors[route.key]?.options.title ?? route.name;
-        return (
-          <ScalePressable
-            key={route.key}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: focused }}
-            accessibilityLabel={label}
-            pressedScale={0.94}
-            onPress={() => {
-              if (!focused) navigateToTab(route.key);
-            }}
-            style={styles.item}
-          >
-            <Icon name={TAB_ICONS[route.name] ?? "more"} size={22} color={color} />
-            <Text variant="tab" color={color}>
-              {label}
-            </Text>
-          </ScalePressable>
-        );
-      })}
+      {slot > 0 ? (
+        <Animated.View pointerEvents="none" style={[styles.indicatorSlot, { width: slot }, indicator]}>
+          <View style={[styles.indicator, { backgroundColor: theme.amber }]} />
+        </Animated.View>
+      ) : null}
+      {state.routes.map((route, index) => (
+        <TabItem
+          key={route.key}
+          label={descriptors[route.key]?.options.title ?? route.name}
+          icon={TAB_ICONS[route.name] ?? "more"}
+          focused={state.index === index}
+          onPress={() => {
+            if (state.index !== index) navigateToTab(route.key);
+          }}
+        />
+      ))}
     </View>
   );
 }
@@ -73,8 +114,8 @@ export default function TabsLayout() {
       <Tabs screenOptions={{ headerShown: false }} tabBar={(props) => <TabBar {...props} />}>
         <Tabs.Screen name="index" options={{ title: i18n.t("tabs.party") }} />
         <Tabs.Screen name="crew" options={{ title: i18n.t("crew.tab") }} />
-        <Tabs.Screen name="bars" options={{ title: i18n.t("bars.tab") }} />
         <Tabs.Screen name="games" options={{ title: games.t("catalogue.title") }} />
+        <Tabs.Screen name="bars" options={{ title: i18n.t("bars.tab") }} />
         <Tabs.Screen name="me" options={{ title: i18n.t("tabs.me") }} />
       </Tabs>
       <ToastHost bottomOffset={insets.bottom + 76} large={level >= 2} />
@@ -85,13 +126,14 @@ export default function TabsLayout() {
 const styles = StyleSheet.create({
   bar: {
     flexDirection: "row",
-    justifyContent: "space-around",
     paddingTop: 10,
     paddingHorizontal: 6,
     borderTopWidth: 1,
   },
+  indicatorSlot: { position: "absolute", top: -1, left: 6, alignItems: "center" },
+  indicator: { width: 28, height: 2, borderRadius: 1 },
   item: {
-    minWidth: 60,
+    flex: 1,
     minHeight: 44,
     alignItems: "center",
     justifyContent: "center",
