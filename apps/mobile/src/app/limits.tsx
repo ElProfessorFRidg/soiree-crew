@@ -39,10 +39,14 @@ export default function LimitsScreen() {
       ? null
       : Math.round(preferences.personalLimit * 10);
   const { driving } = live;
-  const underText =
-    driving.underLimitAt === null || driving.underLimitAt <= now
-      ? i18n.t("limits.underNow")
-      : formatClock(driving.underLimitAt, i18n.language, preferences.hourCycle);
+  // O-87: the same conservative reading as the Party screen.
+  const underText = driving.rising
+    ? i18n.t("party.drivingRising")
+    : driving.tooCloseToCall
+      ? i18n.t("party.tooClose")
+      : driving.underLimitAt === null || driving.underLimitAt <= now
+        ? i18n.t("limits.underNow")
+        : formatClock(driving.underLimitAt, i18n.language, preferences.hourCycle);
 
   return (
     <Screen back title={i18n.t("limits.title")}>

@@ -103,6 +103,17 @@ describe("T2: woman 60 kg, three wines at 0, 0.5, 1 h", () => {
     expectTime(estimateDriving(drinks, woman60, now, 0.5).underLimitAt!, 5.32);
     expectTime(estimateDriving(drinks, woman60, now, 0.2).underLimitAt!, 8.77);
   });
+  it("O-87: no verdict while still rising, and a peak just under the limit is too close to call", () => {
+    // Right after the third glass the curve still climbs to its 0.78 peak (84 min).
+    expect(estimateDriving(drinks, woman60, T0 + 1 * H, 0.5).rising).toBe(true);
+    expect(estimateDriving(drinks, woman60, T0 + 2 * H, 0.5).rising).toBe(false);
+    // A limit just above the peak: neither "under the limit" nor a countdown.
+    const near = estimateDriving(drinks, woman60, T0 + 2 * H, 0.85);
+    expect(near.tooCloseToCall).toBe(true);
+    // Far above the peak: nothing to call.
+    const far = estimateDriving(drinks, woman60, T0 + 2 * H, 1.5);
+    expect([far.rising, far.tooCloseToCall, far.underLimitAt]).toEqual([false, false, null]);
+  });
 });
 
 describe("T3: man 70 kg, ten shots every 12 min", () => {

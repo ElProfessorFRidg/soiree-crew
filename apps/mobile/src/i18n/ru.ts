@@ -33,6 +33,7 @@ export const ru: Messages = {
     evening: { v1: "Становится жарко.", v2: "Вечер набирает обороты.", v3: "Становится шумно." },
   },
   party: {
+    drivingRising: "Ещё растёт",
     alreadyZero: "Уже ноль",
     tileGames: "Игры",
     tileRound: "Раунд",

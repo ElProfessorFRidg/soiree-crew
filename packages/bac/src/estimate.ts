@@ -35,6 +35,8 @@ export interface DrivingEstimate {
   underLimitAt: number | null;
   /** Within 0.10 g/L or one hour of the limit: the UI says "too close to call". */
   tooCloseToCall: boolean;
+  /** O-87: the estimate still climbs towards a peak near or over the limit; no countdown is shown. */
+  rising: boolean;
 }
 
 function isZero(bac: number, gutGrams: number): boolean {
@@ -53,6 +55,9 @@ function firstZeroAfter(sim: BacSimulation, from: number): number | null {
   const last = points[points.length - 1];
   return last && last.at < end ? last.at : end;
 }
+
+/** O-87: within this much of the limit, the app does not call it either way. */
+const CLOSE_BAC = 0.1;
 
 export function estimateBac(drinks: readonly DrinkIntake[], profile: BodyProfile, now: number): BacEstimate {
   const sim = new BacSimulation(drinks, distributionVolume(profile), now);
@@ -126,12 +131,15 @@ export function estimateDriving(
     if (last && underLimitAt === horizon && last.at < horizon) underLimitAt = last.at;
   }
 
-  const closeInValue = Math.abs(current.bac - limit) <= 0.1;
+  // O-87: "too close to call" near the limit now, near it at the coming peak (a peak just under
+  // the limit is not "under the limit"), or within an hour of getting back under it.
+  const closeInValue = Math.abs(current.bac - limit) <= CLOSE_BAC || (peakBac < limit && limit - peakBac <= CLOSE_BAC);
   const closeInTime = underLimitAt !== null && underLimitAt - now <= HOUR_MS && underLimitAt > now;
   return {
     limitBac,
     overLimitNow,
     underLimitAt,
     tooCloseToCall: limit > ZERO_BAC && (closeInValue || closeInTime),
+    rising: peakAt > now && peakBac >= limit - CLOSE_BAC,
   };
 }

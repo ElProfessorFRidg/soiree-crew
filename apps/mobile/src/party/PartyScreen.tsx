@@ -323,12 +323,17 @@ function DrivingPanels(props: LevelProps) {
   let drivingColor: string;
   // A duration is a figure (numeral font); a verdict is a phrase and reads as one.
   let drivingIsPhrase = true;
-  if (driving.underLimitAt === null || driving.underLimitAt <= now) {
-    drivingValue = i18n.t("party.drivingOk");
-    drivingColor = theme.ok;
-  } else if (driving.tooCloseToCall && !driving.overLimitNow) {
+  // O-87: still climbing towards the limit, or within 0.10 g/L or an hour of it, the app does not
+  // call it; only a clear margin is "under the limit", and a countdown shows only once falling.
+  if (driving.rising) {
+    drivingValue = i18n.t("party.drivingRising");
+    drivingColor = theme.danger;
+  } else if (driving.tooCloseToCall) {
     drivingValue = i18n.t("party.tooClose");
     drivingColor = theme.amber;
+  } else if (driving.underLimitAt === null || driving.underLimitAt <= now) {
+    drivingValue = i18n.t("party.drivingOk");
+    drivingColor = theme.ok;
   } else {
     drivingValue = formatDuration(driving.underLimitAt - now, i18n.language);
     drivingColor = theme.danger;

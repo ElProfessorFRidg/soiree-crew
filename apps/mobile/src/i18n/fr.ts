@@ -32,6 +32,7 @@ export const fr = {
     evening: { v1: "Ça commence à chauffer.", v2: "La soirée prend forme.", v3: "Ça s'anime." },
   },
   party: {
+    drivingRising: "Ça monte encore",
     alreadyZero: "Déjà à 0",
     tileGames: "Jeux",
     tileRound: "Tournée",
