@@ -130,6 +130,10 @@ export const it: Messages = {
     unmute: "Riattiva i promemoria",
     muteNow: "Silenzia i promemoria fino a domattina",
   },
+  liveActivity: {
+    title: "Ritorno a 0 verso le {time}",
+    ended: "Ritorno a 0",
+  },
   reminders: {
     nightChannel: "Serata in corso",
     nightTitle: "Tasso stimato alle {time}: {value}",

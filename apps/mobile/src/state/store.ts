@@ -68,6 +68,8 @@ export interface AppState {
   nonceBook: { nonce: string; expiresAt: number }[];
   /** QOL-27: BAC figures on the lock screen and in notifications; off means time to zero only. */
   lockScreenNumbers: boolean;
+  /** HUB-02: the iOS Live Activity of tonight, so a relaunch updates it instead of starting another. */
+  liveActivityId: string | null;
   /** SLOP-11: the last variant shown of each recurring line, and for which occasion. */
   copyVariants: Record<string, { index: number; occasion: string }>;
   /** QOL-32: when the logging nudge was last answered. */
@@ -107,6 +109,7 @@ export const useAppStore = create<AppState>()(
       hapticsOn: true,
       copyVariants: {},
       lockScreenNumbers: false,
+      liveActivityId: null,
       installId: null,
       eventSeq: 0,
       chainHead: "",

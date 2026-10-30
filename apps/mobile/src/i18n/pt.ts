@@ -130,6 +130,10 @@ export const pt: Messages = {
     unmute: "Voltar a ligar os lembretes",
     muteNow: "Silenciar lembretes até amanhã de manhã",
   },
+  liveActivity: {
+    title: "Volta a 0 por volta das {time}",
+    ended: "Volta a 0",
+  },
   reminders: {
     nightChannel: "Festa a decorrer",
     nightTitle: "Taxa estimada às {time}: {value}",

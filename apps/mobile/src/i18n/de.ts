@@ -129,6 +129,10 @@ export const de: Messages = {
     unmute: "Erinnerungen wieder an",
     muteNow: "Erinnerungen bis morgen früh stummschalten",
   },
+  liveActivity: {
+    title: "Wieder bei 0 gegen {time}",
+    ended: "Wieder bei 0",
+  },
   reminders: {
     nightChannel: "Laufender Abend",
     nightTitle: "Geschätzt um {time}: {value}",

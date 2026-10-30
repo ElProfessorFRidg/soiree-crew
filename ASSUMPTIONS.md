@@ -46,6 +46,7 @@ Status values: `open`, `confirmed`, `overturned`.
 | A-ORCH-36 | MOT-11 on Android: home-screen widgets are drawn with RemoteViews, which allow no animation, so the widget updates in place and that is the OS's limit. The animated parts (curve, Live Activity) belong to the iOS WidgetKit target. | Android widget API. | iOS target. | open |
 | A-ORCH-37 | SEC-08: the arrival flow asks for the health-data consent before the weight, one step earlier than the Arrivee board; the other departures from the board are listed in ADR 0006. | GDPR art. 9 wants consent before collection. | Legal review. | open |
 | A-ORCH-38 | SEC-08 withdrawal: the body profile is deleted; drinks and water become empty tombstones (no content, no times) so other phones drop them on sync. Party recaps already computed keep their totals. | The sync protocol needs a deletion marker; a hard delete would leave copies on the other phones. | Legal review of the recap totals. | open |
+| A-ORCH-39 | HUB-02 on iOS uses expo-live-activity (Software Mansion Labs, early stage): one Live Activity per night with the back-to-zero time and a countdown iOS draws itself, the estimate only when lock-screen figures are on (QOL-27). It adds a widget extension (app.soireecrew.mobile.LiveActivity) that a sideloading tool has to sign with the app. No push updates yet, so the 8 h limit (QOL-26) is not renewed. | Library choice; extension signing. | Tested on a phone. | open |
 
 ## From recon reports
 

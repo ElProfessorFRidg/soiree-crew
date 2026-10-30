@@ -129,6 +129,10 @@ export const fr = {
     unmute: "Remettre les rappels",
     muteNow: "Couper les rappels jusqu'à demain matin",
   },
+  liveActivity: {
+    title: "Retour à 0 vers {time}",
+    ended: "Retour à 0",
+  },
   reminders: {
     nightChannel: "Soirée en cours",
     nightTitle: "Taux estimé à {time} : {value}",

@@ -131,6 +131,10 @@ export const en: Messages = {
     unmute: "Turn reminders back on",
     muteNow: "Mute reminders until tomorrow morning",
   },
+  liveActivity: {
+    title: "Back to zero around {time}",
+    ended: "Back to zero",
+  },
   reminders: {
     nightChannel: "Night in progress",
     nightTitle: "Estimate at {time}: {value}",

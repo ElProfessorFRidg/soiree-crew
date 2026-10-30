@@ -130,6 +130,10 @@ export const es: Messages = {
     unmute: "Volver a activar los recordatorios",
     muteNow: "Silenciar recordatorios hasta mañana",
   },
+  liveActivity: {
+    title: "Vuelta a 0 hacia las {time}",
+    ended: "Vuelta a 0",
+  },
   reminders: {
     nightChannel: "Fiesta en curso",
     nightTitle: "Tasa estimada ({time}): {value}",

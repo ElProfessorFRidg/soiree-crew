@@ -130,6 +130,10 @@ export const ru: Messages = {
     unmute: "Вернуть напоминания",
     muteNow: "Выключить напоминания до утра",
   },
+  liveActivity: {
+    title: "Вернёшься к нулю около {time}",
+    ended: "Снова ноль",
+  },
   reminders: {
     nightChannel: "Вечеринка идёт",
     nightTitle: "Оценка на {time}: {value}",

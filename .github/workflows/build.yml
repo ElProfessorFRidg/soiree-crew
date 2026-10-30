@@ -189,7 +189,11 @@ jobs:
           unzip -q soiree-crew-unsigned.ipa -d sim
           APP=$(ls -d sim/Payload/*.app | head -n 1)
           python3 tools/ci/ios-device-to-simulator.py "$APP"
-          for f in "$APP"/Frameworks/*.framework "$APP"/Frameworks/*.dylib; do
+          # Inside out: frameworks, then the app extensions (Live Activity), then the app.
+          for f in "$APP"/Frameworks/*.framework "$APP"/Frameworks/*.dylib "$APP"/PlugIns/*.appex/Frameworks/*.framework; do
+            if [ -e "$f" ]; then codesign --force --sign - --timestamp=none "$f"; fi
+          done
+          for f in "$APP"/PlugIns/*.appex; do
             if [ -e "$f" ]; then codesign --force --sign - --timestamp=none "$f"; fi
           done
           codesign --force --sign - --timestamp=none "$APP"

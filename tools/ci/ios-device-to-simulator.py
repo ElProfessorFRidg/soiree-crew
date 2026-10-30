@@ -66,7 +66,7 @@ def main(app: str) -> int:
     for root, _, files in os.walk(app):
         for name in files:
             path = os.path.join(root, name)
-            if name == "Info.plist" and (root == app or root.endswith(".framework")):
+            if name == "Info.plist" and (root == app or root.endswith((".framework", ".appex"))):
                 patch_plist(path)
                 continue
             result = patch_macho(path)
