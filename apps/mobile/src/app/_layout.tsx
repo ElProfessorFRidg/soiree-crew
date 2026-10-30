@@ -14,7 +14,7 @@ import { checkForUpdate } from "@/system/updates";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { AppState as RNAppState, Platform } from "react-native";
+import { AppState as RNAppState, Platform, Settings } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
   ReducedMotionConfig,
@@ -156,6 +156,14 @@ export default function RootLayout() {
     const subscription =
       Notifications.addNotificationResponseReceivedListener(open);
     return () => subscription.remove();
+  }, [ready]);
+
+  // CI only: the launch test opens each main screen with `-ciRoute /path` (an iOS launch argument,
+  // read from the user defaults); a person launching the app never passes one.
+  useEffect(() => {
+    if (!ready || Platform.OS !== "ios") return;
+    const route = Settings.get("ciRoute") as unknown;
+    if (typeof route === "string" && route.startsWith("/")) setTimeout(() => router.push(route as never), 300);
   }, [ready]);
 
   if (!ready) return null;

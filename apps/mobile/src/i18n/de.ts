@@ -32,6 +32,7 @@ export const de: Messages = {
     evening: { v1: "Es wird langsam warm.", v2: "Der Abend nimmt Form an.", v3: "Es wird lebhaft." },
   },
   party: {
+    alreadyZero: "Schon bei 0",
     tileGames: "Spiele",
     tileRound: "Runde",
     tileHome: "Heimweg",

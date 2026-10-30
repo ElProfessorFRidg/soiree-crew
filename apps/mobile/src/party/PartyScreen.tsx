@@ -318,9 +318,11 @@ function DrivingPanels(props: LevelProps) {
   const { estimate, driving } = live;
   const zeroTolerance = driving.limitBac === 0;
 
-  const backToZero = estimate.backToZeroAt ? formatDuration(estimate.backToZeroAt - now, i18n.language) : "0";
+  const backToZero = estimate.backToZeroAt ? formatDuration(estimate.backToZeroAt - now, i18n.language) : null;
   let drivingValue: string;
   let drivingColor: string;
+  // A duration is a figure (numeral font); a verdict is a phrase and reads as one.
+  let drivingIsPhrase = true;
   if (driving.underLimitAt === null || driving.underLimitAt <= now) {
     drivingValue = i18n.t("party.drivingOk");
     drivingColor = theme.ok;
@@ -330,19 +332,32 @@ function DrivingPanels(props: LevelProps) {
   } else {
     drivingValue = formatDuration(driving.underLimitAt - now, i18n.language);
     drivingColor = theme.danger;
+    drivingIsPhrase = false;
   }
 
   return (
     <View style={styles.grid2}>
       <Panel style={styles.flex}>
         <Text variant="label">{i18n.t("party.backToZero")}</Text>
-        <Numeral size={34}>{backToZero}</Numeral>
+        {backToZero ? (
+          <Numeral size={34}>{backToZero}</Numeral>
+        ) : (
+          <Text variant="h2" color={theme.ok}>
+            {i18n.t("party.alreadyZero")}
+          </Text>
+        )}
       </Panel>
       <Panel style={styles.flex}>
         <Text variant="label">{i18n.t("party.driving")}</Text>
-        <Numeral size={34} color={drivingColor}>
-          {drivingValue}
-        </Numeral>
+        {drivingIsPhrase ? (
+          <Text variant="h2" color={drivingColor}>
+            {drivingValue}
+          </Text>
+        ) : (
+          <Numeral size={34} color={drivingColor}>
+            {drivingValue}
+          </Numeral>
+        )}
         {zeroTolerance && estimate.bac > 0 ? <Text variant="small">{i18n.t("party.zeroTolerance")}</Text> : null}
       </Panel>
     </View>
