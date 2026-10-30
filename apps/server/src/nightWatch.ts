@@ -1,6 +1,7 @@
 import { estimateBac, POISONING_CARD_THRESHOLD, type BodyProfile, type DrinkIntake, type FoodLevel } from "@crew/bac";
 import type { Context } from "./context";
 import type { Db } from "./db";
+import { notifyDanger, notifyQuiet, notifyUnwell } from "./notifications/producers";
 
 // The server keeps an eye on the night: who went quiet (N-29), whose estimate went past 2.0 g/L
 // (O-88), who should hear first that someone is unwell (N-36). Alerts travel as live-socket hints;
@@ -68,8 +69,8 @@ export async function checkDanger(ctx: Context, party: Pick<LivePartyRow, "id" |
   if (bac < POISONING_CARD_THRESHOLD || row.danger_alerted_at !== null) return false;
   await ctx.db.query("update party_members set danger_alerted_at = $3 where party_id = $1 and user_id = $2", [party.id, userId, now]);
   const others = (await goingIds(ctx.db, party.id)).filter((id) => id !== userId);
-  // push: party.danger
   ctx.live.notify(others, { type: "party.danger", partyId: party.id, userId });
+  await notifyDanger(ctx, party.id, userId, others);
   return true;
 }
 
@@ -97,8 +98,8 @@ export async function tellUnwell(ctx: Context, partyId: string, userId: string):
   }
   const everyone = first.length === others.length;
   await ctx.db.query("update party_members set unwell_widened_at = $3 where party_id = $1 and user_id = $2", [partyId, userId, everyone ? ctx.now() : null]);
-  // push: party.unwell
   ctx.live.notify(first, { type: "party.unwell", partyId, userId, near: !everyone });
+  await notifyUnwell(ctx, partyId, userId, first);
   return first;
 }
 
@@ -135,13 +136,14 @@ export async function sweepParty(ctx: Context, party: LivePartyRow): Promise<voi
     ) {
       await ctx.db.query("update party_members set quiet_alerted_at = $3 where party_id = $1 and user_id = $2", [party.id, m.user_id, now]);
       // QOL-10: a dead phone is not a missing person; the hint says the battery was low.
-      // push: party.quiet
       ctx.live.notify(others, { type: "party.quiet", partyId: party.id, userId: m.user_id, batteryLow: m.battery_low });
+      await notifyQuiet(ctx, party.id, m.user_id, others);
     }
     if (m.unwell_at !== null && m.home_safe_at === null && m.unwell_widened_at === null && now - m.unwell_at >= UNWELL_WIDEN_MS) {
       await ctx.db.query("update party_members set unwell_widened_at = $3 where party_id = $1 and user_id = $2", [party.id, m.user_id, now]);
-      // push: party.unwell
       ctx.live.notify(others, { type: "party.unwell", partyId: party.id, userId: m.user_id, near: false });
+      // Those told first keep one inbox line: the notification collapses on the same person.
+      await notifyUnwell(ctx, party.id, m.user_id, others);
     }
     await checkDanger(ctx, party, m.user_id);
   }

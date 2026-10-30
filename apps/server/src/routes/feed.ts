@@ -20,6 +20,8 @@ type BaseItem =
   | { kind: "party"; at: number; partyId: string; name: string; by: string }
   | { kind: "poll"; at: number; title: string; by: string }
   | { kind: "takeover"; at: number; venueName: string; userId: string }
+  /** AC-09: a cheat attempt the crew admin has not overturned. */
+  | { kind: "cheat"; at: number; venueName: string; userId: string }
   | { kind: "joined"; at: number; userIds: string[] }
   | { kind: "quote"; at: number; partyName: string; text: string; saidBy: string | null }
   | { kind: "reactions"; at: number; partyName: string; partyId: string; count: number };
@@ -108,6 +110,13 @@ async function buildFeed(ctx: Context, crewId: string): Promise<KeyedItem[]> {
     "select r.id, r.started_at, r.user_id, v.name from reigns r join venues v on v.id = r.venue_id and v.crew_id = $1 where r.started_at > $2",
     [crewId, since],
   );
+  // AC-09: refused check-ins of current members, unless an admin overturned them.
+  const cheats = await ctx.db.query<{ id: string; at: number; user_id: string; name: string }>(
+    `select c.id, c.at, c.user_id, v.name from check_ins c join venues v on v.id = c.venue_id and v.crew_id = $1
+     join crew_members m on m.crew_id = $1 and m.user_id = c.user_id
+     where c.verdict = 'rejected' and c.overturned_by is null and c.at > $2`,
+    [crewId, since],
+  );
   const joined = await ctx.db.query<{ at: number; user_id: string }>("select joined_at as at, user_id from crew_members where crew_id = $1 and joined_at > $2", [
     crewId,
     since,
@@ -135,6 +144,7 @@ async function buildFeed(ctx: Context, crewId: string): Promise<KeyedItem[]> {
     ...parties.map((p) => ({ kind: "party" as const, key: `party:${p.id}`, at: p.created_at, partyId: p.id, name: p.name, by: p.created_by })),
     ...polls.map((p) => ({ kind: "poll" as const, key: `poll:${p.id}`, at: p.created_at, title: p.title, by: p.created_by })),
     ...reigns.map((r) => ({ kind: "takeover" as const, key: `takeover:${r.id}`, at: r.started_at, venueName: r.name, userId: r.user_id })),
+    ...cheats.map((c) => ({ kind: "cheat" as const, key: `cheat:${c.id}`, at: c.at, venueName: c.name, userId: c.user_id })),
     ...grouped(joined, (r) => `joined:${night(r.at)}`).map((g) => ({ kind: "joined" as const, key: g.key, at: g.at, userIds: g.userIds })),
     ...quotes.map((q) => ({ kind: "quote" as const, key: `quote:${q.id}`, at: q.created_at, partyName: q.name, text: q.text, saidBy: q.said_by })),
     ...grouped(reactions, (r) => `reactions:${r.party_id}`).map((g) => ({

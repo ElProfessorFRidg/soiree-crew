@@ -29,7 +29,9 @@ export type LiveEvent =
   /** O-43: a friend request, an answer or a removal; the friends list refetches. */
   | { type: "friends.changed" }
   /** COM-08: a moderation decision about my content or my report (statement of reasons). */
-  | { type: "moderation.notice" };
+  | { type: "moderation.notice" }
+  /** O-38: a new inbox item; `alert` when the phone should show it (not muted, not held for the morning). */
+  | { type: "notification"; id: string; kind: string; alert: boolean };
 
 /**
  * Pushes hints, never data: a device that hears "party.changed" refetches what

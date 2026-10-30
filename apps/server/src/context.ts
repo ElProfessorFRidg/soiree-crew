@@ -4,6 +4,7 @@ import type { Sealer } from "./crypto";
 import { hashToken } from "./crypto";
 import type { Db } from "./db";
 import type { LiveHub } from "./live";
+import type { PushService } from "./notifications/push";
 
 export interface Context {
   db: Db;
@@ -25,6 +26,8 @@ export interface Context {
   operators?: string[];
   /** <ai_features>: the language model, when the server is configured for one. */
   ai?: AiProvider | null;
+  /** O-38: APNs and FCM senders, when the server is configured for them; the inbox works without. */
+  push?: PushService | null;
 }
 
 export class HttpError extends Error {

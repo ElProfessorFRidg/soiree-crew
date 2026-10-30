@@ -4,6 +4,7 @@ import { estimateBac, type BodyProfile, type DrinkIntake } from "@crew/bac";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { assertPublishable } from "../posting";
 import { intakeOf, PRE_PARTY_MS, sweepParty, tellUnwell } from "../nightWatch";
+import { notifyRecapReady } from "../notifications/producers";
 import { partySchema, responseSchema } from "../schemas";
 
 const HOUR_MS = 3_600_000;
@@ -534,11 +535,11 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
     ctx.live.notify(members.map((m) => m.user_id), { type: "party.changed", partyId: party.id });
     // push: party.stripReady (JOY-09: the party is over, the photo strip is ready; after quiet hours, QOL-20)
     // N-25: the night is over; whoever went and is not home yet is asked.
-    // push: party.homeCheck
     ctx.live.notify(
       members.filter((m) => m.response === "going" && m.home_safe_at === null).map((m) => m.user_id),
       { type: "party.homeCheck", partyId: party.id },
     );
+    await notifyRecapReady(ctx, party.id);
     return { ok: true };
   });
 }

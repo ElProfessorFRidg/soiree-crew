@@ -2,11 +2,13 @@ import { createHash } from "node:crypto";
 import { existsSync, rmSync } from "node:fs";
 import { aiProvider } from "./ai";
 import { buildApp } from "./app";
+import type { Context } from "./context";
 import { Sealer } from "./crypto";
 import { connectPglite, connectPostgres, migrate } from "./db";
 import { LiveHub } from "./live";
 import { sweepLiveParties } from "./nightWatch";
-import type { Context } from "./context";
+import { startNotificationSweeper } from "./notifications/producers";
+import { pushFromEnv } from "./notifications/push";
 
 // Configuration comes from the environment only.
 //   DATABASE_URL  postgres://... (falls back to an on-disk PGlite database in ./data for local use)
@@ -20,6 +22,8 @@ import type { Context } from "./context";
 //   DOWNLOADS_DIR   where deploy/android drops the APK it builds, served at /download/soiree-crew.apk
 //   OPERATOR_USERNAMES   comma-separated usernames who review venue claims (COM-11)
 //   SEASON_VARIANTS   optional JSON, {"2026-12": "games"} (TER-12)
+//   APNS_KEY_ID, APNS_TEAM_ID, APNS_KEY, APNS_TOPIC, APNS_PRODUCTION   optional, iOS push (O-38)
+//   FCM_SERVICE_ACCOUNT, or FCM_PROJECT_ID + FCM_CLIENT_EMAIL + FCM_PRIVATE_KEY   optional, Android push (O-38)
 
 const dataKey = process.env.DATA_KEY;
 if (!dataKey) {
@@ -38,8 +42,10 @@ function trustProxy(value: string | undefined): boolean | number {
   const hops = Number.parseInt(value, 10);
   return Number.isFinite(hops) && hops > 0 ? hops : false;
 }
+const push = pushFromEnv(process.env, (message) => console.error(message));
 const context: Context = {
   db,
+  push,
   sealer: new Sealer(dataKey),
   live: new LiveHub(),
   now: () => Date.now(),
@@ -58,6 +64,9 @@ const context: Context = {
 const app = await buildApp(context, { logger: true, trustProxy: trustProxy(process.env.TRUST_PROXY) });
 
 await app.listen({ port, host: "0.0.0.0" });
+app.log.info(`push: iOS ${push?.enabled("ios") ? "on" : "off"}, Android ${push?.enabled("android") ? "on" : "off"}`);
+// N-25, N-29, O-41, QOL-20: notifications nobody's request causes.
+const stopSweeper = startNotificationSweeper(context, (error) => app.log.error(error));
 
 // N-29, N-36, O-88: once a minute the server looks over the live parties and tells the crews.
 setInterval(() => {
@@ -68,6 +77,8 @@ let closing = false;
 const shutdown = () => {
   if (closing) return;
   closing = true;
+  stopSweeper();
+  push?.close();
   // Open sockets (the live channel) can hold app.close() forever: give it 3 s, then close the database anyway.
   const grace = new Promise((resolve) => setTimeout(resolve, 3_000).unref());
   void Promise.race([app.close(), grace])

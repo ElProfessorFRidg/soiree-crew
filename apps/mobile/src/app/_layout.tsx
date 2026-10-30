@@ -48,6 +48,7 @@ import { LaunchCurtain } from "@/ui/LaunchCurtain";
 import { purgePlainFiles } from "@/chat/media";
 import { watchLiveActivity } from "@/system/liveActivity";
 import { PrivacyCover } from "@/ui/PrivacyCover";
+import { handleNotificationResponse, prepareNotifications } from "@/notify/push";
 
 /** Expo Router shows this instead of a crashed screen (any route below this layout). */
 export { CrashScreen as ErrorBoundary };
@@ -115,6 +116,11 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
+    // QOL-03: action buttons and Android channels speak the app's language.
+    if (ready) void prepareNotifications().catch(() => undefined);
+  }, [ready, language]);
+
+  useEffect(() => {
     // Server transport, socket and delta sync follow the session (ADR 0002).
     if (hydrated && sessionReady) connect(session);
   }, [hydrated, sessionReady, session]);
@@ -167,6 +173,8 @@ export default function RootLayout() {
         void muteUntilMorning();
         return;
       }
+      // O-38, QOL-03: crew notifications and their action buttons.
+      if (handleNotificationResponse(response)) return;
       const url = response.notification.request.content.data?.url;
       if (typeof url === "string" && url.startsWith("/"))
         router.push(url as never);
@@ -244,6 +252,8 @@ export default function RootLayout() {
                 />
                 <Stack.Screen name="recaps" />
                 <Stack.Screen name="settings" />
+                <Stack.Screen name="notifications" />
+                <Stack.Screen name="notification-settings" />
                 <Stack.Screen name="home" />
                 <Stack.Screen name="where-to" />
                 <Stack.Screen name="join" options={{ animation: "fade" }} />

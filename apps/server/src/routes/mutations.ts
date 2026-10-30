@@ -4,6 +4,7 @@ import { z, type ZodError } from "zod";
 import { requireUser, type Context } from "../context";
 import type { Db } from "../db";
 import { checkDanger } from "../nightWatch";
+import { checkOvertakes } from "../notifications/producers";
 import { mutationBatchSchema, mutationSchema, type MutationInput } from "../schemas";
 
 /** Tolerance for clock skew between the phone and the server. */
@@ -265,6 +266,7 @@ export function mutationRoutes(app: FastifyInstance, ctx: Context): void {
     for (const partyId of changedParties) {
       const members = await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1 and response = 'going'", [partyId]);
       ctx.live.notify(members.map((m) => m.user_id), { type: "party.changed", partyId });
+      await checkOvertakes(ctx, partyId);
     }
     ctx.live.notify([user.id], { type: "sync", reason: "own_write" });
     // O-88: a drink can carry the estimate past 2.0 g/L; the minute sweep catches the rise that follows.

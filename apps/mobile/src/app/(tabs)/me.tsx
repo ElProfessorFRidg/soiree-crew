@@ -18,6 +18,7 @@ import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { vaultClosed } from "@/vault/vault";
+import { NotificationBell } from "@/notify/NotificationBell";
 
 export default function MeScreen() {
   const i18n = useT();
@@ -58,7 +59,7 @@ export default function MeScreen() {
   };
 
   return (
-    <Screen title={i18n.t("profile.title")} withToasts>
+    <Screen title={i18n.t("profile.title")} withToasts trailing={<NotificationBell />}>
       <UpdateNotice />
       <Text variant="label">{i18n.t("profile.body")}</Text>
       <ProfileFields draft={draft} onChange={onProfileChange} />

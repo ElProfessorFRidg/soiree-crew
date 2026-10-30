@@ -8,6 +8,7 @@ import { crewTimeZone, currentSeason } from "../territory";
 import { gameWins } from "./games";
 import { dayBoundaries, dayBoundaryOf, nightOf, offsetMinutes } from "../time";
 import { CREW_KINDS } from "../schemas";
+import { checkOvertakes } from "../notifications/producers";
 
 const DAY_MS = 86_400_000;
 
@@ -28,7 +29,7 @@ interface DrinkRow {
 }
 
 /** RANK-09: the drinking leaderboard is on for the crew build and can be switched off for a public release. */
-function drinkingLeaderboardEnabled(): boolean {
+export function drinkingLeaderboardEnabled(): boolean {
   return (process.env.DRINKING_LEADERBOARD ?? "on") !== "off";
 }
 
@@ -67,7 +68,7 @@ async function periodBounds(ctx: Context, crewId: string, period: string, partyI
 type Metric = z.infer<typeof querySchema>["metric"];
 
 /** One board over [from, to): verified drinks only, nothing past the danger cap (RANK-06, RANK-07). */
-async function computeBoard(ctx: Context, crewId: string, from: number, to: number, timeZone: string, metric: Metric, viewerId: string) {
+export async function computeBoard(ctx: Context, crewId: string, from: number, to: number, timeZone: string, metric: Metric, viewerId: string) {
   const members = await ctx.db.query<{ user_id: string; display_name: string; sealed: string | null }>(
     `select m.user_id, u.display_name, b.sealed from crew_members m join users u on u.id = m.user_id
      left join body_profiles b on b.user_id = m.user_id
@@ -275,6 +276,8 @@ export function leaderboardRoutes(app: FastifyInstance, ctx: Context): void {
     ]);
     const members = await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1 and response = 'going'", [drink.party_id]);
     ctx.live.notify(members.map((m) => m.user_id), { type: "party.changed", partyId: drink.party_id });
+    // A confirmation can make a drink count (AC-07), and so move the board.
+    await checkOvertakes(ctx, drink.party_id);
     return { ok: true };
   });
 

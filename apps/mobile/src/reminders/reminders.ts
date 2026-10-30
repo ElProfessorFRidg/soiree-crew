@@ -6,6 +6,7 @@ import { createTranslator, type Translator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
 import { variantKey } from "@/i18n/variants";
 import { useAppStore } from "@/state/store";
+import { REMOTE_PUSH } from "@/notify/remote";
 
 const MINUTE_MS = 60_000;
 const WATER_ID = "water-reminder";
@@ -21,8 +22,9 @@ const supported = Platform.OS === "ios" || Platform.OS === "android";
 
 Notifications.setNotificationHandler({
   handleNotification: async (notification) => ({
-    // The night notification updates quietly in the list, never as a banner.
-    shouldShowBanner: notification.request.identifier !== "night-in-progress",
+    // The night notification updates quietly in the list, never as a banner. Crew notifications
+    // (O-38) show as a toast inside the app instead, so the banner would say it twice.
+    shouldShowBanner: notification.request.identifier !== "night-in-progress" && typeof notification.request.content.data?.k !== "string",
     shouldShowList: true,
     shouldPlaySound: false,
     shouldSetBadge: false,
@@ -301,7 +303,8 @@ export async function notifyRecapReady(party: { id: string; name: string }): Pro
   const { recapNotified, preferences } = useAppStore.getState();
   if (recapNotified.includes(party.id)) return;
   useAppStore.setState({ recapNotified: [...recapNotified, party.id].slice(-40) });
-  if (!preferences.notifyRecap || !(await allowed())) return;
+  // With push, the server sends it (O-38); without, this local one still waits out the quiet hours.
+  if (REMOTE_PUSH || !preferences.notifyRecap || !(await allowed())) return;
   const i18n = createTranslator(preferences.language);
   const at = afterQuietHours(Date.now(), preferences.quietFromHour, preferences.quietToHour);
   await Notifications.scheduleNotificationAsync({

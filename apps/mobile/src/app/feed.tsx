@@ -44,6 +44,7 @@ const ICONS: Record<FeedLine["kind"], AnyIconName> = {
   party: "glass",
   poll: "cal",
   takeover: "crown",
+  cheat: "flag",
   joined: "users",
   quote: "chat",
   reactions: "star",
@@ -305,6 +306,8 @@ export default function FeedScreen() {
         return { title: i18n.t("feed.poll", { who: nameOf(item.by), title: item.title }), onPress: () => router.push({ pathname: "/polls", params: { crewId } }) };
       case "takeover":
         return { title: i18n.t("feed.takeover", { who: nameOf(item.userId), venue: item.venueName }) };
+      case "cheat":
+        return { title: i18n.t("feed.cheat", { who: nameOf(item.userId), venue: item.venueName }) };
       case "joined":
         return { title: i18n.plural("feed.joined", item.userIds.length, { who: people(item.userIds, nameOf, i18n) }) };
       case "quote":

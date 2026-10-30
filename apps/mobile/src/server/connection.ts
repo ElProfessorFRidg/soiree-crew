@@ -22,6 +22,8 @@ import { backupIfDue } from "@/chat/backup";
 import { onChatHint, onTyping, startChat } from "@/chat/engine";
 import { onCheers } from "@/party/cheers";
 import { checkBudget } from "@/money/budgetAlert";
+import { clearInbox, refreshInbox } from "@/notify/inbox";
+import { forgetPush, onNotificationHint, registerForPush } from "@/notify/push";
 
 type Deleted = { id: string; deleted: true };
 interface SyncResponse {
@@ -133,8 +135,24 @@ function openSocket(session: ServerSession): void {
   };
   ws.onmessage = (event) => {
     try {
-      const message = JSON.parse(String(event.data)) as { type: string; partyId?: string; crewId?: string; conversationId?: string; userId?: string; withName?: string; proof?: boolean; mention?: boolean };
+      const message = JSON.parse(String(event.data)) as {
+        type: string;
+        partyId?: string;
+        crewId?: string;
+        conversationId?: string;
+        userId?: string;
+        withName?: string;
+        proof?: boolean;
+        mention?: boolean;
+        id?: string;
+        kind?: string;
+        alert?: boolean;
+      };
       emitLiveHint(message.type);
+      // O-38: a new inbox item; the inbox decides how it shows.
+      if (message.type === "notification" && message.id && message.kind) {
+        void onNotificationHint({ id: message.id, kind: message.kind, alert: Boolean(message.alert) }).catch(() => undefined);
+      }
       if (message.type === "cheers") onCheers(message.withName ?? "", Boolean(message.proof));
       if (message.type === "chat.typing" && message.conversationId && message.userId) onTyping(message.conversationId, message.userId);
       else if (message.type.startsWith("chat.")) onChatHint(message.type, message.conversationId);
@@ -158,7 +176,8 @@ function openSocket(session: ServerSession): void {
         onPartyAlert(message.type, message.partyId, message.userId);
         void refreshLiveParty(message.partyId).catch(() => undefined);
       }
-      if (message.type === "security.newDevice") showToast({ message: createTranslator(useAppStore.getState().preferences.language).t("account.newDevice") });
+      // With the inbox (O-38) the new-device notice arrives as a notification; older servers send only this hint.
+      if (message.type === "security.newDevice" && !hasInbox) showToast({ message: createTranslator(useAppStore.getState().preferences.language).t("account.newDevice") });
     } catch {
       // A malformed hint is ignored: the next foreground sync catches up anyway.
     }
@@ -176,9 +195,17 @@ function openSocket(session: ServerSession): void {
   };
 }
 
+/** Servers without the notification inbox answer 404: the app then keeps the older hints. */
+let hasInbox = false;
+
 async function refreshAll(): Promise<void> {
   await flush();
-  await Promise.allSettled([pull(), refreshCrews(), refreshParties(), refreshSos(), refreshInvitations()]);
+  // N-35: the inbox is fetched on every return to the foreground, which also covers builds without push.
+  const inbox = refreshInbox().then(
+    () => (hasInbox = true),
+    () => undefined,
+  );
+  await Promise.allSettled([pull(), refreshCrews(), refreshParties(), refreshSos(), refreshInvitations(), inbox]);
   await Promise.allSettled(useCrewData.getState().crews.map((crew) => refreshRadar(crew.id)));
 }
 
@@ -197,6 +224,9 @@ export function connect(session: ServerSession | null): void {
   if (!session) {
     clearInvitations();
     setTransport(new LocalTransport());
+    clearInbox();
+    forgetPush();
+    hasInbox = false;
     return;
   }
   setTransport(new HttpTransport());
@@ -208,6 +238,7 @@ export function connect(session: ServerSession | null): void {
   useAppStore.setState({ accountUserId: session.userId });
   uploadLocalHistory();
   void refreshAll();
+  void registerForPush().catch(() => undefined);
   openSocket(session);
 
   let lastForeground = 0;

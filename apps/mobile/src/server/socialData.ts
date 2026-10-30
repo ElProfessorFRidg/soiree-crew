@@ -132,6 +132,8 @@ export type FeedLine =
   | { kind: "party"; at: number; partyId: string; name: string; by: string }
   | { kind: "poll"; at: number; title: string; by: string }
   | { kind: "takeover"; at: number; venueName: string; userId: string }
+  /** AC-09: a refused check-in nobody overturned. */
+  | { kind: "cheat"; at: number; venueName: string; userId: string }
   | { kind: "joined"; at: number; userIds: string[] }
   | { kind: "quote"; at: number; partyName: string; text: string; saidBy: string | null }
   | { kind: "reactions"; at: number; partyName: string; partyId: string; count: number };

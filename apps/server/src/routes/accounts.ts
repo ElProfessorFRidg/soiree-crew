@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { bearer, requireUser, HttpError, type Context } from "../context";
 import { DUMMY_PASSWORD_HASH, hashPassword, needsRehash, hashToken, newCode, newId, newToken, verifyPassword } from "../crypto";
+import { notifyNewDevice } from "../notifications/producers";
 import { RateLimiter } from "../ratelimit";
 import { deleteChatBackup } from "./chat";
 import { deletePhotoFiles } from "./photos";
@@ -89,6 +90,7 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
     if (needsRehash(user.password_hash)) await ctx.db.query("update credentials set password_hash = $2 where user_id = $1", [user.id, await hashPassword(input.password)]);
     const token = await createSession(ctx, user.id, input.deviceLabel ?? "");
     ctx.live.notify([user.id], { type: "security.newDevice" });
+    await notifyNewDevice(ctx, user.id);
     return reply.status(201).send({ user: { id: user.id, username: user.username, displayName: user.display_name }, token });
   });
 
@@ -156,6 +158,7 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
     const token = await createSession(ctx, user.id, input.deviceLabel ?? "");
     // SEC-07: the phones already signed in hear about the new one.
     ctx.live.notify([user.id], { type: "security.newDevice" });
+    await notifyNewDevice(ctx, user.id);
     return reply.status(201).send({ user: { id: user.id, username: user.username, displayName: user.display_name }, token });
   });
 

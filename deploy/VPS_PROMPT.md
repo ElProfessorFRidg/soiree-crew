@@ -27,6 +27,7 @@ Ask me for the domain (for example `crew.mydomain.tld`). Check the DNS A/AAAA re
   - `SERVER_NAME`, `SERVER_DESCRIPTION`: ask me. `PUBLIC_SERVER=true`.
   - `OPERATOR_IDS`: leave empty for now (see step 7).
   - Leave the AI variables empty unless I give you a key.
+  - Push notifications (O-38): leave `APNS_*` and `FCM_*` empty unless I give you an APNs .p8 key (with its key id, my team id, `APNS_TOPIC=app.soireecrew.mobile`, and `APNS_PRODUCTION=true` only for TestFlight or App Store builds) or a Firebase service-account JSON. Store them as secrets, never in a file in the repo. The server works without them: the in-app inbox and the live socket carry notifications. After a deploy with them, check the start log says `push: iOS on`. The server must reach `api.push.apple.com` (or `api.sandbox.push.apple.com`) on 443 over HTTP/2, and `oauth2.googleapis.com` plus `fcm.googleapis.com` for Android.
 - Make sure nothing publishes port 8787 or 5432 on the host: only the proxy reaches the API, and PostgreSQL is reachable from the API container only.
 - Persistent volumes: `pgdata` and `uploads` must survive redeploys.
 - Turn on automatic deploys on push to `main` only if I say yes.
