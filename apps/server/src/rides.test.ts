@@ -174,6 +174,6 @@ describe("drink prices per bar (N-09)", () => {
     await put(malik, 750);
     await put(ines, 900);
     const prices = (await app.inject({ method: "GET", url: `/v1/venues/${venueId}/prices`, headers: malik.auth })).json() as { prices: { kind: string; amount: number; reports: number }[] };
-    expect(prices.prices).toEqual([{ kind: "pint", currency: "EUR", amount: 750, reports: 3 }]);
+    expect(prices.prices).toEqual([expect.objectContaining({ kind: "pint", currency: "EUR", amount: 750, reports: 3 })]);
   });
 });

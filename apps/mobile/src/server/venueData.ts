@@ -3,6 +3,7 @@ import { Platform } from "react-native";
 import * as Location from "expo-location";
 import { create } from "zustand";
 import { newId } from "@/state/store";
+import type { VenueFacts, WeekSchedule } from "@/venues/hours";
 import { api } from "./api";
 import { useCrewData } from "./crewData";
 
@@ -24,13 +25,20 @@ export interface VenueSummary {
   /** TER-11: counts for territories (two members on two nights, or the HQ). */
   validated?: boolean;
   hereNow: number;
+  /** TER-01 filters, from the owner's or the crew's hours. Null when nobody entered hours. */
+  openNow?: boolean | null;
+  happyNow?: boolean;
 }
 
 export interface VenuePage {
   validated?: boolean;
   /** TER-12: this month's rule twist. */
   variant?: "none" | "discovery" | "games" | "organiser" | "regulars";
-  venue: { id: string; crewId: string; name: string; kind: VenueKind; lat: number; lng: number; address: string };
+  venue: { id: string; crewId: string; name: string; kind: VenueKind; lat: number; lng: number; address: string; isHq?: boolean };
+  /** N-08, COM-01: hours and happy hour, the owner's once claimed, else the crew's (editable). */
+  facts?: VenueFacts;
+  /** N-08: whether I may make this the crew's HQ, or stop it being one. */
+  canSetHq?: boolean;
   season: string;
   bossId: string | null;
   top: { userId: string; name: string; points: number; nights: number }[];
@@ -73,11 +81,86 @@ export function fetchVenuePage(venueId: string): Promise<VenuePage> {
   return api<VenuePage>(`/v1/venues/${venueId}`);
 }
 
-export async function addVenue(crewId: string, input: { name: string; kind: VenueKind; lat: number; lng: number; address?: string }): Promise<string> {
+export async function addVenue(crewId: string, input: { name: string; kind: VenueKind; lat: number; lng: number; address?: string; isHq?: boolean }): Promise<string> {
   const id = newId();
   await api(`/v1/crews/${crewId}/venues`, { method: "POST", body: { id, ...input } });
   await refreshVenues(crewId);
   return id;
+}
+
+/** N-08: the address or the HQ of a venue, after it was added. */
+export function updateVenue(venueId: string, input: { address?: string; isHq?: boolean }): Promise<unknown> {
+  return api(`/v1/venues/${venueId}`, { method: "PATCH", body: input });
+}
+
+/** N-08: the crew's hours for a venue nobody has claimed. */
+export function saveVenueHours(venueId: string, schedule: WeekSchedule): Promise<unknown> {
+  return api(`/v1/venues/${venueId}/hours`, { method: "PUT", body: schedule });
+}
+
+export interface VenuePhoto {
+  id: string;
+  partyId: string;
+  userId: string;
+  width: number;
+  height: number;
+  at: number;
+  url: string;
+}
+
+/** TER-05: album photos of the nights here that I was part of. */
+export function fetchVenuePhotos(venueId: string): Promise<{ photos: VenuePhoto[] }> {
+  return api(`/v1/venues/${venueId}/photos`);
+}
+
+export type WhereToReason = "happyNow" | "friendsHere" | "wanted" | "close" | "cheap" | "favourite" | "toConquer" | "openNow";
+
+export interface WhereToOption {
+  venueId: string;
+  name: string;
+  kind: VenueKind;
+  lat: number;
+  lng: number;
+  address: string;
+  /** False for a place from the want-to-go list that the crew has not added. */
+  crewVenue: boolean;
+  openNow: boolean | null;
+  happyNow: boolean;
+  pint: number | null;
+  average: number | null;
+  currency: string | null;
+  distanceM: number | null;
+  wanted: boolean;
+  hereNow: number;
+  explored: boolean;
+  visits: number;
+  /** Strongest first: what makes this option good tonight. */
+  reasons: WhereToReason[];
+}
+
+export interface WhereToResult {
+  total: number;
+  suggestion: string | null;
+  /** TER-08: a never-visited venue to conquer. */
+  conquest: string | null;
+  options: WhereToOption[];
+}
+
+/** N-11: ranked options for the crew, with or without a party. */
+export function fetchWhereTo(
+  crewId: string,
+  filters: { here?: { lat: number; lng: number } | null; openNow?: boolean; happyNow?: boolean; maxPrice?: number; currency?: string },
+): Promise<WhereToResult> {
+  const params = new URLSearchParams();
+  if (filters.here) {
+    params.set("lat", String(filters.here.lat));
+    params.set("lng", String(filters.here.lng));
+  }
+  if (filters.openNow) params.set("open", "1");
+  if (filters.happyNow) params.set("happy", "1");
+  if (filters.maxPrice) params.set("maxPrice", String(filters.maxPrice));
+  if (filters.currency) params.set("currency", filters.currency);
+  return api(`/v1/crews/${crewId}/where-to?${params.toString()}`);
 }
 
 export type LocationFailure = "denied" | "unavailable";

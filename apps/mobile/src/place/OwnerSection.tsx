@@ -10,6 +10,7 @@ import { Panel, Tag } from "@/ui/controls";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { showFailure } from "@/server/errors";
+import { HoursEditor } from "@/venues/HoursEditor";
 
 /** COM-11: the "managed by the venue" label, its hours, and for the owner the editor; else the claim form. */
 export function OwnerSection({ page, onChanged }: { page: PlacePage; onChanged: () => void }) {
@@ -32,7 +33,8 @@ export function OwnerSection({ page, onChanged }: { page: PlacePage; onChanged: 
   return (
     <>
       {page.claimed ? <Tag tone="ok" icon="check" label={i18n.t("place.claimed")} /> : null}
-      {page.info && !page.isOwner ? (
+      {/* Visitors see the hours in the place's HoursPanel (COM-01); older servers send only `info`. */}
+      {page.info && !page.isOwner && !page.facts ? (
         <Panel>
           {page.info.hours ? <Text>{i18n.t("place.hoursLine", { hours: page.info.hours })}</Text> : null}
           {page.info.happyHours ? <Text>{i18n.t("place.happyLine", { hours: page.info.happyHours })}</Text> : null}
@@ -42,6 +44,22 @@ export function OwnerSection({ page, onChanged }: { page: PlacePage; onChanged: 
       {page.isOwner ? (
         <Panel>
           <Text variant="label">{i18n.t("place.ownerTitle")}</Text>
+          {/* N-08: the weekly schedule is what "open now" and the happy hour filters read. */}
+          <Text variant="small">{i18n.t("place.ownerSchedule")}</Text>
+          <HoursEditor
+            initial={page.facts?.source === "owner" ? page.facts.schedule : null}
+            busy={busy}
+            onSave={(schedule) => {
+              setBusy(true);
+              void savePlaceInfo(venueId, { hours: hours.trim(), happyHours: happyHours.trim(), schedule })
+                .then(() => {
+                  haptic.confirmed();
+                  onChanged();
+                })
+                .catch(failed)
+                .finally(() => setBusy(false));
+            }}
+          />
           <Field label={i18n.t("place.hoursField")} value={hours} onChangeText={setHours} maxLength={300} placeholder={i18n.t("place.hoursPlaceholder")} />
           <Field label={i18n.t("place.happyField")} value={happyHours} onChangeText={setHappyHours} maxLength={200} />
           <Button

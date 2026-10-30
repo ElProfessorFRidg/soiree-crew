@@ -34,6 +34,8 @@ export interface UserPreferences {
   quietToHour: number;
   /** QOL-18: the ride app picked once and remembered. Null until chosen. */
   rideApp: string | null;
+  /** QOL-18: the maps app for directions. Null means the phone's own (Apple Maps on iOS, Google Maps elsewhere). */
+  mapsApp: "apple" | "google" | "waze" | null;
 }
 
 export interface DeviceLocale {
@@ -79,6 +81,7 @@ export function defaultPreferences(device: DeviceLocale): UserPreferences {
     quietFromHour: 22,
     quietToHour: 9,
     rideApp: null,
+    mapsApp: null,
   };
 }
 

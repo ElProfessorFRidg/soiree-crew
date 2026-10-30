@@ -19,8 +19,9 @@ import { Text } from "@/ui/Text";
 import { fetchFriendLocations, type FriendLocation } from "@/location/liveShare";
 import { useEcoInterval } from "@/power/eco";
 import { Avatar } from "@/ui/Avatar";
+import { OpenTags } from "@/venues/HoursPanel";
 
-type Filter = "all" | "friends" | "fog";
+type Filter = "all" | "friends" | "fog" | "open" | "happy";
 const MAP_HEIGHT_RATIO = 0.46;
 
 function VenuePin({ venue, selected, onPress }: { venue: VenueSummary; selected: boolean; onPress: () => void }) {
@@ -28,28 +29,40 @@ function VenuePin({ venue, selected, onPress }: { venue: VenueSummary; selected:
   const color = venue.bossId ? avatarColor(venue.bossId) : theme.surfaceRaised;
   const size = selected ? 40 : 30;
   return (
-    <ScalePressable accessibilityLabel={venue.name} onPress={onPress} style={{ alignItems: "center" }}>
+    <ScalePressable accessibilityLabel={venue.bossName ? `${venue.name}, ${venue.bossName}` : venue.name} onPress={onPress} style={{ alignItems: "center" }}>
       {venue.bossId ? (
         <Animated.View entering={ZoomIn.duration(duration.crownDrop).easing(easings.overshoot)}>
           <Icon name="crown" size={16} color={theme.amber} />
         </Animated.View>
       ) : null}
-      <View
-        style={{
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          backgroundColor: color,
-          borderWidth: selected ? 3 : 2,
-          borderColor: selected ? theme.text : theme.bg,
-          // TER-08 fog of war: never-visited venues are faded.
-          opacity: venue.explored ? 1 : 0.45,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Icon name={venue.kind === "club" ? "star" : venue.kind === "home" ? "home" : "glass"} size={selected ? 20 : 15} color={palette.accent.onAccent} />
-      </View>
+      {venue.bossId && venue.bossName ? (
+        // TER-01: the boss's own avatar, in their colour across the app.
+        <View style={{ opacity: venue.explored ? 1 : 0.45 }}>
+          <Avatar personId={venue.bossId} name={venue.bossName} size={size} ring={selected ? theme.text : theme.bg} />
+        </View>
+      ) : (
+        <View
+          style={{
+            width: size,
+            height: size,
+            borderRadius: size / 2,
+            backgroundColor: color,
+            borderWidth: selected ? 3 : 2,
+            borderColor: selected ? theme.text : theme.bg,
+            // TER-08 fog of war: never-visited venues are faded.
+            opacity: venue.explored ? 1 : 0.45,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Icon name={venue.kind === "club" ? "star" : venue.kind === "home" ? "home" : "glass"} size={selected ? 20 : 15} color={palette.accent.onAccent} />
+        </View>
+      )}
+      {venue.happyNow ? (
+        <View style={[styles.happyBadge, { backgroundColor: theme.amber }]}>
+          <Icon name="glass" size={11} color={palette.accent.onAccent} />
+        </View>
+      ) : null}
       {venue.hereNow > 0 ? (
         <View style={[styles.hereBadge, { backgroundColor: theme.ok }]}>
           <Text variant="tab" color={palette.accent.onAccent}>
@@ -103,6 +116,9 @@ export default function BarsScreen() {
     const all = data?.venues ?? [];
     if (filter === "friends") return all.filter((v) => v.hereNow > 0);
     if (filter === "fog") return all.filter((v) => !v.explored && v.kind !== "home");
+    // TER-01: known to be open now, or in happy hour now, from the owner's or the crew's hours.
+    if (filter === "open") return all.filter((v) => v.openNow === true);
+    if (filter === "happy") return all.filter((v) => v.happyNow === true);
     return all;
   }, [data, filter]);
 
@@ -165,6 +181,8 @@ export default function BarsScreen() {
         {(
           [
             ["all", "bars.all"],
+            ["open", "bars.openNow"],
+            ["happy", "bars.happyHour"],
             ["friends", "bars.friendsHere"],
             ["fog", "bars.toConquer"],
           ] as const
@@ -181,6 +199,7 @@ export default function BarsScreen() {
               {selected.bossName ? <Tag label={i18n.t("bars.boss", { name: selected.bossName })} tone="amber" icon="crown" /> : <Tag label={i18n.t("bars.noBoss")} />}
               {!selected.explored ? <Tag label={i18n.t("bars.fog")} /> : null}
               {selected.hereNow > 0 ? <Tag label={i18n.plural("bars.hereNow", selected.hereNow)} tone="ok" /> : null}
+              <OpenTags openNow={selected.openNow ?? null} happyNow={selected.happyNow ?? false} />
             </View>
             <Text variant="small">{i18n.plural("bars.myPoints", selected.myPoints)}</Text>
             <View style={styles.actions}>
@@ -203,7 +222,18 @@ export default function BarsScreen() {
         </Animated.View>
       ) : !data?.venues.length ? (
         <Text>{i18n.t("bars.empty")}</Text>
+      ) : venues.length === 0 && (filter === "open" || filter === "happy") ? (
+        <Text variant="small">{i18n.t("bars.noHours")}</Text>
       ) : null}
+
+      {/* N-11: "Where to?" from here too, not only during a party. */}
+      <Button
+        label={i18n.t("whereTo.open")}
+        icon="dice"
+        variant="secondary"
+        height={48}
+        onPress={() => router.push({ pathname: "/where-to", params: livePartyId ? { id: livePartyId, crewId } : { crewId } })}
+      />
 
       <Button label={i18n.t("bars.addHere")} icon="plus" variant="outline" height={48} onPress={() => router.push({ pathname: "/add-venue", params: { crewId } })} />
     </Screen>
@@ -216,5 +246,6 @@ const styles = StyleSheet.create({
   tags: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   actions: { flexDirection: "row", gap: 10 },
   flex: { flex: 1 },
+  happyBadge: { position: "absolute", left: -6, top: 8, width: 18, height: 18, borderRadius: 9, alignItems: "center", justifyContent: "center" },
   hereBadge: { position: "absolute", right: -8, top: 8, minWidth: 18, height: 18, borderRadius: 9, alignItems: "center", justifyContent: "center", paddingHorizontal: 4 },
 });
