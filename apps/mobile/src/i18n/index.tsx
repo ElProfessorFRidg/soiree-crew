@@ -8,6 +8,7 @@ import { it } from "./it";
 import { pt } from "./pt";
 import { ru } from "./ru";
 import type { MessageKey, Messages, PluralForms, PluralKey } from "./types";
+import { pluralCategory } from "@crew/units";
 
 export type { MessageKey, PluralKey } from "./types";
 
@@ -44,7 +45,6 @@ export interface Translator {
 export function createTranslator(language: UiLanguage): Translator {
   const messages = catalogs[language];
   const locale = localeTags[language];
-  const rules = new Intl.PluralRules(locale);
   const integer = new Intl.NumberFormat(locale);
   const number = (value: number, digits = 0) =>
     new Intl.NumberFormat(locale, { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
@@ -62,7 +62,7 @@ export function createTranslator(language: UiLanguage): Translator {
     plural(key, count, params) {
       const forms = lookup(messages, key) as PluralForms | undefined;
       if (!forms) return key;
-      const category = rules.select(count);
+      const category = pluralCategory(language, count);
       const template = forms[category] ?? forms.other;
       return interpolate(template, { count, ...params }, formatParam);
     },

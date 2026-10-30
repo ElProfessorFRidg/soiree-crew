@@ -1,5 +1,5 @@
 // French copy of the games module. Tutoiement, plain in the controls, playful in the rules.
-// Plural entries use Intl.PluralRules categories: one, other.
+// Plural entries use CLDR categories (pluralCategory in @crew/units): one, other.
 
 export const fr = {
   crewCards: {

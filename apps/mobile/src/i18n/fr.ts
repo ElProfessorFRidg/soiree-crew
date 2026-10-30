@@ -1,5 +1,5 @@
 // French copy. Tutoiement, plain, specific (design/DESIGN.md §9, SLOP.md).
-// Plural entries use Intl.PluralRules categories: one, other.
+// Plural entries use CLDR categories (pluralCategory in @crew/units): one, other.
 
 export const fr = {
   common: {

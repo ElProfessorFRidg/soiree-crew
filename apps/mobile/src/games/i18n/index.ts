@@ -9,6 +9,7 @@ import { it } from "./it";
 import { pt } from "./pt";
 import { ru } from "./ru";
 import type { GameMessageKey, GameMessages, GamePluralKey, PluralForms } from "./types";
+import { pluralCategory } from "@crew/units";
 
 export type { GameMessageKey, GamePluralKey } from "./types";
 
@@ -43,7 +44,6 @@ export interface GameTranslator {
 export function createGameTranslator(language: UiLanguage): GameTranslator {
   const messages = catalogs[language];
   const locale = localeTags[language];
-  const rules = new Intl.PluralRules(locale);
   const integer = new Intl.NumberFormat(locale);
   const format = (n: number) => integer.format(n);
   return {
@@ -55,7 +55,7 @@ export function createGameTranslator(language: UiLanguage): GameTranslator {
     plural(key, count, params) {
       const forms = lookup(messages, key) as PluralForms | undefined;
       if (!forms) return key;
-      return interpolate(forms[rules.select(count)] ?? forms.other, { count, ...params }, format);
+      return interpolate(forms[pluralCategory(language, count)] ?? forms.other, { count, ...params }, format);
     },
   };
 }
