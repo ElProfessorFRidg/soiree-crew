@@ -1,7 +1,11 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
+import { GAMES, type GameId } from "@crew/games";
 import { breathRatio, countryRules, formatBacValue } from "@crew/units";
+import { useGameT } from "@/games/i18n";
+import { CRITERIA } from "@/server/placeData";
+import { useTheme } from "@/theme";
 import { drinkLabel } from "@/drinks/display";
 import type { DrinkKind } from "@/drinks/presets";
 import { useT } from "@/i18n";
@@ -25,11 +29,14 @@ import { showFailure } from "@/server/errors";
 import { confirmAction } from "@/ui/confirm";
 
 type ViewAs = "me" | "stranger" | "friend" | "crew";
+const GAMES_IDS = new Set<string>(GAMES.map((game) => game.id));
 
 /** O-39, PROF-02, PROF-07: a profile as the server lets the viewer see it. */
 export default function ProfileScreen() {
   const params = useLocalSearchParams<{ id?: string; as?: ViewAs }>();
   const i18n = useT();
+  const g = useGameT();
+  const theme = useTheme();
   const me = useSession((state) => state.session?.userId);
   const preferences = useAppStore((state) => state.preferences);
   const id = !params.id || params.id === "me" ? "me" : params.id;
@@ -66,6 +73,15 @@ export default function ProfileScreen() {
   const date = (at: number) => new Intl.DateTimeFormat(i18n.locale, { day: "numeric", month: "long" }).format(new Date(at));
   const titleLabel = (t: NonNullable<typeof s.titles>[number]) => (t.kind === "mayor" ? i18n.t("ranking.mayor", { venue: t.venueName ?? "" }) : i18n.t(`ranking.${t.kind}`));
   const empty = Object.keys(s).length === 0;
+  const nightsLine = s.nights
+    ? [
+        typeof s.nights.total === "number" ? i18n.plural("people.nightsTotal", s.nights.total) : null,
+        typeof s.nights.last30Days === "number" ? i18n.plural("people.nightsRecent", s.nights.last30Days) : null,
+      ]
+        .filter(Boolean)
+        .join(", ")
+    : "";
+  const gameName = (gameId: string) => (GAMES_IDS.has(gameId) ? g.t(`games.${gameId as GameId}.name`) : gameId);
   const whenLong = (at: number) => `${new Intl.DateTimeFormat(i18n.locale, { weekday: "long" }).format(new Date(at))} ${formatClock(at, i18n.language, preferences.hourCycle)}`;
 
   const friendButton = () => {
@@ -139,7 +155,17 @@ export default function ProfileScreen() {
           <Button label={i18n.t("privacySummary.open")} icon="eye" variant="outline" height={48} onPress={() => router.push("/privacy-summary")} />
         </>
       ) : (
-        friendButton()
+        <>
+          {friendButton()}
+          {/* COM-05: invite this person, and their crew, to one of my crew's parties. */}
+          <Button
+            label={i18n.t("people.inviteToParty")}
+            icon="glass"
+            variant="outline"
+            height={48}
+            onPress={() => router.push({ pathname: "/invite-to-party", params: { userId: profile.userId, name } })}
+          />
+        </>
       )}
 
       {empty ? <Text variant="small">{i18n.t("people.nothing")}</Text> : null}
@@ -186,43 +212,105 @@ export default function ProfileScreen() {
         </Panel>
       ) : null}
 
+      {s.reviews?.length ? (
+        // PROF-02: each review already filtered by its own audience (PROF-04) on the server.
+        <Panel>
+          <Text variant="label">{i18n.t("people.reviews")}</Text>
+          {s.reviews.map((r) => (
+            <View key={r.id} style={styles.review}>
+              <View style={styles.venue}>
+                <Text variant="h3" style={styles.flex} onPress={() => router.push({ pathname: "/place", params: { venueId: r.venueId } })}>
+                  {r.place}
+                </Text>
+                {r.hidden ? <Tag label={i18n.t("people.hiddenTag")} /> : null}
+                {r.audience && r.audience !== "public" ? <Tag label={i18n.t(`place.audience.${r.audience}`)} /> : null}
+              </View>
+              <Text variant="small">
+                {CRITERIA.filter((c) => r.ratings[c])
+                  .map((c) => `${i18n.t(`place.criteria.${c}`)} ${r.ratings[c]}/5`)
+                  .join(", ")}
+                {r.visitedAt ? `, ${date(r.visitedAt)}` : ""}
+              </Text>
+              {r.text ? <Text>{r.text}</Text> : null}
+              {r.photos.length ? (
+                <View style={styles.photos}>
+                  {r.photos.map((p) => (
+                    <Image key={p.id} source={{ uri: p.url }} accessibilityLabel={i18n.t("place.reviewPhoto")} style={[styles.photo, { backgroundColor: theme.surfaceRaised }]} />
+                  ))}
+                </View>
+              ) : null}
+              {!mine ? <ReportPanel targetKind="review" targetId={r.id} compact /> : null}
+            </View>
+          ))}
+        </Panel>
+      ) : null}
+
       {s.drinks ? (
         <Panel>
           <Text variant="label">{i18n.t("people.drinks")}</Text>
-          <Text>{i18n.plural("people.drinksTotal", s.drinks.total)}</Text>
-          {s.drinks.favourites.length ? (
+          {/* PROF-03: any figure may be missing, hidden by its owner. */}
+          {typeof s.drinks.total === "number" ? <Text>{i18n.plural("people.drinksTotal", s.drinks.total)}</Text> : null}
+          {s.drinks.favourites?.length ? (
             <Text variant="small">
               {i18n.t("people.favourites", { list: s.drinks.favourites.map((f) => drinkLabel({ kind: f.kind as DrinkKind }, i18n)).join(", ") })}
             </Text>
           ) : null}
-          {s.drinks.usualFirstDrink !== null ? (
+          {typeof s.drinks.usualFirstDrink === "number" ? (
             <Text variant="small">
               {i18n.t("people.usualFirst", { time: formatClock(new Date(2026, 0, 1, 12, s.drinks.usualFirstDrink).getTime(), i18n.language, preferences.hourCycle) })}
             </Text>
           ) : null}
-          {s.drinks.usualPacePerHour !== null ? <Text variant="small">{i18n.t("people.usualPace", { value: i18n.number(s.drinks.usualPacePerHour, 1) })}</Text> : null}
+          {typeof s.drinks.usualPacePerHour === "number" ? <Text variant="small">{i18n.t("people.usualPace", { value: i18n.number(s.drinks.usualPacePerHour, 1) })}</Text> : null}
+          {/* N-13: the median end of their nights. */}
+          {typeof s.drinks.usualLeaving === "number" ? (
+            <Text variant="small">
+              {i18n.t("people.usualLeaving", { time: formatClock(new Date(2026, 0, 1, 12, s.drinks.usualLeaving).getTime(), i18n.language, preferences.hourCycle) })}
+            </Text>
+          ) : null}
         </Panel>
       ) : null}
 
       {s.nights ? (
         <Panel>
           <Text variant="label">{i18n.t("people.nights")}</Text>
-          <Text>
-            {i18n.plural("people.nightsTotal", s.nights.total)}, {i18n.plural("people.nightsRecent", s.nights.last30Days)}
-          </Text>
+          {nightsLine ? <Text>{nightsLine}</Text> : null}
+          {/* O-43: dated history, sent by the server only to friends, crew mates and me. */}
+          {s.nights.history?.length ? (
+            <>
+              <Text variant="small">{i18n.t("people.nightHistory")}</Text>
+              {s.nights.history.map((n) => (
+                <Text key={n.at} variant="small">
+                  {`${date(n.at)}, ${n.name || i18n.t("people.aNightOut")}${n.venues.length ? ` · ${n.venues.join(", ")}` : ""}`}
+                </Text>
+              ))}
+            </>
+          ) : null}
         </Panel>
       ) : null}
 
-      {s.records ? (
+      {s.records && (typeof s.records.highestBac === "number" || typeof s.records.biggestNight === "number") ? (
         // PROF-06: plain text, no colour, no animation, no badge.
         <Panel>
           <Text variant="label">{i18n.t("people.records")}</Text>
-          {s.records.highestBac !== null ? (
+          {typeof s.records.highestBac === "number" ? (
             <Text>
               {i18n.t("people.highestBac", { value: `${formatBacValue(s.records.highestBac, preferences.bacUnit, ratio, i18n.locale)} ${i18n.t(`units.${preferences.bacUnit}`)}` })}
             </Text>
           ) : null}
-          <Text>{i18n.plural("people.biggestNight", s.records.biggestNight)}</Text>
+          {typeof s.records.biggestNight === "number" ? <Text>{i18n.plural("people.biggestNight", s.records.biggestNight)}</Text> : null}
+        </Panel>
+      ) : null}
+
+      {s.games && typeof s.games.wins === "number" ? (
+        // PROF-02, N-24: wins the server recorded at the end of games.
+        <Panel>
+          <Text variant="label">{i18n.t("people.games")}</Text>
+          <Text>{i18n.plural("people.gameWins", s.games.wins)}</Text>
+          {(s.games.byGame ?? []).map((g) => (
+            <Text key={g.gameId} variant="small">
+              {i18n.t("people.gameWinsLine", { game: gameName(g.gameId), count: i18n.number(g.wins) })}
+            </Text>
+          ))}
         </Panel>
       ) : null}
 
@@ -265,4 +353,7 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   tags: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   venue: { flexDirection: "row", alignItems: "center", gap: 8, minHeight: 48 },
+  review: { gap: 6, paddingVertical: 6 },
+  photos: { flexDirection: "row", gap: 6 },
+  photo: { width: 88, height: 88, borderRadius: 10 },
 });

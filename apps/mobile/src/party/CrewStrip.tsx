@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { breathRatio, countryRules, formatBacValue } from "@crew/units";
 import { space } from "@crew/design-tokens";
 import { useT } from "@/i18n";
+import { useCrewNames } from "@/crew/names";
 import { useLiveParty } from "@/server/crewData";
 import { useSession } from "@/server/session";
 import { useAppStore } from "@/state/store";
@@ -17,6 +18,7 @@ export function CrewStrip({ big }: { big?: boolean }) {
   const current = useLiveParty();
   const me = useSession((state) => state.session?.userId);
   const preferences = useAppStore((state) => state.preferences);
+  const nameOf = useCrewNames(current?.party.crewId);
   if (!current?.live) return null;
   const rules = countryRules(preferences.legalCountry);
   const others = current.live.members.filter((m) => m.userId !== me && m.response === "going");
@@ -42,13 +44,13 @@ export function CrewStrip({ big }: { big?: boolean }) {
           return (
             <ScalePressable
               key={member.userId}
-              accessibilityLabel={member.displayName}
+              accessibilityLabel={nameOf(member.userId, member.displayName)}
               onPress={() => router.push({ pathname: "/live", params: { id: current.party.id } })}
               style={[styles.cell, { minWidth: big ? 72 : 66 }]}
             >
-              <Avatar personId={member.userId} name={member.displayName} size={size} faded={member.homeSafeAt !== null} />
+              <Avatar personId={member.userId} name={nameOf(member.userId, member.displayName)} size={size} faded={member.homeSafeAt !== null} />
               <Text variant="h3" style={{ fontSize: 13 }} numberOfLines={2}>
-                {member.displayName}
+                {nameOf(member.userId, member.displayName)}
               </Text>
               {!big && member.bac !== null ? (
                 <Text variant="small" style={{ fontSize: 12 }}>

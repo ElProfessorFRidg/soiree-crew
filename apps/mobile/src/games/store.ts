@@ -3,6 +3,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import type { GameId, GameLevel, Player } from "@crew/games";
 import { newId } from "@/state/store";
+import { distinctName } from "@/crew/names";
 
 /** A player at the table. Guests have no account; crew members keep their crew id for the live BAC check. */
 export interface TablePlayer {
@@ -58,15 +59,8 @@ export const useGamesStore = create<GamesState>()(
   }),
 );
 
-/** Two players with the same name get told apart (QOL-11): « Lucas », « Lucas 2 ». */
-export function distinctName(name: string, taken: readonly string[]): string {
-  const base = name.trim();
-  const lower = new Set(taken.map((n) => n.toLocaleLowerCase()));
-  if (!lower.has(base.toLocaleLowerCase())) return base;
-  let n = 2;
-  while (lower.has(`${base} ${n}`.toLocaleLowerCase())) n += 1;
-  return `${base} ${n}`;
-}
+// QOL-11: the same rule as everywhere else in the app (crew/names.ts).
+export { distinctName } from "@/crew/names";
 
 export function addTablePlayer(name: string, crewMemberId: string | null = null): TablePlayer | null {
   const trimmed = name.trim();

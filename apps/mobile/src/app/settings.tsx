@@ -10,6 +10,7 @@ import { CREW_KINDS, setCrewAi, setCrewLeaderboard, setCrewPublicName, updateCre
 import { setCrewParticipation } from "@/server/venueData";
 import { setPreferences } from "@/state/preferences";
 import { followPhoneHourCycle, useAppStore } from "@/state/store";
+import { WeekStartRow } from "@/system/WeekStartRow";
 import { useTheme } from "@/theme";
 import { Chip, Panel, Row, Segmented, Switch } from "@/ui/controls";
 import { Icon, type AnyIconName } from "@/ui/Icon";
@@ -24,6 +25,7 @@ import { AccountSection } from "@/profile/AccountSection";
 import { RegionRules } from "@/profile/RegionRules";
 import { UpdateNotice } from "@/system/UpdateNotice";
 import { showFailure } from "@/server/errors";
+import { MAPS_APPS, MAPS_NAMES, mapsAppOf, type MapsApp } from "@/venues/directions";
 
 const CURRENCIES = ["EUR", "USD", "GBP", "CHF", "CAD", "AUD"] as const;
 const WATER_STEPS = [30, 45, 60, 90] as const;
@@ -166,6 +168,18 @@ export default function SettingsScreen() {
               decreaseLabel={i18n.t("settings.earlierBoundary")}
               increaseLabel={i18n.t("settings.laterBoundary")}
             />
+            <Text variant="small">{i18n.t("settings.dayBoundaryHint", { time: hour(preferences.dayBoundaryHour) })}</Text>
+            <WeekStartRow />
+          </Section>
+          {/* QOL-18: chosen once, used by every Directions button. */}
+          <Section title={i18n.t("settings.mapsApp")}>
+            <Segmented<MapsApp>
+              accessibilityLabel={i18n.t("settings.mapsApp")}
+              value={mapsAppOf(preferences.mapsApp)}
+              items={MAPS_APPS.map((value) => ({ value, label: MAPS_NAMES[value] }))}
+              onChange={(mapsApp) => setPreferences({ mapsApp })}
+            />
+            <Text variant="small">{i18n.t("settings.mapsAppHint")}</Text>
           </Section>
 
           <Text variant="small">{i18n.t("settings.savedEverywhere")}</Text>

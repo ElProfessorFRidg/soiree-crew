@@ -76,6 +76,16 @@ export interface AppState {
   nudgeDismissedAt: number | null;
   /** QOL-30: party reminders muted until this morning time. */
   remindersMutedUntil: number | null;
+  /** PREF-02: first day of the week picked in Settings (0 = Sunday); null follows the phone. */
+  weekStartOverride: number | null;
+  /** PREF-05: the time zone seen at the last launch, to notice a trip even inside one country. */
+  lastTimeZone: string | null;
+  /** PREF-05: a time zone the user chose not to act on; asked again only for another one. */
+  travelZoneDismissed: string | null;
+  /** QOL-21: birthdays already scheduled on this phone, as "userId:date". */
+  birthdayNotified: string[];
+  /** QOL-02: "userId:time zone" last sent to the server, so it is sent again only on a change. */
+  clockSent: string | null;
 }
 
 export const useAppStore = create<AppState>()(
@@ -116,6 +126,11 @@ export const useAppStore = create<AppState>()(
       nonceBook: [],
       nudgeDismissedAt: null,
       remindersMutedUntil: null,
+      weekStartOverride: null,
+      lastTimeZone: null,
+      travelZoneDismissed: null,
+      birthdayNotified: [],
+      clockSent: null,
     }),
     {
       name: "crew-app-v1",

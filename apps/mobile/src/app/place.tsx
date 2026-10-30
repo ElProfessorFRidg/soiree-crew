@@ -17,7 +17,6 @@ import {
   fetchPlace,
   fetchWantToGo,
   markUseful,
-  reportDoor,
   rsvp,
   saveReview,
   saveTags,
@@ -34,13 +33,22 @@ import { newId, useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
 import { Bars } from "@/ui/Bars";
-import { Button } from "@/ui/Button";
+import { Button, IconButton } from "@/ui/Button";
+import { OpenPartiesSection } from "@/crew/OpenParty";
 import { Chip, Panel, Row, Segmented } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { SkeletonRows } from "@/ui/Skeleton";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
-import { showFailure } from "@/server/errors";
+import { serverMessage, showFailure } from "@/server/errors";
+import { ApiError } from "@/server/api";
+import { ReportPanel } from "@/moderation/ReportPanel";
+import { DoorPanel } from "@/place/DoorPanel";
+import { ReviewPhotos } from "@/place/ReviewPhotos";
+import { StaffRequests } from "@/place/StaffRequests";
+import { Copyable } from "@/ui/Copyable";
+import { DirectionsButton } from "@/venues/DirectionsButton";
+import { HoursPanel } from "@/venues/HoursPanel";
 
 const EVENT_KINDS: EventKind[] = ["dj", "student", "match", "concert", "quiz", "other"];
 
@@ -58,6 +66,7 @@ export default function PlaceScreen() {
   const [ratings, setRatings] = useState<Partial<Record<Criterion, number>>>({});
   const [text, setText] = useState("");
   const [audience, setAudience] = useState<ReviewAudience>("public");
+  const [reviewError, setReviewError] = useState<string | null>(null);
   const [eventTitle, setEventTitle] = useState("");
   const [eventKind, setEventKind] = useState<EventKind>("dj");
   const [eventDay, setEventDay] = useState(0);
@@ -72,6 +81,9 @@ export default function PlaceScreen() {
           setRatings(mine.ratings);
           setText(mine.text);
           setAudience(mine.audience);
+        } else if (data.reviewAudience) {
+          // PROF-04: a first review starts with my profile's reviews section audience.
+          setAudience(data.reviewAudience);
         }
       })
       .catch(offline);
@@ -90,13 +102,6 @@ export default function PlaceScreen() {
   }
   const money = (amount: number, currency: string) => formatMoney(amount, currency, i18n.locale);
   const weekdayLabels = Array.from({ length: 7 }, (_, i) => new Intl.DateTimeFormat(i18n.locale, { weekday: "narrow" }).format(new Date(2026, 10, 2 + i)));
-  const doorVerdict = page.door.reports
-    ? page.door.always >= page.door.sometimes + page.door.never
-      ? i18n.t("place.doorAlways")
-      : page.door.never > page.door.always + page.door.sometimes
-        ? i18n.t("place.doorNever")
-        : i18n.t("place.doorSometimes")
-    : null;
   const toggleTag = (tag: VibeTag) => {
     const next = page.myTags.includes(tag) ? page.myTags.filter((t) => t !== tag) : [...page.myTags, tag];
     haptic.select();
@@ -105,8 +110,12 @@ export default function PlaceScreen() {
 
   return (
     <Screen back title={page.place.name} withToasts onRefresh={async () => load()}>
-      {page.place.address ? <Text variant="small">{page.place.address}</Text> : null}
+      {page.place.address ? <Copyable value={page.place.address} /> : null}
+      <DirectionsButton lat={page.place.lat} lng={page.place.lng} label={page.place.address || page.place.name} />
+      {/* COM-01: the owner's hours, else the ones users entered, said as such. The owner edits theirs below. */}
+      {page.facts && !page.isOwner ? <HoursPanel facts={page.facts} /> : null}
       <OwnerSection page={page} onChanged={load} />
+      {page.isOwner ? <StaffRequests venueId={venueId} /> : null}
       <View style={styles.figures}>
         <View style={styles.figure}>
           <Numeral size={32} color={theme.amber}>
@@ -164,24 +173,7 @@ export default function PlaceScreen() {
         </>
       ) : null}
 
-      <Panel>
-        <Text variant="label">{i18n.t("place.door")}</Text>
-        <Text>{doorVerdict ? i18n.plural("place.doorVerdict", page.door.reports, { verdict: doorVerdict }) : i18n.t("place.doorUnknown")}</Text>
-        {page.door.adultsOnly ? <Text variant="small">{i18n.t("place.adultsOnly")}</Text> : null}
-        {page.canReview ? (
-          <Segmented<"always" | "sometimes" | "never">
-            accessibilityLabel={i18n.t("place.doorAsk")}
-            value={"sometimes"}
-            items={[
-              { value: "always", label: i18n.t("place.idAlways") },
-              { value: "sometimes", label: i18n.t("place.idSometimes") },
-              { value: "never", label: i18n.t("place.idNever") },
-            ]}
-            onChange={(idCheck) => void reportDoor(venueId, idCheck, null).then(load).catch(offline)}
-          />
-        ) : null}
-        <Text variant="small">{i18n.t("place.doorNote")}</Text>
-      </Panel>
+      <DoorPanel venueId={venueId} page={page} onChanged={load} />
 
       <Text variant="label">{i18n.t("place.events")}</Text>
       {page.events.length === 0 ? <Text variant="small">{i18n.t("place.noEvents")}</Text> : null}
@@ -226,6 +218,9 @@ export default function PlaceScreen() {
         />
       </Panel>
 
+      {/* COM-05: parties opened here by their hosts, with a join request in one tap. */}
+      <OpenPartiesSection venueId={page.place.venueId} />
+
       {page.regulars.length ? (
         <Panel>
           <Text variant="label">{i18n.t("place.regulars")}</Text>
@@ -236,13 +231,23 @@ export default function PlaceScreen() {
               subtitle={r.legend ? i18n.t("place.legend", { place: page.place.name }) : i18n.plural("place.nights", r.nights)}
               leading={<Avatar personId={r.userId} name={r.name} size={32} />}
               trailing={
-                r.openToMeet && !r.friend && r.userId !== me ? (
-                  <Button
-                    label={i18n.t("people.addFriend")}
-                    variant="secondary"
-                    height={40}
-                    onPress={() => void befriend(r.userId).then(() => showToast({ message: i18n.t("people.requestSent", { name: r.name }) })).catch(offline)}
-                  />
+                r.userId !== me ? (
+                  <View style={styles.regularActions}>
+                    {r.openToMeet && !r.friend ? (
+                      <Button
+                        label={i18n.t("people.addFriend")}
+                        variant="secondary"
+                        height={40}
+                        onPress={() => void befriend(r.userId).then(() => showToast({ message: i18n.t("people.requestSent", { name: r.name }) })).catch(offline)}
+                      />
+                    ) : null}
+                    {/* COM-05: invite this regular, and their crew, to one of my crew's parties. */}
+                    <IconButton
+                      icon="glass"
+                      accessibilityLabel={i18n.t("people.inviteTitle", { name: r.name })}
+                      onPress={() => router.push({ pathname: "/invite-to-party", params: { userId: r.userId, name: r.name } })}
+                    />
+                  </View>
                 ) : undefined
               }
               onPress={() => router.push({ pathname: "/profile", params: { id: r.userId } })}
@@ -267,6 +272,7 @@ export default function PlaceScreen() {
               .join(", ")}
           </Text>
           {r.text ? <Text>{r.text}</Text> : null}
+          <ReviewPhotos venueId={venueId} photos={r.photos ?? []} mine={r.mine} onChanged={load} />
           <ReviewReply review={r} isOwner={Boolean(page.isOwner)} onChanged={load} />
           {!r.mine ? (
             <Button
@@ -276,6 +282,8 @@ export default function PlaceScreen() {
               onPress={() => void markUseful(r.id, !r.markedUseful).then(load).catch(offline)}
             />
           ) : null}
+          {/* COM-08, O-77: any review can be reported; public content goes to the server's moderators. */}
+          {!r.mine ? <ReportPanel targetKind="review" targetId={r.id} compact /> : null}
         </Panel>
       ))}
 
@@ -295,7 +303,18 @@ export default function PlaceScreen() {
                 />
               </View>
             ))}
-            <Field label={i18n.t("place.reviewText")} hint={i18n.t("place.reviewRule")} value={text} onChangeText={setText} maxLength={280} multiline />
+            <Field
+              label={i18n.t("place.reviewText")}
+              hint={i18n.t("place.reviewRule")}
+              error={reviewError}
+              value={text}
+              onChangeText={(next) => {
+                setText(next);
+                setReviewError(null);
+              }}
+              maxLength={280}
+              multiline
+            />
             <Segmented<ReviewAudience>
               accessibilityLabel={i18n.t("place.reviewAudience")}
               value={audience}
@@ -313,7 +332,13 @@ export default function PlaceScreen() {
                     setWriting(false);
                     load();
                   })
-                  .catch(offline)
+                  .catch((error: unknown) => {
+                    // COM-02, COM-08: a filter refusal is explained under the text, where it can be fixed.
+                    if (error instanceof ApiError && error.failure.kind === "http" && error.failure.code.startsWith("text_")) {
+                      haptic.error();
+                      setReviewError(serverMessage(error.failure.code, i18n));
+                    } else offline(error);
+                  })
               }
             />
           </Panel>
@@ -333,6 +358,7 @@ function average(ratings: Record<string, number | null>): number | null {
 }
 
 const styles = StyleSheet.create({
+  regularActions: { flexDirection: "row", alignItems: "center", gap: 8 },
   figures: { flexDirection: "row", gap: 12 },
   figure: { flex: 1, gap: 2 },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },

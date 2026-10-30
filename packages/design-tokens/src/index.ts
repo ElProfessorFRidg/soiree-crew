@@ -239,3 +239,4 @@ export function avatarColor(personId: string): string {
   return colors[Math.abs(hash) % colors.length] ?? colors[0]!;
 }
 export * from "./glassIcons";
+export * from "./moodIcons";

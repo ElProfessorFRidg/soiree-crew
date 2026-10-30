@@ -1,5 +1,8 @@
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import { onLiveHint } from "@/server/liveHints";
+import { useConsumePendingReferral } from "@/server/pendingReferral";
+import { fetchNotices } from "@/server/profileData";
 import { useT } from "@/i18n";
 import { UpdateNotice } from "@/system/UpdateNotice";
 import { ProfileFields, type ProfileDraft } from "@/profile/ProfileFields";
@@ -30,6 +33,18 @@ export default function MeScreen() {
       .then(() => setOperator(true))
       .catch(() => setOperator(false));
   }, [session]);
+  // COM-08: moderation notices (statement of reasons), shown once there is at least one, kept live.
+  const [notices, setNotices] = useState<{ count: number; unread: number }>({ count: 0, unread: 0 });
+  const loadNotices = useCallback(() => {
+    if (!useSession.getState().session) return;
+    void fetchNotices()
+      .then((data) => setNotices({ count: data.notices.length, unread: data.unread }))
+      .catch(() => undefined);
+  }, []);
+  useFocusEffect(loadNotices);
+  useEffect(() => onLiveHint((hint) => (hint === "moderation.notice" || hint === "open" ? loadNotices() : undefined)), [loadNotices]);
+  // O-43: a referral link opened before the account existed is sent once connected.
+  useConsumePendingReferral(i18n);
 
   const onProfileChange = (next: ProfileDraft) => {
     // ADP-06: the weight drives tonight's estimate, so it is not changed in the middle of a night.
@@ -59,11 +74,27 @@ export default function MeScreen() {
         trailing={<Icon name="chev" color={theme.textMuted} />}
         onPress={() => router.push("/friends")}
       />
+      {notices.count ? (
+        <Row
+          title={i18n.t("people.notices")}
+          subtitle={notices.unread ? i18n.plural("people.noticesNew", notices.unread) : undefined}
+          leading={<Icon name="flag" color={notices.unread ? theme.danger : theme.textMuted} />}
+          trailing={<Icon name="chev" color={theme.textMuted} />}
+          onPress={() => router.push("/notices")}
+        />
+      ) : null}
       <Row
         title={i18n.t("myStats.title")}
         leading={<Icon name="trophy" color={theme.textMuted} />}
         trailing={<Icon name="chev" color={theme.textMuted} />}
         onPress={() => router.push("/my-stats")}
+      />
+      {/* O-76: the morning-after alibi, any day. */}
+      <Row
+        title={i18n.t("morning.alibi")}
+        leading={<Icon name="sparkdot" color={theme.textMuted} />}
+        trailing={<Icon name="chev" color={theme.textMuted} />}
+        onPress={() => router.push("/alibi")}
       />
       <Row
         title={i18n.t("privacy.open")}

@@ -26,6 +26,7 @@ import { themes } from "@crew/design-tokens";
 import { I18nProvider } from "@/i18n";
 import { connect } from "@/server/connection";
 import { loadSession, useSession } from "@/server/session";
+import { refreshCalendarReminders, sendClock, watchCalendarReminders } from "@/server/calendarData";
 import { useSyncFeedback } from "@/sync/feedback";
 import { flush } from "@/sync/engine";
 import { followPhoneHourCycle, useAppStore } from "@/state/store";
@@ -117,6 +118,14 @@ export default function RootLayout() {
   }, [hydrated, sessionReady, session]);
 
   useEffect(() => {
+    // QOL-02: the server learns the phone's time zone; N-06, QOL-21: local reminders follow the parties.
+    if (!hydrated || !sessionReady || !session) return;
+    void sendClock().catch(() => undefined);
+    watchCalendarReminders();
+    void refreshCalendarReminders();
+  }, [hydrated, sessionReady, session]);
+
+  useEffect(() => {
     if (!ready) return;
     // The native splash is hidden by LaunchCurtain, once its copy is on screen (MOT-10).
     // Whatever was queued before the app was killed goes out now (SYNC-06).
@@ -131,6 +140,8 @@ export default function RootLayout() {
         void flushUploads();
         void flushGameResults();
         void refreshReminders();
+        void sendClock().catch(() => undefined);
+        void refreshCalendarReminders();
       }
     });
     return () => subscription.remove();

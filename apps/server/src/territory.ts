@@ -87,7 +87,8 @@ export async function crewStandings(ctx: Context, crewId: string, season: string
     [crewId, start, end],
   );
   const exclusions = await ctx.db.query<{ venue_id: string; user_id: string }>(
-    "select e.venue_id, e.user_id from workplace_exclusions e join venues v on v.id = e.venue_id and v.crew_id = $1",
+    // TER-11: only a claim a crew admin (or the venue's owner) approved counts.
+    "select e.venue_id, e.user_id from workplace_exclusions e join venues v on v.id = e.venue_id and v.crew_id = $1 where e.status = 'approved'",
     [crewId],
   );
   const now = Math.min(ctx.now(), end);

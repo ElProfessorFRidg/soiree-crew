@@ -4,7 +4,9 @@ import { challengers, seasonBounds, territoryTitles } from "@crew/territory";
 import { AC_CONFIG, distanceMeters, evaluateCheckIn, fixHash } from "../anticheat";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { crewStandings, crewTimeZone, currentSeason, seasonRules, updateBoss, validatedVenues } from "../territory";
-import { nightOf, offsetMinutes } from "../time";
+import { dayBoundaryOf, nightOf, offsetMinutes } from "../time";
+import { samePlaceIds, venueFacts } from "../hours";
+import { canSetHq, setHq } from "./venueFacts";
 
 const venueSchema = z.object({
   id: z.string().uuid(),
@@ -13,6 +15,8 @@ const venueSchema = z.object({
   lat: z.number().min(-90).max(90),
   lng: z.number().min(-180).max(180),
   address: z.string().trim().max(120).optional(),
+  /** N-08: the crew's HQ, one per crew. */
+  isHq: z.boolean().optional(),
 });
 
 const fixSchema = z.object({
@@ -107,6 +111,7 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
        where c.verdict = 'accepted' and c.private = false`,
       [crewId],
     );
+    // QOL-02: titles belong to the territory game, shared by all, so they keep the default boundary.
     const rows = territoryTitles(
       members.map((m) => ({
         memberId: m.user_id,
@@ -132,13 +137,17 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
 
   app.post<{ Params: { id: string } }>("/v1/crews/:id/venues", async (request, reply) => {
     const user = requireUser(request);
-    await assertCrewMember(ctx, request.params.id, user.id);
+    const { role } = await assertCrewMember(ctx, request.params.id, user.id);
     const input = venueSchema.parse(request.body);
+    // N-08: somebody's flat is never the HQ; moving an existing HQ is for admins.
+    const hq = input.isHq === true && input.kind !== "home";
+    if (hq && !(await canSetHq(ctx, request.params.id, role))) throw new HttpError(403, "hq_admin_only");
     await ctx.db.query(
       `insert into venues (id, crew_id, name, kind, lat, lng, address, created_by, created_at)
        values ($1, $2, $3, $4, $5, $6, $7, $8, $9) on conflict (id) do nothing`,
       [input.id, request.params.id, input.name, input.kind, input.lat, input.lng, input.address ?? "", user.id, ctx.now()],
     );
+    if (hq) await setHq(ctx, request.params.id, input.id, true);
     await notifyCrew(ctx, request.params.id);
     return reply.status(201).send({ id: input.id });
   });
@@ -175,6 +184,12 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
     );
     const nameOf = new Map(names.map((n) => [n.id, n.display_name]));
     const visitedSet = new Set(visited.map((v) => v.venue_id));
+    // TER-01 filters: open now and happy hour now, from the owner's or the crew's hours.
+    const facts = new Map<string, { openNow: boolean | null; happyNow: boolean }>();
+    for (const v of venues) {
+      const f = await venueFacts(ctx, await samePlaceIds(ctx, v), timeZone, v.id);
+      facts.set(v.id, { openNow: f.openNow, happyNow: f.happyNow });
+    }
     return {
       season,
       variant: seasonRules(season).variant,
@@ -197,6 +212,8 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
           // TER-11: points start once two members came on two nights.
           validated: valid.has(v.id),
           hereNow: here.find((h) => h.venue_id === v.id)?.n ?? 0,
+          openNow: facts.get(v.id)?.openNow ?? null,
+          happyNow: facts.get(v.id)?.happyNow ?? false,
         };
       }),
     };
@@ -239,18 +256,33 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
           [venue.id, user.id, here.at - AC_CONFIG.time.peerActiveWindowMin * 60_000, now],
         )
       : [];
-    // TER-10: my lifetime nights here, never lost, for the loyalty tier.
+    // TER-10: my lifetime nights here, never lost, for the loyalty tier, cut at my own day boundary (QOL-02).
+    const myBoundary = await dayBoundaryOf(ctx.db, user.id);
     const myNights = new Set(
       (
         await ctx.db.query<{ at: number }>("select at from check_ins where venue_id = $1 and user_id = $2 and verdict = 'accepted'", [venue.id, user.id])
-      ).map((c) => nightOf(c.at, timeZone)),
+      ).map((c) => nightOf(c.at, timeZone, myBoundary)),
     ).size;
     const rivalry = venue.kind === "home" ? null : await crewRivalry(ctx, venue, season, standing?.scores.reduce((sum, s) => sum + s.points, 0) ?? 0);
     const validated = (await validatedVenues(ctx.db, venue.crew_id, timeZone)).has(venue.id);
+    const facts = await venueFacts(ctx, await samePlaceIds(ctx, venue), timeZone, venue.id);
+    const { role } = await assertCrewMember(ctx, venue.crew_id, user.id);
     return {
       validated,
       variant: seasonRules(season).variant,
-      venue: { id: venue.id, crewId: venue.crew_id, name: venue.name, kind: venue.kind, lat: venue.lat, lng: venue.lng, address: venue.address },
+      venue: { id: venue.id, crewId: venue.crew_id, name: venue.name, kind: venue.kind, lat: venue.lat, lng: venue.lng, address: venue.address, isHq: venue.is_hq },
+      // N-08, COM-11: the crew writes hours until an owner claims the place; then the owner's win.
+      facts: {
+        source: facts.source,
+        hoursText: facts.hoursText,
+        happyText: facts.happyText,
+        schedule: facts.schedule,
+        openNow: facts.openNow,
+        happyNow: facts.happyNow,
+        canEdit: !facts.claimed && venue.kind !== "home",
+      },
+      // Whether this member may make this venue the HQ, or stop it being the HQ.
+      canSetHq: venue.kind !== "home" && (venue.is_hq ? role === "admin" : await canSetHq(ctx, venue.crew_id, role)),
       rivalry,
       myNights,
       season,
@@ -453,12 +485,6 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
     return { ok: true };
   });
 
-  app.post<{ Params: { id: string } }>("/v1/venues/:id/workplace", async (request) => {
-    const user = requireUser(request);
-    const venue = await venueForMember(ctx, request.params.id, user.id);
-    await ctx.db.query("insert into workplace_exclusions (venue_id, user_id) values ($1, $2) on conflict do nothing", [venue.id, user.id]);
-    await updateBoss(ctx, venue.crew_id, venue.id);
-    return { ok: true };
-  });
+  // TER-11: "I work here" lives in routes/workplace.ts, with the admin approval.
 
 }

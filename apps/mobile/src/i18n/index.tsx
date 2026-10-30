@@ -1,4 +1,5 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { getLocales } from "expo-localization";
 import type { UiLanguage } from "@crew/units";
 import { de } from "./de";
 import { en } from "./en";
@@ -14,6 +15,26 @@ export type { MessageKey, PluralKey } from "./types";
 
 const catalogs: Record<UiLanguage, Messages> = { fr, en, es, it, de, pt, ru };
 export const localeTags: Record<UiLanguage, string> = { fr: "fr-FR", en: "en-GB", es: "es-ES", it: "it-IT", de: "de-DE", pt: "pt-PT", ru: "ru-RU" };
+
+/**
+ * PREF-02: dates and numbers follow the phone's region, not only the app's language: English on a
+ * US phone writes 11/7, on a UK phone 07/11. The phone's own locale for that language wins (it carries
+ * the region the user chose), then the language with the phone's region if the runtime knows it.
+ */
+export function regionalLocale(language: UiLanguage): string {
+  try {
+    const locales = getLocales();
+    const own = locales.find((l) => l.languageCode?.toLowerCase() === language && l.regionCode);
+    const candidates = [own ? `${language}-${own.regionCode!.toUpperCase()}` : null, locales[0]?.regionCode ? `${language}-${locales[0].regionCode.toUpperCase()}` : null];
+    for (const tag of candidates) {
+      // Only a region the runtime has data for: "en-XX" without it would fall back to US formats.
+      if (tag && new Intl.DateTimeFormat(tag).resolvedOptions().locale.toLowerCase() === tag.toLowerCase()) return tag;
+    }
+  } catch {
+    // No locale data (an old runtime): the language's usual region below.
+  }
+  return localeTags[language];
+}
 
 type Params = Record<string, string | number>;
 
@@ -44,7 +65,7 @@ export interface Translator {
 
 export function createTranslator(language: UiLanguage): Translator {
   const messages = catalogs[language];
-  const locale = localeTags[language];
+  const locale = regionalLocale(language);
   const integer = new Intl.NumberFormat(locale);
   const number = (value: number, digits = 0) =>
     new Intl.NumberFormat(locale, { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);

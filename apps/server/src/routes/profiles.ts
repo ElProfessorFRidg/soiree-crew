@@ -4,10 +4,12 @@ import { appIconsOf } from "../appIcons";
 import { RateLimiter } from "../ratelimit";
 import { BacSimulation, distributionVolume, type BodyProfile, type DrinkIntake } from "@crew/bac";
 import { territoryTitles } from "@crew/territory";
-import { randomUUID } from "node:crypto";
-import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
-import { AUDIENCES, audiencesOf, canSee, PRESETS, SECTIONS, seesDates, STRANGER, type Relation, type Section } from "../profileRules";
-import { nightOf, offsetMinutes } from "../time";
+import { HttpError, requireUser, type Context } from "../context";
+import { addExtraSections, hiddenItems } from "../profileExtras";
+import { AUDIENCES, audiencesOf, canSee, PRESETS, SECTIONS, seesDates, STATS, STRANGER, type Relation, type Section } from "../profileRules";
+import { assertPublishable } from "../posting";
+import { dayBoundaryOf, nightOf, offsetMinutes } from "../time";
+import { personalClock, personalHabits } from "../habits";
 
 const HOUR_MS = 3_600_000;
 const uuid = z.string().uuid();
@@ -97,6 +99,7 @@ async function buildSections(ctx: Context, ownerId: string, relation: Relation, 
   const ruled = relation.me ? reigns : reigns.filter((r) => !hidden.has(r.venue_id));
 
   if (visible("titles")) {
+    // QOL-02: titles belong to the territory game, shared by all, so they keep the default boundary.
     const [row] = territoryTitles([
       {
         memberId: ownerId,
@@ -109,11 +112,13 @@ async function buildSections(ctx: Context, ownerId: string, relation: Relation, 
   }
 
   if (visible("venues")) {
+    // QOL-02: the owner's nights, cut at the owner's day boundary.
+    const ownerBoundary = await dayBoundaryOf(ctx.db, ownerId);
     const byVenue = new Map<string, { venueId: string; name: string; visits: number; nights: Set<string>; lastAt: number; ruled: boolean }>();
     for (const c of shown) {
       const entry = byVenue.get(c.venue_id) ?? { venueId: c.venue_id, name: c.name, visits: 0, nights: new Set<string>(), lastAt: 0, ruled: false };
       entry.visits += 1;
-      entry.nights.add(nightOf(c.at, c.time_zone));
+      entry.nights.add(nightOf(c.at, c.time_zone, ownerBoundary));
       entry.lastAt = Math.max(entry.lastAt, c.at);
       byVenue.set(c.venue_id, entry);
     }
@@ -164,6 +169,8 @@ async function buildSections(ctx: Context, ownerId: string, relation: Relation, 
       favourites: kinds.map((k) => ({ kind: k.kind, count: k.n })),
       usualFirstDrink: firstMean === null ? null : Math.round(firstMean),
       usualPacePerHour: paceMean === null ? null : Math.round(paceMean * 10) / 10,
+      // N-13: when the night usually ends, on the owner's own night clock.
+      usualLeaving: (await personalHabits(ctx, ownerId, await personalClock(ctx, ownerId))).usualLeaving,
     };
   }
 
@@ -202,8 +209,26 @@ async function buildSections(ctx: Context, ownerId: string, relation: Relation, 
     );
     out.nights = { total: nights.length, last30Days: nights.filter((n) => now - n.starts_at < 30 * 24 * HOUR_MS).length };
   }
+
+  if (visible("birthday")) {
+    const row = (await ctx.db.query<{ birth_month: number | null; birth_day: number | null; birth_year: number | null }>(
+      "select birth_month, birth_day, birth_year from profiles where user_id = $1",
+      [ownerId],
+    ))[0];
+    // QOL-21: month and day for those allowed; the year stays with its owner.
+    if (row?.birth_month && row.birth_day) {
+      out.birthday = { month: row.birth_month, day: row.birth_day, ...(relation.me && row.birth_year ? { year: row.birth_year } : {}) };
+    }
+  }
+  // PROF-02 reviews and games, O-43 night history, PROF-03 single figures hidden.
+  await addExtraSections(ctx, out, { ownerId, viewerId, relation, visible, now });
   return out;
 }
+
+/** QOL-21: a real calendar day; 29 February is allowed, the year being optional. */
+export const birthdaySchema = z
+  .object({ month: z.number().int().min(1).max(12), day: z.number().int().min(1).max(31), year: z.number().int().min(1900).max(2100).optional() })
+  .refine((b) => b.day <= new Date(Date.UTC(b.year ?? 2000, b.month, 0)).getUTCDate(), { message: "day" });
 
 /** AC-09: the shame badge lasts a week, like the line on the venue page. */
 const CHEAT_VISIBLE_MS = 7 * 24 * HOUR_MS;
@@ -259,6 +284,8 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
       ...(mine ? { audiences: audiencesOf(stored ? (JSON.parse(stored.audiences) as Record<string, unknown>) : {}), findable: stored?.findable ?? "username", regularOptIn: stored?.regular_opt_in ?? false, openToMeet: stored?.open_to_meet ?? false, requestsFrom: stored?.requests_from ?? "everyone", storyOptOut: stored?.story_opt_out ?? false } : {}),
       mutualFriends: ownerId === user.id ? 0 : await mutualFriends(ctx, user.id, ownerId),
       cheat: relation.me || relation.crewMate ? await cheatFlag(ctx, ownerId, as ? ownerId : user.id, ctx.now()) : null,
+      // PROF-03: the figures I hid one by one, so the edit screen can show them.
+      ...(mine ? { hiddenStats: [...(await hiddenItems(ctx, ownerId)).stats] } : {}),
     };
   });
 
@@ -276,8 +303,12 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
         bio: z.string().trim().max(160).optional(),
         country: z.string().trim().max(60).optional(),
         preset: z.enum(["private", "friends", "public"]).optional(),
-        audiences: z.record(z.enum(SECTIONS), z.enum(AUDIENCES)).optional(),
+        // One section or several at a time: a partial record, not an exhaustive one.
+        audiences: z.partialRecord(z.enum(SECTIONS), z.enum(AUDIENCES)).optional(),
+        birthday: birthdaySchema.nullable().optional(),
         hiddenVenues: z.array(uuid).max(500).optional(),
+        hiddenReviews: z.array(uuid).max(500).optional(),
+        hiddenStats: z.array(z.enum(STATS)).max(STATS.length).optional(),
         findable: z.enum(["search", "username", "nobody"]).optional(),
         regularOptIn: z.boolean().optional(),
         openToMeet: z.boolean().optional(),
@@ -289,6 +320,9 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
       "select bio, country, audiences, hidden_venues from profiles where user_id = $1",
       [user.id],
     ))[0];
+    // COM-08: a changed bio or country is text others read, so it goes through the filters.
+    const changed = [input.bio, input.country].filter((t, i) => t !== undefined && t !== (i === 0 ? current?.bio : current?.country));
+    if (changed.length) await assertPublishable(ctx, user.id, changed);
     const audiences = {
       ...audiencesOf(current ? (JSON.parse(current.audiences) as Record<string, unknown>) : {}),
       ...(input.preset ? PRESETS[input.preset] : {}),
@@ -311,6 +345,12 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
     if (input.openToMeet !== undefined) await ctx.db.query("update profiles set open_to_meet = $2 where user_id = $1", [user.id, input.openToMeet]);
     if (input.requestsFrom) await ctx.db.query("update profiles set requests_from = $2 where user_id = $1", [user.id, input.requestsFrom]);
     if (input.storyOptOut !== undefined) await ctx.db.query("update profiles set story_opt_out = $2 where user_id = $1", [user.id, input.storyOptOut]);
+    if (input.hiddenReviews) await ctx.db.query("update profiles set hidden_reviews = $2 where user_id = $1", [user.id, JSON.stringify(input.hiddenReviews)]);
+    if (input.hiddenStats) await ctx.db.query("update profiles set hidden_stats = $2 where user_id = $1", [user.id, JSON.stringify([...new Set(input.hiddenStats)])]);
+    if (input.birthday !== undefined) {
+      const b = input.birthday;
+      await ctx.db.query("update profiles set birth_month = $2, birth_day = $3, birth_year = $4 where user_id = $1", [user.id, b?.month ?? null, b?.day ?? null, b?.year ?? null]);
+    }
     return { audiences };
   });
 
@@ -367,13 +407,17 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
     } else if (row.status === "pending" && row.requested_by !== user.id) {
       await ctx.db.query("update friendships set status = 'accepted', at = $3 where user_a = $1 and user_b = $2", [a, b, ctx.now()]);
     }
+    // O-43: both lists update live. push: friends.request (new) or friends.accepted
+    ctx.live.notify([user.id, other], { type: "friends.changed" });
     return { friendship: await friendshipState(ctx, user.id, other) };
   });
 
   app.delete<{ Params: { id: string } }>("/v1/users/:id/friend", async (request, reply) => {
     const user = requireUser(request);
-    const [a, b] = pair(user.id, uuid.parse(request.params.id));
-    await ctx.db.query("delete from friendships where user_a = $1 and user_b = $2", [a, b]);
+    const other = uuid.parse(request.params.id);
+    const [a, b] = pair(user.id, other);
+    const removed = await ctx.db.query("delete from friendships where user_a = $1 and user_b = $2 returning user_a", [a, b]);
+    if (removed.length) ctx.live.notify([user.id, other], { type: "friends.changed" });
     return reply.status(204).send();
   });
 
@@ -385,6 +429,7 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
     const [a, b] = pair(user.id, other);
     await ctx.db.query("delete from friendships where user_a = $1 and user_b = $2", [a, b]);
     await ctx.db.query("insert into blocks (blocker, blocked, at) values ($1, $2, $3) on conflict do nothing", [user.id, other, ctx.now()]);
+    ctx.live.notify([user.id, other], { type: "friends.changed" });
     return { ok: true };
   });
 
@@ -409,78 +454,7 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
     return reply.status(204).send();
   });
 
-  /**
-   * COM-08: a report about a profile, a party or a venue. In a private build the
-   * crew's admins read them; a report about a person goes to every crew we share.
-   */
-  app.post("/v1/reports", async (request, reply) => {
-    const user = requireUser(request);
-    const input = z
-      .object({
-        targetKind: z.enum(["profile", "party", "venue"]),
-        targetId: uuid,
-        reason: z.enum(["harassment", "fake", "inappropriate", "other"]),
-        note: z.string().trim().max(300).optional(),
-      })
-      .parse(request.body);
-    let crews: string[] = [];
-    if (input.targetKind === "profile") {
-      crews = (
-        await ctx.db.query<{ crew_id: string }>(
-          "select x.crew_id from crew_members x join crew_members y on y.crew_id = x.crew_id where x.user_id = $1 and y.user_id = $2",
-          [user.id, input.targetId],
-        )
-      ).map((r) => r.crew_id);
-    } else {
-      const table = input.targetKind === "party" ? "parties" : "venues";
-      crews = (
-        await ctx.db.query<{ crew_id: string }>(
-          `select t.crew_id from ${table} t join crew_members m on m.crew_id = t.crew_id and m.user_id = $2 where t.id = $1`,
-          [input.targetId, user.id],
-        )
-      ).map((r) => r.crew_id);
-      if (!crews.length) throw new HttpError(404, "not_found");
-    }
-    for (const crewId of crews.length ? crews : [null]) {
-      await ctx.db.query(
-        "insert into reports (id, reporter, target_kind, target_id, crew_id, reason, note, at) values ($1, $2, $3, $4, $5, $6, $7, $8)",
-        [randomUUID(), user.id, input.targetKind, input.targetId, crewId, input.reason, input.note ?? "", ctx.now()],
-      );
-    }
-    return reply.status(201).send({ ok: true });
-  });
-
-  /** Admins see the reports about their crew; the reporter stays anonymous to them. */
-  app.get<{ Params: { id: string } }>("/v1/crews/:id/reports", async (request) => {
-    const user = requireUser(request);
-    const { role } = await assertCrewMember(ctx, request.params.id, user.id);
-    if (role !== "admin") throw new HttpError(403, "forbidden");
-    const rows = await ctx.db.query<{ id: string; target_kind: string; target_id: string; reason: string; note: string; at: number; handled_at: number | null; evidence: string | null }>(
-      "select id, target_kind, target_id, reason, note, at, handled_at, evidence from reports where crew_id = $1 order by at desc limit 100",
-      [request.params.id],
-    );
-    return {
-      reports: rows.map((r) => ({
-        id: r.id,
-        targetKind: r.target_kind,
-        targetId: r.target_id,
-        reason: r.reason,
-        note: r.note,
-        at: r.at,
-        handledAt: r.handled_at,
-        // MSG-07: the messages the reporter chose to send, decrypted on their phone.
-        ...(r.evidence ? { messages: ctx.sealer.open<{ id: string; userId: string; body: string; at: number; reported: boolean }[]>(r.evidence) } : {}),
-      })),
-    };
-  });
-
-  app.post<{ Params: { id: string; reportId: string } }>("/v1/crews/:id/reports/:reportId/handled", async (request) => {
-    const user = requireUser(request);
-    const { role } = await assertCrewMember(ctx, request.params.id, user.id);
-    if (role !== "admin") throw new HttpError(403, "forbidden");
-    await ctx.db.query("update reports set handled_at = $3 where id = $1 and crew_id = $2", [request.params.reportId, request.params.id, ctx.now()]);
-    return { ok: true };
-  });
+  // COM-08 reports moved to routes/moderation.ts with the decisions, strikes and notices.
 
   app.get("/v1/friends", async (request) => {
     const user = requireUser(request);

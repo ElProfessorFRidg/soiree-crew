@@ -46,6 +46,7 @@ export const preferencesPatchSchema = z
     quietFromHour: z.number().int().min(0).max(23),
     quietToHour: z.number().int().min(0).max(23),
     rideApp: z.enum(["uber", "bolt", "heetch", "freenow", "g7"]).nullable(),
+    mapsApp: z.enum(["apple", "google", "waze"]).nullable(),
   })
   .partial();
 

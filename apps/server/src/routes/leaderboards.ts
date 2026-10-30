@@ -6,7 +6,7 @@ import { AC_CONFIG, verifyDrinks } from "../anticheat";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { crewTimeZone, currentSeason } from "../territory";
 import { gameWins } from "./games";
-import { nightOf, offsetMinutes } from "../time";
+import { dayBoundaries, dayBoundaryOf, nightOf, offsetMinutes } from "../time";
 import { CREW_KINDS } from "../schemas";
 
 const DAY_MS = 86_400_000;
@@ -53,9 +53,10 @@ async function periodBounds(ctx: Context, crewId: string, period: string, partyI
     return { from: start, to: end, timeZone };
   }
   if (period === "week") {
-    // Monday 06:00 local of the current week.
-    const night = nightOf(now, timeZone);
-    const date = new Date(`${night}T06:00:00Z`);
+    // Monday at the day boundary of the person asking (QOL-02), local time, of the current week.
+    const boundary = await dayBoundaryOf(ctx.db, userId);
+    const night = nightOf(now, timeZone, boundary);
+    const date = new Date(`${night}T${String(boundary).padStart(2, "0")}:00:00Z`);
     const day = date.getUTCDay() || 7;
     const monday = date.getTime() - (day - 1) * DAY_MS - offsetMinutes(now, timeZone) * 60_000;
     return { from: monday, to: monday + 7 * DAY_MS, timeZone };
@@ -97,6 +98,8 @@ async function computeBoard(ctx: Context, crewId: string, from: number, to: numb
   // RANK-05: games won, counted from two members up (routes/games.ts).
   const wins = metric === "games" ? await gameWins(ctx.db, crewId, from, to) : new Map<string, number>();
 
+  // QOL-02: a person's nights out are counted with their own day boundary.
+  const boundaries = await dayBoundaries(ctx.db, ids);
   const rows = members.map((member) => {
     const mine = drinks.filter((d) => d.user_id === member.user_id);
     const decoded = mine.map((d) => ({ row: d, body: ctx.sealer.open<{ volumeMl: number; abv: number; withFood: boolean }>(d.sealed) }));
@@ -127,7 +130,7 @@ async function computeBoard(ctx: Context, crewId: string, from: number, to: numb
         } else unverified += 1;
       }
     }
-    const nights = new Set(nightsOut.filter((n) => n.user_id === member.user_id).map((n) => nightOf(n.starts_at, timeZone))).size;
+    const nights = new Set(nightsOut.filter((n) => n.user_id === member.user_id).map((n) => nightOf(n.starts_at, timeZone, boundaries.get(member.user_id)))).size;
     const value = metric === "drinks" ? count : metric === "grams" ? Math.round(grams) : metric === "games" ? (wins.get(member.user_id) ?? 0) : nights;
     return { userId: member.user_id, name: member.display_name, value, unverified: member.user_id === viewerId ? unverified : undefined };
   });

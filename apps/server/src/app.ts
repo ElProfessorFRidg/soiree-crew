@@ -8,6 +8,7 @@ import { crewRoutes } from "./routes/crews";
 import { moneyRoutes } from "./routes/money";
 import { mutationRoutes } from "./routes/mutations";
 import { partyRoutes } from "./routes/parties";
+import { partyGuestRoutes } from "./routes/partyGuests";
 import { photoRoutes } from "./routes/photos";
 import { pollRoutes } from "./routes/polls";
 import { cardRoutes } from "./routes/cards";
@@ -19,15 +20,21 @@ import { feedRoutes } from "./routes/feed";
 import { gameRoutes } from "./routes/games";
 import { aiOrderRoutes } from "./routes/aiOrder";
 import { communityRoutes } from "./routes/community";
+import { moderationRoutes } from "./routes/moderation";
+import { referralRoutes } from "./routes/referrals";
+import { gameWinRoutes } from "./routes/gameWins";
+import { workplaceRoutes } from "./routes/workplace";
 import { statsRoutes } from "./routes/stats";
 import { profileRoutes } from "./routes/profiles";
 import { radarRoutes } from "./routes/radar";
+import { calendarRoutes } from "./routes/calendar";
 import { recapRoutes } from "./routes/recap";
 import { leaderboardRoutes } from "./routes/leaderboards";
 import { syncRoutes } from "./routes/sync";
 import { venueRoutes } from "./routes/venues";
+import { venueFactRoutes } from "./routes/venueFacts";
 
-const PUBLIC_ROUTES = new Set(["POST /v1/accounts", "POST /v1/sessions/claim", "POST /v1/sessions/password", "GET /v1/health", "GET /v1/info", "GET /download/android.json", "GET /download/soiree-crew.apk", "GET /v1/invites/:code", "GET /v1/live", "GET /i/:code", "GET /v1/photos/:id"]);
+const PUBLIC_ROUTES = new Set(["POST /v1/accounts", "POST /v1/sessions/claim", "POST /v1/sessions/password", "GET /v1/health", "GET /v1/info", "GET /download/android.json", "GET /download/soiree-crew.apk", "GET /v1/invites/:code", "GET /v1/live", "GET /i/:code", "GET /f/:code","GET /v1/photos/:id", "GET /v1/receipts/:id","GET /v1/calendar/:token.ics"]);
 
 export async function buildApp(ctx: Context, options: { logger?: boolean; trustProxy?: boolean | number } = {}): Promise<FastifyInstance> {
   const app = Fastify({
@@ -95,14 +102,21 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
   syncRoutes(app, ctx);
   crewRoutes(app, ctx);
   partyRoutes(app, ctx);
+  partyGuestRoutes(app, ctx);
   pollRoutes(app, ctx);
   cardRoutes(app, ctx);
   feedRoutes(app, ctx);
   aiOrderRoutes(app, ctx);
   communityRoutes(app, ctx);
+  moderationRoutes(app, ctx);
+  referralRoutes(app, ctx);
+  gameWinRoutes(app, ctx);
+  workplaceRoutes(app, ctx);
   venueRoutes(app, ctx, ctx.hashSecret);
+  venueFactRoutes(app, ctx);
   leaderboardRoutes(app, ctx);
   radarRoutes(app, ctx);
+  calendarRoutes(app, ctx);
   moneyRoutes(app, ctx);
   recapRoutes(app, ctx);
   chatRoutes(app, ctx);

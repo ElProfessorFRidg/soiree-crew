@@ -11,7 +11,11 @@ import { fitRegion, TileMap, type LatLng } from "@/map/TileMap";
 import { useLevelNow } from "@/state/levelNow";
 import { useCrewData, useLiveParty } from "@/server/crewData";
 import { useSession } from "@/server/session";
-import { refreshVenues, useVenueData, type VenueSummary } from "@/server/venueData";
+import {
+  refreshVenues,
+  useVenueData,
+  type VenueSummary,
+} from "@/server/venueData";
 import { useTheme } from "@/theme";
 import { Button, IconButton } from "@/ui/Button";
 import { Chip, Panel, Tag } from "@/ui/controls";
@@ -19,43 +23,104 @@ import { Icon } from "@/ui/Icon";
 import { ScalePressable } from "@/ui/Pressable";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
-import { fetchFriendLocations, type FriendLocation } from "@/location/liveShare";
+import {
+  fetchFriendLocations,
+  type FriendLocation,
+} from "@/location/liveShare";
 import { useEcoInterval } from "@/power/eco";
 import { Avatar } from "@/ui/Avatar";
+import { OpenTags } from "@/venues/HoursPanel";
 
-type Filter = "all" | "friends" | "fog";
+type Filter = "all" | "friends" | "fog" | "open" | "happy";
 const MAP_HEIGHT_RATIO = 0.46;
 
-function VenuePin({ venue, selected, onPress, takeoverAt, still }: { venue: VenueSummary; selected: boolean; onPress: () => void; takeoverAt: number; still: boolean }) {
+function VenuePin({
+  venue,
+  selected,
+  onPress,
+  takeoverAt,
+  still,
+}: {
+  venue: VenueSummary;
+  selected: boolean;
+  onPress: () => void;
+  takeoverAt: number;
+  still: boolean;
+}) {
   const theme = useTheme();
   const color = venue.bossId ? avatarColor(venue.bossId) : theme.surfaceRaised;
   const size = selected ? 40 : 30;
   return (
-    <ScalePressable accessibilityLabel={venue.name} onPress={onPress} style={{ alignItems: "center" }}>
+    <ScalePressable
+      accessibilityLabel={
+        venue.bossName ? `${venue.name}, ${venue.bossName}` : venue.name
+      }
+      onPress={onPress}
+      style={{ alignItems: "center" }}
+    >
       {venue.bossId ? (
         <CrownDrop takeoverAt={takeoverAt} still={still}>
           <Icon name="crown" size={16} color={theme.amber} />
         </CrownDrop>
       ) : null}
       <View>
-        {venue.bossId ? <TakeoverWash takeoverAt={takeoverAt} color={color} size={size} still={still} /> : null}
-        <LivePulse live={venue.hereNow > 0} color={theme.ok} size={size} still={still} />
-        <View
-          style={{
-            width: size,
-            height: size,
-            borderRadius: size / 2,
-            backgroundColor: color,
-            borderWidth: selected ? 3 : 2,
-            borderColor: selected ? theme.text : theme.bg,
-            // TER-08 fog of war: never-visited venues are faded.
-            opacity: venue.explored ? 1 : 0.45,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Icon name={venue.kind === "club" ? "star" : venue.kind === "home" ? "home" : "glass"} size={selected ? 20 : 15} color={palette.accent.onAccent} />
-        </View>
+        {venue.bossId ? (
+          <TakeoverWash
+            takeoverAt={takeoverAt}
+            color={color}
+            size={size}
+            still={still}
+          />
+        ) : null}
+        <LivePulse
+          live={venue.hereNow > 0}
+          color={theme.ok}
+          size={size}
+          still={still}
+        />
+        {venue.bossId && venue.bossName ? (
+          // TER-01: the boss's own avatar, in their colour across the app.
+          <View style={{ opacity: venue.explored ? 1 : 0.45 }}>
+            <Avatar
+              personId={venue.bossId}
+              name={venue.bossName}
+              size={size}
+              ring={selected ? theme.text : theme.bg}
+            />
+          </View>
+        ) : (
+          <View
+            style={{
+              width: size,
+              height: size,
+              borderRadius: size / 2,
+              backgroundColor: color,
+              borderWidth: selected ? 3 : 2,
+              borderColor: selected ? theme.text : theme.bg,
+              // TER-08 fog of war: never-visited venues are faded.
+              opacity: venue.explored ? 1 : 0.45,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Icon
+              name={
+                venue.kind === "club"
+                  ? "star"
+                  : venue.kind === "home"
+                    ? "home"
+                    : "glass"
+              }
+              size={selected ? 20 : 15}
+              color={palette.accent.onAccent}
+            />
+          </View>
+        )}
+        {venue.happyNow ? (
+          <View style={[styles.happyBadge, { backgroundColor: theme.amber }]}>
+            <Icon name="glass" size={11} color={palette.accent.onAccent} />
+          </View>
+        ) : null}
       </View>
       {venue.hereNow > 0 ? (
         <View style={[styles.hereBadge, { backgroundColor: theme.ok }]}>
@@ -74,13 +139,18 @@ export default function BarsScreen() {
   const session = useSession((state) => state.session);
   const crews = useCrewData((state) => state.crews);
   const [crewId, setCrewId] = useState<string | null>(crews[0]?.id ?? null);
-  const data = useVenueData((state) => (crewId ? state.byCrew[crewId] : undefined));
+  const data = useVenueData((state) =>
+    crewId ? state.byCrew[crewId] : undefined,
+  );
   const [filter, setFilter] = useState<Filter>("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [region, setRegion] = useState<{ center: LatLng; zoom: number } | null>(null);
+  const [region, setRegion] = useState<{ center: LatLng; zoom: number } | null>(
+    null,
+  );
   const mapHeight = Math.round(height * MAP_HEIGHT_RATIO);
   const live = useLiveParty();
-  const livePartyId = live && live.party.crewId === crewId ? live.party.id : null;
+  const livePartyId =
+    live && live.party.crewId === crewId ? live.party.id : null;
   const [friends, setFriends] = useState<FriendLocation[]>([]);
   const me = session?.userId;
   const pollMs = useEcoInterval(60_000);
@@ -91,7 +161,10 @@ export default function BarsScreen() {
       setFriends([]);
       return;
     }
-    const load = () => void fetchFriendLocations(livePartyId).then((list) => setFriends(list.filter((f) => f.userId !== me))).catch(() => undefined);
+    const load = () =>
+      void fetchFriendLocations(livePartyId)
+        .then((list) => setFriends(list.filter((f) => f.userId !== me)))
+        .catch(() => undefined);
     load();
     const timer = setInterval(load, pollMs);
     return () => clearInterval(timer);
@@ -116,12 +189,15 @@ export default function BarsScreen() {
   const reduceMotion = useReducedMotion();
   const level = useLevelNow((state) => state.level);
   const still = reduceMotion || level >= 2;
-  const lastBosses = useRef<{ crewId: string; venues: BossSnapshot[] } | null>(null);
+  const lastBosses = useRef<{ crewId: string; venues: BossSnapshot[] } | null>(
+    null,
+  );
   const [takeovers, setTakeovers] = useState<Record<string, number>>({});
   useEffect(() => {
     if (!crewId || !data) return;
     const snapshot = data.venues.map((v) => ({ id: v.id, bossId: v.bossId }));
-    const previous = lastBosses.current?.crewId === crewId ? lastBosses.current.venues : null;
+    const previous =
+      lastBosses.current?.crewId === crewId ? lastBosses.current.venues : null;
     lastBosses.current = { crewId, venues: snapshot };
     const changed = takeoversBetween(previous, snapshot);
     if (!changed.length) return;
@@ -137,12 +213,17 @@ export default function BarsScreen() {
   const venues = useMemo(() => {
     const all = data?.venues ?? [];
     if (filter === "friends") return all.filter((v) => v.hereNow > 0);
-    if (filter === "fog") return all.filter((v) => !v.explored && v.kind !== "home");
+    if (filter === "fog")
+      return all.filter((v) => !v.explored && v.kind !== "home");
+    // TER-01: known to be open now, or in happy hour now, from the owner's or the crew's hours.
+    if (filter === "open") return all.filter((v) => v.openNow === true);
+    if (filter === "happy") return all.filter((v) => v.happyNow === true);
     return all;
   }, [data, filter]);
 
   useEffect(() => {
-    if (!region && data?.venues.length) setRegion(fitRegion(data.venues, width - 40, mapHeight));
+    if (!region && data?.venues.length)
+      setRegion(fitRegion(data.venues, width - 40, mapHeight));
   }, [data, region, width, mapHeight]);
 
   if (!session || !crews.length || !crewId) {
@@ -161,15 +242,32 @@ export default function BarsScreen() {
       title={i18n.t("bars.title")}
       trailing={
         <View style={styles.headerButtons}>
-          <IconButton icon="search" accessibilityLabel={i18n.t("discover.title")} onPress={() => router.push("/discover")} />
-          <Button label={i18n.t("bars.leaderboard")} icon="trophy" variant="secondary" height={40} onPress={() => router.push({ pathname: "/leaderboard", params: { crewId } })} />
+          <IconButton
+            icon="search"
+            accessibilityLabel={i18n.t("discover.title")}
+            onPress={() => router.push("/discover")}
+          />
+          <Button
+            label={i18n.t("bars.leaderboard")}
+            icon="trophy"
+            variant="secondary"
+            height={40}
+            onPress={() =>
+              router.push({ pathname: "/leaderboard", params: { crewId } })
+            }
+          />
         </View>
       }
     >
       {crews.length > 1 ? (
         <View style={styles.chips}>
           {crews.map((crew) => (
-            <Chip key={crew.id} label={crew.name} selected={crew.id === crewId} onPress={() => setCrewId(crew.id)} />
+            <Chip
+              key={crew.id}
+              label={crew.name}
+              selected={crew.id === crewId}
+              onPress={() => setCrewId(crew.id)}
+            />
           ))}
         </View>
       ) : null}
@@ -186,14 +284,27 @@ export default function BarsScreen() {
             lat: venue.lat,
             lng: venue.lng,
             render: () => (
-              <VenuePin venue={venue} selected={venue.id === selectedId} onPress={() => setSelectedId(venue.id)} takeoverAt={takeovers[venue.id] ?? 0} still={still} />
+              <VenuePin
+                venue={venue}
+                selected={venue.id === selectedId}
+                onPress={() => setSelectedId(venue.id)}
+                takeoverAt={takeovers[venue.id] ?? 0}
+                still={still}
+              />
             ),
           })),
           ...friends.map((f) => ({
             id: `friend-${f.userId}`,
             lat: f.lat,
             lng: f.lng,
-            render: () => <Avatar personId={f.userId} name={f.name} size={30} ring={palette.accent.amber} />,
+            render: () => (
+              <Avatar
+                personId={f.userId}
+                name={f.name}
+                size={30}
+                ring={palette.accent.amber}
+              />
+            ),
           })),
         ]}
       />
@@ -202,47 +313,110 @@ export default function BarsScreen() {
         {(
           [
             ["all", "bars.all"],
+            ["open", "bars.openNow"],
+            ["happy", "bars.happyHour"],
             ["friends", "bars.friendsHere"],
             ["fog", "bars.toConquer"],
           ] as const
         ).map(([value, key]) => (
-          <Chip key={value} label={i18n.t(key)} selected={filter === value} onPress={() => setFilter(value)} />
+          <Chip
+            key={value}
+            label={i18n.t(key)}
+            selected={filter === value}
+            onPress={() => setFilter(value)}
+          />
         ))}
       </View>
 
       {selected ? (
-        <Animated.View key={selected.id} entering={FadeIn.duration(duration.enter)}>
+        <Animated.View
+          key={selected.id}
+          entering={FadeIn.duration(duration.enter)}
+        >
           <Panel>
             <Text variant="h2">{selected.name}</Text>
             <View style={styles.tags}>
-              {selected.bossName ? <Tag label={i18n.t("bars.boss", { name: selected.bossName })} tone="amber" icon="crown" /> : <Tag label={i18n.t("bars.noBoss")} />}
+              {selected.bossName ? (
+                <Tag
+                  label={i18n.t("bars.boss", { name: selected.bossName })}
+                  tone="amber"
+                  icon="crown"
+                />
+              ) : (
+                <Tag label={i18n.t("bars.noBoss")} />
+              )}
               {!selected.explored ? <Tag label={i18n.t("bars.fog")} /> : null}
-              {selected.hereNow > 0 ? <Tag label={i18n.plural("bars.hereNow", selected.hereNow)} tone="ok" /> : null}
+              {selected.hereNow > 0 ? (
+                <Tag
+                  label={i18n.plural("bars.hereNow", selected.hereNow)}
+                  tone="ok"
+                />
+              ) : null}
+              <OpenTags
+                openNow={selected.openNow ?? null}
+                happyNow={selected.happyNow ?? false}
+              />
             </View>
-            <Text variant="small">{i18n.plural("bars.myPoints", selected.myPoints)}</Text>
+            <Text variant="small">
+              {i18n.plural("bars.myPoints", selected.myPoints)}
+            </Text>
             <View style={styles.actions}>
               <Button
                 label={i18n.t("bars.checkIn")}
                 icon="pin"
                 height={52}
                 style={styles.flex}
-                onPress={() => router.push({ pathname: "/checkin", params: { venueId: selected.id, crewId } })}
+                onPress={() =>
+                  router.push({
+                    pathname: "/checkin",
+                    params: { venueId: selected.id, crewId },
+                  })
+                }
               />
               <Button
                 label={i18n.t("bars.open")}
                 variant="secondary"
                 height={52}
                 style={styles.flex}
-                onPress={() => router.push({ pathname: "/venue", params: { id: selected.id } })}
+                onPress={() =>
+                  router.push({
+                    pathname: "/venue",
+                    params: { id: selected.id },
+                  })
+                }
               />
             </View>
           </Panel>
         </Animated.View>
       ) : !data?.venues.length ? (
         <Text>{i18n.t("bars.empty")}</Text>
+      ) : venues.length === 0 && (filter === "open" || filter === "happy") ? (
+        <Text variant="small">{i18n.t("bars.noHours")}</Text>
       ) : null}
 
-      <Button label={i18n.t("bars.addHere")} icon="plus" variant="outline" height={48} onPress={() => router.push({ pathname: "/add-venue", params: { crewId } })} />
+      {/* N-11: "Where to?" from here too, not only during a party. */}
+      <Button
+        label={i18n.t("whereTo.open")}
+        icon="dice"
+        variant="secondary"
+        height={48}
+        onPress={() =>
+          router.push({
+            pathname: "/where-to",
+            params: livePartyId ? { id: livePartyId, crewId } : { crewId },
+          })
+        }
+      />
+
+      <Button
+        label={i18n.t("bars.addHere")}
+        icon="plus"
+        variant="outline"
+        height={48}
+        onPress={() =>
+          router.push({ pathname: "/add-venue", params: { crewId } })
+        }
+      />
     </Screen>
   );
 }
@@ -253,5 +427,25 @@ const styles = StyleSheet.create({
   tags: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   actions: { flexDirection: "row", gap: 10 },
   flex: { flex: 1 },
-  hereBadge: { position: "absolute", right: -8, top: 8, minWidth: 18, height: 18, borderRadius: 9, alignItems: "center", justifyContent: "center", paddingHorizontal: 4 },
+  happyBadge: {
+    position: "absolute",
+    left: -6,
+    top: 8,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  hereBadge: {
+    position: "absolute",
+    right: -8,
+    top: 8,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+  },
 });

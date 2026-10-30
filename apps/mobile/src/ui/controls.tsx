@@ -208,7 +208,8 @@ export function Row({
   last,
 }: {
   title: string;
-  subtitle?: string;
+  /** A string, or a node such as a RelativeTime (QOL-12). */
+  subtitle?: ReactNode;
   leading?: ReactNode;
   trailing?: ReactNode;
   onPress?: () => void;

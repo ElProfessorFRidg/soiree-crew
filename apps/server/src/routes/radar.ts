@@ -2,17 +2,24 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { newId } from "../crypto";
+import { assertPublishable } from "../posting";
 import { crewTimeZone } from "../territory";
-import { nightOf } from "../time";
+import { dayBoundaryOf, nightOf, userClock } from "../time";
 
 const night = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
-const statusSchema = z.object({
-  night,
-  status: z.enum(["going_out", "maybe", "home", "unavailable"]),
-  fromMinute: z.number().int().min(0).max(36 * 60).nullable().optional(),
-  toMinute: z.number().int().min(0).max(36 * 60).nullable().optional(),
-  place: z.string().trim().max(60).optional(),
-});
+/** N-01: the window counts minutes from midnight of the night's date, past 24 h for after midnight. */
+const statusSchema = z
+  .object({
+    night,
+    status: z.enum(["going_out", "maybe", "home", "unavailable"]),
+    fromMinute: z.number().int().min(0).max(36 * 60).nullable().optional(),
+    toMinute: z.number().int().min(0).max(36 * 60).nullable().optional(),
+    place: z.string().trim().max(60).optional(),
+  })
+  .refine((s) => s.fromMinute == null || s.toMinute == null || s.toMinute > s.fromMinute, { message: "window" });
+
+/** N-01: a status can be set for tonight and the six nights after, the span the board shows. */
+const STATUS_DAYS_AHEAD = 6;
 
 function addDays(key: string, days: number): string {
   const date = new Date(`${key}T12:00:00Z`);
@@ -34,11 +41,21 @@ export function radarRoutes(app: FastifyInstance, ctx: Context): void {
   app.put("/v1/status", async (request) => {
     const user = requireUser(request);
     const input = statusSchema.parse(request.body);
+    // N-01: tonight up to six nights ahead, one day of slack either side for a phone in another zone.
+    const clock = await userClock(ctx.db, user.id);
+    const firstCrew = (await ctx.db.query<{ crew_id: string }>("select crew_id from crew_members where user_id = $1 order by joined_at limit 1", [user.id]))[0];
+    const timeZone = clock.timeZone ?? (firstCrew ? await crewTimeZone(ctx.db, firstCrew.crew_id) : "Europe/Paris");
+    const tonight = nightOf(ctx.now(), timeZone, clock.dayBoundaryHour);
+    if (input.night < addDays(tonight, -1) || input.night > addDays(tonight, STATUS_DAYS_AHEAD + 1)) throw new HttpError(400, "invalid");
+    // A window and a place only mean something when going out (or maybe).
+    const out = input.status === "going_out" || input.status === "maybe";
     await ctx.db.query(
       `insert into night_statuses (user_id, night, status, from_minute, to_minute, place, updated_at) values ($1, $2, $3, $4, $5, $6, $7)
        on conflict (user_id, night) do update set status = $3, from_minute = $4, to_minute = $5, place = $6, updated_at = $7`,
-      [user.id, input.night, input.status, input.fromMinute ?? null, input.toMinute ?? null, input.place ?? "", ctx.now()],
+      [user.id, input.night, input.status, out ? (input.fromMinute ?? null) : null, out ? (input.toMinute ?? null) : null, out ? (input.place ?? "") : "", ctx.now()],
     );
+    // Statuses expire with their night: past ones are never shown, so they are not kept either.
+    await ctx.db.query("delete from night_statuses where user_id = $1 and night < $2", [user.id, addDays(tonight, -1)]);
     const mates = await crewMates(ctx, user.id);
     const crews = await ctx.db.query<{ crew_id: string }>("select crew_id from crew_members where user_id = $1", [user.id]);
     for (const crew of crews) ctx.live.notify(mates, { type: "crew.changed", crewId: crew.crew_id });
@@ -56,8 +73,9 @@ export function radarRoutes(app: FastifyInstance, ctx: Context): void {
     const user = requireUser(request);
     await assertCrewMember(ctx, request.params.id, user.id);
     const timeZone = await crewTimeZone(ctx.db, request.params.id);
-    const tonight = nightOf(ctx.now(), timeZone);
-    const last = addDays(tonight, 6);
+    // QOL-02: the board describes the evening of the person looking at it.
+    const tonight = nightOf(ctx.now(), timeZone, await dayBoundaryOf(ctx.db, user.id));
+    const last = addDays(tonight, STATUS_DAYS_AHEAD);
     const members = await ctx.db.query<{ user_id: string; display_name: string }>(
       "select m.user_id, u.display_name from crew_members m join users u on u.id = m.user_id where m.crew_id = $1 order by u.display_name",
       [request.params.id],
@@ -79,7 +97,7 @@ export function radarRoutes(app: FastifyInstance, ctx: Context): void {
       : [];
     return {
       tonight,
-      nights: Array.from({ length: 7 }, (_, i) => addDays(tonight, i)),
+      nights: Array.from({ length: STATUS_DAYS_AHEAD + 1 }, (_, i) => addDays(tonight, i)),
       members: members.map((m) => ({ userId: m.user_id, name: m.display_name })),
       statuses: statuses.map((s) => ({ userId: s.user_id, night: s.night, status: s.status, fromMinute: s.from_minute, toMinute: s.to_minute, place: s.place })),
       calls: calls.map((c) => ({
@@ -98,8 +116,10 @@ export function radarRoutes(app: FastifyInstance, ctx: Context): void {
     const user = requireUser(request);
     await assertCrewMember(ctx, request.params.id, user.id);
     const input = z.object({ note: z.string().trim().max(80).optional() }).parse(request.body ?? {});
+    // COM-08: the note goes to the whole crew.
+    await assertPublishable(ctx, user.id, [input.note]);
     const timeZone = await crewTimeZone(ctx.db, request.params.id);
-    const tonight = nightOf(ctx.now(), timeZone);
+    const tonight = nightOf(ctx.now(), timeZone, await dayBoundaryOf(ctx.db, user.id));
     const id = newId();
     await ctx.db.query("insert into out_calls (id, crew_id, user_id, night, note, created_at) values ($1, $2, $3, $4, $5, $6)", [
       id,

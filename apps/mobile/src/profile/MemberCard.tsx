@@ -32,7 +32,8 @@ export function MemberCard() {
   if (!view.sections.identity) return <Text variant="small">{i18n.t("people.cardEmpty")}</Text>;
   const s = view.sections;
   const held = (s.titles ?? []).filter((t) => t.kind === "mayor").length;
-  const favourite = s.drinks?.favourites[0];
+  // PROF-03: the owner may have hidden the favourites.
+  const favourite = s.drinks?.favourites?.[0];
 
   const share = async () => {
     if (!card.current) return;
@@ -66,7 +67,7 @@ export function MemberCard() {
           </View>
         ) : null}
         {held ? <Text>{i18n.plural("people.cardBars", held)}</Text> : null}
-        {s.nights && s.nights.total > 0 ? <Text>{i18n.plural("people.cardNights", s.nights.total)}</Text> : null}
+        {s.nights?.total ? <Text>{i18n.plural("people.cardNights", s.nights.total)}</Text> : null}
         {favourite ? <Text variant="small">{i18n.t("people.favourites", { list: drinkLabel({ kind: favourite.kind as DrinkKind }, i18n) })}</Text> : null}
         {s.crews?.length ? <Text variant="small">{s.crews.map((c) => c.name).join(", ")}</Text> : null}
         <Text variant="label" align="center">

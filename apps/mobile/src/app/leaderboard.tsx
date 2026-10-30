@@ -4,6 +4,7 @@ import { StyleSheet, View } from "react-native";
 import Animated, { LinearTransition, ZoomIn } from "react-native-reanimated";
 import { duration } from "@crew/design-tokens";
 import { useT } from "@/i18n";
+import { useCrewNames } from "@/crew/names";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
 import { leaderChanged as isNewLeader, splitPodium } from "@/motion/math/podium";
@@ -88,6 +89,7 @@ export default function LeaderboardScreen() {
   const params = useLocalSearchParams<{ crewId?: string }>();
   const crews = useCrewData((state) => state.crews);
   const crewId = params.crewId ?? crews[0]?.id;
+  const crewName = useCrewNames(crewId);
   const live = useLiveParty();
   const livePartyId = live?.party.id;
   const me = useSession((state) => state.session?.userId);
@@ -144,7 +146,7 @@ export default function LeaderboardScreen() {
 
   const myRow = rows.find((r) => r.userId === me);
   const { podium, rest } = splitPodium(rows);
-  const displayName = (row: { userId: string; name: string }) => (row.userId === me ? `${row.name} (${i18n.t("crew.you")})` : row.name);
+  const displayName = (row: { userId: string; name: string }) => (row.userId === me ? `${crewName(row.userId, row.name)} (${i18n.t("crew.you")})` : crewName(row.userId, row.name));
   const shownValue = (value: number) => (metric === "grams" ? `${value} g` : String(value));
 
   return (
@@ -183,7 +185,7 @@ export default function LeaderboardScreen() {
             <View
               style={[styles.row, { borderBottomColor: theme.line }]}
               accessible
-              accessibilityLabel={i18n.t("ranking.a11y", { rank: row.rank, name: row.name, value: row.value })}
+              accessibilityLabel={i18n.t("ranking.a11y", { rank: row.rank, name: crewName(row.userId, row.name), value: row.value })}
             >
               <View style={styles.rank}>
                 {row.rank === 1 && row.value > 0 ? (
@@ -196,7 +198,7 @@ export default function LeaderboardScreen() {
                   </Numeral>
                 )}
               </View>
-              <Avatar personId={row.userId} name={row.name} size={40} />
+              <Avatar personId={row.userId} name={crewName(row.userId, row.name)} size={40} />
               <Text variant="h3" style={styles.flex}>
                 {displayName(row)}
               </Text>
@@ -222,9 +224,9 @@ export default function LeaderboardScreen() {
           {confirmable.length === 0 ? <Text variant="small">{i18n.t("ranking.noConfirmable")}</Text> : null}
           {confirmable.map((drink) => (
             <View key={drink.id} style={styles.confirmRow}>
-              <Avatar personId={drink.userId} name={drink.name} size={32} />
+              <Avatar personId={drink.userId} name={crewName(drink.userId, drink.name)} size={32} />
               <Text style={styles.flex}>
-                {drink.name}, {formatClock(drink.consumedAt, i18n.language, hourCycle)}
+                {crewName(drink.userId, drink.name)}, {formatClock(drink.consumedAt, i18n.language, hourCycle)}
               </Text>
               <Button
                 label={drink.confirmedByMe ? i18n.t("ranking.confirmed") : i18n.t("ranking.confirm")}
@@ -276,6 +278,7 @@ export default function LeaderboardScreen() {
 /** TER-06: bars held this season and the titles that come with going out. */
 function BarTitles({ crewId }: { crewId: string }) {
   const i18n = useT();
+  const crewName = useCrewNames(crewId);
   const theme = useTheme();
   const [rows, setRows] = useState<TitlesRow[]>([]);
   useEffect(() => {
@@ -292,9 +295,9 @@ function BarTitles({ crewId }: { crewId: string }) {
       <View>
         {rows.map((row, index) => (
           <View key={row.userId} style={[styles.row, { borderBottomColor: theme.line, borderBottomWidth: index === rows.length - 1 ? 0 : 1 }]}>
-            <Avatar personId={row.userId} name={row.name} />
+            <Avatar personId={row.userId} name={crewName(row.userId, row.name)} />
             <View style={styles.flex}>
-              <Text variant="h3">{row.name}</Text>
+              <Text variant="h3">{crewName(row.userId, row.name)}</Text>
               <Text variant="small">
                 {i18n.plural("ranking.ruled", row.ruled)}, {i18n.plural("ranking.visited", row.visited)}
               </Text>

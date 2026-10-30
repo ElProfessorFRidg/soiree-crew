@@ -8,6 +8,7 @@ import { useGameLock } from "./unlocks";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
 import { useCrewData } from "@/server/crewData";
+import { useCrewNames } from "@/crew/names";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
 import { Button, IconButton } from "@/ui/Button";
@@ -41,6 +42,7 @@ export function SetupScreen({ gameId }: { gameId: GameId }) {
   const table = useGamesStore((s) => s.table);
   const settings = { ...DEFAULT_SETTINGS, ...useGamesStore((s) => s.settings[gameId]) };
   const crews = useCrewData((s) => s.crews);
+  const nameOf = useCrewNames();
   const [name, setName] = useState("");
 
   const members = crews.flatMap((crew) => crew.members).filter((m, i, all) => all.findIndex((x) => x.id === m.id) === i);
@@ -48,7 +50,7 @@ export function SetupScreen({ gameId }: { gameId: GameId }) {
 
   useEffect(() => {
     // First game on this phone: the table starts from the crew, when there is one (O-49).
-    if (table.length === 0 && members.length > 0) for (const m of members) addTablePlayer(m.nickname ?? m.displayName, m.id);
+    if (table.length === 0 && members.length > 0) for (const m of members) addTablePlayer(nameOf(m.id, m.displayName), m.id);
     // Only on first open; later edits of the table are the user's.
   }, []);
 
@@ -131,7 +133,7 @@ export function SetupScreen({ gameId }: { gameId: GameId }) {
             <Text variant="label">{g.t("setup.fromCrew")}</Text>
             <View style={styles.chips}>
               {missingMembers.map((m) => (
-                <Chip key={m.id} label={m.nickname ?? m.displayName} icon="plus" onPress={() => addTablePlayer(m.nickname ?? m.displayName, m.id)} />
+                <Chip key={m.id} label={nameOf(m.id, m.displayName)} icon="plus" onPress={() => addTablePlayer(nameOf(m.id, m.displayName), m.id)} />
               ))}
             </View>
           </>

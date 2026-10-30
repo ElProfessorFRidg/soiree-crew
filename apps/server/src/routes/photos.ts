@@ -5,6 +5,7 @@ import { join } from "node:path";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { HttpError, requireUser, type Context } from "../context";
+import { assertCanPost } from "../posting";
 import { RateLimiter } from "../ratelimit";
 
 const uuid = z.string().uuid();
@@ -24,10 +25,23 @@ function signature(ctx: Context, id: string, exp: number): string {
   return createHmac("sha256", ctx.hashSecret).update(`photo:${id}:${exp}`).digest("base64url");
 }
 
-/** A link to one photo that works for an hour, for screens that show it outside the album (N-22). */
+/** A link to one photo that works for an hour: album photos shown elsewhere (N-22), review photos and moderation (COM-02, COM-08). */
 export function signedPhotoUrl(ctx: Context, id: string): string {
   const exp = ctx.now() + LINK_TTL_MS;
   return `${ctx.publicUrl}/v1/photos/${id}?exp=${exp}&sig=${signature(ctx, id, exp)}`;
+}
+
+/**
+ * QOL-09: checks and stores one JPEG sent as base64. Shared by the party album and review photos (COM-02).
+ * Returns the decoded size.
+ */
+export async function storeJpeg(ctx: Context, id: string, data: string): Promise<number> {
+  const bytes = Buffer.from(data, "base64");
+  const jpeg = bytes.length > 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  if (!jpeg) throw new HttpError(400, "not_jpeg");
+  if (bytes.length > MAX_BYTES) throw new HttpError(413, "too_large");
+  await writeFile(photoPath(ctx, id), bytes);
+  return bytes.length;
 }
 
 /** Members who may see a party's album: its crew members who said they were going. */
@@ -50,6 +64,7 @@ export function photoRoutes(app: FastifyInstance, ctx: Context): void {
   app.post<{ Params: { id: string } }>("/v1/parties/:id/photos", { bodyLimit: 8 * 1024 * 1024 }, async (request, reply) => {
     const user = requireUser(request);
     await assertGoing(ctx, request.params.id, user.id);
+    await assertCanPost(ctx, user.id);
     uploads.check(user.id);
     const input = z
       .object({ id: uuid, data: z.string().min(100).max(7_000_000), width: z.number().int().min(1).max(8000), height: z.number().int().min(1).max(8000) })
@@ -112,7 +127,7 @@ export function photoRoutes(app: FastifyInstance, ctx: Context): void {
     const expected = signature(ctx, id, exp);
     const valid = Number.isFinite(exp) && exp > ctx.now() && sig.length === expected.length && timingSafeEqual(Buffer.from(sig), Buffer.from(expected));
     if (!valid) throw new HttpError(404, "not_found");
-    const exists = await ctx.db.query("select 1 from photos where id = $1", [id]);
+    const exists = await ctx.db.query("select 1 from photos where id = $1 union all select 1 from review_photos where id = $1", [id]);
     if (!exists.length) throw new HttpError(404, "not_found");
     const file = await readFile(photoPath(ctx, id)).catch(() => null);
     if (!file) throw new HttpError(404, "not_found");
@@ -130,6 +145,6 @@ export function photoRoutes(app: FastifyInstance, ctx: Context): void {
 
 /** O-07: files of a deleted account go with it. Called before the rows are removed. */
 export async function deletePhotoFiles(ctx: Context, userId: string): Promise<void> {
-  const rows = await ctx.db.query<{ id: string }>("select id from photos where user_id = $1", [userId]);
+  const rows = await ctx.db.query<{ id: string }>("select id from photos where user_id = $1 union all select id from review_photos where user_id = $1", [userId]);
   for (const r of rows) await unlink(photoPath(ctx, r.id)).catch(() => undefined);
 }

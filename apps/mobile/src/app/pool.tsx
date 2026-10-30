@@ -1,10 +1,10 @@
-import * as Clipboard from "expo-clipboard";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
-import { Linking, Pressable, Share, StyleSheet, View } from "react-native";
+import { useCallback, useState } from "react";
+import { Linking, Share, StyleSheet, View } from "react-native";
 import { formatMoney } from "@crew/money";
 import { Field } from "@/crew/Field";
 import { useT } from "@/i18n";
+import { useCrewNames } from "@/crew/names";
 import { haptic } from "@/motion/haptics";
 import {
   deleteExpense,
@@ -23,20 +23,17 @@ import { showToast } from "@/ui/Toast";
 import { SkeletonRows } from "@/ui/Skeleton";
 import { showFailure } from "@/server/errors";
 import { confirmAction } from "@/ui/confirm";
+import { Copyable } from "@/ui/Copyable";
+import { PoolMembers } from "@/money/PoolMembers";
+import { ReceiptThumb } from "@/money/ReceiptViewer";
 
 export default function PoolScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const i18n = useT();
   const me = useSession((state) => state.session?.userId);
   const [detail, setDetail] = useState<PoolDetail | null>(null);
+  const crewName = useCrewNames();
   const [iban, setIban] = useState<string | null>(null);
-  // N-19 (Argent board): a long press copies the IBAN and says "Copied" in place for 1.8 s.
-  const [copied, setCopied] = useState<string | null>(null);
-  useEffect(() => {
-    if (!copied) return;
-    const timer = setTimeout(() => setCopied(null), 1800);
-    return () => clearTimeout(timer);
-  }, [copied]);
 
   const load = useCallback(() => {
     void fetchPool(id).then(setDetail).catch(showFailure(i18n));
@@ -53,7 +50,7 @@ export default function PoolScreen() {
   const nameOf = (userId: string) =>
     userId === me
       ? i18n.t("common.you")
-      : (detail.members.find((m) => m.userId === userId)?.name ?? "?");
+      : crewName(userId, detail.members.find((m) => m.userId === userId)?.name);
   const money = (amount: number, currency: string) =>
     formatMoney(amount, currency, i18n.locale);
   const mine = detail.members.find((m) => m.userId === me);
@@ -61,9 +58,11 @@ export default function PoolScreen() {
 
   return (
     <Screen back title={detail.pool.name} withToasts>
-      <Text variant="small">
-        {i18n.plural("money.members", detail.members.length)}
-      </Text>
+      <PoolMembers
+        detail={detail}
+        nameOf={(userId, fallback) => (userId === me ? i18n.t("common.you") : crewName(userId, fallback))}
+        onAdded={load}
+      />
 
       <Text variant="label">
         {detail.settlement.some((s) => s.transfers.length)
@@ -88,7 +87,7 @@ export default function PoolScreen() {
                 <Avatar
                   personId={other}
                   name={
-                    detail.members.find((m) => m.userId === other)?.name ?? "?"
+                    crewName(other, detail.members.find((m) => m.userId === other)?.name)
                   }
                   size={34}
                 />
@@ -111,23 +110,8 @@ export default function PoolScreen() {
                 </Text>
               </View>
               {payee?.payment?.iban && t.fromId === me ? (
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityHint={i18n.t("money.copyHint")}
-                  onLongPress={() => {
-                    void Clipboard.setStringAsync(payee.payment!.iban!);
-                    haptic.confirmed();
-                    setCopied(key);
-                  }}
-                >
-                  <Text variant="small">{i18n.t("money.iban")}</Text>
-                  <Text selectable>{payee.payment.iban}</Text>
-                  <Text variant="small">
-                    {copied === key
-                      ? i18n.t("money.copied")
-                      : i18n.t("money.copyHint")}
-                  </Text>
-                </Pressable>
+                // QOL-19: long press copies with an inline "Copied"; a Copy button at levels 2 and 3.
+                <Copyable value={payee.payment.iban} label={i18n.t("money.iban")} showHint />
               ) : null}
               {payee?.payment?.link && t.fromId === me ? (
                 <Button
@@ -200,18 +184,31 @@ export default function PoolScreen() {
         {detail.expenses.map((expense, index) => (
           <Row
             key={expense.id}
-            title={`${expense.description} · ${money(expense.amount, expense.currency)}`}
-            subtitle={
+            // N-19: paid in another currency, both amounts show; balances use the pool's.
+            title={`${expense.description} · ${
+              expense.poolAmount != null && expense.currency !== detail.pool.currency
+                ? i18n.t("money.bothAmounts", { amount: money(expense.amount, expense.currency), converted: money(expense.poolAmount, detail.pool.currency) })
+                : money(expense.amount, expense.currency)
+            }`}
+            subtitle={[
               expense.payerId === me
                 ? i18n.t("money.youPaid")
-                : i18n.t("money.paidBy", { name: nameOf(expense.payerId) })
-            }
+                : i18n.t("money.paidBy", { name: nameOf(expense.payerId) }),
+              expense.venue?.name,
+              expense.party && expense.party.id !== detail.pool.partyId
+                ? expense.party.kind === "trip"
+                  ? i18n.t("money.tripName", { name: expense.party.name })
+                  : expense.party.name
+                : null,
+            ]
+              .filter(Boolean)
+              .join(", ")}
+            trailing={expense.receiptUrl ? <ReceiptThumb url={expense.receiptUrl} title={expense.description} /> : undefined}
             leading={
               <Avatar
                 personId={expense.payerId}
                 name={
-                  detail.members.find((m) => m.userId === expense.payerId)
-                    ?.name ?? "?"
+                  crewName(expense.payerId, detail.members.find((m) => m.userId === expense.payerId)?.name)
                 }
                 size={34}
               />

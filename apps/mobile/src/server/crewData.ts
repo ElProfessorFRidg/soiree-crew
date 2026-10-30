@@ -11,6 +11,8 @@ export interface CrewMember {
   username: string;
   displayName: string;
   nickname: string | null;
+  /** QOL-11: who gave the nickname, shown so the crew can see it and undo it. */
+  nicknameSetBy?: string | null;
   role: "admin" | "member";
 }
 
@@ -51,6 +53,12 @@ export interface Party {
   closedAt: number | null;
   live: boolean;
   myResponse: PartyResponse;
+  /** COM-05: the place where the hosts opened the party to join requests. */
+  openVenueId?: string | null;
+  /** COM-05: I created it or admin its crew, so I open it and decide on join requests. */
+  host?: boolean;
+  /** COM-05: a party of another crew I was invited to, by whom, and whether I may bring my crew. */
+  guest?: { invitedBy: string | null; mayBringCrew: boolean };
 }
 
 export interface LiveMember {

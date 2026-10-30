@@ -8,7 +8,7 @@ import { View } from "react-native";
 import { Field } from "@/crew/Field";
 import { useT, type Translator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
-import { exportMyData } from "./exportData";
+import { DataControls } from "./DataControls";
 import { api, ApiError } from "@/server/api";
 import { serverMessage, showFailure, failureMessage } from "@/server/errors";
 import { useCrewData } from "@/server/crewData";
@@ -298,17 +298,7 @@ export function AccountSection() {
           />
           <Credentials />
           <Devices />
-          <Button
-            label={i18n.t("account.export")}
-            variant="outline"
-            height={44}
-            accessibilityHint={i18n.t("account.exportHint")}
-            onPress={() =>
-              void exportMyData()
-                .then(() => showToast({ message: i18n.t("account.exportReady") }))
-                .catch(showFailure(i18n))
-            }
-          />
+          <DataControls />
           <Button
             label={i18n.t("account.signOut")}
             variant="outline"

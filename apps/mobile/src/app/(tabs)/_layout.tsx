@@ -12,6 +12,7 @@ import { haptic } from "@/motion/haptics";
 import { useMorningAfter } from "@/recap/morning";
 import { useHomeScreenActions } from "@/system/quickActions";
 import { useLevelNow } from "@/state/levelNow";
+import { useInvitations } from "@/server/socialData";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Icon, type AnyIconName } from "@/ui/Icon";
@@ -29,8 +30,9 @@ const TAB_ICONS: Record<string, AnyIconName> = {
 };
 
 /** One tab: the icon pops when it becomes the active one (DESIGN.md §5 pop), static under Reduce Motion. */
-function TabItem({ label, icon, focused, onPress }: { label: string; icon: AnyIconName; focused: boolean; onPress: () => void }) {
+function TabItem({ label, icon, focused, onPress, badge = 0 }: { label: string; icon: AnyIconName; focused: boolean; onPress: () => void; badge?: number }) {
   const theme = useTheme();
+  const i18n = useT();
   const reduceMotion = useReducedMotion();
   const scale = useSharedValue(1);
   useEffect(() => {
@@ -46,13 +48,21 @@ function TabItem({ label, icon, focused, onPress }: { label: string; icon: AnyIc
     <ScalePressable
       accessibilityRole="tab"
       accessibilityState={{ selected: focused }}
-      accessibilityLabel={label}
+      // O-36: the badge is read out with the tab, not as a separate element.
+      accessibilityLabel={badge > 0 ? `${label}, ${i18n.plural("crew.tabBadge", badge)}` : label}
       pressedScale={0.94}
       onPress={onPress}
       style={styles.item}
     >
       <Animated.View style={iconStyle}>
         <Icon name={icon} size={22} color={color} />
+        {badge > 0 ? (
+          <View style={[styles.badge, { backgroundColor: theme.danger, borderColor: theme.bg }]}>
+            <Text variant="tag" color={theme.bg} style={styles.badgeText}>
+              {badge > 99 ? "99+" : String(badge)}
+            </Text>
+          </View>
+        ) : null}
       </Animated.View>
       <Text variant="tab" color={color} numberOfLines={1}>
         {label}
@@ -66,6 +76,8 @@ function TabBar({ state, descriptors, navigateToTab }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const reduceMotion = useReducedMotion();
   const [width, setWidth] = useState(0);
+  // O-36: the real number of invitations waiting, on the Crew tab (DESIGN.md: badge in danger colour).
+  const invitations = useInvitations((s) => s.total);
   const slot = width / Math.max(1, state.routes.length);
   // A short amber line slides to the active tab.
   const x = useSharedValue(0);
@@ -91,6 +103,7 @@ function TabBar({ state, descriptors, navigateToTab }: BottomTabBarProps) {
           label={descriptors[route.key]?.options.title ?? route.name}
           icon={TAB_ICONS[route.name] ?? "more"}
           focused={state.index === index}
+          badge={route.name === "crew" ? invitations : 0}
           onPress={() => {
             if (state.index === index) return;
             haptic.select();
@@ -135,6 +148,19 @@ const styles = StyleSheet.create({
   },
   indicatorSlot: { position: "absolute", top: -1, left: 6, alignItems: "center" },
   indicator: { width: 28, height: 2, borderRadius: 1 },
+  badge: {
+    position: "absolute",
+    top: -6,
+    left: 14,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+    paddingHorizontal: 4,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badgeText: { fontSize: 10, lineHeight: 12 },
   item: {
     flex: 1,
     minHeight: 44,

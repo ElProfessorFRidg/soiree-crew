@@ -4,10 +4,11 @@ import { StyleSheet, View } from "react-native";
 import { Field } from "@/crew/Field";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
-import { addVenue, currentFix, type VenueKind } from "@/server/venueData";
+import { useCrewData } from "@/server/crewData";
+import { addVenue, currentFix, useVenueData, type VenueKind } from "@/server/venueData";
 import { useTheme } from "@/theme";
 import { Button } from "@/ui/Button";
-import { Panel, Segmented } from "@/ui/controls";
+import { Panel, Segmented, Switch } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
@@ -15,13 +16,22 @@ import { useDraft } from "@/state/drafts";
 import { showFailure } from "@/server/errors";
 import { OpenSettingsButton } from "@/system/OpenSettingsButton";
 
-/** N-08: a venue is placed where the user stands; no address search, no third-party geocoder. */
+/**
+ * N-08: a venue is placed where the user stands; no address search, no third-party geocoder.
+ * The address is typed (for directions and to copy), and the crew's HQ is a switch away.
+ */
 export default function AddVenueScreen() {
   const i18n = useT();
   const theme = useTheme();
   const { crewId } = useLocalSearchParams<{ crewId: string }>();
   const [name, setName, clearName] = useDraft("add-venue:name");
+  const [address, setAddress, clearAddress] = useDraft("add-venue:address");
   const [kind, setKind] = useState<VenueKind>("bar");
+  const [isHq, setIsHq] = useState(false);
+  const isAdmin = useCrewData((state) => state.crews.find((c) => c.id === crewId)?.role === "admin");
+  const hasHq = useVenueData((state) => (crewId ? (state.byCrew[crewId]?.venues.some((v) => v.isHq) ?? false) : false));
+  // The server says the same: the first HQ is anyone's call, moving it is the admin's.
+  const canHq = kind !== "home" && (!hasHq || isAdmin);
   const [position, setPosition] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [blocked, setBlocked] = useState(false);
@@ -51,10 +61,11 @@ export default function AddVenueScreen() {
           onPress={() => {
             if (!position || !crewId) return;
             setBusy(true);
-            addVenue(crewId, { name: name.trim(), kind, ...position })
+            addVenue(crewId, { name: name.trim(), kind, ...position, ...(address.trim() ? { address: address.trim() } : {}), ...(canHq && isHq ? { isHq: true } : {}) })
               .then(() => {
                 haptic.confirmed();
                 clearName();
+                clearAddress();
                 router.back();
               })
               .catch(showFailure(i18n))
@@ -74,6 +85,27 @@ export default function AddVenueScreen() {
         />
         {kind === "home" ? <Text variant="small">{i18n.t("addVenue.homeHint")}</Text> : null}
       </Panel>
+      <Field
+        label={i18n.t("addVenue.address")}
+        placeholder={i18n.t("addVenue.addressPlaceholder")}
+        hint={i18n.t("addVenue.addressHint")}
+        value={address}
+        onChangeText={setAddress}
+        maxLength={120}
+        textContentType="fullStreetAddress"
+        autoComplete="street-address"
+      />
+      {canHq ? (
+        <Panel>
+          <View style={styles.switchRow}>
+            <View style={styles.flex}>
+              <Text>{i18n.t("addVenue.hq")}</Text>
+              <Text variant="small">{hasHq ? i18n.t("addVenue.hqMove") : i18n.t("addVenue.hqHint")}</Text>
+            </View>
+            <Switch value={isHq} onValueChange={setIsHq} accessibilityLabel={i18n.t("addVenue.hq")} />
+          </View>
+        </Panel>
+      ) : null}
       <View style={styles.status}>
         {locationError ? (
           <>
@@ -90,4 +122,6 @@ export default function AddVenueScreen() {
 
 const styles = StyleSheet.create({
   status: { minHeight: 24 },
+  switchRow: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 48 },
+  flex: { flex: 1, gap: 2 },
 });

@@ -7,6 +7,7 @@ import { removeDrink, removeWater, restoreDrink } from "@/drinks/actions";
 import { drinkLabel } from "@/drinks/display";
 import { useT } from "@/i18n";
 import { formatClock } from "@/i18n/format";
+import { RelativeTime } from "@/ui/RelativeTime";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
 import { useAppStore } from "@/state/store";
@@ -128,6 +129,7 @@ export default function HistoryScreen() {
                       <View style={[styles.item, { backgroundColor: theme.surface }]}>
                         <Numeral size={22}>{formatClock(drink.consumedAt, i18n.language, preferences.hourCycle)}</Numeral>
                         <View style={styles.flex}>
+                          <RelativeTime at={drink.consumedAt} />
                           {drink.sync !== "saved" ? <Tag label={i18n.t("common.sending")} icon="clock" /> : null}
                         </View>
                         {/* The swipe is a shortcut: the button stays for a drunk thumb (ADP-04). */}

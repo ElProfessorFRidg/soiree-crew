@@ -5,17 +5,20 @@ import { Field } from "@/crew/Field";
 import { useT } from "@/i18n";
 import { useAppStore } from "@/state/store";
 import { haptic } from "@/motion/haptics";
-import { fetchProfile, PROFILE_SECTIONS, saveProfile, type Audience, type Findable, type ProfileSection, type ProfileView } from "@/server/profileData";
+import { fetchProfile, PROFILE_SECTIONS, PROFILE_STATS, saveProfile, type Audience, type Findable, type ProfileSection, type ProfileView, type ReviewAudience } from "@/server/profileData";
+import { setReviewAudience } from "@/server/placeData";
 import { Button } from "@/ui/Button";
 import { Chip, Panel, Segmented, Switch } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { showFailure } from "@/server/errors";
+import { BirthdayEditor } from "@/profile/BirthdayEditor";
 
 const AUDIENCES: Audience[] = ["me", "crews", "friends", "everyone"];
+const REVIEW_AUDIENCES: ReviewAudience[] = ["public", "anonymous", "friends", "me"];
 
-/** PROF-01, PROF-03: presets, an audience per section, and venues hidden one by one. */
+/** PROF-01, PROF-03, PROF-04: presets, an audience per section, and venues, reviews and figures hidden one by one. */
 export default function EditProfileScreen() {
   const i18n = useT();
   const [profile, setProfile] = useState<ProfileView | null>(null);
@@ -40,6 +43,9 @@ export default function EditProfileScreen() {
   const audiences = profile.audiences;
   const venues = profile.sections.venues ?? [];
   const hidden = venues.filter((v) => v.hidden).map((v) => v.venueId);
+  const reviews = profile.sections.reviews ?? [];
+  const hiddenReviews = reviews.filter((r) => r.hidden).map((r) => r.id);
+  const hiddenStats = profile.hiddenStats ?? [];
 
   const apply = (input: Parameters<typeof saveProfile>[0]) => {
     haptic.select();
@@ -75,6 +81,11 @@ export default function EditProfileScreen() {
         }}
       />
 
+      <BirthdayEditor
+        initial={profile.sections.birthday}
+        onSaved={(birthday) => setProfile((p) => (p ? { ...p, sections: { ...p.sections, birthday: birthday ?? undefined } } : p))}
+      />
+
       <Text variant="label">{i18n.t("people.presets")}</Text>
       <View style={styles.chips}>
         <Chip label={i18n.t("people.presetPrivate")} onPress={() => apply({ preset: "private" })} />
@@ -94,6 +105,7 @@ export default function EditProfileScreen() {
           />
         </View>
       ))}
+      <Text variant="small">{i18n.t("people.reviewAudienceHint")}</Text>
       <Text variant="small">{i18n.t("people.neverStrangers")}</Text>
 
       <Text variant="label">{i18n.t("people.findable")}</Text>
@@ -192,6 +204,65 @@ export default function EditProfileScreen() {
           <Text variant="small">{i18n.t("people.hideVenue")}</Text>
         </Panel>
       ) : null}
+
+      {reviews.length ? (
+        // PROF-03, PROF-04: each review's audience and visibility, changed one by one. The place
+        // page and the profile both read them from the server, so both follow at once.
+        <Panel>
+          <Text variant="label">{i18n.t("people.myReviews")}</Text>
+          {reviews.map((r) => (
+            <View key={r.id} style={styles.review}>
+              <View style={styles.switchRow}>
+                <Text variant="h3" style={styles.flex}>
+                  {r.place}
+                </Text>
+                <Switch
+                  value={!!r.hidden}
+                  accessibilityLabel={`${i18n.t("people.hideReview")}, ${r.place}`}
+                  onValueChange={(on) => {
+                    const next = on ? [...hiddenReviews, r.id] : hiddenReviews.filter((h) => h !== r.id);
+                    setProfile((p) => (p ? { ...p, sections: { ...p.sections, reviews: reviews.map((x) => (x.id === r.id ? { ...x, hidden: on } : x)) } } : p));
+                    apply({ hiddenReviews: next });
+                  }}
+                />
+              </View>
+              <View style={styles.chips}>
+                {REVIEW_AUDIENCES.map((a) => (
+                  <Chip
+                    key={a}
+                    label={i18n.t(`place.audience.${a}`)}
+                    selected={r.audience === a}
+                    onPress={() => {
+                      setProfile((p) => (p ? { ...p, sections: { ...p.sections, reviews: reviews.map((x) => (x.id === r.id ? { ...x, audience: a } : x)) } } : p));
+                      void setReviewAudience(r.id, a).catch(offline);
+                    }}
+                  />
+                ))}
+              </View>
+            </View>
+          ))}
+          <Text variant="small">{i18n.t("people.hideReview")}</Text>
+        </Panel>
+      ) : null}
+
+      <Panel>
+        <Text variant="label">{i18n.t("people.hideStats")}</Text>
+        {PROFILE_STATS.map((stat) => (
+          <View key={stat} style={styles.switchRow}>
+            <Text style={styles.flex}>{i18n.t(`people.stat.${stat}`)}</Text>
+            <Switch
+              value={hiddenStats.includes(stat)}
+              accessibilityLabel={`${i18n.t("people.hideStats")}, ${i18n.t(`people.stat.${stat}`)}`}
+              onValueChange={(on) => {
+                const next = on ? [...hiddenStats, stat] : hiddenStats.filter((s) => s !== stat);
+                setProfile((p) => (p ? { ...p, hiddenStats: next } : p));
+                apply({ hiddenStats: next });
+              }}
+            />
+          </View>
+        ))}
+        <Text variant="small">{i18n.t("people.hideStatsHint")}</Text>
+      </Panel>
     </Screen>
   );
 }
@@ -199,6 +270,7 @@ export default function EditProfileScreen() {
 const styles = StyleSheet.create({
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   section: { gap: 6 },
+  review: { gap: 6, paddingVertical: 4 },
   switchRow: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 48 },
   flex: { flex: 1 },
 });

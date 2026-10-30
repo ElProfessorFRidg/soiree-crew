@@ -197,6 +197,83 @@ export function crossesPersonalLimit(): { crosses: boolean; at: number | null } 
   return { crosses: true, at: estimate.peak.at };
 }
 
+/** N-06: a party I said yes to is announced this long before it starts. */
+const PARTY_LEAD_MS = 60 * MINUTE_MS;
+const PARTY_PREFIX = "party-soon-";
+/** QOL-21: a crew mate's birthday is announced this many days before, early evening. */
+const BIRTHDAY_LEAD_DAYS = 3;
+const BIRTHDAY_HOUR = 18;
+const BIRTHDAY_PREFIX = "birthday-";
+
+async function cancelStale(prefix: string, keep: ReadonlySet<string>): Promise<void> {
+  const scheduled = await Notifications.getAllScheduledNotificationsAsync().catch(() => []);
+  for (const n of scheduled) {
+    if (n.identifier.startsWith(prefix) && !keep.has(n.identifier)) await Notifications.cancelScheduledNotificationAsync(n.identifier).catch(() => undefined);
+  }
+}
+
+/**
+ * N-06: one local notification an hour before each party I said yes to. Saying no, or the
+ * party being cancelled or closed, takes its reminder away. Local only: no push involved.
+ */
+export async function schedulePartyReminders(
+  parties: readonly { id: string; name: string; mood: string; crewName: string; startsAt: number; closedAt: number | null; myResponse: string }[],
+): Promise<void> {
+  if (!supported) return;
+  const now = Date.now();
+  const upcoming = parties.filter((p) => p.myResponse === "going" && p.closedAt === null && p.startsAt - PARTY_LEAD_MS > now);
+  const keep = new Set(upcoming.map((p) => `${PARTY_PREFIX}${p.id}`));
+  await cancelStale(PARTY_PREFIX, keep);
+  if (!upcoming.length || !(await allowed())) return;
+  const { preferences } = useAppStore.getState();
+  const i18n = createTranslator(preferences.language);
+  for (const p of upcoming) {
+    const name = p.name || i18n.t(`newParty.moods.${p.mood}` as "newParty.moods.party");
+    const time = formatClock(p.startsAt, preferences.language, preferences.hourCycle);
+    await Notifications.scheduleNotificationAsync({
+      identifier: `${PARTY_PREFIX}${p.id}`,
+      content: { title: i18n.t("reminders.partySoonTitle", { party: name, time }), body: i18n.t("reminders.partySoonBody", { crew: p.crewName }), data: { url: `/live?id=${p.id}` } },
+      trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: new Date(p.startsAt - PARTY_LEAD_MS) },
+    }).catch(() => undefined);
+  }
+}
+
+/**
+ * QOL-21: crew mates' birthdays, a few days before at 6 pm (or as soon as the quiet hours end
+ * when that moment has passed). Once per birthday; the tap opens a party already filled in.
+ */
+export async function scheduleBirthdayReminders(birthdays: readonly { userId: string; name: string; date: string; crewId: string }[]): Promise<void> {
+  if (!supported) return;
+  const { preferences, birthdayNotified } = useAppStore.getState();
+  const seen = new Set<string>();
+  const fresh = birthdays.filter((b) => {
+    const key = `${b.userId}:${b.date}`;
+    if (seen.has(key) || birthdayNotified.includes(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  if (!fresh.length || !(await allowed())) return;
+  const i18n = createTranslator(preferences.language);
+  const now = Date.now();
+  for (const b of fresh) {
+    const [y, m, d] = b.date.split("-").map(Number) as [number, number, number];
+    const day = new Date(y, m - 1, d);
+    const lead = new Date(y, m - 1, d - BIRTHDAY_LEAD_DAYS, BIRTHDAY_HOUR).getTime();
+    // Already inside the window: the next decent moment, unless the day itself is over.
+    const at = lead > now ? lead : afterQuietHours(now + MINUTE_MS, preferences.quietFromHour, preferences.quietToHour);
+    if (at >= new Date(y, m - 1, d + 1).getTime()) continue;
+    const when = new Intl.DateTimeFormat(i18n.locale, { weekday: "long", day: "numeric", month: "long" }).format(day);
+    const partyName = i18n.t("radar.birthdayPartyName", { name: b.name });
+    const url = `/new-party?crewId=${encodeURIComponent(b.crewId)}&mood=birthday&date=${b.date}&name=${encodeURIComponent(partyName)}`;
+    await Notifications.scheduleNotificationAsync({
+      identifier: `${BIRTHDAY_PREFIX}${b.userId}-${b.date}`,
+      content: { title: i18n.t("radar.birthdayOn", { name: b.name, date: when }), body: i18n.t("radar.birthdayPlanQuestion"), data: { url } },
+      trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: new Date(at) },
+    }).catch(() => undefined);
+  }
+  useAppStore.setState({ birthdayNotified: [...birthdayNotified, ...seen].slice(-60) });
+}
+
 /** O-41: "the recap is ready" as soon as a party closes, at a decent hour. Once per party. */
 export async function notifyRecapReady(party: { id: string; name: string }): Promise<void> {
   const { recapNotified, preferences } = useAppStore.getState();

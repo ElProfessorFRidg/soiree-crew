@@ -1,12 +1,15 @@
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { formatMoney, parseAmount, shares } from "@crew/money";
+import { formatMoney, parseAmount } from "@crew/money";
 import { Field } from "@/crew/Field";
 import { useT } from "@/i18n";
+import { useCrewNames } from "@/crew/names";
 import { haptic } from "@/motion/haptics";
 import { useCrewData, useLiveParty } from "@/server/crewData";
-import { createPool, fetchPool, fetchPools, fetchRounds, type PoolSummary, type RoundsState } from "@/server/moneyData";
+import { createPool, fetchPartySpend, fetchPools, fetchRounds, type PoolSummary, type RoundsState } from "@/server/moneyData";
+import { checkBudget } from "@/money/budgetAlert";
+import { Chip } from "@/ui/controls";
 import { useSession } from "@/server/session";
 import { setPreferences } from "@/state/preferences";
 import { useAppStore } from "@/state/store";
@@ -20,19 +23,19 @@ import { showToast } from "@/ui/Toast";
 import { useDraft } from "@/state/drafts";
 import { showFailure } from "@/server/errors";
 
-/** N-20: tonight's spending is my share of the party pool's expenses. */
-function useTonightSpent(partyPoolId: string | undefined, me: string | undefined): number | null {
+/**
+ * N-20: tonight's spending is my share of the party's pools and of expenses tied to the party,
+ * counted by the server the same way as for the 90 % and 100 % alerts (checkBudget).
+ */
+function useTonightSpent(partyId: string | undefined, currency: string, refresh: number): number | null {
   const [spent, setSpent] = useState<number | null>(null);
   useEffect(() => {
-    if (!partyPoolId || !me) return;
-    void fetchPool(partyPoolId)
-      .then((detail) => {
-        let total = 0;
-        for (const expense of detail.expenses) total += shares(expense)[me] ?? 0;
-        setSpent(total);
-      })
+    if (!partyId) return;
+    void fetchPartySpend(partyId)
+      .then((data) => setSpent(data.spent.find((s) => s.currency === currency)?.amount ?? 0))
       .catch(() => undefined);
-  }, [partyPoolId, me]);
+    void checkBudget();
+  }, [partyId, currency, refresh]);
   return spent;
 }
 
@@ -49,6 +52,9 @@ export default function MoneyScreen() {
   const [rounds, setRounds] = useState<RoundsState | null>(null);
   const [poolName, setPoolName, clearPoolName] = useDraft("money:pool-name");
   const [budgetInput, setBudgetInput] = useState("");
+  // O-70: who the new pool is for. Everyone by default; unticking leaves someone out.
+  const [leftOut, setLeftOut] = useState<Set<string>>(new Set());
+  const [refresh, setRefresh] = useState(0);
 
   // Keyed on ids: useLiveParty builds a new object on every render.
   const crewKey = crew?.id;
@@ -56,15 +62,17 @@ export default function MoneyScreen() {
   const load = useCallback(() => {
     if (crewKey) void fetchPools(crewKey).then((data) => setPools(data.pools)).catch(() => undefined);
     if (partyKey) void fetchRounds(partyKey).then(setRounds).catch(() => undefined);
+    setRefresh((n) => n + 1);
   }, [crewKey, partyKey]);
   useFocusEffect(load);
 
-  const partyPool = live ? pools.find((p) => p.partyId === live.party.id) : undefined;
-  const spent = useTonightSpent(partyPool?.id, me);
+  const spent = useTonightSpent(partyKey, preferences.currency, refresh);
   const money = (amount: number, currency = preferences.currency) => formatMoney(amount, currency, i18n.locale);
   const budget = preferences.partyBudget;
   const ratio = budget && spent !== null ? spent / budget : 0;
-  const nextName = rounds?.present.find((p) => p.userId === rounds.nextPayerId)?.name;
+  const crewName = useCrewNames(crew?.id);
+  const nextPayer = rounds?.present.find((p) => p.userId === rounds.nextPayerId);
+  const nextName = nextPayer ? crewName(nextPayer.userId, nextPayer.name) : undefined;
 
   return (
     <Screen back title={i18n.t("money.title")} withToasts onRefresh={async () => load()}>
@@ -95,7 +103,13 @@ export default function MoneyScreen() {
                 }}
               />
             </View>
-            {ratio >= 1 ? <Text color={theme.danger}>{i18n.t("money.budgetOver")}</Text> : ratio >= 0.9 ? <Text color={theme.amberText}>{i18n.t("money.budgetNear")}</Text> : null}
+            {ratio >= 1 ? (
+              <Text color={theme.danger}>{i18n.t("money.budgetOver")}</Text>
+            ) : ratio >= 0.9 ? (
+              <Text color={theme.amberText}>{i18n.t("money.budgetNear")}</Text>
+            ) : (
+              <Text variant="small">{i18n.t("money.budgetWarnAt")}</Text>
+            )}
             <Button label={i18n.t("money.budgetRemove")} variant="outline" height={40} onPress={() => setPreferences({ partyBudget: null })} />
           </>
         ) : (
@@ -151,15 +165,47 @@ export default function MoneyScreen() {
       {crew ? (
         <Panel>
           <Field label={i18n.t("money.newPool")} placeholder={i18n.t("money.poolName")} value={poolName} onChangeText={setPoolName} maxLength={60} />
+          {crew.members.length > 1 ? (
+            <>
+              <Text variant="label">{i18n.t("money.whoIsIn")}</Text>
+              <View style={styles.chips}>
+                {crew.members.map((m) => (
+                  <Chip
+                    key={m.id}
+                    label={m.id === me ? i18n.t("common.you") : crewName(m.id, m.displayName)}
+                    // I am always in my own pool.
+                    selected={m.id === me || !leftOut.has(m.id)}
+                    {...(m.id === me
+                      ? {}
+                      : {
+                          onPress: () =>
+                            setLeftOut((current) => {
+                              const next = new Set(current);
+                              if (next.has(m.id)) next.delete(m.id);
+                              else next.add(m.id);
+                              return next;
+                            }),
+                        })}
+                  />
+                ))}
+              </View>
+            </>
+          ) : null}
           <Button
             label={i18n.t("money.create")}
             variant="secondary"
             height={44}
             disabled={!poolName.trim()}
             onPress={() =>
-              void createPool(crew.id, poolName.trim(), preferences.currency, crew.members.map((m) => m.id))
+              void createPool(
+                crew.id,
+                poolName.trim(),
+                preferences.currency,
+                crew.members.map((m) => m.id).filter((id) => id === me || !leftOut.has(id)),
+              )
                 .then((id) => {
                   clearPoolName();
+                  setLeftOut(new Set());
                   router.push({ pathname: "/pool", params: { id } });
                 })
                 .catch(showFailure(i18n))
@@ -175,4 +221,5 @@ const styles = StyleSheet.create({
   bar: { height: 14, borderRadius: 7, overflow: "hidden" },
   inline: { flexDirection: "row", alignItems: "flex-end", gap: 10 },
   flex: { flex: 1 },
+  chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
 });

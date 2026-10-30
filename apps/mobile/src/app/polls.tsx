@@ -2,6 +2,7 @@ import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useT, type Translator } from "@/i18n";
+import { useCrewNames } from "@/crew/names";
 import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
 import { refreshParties, useCrewData } from "@/server/crewData";
@@ -33,6 +34,7 @@ export default function PollsScreen() {
   const me = useSession((state) => state.session?.userId);
   const hourCycle = useAppStore((state) => state.preferences.hourCycle);
   const crew = useCrewData((state) => state.crews.find((c) => c.id === crewId));
+  const crewName = useCrewNames(crewId);
   const [polls, setPolls] = useState<Poll[] | null>(null);
   const [usual, setUsual] = useState<UsualNights | null>(null);
   const offline = showFailure(i18n);
@@ -47,7 +49,7 @@ export default function PollsScreen() {
   }, [crewId]);
   useFocusEffect(load);
 
-  const nameOf = (id: string) => (id === me ? i18n.t("common.you") : (crew?.members.find((m) => m.id === id)?.displayName ?? "?"));
+  const nameOf = (id: string) => (id === me ? i18n.t("common.you") : crewName(id));
   const mine = usual?.members.find((m) => m.userId === me)?.weekdays ?? [];
   const toggleDay = (day: number) => {
     const next = mine.includes(day) ? mine.filter((d) => d !== day) : [...mine, day];

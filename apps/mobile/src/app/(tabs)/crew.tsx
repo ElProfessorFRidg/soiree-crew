@@ -1,12 +1,17 @@
 import * as Clipboard from "expo-clipboard";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import QRCode from "react-native-qrcode-svg";
 import { Platform, ScrollView, Share, StyleSheet, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { duration, space } from "@crew/design-tokens";
+import { duration, palette, space } from "@crew/design-tokens";
 import { ConnectServer } from "@/crew/ConnectServer";
 import { Field } from "@/crew/Field";
-import { crewErrorMessage, inviteCodeFrom } from "@/crew/invite";
+import { crewErrorMessage, inviteCodeFrom, parseInviteQr } from "@/crew/invite";
+import { QrScanner } from "@/crew/LinkScanner";
+import { moodIcon } from "@/crew/moods";
+import { distinctLabels, NICKNAME_MAX } from "@/crew/names";
+import { bringCrew, decideJoinRequest, refreshInvitations, setNickname, useInvitations, type JoinRequest } from "@/server/socialData";
 import { RadarSection } from "@/crew/RadarSection";
 import { SosBanner } from "@/crew/SosBanner";
 import { useT, type Translator } from "@/i18n";
@@ -33,8 +38,11 @@ import { refreshRadar } from "@/server/radarData";
 import { StartHereBanner } from "@/crew/StartHereBanner";
 import { addPartyToCalendar } from "@/crew/calendar";
 import { CrewCelebration } from "@/crew/Celebration";
+import { CalendarSubscribe } from "@/crew/CalendarSubscribe";
 import { showFailure } from "@/server/errors";
 import { confirmAction } from "@/ui/confirm";
+import { useCopy } from "@/ui/Copyable";
+import { useLevelNow } from "@/state/levelNow";
 
 function partyWhen(party: Party, i18n: Translator, hourCycle: "h12" | "h23"): string {
   const day = new Intl.DateTimeFormat(i18n.locale, { weekday: "long", day: "numeric", month: "long" }).format(new Date(party.startsAt));
@@ -43,12 +51,22 @@ function partyWhen(party: Party, i18n: Translator, hourCycle: "h12" | "h23"): st
 
 function InvitationCard({ party, crewName }: { party: Party; crewName: string }) {
   const i18n = useT();
+  const theme = useTheme();
   const hourCycle = useAppStore((state) => state.preferences.hourCycle);
+  const crews = useCrewData((state) => state.crews);
+  const [bringing, setBringing] = useState<string | null>(null);
+  // COM-05: someone met at a bar asked me, maybe with my crew: I pick which crew comes along.
+  const mayBring = party.guest?.mayBringCrew === true && crews.length > 0;
   return (
     <Panel>
-      <Text variant="h3">{party.name || i18n.t(`newParty.moods.${party.mood}`)}</Text>
+      <View style={styles.titleRow}>
+        <Icon name={moodIcon(party.mood)} color={theme.amber} />
+        <Text variant="h3" style={styles.flex}>
+          {party.name || i18n.t(`newParty.moods.${party.mood}`)}
+        </Text>
+      </View>
       <Text variant="small">
-        {crewName}, {partyWhen(party, i18n, hourCycle)}
+        {party.guest ? i18n.t("crew.guestInvite", { name: party.guest.invitedBy ?? "?" }) : crewName}, {partyWhen(party, i18n, hourCycle)}
       </Text>
       <Segmented<"going" | "declined" | "invited">
         accessibilityLabel={party.name}
@@ -63,25 +81,138 @@ function InvitationCard({ party, crewName }: { party: Party; crewName: string })
           respondToParty(party.id, response).catch((error: unknown) => showToast({ tone: "danger", message: crewErrorMessage(error, i18n) }));
         }}
       />
+      {mayBring ? (
+        <>
+          <Text variant="small">{i18n.t("crew.bringCrewHint")}</Text>
+          <View style={styles.kinds}>
+            {crews.map((c) => (
+              <Chip
+                key={c.id}
+                label={bringing === c.id ? i18n.t("crew.bringing") : c.name}
+                icon="users"
+                onPress={() => {
+                  if (bringing) return;
+                  setBringing(c.id);
+                  bringCrew(party.id, c.id)
+                    .then((count) => {
+                      haptic.confirmed();
+                      showToast({ message: i18n.plural("crew.broughtCrew", count) });
+                    })
+                    .catch(showFailure(i18n))
+                    .finally(() => setBringing(null));
+                }}
+              />
+            ))}
+          </View>
+        </>
+      ) : null}
     </Panel>
   );
 }
 
+/** COM-05: someone asked to join an open party I host; one tap lets them in or not. */
+function JoinRequestCard({ request }: { request: JoinRequest }) {
+  const i18n = useT();
+  const decide = (approve: boolean) => {
+    haptic.select();
+    decideJoinRequest(request.partyId, request.userId, approve)
+      .then(() => {
+        if (approve) haptic.confirmed();
+      })
+      .catch(showFailure(i18n));
+  };
+  return (
+    <Panel>
+      <View style={styles.titleRow}>
+        <Avatar personId={request.userId} name={request.name} size={34} />
+        <Text style={styles.flex}>{i18n.t("crew.joinRequestLine", { name: request.name, party: request.partyName })}</Text>
+      </View>
+      <View style={styles.actions}>
+        <Button label={i18n.t("crew.refuse")} variant="outline" height={44} style={styles.flex} onPress={() => decide(false)} />
+        <Button label={i18n.t("crew.approve")} variant="secondary" height={44} style={styles.flex} onPress={() => decide(true)} />
+      </View>
+    </Panel>
+  );
+}
+
+/** QOL-11: the crew names its members. Anyone in the crew can give, change or remove a nickname. */
+function Nicknames({ crew, labels }: { crew: Crew; labels: Map<string, string> }) {
+  const i18n = useT();
+  const me = useSession((state) => state.session?.userId);
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState<string | null>(null);
+  const nameOf = (id: string | null | undefined) => (id ? (id === me ? i18n.t("crew.you") : (labels.get(id) ?? "?")) : "?");
+  const save = (memberId: string, value: string | null) => {
+    setSaving(memberId);
+    setNickname(crew.id, memberId, value)
+      .then(() => {
+        haptic.confirmed();
+        setDrafts(({ [memberId]: _done, ...rest }) => rest);
+      })
+      .catch(showFailure(i18n))
+      .finally(() => setSaving(null));
+  };
+  return (
+    <Animated.View entering={FadeIn.duration(duration.enter)} style={styles.nicknames}>
+      <Text variant="small">{i18n.t("crew.nicknamesHint")}</Text>
+      {crew.members.map((member) => {
+        const draft = drafts[member.id];
+        const changed = draft !== undefined && draft.trim() !== (member.nickname ?? "");
+        return (
+          <View key={member.id} style={styles.nicknameRow}>
+            <Avatar personId={member.id} name={labels.get(member.id) ?? member.displayName} size={34} />
+            <View style={styles.flex}>
+              <Field
+                label={i18n.t("crew.nicknameFor", { name: member.displayName })}
+                placeholder={member.displayName}
+                value={draft ?? member.nickname ?? ""}
+                onChangeText={(text) => setDrafts((d) => ({ ...d, [member.id]: text }))}
+                maxLength={NICKNAME_MAX}
+                autoCorrect={false}
+                returnKeyType="done"
+                onSubmitEditing={() => (changed ? save(member.id, (draft ?? "").trim() || null) : undefined)}
+              />
+              {member.nickname && member.nicknameSetBy ? <Text variant="small">{i18n.t("crew.nicknameBy", { name: nameOf(member.nicknameSetBy) })}</Text> : null}
+            </View>
+            {changed ? (
+              <Button label={i18n.t("crew.nicknameSave")} variant="secondary" height={40} loading={saving === member.id} onPress={() => save(member.id, (draft ?? "").trim() || null)} />
+            ) : member.nickname ? (
+              <IconButton icon="x" accessibilityLabel={i18n.t("crew.nicknameClear", { name: member.displayName })} onPress={() => save(member.id, null)} />
+            ) : null}
+          </View>
+        );
+      })}
+    </Animated.View>
+  );
+}
 
 function CrewCard({ crew }: { crew: Crew }) {
   const i18n = useT();
   const theme = useTheme();
   const me = useSession((state) => state.session?.userId);
+  const mentions = useInvitations((state) => state.mentions[crew.id] ?? 0);
+  // QOL-11: two « Lucas » in one crew read « Lucas » and « Lucas 2 », the same on every phone.
+  const labels = useMemo(() => distinctLabels(crew.members), [crew.members]);
   const [invite, setInvite] = useState<{ code: string; url: string } | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [inviting, setInviting] = useState(false);
+  const copyCode = useCopy();
+  const level = useLevelNow((state) => state.level);
+  const [naming, setNaming] = useState(false);
 
+  // O-36: the invite shows as a QR to scan on the spot, with the code and the link to share.
   const onInvite = async () => {
+    if (invite) {
+      setInvite(null);
+      return;
+    }
+    setInviting(true);
     try {
-      const created = await createInvite(crew.id);
-      setInvite(created);
-      await Share.share({ message: i18n.t("crew.inviteShare", { crew: crew.name, url: created.url }) });
+      setInvite(await createInvite(crew.id));
+      haptic.select();
     } catch (error) {
       showToast({ tone: "danger", message: crewErrorMessage(error, i18n) });
+    } finally {
+      setInviting(false);
     }
   };
 
@@ -110,25 +241,28 @@ function CrewCard({ crew }: { crew: Crew }) {
       <CrewCelebration crewId={crew.id} />
 
       <View style={styles.members}>
-        {crew.members.map((member) => (
-          <ScalePressable
-            key={member.id}
-            style={styles.member}
-            accessibilityRole="button"
-            accessibilityLabel={member.nickname ?? member.displayName}
-            onPress={() => {
-              flyHero(`avatar:${member.id}`);
-              router.push({ pathname: "/profile", params: { id: member.id === me ? "me" : member.id } });
-            }}
-          >
-            <HeroSource heroKey={`avatar:${member.id}`} node={<Avatar personId={member.id} name={member.nickname ?? member.displayName} />}>
-              <Avatar personId={member.id} name={member.nickname ?? member.displayName} />
-            </HeroSource>
-            <Text variant="tab" align="center" numberOfLines={2}>
-              {member.id === me ? i18n.t("crew.you") : (member.nickname ?? member.displayName)}
-            </Text>
-          </ScalePressable>
-        ))}
+        {crew.members.map((member) => {
+          const label = labels.get(member.id) ?? member.displayName;
+          return (
+            <ScalePressable
+              key={member.id}
+              style={styles.member}
+              accessibilityRole="button"
+              accessibilityLabel={label}
+              onPress={() => {
+                flyHero(`avatar:${member.id}`);
+                router.push({ pathname: "/profile", params: { id: member.id === me ? "me" : member.id } });
+              }}
+            >
+              <HeroSource heroKey={`avatar:${member.id}`} node={<Avatar personId={member.id} name={label} />}>
+                <Avatar personId={member.id} name={label} />
+              </HeroSource>
+              <Text variant="tab" align="center" numberOfLines={2}>
+                {member.id === me ? i18n.t("crew.you") : label}
+              </Text>
+            </ScalePressable>
+          );
+        })}
       </View>
       {/* One scrolling row instead of a list of links (Radar board). */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipRow} contentContainerStyle={styles.chips}>
@@ -140,29 +274,53 @@ function CrewCard({ crew }: { crew: Crew }) {
             ["crewStats.open", "trophy", () => router.push({ pathname: "/crew-stats", params: { crewId: crew.id } })],
             ["recap.list", "sparkdot", () => router.push("/recaps")],
             ["stickers.title", "image", () => router.push({ pathname: "/stickers", params: { crewId: crew.id } })],
+            ["crew.nicknames", "edit", () => setNaming((on) => !on)],
             ...(crew.role === "admin" ? ([["people.reports", "flag", () => router.push({ pathname: "/reports", params: { crewId: crew.id } })]] as const) : []),
           ] as const
-        ).map(([key, icon, go]) => (
-          <Chip key={key} label={i18n.t(key)} icon={icon} onPress={go} />
-        ))}
+        ).map(([key, icon, go]) =>
+          // N-31: an unseen mention in the feed puts a marker on its chip.
+          key === "feed.title" && mentions > 0 ? (
+            <View key={key}>
+              <Chip label={`${i18n.t(key)}, ${i18n.plural("crew.mentionsMarker", mentions)}`} icon={icon} onPress={go} />
+              <View pointerEvents="none" style={[styles.marker, { backgroundColor: theme.danger, borderColor: theme.surface }]} />
+            </View>
+          ) : (
+            <Chip key={key} label={i18n.t(key)} icon={icon} selected={key === "crew.nicknames" && naming} onPress={go} />
+          ),
+        )}
       </ScrollView>
+      {naming ? <Nicknames crew={crew} labels={labels} /> : null}
       {invite ? (
-        <Animated.View entering={FadeIn.duration(duration.enter)} style={styles.inviteRow}>
-          <Text style={styles.flex}>{i18n.t("crew.inviteCodeIs", { code: invite.code })}</Text>
+        <Animated.View entering={FadeIn.duration(duration.enter)} style={styles.invitePanel}>
+          <View style={[styles.qr, { backgroundColor: palette.dark.text }]}>
+            <QRCode value={invite.url} size={168} backgroundColor={palette.dark.text} color={palette.accent.onAccent} />
+          </View>
+          <Text variant="small" align="center">
+            {i18n.t("crew.inviteQrHint")}
+          </Text>
+          <View style={styles.inviteRow}>
+            {/* QOL-19: the code copies on a long press too, with the same haptic and "Copied". */}
+            <Text style={styles.flex} selectable onLongPress={() => copyCode.copy(invite.code)} accessibilityHint={i18n.t("common.copyHint")}>
+              {i18n.t("crew.inviteCodeIs", { code: invite.code })}
+            </Text>
+            <Button
+              label={copyCode.copied ? i18n.t("crew.copied") : i18n.t("crew.copyCode")}
+              variant="secondary"
+              height={level >= 2 ? 56 : 40}
+              onPress={() => copyCode.copy(invite.code)}
+            />
+          </View>
           <Button
-            label={copied ? i18n.t("crew.copied") : i18n.t("crew.copyCode")}
-            variant="secondary"
-            height={40}
-            onPress={() => {
-              void Clipboard.setStringAsync(invite.code);
-              haptic.select();
-              setCopied(true);
-              setTimeout(() => setCopied(false), 1_800);
-            }}
+            label={i18n.t("crew.shareLink")}
+            icon="share"
+            variant="outline"
+            height={44}
+            onPress={() => void Share.share({ message: i18n.t("crew.inviteShare", { crew: crew.name, url: invite.url }) }).catch(() => undefined)}
           />
         </Animated.View>
       ) : null}
-      <Button label={i18n.t("crew.invite")} icon="share" height={48} onPress={() => void onInvite()} />
+      <CalendarSubscribe crewId={crew.id} />
+      <Button label={invite ? i18n.t("crew.inviteHide") : i18n.t("crew.invite")} icon={invite ? "x" : "qr"} height={48} loading={inviting} onPress={() => void onInvite()} />
       <Button label={i18n.t("crew.leave")} variant="outline" height={40} onPress={onLeave} />
     </Panel>
   );
@@ -184,6 +342,14 @@ export default function CrewScreen() {
   const [busy, setBusy] = useState<"create" | "join" | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const pendingInvite = usePendingInvite((state) => state.invite);
+  const joinRequests = useInvitations((state) => state.joinRequests);
+
+  // O-36: the badge and the requests are fresh whenever the tab shows.
+  useFocusEffect(
+    useCallback(() => {
+      if (session) void refreshInvitations().catch(() => undefined);
+    }, [session]),
+  );
 
   // QOL-05: an invite link opened before signing up is accepted as soon as the account exists.
   useEffect(() => {
@@ -208,8 +374,10 @@ export default function CrewScreen() {
 
   const now = Date.now();
   const crewNameOf = (id: string) => crews.find((c) => c.id === id)?.name ?? "";
-  const invitations = parties.filter((p) => p.closedAt === null && p.endsAt > now && p.myResponse !== "going");
-  const going = parties.filter((p) => p.closedAt === null && p.endsAt > now && p.myResponse === "going");
+  // COM-05: a guest card stays while its crew can still be brought along.
+  const invitations = parties.filter((p) => p.closedAt === null && p.endsAt > now && (p.myResponse !== "going" || (p.guest?.mayBringCrew ?? false)));
+  const going = parties.filter((p) => p.closedAt === null && p.endsAt > now && p.myResponse === "going" && !invitations.includes(p));
+  const subtitleOf = (party: Party) => (party.guest ? i18n.t("crew.guestInvite", { name: party.guest.invitedBy ?? "?" }) : crewNameOf(party.crewId));
 
   return (
     <Screen
@@ -240,6 +408,14 @@ export default function CrewScreen() {
           ))}
         </>
       ) : null}
+      {joinRequests.length ? (
+        <>
+          <Text variant="label">{i18n.t("crew.joinRequests")}</Text>
+          {joinRequests.map((request) => (
+            <JoinRequestCard key={`${request.partyId}-${request.userId}`} request={request} />
+          ))}
+        </>
+      ) : null}
 
       {going.length ? (
         <View>
@@ -248,8 +424,8 @@ export default function CrewScreen() {
             <Row
               key={party.id}
               title={party.name || i18n.t(`newParty.moods.${party.mood}`)}
-              subtitle={`${crewNameOf(party.crewId)}, ${partyWhen(party, i18n, hourCycle)}`}
-              leading={party.live ? <LiveDot size={10} /> : <Icon name="cal" color={theme.textMuted} />}
+              subtitle={`${subtitleOf(party)}, ${partyWhen(party, i18n, hourCycle)}`}
+              leading={party.live ? <LiveDot size={10} /> : <Icon name={moodIcon(party.mood)} color={theme.textMuted} />}
               trailing={
                 !party.live && Platform.OS !== "web" ? (
                   <IconButton icon="cal" accessibilityLabel={i18n.t("crew.addToCalendar")} onPress={() => void addPartyToCalendar(party, crewNameOf(party.crewId), i18n)} />
@@ -292,6 +468,12 @@ export default function CrewScreen() {
               autoCapitalize="characters"
               autoCorrect={false}
               maxLength={8}
+            />
+            <QrScanner
+              label={i18n.t("crew.scanQr")}
+              hint={i18n.t("crew.scanQrHint")}
+              parse={parseInviteQr}
+              onScan={(found) => router.push({ pathname: "/join", params: { code: found.code, server: found.server ?? session.url } })}
             />
             <Button
               label={i18n.t("crew.pasteInvite")}
@@ -412,7 +594,13 @@ const styles = StyleSheet.create({
   crewHead: { flexDirection: "row", alignItems: "center", gap: 12 },
   members: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
   member: { width: 60, alignItems: "center", gap: 4 },
-  inviteRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+  inviteRow: { flexDirection: "row", alignItems: "center", gap: 10, alignSelf: "stretch" },
+  invitePanel: { alignItems: "center", gap: 10 },
+  qr: { width: 192, height: 192, borderRadius: 16, alignItems: "center", justifyContent: "center" },
+  titleRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+  nicknames: { gap: 12 },
+  nicknameRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+  marker: { position: "absolute", top: -2, right: -2, width: 12, height: 12, borderRadius: 6, borderWidth: 2 },
   actions: { flexDirection: "row", gap: 10 },
   chipRow: { marginHorizontal: -space.cardPadding },
   chips: { gap: 8, paddingHorizontal: space.cardPadding, paddingVertical: 4 },

@@ -2,7 +2,9 @@ import { randomUUID } from "node:crypto";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { HttpError, requireUser, type Context } from "../context";
+import { scheduleSchema } from "../hours";
 import { RateLimiter } from "../ratelimit";
+import { assertCleanText } from "../textFilter";
 import { placeOf } from "./community";
 
 const uuid = z.string().uuid();
@@ -16,7 +18,7 @@ export async function placeOwner(ctx: Context, ids: string[]): Promise<string | 
 }
 
 /** By account id (OPERATOR_IDS). A username is accepted too, but a name nobody holds yet could be registered by anyone. */
-function isOperator(ctx: Context, user: { id: string; username: string }): boolean {
+export function isOperator(ctx: Context, user: { id: string; username: string }): boolean {
   const operators = ctx.operators ?? [];
   return operators.includes(user.id) || operators.includes(user.username.toLowerCase());
 }
@@ -57,11 +59,16 @@ export function claimRoutes(app: FastifyInstance, ctx: Context): void {
     const user = requireUser(request);
     const { venue, ids } = await placeOf(ctx, request.params.id);
     if ((await placeOwner(ctx, ids)) !== user.id) throw new HttpError(403, "not_owner");
-    const input = z.object({ hours: z.string().trim().max(300), happyHours: z.string().trim().max(200) }).parse(request.body);
+    // N-08, COM-01: the weekly schedule next to the free text is what "open now" reads.
+    const input = z
+      .object({ hours: z.string().trim().max(300), happyHours: z.string().trim().max(200), schedule: scheduleSchema.nullable().optional() })
+      .parse(request.body);
+    const schedule = input.schedule && (input.schedule.open.length || input.schedule.happy.length) ? JSON.stringify(input.schedule) : null;
     await ctx.db.query(
-      `insert into place_info (venue_id, hours, happy_hours, updated_by, updated_at) values ($1, $2, $3, $4, $5)
-       on conflict (venue_id) do update set hours = excluded.hours, happy_hours = excluded.happy_hours, updated_by = excluded.updated_by, updated_at = excluded.updated_at`,
-      [venue.id, input.hours, input.happyHours, user.id, ctx.now()],
+      `insert into place_info (venue_id, hours, happy_hours, schedule, updated_by, updated_at) values ($1, $2, $3, $4, $5, $6)
+       on conflict (venue_id) do update set hours = excluded.hours, happy_hours = excluded.happy_hours,
+         schedule = case when $7 then excluded.schedule else place_info.schedule end, updated_by = excluded.updated_by, updated_at = excluded.updated_at`,
+      [venue.id, input.hours, input.happyHours, schedule, user.id, ctx.now(), input.schedule !== undefined],
     );
     return { ok: true };
   });
@@ -74,6 +81,8 @@ export function claimRoutes(app: FastifyInstance, ctx: Context): void {
     const { ids } = await placeOf(ctx, review.venue_id);
     if ((await placeOwner(ctx, ids)) !== user.id) throw new HttpError(403, "not_owner");
     const input = z.object({ text: z.string().trim().min(1).max(600) }).parse(request.body);
+    // COM-08: the owner's public answer goes through the same filters as any public text.
+    assertCleanText(input.text);
     await ctx.db.query(
       "insert into review_replies (review_id, user_id, text, at) values ($1, $2, $3, $4) on conflict (review_id) do update set text = excluded.text, at = excluded.at",
       [request.params.id, user.id, input.text, ctx.now()],

@@ -3,13 +3,12 @@ import { useCallback, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { avatarColor, palette, radius } from "@crew/design-tokens";
 import { refreshConversations, startChat } from "@/chat/engine";
-import { whenShort } from "@/chat/format";
+import { RelativeTime } from "@/ui/RelativeTime";
 import { useNames } from "@/chat/names";
 import { unreadCount, useChat, type ChatMessage, type Conversation } from "@/chat/store";
 import { Field } from "@/crew/Field";
 import { useT } from "@/i18n";
 import { useSession } from "@/server/session";
-import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Avatar, initials } from "@/ui/Avatar";
 import { Button } from "@/ui/Button";
@@ -38,7 +37,6 @@ export default function MessagesScreen() {
   const theme = useTheme();
   const name = useNames();
   const me = useSession((s) => s.session?.userId ?? "");
-  const hourCycle = useAppStore((s) => s.preferences.hourCycle);
   const { ready, problem, conversations, messages, meta } = useChat();
   const [query, setQuery] = useState("");
 
@@ -90,7 +88,7 @@ export default function MessagesScreen() {
                 title={conversation.title}
                 subtitle={message.body}
                 leading={<Icon name="search" color={theme.textMuted} />}
-                trailing={<Text variant="small">{whenShort(message.at, i18n, hourCycle)}</Text>}
+                trailing={<RelativeTime at={message.at} />}
                 onPress={() => router.push({ pathname: "/chat/[id]", params: { id: conversation.id, focus: message.id } })}
                 last={index === results.length - 1}
               />
@@ -123,7 +121,7 @@ export default function MessagesScreen() {
                 leading={<ConversationMark conversation={c} />}
                 trailing={
                   <View style={styles.side}>
-                    {last ? <Text variant="small">{whenShort(last, i18n, hourCycle)}</Text> : null}
+                    {last ? <RelativeTime at={last} /> : null}
                     {unread ? <Tag tone="amber" label={i18n.number(unread)} /> : null}
                   </View>
                 }

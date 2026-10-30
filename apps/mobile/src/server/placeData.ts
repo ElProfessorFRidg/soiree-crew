@@ -1,3 +1,4 @@
+import type { VenueFacts, WeekSchedule } from "@/venues/hours";
 import { api } from "./api";
 
 export const VIBE_TAGS = ["dance", "terrace", "student", "live", "quiet", "sport", "karaoke", "rock", "electro", "hiphop", "cheap"] as const;
@@ -6,6 +7,8 @@ export const CRITERIA = ["prices", "vibe", "music", "service", "queue", "safe"] 
 export type Criterion = (typeof CRITERIA)[number];
 export type ReviewAudience = "public" | "anonymous" | "friends" | "me";
 export type EventKind = "dj" | "student" | "match" | "concert" | "quiz" | "other";
+export type IdCheck = "always" | "sometimes" | "never";
+export type AgePolicy = "adults" | "allAgesEarly";
 
 export interface PlacePage {
   place: { venueId: string; name: string; address: string | null; lat: number; lng: number };
@@ -25,6 +28,8 @@ export interface PlacePage {
     text: string;
     /** COM-11: the owner's public answer. */
     reply: { text: string; at: number } | null;
+    /** COM-02: up to three, through short-lived links. */
+    photos?: { id: string; url: string }[];
     visitedAt: number;
     useful: number;
     markedUseful: boolean;
@@ -35,7 +40,20 @@ export interface PlacePage {
   claimed?: boolean;
   isOwner?: boolean;
   info?: { hours: string; happyHours: string } | null;
-  door: { always: number; sometimes: number; never: number; adultsOnly: number; reports: number };
+  /** COM-01: the owner's hours, else the ones crews entered (labelled as such); open now from either. */
+  facts?: VenueFacts;
+  door: {
+    always: number;
+    sometimes: number;
+    never: number;
+    adultsOnly: number;
+    /** COM-07: the official age policy, counted like the ID check. */
+    allAgesEarly?: number;
+    reports: number;
+    mine?: { idCheck: IdCheck; agePolicy: AgePolicy | null } | null;
+  };
+  /** PROF-04: the audience a new review starts with, from my profile's reviews section. */
+  reviewAudience?: ReviewAudience;
   events: { id: string; title: string; kind: EventKind; startsAt: number; official?: boolean; going: number; friendsGoing: number; mine: boolean }[];
   regulars: { userId: string; name: string; nights: number; openToMeet: boolean; friend: boolean; legend: boolean }[];
 }
@@ -49,19 +67,25 @@ export interface NearbyPlace {
   pint: number | null;
   strict: boolean;
   tags: VibeTag[];
+  openNow?: boolean | null;
+  happyNow?: boolean;
 }
 
 export const fetchPlace = (venueId: string) => api<PlacePage>(`/v1/places/${venueId}`);
 export const saveReview = (venueId: string, body: { ratings: Partial<Record<Criterion, number>>; text: string; audience: ReviewAudience }) =>
-  api(`/v1/places/${venueId}/review`, { method: "PUT", body });
+  api<{ ok: true; id: string; audience: ReviewAudience }>(`/v1/places/${venueId}/review`, { method: "PUT", body });
+/** PROF-04: one review's audience; the place page and the profile follow at once. */
+export const setReviewAudience = (reviewId: string, audience: ReviewAudience) => api(`/v1/reviews/${reviewId}`, { method: "PATCH", body: { audience } });
+export const deleteReviewPhoto = (photoId: string) => api(`/v1/review-photos/${photoId}`, { method: "DELETE" });
 export const markUseful = (reviewId: string, useful: boolean) => api(`/v1/reviews/${reviewId}/useful`, { method: "POST", body: { useful } });
 export const saveTags = (venueId: string, tags: VibeTag[]) => api(`/v1/places/${venueId}/tags`, { method: "PUT", body: { tags } });
 export const reportDoor = (venueId: string, idCheck: "always" | "sometimes" | "never", agePolicy: "adults" | "allAgesEarly" | null) =>
   api(`/v1/places/${venueId}/door`, { method: "PUT", body: { idCheck, agePolicy } });
 export const addEvent = (venueId: string, body: { id: string; title: string; kind: EventKind; startsAt: number }) => api(`/v1/places/${venueId}/events`, { method: "POST", body });
 export const rsvp = (eventId: string, going: boolean) => api(`/v1/events/${eventId}/rsvp`, { method: "POST", body: { going } });
-export const fetchNearby = (lat: number, lng: number, filters: { maxPint?: number; strict?: boolean; tag?: VibeTag }) => {
+export const fetchNearby = (lat: number, lng: number, filters: { maxPint?: number; strict?: boolean; tag?: VibeTag; openNow?: boolean }) => {
   const params = new URLSearchParams({ lat: String(lat), lng: String(lng) });
+  if (filters.openNow) params.set("open", "1");
   if (filters.maxPint) params.set("maxPint", String(filters.maxPint));
   if (filters.strict) params.set("strict", "1");
   if (filters.tag) params.set("tag", filters.tag);
@@ -73,7 +97,7 @@ export const setWantToGo = (crewId: string, venueId: string, want: boolean) => a
 // COM-11: claiming a page, the owner's info and replies, and the operator's queue.
 export const fetchClaim = (venueId: string) => api<{ status: "pending" | "approved" | "rejected" | null; claimed: boolean }>(`/v1/places/${venueId}/claim`);
 export const claimPlace = (venueId: string, body: { role: string; contact: string }) => api(`/v1/places/${venueId}/claim`, { method: "POST", body });
-export const savePlaceInfo = (venueId: string, body: { hours: string; happyHours: string }) => api(`/v1/places/${venueId}/info`, { method: "PUT", body });
+export const savePlaceInfo = (venueId: string, body: { hours: string; happyHours: string; schedule?: WeekSchedule | null }) => api(`/v1/places/${venueId}/info`, { method: "PUT", body });
 export const replyToReview = (reviewId: string, text: string) => api(`/v1/reviews/${reviewId}/reply`, { method: "PUT", body: { text } });
 export interface PendingClaim {
   id: string;

@@ -1,13 +1,31 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Image, ScrollView, StyleSheet, View } from "react-native";
+import { radius } from "@crew/design-tokens";
+import { formatMoney } from "@crew/money";
+import { Field } from "@/crew/Field";
 import { useT } from "@/i18n";
 import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
-import { api } from "@/server/api";
 import { useCrewData } from "@/server/crewData";
 import { useSession } from "@/server/session";
-import { confirmCheckIn, fetchVenuePage, overturnCheckIn, setCrewParticipation, type VenuePage } from "@/server/venueData";
+import {
+  confirmCheckIn,
+  fetchVenuePage,
+  fetchVenuePhotos,
+  overturnCheckIn,
+  refreshVenues,
+  saveVenueHours,
+  setCrewParticipation,
+  updateVenue,
+  type VenuePage,
+  type VenuePhoto,
+} from "@/server/venueData";
+import { Copyable } from "@/ui/Copyable";
+import { ScalePressable } from "@/ui/Pressable";
+import { DirectionsButton } from "@/venues/DirectionsButton";
+import type { WeekSchedule } from "@/venues/hours";
+import { HoursPanel, OpenTags } from "@/venues/HoursPanel";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
@@ -18,6 +36,7 @@ import { Screen } from "@/ui/Screen";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { ReportPanel } from "@/moderation/ReportPanel";
+import { WorkplacePanel } from "@/crew/WorkplacePanel";
 import { fetchVenueStats, type VenueStats } from "@/server/statsData";
 import { VenuePrices } from "@/crew/VenuePrices";
 import { loyaltyTier, nextTier } from "@/crew/loyalty";
@@ -39,6 +58,9 @@ function VenueNumbers({ venueId }: { venueId: string }) {
         {[i18n.plural("crewStats.venueVisits", stats.visits), i18n.plural("crewStats.venueNights", stats.nights), i18n.plural("crewStats.venuePeople", stats.people)].join(", ")}
       </Text>
       {stats.averageDrinks !== null ? <Text variant="small">{i18n.t("crewStats.venueAverage", { value: i18n.number(stats.averageDrinks, 1) })}</Text> : null}
+      {stats.averageSpend ? (
+        <Text variant="small">{i18n.t("crewStats.venueSpend", { amount: formatMoney(stats.averageSpend.amount, stats.averageSpend.currency, i18n.locale) })}</Text>
+      ) : null}
       {stats.bestNights.length ? <Text variant="label">{i18n.t("crewStats.bestNights")}</Text> : null}
       {stats.bestNights.map((n) => (
         <Text key={n.night} variant="small">
@@ -46,6 +68,67 @@ function VenueNumbers({ venueId }: { venueId: string }) {
         </Text>
       ))}
     </Panel>
+  );
+}
+
+/** N-08, QOL-19: the address, copyable; one can be typed for a venue added without it. */
+function AddressRow({ venueId, address, onSaved }: { venueId: string; address: string; onSaved: () => void }) {
+  const i18n = useT();
+  const [editing, setEditing] = useState(false);
+  const [text, setText] = useState("");
+  const [busy, setBusy] = useState(false);
+  if (address && !editing) return <Copyable value={address} label={i18n.t("venue.address")} />;
+  if (!editing) return <Button label={i18n.t("venue.addAddress")} icon="edit" variant="outline" height={44} onPress={() => setEditing(true)} />;
+  return (
+    <View style={styles.address}>
+      <Field label={i18n.t("venue.address")} placeholder={i18n.t("addVenue.addressPlaceholder")} value={text} onChangeText={setText} maxLength={120} autoFocus />
+      <Button
+        label={i18n.t("common.save")}
+        height={44}
+        loading={busy}
+        disabled={!text.trim()}
+        onPress={() => {
+          setBusy(true);
+          void updateVenue(venueId, { address: text.trim() })
+            .then(() => {
+              haptic.confirmed();
+              setEditing(false);
+              onSaved();
+            })
+            .catch(showFailure(i18n))
+            .finally(() => setBusy(false));
+        }}
+      />
+    </View>
+  );
+}
+
+/** TER-05: album photos of our nights here; the server only returns those I was going to. */
+function VenuePhotos({ venueId }: { venueId: string }) {
+  const i18n = useT();
+  const [photos, setPhotos] = useState<VenuePhoto[]>([]);
+  useEffect(() => {
+    void fetchVenuePhotos(venueId)
+      .then((res) => setPhotos(res.photos))
+      .catch(() => undefined);
+  }, [venueId]);
+  if (!photos.length) return null;
+  return (
+    <View>
+      <Text variant="label">{i18n.t("venue.photos")}</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.photos}>
+        {photos.map((p) => (
+          <ScalePressable
+            key={p.id}
+            accessibilityRole="imagebutton"
+            accessibilityLabel={i18n.t("venue.photoA11y", { date: new Intl.DateTimeFormat(i18n.locale, { day: "numeric", month: "long" }).format(new Date(p.at)) })}
+            onPress={() => router.push({ pathname: "/album", params: { partyId: p.partyId } })}
+          >
+            <Image source={{ uri: p.url }} style={styles.photo} />
+          </ScalePressable>
+        ))}
+      </ScrollView>
+    </View>
   );
 }
 
@@ -75,6 +158,13 @@ export default function VenueScreen() {
   return (
     <Screen back title={page.venue.name} withToasts>
       <Text variant="small">{i18n.t("venue.season", { season: page.season })}</Text>
+      {page.venue.isHq || page.facts ? (
+        <View style={styles.tags}>
+          {page.venue.isHq ? <Tag tone="amber" icon="home" label={i18n.t("venue.hq")} /> : null}
+          {page.facts ? <OpenTags openNow={page.facts.openNow} happyNow={page.facts.happyNow} /> : null}
+        </View>
+      ) : null}
+      <AddressRow venueId={page.venue.id} address={page.venue.address} onSaved={load} />
       {page.variant && page.variant !== "none" ? <Tag tone="amber" label={i18n.t(`venue.variant.${page.variant}`)} /> : null}
       {page.validated === false ? (
         <Panel tint="amber">
@@ -117,6 +207,13 @@ export default function VenueScreen() {
         height={56}
         onPress={() => router.push({ pathname: "/checkin", params: { venueId: page.venue.id, crewId: page.venue.crewId } })}
       />
+      <DirectionsButton lat={page.venue.lat} lng={page.venue.lng} label={page.venue.address || page.venue.name} />
+      {page.facts ? (
+        <HoursPanel
+          facts={page.facts}
+          {...(page.facts.canEdit ? { onSave: (schedule: WeekSchedule) => saveVenueHours(page.venue.id, schedule).then(load) } : {})}
+        />
+      ) : null}
 
       {typeof page.myNights === "number" && page.myNights > 0 ? (
         <View style={styles.cheat}>
@@ -216,6 +313,24 @@ export default function VenueScreen() {
       ) : null}
 
       <Panel>
+        {page.canSetHq ? (
+          <View style={styles.switchRow}>
+            <Text style={styles.flex}>{i18n.t("venue.hqSwitch")}</Text>
+            <Switch
+              value={page.venue.isHq ?? false}
+              onValueChange={(on) => {
+                haptic.select();
+                void updateVenue(page.venue.id, { isHq: on })
+                  .then(() => {
+                    load();
+                    void refreshVenues(page.venue.crewId).catch(() => undefined);
+                  })
+                  .catch(showFailure(i18n));
+              }}
+              accessibilityLabel={i18n.t("venue.hqSwitch")}
+            />
+          </View>
+        ) : null}
         <View style={styles.switchRow}>
           <Text style={styles.flex}>{i18n.t("venue.territoryOut")}</Text>
           <Switch
@@ -227,21 +342,10 @@ export default function VenueScreen() {
             accessibilityLabel={i18n.t("venue.territoryOut")}
           />
         </View>
-        <Button
-          label={i18n.t("venue.workHere")}
-          variant="outline"
-          height={44}
-          onPress={() =>
-            void api(`/v1/venues/${page.venue.id}/workplace`, { method: "POST" })
-              .then(() => {
-                showToast({ message: i18n.t("venue.workHereHint") });
-                load();
-              })
-              .catch(() => undefined)
-          }
-        />
+        <WorkplacePanel venueId={page.venue.id} onChanged={load} />
       </Panel>
       <VenueNumbers venueId={page.venue.id} />
+      <VenuePhotos venueId={page.venue.id} />
       <VenuePrices venueId={page.venue.id} />
       <ReportPanel targetKind="venue" targetId={page.venue.id} />
     </Screen>
@@ -249,7 +353,11 @@ export default function VenueScreen() {
 }
 
 const styles = StyleSheet.create({
-  rank: { flexDirection: "row", alignItems: "center", gap: 8, width: 64 },
+  tags: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
+  photos: { gap: 8 },
+  photo: { width: 112, height: 112, borderRadius: radius.tile },
+  address: { gap: 8 },
+  rank:{ flexDirection: "row", alignItems: "center", gap: 8, width: 64 },
   cheat: { flexDirection: "row", alignItems: "center", gap: 10, minHeight: 44 },
   switchRow: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 48 },
   flex: { flex: 1 },

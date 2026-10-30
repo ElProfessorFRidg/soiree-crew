@@ -64,8 +64,8 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| O-35 | P0 | Soirees.dc.html | partial | Create a party: mood (about ten icons: party, birthday, champagne, sunset, costume, wine, fire, night, home, t... |
-| O-36 | P0 | Soirees.dc.html | partial | Invite the crew: invitations as cards, reply straight from the list, tab badge with the real number of invitat... |
+| O-35 | P0 | Soirees.dc.html | build | Create a party: mood (about ten icons: party, birthday, champagne, sunset, costume, wine, fire, night, home, t... |
+| O-36 | P0 | Soirees.dc.html | build | Invite the crew: invitations as cards, reply straight from the list, tab badge with the real number of invitat... |
 | O-37 | P0 | Soirees.dc.html | partial | Live dashboard: everyone's BAC in real time, who is speeding up, who is slowing down, who has gone missing for... |
 | O-38 | P0 | Soirees.dc.html | partial | Live crew notifications at a controlled volume (S2M had to cut a third of theirs): whatever remains must be us... |
 | O-39 | P0 | Soirees.dc.html | build | Participant profiles tappable from the party, add as friend in one tap. |
@@ -77,7 +77,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| O-43 | P1 | Profil.dc.html | partial | Reliable search, friend requests without duplicates (a request already received is accepted instead of duplica... |
+| O-43 | P1 | Profil.dc.html | build | Reliable search, friend requests without duplicates (a request already received is accepted instead of duplica... |
 
 ## Games (15)
 
@@ -122,7 +122,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| O-70 | P1 | Argent.dc.html | partial | Create a pool, add friends and expenses, compute who owes whom with the minimum number of transfers, record re... |
+| O-70 | P1 | Argent.dc.html | build | Create a pool, add friends and expenses, compute who owes whom with the minimum number of transfers, record re... |
 
 ## Status, monetisation, extras
 
@@ -135,8 +135,8 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | O-73 | retired | none (no tips) | retired | In-app tips (Beer 25 cl, 33 cl, 50 cl, 1 L). |
 | O-74 | retired | Bar.dc.html | retired | Built-in shop (catalogue, product page, cart, payment). |
 | O-75 | retired | none | retired | Subscriber-only community (Instagram link). |
-| O-76 | P1 | Bar.dc.html | partial | Next-morning alibi generator. |
-| O-77 | P1 | Reglages.dc.html | partial | Report content (user-generated content). |
+| O-76 | P1 | Bar.dc.html | build | Next-morning alibi generator. |
+| O-77 | P1 | Reglages.dc.html | build | Report content (user-generated content). |
 | O-78 | P0 | Backstage | build | Visual direction. S2M uses a violet / cyan "aurora" background, liquid-glass effects and a neon home. Keep the... |
 | O-79 | retired | Systeme.dc.html | retired | Bilingual marketing website (video, parallax, scroll reveals, store links, reviews). |
 | O-80 | retired | none (no ads) | retired | Ads. |
@@ -164,51 +164,51 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | PREF-01 | P0 | Reglages.dc.html | build | Settings live on the server: every preference is stored in the database (`UserPreferences`), synced across dev... |
-| PREF-02 | P0 | Arrivee.dc.html | partial | Smart defaults on first launch, from the device language and region (no location permission needed for this): ... |
+| PREF-02 | P0 | Arrivee.dc.html | build | Smart defaults on first launch, from the device language and region (no location permission needed for this): ... |
 | PREF-03 | P0 | Reglages.dc.html | build | Settings page where all of it can be changed by hand: language, country for the legal limit, novice driver mod... |
 | PREF-04 | P0 | Arrivee.dc.html | build | Language, region and units are independent settings. A French speaker living in the US can have French UI, US ... |
-| PREF-05 | P1 | Reglages.dc.html | partial | Travel: when the phone's region or time zone changes (a trip abroad), the app suggests switching the legal-lim... |
+| PREF-05 | P1 | Reglages.dc.html | build | Travel: when the phone's region or time zone changes (a trip abroad), the app suggests switching the legal-lim... |
 | PREF-06 | P0 | Backstage | build | Canonical storage: the database stores one unit per quantity (ml, grams of ethanol, kg, g/L of blood, UTC time... |
 
 ## Radar: who is out, and when
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| N-01 | P0 | Radar.dc.html | partial | Evening status in one gesture: Going out / Down if something happens / Chilling at home / Not available, with ... |
-| N-02 | P0 | Radar.dc.html | partial | Crew board: who is out tonight, this weekend, this week, as a list and as a calendar. |
+| N-01 | P0 | Radar.dc.html | build | Evening status in one gesture: Going out / Down if something happens / Chilling at home / Not available, with ... |
+| N-02 | P0 | Radar.dc.html | build | Crew board: who is out tonight, this weekend, this week, as a list and as a calendar. |
 | N-03 | P0 | Radar.dc.html | partial | "I'm going out, who's in?": broadcast to the crew with quick replies, turns into a party (O-35) in one tap. |
 | N-04 | P1 | Radar.dc.html | build | Outing polls: date slots (When2Meet style), place, plan; vote, close, event created automatically. |
 | N-05 | P1 | Radar.dc.html | build | Recurring availability ("I usually go out on Thursdays") to suggest slots that suit everyone. |
-| N-06 | P1 | Radar.dc.html | partial | Sync with the phone calendar (add event / ICS subscription) + reminders. |
+| N-06 | P1 | Radar.dc.html | build | Sync with the phone calendar (add event / ICS subscription) + reminders. |
 | N-07 | P0 | Soirees.dc.html | build | Live location shared ONLY during a party and ONLY when the person turns it on: ghost mode, auto-expiry, no loc... |
 
 ## Our bars and places
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| N-08 | P0 | Bars.dc.html | partial | Crew venue directory: bars, clubs, flats, spots, with address, opening hours, happy hours, vibe, crew ratings,... |
-| N-09 | P1 | Bars.dc.html | partial | Drink prices logged by the crew per venue (pint, half, shot, cocktail, soft drink), price history, flag when a... |
+| N-08 | P0 | Bars.dc.html | build | Crew venue directory: bars, clubs, flats, spots, with address, opening hours, happy hours, vibe, crew ratings,... |
+| N-09 | P1 | Bars.dc.html | build | Drink prices logged by the crew per venue (pint, half, shot, cocktail, soft drink), price history, flag when a... |
 | N-10 | P0 | Bars.dc.html | build | Check-in at a venue, visible in the party and the recap (verification in <anti_cheat>). |
-| N-11 | P0 | Bars.dc.html | partial | "Where to?": suggestion, vote or roulette between venues by availability, budget, distance, current happy hours. |
-| N-12 | P1 | Bars.dc.html | partial | Venue stats: visits, average spend, average drinks, best nights there. |
+| N-11 | P0 | Bars.dc.html | build | "Where to?": suggestion, vote or roulette between venues by availability, budget, distance, current happy hours. |
+| N-12 | P1 | Bars.dc.html | build | Venue stats: visits, average spend, average drinks, best nights there. |
 
 ## Drinking and going-out habits
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| N-13 | P1 | Profil.dc.html | partial | Each member's drinking profile: favourite drinks, usual pace, time of first drink, usual leaving time. |
-| N-14 | P1 | Profil.dc.html | partial | Crew habits: nights and hours out, frequency, venues, seasonality, calendar heatmap. |
+| N-13 | P1 | Profil.dc.html | build | Each member's drinking profile: favourite drinks, usual pace, time of first drink, usual leaving time. |
+| N-14 | P1 | Profil.dc.html | build | Crew habits: nights and hours out, frequency, venues, seasonality, calendar heatmap. |
 | N-15 | P1 | Profil.dc.html | build | Monthly recap + yearly crew "Wrapped" (Spotify Wrapped spirit), as shareable stories. |
-| N-16 | P1 | Soiree.dc.html | partial | Detailed charts (O-81) filterable by period, venue, drink type, person. |
-| N-17 | P2 | Reglages.dc.html | partial | Personal data export (CSV / JSON) and selective deletion. |
+| N-16 | P1 | Soiree.dc.html | build | Detailed charts (O-81) filterable by period, venue, drink type, person. |
+| N-17 | P2 | Reglages.dc.html | build | Personal data export (CSV / JSON) and selective deletion. |
 
 ## Rounds and money
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | N-18 | P0 | Argent.dc.html | partial | Rounds: who pays next (fair rotation computed); logging a round adds the drinks to each person AND the expense... |
-| N-19 | P1 | Argent.dc.html | partial | Better pools: unequal splits (shares, amounts, percentages), expenses tied to a venue, a party or a trip, rece... |
-| N-20 | P1 | Argent.dc.html | partial | Personal party budget with alert. |
+| N-19 | P1 | Argent.dc.html | build | Better pools: unequal splits (shares, amounts, percentages), expenses tied to a venue, a party or a trip, rece... |
+| N-20 | P1 | Argent.dc.html | build | Personal party budget with alert. |
 
 ## Crew memory
 
@@ -239,7 +239,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | N-30 | P0 | Systeme.dc.html | build | Several crews per user, roles (admin / member), invite by link or QR, clean invitation web page when the app i... |
-| N-31 | P1 | Radar.dc.html | partial | Crew feed: activity, reactions, mentions, with grouped digests instead of spam. |
+| N-31 | P1 | Radar.dc.html | build | Crew feed: activity, reactions, mentions, with grouped digests instead of spam. |
 | N-32 | P1 | Bar.dc.html | build | Shared shopping list for a party (who brings what), can be generated from the cocktails picked in the Bar. |
 | N-33 | P1 | Jeux.dc.html | build | Crew-made cards in the games (inside jokes, home-made questions), moderated by the admin. |
 | N-34 | P1 | Profil.dc.html | build | Crew titles and seniority; badges that also reward organising, hydration, designated driving, getting home saf... |
@@ -250,7 +250,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | QOL-01 | P0 | Soiree.dc.html | partial | "Same again": one tap re-logs the last drink (same size, same price, same venue), also from the widget, the no... |
-| QOL-02 | P0 | Soiree.dc.html | partial | A night belongs to the evening it started: a configurable day boundary (default 6 am) for stats, recaps, "toni... |
+| QOL-02 | P0 | Soiree.dc.html | build | A night belongs to the evening it started: a configurable day boundary (default 6 am) for stats, recaps, "toni... |
 | QOL-03 | P0 | Systeme.dc.html | partial | Actionable notifications: answer "On my way" / "Not tonight" to "who's in?", add a drink, confirm a round or a... |
 | QOL-04 | P0 | Systeme.dc.html | partial | System shortcuts for a drunk thumb: Siri / App Intents and Android App Actions ("Hey Siri, add a beer"), iPhon... |
 | QOL-05 | P0 | Systeme.dc.html | partial | Deep links and universal links for every party, venue, profile, crew invite, recap and game card. Links pasted... |
@@ -259,17 +259,17 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-08 | P0 | Arrivee.dc.html | build | Forms done right: the right keyboard per field (numeric pad with the locale's decimal separator for amounts, e... |
 | QOL-09 | P0 | Etats.dc.html | partial | Photos: compressed before upload, background upload with progress and retry, HEIC accepted, location metadata ... |
 | QOL-10 | P0 | Soirees.dc.html | partial | Dying battery: when a member's battery drops under 10% during a party, the crew sees "low battery" next to the... |
-| QOL-11 | P0 | Etats.dc.html | partial | Names that work: long names, emojis in names, two "Lucas" in one crew disambiguated automatically, initials av... |
-| QOL-12 | P0 | Etats.dc.html | partial | Correct plurals and formats everywhere ("1 verre", "2 verres", decimal comma in French), relative times ("5 mi... |
+| QOL-11 | P0 | Etats.dc.html | build | Names that work: long names, emojis in names, two "Lucas" in one crew disambiguated automatically, initials av... |
+| QOL-12 | P0 | Etats.dc.html | build | Correct plurals and formats everywhere ("1 verre", "2 verres", decimal comma in French), relative times ("5 mi... |
 | QOL-13 | P0 | Etats.dc.html | build | Only destructive actions ask for confirmation, and the confirm button names the action ("Delete the party", ne... |
 | QOL-14 | P0 | Backstage | partial | Navigation without traps: Android back and iOS swipe-back work everywhere, sheets close with a swipe, the app ... |
 | QOL-15 | P1 | Arrivee.dc.html | partial | Try before signing up: games and the Bar work without an account; sign-up is asked only when the user needs a ... |
 | QOL-16 | P1 | Soirees.dc.html | partial | Defaults learned from habits: usual party end time, usual venue, usual drinks first in quick add, the friends ... |
 | QOL-17 | P1 | Soirees.dc.html | partial | Suggestions that save taps: when 3+ crew members check in at the same venue, offer to start a party; when the ... |
-| QOL-18 | P1 | Securite.dc.html | partial | The user's own apps: directions in Apple Maps, Google Maps or Waze, rides in Uber, Bolt or local taxi apps, ch... |
-| QOL-19 | P1 | Argent.dc.html | partial | Long-press copies what people copy (IBAN, codes, addresses), with a haptic and a short inline "Copied". |
+| QOL-18 | P1 | Securite.dc.html | build | The user's own apps: directions in Apple Maps, Google Maps or Waze, rides in Uber, Bolt or local taxi apps, ch... |
+| QOL-19 | P1 | Argent.dc.html | build | Long-press copies what people copy (IBAN, codes, addresses), with a haptic and a short inline "Copied". |
 | QOL-20 | P1 | Recap.dc.html | build | Next-morning mode: the morning after, the app opens on a calm, dark, low-contrast screen with the recap, who o... |
-| QOL-21 | P1 | Radar.dc.html | partial | Calendar and birthdays: parties added to the phone calendar in one tap; a crew member's birthday reminds the o... |
+| QOL-21 | P1 | Radar.dc.html | build | Calendar and birthdays: parties added to the phone calendar in one tap; a crew member's birthday reminds the o... |
 | QOL-22 | P2 | Securite.dc.html | partial | Last ride home: after midnight, the last night bus / metro departures near the venue on the Party screen, when... |
 | QOL-23 | P1 | Etats.dc.html | build | Search that helps: recent searches, typo tolerance (ADP-05), suggestions before typing, results grouped (venue... |
 | QOL-24 | P1 | Reglages.dc.html | partial | Respect the phone: Low Power Mode lowers refresh rates and effects, a data-saver option for photos, light and ... |
@@ -338,17 +338,17 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| TER-01 | P0 | Bars.dc.html | partial | Venue map: all crew venues (N-08), each in the colour and avatar of its current boss, crown, area of influence... |
+| TER-01 | P0 | Bars.dc.html | build | Venue map: all crew venues (N-08), each in the colour and avatar of its current boss, crown, area of influence... |
 | TER-02 | P0 | Bars.dc.html | build | Rule points: a member earns points at a venue through presence (verified check-ins, time spent there), parties... |
 | TER-03 | P0 | Bars.dc.html | build | Check-ins: one counted check-in per venue per party, a minimum delay between two check-ins; every check-in goe... |
 | TER-04 | P0 | Bars.dc.html | partial | Seasons and takeovers: monthly seasons with a reset, "X just took Bar Y from you" notification, history of rei... |
-| TER-05 | P0 | Bars.dc.html | partial | Venue page: current boss, season top 5, past bosses, drink prices (N-09), happy hours, the crew's latest night... |
+| TER-05 | P0 | Bars.dc.html | build | Venue page: current boss, season top 5, past bosses, drink prices (N-09), happy hours, the crew's latest night... |
 | TER-06 | P0 | Bars.dc.html | build | Rankings and titles: number of venues ruled, titles ("Mayor of Bar Y", "Conqueror", "Explorer", "Nomad"), tied... |
 | TER-07 | P1 | Bars.dc.html | build | Crew vs crew: which crew rules which venue when several crews use the app. |
-| TER-08 | P1 | Bars.dc.html | partial | Fog of war: never-visited venues are "to conquer", conquest suggestions for the next night out (linked to N-11). |
+| TER-08 | P1 | Bars.dc.html | build | Fog of war: never-visited venues are "to conquer", conquest suggestions for the next night out (linked to N-11). |
 | TER-09 | P0 | Bars.dc.html | build | Privacy: only check-ins are shared (never continuous tracking for this game), anyone can opt out of the territ... |
 | TER-10 | P1 | Backstage (near Bars.dc.html) | build | Venue loyalty tiers (Bronze, Silver, Gold at 3, 10 and 25 lifetime counted nights), never lost, crew-visible, audience set by the profile. FR label must not reuse "habitué" (see GLOSSARY.md conflicts). Source: territories.md §2.5, §3.4, §5. |
-| TER-11 | P0 | Backstage (near Bars.dc.html) | partial | Workplace exclusion ("I work here", admin-approved; 0 territory points there) and validation of new venues (external place ID or corroborated check-ins by 2 members on 2 nights) before they can be played. Source: territories.md §3.7 cases D and F, §5. |
+| TER-11 | P0 | Backstage (near Bars.dc.html) | build | Workplace exclusion ("I work here", admin-approved; 0 territory points there) and validation of new venues (external place ID or corroborated check-ins by 2 members on 2 nights) before they can be played. Source: territories.md §3.7 cases D and F, §5. |
 | TER-12 | P2 | Backstage (near Bars.dc.html) | build | Season variants: one rule modifier per month from remote config, never related to drinks, frozen into the season's rule version. Source: territories.md §3.6, §5. |
 
 ## Leaderboards
@@ -369,16 +369,16 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| COM-01 | P1 | Bars.dc.html | partial | Public venue page, extending TER-05 to all app users: opening hours, crowd-sourced prices (N-09), happy hours,... |
-| COM-02 | P1 | Bars.dc.html | partial | Reviews: only from users with a verified check-in at that venue (<anti_cheat>), structured ratings (prices, vi... |
+| COM-01 | P1 | Bars.dc.html | build | Public venue page, extending TER-05 to all app users: opening hours, crowd-sourced prices (N-09), happy hours,... |
+| COM-02 | P1 | Bars.dc.html | build | Reviews: only from users with a verified check-in at that venue (<anti_cheat>), structured ratings (prices, vi... |
 | COM-03 | P1 | Bars.dc.html | build | Venue regulars: a public top of regulars per venue and per season, among users who opted in, by presence only ... |
 | COM-04 | P1 | Profil.dc.html | build | Public profile: built and controlled through <profiles> (private by default, audience per section and per item... |
-| COM-05 | P1 | Profil.dc.html | partial | Meeting people: an "open to meeting people" switch. From a venue page or a regular's profile, send a friend re... |
+| COM-05 | P1 | Profil.dc.html | build | Meeting people: an "open to meeting people" switch. From a venue page or a regular's profile, send a friend re... |
 | COM-06 | P0 | Bars.dc.html | build | Presence privacy: strangers only see "how busy tonight" levels and counts once at least 5 users are there, rou... |
-| COM-07 | P1 | Bars.dc.html | partial | Age-policy filter: crowd-sourced door policy per venue, meaning ID checks at the door (always / sometimes / ne... |
-| COM-08 | P0 | Bars.dc.html | partial | Safety and moderation: report any review, photo, profile or party; block and mute; automatic filters for insul... |
+| COM-07 | P1 | Bars.dc.html | build | Age-policy filter: crowd-sourced door policy per venue, meaning ID checks at the door (always / sometimes / ne... |
+| COM-08 | P0 | Bars.dc.html | build | Safety and moderation: report any review, photo, profile or party; block and mute; automatic filters for insul... |
 | COM-09 | P1 | Bars.dc.html | build | Venue events: community-submitted events (DJ set, student night, match screening) with date, RSVP, how many fr... |
-| COM-10 | P1 | Bars.dc.html | partial | Discovery: venues nearby ranked by reviews and check-ins, filters (open now, pint under a set price, strict 18... |
+| COM-10 | P1 | Bars.dc.html | build | Discovery: venues nearby ranked by reviews and check-ins, filters (open now, pint under a set price, strict 18... |
 | COM-11 | P2 | Bars.dc.html | build | Venue owners can claim their page to post hours, happy hours and events and to answer reviews. They can never ... |
 | COM-12 | P0 (before COM-02) | Backstage (near Bars.dc.html) | proposed | "How reviews work" page and the review-law notices next to every review list (check method, publication and experience dates, ranking criteria, no reward, retention). Source: community.md §2.1.3, §2.3, §5. |
 | COM-13 | P0 (before any public feature) | Backstage | proposed | Statement of reasons and contest flow (DSA art. 17 and 20) for every moderation decision, plus the notifier's decision notice. Source: community.md §2.1.2, §5. |
@@ -391,14 +391,14 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | PROF-01 | P0 | Profil.dc.html | build | Four audiences for everything on a profile: Only me, My crews, Friends, Everyone. Profile-wide presets (Privat... |
-| PROF-02 | P0 | Profil.dc.html | partial | Profile sections, each with its own audience: identity (pseudonym, photo, bio, country), crews, titles and bad... |
-| PROF-03 | P0 | Profil.dc.html | partial | Per-item overrides: hide one venue, one review or one stat without touching the rest. |
-| PROF-04 | P1 | Bars.dc.html | partial | Reviews: each review is posted as Public with name, Public anonymous ("a regular", still counted in the venue ... |
+| PROF-02 | P0 | Profil.dc.html | build | Profile sections, each with its own audience: identity (pseudonym, photo, bio, country), crews, titles and bad... |
+| PROF-03 | P0 | Profil.dc.html | build | Per-item overrides: hide one venue, one review or one stat without touching the rest. |
+| PROF-04 | P1 | Bars.dc.html | build | Reviews: each review is posted as Public with name, Public anonymous ("a regular", still counted in the venue ... |
 | PROF-05 | P0 | Profil.dc.html | build | Never shown to strangers, whatever the settings: current location, current venue, live status (N-01), live BAC... |
 | PROF-06 | P0 | Profil.dc.html | build | Records are stats, not trophies: the highest BAC reached and the biggest night show as plain figures, never ce... |
 | PROF-07 | P0 | Profil.dc.html | build | "View as": preview your own profile as a stranger, a friend or a crew member, one tap away from the profile an... |
 | PROF-08 | P0 | Backstage | build | Enforced by the server: the API never sends a field the viewer is not allowed to see (hiding it in the UI is n... |
-| PROF-09 | P1 | Profil.dc.html | partial | Findability: strangers can find you by search, by exact username only, or not at all. You appear among a venue... |
+| PROF-09 | P1 | Profil.dc.html | build | Findability: strangers can find you by search, by exact username only, or not at all. You appear among a venue... |
 | PROF-10 | P1 | Profil.dc.html | build | Privacy summary: one screen listing what strangers can see right now, reachable from the profile, shown once a... |
 
 ## Messaging
