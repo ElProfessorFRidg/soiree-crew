@@ -146,6 +146,46 @@ export function nextRoundPayer(
   return [...stats.entries()].sort(([a, x], [b, y]) => x.rounds - y.rounds || x.total - y.total || x.last - y.last || a.localeCompare(b))[0]![0];
 }
 
+/**
+ * N-19: a typed exchange rate, "1 unit of the expense currency = this many units of the pool
+ * currency", normalised to a plain decimal string ("0,0061" -> "0.0061"). Null when it is not a
+ * positive number with at most 9 digits on each side. The rate stays a string so no float is stored.
+ */
+export function parseRate(input: string): string | null {
+  const cleaned = input.replace(/[\s  ]/g, "").replace(",", ".");
+  const match = /^(\d{1,9})(?:\.(\d{1,9}))?$/.exec(cleaned);
+  if (!match) return null;
+  const whole = match[1]!.replace(/^0+(?=\d)/, "");
+  const frac = (match[2] ?? "").replace(/0+$/, "");
+  if (/^0*$/.test(whole + frac)) return null;
+  return frac ? `${whole}.${frac}` : whole;
+}
+
+/**
+ * N-19: an amount in minor units converted at a typed rate, rounded half up to the minor unit.
+ * Integer arithmetic only: every amount in the app is in hundredths of its currency, so the
+ * conversion is amount x rate whatever the two currencies are.
+ */
+export function convertAmount(amount: number, rate: string): number {
+  const normalised = parseRate(rate);
+  if (normalised === null || !Number.isInteger(amount) || amount < 0) throw new SplitError("invalid_rate");
+  const [whole, frac = ""] = normalised.split(".");
+  const scale = 10n ** BigInt(frac.length);
+  const numerator = BigInt(amount) * BigInt(`${whole}${frac}`);
+  return Number((numerator * 2n + scale) / (2n * scale));
+}
+
+/**
+ * N-19: the same expense in the pool's currency, for balances. Splits by amounts were typed in the
+ * expense currency, so they become weights: the converted total is spread in the same proportions
+ * and still adds up to the cent.
+ */
+export function inPoolCurrency(expense: Expense, poolCurrency: string, poolAmount: number | null): Expense {
+  if (poolAmount === null || expense.currency === poolCurrency) return expense;
+  const split: Split = expense.split.kind === "amounts" ? { kind: "shares", shares: expense.split.amounts } : expense.split;
+  return { ...expense, amount: poolAmount, currency: poolCurrency, split };
+}
+
 /** Parses a typed amount in the user's locale ("12,50" or "12.50") into minor units. */
 export function parseAmount(input: string, fractionDigits = 2): number | null {
   const cleaned = input.replace(/[\s  ]/g, "").replace(",", ".");

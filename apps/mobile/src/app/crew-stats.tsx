@@ -2,8 +2,12 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useT, type Translator } from "@/i18n";
+import { useCrewNames } from "@/crew/names";
 import { formatClock } from "@/i18n/format";
-import { fetchCrewStats, type CrewBoardRow, type CrewStats } from "@/server/statsData";
+import { fetchCrewStats, type CrewBoardRow, type CrewStats, type StatsFilter } from "@/server/statsData";
+import { FilterChips } from "@/stats/FilterChips";
+import { useFirstDayOfWeek } from "@/system/weekStart";
+import { CalendarHeatmap } from "@/ui/Heatmap";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
@@ -22,10 +26,14 @@ function clockFromNoon(minutes: number, i18n: Translator, hourCycle: "h12" | "h2
 export default function CrewStatsScreen() {
   const { crewId } = useLocalSearchParams<{ crewId: string }>();
   const i18n = useT();
+  const crewName = useCrewNames(crewId);
   const theme = useTheme();
   const hourCycle = useAppStore((state) => state.preferences.hourCycle);
   const [stats, setStats] = useState<CrewStats | null>(null);
-  const load = useCallback(() => fetchCrewStats(crewId).then(setStats), [crewId]);
+  // N-16: narrowed on the server, so the phone never sees what it is not shown.
+  const [filter, setFilter] = useState<StatsFilter>({});
+  const firstDay = useFirstDayOfWeek();
+  const load = useCallback(() => fetchCrewStats(crewId, filter).then(setStats), [crewId, filter]);
   useEffect(() => {
     void load().catch(() => undefined);
   }, [load]);
@@ -61,10 +69,13 @@ export default function CrewStatsScreen() {
   board(i18n.t("crewStats.boardFirstDrink"), (r) => r.firstDrink, (v) => clockFromNoon(v, i18n, hourCycle), true);
   board(i18n.t("crewStats.boardHydration"), (r) => r.hydration, (v) => i18n.number(v, 2));
 
+  const filtered = !!(filter.venueId || filter.userId);
+  const allNights = stats.allNights ?? stats.totalNights;
+
   return (
     <Screen back title={i18n.t("crewStats.title")} onRefresh={load}>
-      {stats.totalNights === 0 ? <Text>{i18n.t("crewStats.empty")}</Text> : null}
-      {stats.totalNights > 0 ? (
+      {allNights === 0 ? <Text>{i18n.t("crewStats.empty")}</Text> : null}
+      {allNights > 0 ? (
         <Button label={i18n.t("wrapped.open")} icon="sparkdot" variant="secondary" height={52} onPress={() => router.push({ pathname: "/wrapped", params: { crewId } })} />
       ) : null}
 
@@ -78,7 +89,7 @@ export default function CrewStatsScreen() {
       </Panel>
 
       <Panel>
-        <Text variant="h3">{i18n.plural("crewStats.nights", stats.totalNights)}</Text>
+        <Text variant="h3">{i18n.plural("crewStats.nights", allNights)}</Text>
         {stats.milestones.reached.length ? (
           <View style={styles.tags}>
             {stats.milestones.reached.map((m) => (
@@ -88,6 +99,48 @@ export default function CrewStatsScreen() {
         ) : null}
         {stats.milestones.next ? <Text variant="small">{i18n.t("crewStats.nextMilestone", { count: stats.milestones.next })}</Text> : null}
       </Panel>
+
+      <FilterChips options={stats.filters} value={filter} onChange={setFilter} nameOf={(userId, fallback) => crewName(userId, fallback)} />
+      {filtered ? <Text variant="h3">{i18n.plural("crewStats.matching", stats.totalNights)}</Text> : null}
+
+      {stats.calendar && stats.tonight && allNights > 0 ? (
+        <>
+          <Text variant="label">{i18n.t("crewStats.calendar")}</Text>
+          <Panel>
+            <CalendarHeatmap
+              nights={stats.calendar}
+              tonight={stats.tonight}
+              weeks={26}
+              firstDay={firstDay}
+              locale={i18n.locale}
+              accessibilityLabel={i18n.plural("crewStats.calendarA11y", stats.calendar.length)}
+            />
+          </Panel>
+        </>
+      ) : null}
+
+      {stats.hoursOut && stats.hoursOut.nights > 0 ? (
+        <Panel>
+          <Text variant="label">{i18n.t("crewStats.hoursOut")}</Text>
+          <View style={styles.figures}>
+            <View style={styles.flex}>
+              <Numeral size={36} color={theme.amber}>
+                {i18n.number(stats.hoursOut.total, stats.hoursOut.total < 100 ? 1 : 0)}
+              </Numeral>
+              <Text variant="small">{i18n.t("crewStats.hoursTotal")}</Text>
+            </View>
+            {stats.hoursOut.perNight !== null ? (
+              <View style={styles.flex}>
+                <Numeral size={36} color={theme.amber}>
+                  {i18n.number(stats.hoursOut.perNight, 1)}
+                </Numeral>
+                <Text variant="small">{i18n.t("crewStats.hoursPerNight")}</Text>
+              </View>
+            ) : null}
+          </View>
+          <Text variant="small">{i18n.plural("crewStats.hoursNote", stats.hoursOut.nights)}</Text>
+        </Panel>
+      ) : null}
 
       {stats.totalNights > 0 ? (
         <>
@@ -114,9 +167,9 @@ export default function CrewStatsScreen() {
       <Panel>
         {stats.honours.map((h) => (
           <View key={h.userId} style={styles.honour}>
-            <Avatar personId={h.userId} name={h.name} size={32} />
+            <Avatar personId={h.userId} name={crewName(h.userId, h.name)} size={32} />
             <View style={styles.flex}>
-              <Text variant="h3">{h.name}</Text>
+              <Text variant="h3">{crewName(h.userId, h.name)}</Text>
               <Text variant="small">
                 {i18n.t("crewStats.since", { date: new Intl.DateTimeFormat(i18n.locale, { day: "numeric", month: "long", year: "numeric" }).format(new Date(h.joinedAt)) })}
               </Text>
@@ -141,8 +194,8 @@ export default function CrewStatsScreen() {
               <Text variant="small" style={styles.rank}>
                 {index + 1}
               </Text>
-              <Avatar personId={row.userId} name={row.name} size={28} />
-              <Text style={styles.flex}>{row.name}</Text>
+              <Avatar personId={row.userId} name={crewName(row.userId, row.name)} size={28} />
+              <Text style={styles.flex}>{crewName(row.userId, row.name)}</Text>
               <Text variant="h3">{value}</Text>
             </View>
           ))}
@@ -154,6 +207,7 @@ export default function CrewStatsScreen() {
 
 const styles = StyleSheet.create({
   tags: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
+  figures: { flexDirection: "row", gap: 12 },
   line: { flexDirection: "row", alignItems: "center", gap: 10, minHeight: 40 },
   flex: { flex: 1 },
   rank: { width: 16 },

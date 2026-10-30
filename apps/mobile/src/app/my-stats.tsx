@@ -3,7 +3,12 @@ import { useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { drinkLabel } from "@/drinks/display";
 import { DRINK_FAMILIES, myStats, nightsByWeek, type DrinkFamily } from "@/drinks/myStats";
+import { nightKey } from "@crew/units";
+import { useCrewNames } from "@/crew/names";
 import { useT } from "@/i18n";
+import { formatClock } from "@/i18n/format";
+import { FilterChips } from "@/stats/FilterChips";
+import { useMyStats } from "@/stats/useMyStats";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Bars } from "@/ui/Bars";
@@ -20,11 +25,20 @@ const DAY_MS = 86_400_000;
 export default function MyStatsScreen() {
   const i18n = useT();
   const theme = useTheme();
-  const drinks = useAppStore((state) => state.drinks);
-  const water = useAppStore((state) => state.water);
+  const allDrinks = useAppStore((state) => state.drinks);
+  const allWater = useAppStore((state) => state.water);
   const dayBoundaryHour = useAppStore((state) => state.preferences.dayBoundaryHour);
   const [period, setPeriod] = useState<Period>("30");
   const [family, setFamily] = useState<DrinkFamily>("all");
+  const hourCycle = useAppStore((state) => state.preferences.hourCycle);
+  // N-13, N-16: habits and the venue / person filter come from the server; my drinks stay here.
+  const mine = useMyStats();
+  const crewName = useCrewNames();
+  const { drinks, water } = useMemo(() => {
+    if (!mine.nights) return { drinks: allDrinks, water: allWater };
+    const keep = (at: number) => mine.nights!.has(nightKey(at, -new Date(at).getTimezoneOffset(), dayBoundaryHour));
+    return { drinks: allDrinks.filter((d) => keep(d.consumedAt)), water: allWater.filter((w) => keep(w.at)) };
+  }, [allDrinks, allWater, mine.nights, dayBoundaryHour]);
 
   const stats = useMemo(() => {
     const to = Date.now();
@@ -32,6 +46,8 @@ export default function MyStatsScreen() {
   }, [drinks, water, period, family, dayBoundaryHour]);
 
   const year = useMemo(() => nightsByWeek(drinks, Date.now(), dayBoundaryHour), [drinks, dayBoundaryHour]);
+  const habits = mine.data?.habits;
+  const clock = (minutesAfterNoon: number) => formatClock(new Date(2026, 0, 1, 12, minutesAfterNoon).getTime(), i18n.language, hourCycle);
   const yearNights = year.reduce((sum, n) => sum + n, 0);
 
   const weekdayLabels = Array.from({ length: 7 }, (_, i) => new Intl.DateTimeFormat(i18n.locale, { weekday: "narrow" }).format(new Date(2026, 10, 2 + i)));
@@ -66,6 +82,17 @@ export default function MyStatsScreen() {
           <Chip key={f} label={i18n.t(`myStats.family.${f}`)} selected={f === family} onPress={() => setFamily(f)} />
         ))}
       </View>
+      <FilterChips options={mine.data?.filters} value={mine.filter} onChange={mine.setFilter} nameOf={crewName} />
+
+      {habits && habits.nights > 0 ? (
+        <Panel>
+          <Text variant="label">{i18n.t("myStats.habits")}</Text>
+          {habits.usualFirstDrink !== null ? <Text>{i18n.t("people.usualFirst", { time: clock(habits.usualFirstDrink) })}</Text> : null}
+          {habits.usualPacePerHour !== null ? <Text>{i18n.t("people.usualPace", { value: i18n.number(habits.usualPacePerHour, 1) })}</Text> : null}
+          {habits.usualLeaving !== null ? <Text>{i18n.t("people.usualLeaving", { time: clock(habits.usualLeaving) })}</Text> : null}
+          <Text variant="small">{i18n.plural("myStats.habitsFrom", habits.nights)}</Text>
+        </Panel>
+      ) : null}
 
       {stats.drinks === 0 ? <Text>{i18n.t("myStats.empty")}</Text> : null}
       <Panel>
@@ -114,7 +141,7 @@ export default function MyStatsScreen() {
       <Panel>
         <Row title={i18n.t("wrapped.title")} trailing={<Icon name="chev" color={theme.textMuted} />} onPress={() => router.push("/wrapped")} last />
       </Panel>
-      <Text variant="small">{i18n.t("myStats.note")}</Text>
+      <Text variant="small">{mine.nights ? i18n.t("myStats.filteredNote") : i18n.t("myStats.note")}</Text>
     </Screen>
   );
 }

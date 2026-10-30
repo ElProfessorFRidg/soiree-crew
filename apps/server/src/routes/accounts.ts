@@ -5,9 +5,13 @@ import { DUMMY_PASSWORD_HASH, hashPassword, needsRehash, hashToken, newCode, new
 import { RateLimiter } from "../ratelimit";
 import { deleteChatBackup } from "./chat";
 import { deletePhotoFiles } from "./photos";
+import { deleteReceiptFiles } from "./money";
 import { accountSchema, passwordSchema } from "../schemas";
+import { exportToCsv } from "../csv";
 
 const TRANSFER_TTL_MS = 10 * 60_000;
+/** N-17: the kinds of personal data that can be erased one by one. */
+const DATA_CATEGORIES = ["drinks", "water", "customDrinks", "checkIns", "nightStatuses", "reviews", "photos", "receipts", "recapReactions"] as const;
 
 async function createSession(ctx: Context, userId: string, deviceLabel: string): Promise<string> {
   const token = newToken();
@@ -185,8 +189,9 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
    * N-17, SEC-08: everything the server holds about me, decrypted, in one JSON
    * document. Other people's data only appears where it is part of mine (a crew name, a payer).
    */
-  app.get("/v1/me/export", async (request) => {
+  app.get<{ Querystring: { format?: string } }>("/v1/me/export", async (request) => {
     const user = requireUser(request);
+    const format = z.enum(["json", "csv"]).default("json").parse(request.query.format);
     const one = async <T>(sql: string) => (await ctx.db.query<T>(sql, [user.id]))[0];
     const all = <T>(sql: string) => ctx.db.query<T>(sql, [user.id]);
     const open = <T>(sealed: string | null | undefined): T | null => (sealed ? ctx.sealer.open<T>(sealed) : null);
@@ -212,7 +217,7 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
     const statuses = await all("select night, status, from_minute, to_minute, place from night_statuses where user_id = $1 order by night");
     const sos = await all("select id, crew_id, party_id, created_at, resolved_at from sos_alerts where user_id = $1 order by created_at");
     const expenses = await all(
-      "select id, pool_id, payer_id, amount, currency, description, split, created_at, deleted_at from expenses where payer_id = $1 or created_by = $1 order by created_at",
+      "select id, pool_id, payer_id, amount, currency, rate, pool_amount, description, split, party_id, venue_id, receipt_id, created_at, deleted_at from expenses where payer_id = $1 or created_by = $1 order by created_at",
     );
     const repayments = await all("select id, pool_id, from_id, to_id, amount, currency, created_at from repayments where from_id = $1 or to_id = $1 order by created_at");
     const reactions = await all("select party_id, to_id, emoji, at from recap_reactions where from_id = $1");
@@ -224,7 +229,10 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
     const friendships = await all("select user_a, user_b, requested_by, status, at from friendships where user_a = $1 or user_b = $1");
     const blocks = await all("select blocked, at from blocks where blocker = $1");
 
-    return {
+    const reviews = await all("select r.id, v.name as venue, r.ratings, r.text, r.audience, r.visited_at, r.created_at, r.updated_at from place_reviews r join venues v on v.id = r.venue_id where r.user_id = $1 order by r.created_at");
+    const photos = await all("select id, party_id, width, height, bytes, created_at from photos where user_id = $1 order by created_at");
+
+    const data = {
       exportedAt: ctx.now(),
       account: account ? { ...account, email: open<string>(credentials?.email_sealed), passwordSetAt: credentials?.updated_at ?? null } : account,
       preferences: preferences ? JSON.parse(preferences.data) : null,
@@ -248,7 +256,61 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
         : null,
       friendships,
       blocks,
+      reviews,
+      photos,
     };
+    // N-17: the same records as one CSV file, a `category` column first (see csv.ts).
+    return format === "csv" ? { csv: exportToCsv(data) } : data;
+  });
+
+  /**
+   * N-17: erasing one kind of my data and keeping the rest. Drinks and water leave tombstones, as
+   * when consent is withdrawn, so my other phones drop them on their next sync. Expenses are not
+   * offered: they are shared with the pool and erasing them would change what others owe.
+   */
+  app.delete<{ Params: { category: string } }>("/v1/me/data/:category", async (request, reply) => {
+    const user = requireUser(request);
+    const category = z.enum(DATA_CATEGORIES).parse(request.params.category);
+    const now = ctx.now();
+    if (category === "photos") await deletePhotoFiles(ctx, user.id);
+    if (category === "receipts") await deleteReceiptFiles(ctx, user.id);
+    await ctx.db.transaction(async (tx) => {
+      switch (category) {
+        case "drinks":
+          await tx.query("delete from drink_confirmations where drink_id in (select id from drinks where user_id = $1)", [user.id]);
+          await tx.query(
+            "update drinks set kind = 'erased', preset_id = 'erased', sealed = '', consumed_at = 0, logged_at = 0, verified = false, deleted_at = $2, updated_at = $2 where user_id = $1",
+            [user.id, now],
+          );
+          break;
+        case "water":
+          await tx.query("update water set at = 0, deleted_at = $2, updated_at = $2 where user_id = $1", [user.id, now]);
+          break;
+        case "customDrinks":
+          await tx.query("update custom_drinks set data = '{}', deleted_at = $2, updated_at = $2 where user_id = $1", [user.id, now]);
+          break;
+        case "checkIns":
+          await tx.query("delete from check_ins where user_id = $1", [user.id]);
+          break;
+        case "nightStatuses":
+          await tx.query("delete from night_statuses where user_id = $1", [user.id]);
+          break;
+        case "reviews":
+          await tx.query("delete from place_reviews where user_id = $1", [user.id]);
+          break;
+        case "photos":
+          await tx.query("delete from photos where user_id = $1", [user.id]);
+          break;
+        case "receipts":
+          await tx.query("update expenses set receipt_id = null where created_by = $1", [user.id]);
+          break;
+        case "recapReactions":
+          await tx.query("delete from recap_reactions where from_id = $1", [user.id]);
+          break;
+      }
+    });
+    if (category === "drinks" || category === "water" || category === "customDrinks") ctx.live.notify([user.id], { type: "sync", reason: "own_write" });
+    return reply.status(204).send();
   });
 
   app.delete<{ Params: { id: string } }>("/v1/sessions/:id", async (request, reply) => {
@@ -280,6 +342,7 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
   app.delete("/v1/me", async (request, reply) => {
     const user = requireUser(request);
     await deletePhotoFiles(ctx, user.id);
+    await deleteReceiptFiles(ctx, user.id);
     await deleteChatBackup(ctx, user.id);
     await ctx.db.transaction(async (tx) => {
       // Crews and parties nobody else is in go with the account; the others get a new owner.

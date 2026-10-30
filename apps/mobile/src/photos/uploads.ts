@@ -24,6 +24,8 @@ export interface PendingPhoto {
   attempts: number;
   /** Web keeps the data itself: there is no file to read back later. */
   data?: string;
+  /** COM-02: a photo for my review of this place instead of a party album (partyId is then empty). */
+  reviewVenueId?: string;
 }
 
 interface UploadState {
@@ -60,20 +62,51 @@ async function prepare(asset: ImagePicker.ImagePickerAsset): Promise<{ uri: stri
 
 /** Opens the camera or the library, then queues the photos for this party. Returns how many were added. */
 export async function addPhotos(partyId: string, source: "camera" | "library"): Promise<number> {
+  return pickAndQueue(source, 10, { partyId });
+}
+
+/**
+ * COM-02: photos for my review of a place, same resizing and metadata stripping, same retry queue.
+ * The review must exist on the server first; `room` is how many more it can take (3 at most).
+ */
+export async function addReviewPhotos(venueId: string, source: "camera" | "library", room: number): Promise<number> {
+  return pickAndQueue(source, room, { partyId: "", reviewVenueId: venueId });
+}
+
+async function pickAndQueue(source: "camera" | "library", limit: number, target: { partyId: string; reviewVenueId?: string }): Promise<number> {
+  if (limit <= 0) return 0;
   const permission = source === "camera" ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
   // -1: refused, the system may ask again; -2: refused for good, only the settings can help.
   if (!permission.granted) return permission.canAskAgain ? -1 : -2;
   const result =
     source === "camera"
       ? await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 1, exif: false })
-      : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], allowsMultipleSelection: true, selectionLimit: 10, quality: 1, exif: false });
+      : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], allowsMultipleSelection: limit > 1, selectionLimit: limit, quality: 1, exif: false });
   if (result.canceled) return 0;
-  for (const asset of result.assets) {
+  const assets = result.assets.slice(0, limit);
+  for (const asset of assets) {
     const ready = await prepare(asset);
-    useUploads.setState((s) => ({ queue: [...s.queue, { id: newId(), partyId, ...ready, status: "pending", attempts: 0 }] }));
+    useUploads.setState((s) => ({ queue: [...s.queue, { id: newId(), ...target, ...ready, status: "pending", attempts: 0 }] }));
   }
   void flushUploads();
-  return result.assets.length;
+  return assets.length;
+}
+
+/**
+ * N-19: one receipt photo for an expense, re-encoded like album photos (no location kept).
+ * Returns the JPEG as base64 and a uri to preview it, null when cancelled, -1 / -2 when refused.
+ */
+export async function pickReceipt(source: "camera" | "library"): Promise<{ uri: string; data: string } | null | -1 | -2> {
+  const permission = source === "camera" ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (!permission.granted) return permission.canAskAgain ? -1 : -2;
+  const result =
+    source === "camera"
+      ? await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 1, exif: false })
+      : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], quality: 1, exif: false });
+  const asset = result.canceled ? undefined : result.assets[0];
+  if (!asset) return null;
+  const ready = await prepare(asset);
+  return { uri: ready.uri, data: ready.data ?? (await new File(ready.uri).base64()) };
 }
 
 let running = false;
@@ -89,7 +122,8 @@ export async function flushUploads(): Promise<void> {
       patch(next.id, { status: "sending" });
       try {
         const data = next.data ?? (await new File(next.uri).base64());
-        await api(`/v1/parties/${next.partyId}/photos`, { method: "POST", body: { id: next.id, data, width: next.width, height: next.height } });
+        const path = next.reviewVenueId ? `/v1/places/${next.reviewVenueId}/review/photos` : `/v1/parties/${next.partyId}/photos`;
+        await api(path, { method: "POST", body: { id: next.id, data, width: next.width, height: next.height } });
         useUploads.setState((s) => ({ queue: s.queue.filter((p) => p.id !== next.id) }));
         if (Platform.OS !== "web") new File(next.uri).delete();
       } catch {

@@ -136,7 +136,7 @@ export function purgePlainFiles(): void {
   if (Platform.OS === "web") return;
   try {
     for (const entry of new Directory(Paths.cache).list()) {
-      if (entry instanceof File && /^(voice-|video-|soiree-crew-.*\.json$)/.test(entry.name)) entry.delete();
+      if (entry instanceof File && /^(voice-|video-|soiree-crew-.*\.(json|csv)$)/.test(entry.name)) entry.delete();
     }
   } catch {
     // Nothing to clean, or the cache is not readable yet: next launch.

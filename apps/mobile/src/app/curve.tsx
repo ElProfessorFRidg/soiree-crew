@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { breathRatio, countryRules, drivingLimit, formatBacValue } from "@crew/units";
+import { breathRatio, countryRules, drivingLimit, formatBacValue, nightKey } from "@crew/units";
+import { useCrewNames } from "@/crew/names";
+import { FilterChips } from "@/stats/FilterChips";
+import { useMyStats } from "@/stats/useMyStats";
 import { BacChart } from "@/curve/BacChart";
 import { buildSeries, gramStats, type CurvePeriod } from "@/curve/series";
 import { useT } from "@/i18n";
@@ -29,9 +32,17 @@ export default function CurveScreen() {
   const now = useNow(30_000);
   const profile = useBodyProfile();
   const storedProfile = useAppStore((state) => state.profile);
-  const intakes = useIntakes();
+  const allIntakes = useIntakes();
   const preferences = useAppStore((state) => state.preferences);
   const [period, setPeriod] = useState<CurvePeriod>("day");
+  // N-16: over several nights, the curve can keep only the nights at a venue or with someone.
+  const mine = useMyStats();
+  const crewName = useCrewNames();
+  const nights = period === "day" ? null : mine.nights;
+  const intakes = useMemo(
+    () => (nights ? allIntakes.filter((d) => nights.has(nightKey(d.consumedAt, -new Date(d.consumedAt).getTimezoneOffset(), preferences.dayBoundaryHour))) : allIntakes),
+    [allIntakes, nights, preferences.dayBoundaryHour],
+  );
 
   const rules = countryRules(preferences.legalCountry);
   const ratio = breathRatio(rules);
@@ -71,6 +82,7 @@ export default function CurveScreen() {
         items={PERIODS.map((value) => ({ value, label: i18n.t(`curve.${value}`) }))}
         onChange={setPeriod}
       />
+      {period !== "day" ? <FilterChips options={mine.data?.filters} value={mine.filter} onChange={mine.setFilter} nameOf={crewName} /> : null}
       <Panel style={styles.chartPanel}>
         <BacChart
           series={series}
@@ -89,6 +101,7 @@ export default function CurveScreen() {
       <Text variant="small">
         {i18n.t("curve.profileNote", { weight: storedProfile.weightKg, body })}
         {period === "average" ? ` ${i18n.t("curve.averageNote")}` : ""}
+        {nights ? ` ${i18n.t("myStats.filteredNote")}` : ""}
       </Text>
       <View style={styles.stats}>
         {(

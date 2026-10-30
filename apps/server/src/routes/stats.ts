@@ -1,9 +1,12 @@
+import { randomUUID } from "node:crypto";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
-import { byMonth, byWeekday, crewStreak, milestones } from "../stats";
+import { priceChange, spendPerVisit } from "../hours";
+import { byMonth, byWeekday, calendarNights, crewStreak, milestones, nightsBetween, outings } from "../stats";
+import { personalClock, personalHabits, sharingPeople } from "../habits";
 import { crewTimeZone } from "../territory";
-import { nightOf, offsetMinutes } from "../time";
+import { dayBoundaryOf, nightOf, offsetMinutes } from "../time";
 import { seasonBounds } from "@crew/territory";
 
 /** RANK-09: drinking-based boards follow the same flag as the main leaderboard. */
@@ -17,15 +20,93 @@ function minutesAfterNoon(at: number, timeZone: string): number {
 
 const average = (values: number[]) => (values.length ? Math.round(values.reduce((s, v) => s + v, 0) / values.length) : null);
 
+/** N-14: the crew calendar covers 26 weeks, which still fits a phone's width at a readable size. */
+const CALENDAR_WEEKS = 26;
+const HOUR_MS = 3_600_000;
+
+type TogetherParty = { id: string; starts_at: number; going: number };
+
+/**
+ * N-16: narrows a crew's nights together to one venue (a member checked in there, publicly) and/or
+ * one person (they were going). The person must be me or someone whose nights I may see (PROF-01).
+ */
+async function filterCrewNights(
+  ctx: Context,
+  q: { crewId: string; viewerId: string; timeZone: string; boundary: number; venueId: string | undefined; userId: string | undefined },
+  parties: TogetherParty[],
+): Promise<{ together: TogetherParty[]; options: { venues: { id: string; name: string }[]; people: { userId: string; name: string }[] } }> {
+  const venues = await ctx.db.query<{ id: string; name: string }>(
+    `select distinct v.id, v.name from venues v join check_ins c on c.venue_id = v.id and c.verdict = 'accepted' and c.private = false
+     join crew_members m on m.crew_id = $1 and m.user_id = c.user_id
+     where v.crew_id = $1 and v.kind <> 'home' order by v.name`,
+    [q.crewId],
+  );
+  const people = await sharingPeople(ctx, q.viewerId, q.crewId);
+  let together = parties;
+  if (q.venueId) {
+    if (!venues.some((v) => v.id === q.venueId)) throw new HttpError(404, "not_found");
+    const visits = await ctx.db.query<{ at: number; party_id: string | null }>(
+      `select c.at, c.party_id from check_ins c join crew_members m on m.crew_id = $1 and m.user_id = c.user_id
+       where c.venue_id = $2 and c.verdict = 'accepted' and c.private = false`,
+      [q.crewId, q.venueId],
+    );
+    const nights = new Set(visits.map((v) => nightOf(v.at, q.timeZone, q.boundary)));
+    const linked = new Set(visits.map((v) => v.party_id));
+    together = together.filter((p) => linked.has(p.id) || nights.has(nightOf(p.starts_at, q.timeZone, q.boundary)));
+  }
+  if (q.userId) {
+    if (q.userId !== q.viewerId && !people.some((p) => p.userId === q.userId)) throw new HttpError(403, "not_visible");
+    const going = together.length
+      ? await ctx.db.query<{ party_id: string }>("select party_id from party_members where user_id = $1 and response = 'going' and party_id = any($2::uuid[])", [
+          q.userId,
+          together.map((p) => p.id),
+        ])
+      : [];
+    const theirs = new Set(going.map((g) => g.party_id));
+    together = together.filter((p) => theirs.has(p.id));
+  }
+  return { together, options: { venues, people } };
+}
+
+/**
+ * N-14: hours out, from what was logged: each night of a party runs from its first sign of life
+ * (a drink, a check-in) to its last (a drink, leaving a venue, getting home). Nights with nothing
+ * logged are left out rather than guessed.
+ */
+async function crewHoursOut(ctx: Context, parties: TogetherParty[]): Promise<{ total: number; perNight: number | null; nights: number }> {
+  const ids = parties.map((p) => p.id);
+  if (!ids.length) return { total: 0, perNight: null, nights: 0 };
+  const rows = await ctx.db.query<{ party_id: string; at: number; until: number }>(
+    `select d.party_id, d.consumed_at as at, d.consumed_at as until from drinks d
+       join party_members m on m.party_id = d.party_id and m.user_id = d.user_id and m.response = 'going'
+       where d.party_id = any($1::uuid[]) and d.deleted_at is null and d.consumed_at > 0
+     union all
+     select c.party_id, c.at, least(coalesce(c.ended_at, c.last_proof_at), c.at + 43200000) as until from check_ins c
+       where c.party_id = any($1::uuid[]) and c.verdict = 'accepted'
+     union all
+     select m.party_id, m.home_safe_at as at, m.home_safe_at as until from party_members m
+       where m.party_id = any($1::uuid[]) and m.response = 'going' and m.home_safe_at is not null`,
+    [ids],
+  );
+  const spans = outings(rows.map((r) => ({ key: r.party_id, from: Number(r.at), to: Number(r.until) })))
+    .map((s) => (s.last - s.first) / HOUR_MS)
+    .filter((h) => h > 0);
+  const total = spans.reduce((s, h) => s + h, 0);
+  return { total: Math.round(total * 10) / 10, perNight: spans.length ? Math.round((total / spans.length) * 10) / 10 : null, nights: spans.length };
+}
+
 export function statsRoutes(app: FastifyInstance, ctx: Context): void {
   /** N-14 habits, JOY-06 streak, JOY-08 milestones and RANK-05 secondary boards for one crew. */
-  app.get<{ Params: { id: string } }>("/v1/crews/:id/stats", async (request) => {
+  app.get<{ Params: { id: string }; Querystring: { venueId?: string; userId?: string } }>("/v1/crews/:id/stats", async (request) => {
     const user = requireUser(request);
     await assertCrewMember(ctx, request.params.id, user.id);
     const crewId = request.params.id;
+    const filter = z.object({ venueId: z.string().uuid().optional(), userId: z.string().uuid().optional() }).parse(request.query);
     const timeZone = await crewTimeZone(ctx.db, crewId);
+    // QOL-02: nights as the person asking counts them.
+    const boundary = await dayBoundaryOf(ctx.db, user.id);
     const now = ctx.now();
-    const tonight = nightOf(now, timeZone);
+    const tonight = nightOf(now, timeZone, boundary);
 
     // A night out together: a party that started, with at least two members going.
     const parties = await ctx.db.query<{ id: string; starts_at: number; going: number }>(
@@ -33,15 +114,20 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
        from parties p where p.crew_id = $1 and p.starts_at <= $2`,
       [crewId, now],
     );
-    const together = parties.filter((p) => p.going >= 2);
-    const nights = [...new Set(together.map((p) => nightOf(p.starts_at, timeZone)))];
+    const allTogether = parties.filter((p) => p.going >= 2);
+    // JOY-06, JOY-08: the streak and milestones belong to the whole crew, whatever the filter.
+    const allNights = [...new Set(allTogether.map((p) => nightOf(p.starts_at, timeZone, boundary)))];
+    const filtered = await filterCrewNights(ctx, { crewId, viewerId: user.id, timeZone, boundary, venueId: filter.venueId, userId: filter.userId }, allTogether);
+    const together = filtered.together;
+    const nights = [...new Set(together.map((p) => nightOf(p.starts_at, timeZone, boundary)))];
+    const hoursOut = await crewHoursOut(ctx, together);
     const crew = (await ctx.db.query<{ created_at: number; leaderboard_enabled: boolean }>("select created_at, leaderboard_enabled from crews where id = $1", [crewId]))[0]!;
 
     const topVenues = await ctx.db.query<{ venue_id: string; name: string; visits: number }>(
       `select c.venue_id, v.name, count(*)::int as visits from check_ins c join venues v on v.id = c.venue_id and v.crew_id = $1 and v.kind <> 'home'
        join crew_members m on m.crew_id = $1 and m.user_id = c.user_id
-       where c.verdict = 'accepted' and c.private = false group by c.venue_id, v.name order by visits desc limit 5`,
-      [crewId],
+       where c.verdict = 'accepted' and c.private = false and ($2::uuid is null or c.user_id = $2) group by c.venue_id, v.name order by visits desc limit 5`,
+      [crewId, filter.userId ?? null],
     );
 
     // RANK-05: members who stay on the board; each metric counts only what was earned in this crew.
@@ -113,8 +199,16 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
       weekdays: byWeekday(nights),
       months: byMonth(nights, tonight),
       topVenues: topVenues.map((v) => ({ venueId: v.venue_id, name: v.name, visits: v.visits })),
-      streak: crewStreak(nights, tonight),
-      milestones: milestones(nights.length),
+      streak: crewStreak(allNights, tonight),
+      milestones: milestones(allNights.length),
+      // N-16: all nights together, when the figures above are filtered.
+      allNights: allNights.length,
+      // N-14: half a year of nights for the calendar; the phone lays the weeks out from its own first weekday.
+      tonight,
+      calendar: calendarNights(nights, tonight, CALENDAR_WEEKS),
+      hoursOut,
+      // N-16: what the figures above can be narrowed to.
+      filters: filtered.options,
       crewSince: crew.created_at,
       boards,
       honours: everyone.map((m) => {
@@ -131,6 +225,54 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
   });
 
   /**
+   * N-13, N-16: my habits (usual first drink, pace, usual leaving time) and the nights a venue or a
+   * person narrows my figures to. The phone keeps my drinks; the server knows where I was and
+   * with whom, so it hands back night keys (my boundary, my time zone) for the phone to filter on.
+   */
+  app.get<{ Querystring: { venueId?: string; withUserId?: string } }>("/v1/me/stats", async (request) => {
+    const user = requireUser(request);
+    const filter = z.object({ venueId: z.string().uuid().optional(), withUserId: z.string().uuid().optional() }).parse(request.query);
+    const clock = await personalClock(ctx, user.id);
+    const keyOf = (at: number) => nightOf(at, clock.timeZone, clock.dayBoundaryHour);
+    const venues = await ctx.db.query<{ id: string; name: string }>(
+      `select distinct v.id, v.name from check_ins c join venues v on v.id = c.venue_id
+       join crew_members m on m.crew_id = v.crew_id and m.user_id = c.user_id
+       where c.user_id = $1 and c.verdict = 'accepted' order by v.name`,
+      [user.id],
+    );
+    const people = await sharingPeople(ctx, user.id);
+    let nights: Set<string> | null = null;
+    const narrow = (keys: Iterable<string>) => {
+      const next = new Set(keys);
+      nights = nights === null ? next : new Set([...nights].filter((k) => next.has(k)));
+    };
+    if (filter.venueId) {
+      if (!venues.some((v) => v.id === filter.venueId)) throw new HttpError(404, "not_found");
+      const visits = await ctx.db.query<{ at: number }>("select at from check_ins where user_id = $1 and venue_id = $2 and verdict = 'accepted'", [user.id, filter.venueId]);
+      narrow(visits.map((v) => keyOf(Number(v.at))));
+    }
+    if (filter.withUserId) {
+      if (!people.some((p) => p.userId === filter.withUserId)) throw new HttpError(403, "not_visible");
+      const shared = await ctx.db.query<{ starts_at: number; ends_at: number; closed_at: number | null }>(
+        `select p.starts_at, p.ends_at, p.closed_at from parties p
+         join party_members a on a.party_id = p.id and a.user_id = $1 and a.response = 'going'
+         join party_members b on b.party_id = p.id and b.user_id = $2 and b.response = 'going'
+         where p.starts_at <= $3`,
+        [user.id, filter.withUserId, ctx.now()],
+      );
+      narrow(shared.flatMap((p) => nightsBetween(Number(p.starts_at), Math.min(Number(p.closed_at ?? p.ends_at), Number(p.ends_at), ctx.now()), keyOf)));
+    }
+    const only: Set<string> | null = nights;
+    return {
+      timeZone: clock.timeZone,
+      dayBoundaryHour: clock.dayBoundaryHour,
+      filters: { venues, people },
+      nights: only === null ? null : [...only].sort(),
+      habits: await personalHabits(ctx, user.id, clock, only ?? undefined),
+    };
+  });
+
+  /**
    * N-15: the crew's month or year as a story. Facts about the crew together, never a drinking
    * ranking: drink and water totals only show where the crew keeps the leaderboard on.
    */
@@ -139,9 +281,11 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
     await assertCrewMember(ctx, request.params.id, user.id);
     const crewId = request.params.id;
     const timeZone = await crewTimeZone(ctx.db, crewId);
+    // QOL-02: nights as the person asking counts them.
+    const boundary = await dayBoundaryOf(ctx.db, user.id);
     const now = ctx.now();
     const period = z.enum(["month", "year"]).default("month").parse(request.query.period);
-    const thisMonth = nightOf(now, timeZone).slice(0, 7);
+    const thisMonth = nightOf(now, timeZone, boundary).slice(0, 7);
     const key = (period === "month" ? z.string().regex(/^\d{4}-\d{2}$/) : z.string().regex(/^\d{4}$/))
       .default(period === "month" ? thisMonth : thisMonth.slice(0, 4))
       .parse(request.query.key);
@@ -155,7 +299,7 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
       [crewId, from, to, now],
     );
     const together = parties.filter((p) => p.going >= 2);
-    const nights = [...new Set(together.map((p) => nightOf(p.starts_at, timeZone)))];
+    const nights = [...new Set(together.map((p) => nightOf(p.starts_at, timeZone, boundary)))];
     const ids = together.map((p) => p.id);
     const presence = ids.length
       ? await ctx.db.query<{ user_id: string; display_name: string; n: number; home: number; hidden: boolean }>(
@@ -228,13 +372,27 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
       const key = `${r.kind}|${r.currency}`;
       groups.set(key, [...(groups.get(key) ?? []), r.amount]);
     }
+    // N-09: every price ever noted here, and the last change, flagged when it is recent.
+    const history = await ctx.db.query<{ kind: string; amount: number; currency: string; at: number }>(
+      "select kind, amount, currency, at from venue_price_history where venue_id = $1 order by at",
+      [request.params.id],
+    );
     return {
       prices: [...groups.entries()].map(([key, amounts]) => {
         const [kind, currency] = key.split("|") as [string, string];
         const sorted = [...amounts].sort((a, b) => a - b);
         const mid = Math.floor(sorted.length / 2);
         const median = sorted.length % 2 ? sorted[mid]! : Math.round((sorted[mid - 1]! + sorted[mid]!) / 2);
-        return { kind, currency, amount: median, reports: amounts.length };
+        const points = history.filter((h) => h.kind === kind && h.currency === currency);
+        const change = priceChange(points, ctx.now());
+        return {
+          kind,
+          currency,
+          amount: median,
+          reports: amounts.length,
+          change,
+          history: points.slice(-10).reverse().map((p) => ({ amount: p.amount, at: Number(p.at) })),
+        };
       }),
     };
   });
@@ -247,11 +405,23 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
     const input = z
       .object({ kind: z.string().min(1).max(30), amount: z.number().int().positive().max(100_000), currency: z.string().regex(/^[A-Z]{3}$/) })
       .parse(request.body);
-    await ctx.db.query(
-      `insert into venue_prices (venue_id, user_id, kind, amount, currency, at) values ($1, $2, $3, $4, $5, $6)
-       on conflict (venue_id, user_id, kind) do update set amount = excluded.amount, currency = excluded.currency, at = excluded.at`,
-      [request.params.id, user.id, input.kind, input.amount, input.currency, ctx.now()],
-    );
+    await ctx.db.transaction(async (tx) => {
+      await tx.query(
+        `insert into venue_prices (venue_id, user_id, kind, amount, currency, at) values ($1, $2, $3, $4, $5, $6)
+         on conflict (venue_id, user_id, kind) do update set amount = excluded.amount, currency = excluded.currency, at = excluded.at`,
+        [request.params.id, user.id, input.kind, input.amount, input.currency, ctx.now()],
+      );
+      // N-09: the history keeps every note; the row above is only each person's latest.
+      await tx.query("insert into venue_price_history (id, venue_id, user_id, kind, amount, currency, at) values ($1, $2, $3, $4, $5, $6, $7)", [
+        randomUUID(),
+        request.params.id,
+        user.id,
+        input.kind,
+        input.amount,
+        input.currency,
+        ctx.now(),
+      ]);
+    });
     return { ok: true };
   });
 
@@ -262,31 +432,42 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
     if (!venue) throw new HttpError(404, "not_found");
     await assertCrewMember(ctx, venue.crew_id, user.id);
     const timeZone = await crewTimeZone(ctx.db, venue.crew_id);
+    // QOL-02: nights as the person asking counts them.
+    const boundary = await dayBoundaryOf(ctx.db, user.id);
     const checkIns = await ctx.db.query<{ user_id: string; party_id: string | null; at: number; ended_at: number | null; last_proof_at: number }>(
       "select user_id, party_id, at, ended_at, last_proof_at from check_ins where venue_id = $1 and verdict = 'accepted' and private = false",
       [request.params.id],
     );
     const nights = new Map<string, Set<string>>();
     for (const c of checkIns) {
-      const night = nightOf(c.at, timeZone);
+      const night = nightOf(c.at, timeZone, boundary);
       nights.set(night, (nights.get(night) ?? new Set()).add(c.user_id));
     }
     // Drinks logged while someone was checked in here, per person and night.
     const perStay: number[] = [];
+    const stayKinds: string[][] = [];
     for (const c of checkIns) {
       const until = c.ended_at ?? c.last_proof_at;
-      const rows = await ctx.db.query<{ n: number }>(
-        "select count(*)::int as n from drinks where user_id = $1 and deleted_at is null and kind <> 'soft' and consumed_at between $2 and $3",
+      const rows = await ctx.db.query<{ kind: string }>(
+        "select kind from drinks where user_id = $1 and deleted_at is null and consumed_at between $2 and $3",
         [c.user_id, c.at, until],
       );
-      perStay.push(rows[0]!.n);
+      perStay.push(rows.filter((r) => r.kind !== "soft").length);
+      stayKinds.push(rows.map((r) => r.kind));
     }
+    // N-12: average spend per visit, the drinks of each stay at the crew's prices here.
+    const priceRows = await ctx.db.query<{ kind: string; amount: number; currency: string }>(
+      "select kind, amount, currency from venue_prices where venue_id = $1 and at > $2",
+      [request.params.id, ctx.now() - 180 * 86_400_000],
+    );
+    const averageSpend = spendPerVisit(stayKinds, priceRows);
     const best = [...nights.entries()].sort((a, b) => b[1].size - a[1].size).slice(0, 3);
     return {
       visits: checkIns.length,
       nights: nights.size,
       people: new Set(checkIns.map((c) => c.user_id)).size,
       averageDrinks: perStay.length ? Math.round((perStay.reduce((s, v) => s + v, 0) / perStay.length) * 10) / 10 : null,
+      averageSpend,
       bestNights: best.map(([night, people]) => ({ night, people: people.size })),
     };
   });
