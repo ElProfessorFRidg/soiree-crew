@@ -12,7 +12,7 @@
       "bundleIdentifier": "app.soireecrew.mobile",
       "supportsTablet": false,
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false,
+        "ITSAppUsesNonExemptEncryption": true,
         "UIBackgroundModes": [],
         "CFBundleAllowMixedLocalizations": true,
         "CADisableMinimumFrameDurationOnPhone": true,

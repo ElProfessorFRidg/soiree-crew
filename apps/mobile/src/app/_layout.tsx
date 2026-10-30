@@ -43,6 +43,7 @@ import { watchWidget } from "@/widgets/sync";
 import { CrashScreen } from "@/ui/CrashScreen";
 import { purgePlainFiles } from "@/chat/media";
 import { watchLiveActivity } from "@/system/liveActivity";
+import { PrivacyCover } from "@/ui/PrivacyCover";
 
 /** Expo Router shows this instead of a crashed screen (any route below this layout). */
 export { CrashScreen as ErrorBoundary };
@@ -268,6 +269,7 @@ export default function RootLayout() {
                 />
               </Stack>
               <HeroOverlay />
+              <PrivacyCover />
             </I18nProvider>
           </NavigationThemeProvider>
         </ThemeProvider>

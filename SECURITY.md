@@ -50,7 +50,7 @@ Every route was checked for an ownership or membership test before it reads or w
 
 ## Export compliance (SEC-10)
 
-The app itself only uses the system's HTTPS: `ITSAppUsesNonExemptEncryption` is `false` in `app.json`. The AES-256-GCM sealing runs on the server, not in the app. A public release still needs the App Store questionnaire answered and the French ANSSI declaration checked by the publisher; the working memo is `docs/EXPORT_COMPLIANCE.md`.
+The app ships its own end-to-end encryption for messages (MLS, standard algorithms only), so `ITSAppUsesNonExemptEncryption` is `true` in `app.json`. The AES-256-GCM sealing of health data runs on the server. A public release still needs the App Store questionnaire answered and the French ANSSI declaration checked by the publisher; the working memo is `docs/EXPORT_COMPLIANCE.md`.
 
 ## Red team (AC-10), first pass
 

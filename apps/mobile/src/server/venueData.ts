@@ -5,6 +5,7 @@ import { create } from "zustand";
 import { newId } from "@/state/store";
 import { api } from "./api";
 import { useCrewData } from "./crewData";
+import { checkLocationIntegrity } from "../../modules/location-integrity";
 
 export type VenueKind = "bar" | "club" | "spot" | "home";
 
@@ -90,15 +91,20 @@ export async function currentFix(): Promise<
   try {
     const permission = await Location.requestForegroundPermissionsAsync();
     if (!permission.granted) return { ok: false, failure: "denied", canAskAgain: permission.canAskAgain };
-    const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+    // AC-02 on iOS: the native module reads how the system produced the fix, in parallel.
+    const [position, source] = await Promise.all([
+      Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High }),
+      (checkLocationIntegrity() ?? Promise.resolve(null)).catch(() => null),
+    ]);
     return {
       ok: true,
       fix: {
         lat: position.coords.latitude,
         lng: position.coords.longitude,
         accuracy: position.coords.accuracy ?? 999,
-        // AC-02: read, sent, never trusted alone.
-        mocked: position.mocked === true,
+        // AC-02: read, sent, never trusted alone. Android reports a mock provider, iOS a fix
+        // simulated by software (Xcode, spoofing apps).
+        mocked: position.mocked === true || source?.simulatedBySoftware === true,
       },
     };
   } catch {

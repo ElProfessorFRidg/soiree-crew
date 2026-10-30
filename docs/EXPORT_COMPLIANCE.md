@@ -18,7 +18,7 @@ No custom algorithm. End-to-end encrypted messaging (MSG-02) now ships inside th
 
 ## App stores
 
-- iOS: the app now ships its own encryption (MLS, standard algorithms only). Before an App Store release, `ITSAppUsesNonExemptEncryption` must be revisited: standard algorithms in a mass-market messaging app usually fall under the exemption for "standard encryption" with a self-classification report to the US BIS once a year, and the App Store Connect questionnaire must be answered accordingly. It stays `false` in `app.json` for the current private builds, which are not distributed through the store.
+- iOS: the app now ships its own encryption (MLS, standard algorithms only). Before an App Store release, `ITSAppUsesNonExemptEncryption` must be revisited: standard algorithms in a mass-market messaging app usually fall under the exemption for "standard encryption" with a self-classification report to the US BIS once a year, and the App Store Connect questionnaire must be answered accordingly. Since 30 October 2026 it is `true` in `app.json`, which states what the app does; App Store Connect will then ask for the classification at upload.
 - Google Play: the same answer in the Play Console export section.
 
 ## United States (EAR)
