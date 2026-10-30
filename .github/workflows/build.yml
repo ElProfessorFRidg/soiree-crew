@@ -33,10 +33,26 @@ jobs:
         run: pnpm audit --prod --audit-level=high
         continue-on-error: true
 
+  version:
+    # Version names (docs/VERSIONING.md): app.json holds the series (0.1, 0.2, 1.0...), each release
+    # of main takes the next patch number after the highest tag of that series: 0.1.1, 0.1.2...
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.next.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: next
+        run: git ls-remote --tags origin | node tools/ci/next-version.mjs >> "$GITHUB_OUTPUT"
+
   ios:
     # Unsigned IPA: sign it on your side with your sideloading tool (ADR 0001).
+    needs: version
     runs-on: macos-26
     timeout-minutes: 60
+    # Read by app.config.ts at prebuild and again when Xcode bundles the JavaScript (expo-constants).
+    env:
+      APP_VERSION: ${{ needs.version.outputs.version }}
+      BUILD_NUMBER: ${{ github.run_number }}
     steps:
       - uses: actions/checkout@v7
       - uses: maxim-lobanov/setup-xcode@v1
@@ -127,9 +143,12 @@ jobs:
   android:
     # iOS only for now: the APK is built on demand (Run workflow, "Also build the Android APK").
     if: github.event_name == 'workflow_dispatch' && inputs.android
-    needs: checks
+    needs: [checks, version]
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    env:
+      APP_VERSION: ${{ needs.version.outputs.version }}
+      BUILD_NUMBER: ${{ github.run_number }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-java@v6
@@ -270,7 +289,7 @@ jobs:
     # Every build of main becomes the latest release, so these links never change:
     # https://github.com/<owner>/soiree-crew/releases/latest/download/soiree-crew-unsigned.ipa
     # https://github.com/<owner>/soiree-crew/releases/latest/download/soiree-crew.apk
-    needs: [checks, ios, ios-launch, android]
+    needs: [version, checks, ios, ios-launch, android]
     # The APK job is usually skipped; the release goes out with what was built.
     if: always() && needs.checks.result == 'success' && needs.ios.result == 'success' && needs.ios-launch.result == 'success' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -286,10 +305,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          VERSION=$(node -p "require('./apps/mobile/app.json').expo.version")
-          TAG="v${VERSION}-build.${GITHUB_RUN_NUMBER}"
+          VERSION="${{ needs.version.outputs.version }}"
+          # Semver build metadata after "+": older apps read the build number from the tag.
+          TAG="v${VERSION}+build.${GITHUB_RUN_NUMBER}"
           {
-            echo "Build ${GITHUB_RUN_NUMBER} of ${GITHUB_SHA::7}."
+            echo "Version ${VERSION}, build ${GITHUB_RUN_NUMBER} of ${GITHUB_SHA::7}."
             echo
             echo "- iOS: \`soiree-crew-unsigned.ipa\`, unsigned. Sign it with your sideloading tool."
             if [ -f dist/soiree-crew.apk ]; then echo "- Android: \`soiree-crew.apk\`, signed with the debug key. Allow installs from this source."; fi
@@ -298,4 +318,4 @@ jobs:
           } > notes.md
           FILES="dist/soiree-crew-unsigned.ipa"
           [ -f dist/soiree-crew.apk ] && FILES="$FILES dist/soiree-crew.apk"
-          gh release create "$TAG" $FILES             --title "Soirée Crew ${VERSION} (build ${GITHUB_RUN_NUMBER})"             --notes-file notes.md             --target "$GITHUB_SHA"             --latest
+          gh release create "$TAG" $FILES             --title "Soirée Crew ${VERSION}"             --notes-file notes.md             --target "$GITHUB_SHA"             --latest

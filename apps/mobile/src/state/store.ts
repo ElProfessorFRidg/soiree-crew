@@ -50,7 +50,8 @@ export interface AppState {
   /** O-12: ask GitHub once a day whether a newer build exists. */
   checkUpdates: boolean;
   updateCheckedAt: number | null;
-  latestRelease: { build: number; url: string } | null;
+  /** O-12: `version` is null for releases named before version names (build number only). */
+  latestRelease: { build: number; version?: string | null; url: string } | null;
   /** QOL-23: the last few searches, newest first, on this phone only. */
   recentSearches: string[];
   /** PROF-10: the privacy summary opened once, the first time something went public. */

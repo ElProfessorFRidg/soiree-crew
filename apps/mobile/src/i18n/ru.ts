@@ -885,7 +885,7 @@ export const ru: Messages = {
     securitySummary: "Аккаунт, устройства, экспорт, удаление",
     appearanceSummary: "Звуки, иконка, рейтинги, публичный профиль",
     guardrails: "Режим вечеринки и защита",
-    version: "Soirée Crew, сборка {build}",
+    version: "Soirée Crew {version} (сборка {build})",
     bacExample: "Законный лимит показывается как {value} ({long}).",
     title: "Настройки",
     open: "Все настройки",
@@ -1416,10 +1416,10 @@ export const ru: Messages = {
     sos: "SOS",
   },
   updates: {
-    available: "Вышла версия {build}.",
+    available: "Вышла версия {version}.",
     download: "Скачать",
     check: "Искать новые версии",
-    checkHint: "Раз в день приложение спрашивает GitHub, есть ли версия новее. О тебе ничего не отправляется. Установлена версия {build}.",
+    checkHint: "Раз в день приложение спрашивает GitHub, есть ли версия новее. О тебе ничего не отправляется. Установлена версия {version}.",
   },
   polls: {
     title: "Опросы: когда тусим",

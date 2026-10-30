@@ -18,7 +18,7 @@ import { Screen } from "@/ui/Screen";
 import { Stepper } from "@/ui/Stepper";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
-import { checkForUpdate, currentBuild } from "@/system/updates";
+import { checkForUpdate, currentBuild, currentVersion } from "@/system/updates";
 import { AppIconPicker } from "@/profile/AppIconPicker";
 import { refreshReminders } from "@/reminders/reminders";
 import { AccountSection } from "@/profile/AccountSection";
@@ -97,7 +97,7 @@ function SettingsRoot() {
         {link(i18n.t("privacy.open"), "shield", () => router.push("/privacy"), undefined, true)}
       </Panel>
       <Text variant="small" align="center">
-        {i18n.t("settings.version", { build: currentBuild || "dev" })}
+        {i18n.t("settings.version", { version: currentVersion, build: currentBuild || "dev" })}
       </Text>
     </>
   );
@@ -209,7 +209,7 @@ export default function SettingsScreen() {
             />
             <SwitchRow
               label={i18n.t("updates.check")}
-              hint={i18n.t("updates.checkHint", { build: currentBuild || "dev" })}
+              hint={i18n.t("updates.checkHint", { version: currentVersion })}
               value={checkUpdates}
               onChange={(on) => {
                 useAppStore.setState({ checkUpdates: on, ...(on ? {} : { latestRelease: null }) });

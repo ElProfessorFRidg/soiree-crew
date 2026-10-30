@@ -38,6 +38,8 @@ export const extraIcons = {
   minus: "M5 12h14",
   /** Something made for you: alibi, recap, wrapped. "sparkdot" is only the end dot of a sparkline. */
   sparkle: "M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM18.5 15.5l.7 1.8l1.8.7l-1.8.7l-.7 1.8l-.7-1.8l-1.8-.7l1.8-.7z",
+  /** O-76: the alibi of the day, a masquerade mask (a cover story). */
+  mask: "M2.8 9.4C2.8 7.5 4.3 6 6.2 6c2.4 0 3.6 1.1 5.8 1.1S15.4 6 17.8 6c1.9 0 3.4 1.5 3.4 3.4c0 3.9-2.4 6.6-5 6.6c-2 0-2.9-1.9-4.2-1.9s-2.2 1.9-4.2 1.9c-2.6 0-5-2.7-5-6.6zM6.6 10.6c.8-.9 2.2-.9 3 0M14.4 10.6c.8-.9 2.2-.9 3 0",
   /** The photo strip. */
   film: "M7 3h10a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM6 9h12M6 15h12",
 } as const;

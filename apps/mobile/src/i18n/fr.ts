@@ -869,7 +869,7 @@ export const fr = {
     securitySummary: "Compte, appareils, export, suppression",
     appearanceSummary: "Sons, icône, classements, profil public",
     guardrails: "Mode soirée et garde-fous",
-    version: "Soirée Crew, version {build}",
+    version: "Soirée Crew {version} (build {build})",
     bacExample: "La limite légale s'affiche {value}, en {long}.",
     title: "Réglages",
     open: "Tous les réglages",
@@ -1390,10 +1390,10 @@ export const fr = {
     sos: "SOS",
   },
   updates: {
-    available: "La version {build} est sortie.",
+    available: "La version {version} est sortie.",
     download: "Télécharger",
     check: "Chercher les nouvelles versions",
-    checkHint: "Une fois par jour, l'app demande à GitHub si une version plus récente existe. Rien sur toi n'est envoyé. Version installée : {build}.",
+    checkHint: "Une fois par jour, l'app demande à GitHub si une version plus récente existe. Rien sur toi n'est envoyé. Version installée : {version}.",
   },
   polls: {
     title: "Sondages de sortie",

@@ -871,7 +871,7 @@ export const en: Messages = {
     securitySummary: "Account, devices, export, deletion",
     appearanceSummary: "Sounds, icon, leaderboards, public profile",
     guardrails: "Night mode and guardrails",
-    version: "Soirée Crew, build {build}",
+    version: "Soirée Crew {version} (build {build})",
     bacExample: "The legal limit shows as {value}, in {long}.",
     title: "Settings",
     open: "All settings",
@@ -1392,10 +1392,10 @@ export const en: Messages = {
     sos: "SOS",
   },
   updates: {
-    available: "Version {build} is out.",
+    available: "Version {version} is out.",
     download: "Download",
     check: "Look for new versions",
-    checkHint: "Once a day the app asks GitHub whether a newer version exists. Nothing about you is sent. Installed version: {build}.",
+    checkHint: "Once a day the app asks GitHub whether a newer version exists. Nothing about you is sent. Installed version: {version}.",
   },
   polls: {
     title: "Outing polls",

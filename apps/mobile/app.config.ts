@@ -4,6 +4,8 @@ import type { ConfigContext, ExpoConfig } from "expo/config";
 // so every installed build can be replaced by the next one.
 export default ({ config }: ConfigContext): ExpoConfig => {
   const build = Number.parseInt(process.env.BUILD_NUMBER ?? "1", 10);
+  // docs/VERSIONING.md: CI names each release 0.1.1, 0.1.2...; app.json keeps the series for local builds.
+  const version = process.env.APP_VERSION || config.version;
   // O-38: remote push needs the aps-environment entitlement, which a free Apple account cannot
   // sign. app.json keeps it off; CREW_PUSH=1 turns it on for builds signed with a paid account
   // (and, on Android, CREW_GOOGLE_SERVICES points at the google-services.json for FCM).
@@ -17,6 +19,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   return {
     ...(config as ExpoConfig),
     ...(plugins ? { plugins: plugins as ExpoConfig["plugins"] } : {}),
+    ...(version ? { version } : {}),
     ios: {
       ...config.ios,
       buildNumber: String(build),
@@ -29,6 +32,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     extra: {
       ...config.extra,
       buildNumber: build,
+      appVersion: version ?? null,
       releasesApi: "https://api.github.com/repos/ElProfessorFRidg/soiree-crew/releases/latest",
       defaultServerUrl: process.env.CREW_SERVER_URL || null,
       // Builds made by a server (deploy/android) check that server for updates instead of GitHub.

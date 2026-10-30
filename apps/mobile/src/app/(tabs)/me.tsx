@@ -95,7 +95,7 @@ export default function MeScreen() {
       {/* O-76: the morning-after alibi, any day. */}
       <Row
         title={i18n.t("morning.alibi")}
-        leading={<Icon name="x:sparkle" color={theme.textMuted} />}
+        leading={<Icon name="x:mask" color={theme.textMuted} />}
         trailing={<Icon name="chev" color={theme.textMuted} />}
         onPress={() => router.push("/alibi")}
       />
