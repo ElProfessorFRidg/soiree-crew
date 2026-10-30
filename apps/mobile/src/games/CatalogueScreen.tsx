@@ -111,7 +111,8 @@ export function CatalogueScreen() {
   const list = useRef<FlatList<GameDefinition>>(null);
   const games = filterGames(filter);
   const cardWidth = screenWidth - space.screenX * 2;
-  const cardHeight = Math.min(400, Math.max(300, screenHeight * 0.44));
+  // Room for the title, filters, pager and Play above the floating tab bar on a small iPhone.
+  const cardHeight = Math.min(380, Math.max(260, screenHeight * 0.4));
   const current = games[Math.min(index, games.length - 1)];
 
   useEffect(() => {
@@ -138,7 +139,12 @@ export function CatalogueScreen() {
   };
 
   return (
-    <View style={[styles.screen, { backgroundColor: theme.bg, paddingTop: insets.top + space.screenTop }]}>
+    // Scrolls as a whole: on a small phone Play would otherwise sit under the floating tab bar, out of reach.
+    <ScrollView
+      style={{ flex: 1, backgroundColor: theme.bg }}
+      contentContainerStyle={[styles.screen, { paddingTop: insets.top + space.screenTop, paddingBottom: insets.bottom + 96 }]}
+      showsVerticalScrollIndicator={false}
+    >
       {/* Title and position on one line, the shortcuts on their own scrolling row underneath. */}
       <View style={styles.header}>
         <Text variant="h1" accessibilityRole="header">
@@ -151,7 +157,8 @@ export function CatalogueScreen() {
           {g.t("catalogue.cardsInEnglish")}
         </Text>
       ) : null}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.headerButtons}>
+      {/* flexGrow 0: a horizontal row in a column otherwise stretches its chips into tall ovals. */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.noGrow} contentContainerStyle={styles.headerButtons}>
         <Chip label={i18n.t("bar.title")} icon="wine" onPress={() => router.push("/bar")} />
         <Chip label={g.t("crewCards.open")} icon="edit" onPress={() => router.push("/games/cards")} />
         <Chip label={g.t("hall.open")} icon="trophy" onPress={() => router.push("/games/hall")} />
@@ -234,13 +241,14 @@ export function CatalogueScreen() {
           ) : null}
         </>
       )}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerButtons: { gap: 8, paddingHorizontal: space.screenX, paddingVertical: 4 },
-  screen: { flex: 1, gap: space.sectionGap },
+  headerButtons: { gap: 8, paddingHorizontal: space.screenX, paddingVertical: 4, alignItems: "center" },
+  screen: { gap: space.sectionGap },
+  noGrow: { flexGrow: 0 },
   header: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", paddingHorizontal: space.screenX },
   padded: { paddingHorizontal: space.screenX },
   carousel: { paddingHorizontal: space.screenX },

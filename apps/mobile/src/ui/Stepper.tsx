@@ -148,7 +148,11 @@ export function Stepper({ value, min, max, step = 1, onChange, format, unit, dec
                 keyboardType={decimals ? "decimal-pad" : "number-pad"}
                 returnKeyType="done"
                 maxLength={6}
-                style={[numeral(44), styles.input, { color: theme.amber, borderBottomColor: theme.amber }]}
+                // The whole value is selected and typing replaces it: no caret, which iOS draws as
+                // tall as the line, far taller than the digits of this compressed numeral.
+                caretHidden
+                selectionColor={theme.amber}
+                style={[styles.input, { fontFamily: numeral(size).fontFamily, fontSize: Math.round(size * 0.8), color: theme.text, borderColor: theme.amber, backgroundColor: theme.surface2 }]}
               />
             ) : (
               <Numeral size={size}>{shown}</Numeral>
@@ -177,5 +181,5 @@ const styles = StyleSheet.create({
   button: { width: 52, height: 52, borderRadius: radius.button, alignItems: "center", justifyContent: "center" },
   valueTouch: { flex: 1, minHeight: 56, justifyContent: "center" },
   value: { flexDirection: "row", alignItems: "flex-end", justifyContent: "center", gap: 6 },
-  input: { minWidth: 72, textAlign: "center", borderBottomWidth: 2, paddingVertical: 0 },
+  input: { minWidth: 96, height: 56, textAlign: "center", borderWidth: 1.5, borderRadius: radius.input, paddingHorizontal: 14, paddingVertical: 0, letterSpacing: -0.5 },
 });

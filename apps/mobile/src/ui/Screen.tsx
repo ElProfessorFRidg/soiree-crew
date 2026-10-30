@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { router, useSegments } from "expo-router";
 import { Children, isValidElement, useState, type ReactNode } from "react";
 import { KeyboardAvoidingView, Platform, RefreshControl, StyleSheet, View } from "react-native";
 import Animated, { FadeInUp, interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
@@ -30,6 +30,10 @@ export function Screen({ title, back, trailing, children, footer, withToasts, on
   const theme = useTheme();
   const i18n = useT();
   const insets = useSafeAreaInsets();
+  // iOS draws the tab bar as a floating capsule over the screen: whatever sits at the bottom of a
+  // tab (a pinned button, the end of the list, a toast) goes above it, not under it.
+  const segments = useSegments() as string[];
+  const overTabBar = Platform.OS === "ios" && segments[0] === "(tabs)" ? TAB_BAR : 0;
   // The band under the status bar fills in once content scrolls under the clock.
   const scrollY = useSharedValue(0);
   const onScroll = useAnimatedScrollHandler((event) => {
@@ -96,11 +100,14 @@ export function Screen({ title, back, trailing, children, footer, withToasts, on
         pointerEvents="none"
         style={[styles.band, { height: insets.top, backgroundColor: theme.bg, borderBottomColor: theme.line }, band]}
       />
-      {footer ? <View style={[styles.footer, { paddingBottom: insets.bottom + 12 }]}>{footer}</View> : null}
-      {withToasts ? <ToastHost bottomOffset={insets.bottom + 24} /> : null}
+      {footer ? <View style={[styles.footer, { paddingBottom: insets.bottom + 12 + overTabBar }]}>{footer}</View> : null}
+      {withToasts ? <ToastHost bottomOffset={insets.bottom + 24 + overTabBar} /> : null}
     </KeyboardAvoidingView>
   );
 }
+
+/** Height of iOS's floating tab bar above the home indicator. */
+const TAB_BAR = 64;
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
