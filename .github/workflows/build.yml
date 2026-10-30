@@ -35,7 +35,6 @@ jobs:
 
   ios:
     # Unsigned IPA: sign it on your side with your sideloading tool (ADR 0001).
-    needs: checks
     runs-on: macos-26
     timeout-minutes: 60
     steps:
@@ -51,13 +50,34 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Build caches kept between runs: ccache serves the C, C++ and Objective-C compiles (React
+      # Native and the native modules), the CocoaPods cache saves the pod downloads.
+      - name: Install ccache
+        run: brew install ccache
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/Library/Caches/ccache
+            ~/Library/Caches/CocoaPods
+          key: ios-build-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.run_id }}
+          restore-keys: |
+            ios-build-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}-
+            ios-build-xcode26.6-
       - name: Generate the native project
         working-directory: apps/mobile
         env:
           BUILD_NUMBER: ${{ github.run_number }}
           CREW_SERVER_URL: ${{ vars.CREW_SERVER_URL }}
           CREW_PUBLIC_SERVERS: ${{ vars.CREW_PUBLIC_SERVERS }}
+          # React Native wires ccache into every pod when this is set at pod install.
+          USE_CCACHE: "1"
         run: npx expo prebuild --platform ios --clean
+      # ExpoModulesJSI is the slowest piece to compile. Its build script reuses a slice whose
+      # recorded source hash (sources, paths, Swift and Xcode versions) still matches.
+      - uses: actions/cache@v6
+        with:
+          path: apps/mobile/ios/build/Build/Products/ExpoModulesJSI.xcframework
+          key: expo-modules-jsi-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}
       - name: Build the app without signing
         working-directory: apps/mobile/ios
         run: |
@@ -73,6 +93,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
+            COMPILER_INDEX_STORE_ENABLE=NO \
             > xcodebuild.log 2>&1 || {
               # The real error is usually far above the summary: every error line first, then the end.
               grep -nE "error:|error \(|Error:|fatal|Command PhaseScriptExecution failed" xcodebuild.log | head -n 120
@@ -80,6 +101,7 @@ jobs:
               exit 1
             }
           tail -n 20 xcodebuild.log
+          ccache --show-stats || true
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
@@ -148,72 +170,49 @@ jobs:
           retention-days: 14
 
   ios-launch:
-    # Nobody here has an iPhone at hand: the Release build is launched in a simulator, and a crash
-    # at startup fails the run with its crash report and the app's log (both uploaded).
-    needs: checks
+    # Launches the very IPA that gets released, in a simulator: its binaries are re-marked for the
+    # simulator (same arm64 code on Apple Silicon) and signed ad hoc, so nothing is compiled twice.
+    # A crash at startup fails the run, with the app log and crash report as an artifact.
+    needs: ios
     runs-on: macos-26
-    timeout-minutes: 60
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          # expo-modules-jsi 58.0.21 needs a recent Swift: Xcode 26.3 rejects it. 26.6 is the newest on
-          # GitHub's macOS 26 runners (no Xcode 27 there yet).
           xcode-version: "26.6"
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v7
+      - uses: actions/download-artifact@v8
         with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: Generate the native project
-        working-directory: apps/mobile
-        env:
-          BUILD_NUMBER: ${{ github.run_number }}
-          CREW_SERVER_URL: ${{ vars.CREW_SERVER_URL }}
-          CREW_PUBLIC_SERVERS: ${{ vars.CREW_PUBLIC_SERVERS }}
-        run: npx expo prebuild --platform ios --clean
-      - name: Build for the simulator
-        working-directory: apps/mobile/ios
+          name: soiree-crew-ios-unsigned
+      - name: Make the IPA runnable in the simulator
         run: |
-          WORKSPACE=$(ls -d *.xcworkspace | head -n 1)
-          SCHEME="${WORKSPACE%.xcworkspace}"
-          xcodebuild \
-            -workspace "$WORKSPACE" \
-            -scheme "$SCHEME" \
-            -configuration Release \
-            -sdk iphonesimulator \
-            -destination "generic/platform=iOS Simulator" \
-            -derivedDataPath build \
-            CODE_SIGNING_ALLOWED=NO \
-            > xcodebuild.log 2>&1 || {
-              grep -nE "error:|error \(|Error:|fatal|Command PhaseScriptExecution failed" xcodebuild.log | head -n 120
-              tail -n 120 xcodebuild.log
-              mkdir -p ../../../launch && cp xcodebuild.log ../../../launch/
-              exit 1
-            }
-          tail -n 20 xcodebuild.log
+          unzip -q soiree-crew-unsigned.ipa -d sim
+          APP=$(ls -d sim/Payload/*.app | head -n 1)
+          python3 tools/ci/ios-device-to-simulator.py "$APP"
+          for f in "$APP"/Frameworks/*.framework "$APP"/Frameworks/*.dylib; do
+            if [ -e "$f" ]; then codesign --force --sign - --timestamp=none "$f"; fi
+          done
+          codesign --force --sign - --timestamp=none "$APP"
+          echo "APP=$APP" >> "$GITHUB_ENV"
       - name: Launch and watch for 40 s
-        working-directory: apps/mobile/ios
         run: |
-          APP=$(ls -d build/Build/Products/Release-iphonesimulator/*.app | head -n 1)
           BUNDLE=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Info.plist")
           DEVICE=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; d=json.load(sys.stdin)["devices"]; print(next(x["udid"] for k,v in sorted(d.items(), reverse=True) if "iOS" in k for x in v if x["name"].startswith("iPhone")))')
-          mkdir -p ../../../launch
+          mkdir -p launch
           xcrun simctl boot "$DEVICE"
           xcrun simctl bootstatus "$DEVICE" -b
           xcrun simctl install "$DEVICE" "$APP"
           xcrun simctl launch "$DEVICE" "$BUNDLE"
           sleep 40
-          xcrun simctl io "$DEVICE" screenshot ../../../launch/after-40s.png || true
-          xcrun simctl spawn "$DEVICE" log show --last 3m --style compact --predicate "process CONTAINS 'Soir' OR eventMessage CONTAINS 'JS Exception' OR eventMessage CONTAINS 'RCTFatal'" > ../../../launch/app.log || true
-          cp ~/Library/Logs/DiagnosticReports/*.ips ../../../launch/ 2>/dev/null || true
+          xcrun simctl io "$DEVICE" screenshot launch/after-40s.png || true
+          xcrun simctl spawn "$DEVICE" log show --last 3m --style compact --predicate "process CONTAINS 'Soir' OR eventMessage CONTAINS 'JS Exception' OR eventMessage CONTAINS 'RCTFatal'" > launch/app.log || true
+          cp ~/Library/Logs/DiagnosticReports/*.ips launch/ 2>/dev/null || true
           if xcrun simctl spawn "$DEVICE" launchctl list | grep -q "$BUNDLE"; then
             echo "Still running 40 s after launch."
           else
             echo "::error::The app is not running 40 s after launch. Crash report and log are in the ios-launch artifact."
-            tail -n 80 ../../../launch/app.log || true
-            for f in ../../../launch/*.ips; do [ -f "$f" ] && head -c 6000 "$f"; done
+            grep -E "Unhandled JS Exception|Terminating app|Symbol not found|Library not loaded" launch/app.log | head -n 20 || true
+            awk '/Terminating app/{f=1} f{print; n++} n>40{exit}' launch/app.log || true
             exit 1
           fi
       - uses: actions/upload-artifact@v7
@@ -228,9 +227,9 @@ jobs:
     # Every build of main becomes the latest release, so these links never change:
     # https://github.com/<owner>/soiree-crew/releases/latest/download/soiree-crew-unsigned.ipa
     # https://github.com/<owner>/soiree-crew/releases/latest/download/soiree-crew.apk
-    needs: [ios, ios-launch, android]
+    needs: [checks, ios, ios-launch, android]
     # The APK job is usually skipped; the release goes out with what was built.
-    if: always() && needs.ios.result == 'success' && needs.ios-launch.result == 'success' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    if: always() && needs.checks.result == 'success' && needs.ios.result == 'success' && needs.ios-launch.result == 'success' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
