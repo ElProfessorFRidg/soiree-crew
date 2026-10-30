@@ -223,6 +223,10 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
     );
     const friendships = await all("select user_a, user_b, requested_by, status, at from friendships where user_a = $1 or user_b = $1");
     const blocks = await all("select blocked, at from blocks where blocker = $1");
+    const games = await all(
+      `select r.id, r.crew_id, r.party_id, r.game_id, r.played_at, gm.penalties, (r.winner_id = $1) as won from game_result_members gm
+       join game_results r on r.id = gm.result_id where gm.user_id = $1 order by r.played_at`,
+    );
 
     return {
       exportedAt: ctx.now(),
@@ -248,6 +252,7 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
         : null,
       friendships,
       blocks,
+      games,
     };
   });
 

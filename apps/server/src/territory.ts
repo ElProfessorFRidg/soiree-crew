@@ -2,6 +2,7 @@ import { resolveBoss, rulesForSeason, scoreSeason, seasonBounds, seasonKey, week
 import type { Context } from "./context";
 import { newId } from "./crypto";
 import type { Db } from "./db";
+import { territoryGames } from "./routes/games";
 import { nightOf, offsetMinutes } from "./time";
 
 interface CheckInRow {
@@ -109,7 +110,8 @@ export async function crewStandings(ctx: Context, crewId: string, season: string
   return scoreSeason({
     checkIns,
     parties: parties.map((p) => ({ id: p.id, organiserId: p.created_by })),
-    games: [],
+    // TER-02: games won at the venue (routes/games.ts); the engine checks vesting and caps.
+    games: await territoryGames(ctx.db, crewId, start, end, timeZone),
     discoveredBefore: new Set(before.map((b) => b.venue_id)),
     workplaceExclusions: new Set(exclusions.map((e) => `${e.venue_id}:${e.user_id}`)),
     now,

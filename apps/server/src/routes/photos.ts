@@ -24,6 +24,12 @@ function signature(ctx: Context, id: string, exp: number): string {
   return createHmac("sha256", ctx.hashSecret).update(`photo:${id}:${exp}`).digest("base64url");
 }
 
+/** A link to one photo that works for an hour, for screens that show it outside the album (N-22). */
+export function signedPhotoUrl(ctx: Context, id: string): string {
+  const exp = ctx.now() + LINK_TTL_MS;
+  return `${ctx.publicUrl}/v1/photos/${id}?exp=${exp}&sig=${signature(ctx, id, exp)}`;
+}
+
 /** Members who may see a party's album: its crew members who said they were going. */
 async function assertGoing(ctx: Context, partyId: string, userId: string): Promise<void> {
   const rows = await ctx.db.query(

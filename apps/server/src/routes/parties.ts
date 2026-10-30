@@ -445,6 +445,7 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
     await ctx.db.query("delete from party_locations where party_id = $1", [party.id]);
     const members = await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1", [party.id]);
     ctx.live.notify(members.map((m) => m.user_id), { type: "party.changed", partyId: party.id });
+    // push: party.stripReady (JOY-09: the party is over, the photo strip is ready; after quiet hours, QOL-20)
     return { ok: true };
   });
 }

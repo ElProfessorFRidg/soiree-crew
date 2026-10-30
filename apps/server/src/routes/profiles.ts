@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
+import { appIconsOf } from "../appIcons";
 import { RateLimiter } from "../ratelimit";
 import { BacSimulation, distributionVolume, type BodyProfile, type DrinkIntake } from "@crew/bac";
 import { territoryTitles } from "@crew/territory";
@@ -259,6 +260,12 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
       mutualFriends: ownerId === user.id ? 0 : await mutualFriends(ctx, user.id, ownerId),
       cheat: relation.me || relation.crewMate ? await cheatFlag(ctx, ownerId, as ? ownerId : user.id, ctx.now()) : null,
     };
+  });
+
+  /** JOY-03: the alternate app icons this account has unlocked, computed here, never on the phone. */
+  app.get("/v1/me/app-icons", async (request) => {
+    const user = requireUser(request);
+    return { unlocked: await appIconsOf(ctx, user.id) };
   });
 
   /** PROF-01, PROF-03: my profile fields, audiences (a preset or per section) and hidden venues. */
