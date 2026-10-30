@@ -4,3 +4,6 @@
 *.ttf binary
 *.otf binary
 *.woff2 binary
+# Parallel feature branches add their strings at the same anchors: keep both sides.
+apps/mobile/src/i18n/*.ts merge=union
+apps/mobile/src/games/i18n/*.ts merge=union
