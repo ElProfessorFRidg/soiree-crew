@@ -15,7 +15,9 @@ export type LiveEvent =
   | { type: "chat.message"; conversationId: string }
   | { type: "chat.typing"; conversationId: string; userId: string }
   /** JOY-01: the other phone of a knock; `proof` when it also confirmed both check-ins. */
-  | { type: "cheers"; withUserId: string; withName: string; proof: boolean };
+  | { type: "cheers"; withUserId: string; withName: string; proof: boolean }
+  /** O-38: a new inbox item; `alert` when the phone should show it (not muted, not held for the morning). */
+  | { type: "notification"; id: string; kind: string; alert: boolean };
 
 /**
  * Pushes hints, never data: a device that hears "party.changed" refetches what

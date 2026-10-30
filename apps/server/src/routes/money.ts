@@ -3,6 +3,7 @@ import { z } from "zod";
 import { balances, nextRoundPayer, settle, shares, SplitError, type Expense, type Split } from "@crew/money";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { newId } from "../crypto";
+import { checkOvertakes, notifyRound } from "../notifications/producers";
 
 const uuid = z.string().uuid();
 const currency = z.string().regex(/^[A-Z]{3}$/);
@@ -296,6 +297,8 @@ export function moneyRoutes(app: FastifyInstance, ctx: Context): void {
     });
     ctx.live.notify(going, { type: "party.changed", partyId: request.params.id });
     ctx.live.notify(going, { type: "sync", reason: "own_write" });
+    await notifyRound(ctx, request.params.id, input.id, input.memberIds, user.id);
+    await checkOvertakes(ctx, request.params.id);
     return reply.status(201).send({ id: input.id });
   });
 }

@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { estimateBac, type BodyProfile, type DrinkIntake } from "@crew/bac";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
+import { notifyRecapReady, notifyUnwell } from "../notifications/producers";
 import { partySchema, responseSchema } from "../schemas";
 
 const HOUR_MS = 3_600_000;
@@ -166,6 +167,7 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
     ctx.live.notify(members.map((m) => m.user_id), { type: "party.changed", partyId: party.id });
     // N-36: the others hear it at once, quietly; nobody outside the party does.
     if (input.unwell) ctx.live.notify(members.map((m) => m.user_id).filter((id) => id !== user.id), { type: "party.unwell", partyId: party.id, userId: user.id });
+    if (input.unwell) await notifyUnwell(ctx, party.id, user.id);
     return { ok: true };
   });
 
@@ -445,6 +447,7 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
     await ctx.db.query("delete from party_locations where party_id = $1", [party.id]);
     const members = await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1", [party.id]);
     ctx.live.notify(members.map((m) => m.user_id), { type: "party.changed", partyId: party.id });
+    await notifyRecapReady(ctx, party.id);
     return { ok: true };
   });
 }

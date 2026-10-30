@@ -25,6 +25,7 @@ import { recapRoutes } from "./routes/recap";
 import { leaderboardRoutes } from "./routes/leaderboards";
 import { syncRoutes } from "./routes/sync";
 import { venueRoutes } from "./routes/venues";
+import { notificationRoutes } from "./notifications/routes";
 
 const PUBLIC_ROUTES = new Set(["POST /v1/accounts", "POST /v1/sessions/claim", "POST /v1/sessions/password", "GET /v1/health", "GET /v1/info", "GET /download/android.json", "GET /download/soiree-crew.apk", "GET /v1/invites/:code", "GET /v1/live", "GET /i/:code", "GET /v1/photos/:id"]);
 
@@ -111,5 +112,6 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
   profileRoutes(app, ctx);
   photoRoutes(app, ctx);
   statsRoutes(app, ctx);
+  notificationRoutes(app, ctx);
   return app;
 }

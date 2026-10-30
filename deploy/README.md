@@ -16,6 +16,16 @@
 | `TRUST_PROXY` | set | `1` in the compose file: one reverse proxy in front. Keep port 8787 unpublished, or a client could fake its address. |
 | `AI_PROVIDER`, `ANTHROPIC_API_KEY`, `AI_MODEL` | no | ADR 0004. Off without them. |
 | `SEASON_VARIANTS` | no | JSON, e.g. `{"2026-12":"games"}` (TER-12). |
+| `APNS_KEY_ID` | no | iOS push (O-38). The 10-character id of an APNs auth key (.p8), from developer.apple.com > Keys. Needs a paid Apple developer account. |
+| `APNS_TEAM_ID` | no | The 10-character Apple team id (Membership page). |
+| `APNS_KEY` | no | The content of the .p8 file, PEM, `-----BEGIN PRIVATE KEY-----` included. On one line, write the line breaks as `\n`. |
+| `APNS_TOPIC` | no | The app's bundle id: `app.soireecrew.mobile`. |
+| `APNS_PRODUCTION` | no | `true` for TestFlight and App Store builds; leave unset for development builds (sandbox APNs). |
+| `FCM_SERVICE_ACCOUNT` | no | Android push (O-38): the service-account JSON from Firebase (Project settings > Service accounts), on one line. Or set `FCM_PROJECT_ID`, `FCM_CLIENT_EMAIL` and `FCM_PRIVATE_KEY` instead. |
+
+### Push notifications (O-38)
+
+Without the variables above the server still keeps every notification in each person's inbox and sends it over the live socket; the app shows it while running and fetches the inbox when opened. With them, it also pushes to phones whose build registered for push (an iOS build made with `CREW_PUSH=1`, see `apps/mobile/app.config.ts`). Pushes carry generic text in the person's language and ids only: no name, no figure, no message (QOL-27, MSG-04). The log line `push: iOS on, Android off` at start says what is configured. Only APNs (`api.push.apple.com`, port 443, HTTP/2) and Google (`oauth2.googleapis.com`, `fcm.googleapis.com`) are contacted; no third-party push service.
 
 ## What the proxy must allow
 

@@ -5,6 +5,7 @@ import { join } from "node:path";
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { bearer, HttpError, requireUser, type Context } from "../context";
+import { notifyChatMessage } from "../notifications/producers";
 import { RateLimiter } from "../ratelimit";
 import { hashToken } from "../crypto";
 import type { Db } from "../db";
@@ -443,6 +444,7 @@ export function chatRoutes(app: FastifyInstance, ctx: Context): void {
       return row.seq;
     });
     notify(ctx, members, { type: input.kind === "commit" ? "chat.roster" : "chat.message", conversationId: conversation.id });
+    if (input.kind === "application") await notifyChatMessage(ctx, conversation, members, user.id);
     return reply.status(201).send({ seq });
   });
 

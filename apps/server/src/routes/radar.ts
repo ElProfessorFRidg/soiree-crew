@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { newId } from "../crypto";
+import { notifyOutCall, notifySos } from "../notifications/producers";
 import { crewTimeZone } from "../territory";
 import { nightOf } from "../time";
 
@@ -116,6 +117,7 @@ export function radarRoutes(app: FastifyInstance, ctx: Context): void {
     );
     const members = await ctx.db.query<{ user_id: string }>("select user_id from crew_members where crew_id = $1", [request.params.id]);
     ctx.live.notify(members.map((m) => m.user_id), { type: "crew.changed", crewId: request.params.id });
+    await notifyOutCall(ctx, request.params.id, id, user.id);
     return reply.status(201).send({ id });
   });
 
@@ -183,6 +185,7 @@ export function radarRoutes(app: FastifyInstance, ctx: Context): void {
       );
       const members = await ctx.db.query<{ user_id: string }>("select user_id from crew_members where crew_id = $1 and user_id <> $2", [crew.crew_id, user.id]);
       ctx.live.notify(members.map((m) => m.user_id), { type: "crew.changed", crewId: crew.crew_id });
+      await notifySos(ctx, crew.crew_id, input.partyId ?? null, id, user.id);
     }
     return reply.status(201).send({ ids });
   });

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { challengers, seasonBounds, territoryTitles } from "@crew/territory";
 import { AC_CONFIG, distanceMeters, evaluateCheckIn, fixHash } from "../anticheat";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
+import { notifyCheatAttempt, notifyTakeover } from "../notifications/producers";
 import { crewStandings, crewTimeZone, currentSeason, seasonRules, updateBoss, validatedVenues } from "../territory";
 import { nightOf, offsetMinutes } from "../time";
 
@@ -346,6 +347,8 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
 
     const takeover = evaluation.verdict === "accepted" && !input.private ? await updateBoss(ctx, venue.crew_id, venue.id) : null;
     await notifyCrew(ctx, venue.crew_id);
+    if (takeover) await notifyTakeover(ctx, venue.crew_id, takeover);
+    if (evaluation.verdict === "rejected") await notifyCheatAttempt(ctx, venue.crew_id, venue.id, user.id, input.id);
     return reply.status(201).send({
       id: input.id,
       verdict: evaluation.verdict,
