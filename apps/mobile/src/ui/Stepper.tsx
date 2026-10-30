@@ -21,6 +21,10 @@ interface Props {
   increaseLabel: string;
   /** Shown inline when a bound is reached; the screen never freezes (O-04). */
   boundMessage?: string;
+  /** False where a typed number would mean nothing, like a clock time; the buttons and the hold still work. */
+  editable?: boolean;
+  /** Figure size; 44 by default. */
+  size?: number;
 }
 
 /** Hold a button: the first repeat waits a little, then the steps speed up. */
@@ -32,7 +36,7 @@ const REPEAT_FASTEST_MS = 45;
  * A number set three ways: a tap for one step, a hold that speeds up (62 to 80 kg in a second),
  * or a tap on the figure to type it. Every step ticks when haptics are on.
  */
-export function Stepper({ value, min, max, step = 1, onChange, format, unit, decreaseLabel, increaseLabel, boundMessage }: Props) {
+export function Stepper({ value, min, max, step = 1, onChange, format, unit, decreaseLabel, increaseLabel, boundMessage, editable = true, size = 44 }: Props) {
   const theme = useTheme();
   const scale = useSharedValue(1);
   const first = useRef(true);
@@ -128,6 +132,7 @@ export function Stepper({ value, min, max, step = 1, onChange, format, unit, dec
           accessibilityValue={{ text: unit ? `${shown} ${unit}` : shown }}
           accessibilityActions={[{ name: "increment" }, { name: "decrement" }]}
           onAccessibilityAction={(event) => change(event.nativeEvent.actionName === "increment" ? step : -step)}
+          disabled={!editable}
           onPress={() => setEditing(value.toFixed(decimals))}
           style={styles.valueTouch}
         >
@@ -146,7 +151,7 @@ export function Stepper({ value, min, max, step = 1, onChange, format, unit, dec
                 style={[numeral(44), styles.input, { color: theme.amber, borderBottomColor: theme.amber }]}
               />
             ) : (
-              <Numeral size={44}>{shown}</Numeral>
+              <Numeral size={size}>{shown}</Numeral>
             )}
             {unit ? (
               <Text variant="h3" muted>

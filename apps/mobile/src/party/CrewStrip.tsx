@@ -39,7 +39,7 @@ export function CrewStrip({ big }: { big?: boolean }) {
               : member.designatedDriver
                 ? { label: i18n.t("live.driver"), tone: "water" as const }
                 : member.quiet
-                  ? { label: i18n.t("live.quiet", { minutes: 45 }), tone: "amber" as const }
+                  ? { label: i18n.t("live.quiet", { minutes: member.lastActivityAt ? Math.round((Date.now() - member.lastActivityAt) / 60_000) : 0 }), tone: "amber" as const }
                   : null;
           return (
             <ScalePressable
@@ -58,6 +58,12 @@ export function CrewStrip({ big }: { big?: boolean }) {
                 </Text>
               ) : null}
               {tag && !big ? <Tag label={tag.label} tone={tag.tone} /> : null}
+              {/* HUB-01: where each one is right now. */}
+              {member.venue && !member.homeSafeAt ? (
+                <Text variant="tab" align="center" style={styles.venue}>
+                  {member.venue.name}
+                </Text>
+              ) : null}
             </ScalePressable>
           );
         })}
@@ -71,4 +77,5 @@ const styles = StyleSheet.create({
   scroller: { marginHorizontal: -space.screenX },
   row: { gap: 12, paddingHorizontal: space.screenX },
   cell: { alignItems: "center", gap: 4 },
+  venue: { maxWidth: 96 },
 });

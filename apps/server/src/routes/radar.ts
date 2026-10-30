@@ -218,6 +218,11 @@ export function radarRoutes(app: FastifyInstance, ctx: Context): void {
        where a.resolved_at is null and a.user_id <> $1 and a.created_at > $2 order by a.created_at desc`,
       [user.id, ctx.now() - 12 * 3_600_000],
     );
+    // N-28: my own open alerts, so the sender can call them off from any of their phones.
+    const mine = await ctx.db.query<{ id: string; created_at: number }>(
+      "select id, created_at from sos_alerts where user_id = $1 and resolved_at is null and created_at > $2 order by created_at desc",
+      [user.id, ctx.now() - 12 * 3_600_000],
+    );
     return {
       alerts: rows.map((r) => ({
         id: r.id,
@@ -226,17 +231,24 @@ export function radarRoutes(app: FastifyInstance, ctx: Context): void {
         at: r.created_at,
         location: r.sealed_location ? ctx.sealer.open<{ lat: number; lng: number; accuracy: number }>(r.sealed_location) : null,
       })),
+      mine: mine.map((r) => ({ id: r.id, at: r.created_at })),
     };
   });
 
+  /** Sorted by someone in the crew, or called off by the sender (N-28). Every banner then goes. */
   app.post<{ Params: { id: string } }>("/v1/sos/:id/resolve", async (request) => {
     const user = requireUser(request);
-    await ctx.db.query(
+    const rows = await ctx.db.query<{ crew_id: string }>(
       // SEC-06: the position goes as soon as the alert is over.
       `update sos_alerts set resolved_at = $3, sealed_location = null
-       where id = $1 and (user_id = $2 or crew_id in (select crew_id from crew_members where user_id = $2))`,
+       where id = $1 and resolved_at is null and (user_id = $2 or crew_id in (select crew_id from crew_members where user_id = $2)) returning crew_id`,
       [request.params.id, user.id, ctx.now()],
     );
+    const crewId = rows[0]?.crew_id;
+    if (crewId) {
+      const members = await ctx.db.query<{ user_id: string }>("select user_id from crew_members where crew_id = $1", [crewId]);
+      ctx.live.notify(members.map((m) => m.user_id), { type: "crew.changed", crewId });
+    }
     return { ok: true };
   });
 }

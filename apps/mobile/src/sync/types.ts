@@ -1,4 +1,4 @@
-import type { BodyProfile, UiLevel } from "@crew/bac";
+import type { BodyProfile, FoodLevel, UiLevel } from "@crew/bac";
 import type { UserPreferences } from "@crew/units";
 import type { CustomDrink, DrinkKind } from "@/drinks/presets";
 
@@ -18,6 +18,8 @@ export interface DrinkEntry {
   consumedAt: number;
   loggedAt: number;
   withFood: boolean;
+  /** O-85: what was eaten; wins over `withFood`, which older entries carry alone. */
+  food?: FoodLevel;
   /** Name of a custom drink, kept on the entry so history reads right after the drink is deleted. */
   name?: string;
   sync: SyncState;
@@ -37,6 +39,8 @@ export interface StoredProfile extends BodyProfile {
 
 export type Mutation =
   | { kind: "drink.add"; drink: DrinkEntry }
+  /** O-23: a logged drink changed; `previous` puts it back if the server says no. */
+  | { kind: "drink.edit"; drink: DrinkEntry; previous: DrinkEntry }
   | { kind: "drink.remove"; drink: DrinkEntry }
   | { kind: "water.add"; water: WaterEntry }
   | { kind: "water.remove"; water: WaterEntry }

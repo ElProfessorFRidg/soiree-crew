@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect } from "react";
-import { StyleSheet, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Linking, StyleSheet, View } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { duration } from "@crew/design-tokens";
 import { breathRatio, countryRules, formatBacValue } from "@crew/units";
@@ -10,7 +10,9 @@ import { useCrewNames } from "@/crew/names";
 import { formatClock } from "@/i18n/format";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
-import { closeParty, refreshLiveParty, setPartyStatus, useCrewData, type LiveMember } from "@/server/crewData";
+import { closeParty, refreshLiveParty, setPartyStatus, setQuietAfter, useCrewData, type LiveMember } from "@/server/crewData";
+import { mapUrl } from "@/party/NightAlerts";
+import { Stepper } from "@/ui/Stepper";
 import { useSession } from "@/server/session";
 import { useNow } from "@/state/hooks";
 import { useAppStore } from "@/state/store";
@@ -43,6 +45,9 @@ function MemberRow({ member, me, crewId }: { member: LiveMember; me: boolean; cr
   const home = member.homeSafeAt !== null;
   const absent = member.response !== "going";
   const quietMinutes = member.lastActivityAt ? Math.round((now - member.lastActivityAt) / 60_000) : 0;
+  // O-37: who speeds up and who slows down, from the last hour against the one before.
+  const pace = member.pace;
+  const paceTrend = pace && pace.lastHour > pace.previousHour ? "up" : pace && pace.lastHour < pace.previousHour ? "down" : null;
 
   return (
     // O-39: every participant opens their profile.
@@ -61,13 +66,22 @@ function MemberRow({ member, me, crewId }: { member: LiveMember; me: boolean; cr
           {home ? <Tag label={i18n.t("live.homeSafe")} tone="ok" icon="home" /> : null}
           {member.designatedDriver ? <Tag label={i18n.t("live.driver")} tone="water" icon="car" /> : null}
           {member.unwellAt && !member.homeSafeAt ? <Tag label={i18n.t("unwell.tag")} tone="danger" /> : null}
-          {member.batteryLow ? <Tag label={i18n.t("live.battery")} tone="danger" icon="battery" /> : null}
+          {member.batteryLow ? (
+            <Tag
+              label={member.batteryLowAt ? i18n.t("live.batterySince", { time: formatClock(member.batteryLowAt, i18n.language, preferences.hourCycle) }) : i18n.t("live.battery")}
+              tone="danger"
+              icon="battery"
+            />
+          ) : null}
+          {paceTrend === "up" ? <Tag label={i18n.t("live.speedingUp")} tone="amber" /> : paceTrend === "down" ? <Tag label={i18n.t("live.slowingDown")} /> : null}
           {member.quiet && !member.batteryLow ? <Tag label={i18n.t("live.quiet", { minutes: quietMinutes })} tone="amber" icon="clock" /> : null}
           {!absent ? (
             <Text variant="small">
               {i18n.plural("party.drinks", member.drinks)}, {i18n.plural("party.waters", member.water)}
+              {pace ? `, ${i18n.plural("live.lastHour", pace.lastHour)}` : ""}
             </Text>
           ) : null}
+          {member.venue ? <Text variant="small">{i18n.t("live.atVenue", { venue: member.venue.name })}</Text> : null}
         </View>
       </View>
       {absent ? null : member.bac === null ? (
@@ -84,6 +98,84 @@ function MemberRow({ member, me, crewId }: { member: LiveMember; me: boolean; cr
   );
 }
 
+type Movement = { userId: string; name: string; at: number; kind: "arrived" | "home" };
+
+/** O-37: arrivals and departures of the night, newest first. */
+function Movements({ members }: { members: LiveMember[] }) {
+  const i18n = useT();
+  const hourCycle = useAppStore((state) => state.preferences.hourCycle);
+  const list: Movement[] = [];
+  for (const m of members) {
+    if (m.arrivedAt) list.push({ userId: m.userId, name: m.displayName, at: m.arrivedAt, kind: "arrived" });
+    if (m.homeSafeAt) list.push({ userId: m.userId, name: m.displayName, at: m.homeSafeAt, kind: "home" });
+  }
+  if (!list.length) return null;
+  list.sort((a, b) => b.at - a.at);
+  return (
+    <View style={styles.feed}>
+      <Text variant="label">{i18n.t("live.movements")}</Text>
+      {list.slice(0, 12).map((item) => (
+        <View key={`${item.kind}-${item.userId}`} style={styles.feedRow}>
+          <Numeral size={22}>{formatClock(item.at, i18n.language, hourCycle)}</Numeral>
+          <Text style={styles.flex}>{i18n.t(item.kind === "arrived" ? "live.arrived" : "live.wentHome", { name: item.name })}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+/** QOL-10: where a phone that ran low was last seen, when its owner shared their position. */
+function LastKnown({ members }: { members: LiveMember[] }) {
+  const i18n = useT();
+  const hourCycle = useAppStore((state) => state.preferences.hourCycle);
+  const known = members.filter((m) => m.batteryLow && m.lastKnown && m.homeSafeAt === null);
+  if (!known.length) return null;
+  return (
+    <View style={styles.feed}>
+      {known.map((m) => (
+        <Button
+          key={m.userId}
+          label={i18n.t("live.lastKnownOf", { name: m.displayName, time: formatClock(m.lastKnown!.at, i18n.language, hourCycle) })}
+          icon="pin"
+          variant="outline"
+          height={48}
+          onPress={() => void Linking.openURL(mapUrl(m.lastKnown!))}
+        />
+      ))}
+    </View>
+  );
+}
+
+/** N-29: the creator or a crew admin sets how long a silence lasts before the party is told. */
+function QuietSetting({ partyId, minutes }: { partyId: string; minutes: number }) {
+  const i18n = useT();
+  const [value, setValue] = useState(minutes);
+  useEffect(() => setValue(minutes), [minutes]);
+  useEffect(() => {
+    if (value === minutes) return;
+    // Held steps settle first; one request once the finger is up.
+    const timer = setTimeout(() => void setQuietAfter(partyId, value).catch(showFailure(i18n)), 700);
+    return () => clearTimeout(timer);
+  }, [value, minutes, partyId]);
+  return (
+    <View style={styles.feed}>
+      <Text variant="label">{i18n.t("live.quietAfter")}</Text>
+      <Stepper
+        value={value}
+        min={15}
+        max={240}
+        step={15}
+        unit={i18n.t("live.minutes")}
+        size={34}
+        onChange={setValue}
+        decreaseLabel={i18n.t("live.quietSooner")}
+        increaseLabel={i18n.t("live.quietLater")}
+      />
+      <Text variant="small">{i18n.t("live.quietHint")}</Text>
+    </View>
+  );
+}
+
 export default function LiveScreen() {
   const i18n = useT();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -93,6 +185,7 @@ export default function LiveScreen() {
   const hourCycle = useAppStore((state) => state.preferences.hourCycle);
   const refreshMs = useEcoInterval(REFRESH_MS);
   const share = useLiveShare();
+  const crewRole = useCrewData((state) => state.crews.find((c) => c.id === party?.crewId)?.role);
 
   useEffect(() => {
     if (!id) return;
@@ -126,6 +219,9 @@ export default function LiveScreen() {
           </Animated.View>
         ))}
       </View>
+      <LastKnown members={members} />
+      <Movements members={members} />
+      {live?.party.live && party && (party.createdBy === me || crewRole === "admin") ? <QuietSetting partyId={id} minutes={party.quietAfterMinutes ?? 45} /> : null}
       {mine && mine.response === "going" && live?.party.live ? (
         <Panel>
           <Button
@@ -197,4 +293,6 @@ const styles = StyleSheet.create({
   tags: { flexDirection: "row", flexWrap: "wrap", gap: 6, alignItems: "center", marginTop: 4 },
   bac: { alignItems: "flex-end", gap: 2 },
   switchRow: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 48 },
+  feed: { gap: 8 },
+  feedRow: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 32 },
 });

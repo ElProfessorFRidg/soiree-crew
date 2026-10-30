@@ -22,7 +22,7 @@ export function runQuickAction(action: QuickAction, i18n: Translator): void {
   }
   const { preferences } = useAppStore.getState();
   const last = lastDrink();
-  const drink = logDrink(last ? presetFromEntry(last) : defaultPreset(preferences.unitSystem), Date.now(), false);
+  const drink = logDrink(last ? presetFromEntry(last) : defaultPreset(preferences.unitSystem), Date.now());
   if (drink) offerUndo(drink, i18n, preferences.hourCycle);
 }
 

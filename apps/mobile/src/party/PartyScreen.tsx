@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Linking, Pressable, ScrollView, StyleSheet, View } from "react-native";
-import Animated, { FadeIn } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { POISONING_CARD_THRESHOLD, type UiLevel } from "@crew/bac";
 import { duration, palette, size, space } from "@crew/design-tokens";
@@ -44,13 +44,33 @@ import { RollingNumber } from "./RollingNumber";
 import { DareOfTheNight } from "./DareOfTheNight";
 import { variantKey } from "@/i18n/variants";
 import { showFailure } from "@/server/errors";
+import { FoodPicker } from "@/drinks/FoodPicker";
+import { setEveningFood, useEveningFood } from "@/drinks/food";
+import { greetingKey } from "./greeting";
+import { NightAlerts } from "./NightAlerts";
+import { PartyBoard } from "./PartyBoard";
 
-function greetingKey(hour: number) {
-  if (hour < 5) return "greeting.lateNight" as const;
-  if (hour < 11) return "greeting.morning" as const;
-  if (hour < 17) return "greeting.afternoon" as const;
-  if (hour < 21) return "greeting.apero" as const;
-  return "greeting.evening" as const;
+/** JOY-02: the line above the title, from the night as it goes. */
+function Greeting({ i18n, live, now, drinksTonight }: { i18n: Translator; live: LiveBac; now: number; drinksTonight: number }) {
+  const current = useLiveParty();
+  const me = useSession((state) => state.session?.userId);
+  const mine = current?.live?.members.find((m) => m.userId === me);
+  const key = greetingKey({
+    hour: new Date(now).getHours(),
+    bac: live.estimate.bac,
+    trend: live.estimate.trend,
+    drinksTonight,
+    partyLive: current !== null && current.party.startsAt <= now,
+    designatedDriver: mine?.designatedDriver ?? false,
+    homeSafe: mine?.homeSafeAt != null,
+  });
+  return <Text variant="small">{i18n.t(variantKey(key, new Date(now).toDateString()))}</Text>;
+}
+
+/** O-85: what was eaten tonight; changing it moves every drink of tonight with it. */
+function EveningFood({ i18n, now }: { i18n: Translator; now: number }) {
+  const food = useEveningFood(now);
+  return <FoodPicker value={food} title={i18n.t("party.foodTonight")} onChange={(level) => setEveningFood(level)} />;
 }
 
 /** Drinks and water of the current night (QOL-02: a night lasts until the day boundary). */
@@ -172,7 +192,7 @@ export function PartyScreen() {
   })();
 
   const onAgain = () => {
-    const drink = logDrink(again.preset, Date.now(), false);
+    const drink = logDrink(again.preset, Date.now());
     if (drink) offerUndo(drink, i18n, preferences.hourCycle);
   };
   const onWater = () => {
@@ -211,15 +231,25 @@ export function PartyScreen() {
         contentInsetAdjustmentBehavior="never"
       >
         <SosBanner />
+        <NightAlerts />
         <UnwellBanner />
         <VaultPrompt />
         <EcoNotice />
         <LoggingNudge i18n={i18n} tonight={tonight} now={now} onAgain={onAgain} onWater={onWater} againLabel={again.label} />
         <TravelPrompt />
-        {level === 0 ? <LevelZero {...common} /> : null}
-        {level === 1 ? <LevelOne {...common} /> : null}
-        {level === 2 ? <LevelTwo {...common} /> : null}
-        {level === 3 ? <LevelThree {...common} /> : null}
+        {/* ADP-01: one level fades into the next, the rest of the screen slides to its new place. */}
+        <Animated.View
+          key={`level-${level}`}
+          entering={FadeIn.duration(duration.enter).easing(easings.out)}
+          exiting={FadeOut.duration(Math.round(duration.enter / 2))}
+          layout={LinearTransition.duration(duration.reorder).easing(easings.reorder)}
+          style={styles.level}
+        >
+          {level === 0 ? <LevelZero {...common} /> : null}
+          {level === 1 ? <LevelOne {...common} /> : null}
+          {level === 2 ? <LevelTwo {...common} /> : null}
+          {level === 3 ? <LevelThree {...common} /> : null}
+        </Animated.View>
         {live.estimate.bac >= POISONING_CARD_THRESHOLD ? <PoisoningCard live={live} i18n={i18n} /> : null}
       </ScrollView>
     </View>
@@ -422,7 +452,7 @@ function CurrentVenueRow({ i18n }: { i18n: Translator }) {
       ) : null}
       {live ? (
         <Row
-          title={i18n.t("ranking.title")}
+          title={i18n.t("ranking.seeAll")}
           leading={<Icon name="trophy" color={theme.textMuted} />}
           trailing={<Icon name="chev" color={theme.textMuted} />}
           onPress={() => router.push({ pathname: "/leaderboard", params: { crewId: live.party.crewId } })}
@@ -456,7 +486,7 @@ function LevelZero(props: LevelProps) {
     <>
       <View style={styles.header}>
         <View style={styles.flex}>
-          <Text variant="small">{i18n.t(variantKey(greetingKey(new Date(now).getHours()), new Date(now).toDateString()))}</Text>
+          <Greeting i18n={i18n} live={props.live} now={now} drinksTonight={props.tonight.drinks.length} />
           <PartyTitle i18n={i18n} />
         </View>
         <IconButton icon="clock" accessibilityLabel={i18n.t("party.history")} onPress={() => router.push("/history")} />
@@ -487,8 +517,10 @@ function LevelZero(props: LevelProps) {
         />
       </View>
       <StatusRow {...props} />
+      <EveningFood i18n={i18n} now={now} />
       <CrewStrip />
       <QuickTiles i18n={i18n} />
+      <PartyBoard />
       <View>
         <CurrentVenueRow i18n={i18n} />
       </View>
@@ -508,9 +540,10 @@ function LevelOne(props: LevelProps) {
   return (
     <>
       <View style={styles.header}>
-        <Text variant="h3" style={styles.flex}>
-          {i18n.t("party.tonight")}
-        </Text>
+        <View style={styles.flex}>
+          <Greeting i18n={i18n} live={props.live} now={props.now} drinksTonight={props.tonight.drinks.length} />
+          <Text variant="h3">{i18n.t("party.tonight")}</Text>
+        </View>
         <Tag label={i18n.t("party.level", { level: 1 })} tone="amber" />
       </View>
       <BacHero {...props} size={140} />
@@ -658,6 +691,8 @@ function PoisoningCard({ live, i18n }: { live: LiveBac; i18n: Translator }) {
       </Text>
       <Text color={palette.tint.dangerText}>{i18n.t("party.poisoningBody", { number })}</Text>
       <Button label={i18n.t("party.callEmergency", { number })} icon="phone" variant="danger" onPress={() => void Linking.openURL(`tel:${number}`)} />
+      {/* O-88: the crew can be called from here too. */}
+      <Button label={i18n.t("party.sos")} icon="alert" variant="secondary" onPress={() => router.push("/sos")} />
     </Panel>
   );
 }
@@ -684,4 +719,5 @@ const styles = StyleSheet.create({
   bigCell: { flexBasis: "44%", flexGrow: 1 },
   levelThreeTitle: { fontSize: 20, lineHeight: 26, fontFamily: "Archivo-Bold" },
   titleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  level: { gap: 14 },
 });

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Linking, Pressable, StyleSheet, View } from "react-native";
+import { router } from "expo-router";
+import { Linking, Platform, Pressable, StyleSheet, View } from "react-native";
 import Animated, {
   cancelAnimation,
   Easing,
@@ -13,7 +14,10 @@ import { countryRules } from "@crew/units";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
 import { useLiveParty } from "@/server/crewData";
-import { sendSos } from "@/server/radarData";
+import { cancelMySos, refreshSos, sendSos, useRadar } from "@/server/radarData";
+import { showFailure } from "@/server/errors";
+import { confirmAction } from "@/ui/confirm";
+import { mapUrl } from "@/party/NightAlerts";
 import { UnwellButton } from "@/party/UnwellBanner";
 import { useSession } from "@/server/session";
 import { currentFix } from "@/server/venueData";
@@ -37,6 +41,14 @@ function call(number: string) {
   void Linking.openURL(`tel:${number}`);
 }
 
+/** N-28: a text to the emergency contact, with the position when the phone has one. */
+function text(phone: string, body: string) {
+  haptic.heavy();
+  // iOS reads the body after "&", Android after "?".
+  const separator = Platform.OS === "ios" ? "&" : "?";
+  void Linking.openURL(`sms:${phone}${separator}body=${encodeURIComponent(body)}`);
+}
+
 /**
  * N-28. At levels 0 and 1 the call needs a 2 s hold, so a pocket tap never dials.
  * At levels 2 and 3 a long press is not allowed (ADP-04), so one tap starts a
@@ -55,6 +67,13 @@ export default function SosScreen() {
   const liveParty = useLiveParty();
   const [sent, setSent] = useState<null | "with" | "without" | "failed">(null);
   const [holding, setHolding] = useState(false);
+  const mine = useRadar((state) => state.mine);
+  const contact = useAppStore((state) => state.emergencyContact);
+  const [lastFix, setLastFix] = useState<{ lat: number; lng: number } | null>(null);
+  useEffect(() => {
+    // An alert sent from another of my phones can be called off from here too.
+    if (session) void refreshSos().catch(() => undefined);
+  }, [session]);
 
   /** N-28: the hold alerts the crew (with the location when allowed); without a crew it calls for help. */
   const trigger = () => {
@@ -77,6 +96,7 @@ export default function SosScreen() {
               accuracy: result.fix.accuracy,
             }
           : undefined;
+      if (location) setLastFix(location);
       // Saying "sent" when nothing left would be the worst lie in the app (ADP-09).
       const ok = await sendSos({
         ...(liveParty ? { partyId: liveParty.party.id } : {}),
@@ -145,8 +165,24 @@ export default function SosScreen() {
 
   const holdMode = level < 2;
 
+  /** N-28: the sender calls it off; every banner in the crew goes. */
+  const callOff = () =>
+    void confirmAction({ title: i18n.t("sosAlert.cancelSentConfirm"), confirmLabel: i18n.t("sosAlert.cancelSent"), cancelLabel: i18n.t("sosAlert.keepSent") }).then((ok) => {
+      if (!ok) return;
+      haptic.confirmed();
+      void cancelMySos()
+        .then(() => setSent(null))
+        .catch(showFailure(i18n));
+    });
+
   return (
-    <Screen back title={i18n.t("sos.title")} scrollEnabled={!holding}>
+    <Screen back title={i18n.t("sos.title")} scrollEnabled={!holding} withToasts>
+      {mine.length ? (
+        <Panel tint="danger" style={styles.mine}>
+          <Text variant="h3">{i18n.t("sosAlert.mineOpen")}</Text>
+          <Button label={i18n.t("sosAlert.cancelSent")} variant="secondary" height={52} onPress={callOff} />
+        </Panel>
+      ) : null}
       <View style={styles.center}>
         {holdMode ? (
           <Pressable
@@ -272,6 +308,23 @@ export default function SosScreen() {
 
       <UnwellButton />
 
+      {contact ? (
+        <>
+          <Text variant="label">{i18n.t("sos.contact")}</Text>
+          <Panel>
+            <Row title={i18n.t("sos.callContact", { name: contact.name })} subtitle={contact.phone} onPress={() => call(contact.phone)} />
+            <Row
+              title={i18n.t("sos.textContact", { name: contact.name })}
+              subtitle={lastFix ? i18n.t("sos.textWithPlace") : undefined}
+              onPress={() => text(contact.phone, lastFix ? `${i18n.t("sos.textBody")} ${mapUrl(lastFix)}` : i18n.t("sos.textBody"))}
+              last
+            />
+          </Panel>
+        </>
+      ) : (
+        <Button label={i18n.t("sos.addContact")} variant="outline" height={44} onPress={() => router.push("/(tabs)/me")} />
+      )}
+
       <Text variant="label">{i18n.t("sos.numbers")}</Text>
       <Panel>
         {rules.emergency.ambulance ? (
@@ -332,5 +385,6 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   wide: { alignSelf: "stretch" },
+  mine: { gap: 10 },
   countdown: { gap: 16 },
 });

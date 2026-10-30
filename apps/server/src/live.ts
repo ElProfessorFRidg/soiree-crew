@@ -5,8 +5,14 @@ export interface LiveSocket {
 
 export type LiveEvent =
   | { type: "party.changed"; partyId: string }
-  /** N-36: someone at the party does not feel well. */
-  | { type: "party.unwell"; partyId: string; userId: string }
+  /** N-36: someone at the party does not feel well; `near` when only the nearest were told so far. */
+  | { type: "party.unwell"; partyId: string; userId: string; near?: boolean }
+  /** N-29: a member gave no sign of life for longer than the party's threshold. */
+  | { type: "party.quiet"; partyId: string; userId: string; batteryLow: boolean }
+  /** O-88: a member's estimate went past 2.0 g/L. */
+  | { type: "party.danger"; partyId: string; userId: string }
+  /** N-25: the night is over; everyone going says when they are home. */
+  | { type: "party.homeCheck"; partyId: string }
   | { type: "crew.changed"; crewId: string }
   /** O-36, COM-05: something waiting for my answer changed (party invitation, join request, friend request). */
   | { type: "invites.changed" }

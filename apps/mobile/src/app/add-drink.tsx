@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import type { FoodLevel } from "@crew/bac";
 import { duration, radius, space } from "@crew/design-tokens";
 import { parseOrder, search } from "@crew/fuzzy";
 import { drinkVolumeUnit, formatVolume, type VolumeUnit } from "@crew/units";
@@ -10,6 +11,8 @@ import { Field } from "@/crew/Field";
 import { logDrink } from "@/drinks/actions";
 import { CustomDrinkEditor } from "@/drinks/CustomDrinkEditor";
 import { moveCustomDrink, removeCustomDrink, restoreCustomDrink, saveCustomDrink, sortedCustomDrinks } from "@/drinks/customDrinks";
+import { eveningFood } from "@/drinks/food";
+import { FoodPicker } from "@/drinks/FoodPicker";
 import { drinkLabel, drinkWithArticle } from "@/drinks/display";
 import { offerUndo } from "@/drinks/undoToast";
 import { presetFromCustom, presetsFor, type CustomDrink, type DrinkPreset } from "@/drinks/presets";
@@ -22,10 +25,11 @@ import { api } from "@/server/api";
 import { useCrewData } from "@/server/crewData";
 import { useTheme } from "@/theme";
 import { Button, IconButton } from "@/ui/Button";
-import { Chip, Switch } from "@/ui/controls";
+import { Chip } from "@/ui/controls";
+import { Stepper } from "@/ui/Stepper";
 import { Icon } from "@/ui/Icon";
 import { ScalePressable } from "@/ui/Pressable";
-import { Numeral, Text } from "@/ui/Text";
+import { Text } from "@/ui/Text";
 import { showToast, ToastHost } from "@/ui/Toast";
 import { addPhotos } from "@/photos/uploads";
 import { useLiveParty } from "@/server/crewData";
@@ -34,6 +38,8 @@ import { showPermissionDenied } from "@/system/permissions";
 
 
 const MINUTE_MS = 60_000;
+/** O-22: a forgotten drink goes back this far at most; older ones are edited from the history. */
+const MAX_MINUTES_AGO = 12 * 60;
 
 function volumeText(preset: DrinkPreset, unit: VolumeUnit, i18n: Translator): string {
   if (preset.abv === 0) return i18n.t("drinks.softSub");
@@ -59,7 +65,8 @@ export default function AddDrinkSheet() {
   }));
   // Minutes before now. Never negative: a drink in the future does not count (O-22).
   const [minutesAgo, setMinutesAgo] = useState(0);
-  const [withFood, setWithFood] = useState(false);
+  // O-85: the evening's food level, changeable for this drink alone.
+  const [food, setFood] = useState<FoodLevel>(() => eveningFood());
   const [editing, setEditing] = useState<Editing>(null);
   const [menuFor, setMenuFor] = useState<string | null>(null);
   const live = useLiveParty();
@@ -100,7 +107,7 @@ export default function AddDrinkSheet() {
           <IconButton icon="x" accessibilityLabel={i18n.t("common.close")} onPress={() => (router.canGoBack() ? router.back() : router.replace("/(tabs)"))} />
         </View>
 
-        <QuickType presets={[...customDrinks.map(presetFromCustom), ...presets]} consumedAt={consumedAt} withFood={withFood} onPick={(id) => {
+        <QuickType presets={[...customDrinks.map(presetFromCustom), ...presets]} consumedAt={consumedAt} food={food} onPick={(id) => {
           const index = presets.findIndex((p) => p.id === id);
           if (index >= 0) pick({ type: "preset", index });
           else pick({ type: "custom", id });
@@ -244,30 +251,22 @@ export default function AddDrinkSheet() {
 
         <View style={styles.time}>
           <Text variant="label">{i18n.t("addDrink.drankAt")}</Text>
-          <View style={styles.timeRow}>
-            <IconButton icon="back" accessibilityLabel={i18n.t("addDrink.earlier")} onPress={() => setMinutesAgo((m) => m + 1)} />
-            <Numeral size={30} style={styles.timeValue}>
-              {formatClock(consumedAt, i18n.language, preferences.hourCycle)}
-            </Numeral>
-            <IconButton
-              icon="chev"
-              accessibilityLabel={i18n.t("addDrink.later")}
-              onPress={() => {
-                if (minutesAgo === 0) haptic.error();
-                setMinutesAgo((m) => Math.max(0, m - 1));
-              }}
-            />
-          </View>
-          {minutesAgo === 0 ? <Text variant="small">{i18n.t("addDrink.noFuture")}</Text> : null}
+          {/* O-22: one minute per tap, faster while held; never in the future. */}
+          <Stepper
+            value={-minutesAgo}
+            min={-MAX_MINUTES_AGO}
+            max={0}
+            editable={false}
+            size={34}
+            format={(offset) => formatClock(now + offset * MINUTE_MS, i18n.language, preferences.hourCycle)}
+            onChange={(offset) => setMinutesAgo(-offset)}
+            decreaseLabel={i18n.t("addDrink.earlier")}
+            increaseLabel={i18n.t("addDrink.later")}
+            boundMessage={minutesAgo === 0 ? i18n.t("addDrink.noFuture") : undefined}
+          />
         </View>
 
-        <View style={styles.switchRow}>
-          <View style={styles.flex}>
-            <Text variant="h3">{i18n.t("addDrink.withFood")}</Text>
-            <Text variant="small">{i18n.t("addDrink.withFoodHint")}</Text>
-          </View>
-          <Switch value={withFood} onValueChange={setWithFood} accessibilityLabel={i18n.t("addDrink.withFood")} />
-        </View>
+        <FoodPicker value={food} onChange={setFood} hint={i18n.t("addDrink.withFoodHint")} />
 
         {live ? (
           // O-83: a photo of the drink goes to the party album, not to the drink itself.
@@ -280,6 +279,7 @@ export default function AddDrinkSheet() {
               void addPhotos(live.party.id, "camera")
                 .then((n) => {
                   if (n > 0) showToast({ message: i18n.t("addDrink.photoAdded") });
+                  else if (n === -3) showToast({ message: i18n.t("vault.queued") });
                   else if (n < 0) showPermissionDenied(i18n, i18n.t("album.denied"), n === -1);
                 })
                 .catch(showFailure(i18n))
@@ -293,7 +293,7 @@ export default function AddDrinkSheet() {
           label={i18n.t("addDrink.add", { drink: drinkWithArticle(preset, i18n) })}
           height={64}
           onPress={() => {
-            const drink = logDrink(preset, consumedAt, withFood);
+            const drink = logDrink(preset, consumedAt, food);
             if (!drink) return;
             if (router.canGoBack()) router.back();
             else router.replace("/(tabs)");
@@ -310,7 +310,7 @@ const FR = createTranslator("fr");
 const EN = createTranslator("en");
 
 /** ADP-05: type or dictate "2 pintes et un shot"; typos, plurals and accents are fine. */
-function QuickType({ presets, consumedAt, withFood, onPick }: { presets: DrinkPreset[]; consumedAt: number; withFood: boolean; onPick: (id: string) => void }) {
+function QuickType({ presets, consumedAt, food, onPick }: { presets: DrinkPreset[]; consumedAt: number; food: FoodLevel; onPick: (id: string) => void }) {
   const i18n = useT();
   const [text, setText] = useState("");
   const candidates = useMemo(
@@ -360,7 +360,7 @@ function QuickType({ presets, consumedAt, withFood, onPick }: { presets: DrinkPr
           onPress={() => {
             let count = 0;
             for (const o of order) {
-              for (let n = 0; n < o.quantity; n++) if (logDrink(byId(o.value), at, withFood, count > 0)) count += 1;
+              for (let n = 0; n < o.quantity; n++) if (logDrink(byId(o.value), at, food, count > 0)) count += 1;
             }
             if (!count) return;
             haptic.drinkAdded();
@@ -419,8 +419,5 @@ const styles = StyleSheet.create({
   customMain: { flex: 1, flexDirection: "row", alignItems: "center", gap: 12, minHeight: 60, paddingHorizontal: 14 },
   menu: { flexDirection: "row", gap: 8, marginTop: 8 },
   time: { gap: 8 },
-  timeRow: { flexDirection: "row", alignItems: "center", gap: 12 },
-  timeValue: { flex: 1, textAlign: "center" },
-  switchRow: { flexDirection: "row", alignItems: "center", gap: 12 },
   flex: { flex: 1 },
 });

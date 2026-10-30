@@ -21,6 +21,8 @@ const CREW_DATA_KEY = "crew-data-v1";
 interface Snapshot {
   title: string;
   line: string;
+  /** O-19: shown under a figure, never without one. */
+  notice?: string;
   water: string;
   pint: string;
   /** JOY-04: mood colour of the party going on, for the band at the top. */
@@ -28,7 +30,7 @@ interface Snapshot {
 }
 
 interface StoredState {
-  drinks?: { volumeMl: number; abv: number; consumedAt: number; withFood: boolean; id: string }[];
+  drinks?: { volumeMl: number; abv: number; consumedAt: number; withFood: boolean; food?: "none" | "light" | "full"; id: string }[];
   profile?: BodyProfile | null;
   preferences?: UserPreferences;
   lockScreenNumbers?: boolean;
@@ -69,7 +71,7 @@ export async function readSnapshot(now = Date.now()): Promise<Snapshot> {
   if (!state.lockScreenNumbers) return { ...base, line: i18n.t("widget.backAt", { time: back }) };
   const ratio = breathRatio(countryRules(state.preferences.legalCountry));
   const value = `${formatBacValue(estimate.bac, state.preferences.bacUnit, ratio, i18n.locale)} ${i18n.t(`units.${state.preferences.bacUnit}`)}`;
-  return { ...base, line: i18n.t("widget.levelBack", { value, time: back }) };
+  return { ...base, line: i18n.t("widget.levelBack", { value, time: back }), notice: i18n.t("widget.notice") };
 }
 
 /** QOL-25: the tap is handled in the background task, the app does not open. */
@@ -101,6 +103,7 @@ export function NightWidget({ snapshot }: { snapshot: Snapshot }) {
         {snapshot.mood ? <FlexWidget style={{ width: 36, height: 4, borderRadius: 2, marginBottom: 6, backgroundColor: c(snapshot.mood) }} /> : null}
         <TextWidget text={snapshot.title} style={{ fontSize: 13, color: c(palette.dark.textMuted) }} />
         <TextWidget text={snapshot.line} style={{ fontSize: 18, fontWeight: "700", color: c(palette.dark.text) }} maxLines={2} />
+        {snapshot.notice ? <TextWidget text={snapshot.notice} style={{ fontSize: 11, color: c(palette.dark.textMuted) }} maxLines={2} /> : null}
       </FlexWidget>
       <FlexWidget style={{ flexDirection: "row", flexGap: 8, width: "match_parent" }}>
         <Button label={snapshot.pint} action="AGAIN" fill />

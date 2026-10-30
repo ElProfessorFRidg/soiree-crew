@@ -22,9 +22,11 @@ export interface SosAlert {
 interface RadarState {
   byCrew: Record<string, Radar>;
   sos: SosAlert[];
+  /** N-28: my own alerts still open, which I can call off. */
+  mine: { id: string; at: number }[];
 }
 
-export const useRadar = create<RadarState>(() => ({ byCrew: {}, sos: [] }));
+export const useRadar = create<RadarState>(() => ({ byCrew: {}, sos: [], mine: [] }));
 
 export async function refreshRadar(crewId: string): Promise<void> {
   const radar = await api<Radar>(`/v1/crews/${crewId}/radar`);
@@ -95,12 +97,23 @@ export function linkCallToParty(callId: string, partyId: string): Promise<unknow
 }
 
 export async function refreshSos(): Promise<void> {
-  const { alerts } = await api<{ alerts: SosAlert[] }>("/v1/sos");
-  useRadar.setState({ sos: alerts });
+  const { alerts, mine } = await api<{ alerts: SosAlert[]; mine?: { id: string; at: number }[] }>("/v1/sos");
+  useRadar.setState({ sos: alerts, mine: mine ?? [] });
 }
 
-export function sendSos(input: { partyId?: string; location?: { lat: number; lng: number; accuracy: number } }): Promise<unknown> {
-  return api("/v1/sos", { method: "POST", body: input });
+export async function sendSos(input: { partyId?: string; location?: { lat: number; lng: number; accuracy: number } }): Promise<string[]> {
+  const { ids } = await api<{ ids: string[] }>("/v1/sos", { method: "POST", body: input });
+  const at = Date.now();
+  useRadar.setState((state) => ({ mine: [...ids.map((id) => ({ id, at })), ...state.mine] }));
+  return ids;
+}
+
+/** N-28: the sender calls off every alert they sent; the crew's banners go at once. */
+export async function cancelMySos(): Promise<void> {
+  const { mine } = useRadar.getState();
+  await Promise.all(mine.map((alert) => api(`/v1/sos/${alert.id}/resolve`, { method: "POST" })));
+  useRadar.setState({ mine: [] });
+  await refreshSos().catch(() => undefined);
 }
 
 export async function resolveSos(id: string): Promise<void> {

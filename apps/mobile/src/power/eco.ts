@@ -5,15 +5,19 @@ import { setPartyStatus, useCrewData } from "@/server/crewData";
 
 /** ADP-08: under this charge, unplugged, the app goes easy on the battery during a night. */
 const LOW_LEVEL = 0.2;
+/** QOL-10: under this charge, unplugged, the crew sees "low battery" next to my name. */
+const CREW_LOW_LEVEL = 0.1;
 /** Refreshes and clocks run this many times less often in eco mode. Essentials and SOS are untouched. */
 export const ECO_SLOWDOWN = 4;
 
 interface EcoState {
   eco: boolean;
   level: number | null;
+  /** QOL-10: what the crew was last told. */
+  toldLow: boolean;
 }
 
-export const useEco = create<EcoState>(() => ({ eco: false, level: null }));
+export const useEco = create<EcoState>(() => ({ eco: false, level: null, toldLow: false }));
 
 function liveParty() {
   const now = Date.now();
@@ -22,11 +26,15 @@ function liveParty() {
 
 function update(level: number | null, charging: boolean, lowPowerMode: boolean): void {
   const eco = lowPowerMode || (level !== null && level >= 0 && level <= LOW_LEVEL && !charging);
-  const before = useEco.getState().eco;
   useEco.setState({ eco, level });
   // QOL-10: the crew sees a low battery on the live party, so nobody worries when the phone dies.
+  // The server stamps the time and keeps my last shared position for a while (N-07).
+  const low = level !== null && level >= 0 && level <= CREW_LOW_LEVEL && !charging;
   const party = liveParty();
-  if (party && eco !== before) void setPartyStatus(party.id, { batteryLow: eco }).catch(() => undefined);
+  if (party && low !== useEco.getState().toldLow) {
+    useEco.setState({ toldLow: low });
+    void setPartyStatus(party.id, { batteryLow: low }).catch(() => useEco.setState({ toldLow: !low }));
+  }
 }
 
 let started = false;

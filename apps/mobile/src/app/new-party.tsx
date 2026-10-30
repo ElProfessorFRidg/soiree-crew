@@ -1,12 +1,12 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Field } from "@/crew/Field";
 import { moodIcon } from "@/crew/moods";
 import { useT } from "@/i18n";
 import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
-import { createParty, useCrewData, type PartyMood } from "@/server/crewData";
+import { createParty, fetchHabits, useCrewData, type CrewHabits, type PartyMood } from "@/server/crewData";
 import { linkCallToParty } from "@/server/radarData";
 import { useAppStore } from "@/state/store";
 import { Button } from "@/ui/Button";
@@ -60,6 +60,25 @@ export default function NewPartyScreen() {
   const [end, setEnd] = useState(() => Math.max(27 * 60, Math.ceil((minutesNow + 3 * 60) / STEP_MIN) * STEP_MIN));
   const [tripDays, setTripDays] = useState(2);
   const [busy, setBusy] = useState(false);
+  // QOL-16: what this crew's nights usually look like, until the user sets things by hand.
+  const [habits, setHabits] = useState<CrewHabits | null>(null);
+  const [endTouched, setEndTouched] = useState(false);
+  useEffect(() => {
+    if (!crewId) return;
+    let cancelled = false;
+    void fetchHabits(crewId)
+      .then((found) => {
+        if (cancelled) return;
+        setHabits(found);
+        const usual = found.endMinutes;
+        if (!endTouched && usual !== null) setEnd((current) => (usual > start && usual <= start + 16 * 60 ? usual : current));
+      })
+      .catch(() => setHabits(null));
+    return () => {
+      cancelled = true;
+    };
+    // Only a new crew asks again; the start time does not.
+  }, [crewId]);
 
   const day = useMemo(() => {
     const d = new Date(nightBase);
@@ -68,7 +87,7 @@ export default function NewPartyScreen() {
   }, [dayOffset, nightBase]);
 
   const weekday = new Intl.DateTimeFormat(i18n.locale, { weekday: "long" }).format(day);
-  const autoName = i18n.t("newParty.autoName", { weekday });
+  const autoName = habits?.venue ? i18n.t("newParty.autoNameAt", { weekday, venue: habits.venue.name }) : i18n.t("newParty.autoName", { weekday });
   const startsAt = atMinutes(day, start);
   const endsAt = kind === "trip" ? atMinutes(new Date(day.getTime() + tripDays * DAY_MS), end - 24 * 60) : atMinutes(day, end);
   const dayChips = Array.from({ length: 7 }, (_, offset) => {
@@ -204,11 +223,18 @@ export default function NewPartyScreen() {
           max={start + 16 * 60}
           step={STEP_MIN}
           format={clock}
-          onChange={setEnd}
+          onChange={(next) => {
+            setEndTouched(true);
+            setEnd(next);
+          }}
           decreaseLabel={i18n.t("newParty.earlier")}
           increaseLabel={i18n.t("newParty.later")}
         />
+        {habits?.endMinutes != null && kind === "party" ? <Text variant="small">{i18n.t("newParty.usualEnd", { time: clock(habits.endMinutes) })}</Text> : null}
       </Panel>
+      {habits?.friends.length ? (
+        <Text variant="small">{i18n.t("newParty.usualFriends", { names: habits.friends.map((f) => f.name).join(", ") })}</Text>
+      ) : null}
     </Screen>
   );
 }

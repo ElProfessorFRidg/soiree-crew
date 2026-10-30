@@ -4,7 +4,7 @@ import { Platform } from "react-native";
 import { getCalendars, getLocales } from "expo-localization";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import type { UiLevel, UiLevelState } from "@crew/bac";
+import type { FoodLevel, UiLevel, UiLevelState } from "@crew/bac";
 import { defaultPreferences, type UserPreferences } from "@crew/units";
 import type { VaultItem } from "@/vault/vault";
 import type { CustomDrink, DrinkPreset } from "@/drinks/presets";
@@ -86,6 +86,10 @@ export interface AppState {
   birthdayNotified: string[];
   /** QOL-02: "userId:time zone" last sent to the server, so it is sent again only on a change. */
   clockSent: string | null;
+  /** O-85: what was eaten each evening, by night key; new drinks of that night start from it. */
+  foodByNight: Record<string, FoodLevel>;
+  /** N-28: someone to call or text from the SOS screen. Kept on this phone only. */
+  emergencyContact: { name: string; phone: string } | null;
 }
 
 export const useAppStore = create<AppState>()(
@@ -131,6 +135,8 @@ export const useAppStore = create<AppState>()(
       travelZoneDismissed: null,
       birthdayNotified: [],
       clockSent: null,
+      foodByNight: {},
+      emergencyContact: null,
     }),
     {
       name: "crew-app-v1",
@@ -179,6 +185,8 @@ export function applyMutation(mutation: Mutation): void {
     switch (mutation.kind) {
       case "drink.add":
         return { drinks: [...state.drinks.filter((d) => d.id !== mutation.drink.id), mutation.drink] };
+      case "drink.edit":
+        return { drinks: state.drinks.map((d) => (d.id === mutation.drink.id ? mutation.drink : d)) };
       case "drink.remove":
         return { drinks: state.drinks.filter((d) => d.id !== mutation.drink.id) };
       case "water.add":
@@ -203,6 +211,8 @@ export function revertMutation(mutation: Mutation): void {
   switch (mutation.kind) {
     case "drink.add":
       return applyMutation({ kind: "drink.remove", drink: mutation.drink });
+    case "drink.edit":
+      return applyMutation({ kind: "drink.edit", drink: { ...mutation.previous, sync: "saved" }, previous: mutation.previous });
     case "drink.remove":
       return applyMutation({ kind: "drink.add", drink: { ...mutation.drink, sync: "saved" } });
     case "water.add":
@@ -226,7 +236,7 @@ export function revertMutation(mutation: Mutation): void {
 
 export function setSyncState(mutation: Mutation, sync: SyncState): void {
   useAppStore.setState((state) => {
-    if (mutation.kind === "drink.add") {
+    if (mutation.kind === "drink.add" || mutation.kind === "drink.edit") {
       return { drinks: state.drinks.map((d) => (d.id === mutation.drink.id ? { ...d, sync } : d)) };
     }
     if (mutation.kind === "water.add") {
@@ -236,7 +246,7 @@ export function setSyncState(mutation: Mutation, sync: SyncState): void {
   });
 }
 
-export function buildDrink(preset: DrinkPreset, consumedAt: number, withFood: boolean): DrinkEntry {
+export function buildDrink(preset: DrinkPreset, consumedAt: number, food: FoodLevel): DrinkEntry {
   return {
     id: newId(),
     presetId: preset.id,
@@ -245,7 +255,8 @@ export function buildDrink(preset: DrinkPreset, consumedAt: number, withFood: bo
     abv: preset.abv,
     consumedAt,
     loggedAt: Date.now(),
-    withFood,
+    withFood: food !== "none",
+    food,
     ...(preset.name ? { name: preset.name } : {}),
     sync: "pending",
   };
@@ -258,6 +269,17 @@ export function buildWater(at: number): WaterEntry {
 /** O-13: one account's history never shows under another account on the same phone. */
 export function clearAccountHistory(): void {
   useAppStore.setState({
+    // Body, safety and night state are the previous person's too.
+    profile: null,
+    vault: [],
+    levelState: null,
+    manualLevel: null,
+    foodByNight: {},
+    emergencyContact: null,
+    morningShown: [],
+    recapNotified: [],
+    nudgeDismissedAt: null,
+    remindersMutedUntil: null,
     // AC-12: the server ties an install's chain to one account; another account starts a new one.
     installId: null,
     eventSeq: 0,

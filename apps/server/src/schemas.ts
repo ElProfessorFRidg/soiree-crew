@@ -14,6 +14,8 @@ export const drinkSchema = z.object({
   consumedAt: ms,
   loggedAt: ms,
   withFood: z.boolean(),
+  /** O-85: none, light or full meal; wins over withFood when present. */
+  food: z.enum(["none", "light", "full"]).optional(),
   name: z.string().min(1).max(40).optional(),
 });
 
@@ -61,6 +63,8 @@ export const customDrinkSchema = z.object({
 
 export const mutationSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("drink.add"), drink: drinkSchema }),
+  /** O-23: a drink already logged, changed (time, volume, strength, food). */
+  z.object({ kind: z.literal("drink.edit"), drink: drinkSchema }),
   z.object({ kind: z.literal("drink.remove"), drink: drinkSchema.pick({ id: true }) }),
   z.object({ kind: z.literal("water.add"), water: waterSchema }),
   z.object({ kind: z.literal("water.remove"), water: waterSchema.pick({ id: true }) }),

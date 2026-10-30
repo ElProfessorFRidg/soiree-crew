@@ -1,5 +1,9 @@
+import { unlink } from "node:fs/promises";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
+import { crewTimeZone } from "../territory";
+import { offsetMinutes } from "../time";
+import { photoPath } from "./photos";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { newCode, newId } from "../crypto";
 import { crewSchema } from "../schemas";
@@ -21,6 +25,10 @@ export function cleanNickname(raw: string): string {
     .replace(/\s+/g, " ")
     .trim();
 }
+const DAY_MS = 86_400_000;
+/** QOL-16: habits come from this many of the last nights, and need at least this many. */
+const HABIT_NIGHTS = 10;
+const HABIT_MIN_NIGHTS = 2;
 
 export function crewRoutes(app: FastifyInstance, ctx: Context): void {
   const joins = new RateLimiter(20, 60 * 60_000, ctx.now);
@@ -214,6 +222,69 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
     const members = await ctx.db.query<{ user_id: string }>("select user_id from crew_members where crew_id = $1", [invite.crew_id]);
     ctx.live.notify(members.map((m) => m.user_id), { type: "crew.changed", crewId: invite.crew_id });
     return { crewId: invite.crew_id };
+  });
+
+  /** ADP-06: an admin deletes the whole crew, its nights, albums and chats with it. */
+  app.delete<{ Params: { id: string } }>("/v1/crews/:id", async (request, reply) => {
+    const user = requireUser(request);
+    const { role } = await assertCrewMember(ctx, request.params.id, user.id);
+    if (role !== "admin") throw new HttpError(403, "forbidden");
+    const members = await ctx.db.query<{ user_id: string }>("select user_id from crew_members where crew_id = $1", [request.params.id]);
+    const photos = await ctx.db.query<{ id: string }>("select ph.id from photos ph join parties p on p.id = ph.party_id where p.crew_id = $1", [request.params.id]);
+    await ctx.db.query("delete from crews where id = $1", [request.params.id]);
+    // The files sit next to the database: they go once the rows are gone.
+    for (const photo of photos) await unlink(photoPath(ctx, photo.id)).catch(() => undefined);
+    ctx.live.notify(members.map((m) => m.user_id), { type: "crew.changed", crewId: request.params.id });
+    ctx.live.notify(members.map((m) => m.user_id), { type: "chat.roster" });
+    return reply.status(204).send();
+  });
+
+  /**
+   * QOL-16: what this crew's nights usually look like, to prefill a new one: when they end, where
+   * they happen, who comes. From the last nights I went to, so nothing here is new to me.
+   */
+  app.get<{ Params: { id: string } }>("/v1/crews/:id/habits", async (request) => {
+    const user = requireUser(request);
+    await assertCrewMember(ctx, request.params.id, user.id);
+    const timeZone = await crewTimeZone(ctx.db, request.params.id);
+    const parties = await ctx.db.query<{ id: string; starts_at: number; ends_at: number; closed_at: number | null }>(
+      `select p.id, p.starts_at, p.ends_at, p.closed_at from parties p join party_members m on m.party_id = p.id and m.user_id = $2 and m.response = 'going'
+       where p.crew_id = $1 and p.kind = 'party' and p.closed_at is not null order by p.starts_at desc limit $3`,
+      [request.params.id, user.id, HABIT_NIGHTS],
+    );
+    if (parties.length < HABIT_MIN_NIGHTS) return { nights: parties.length, endMinutes: null, venue: null, friends: [] };
+    const ends = parties
+      .map((p) => {
+        const offset = offsetMinutes(p.starts_at, timeZone) * 60_000;
+        const midnight = Math.floor((p.starts_at + offset) / DAY_MS) * DAY_MS - offset;
+        return Math.round((Math.min(p.closed_at ?? p.ends_at, p.ends_at) - midnight) / 60_000);
+      })
+      .sort((a, b) => a - b);
+    // The median, rounded to the half hour the new-party screen steps by.
+    const median = ends[Math.floor(ends.length / 2)]!;
+    const ids = parties.map((p) => p.id);
+    const venue = (
+      await ctx.db.query<{ id: string; name: string; n: number }>(
+        `select v.id, v.name, count(distinct c.party_id)::int as n from check_ins c join venues v on v.id = c.venue_id and v.crew_id = $2
+         where c.party_id = any($1::uuid[]) and c.verdict = 'accepted' and c.private = false and v.kind <> 'home'
+         group by v.id, v.name order by n desc, v.name limit 1`,
+        [ids, request.params.id],
+      )
+    )[0];
+    const regulars = await ctx.db.query<{ user_id: string; display_name: string; n: number }>(
+      `select m.user_id, u.display_name, count(*)::int as n from party_members m join users u on u.id = m.user_id
+       join crew_members c on c.user_id = m.user_id and c.crew_id = $2
+       where m.party_id = any($1::uuid[]) and m.response = 'going' and m.user_id <> $3 and m.last_activity_at is not null
+       group by m.user_id, u.display_name order by n desc, u.display_name`,
+      [ids, request.params.id, user.id],
+    );
+    return {
+      nights: parties.length,
+      endMinutes: Math.round(median / 30) * 30,
+      // A venue counts as usual from half the nights on; so do friends.
+      venue: venue && venue.n * 2 >= parties.length ? { id: venue.id, name: venue.name } : null,
+      friends: regulars.filter((r) => r.n * 2 >= parties.length).map((r) => ({ userId: r.user_id, name: r.display_name })),
+    };
   });
 
   app.delete<{ Params: { id: string } }>("/v1/crews/:id/members/me", async (request, reply) => {

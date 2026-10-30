@@ -51,7 +51,7 @@ export function syncLiveActivity(): void {
   const i18n = createTranslator(preferences.language);
   const intakes = drinks
     .filter((d) => d.abv > 0)
-    .map((d) => ({ id: d.id, volumeMl: d.volumeMl, abv: d.abv, consumedAt: d.consumedAt, withFood: d.withFood }));
+    .map((d) => ({ id: d.id, volumeMl: d.volumeMl, abv: d.abv, consumedAt: d.consumedAt, withFood: d.withFood, ...(d.food ? { food: d.food } : {}) }));
   const now = Date.now();
   const estimate = profile && intakes.length ? estimateBac(intakes, profile, now) : null;
   try {
@@ -67,7 +67,8 @@ export function syncLiveActivity(): void {
     const value = `${formatBacValue(estimate.bac, preferences.bacUnit, ratio, i18n.locale)} ${i18n.t(`units.${preferences.bacUnit}`)}`;
     const state = {
       title: i18n.t("liveActivity.title", { time: clock(estimate.backToZeroAt) }),
-      subtitle: lockScreenNumbers ? i18n.t("reminders.nightTitle", { time: clock(now), value }) : undefined,
+      // O-19: a figure never shows without the reminder that it is an estimate.
+      subtitle: lockScreenNumbers ? `${i18n.t("reminders.nightTitle", { time: clock(now), value })} ${i18n.t("widget.notice")}` : undefined,
       progressBar: { date: estimate.backToZeroAt },
     };
     const mood = liveMood(useCrewData.getState().parties, now);

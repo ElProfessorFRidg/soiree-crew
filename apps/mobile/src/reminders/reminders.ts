@@ -45,7 +45,7 @@ function intakes(): DrinkIntake[] {
   return useAppStore
     .getState()
     .drinks.filter((d) => d.abv > 0)
-    .map((d) => ({ id: d.id, volumeMl: d.volumeMl, abv: d.abv, consumedAt: d.consumedAt, withFood: d.withFood }));
+    .map((d) => ({ id: d.id, volumeMl: d.volumeMl, abv: d.abv, consumedAt: d.consumedAt, withFood: d.withFood, ...(d.food ? { food: d.food } : {}) }));
 }
 
 /** QOL-03: actions straight from the notification. */
@@ -272,6 +272,28 @@ export async function scheduleBirthdayReminders(birthdays: readonly { userId: st
     }).catch(() => undefined);
   }
   useAppStore.setState({ birthdayNotified: [...birthdayNotified, ...seen].slice(-60) });
+const homeCheckId = (partyId: string) => `home-check-${partyId}`;
+
+/**
+ * N-25: when the night I go to ends, the phone asks whether I am home, even with the app closed.
+ * Scheduled again whenever the party is read, so a new end time moves it.
+ */
+export async function scheduleHomeCheck(party: { id: string; name: string; endsAt: number }): Promise<void> {
+  if (!supported || !(await allowed())) return;
+  const i18n = createTranslator(useAppStore.getState().preferences.language);
+  await Notifications.cancelScheduledNotificationAsync(homeCheckId(party.id)).catch(() => undefined);
+  await Notifications.scheduleNotificationAsync({
+    identifier: homeCheckId(party.id),
+    content: { title: i18n.t("homeCheck.notifTitle"), body: i18n.t("homeCheck.notifBody", { party: party.name }), data: { url: "/(tabs)" } },
+    trigger: party.endsAt <= Date.now() + MINUTE_MS ? null : { type: Notifications.SchedulableTriggerInputTypes.DATE, date: new Date(party.endsAt) },
+  });
+}
+
+/** Home already: the question would be noise. */
+export async function cancelHomeCheck(partyId: string): Promise<void> {
+  if (!supported) return;
+  await Notifications.cancelScheduledNotificationAsync(homeCheckId(partyId)).catch(() => undefined);
+  await Notifications.dismissNotificationAsync(homeCheckId(partyId)).catch(() => undefined);
 }
 
 /** O-41: "the recap is ready" as soon as a party closes, at a decent hour. Once per party. */

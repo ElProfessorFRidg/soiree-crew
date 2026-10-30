@@ -3,13 +3,12 @@ import { z } from "zod";
 import { estimateBac, type BodyProfile, type DrinkIntake } from "@crew/bac";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { assertPublishable } from "../posting";
+import { intakeOf, PRE_PARTY_MS, sweepParty, tellUnwell } from "../nightWatch";
 import { partySchema, responseSchema } from "../schemas";
 
 const HOUR_MS = 3_600_000;
-/** Drinks this long before a party starts still count in its live BACs. */
-const PRE_PARTY_MS = 12 * HOUR_MS;
-/** N-29: a member who has given no sign of life for this long is flagged, gently. */
-const QUIET_AFTER_MS = 45 * 60_000;
+/** QOL-10: the last known position shown with a low battery stays this long. */
+const LAST_KNOWN_MAX_AGE_MS = 2 * HOUR_MS;
 /** A party never stays open for days (O-40). */
 const MAX_PARTY_MS = 18 * HOUR_MS;
 const MAX_TRIP_MS = 10 * 24 * HOUR_MS;
@@ -25,6 +24,7 @@ interface PartyRow {
   closed_at: number | null;
   created_by: string;
   open_venue_id: string | null;
+  quiet_after_minutes: number;
 }
 
 function partyView(row: PartyRow, now: number) {
@@ -37,6 +37,8 @@ function partyView(row: PartyRow, now: number) {
     startsAt: row.starts_at,
     endsAt: row.ends_at,
     closedAt: row.closed_at,
+    quietAfterMinutes: row.quiet_after_minutes,
+    createdBy: row.created_by,
     live: row.closed_at === null && row.starts_at <= now && row.ends_at >= now,
     // COM-05: the place where the hosts opened the party to join requests, if they did.
     openVenueId: row.open_venue_id ?? null,
@@ -52,6 +54,9 @@ async function closeEnded(ctx: Context): Promise<void> {
   await ctx.db.query(
     "delete from party_locations where at < $1 or party_id in (select id from parties where closed_at is not null)",
     [ctx.now() - LOCATION_TTL_MS],
+  );
+  await ctx.db.query(
+    "update party_members set last_known_sealed = null, last_known_at = null where last_known_sealed is not null and party_id in (select id from parties where closed_at is not null)",
   );
 }
 
@@ -165,6 +170,10 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
     // Status is for people at the night; it also marks activity, which counts the night as theirs.
     const going = await ctx.db.query("select 1 from party_members where party_id = $1 and user_id = $2 and response = 'going'", [party.id, user.id]);
     if (!going.length) throw new HttpError(403, "not_going");
+    // O-37: any status during the night is a sign of life, and the first one is the arrival.
+    if (party.closed_at === null && party.starts_at <= now) {
+      await ctx.db.query("update party_members set arrived_at = coalesce(arrived_at, $3) where party_id = $1 and user_id = $2", [party.id, user.id, now]);
+    }
     if (input.homeSafe !== undefined) {
       // Home safe also means fine: it clears "not feeling well" (N-36).
       await ctx.db.query(
@@ -173,7 +182,7 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
       );
     }
     if (input.unwell !== undefined) {
-      await ctx.db.query("update party_members set unwell_at = $3, last_activity_at = $4 where party_id = $1 and user_id = $2", [
+      await ctx.db.query("update party_members set unwell_at = $3, last_activity_at = $4, unwell_widened_at = null where party_id = $1 and user_id = $2", [
         party.id,
         user.id,
         input.unwell ? now : null,
@@ -184,18 +193,36 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
       await ctx.db.query("update party_members set designated_driver = $3 where party_id = $1 and user_id = $2", [party.id, user.id, input.designatedDriver]);
     }
     if (input.batteryLow !== undefined) {
-      await ctx.db.query("update party_members set battery_low = $3, last_activity_at = $4 where party_id = $1 and user_id = $2", [
-        party.id,
-        user.id,
-        input.batteryLow,
-        now,
-      ]);
+      // QOL-10: with live location on, the last position stays for the crew after the phone dies.
+      const position = input.batteryLow
+        ? (await ctx.db.query<{ sealed: string; at: number }>("select sealed, at from party_locations where party_id = $1 and user_id = $2", [party.id, user.id]))[0]
+        : undefined;
+      await ctx.db.query(
+        `update party_members set battery_low = $3, last_activity_at = $4, battery_low_at = case when $3 then $4::bigint else null end,
+           last_known_sealed = $5, last_known_at = $6 where party_id = $1 and user_id = $2`,
+        [party.id, user.id, input.batteryLow, now, position?.sealed ?? null, position?.at ?? null],
+      );
     }
     const members = await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1 and response = 'going'", [party.id]);
     ctx.live.notify(members.map((m) => m.user_id), { type: "party.changed", partyId: party.id });
-    // N-36: the others hear it at once, quietly; nobody outside the party does.
-    if (input.unwell) ctx.live.notify(members.map((m) => m.user_id).filter((id) => id !== user.id), { type: "party.unwell", partyId: party.id, userId: user.id });
+    // N-36: told quietly, the nearest first when positions are shared; nobody outside the party.
+    if (input.unwell) await tellUnwell(ctx, party.id, user.id);
     return { ok: true };
+  });
+
+  /** N-29: how long without a sign of life before the party is told. The creator or an admin sets it. */
+  app.patch<{ Params: { id: string } }>("/v1/parties/:id/settings", async (request) => {
+    const user = requireUser(request);
+    const party = await loadPartyForMember(ctx, request.params.id, user.id);
+    const { role } = await assertCrewMember(ctx, party.crew_id, user.id);
+    if (party.created_by !== user.id && role !== "admin") throw new HttpError(403, "forbidden");
+    const input = z.object({ quietAfterMinutes: z.number().int().min(15).max(240) }).parse(request.body);
+    await ctx.db.query("update parties set quiet_after_minutes = $2 where id = $1", [party.id, input.quietAfterMinutes]);
+    // A new threshold starts a new count: anyone already told may be told again under it.
+    await ctx.db.query("update party_members set quiet_alerted_at = null where party_id = $1", [party.id]);
+    const members = await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1 and response <> 'declined'", [party.id]);
+    ctx.live.notify(members.map((m) => m.user_id), { type: "party.changed", partyId: party.id });
+    return { quietAfterMinutes: input.quietAfterMinutes };
   });
 
   /**
@@ -385,6 +412,7 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
     const user = requireUser(request);
     await closeEnded(ctx);
     const party = await loadPartyForMember(ctx, request.params.id, user.id);
+    await sweepParty(ctx, party);
     const now = ctx.now();
     const at = party.closed_at ?? now;
 
@@ -400,10 +428,14 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
       home_with: string | null;
       home_mode: string | null;
       home_offer_from: string | null;
+      arrived_at: number | null;
+      battery_low_at: number | null;
+      last_known_sealed: string | null;
+      last_known_at: number | null;
       sealed: string | null;
     }>(
       `select m.user_id, u.display_name, m.response, m.designated_driver, m.home_safe_at, m.last_activity_at, m.battery_low, m.unwell_at,
-              m.home_with, m.home_mode, m.home_offer_from, b.sealed
+              m.home_with, m.home_mode, m.home_offer_from, m.arrived_at, m.battery_low_at, m.last_known_sealed, m.last_known_at, b.sealed
        from party_members m join users u on u.id = m.user_id left join body_profiles b on b.user_id = m.user_id
        where m.party_id = $1 order by u.display_name`,
       [party.id],
@@ -421,6 +453,16 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
           [going, party.starts_at - PRE_PARTY_MS, at],
         )
       : [];
+    // HUB-01: where each member is checked in right now, unless the check-in is private.
+    const venueRows = going.length
+      ? await ctx.db.query<{ user_id: string; venue_id: string; name: string }>(
+          `select distinct on (c.user_id) c.user_id, v.id as venue_id, v.name from check_ins c join venues v on v.id = c.venue_id and v.crew_id = $2
+           where c.user_id = any($1::uuid[]) and c.ended_at is null and c.private = false and c.verdict in ('accepted', 'unverified') and c.at >= $3
+           order by c.user_id, c.at desc`,
+          [going, party.crew_id, party.starts_at - PRE_PARTY_MS],
+        )
+      : [];
+    const iAmGoing = going.includes(user.id);
     const waterRows = going.length
       ? await ctx.db.query<{ user_id: string }>("select user_id from water where party_id = $1 and deleted_at is null", [party.id])
       : [];
@@ -438,20 +480,30 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
         homeMode: m.home_mode,
         homeOfferFrom: m.home_offer_from,
         lastActivityAt: m.last_activity_at,
+        arrivedAt: m.arrived_at,
+        batteryLowAt: m.battery_low_at,
+        // QOL-10: only for the people at the night, only while the battery is low, only for a while.
+        lastKnown:
+          iAmGoing && m.battery_low && m.last_known_sealed && m.last_known_at !== null && now - m.last_known_at < LAST_KNOWN_MAX_AGE_MS
+            ? { ...ctx.sealer.open<{ lat: number; lng: number; accuracy: number }>(m.last_known_sealed), at: m.last_known_at }
+            : null,
+        venue: venueRows.filter((r) => r.user_id === m.user_id).map((r) => ({ id: r.venue_id, name: r.name }))[0] ?? null,
       };
-      if (m.response !== "going") return { ...base, bac: null, trend: null, drinks: 0, water: 0, quiet: false };
+      if (m.response !== "going") return { ...base, bac: null, trend: null, drinks: 0, water: 0, quiet: false, pace: null };
       const mine = drinkRows.filter((d) => d.user_id === m.user_id);
-      const intakes: DrinkIntake[] = mine.map((d) => {
-        const body = ctx.sealer.open<{ volumeMl: number; abv: number; withFood: boolean }>(d.sealed);
-        return { id: d.id, volumeMl: body.volumeMl, abv: body.abv, consumedAt: d.consumed_at, withFood: body.withFood };
-      });
+      const intakes: DrinkIntake[] = mine.map((d) => intakeOf(ctx, d));
+      // O-37: drinks in the last hour against the hour before, to tell who speeds up and who slows down.
+      const pace = {
+        lastHour: mine.filter((d) => d.consumed_at > at - HOUR_MS).length,
+        previousHour: mine.filter((d) => d.consumed_at > at - 2 * HOUR_MS && d.consumed_at <= at - HOUR_MS).length,
+      };
       const profile = m.sealed ? ctx.sealer.open<BodyProfile>(m.sealed) : null;
       const estimate = profile && seesLevels ? estimateBac(intakes, profile, at) : null;
       const quiet =
         party.closed_at === null &&
         m.home_safe_at === null &&
         m.last_activity_at !== null &&
-        now - m.last_activity_at > QUIET_AFTER_MS;
+        now - m.last_activity_at > party.quiet_after_minutes * 60_000;
       return {
         ...base,
         bac: estimate ? Math.round(estimate.bac * 1000) / 1000 : null,
@@ -459,6 +511,7 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
         drinks: mine.filter((d) => d.party_id === party.id).length,
         water: waterRows.filter((w) => w.user_id === m.user_id).length,
         quiet,
+        pace,
       };
     });
 
@@ -473,9 +526,19 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
     if (party.created_by !== user.id && role !== "admin") throw new HttpError(403, "forbidden");
     await ctx.db.query("update parties set closed_at = $2 where id = $1 and closed_at is null", [party.id, ctx.now()]);
     await ctx.db.query("delete from party_locations where party_id = $1", [party.id]);
-    const members = await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1", [party.id]);
+    await ctx.db.query("update party_members set last_known_sealed = null, last_known_at = null where party_id = $1", [party.id]);
+    const members = await ctx.db.query<{ user_id: string; response: string; home_safe_at: number | null }>(
+      "select user_id, response, home_safe_at from party_members where party_id = $1",
+      [party.id],
+    );
     ctx.live.notify(members.map((m) => m.user_id), { type: "party.changed", partyId: party.id });
     // push: party.stripReady (JOY-09: the party is over, the photo strip is ready; after quiet hours, QOL-20)
+    // N-25: the night is over; whoever went and is not home yet is asked.
+    // push: party.homeCheck
+    ctx.live.notify(
+      members.filter((m) => m.response === "going" && m.home_safe_at === null).map((m) => m.user_id),
+      { type: "party.homeCheck", partyId: party.id },
+    );
     return { ok: true };
   });
 }

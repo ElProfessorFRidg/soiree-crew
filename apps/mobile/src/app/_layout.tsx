@@ -28,6 +28,7 @@ import { connect } from "@/server/connection";
 import { loadSession, useSession } from "@/server/session";
 import { refreshCalendarReminders, sendClock, watchCalendarReminders } from "@/server/calendarData";
 import { useSyncFeedback } from "@/sync/feedback";
+import { useDriverReminder } from "@/party/driverReminder";
 import { flush } from "@/sync/engine";
 import { followPhoneHourCycle, useAppStore } from "@/state/store";
 import { ThemeProvider } from "@/theme";
@@ -74,6 +75,7 @@ const fonts = {
 
 function SyncFeedback() {
   useSyncFeedback();
+  useDriverReminder();
   return null;
 }
 
@@ -220,6 +222,7 @@ export default function RootLayout() {
                   }}
                 />
                 <Stack.Screen name="history" />
+                <Stack.Screen name="edit-drink" />
                 <Stack.Screen name="curve" />
                 <Stack.Screen name="limits" />
                 <Stack.Screen name="new-party" />

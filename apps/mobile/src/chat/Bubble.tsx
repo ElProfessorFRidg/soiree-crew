@@ -200,7 +200,7 @@ export function Bubble({ message, mine, senderName, replyTo, mentionNames, statu
         ) : null}
         {replyTo ? (
           <View style={[styles.quote, { borderLeftColor: fg }]}>
-            <Text variant="small" color={fg} numberOfLines={2} style={styles.quoteText}>
+            <Text variant="small" color={fg} style={styles.quoteText}>
               {i18n.t("chat.fromName", { name: replyTo.name, text: replyTo.text })}
             </Text>
           </View>

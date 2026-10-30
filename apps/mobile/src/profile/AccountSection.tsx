@@ -13,8 +13,9 @@ import { api, ApiError } from "@/server/api";
 import { serverMessage, showFailure, failureMessage } from "@/server/errors";
 import { useCrewData } from "@/server/crewData";
 import { forgetChat } from "@/chat/engine";
+import { wipePreviousAccount } from "@/server/connection";
 import { saveSession, useSession } from "@/server/session";
-import { clearAccountHistory, useAppStore } from "@/state/store";
+import { useAppStore } from "@/state/store";
 import { Button } from "@/ui/Button";
 import { Panel, Row } from "@/ui/controls";
 import { Text } from "@/ui/Text";
@@ -265,7 +266,8 @@ export function AccountSection() {
       confirmLabel: i18n.t("account.withdrawConfirm"),
       cancelLabel: i18n.t("account.deleteKeep"),
     }).then((ok) => {
-      if (ok) void withdrawHealthConsent(i18n);
+      // ADP-06: erasing the history waits for the morning when the estimate is high.
+      if (ok && !guarded({ kind: "deleteHistory" }, () => void withdrawHealthConsent(i18n))) showToast({ message: i18n.t("vault.queued") });
     });
   };
 
@@ -309,8 +311,8 @@ export function AccountSection() {
               const userId = useSession.getState().session?.userId;
               // Chat keys and history are tied to this session's device: they go with it.
               if (userId) void forgetChat(userId);
-              clearAccountHistory();
-              useCrewData.setState({ crews: [], parties: [], live: {} });
+              // O-13: nothing of this account stays for whoever uses the phone next.
+              wipePreviousAccount(null);
               void saveSession(null);
             }}
           />

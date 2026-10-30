@@ -113,12 +113,12 @@ export default function ConversationScreen() {
       <View style={[styles.header, { paddingTop: insets.top + 10, borderBottomColor: theme.line }]}>
         <IconButton icon="back" accessibilityLabel={i18n.t("common.back")} onPress={() => (router.canGoBack() ? router.back() : router.replace("/messages"))} />
         <View style={styles.flex}>
-          <Text variant="h3" numberOfLines={1} accessibilityRole="header">
+          <Text variant="h3" accessibilityRole="header">
             {conversation.title}
           </Text>
           <View style={styles.lockRow}>
             <Icon name="lock" size={12} color={theme.textMuted} />
-            <Text variant="small" numberOfLines={1} style={styles.flex}>
+            <Text variant="small" style={styles.flex}>
               {subtitle}
             </Text>
           </View>
