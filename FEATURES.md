@@ -36,10 +36,10 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-18 | P0 | Soiree.dc.html | build | Driving status and timer: under / over the legal limit, at least 22 countries with automatic thresholds (watch... |
 | O-19 | P0 | Soiree.dc.html | partial | Permanent notice next to the BAC: indicative estimate, not a certified breathalyser, never drive based on it a... |
 | O-20 | P0 | Soiree.dc.html | build | Quick adds (beer 25 / 33 / 50 cl, wine, shot, cocktail...) with custom-drawn glass icons. |
-| O-21 | P0 | Soiree.dc.html | partial | Custom drinks: create, long-press to edit / move / remove, custom order, synced across devices, personal presets. |
+| O-21 | P0 | Soiree.dc.html | build | Custom drinks: create, long-press to edit / move / remove, custom order, synced across devices, personal presets. |
 | O-22 | P0 | Soiree.dc.html | partial | Drink time adjustable to the minute (forgotten drink); a drink "in the future" never counts in the calculation. |
 | O-23 | P0 | Soiree.dc.html | partial | Grouped history (e.g. 5x Beer 50 cl) that expands to each drink's exact time, delete one at a time, edit with ... |
-| O-24 | P0 | Soiree.dc.html | partial | BAC curve: Day / Week / Month / Total / Average (7-day moving average), zoom, pan, a trace that truly follows ... |
+| O-24 | P0 | Soiree.dc.html | build | BAC curve: Day / Week / Month / Total / Average (7-day moving average), zoom, pan, a trace that truly follows ... |
 | O-25 | P1 | Soiree.dc.html | build | Personal limits drawn on the curve. |
 | O-26 | P0 | Soiree.dc.html | build | Set a limit / goal before going out + alerts when getting close, without spam. |
 | O-27 | P0 | Soiree.dc.html | build | Scheduled hydration reminders. |
@@ -86,8 +86,8 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-44 | P0 | Jeux.dc.html | build | Swipeable carousel catalogue (illustration, tags, duration, player count, Play button, pagination), "one phone... |
 | O-45 | P0 | Jeux.dc.html | build | 3 levels per game: Normal, Hard, Extreme. |
 | O-46 | P0 | Jeux.dc.html | build | Rules shown as cards at launch + a "?" button to see them again mid-game. |
-| O-47 | P0 | JeuxCartes.dc.html | partial | Round timers, shareable result cards, multiplayer robustness (someone leaves, the game goes on). |
-| O-48 | P1 | Jeux.dc.html | partial | Conditional unlocks (e.g. Double Agent unlocks at 4 friends). |
+| O-47 | P0 | JeuxCartes.dc.html | build | Round timers, shareable result cards, multiplayer robustness (someone leaves, the game goes on). |
+| O-48 | P1 | Jeux.dc.html | build | Conditional unlocks (e.g. Double Agent unlocks at 4 friends). |
 | O-49 | P0 | Jeux.dc.html | build | Player management: names, order, players without an account, penalty counter. |
 | O-50 | P0 | JeuxCartes.dc.html | build | "Le Soirée2Malade": card game that ends when the last card is drawn, a mash-up of all the classics with a bite... |
 | O-51 | P0 | JeuxCartes.dc.html | build | "L'Autoroute": cross 5 checkpoints by betting on card values, a "Customs" at checkpoint 2, finish with as few ... |
@@ -104,7 +104,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-62 | P0 | JeuxAction.dc.html | build | "Le Double Agent": two infiltrated agents with a different word, 5 players minimum. |
 | O-63 | P0 | JeuxAction.dc.html | partial | "Gribouille": one player draws, the others guess, 3 to 8 players online (real-time, multi-phone). |
 | O-64 | P0 | JeuxAction.dc.html | build | "La Courbe" (listed on the store pages, rules not public). |
-| O-65 | P0 | Jeux.dc.html | partial | More than 500 cards / questions / dares per language for FR and EN, all written by us (see <localization> and ... |
+| O-65 | P0 | Jeux.dc.html | build | More than 500 cards / questions / dares per language for FR and EN, all written by us (see <localization> and ... |
 | O-89 | P0 | Backstage (near Jeux.dc.html) | build | Penalty model shared by every game: N sips or a forfeit of the same size, per-player "no alcohol" switch, water-or-forfeit swap for a player at UI level 3, penalty counter never creates a drink. Source: games.md §2.0, §5 (proposed there as N-xx). |
 | O-90 | P0 | Backstage (near Jeux.dc.html) | build | Forfeit deck: forfeit cards in three sizes (small, medium, large), FR and EN, counted in the O-65 content budget. Source: games.md §5. |
 | O-91 | P1 | Backstage (near JeuxAction.dc.html) | build | Table style for passing games: the phone stays on the table and the holder taps their name; suggested automatically at UI levels 2 and 3. Source: games.md §2.2, §5. |
@@ -115,7 +115,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 |---|---|---|---|---|
 | O-66 | P1 | Bar.dc.html | partial | 470+ recipes with photo and preparation: Classics, Shots, Party, Alcohol-free, Beers, Desserts, + signature co... |
 | O-67 | P1 | Bar.dc.html | build | Factual recipe card: ingredients and measures, steps, prep time, difficulty, ABV. |
-| O-68 | P1 | Bar.dc.html | partial | Search + category filters, fast loading. |
+| O-68 | P1 | Bar.dc.html | build | Search + category filters, fast loading. |
 | O-69 | P1 | Bar.dc.html | build | Mixer: "what can I make?" from the ingredients at hand. |
 
 ## Shared expenses
@@ -215,9 +215,9 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | N-21 | P1 | Recap.dc.html | partial | Shared album per party (photos and videos private to the group, O-84) + optional photo when logging a drink (O... |
-| N-22 | P0 | Recap.dc.html | partial | Party timeline: arrivals, check-ins, venue takeovers, games played, photos, highlights, built into the recap. |
+| N-22 | P0 | Recap.dc.html | build | Party timeline: arrivals, check-ins, venue takeovers, games played, photos, highlights, built into the recap. |
 | N-23 | P1 | Recap.dc.html | build | "Quote of the night": legendary lines, voted by the crew. |
-| N-24 | P1 | Jeux.dc.html | partial | Hall of fame for games and game records. |
+| N-24 | P1 | Jeux.dc.html | build | Hall of fame for games and game records. |
 | N-37 | P1 | Backstage (near Recap.dc.html) | build | Consent for exports outside the crew: before a recap story, photo strip or result card leaves the app, the people shown can opt out, and the export shows only the exporter's own curve and figures plus crew totals. Renumbered from design-b N-36. Source: design-b.md §2.9 item 7, §3 decision 6, §5. |
 | N-38 | P1 | Crew tab | build | Several crews per person with a kind (friends, school, family, work, sport, other); the radar shows the crew picked at the top. |
 | N-39 | P1 | Crew tab | build | Open crews: an admin lists the crew on the server and anyone signed in there joins without an invite; the crew tab searches them. |
@@ -242,7 +242,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | N-31 | P1 | Radar.dc.html | partial | Crew feed: activity, reactions, mentions, with grouped digests instead of spam. |
 | N-32 | P1 | Bar.dc.html | build | Shared shopping list for a party (who brings what), can be generated from the cocktails picked in the Bar. |
 | N-33 | P1 | Jeux.dc.html | build | Crew-made cards in the games (inside jokes, home-made questions), moderated by the admin. |
-| N-34 | P1 | Profil.dc.html | partial | Crew titles and seniority; badges that also reward organising, hydration, designated driving, getting home saf... |
+| N-34 | P1 | Profil.dc.html | build | Crew titles and seniority; badges that also reward organising, hydration, designated driving, getting home saf... |
 | N-35 | P1 | Reglages.dc.html | partial | Notification centre with fine per-type settings and quiet hours. |
 
 ## Everyday polish
@@ -268,7 +268,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-17 | P1 | Soirees.dc.html | partial | Suggestions that save taps: when 3+ crew members check in at the same venue, offer to start a party; when the ... |
 | QOL-18 | P1 | Securite.dc.html | partial | The user's own apps: directions in Apple Maps, Google Maps or Waze, rides in Uber, Bolt or local taxi apps, ch... |
 | QOL-19 | P1 | Argent.dc.html | partial | Long-press copies what people copy (IBAN, codes, addresses), with a haptic and a short inline "Copied". |
-| QOL-20 | P1 | Recap.dc.html | partial | Next-morning mode: the morning after, the app opens on a calm, dark, low-contrast screen with the recap, who o... |
+| QOL-20 | P1 | Recap.dc.html | build | Next-morning mode: the morning after, the app opens on a calm, dark, low-contrast screen with the recap, who o... |
 | QOL-21 | P1 | Radar.dc.html | partial | Calendar and birthdays: parties added to the phone calendar in one tap; a crew member's birthday reminds the o... |
 | QOL-22 | P2 | Securite.dc.html | partial | Last ride home: after midnight, the last night bus / metro departures near the venue on the Party screen, when... |
 | QOL-23 | P1 | Etats.dc.html | build | Search that helps: recent searches, typo tolerance (ADP-05), suggestions before typing, results grouped (venue... |
@@ -288,15 +288,15 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 |---|---|---|---|---|
 | JOY-01 | P1 | Securite.dc.html | partial | Cheers: bring two phones together (Bluetooth LE / NFC) and both screens play a clink with sound and haptic. It... |
 | JOY-02 | P1 | Soiree.dc.html | partial | Lines that know the time: the Party screen header changes with the hour and the situation ("Still standing?" a... |
-| JOY-03 | P1 | Profil.dc.html | partial | Alternate app icons unlocked through crew titles (N-34) and seasons. |
-| JOY-04 | P1 | Soirees.dc.html | partial | Mood themes: the mood picked for a party (O-35) tints the Party screen, the widget and the recap. |
+| JOY-03 | P1 | Profil.dc.html | build | Alternate app icons unlocked through crew titles (N-34) and seasons. |
+| JOY-04 | P1 | Soirees.dc.html | build | Mood themes: the mood picked for a party (O-35) tints the Party screen, the widget and the recap. |
 | JOY-05 | P2 | Reglages.dc.html | build | Optional sound pack (pour, clink, crown), respects the silent switch, off by default. |
-| JOY-06 | P1 | Radar.dc.html | partial | Crew streak: consecutive weeks where the crew went out together (any night out counts, drinking or not), with ... |
+| JOY-06 | P1 | Radar.dc.html | build | Crew streak: consecutive weeks where the crew went out together (any night out counts, drinking or not), with ... |
 | JOY-07 | P1 | Reglages.dc.html | build | Easter eggs: a handful of hidden interactions (tap the logo ten times, shake on the recap...), documented only... |
-| JOY-08 | P1 | Radar.dc.html | partial | Milestones: 10th, 50th, 100th night out together, crew anniversary, first venue conquered. Milestones count ni... |
-| JOY-09 | P1 | Recap.dc.html | partial | Photo booth: at the end of a party, an automatic photo strip from the shared album, ready for stories. |
+| JOY-08 | P1 | Radar.dc.html | build | Milestones: 10th, 50th, 100th night out together, crew anniversary, first venue conquered. Milestones count ni... |
+| JOY-09 | P1 | Recap.dc.html | build | Photo booth: at the end of a party, an automatic photo strip from the shared album, ready for stories. |
 | JOY-10 | P2 | Reglages.dc.html | partial | Sticker packs (iMessage / WhatsApp) made from crew avatars and moments. |
-| JOY-11 | P1 | Profil.dc.html | partial | Member card: a shareable profile card with titles, venues ruled, favourite drink, nights out. |
+| JOY-11 | P1 | Profil.dc.html | build | Member card: a shareable profile card with titles, venues ruled, favourite drink, nights out. |
 | JOY-12 | P1 | Soiree.dc.html | partial | Dare of the night on the Party screen, different every night, taken from the crew's own cards when they exist ... |
 
 ## Adaptive drunk mode
@@ -318,20 +318,20 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
-| MOT-01 | P0 | Backstage | partial | Motion system in `MOTION.md`, written before any screen: duration tokens, springs and curves, choreography rul... |
+| MOT-01 | P0 | Backstage | build | Motion system in `MOTION.md`, written before any screen: duration tokens, springs and curves, choreography rul... |
 | MOT-02 | P0 | Backstage | build | Living background within our art direction (no radial halo or generic aurora, see <anti_slop>): it breathes an... |
 | MOT-03 | P0 | Soiree.dc.html | build | Adding a drink: glass filling up, bubbles, BAC digits rolling to the new value, dedicated haptic. It is the mo... |
-| MOT-04 | P0 | Soiree.dc.html | partial | Curve: the trace draws itself, smooth colour change when crossing a threshold, clearly marked peak point (no d... |
+| MOT-04 | P0 | Soiree.dc.html | build | Curve: the trace draws itself, smooth colour change when crossing a threshold, clearly marked peak point (no d... |
 | MOT-05 | P0 | Backstage | build | Screen transitions: shared elements (a friend's avatar flies from the list to their profile, a game card grows... |
-| MOT-06 | P0 | JeuxCartes.dc.html | partial | Card games: dealing, 3D flip, swipe, drawing, a card that trembles before a penalty. |
+| MOT-06 | P0 | JeuxCartes.dc.html | build | Card games: dealing, 3D flip, swipe, drawing, a card that trembles before a penalty. |
 | MOT-07 | P0 | JeuxAction.dc.html | build | Game physics: roulette with real deceleration and haptic clicks, a bomb that shakes harder and harder then bur... |
 | MOT-08 | P0 | Recap.dc.html | partial | Cinematic recap: story format, counters rolling, podium rising, curves drawing, badges dropping with confetti,... |
-| MOT-09 | P0 | Bars.dc.html | partial | Venue map: takeover (crown dropping, the new boss's colour washing over the venue); venues where the crew is r... |
-| MOT-10 | P0 | Etats.dc.html | partial | Micro-interactions: buttons, toggles, custom pull-to-refresh, skeletons, illustrated and animated empty states... |
+| MOT-09 | P0 | Bars.dc.html | build | Venue map: takeover (crown dropping, the new boss's colour washing over the venue); venues where the crew is r... |
+| MOT-10 | P0 | Etats.dc.html | build | Micro-interactions: buttons, toggles, custom pull-to-refresh, skeletons, illustrated and animated empty states... |
 | MOT-11 | P1 | Systeme.dc.html | partial | Animated widgets and Live Activity, within each OS's limits. |
 | MOT-12 | P0 | Backstage | partial | Performance and motion accessibility: 60 / 120 fps without jank, tested on a modest phone, battery budget resp... |
-| MOT-13 | P0 | Classements.dc.html | partial | Leaderboards: animated overtakes, podium, a dedicated effect when the leader changes. |
-| MOT-14 | P0 | Backstage | partial | Global motion time scale (0.1x to 10x) and deterministic animation clock hooks in the motion module, exposed in a dev menu and to the test harness, so the frame-by-frame Motion review works across every animation engine. Source: motion.md §3.6, §5. |
+| MOT-13 | P0 | Classements.dc.html | build | Leaderboards: animated overtakes, podium, a dedicated effect when the leader changes. |
+| MOT-14 | P0 | Backstage | build | Global motion time scale (0.1x to 10x) and deterministic animation clock hooks in the motion module, exposed in a dev menu and to the test harness, so the frame-by-frame Motion review works across every animation engine. Source: motion.md §3.6, §5. |
 | MOT-15 | P0 | Backstage | build | Haptic capability matrix and fallbacks per platform, API level and device support level, plus an in-app haptics switch independent of sound. Source: motion.md §3.3, §5. |
 
 ## Bar territories
@@ -339,7 +339,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | ID | Priority | Board | Status | Summary |
 |---|---|---|---|---|
 | TER-01 | P0 | Bars.dc.html | partial | Venue map: all crew venues (N-08), each in the colour and avatar of its current boss, crown, area of influence... |
-| TER-02 | P0 | Bars.dc.html | partial | Rule points: a member earns points at a venue through presence (verified check-ins, time spent there), parties... |
+| TER-02 | P0 | Bars.dc.html | build | Rule points: a member earns points at a venue through presence (verified check-ins, time spent there), parties... |
 | TER-03 | P0 | Bars.dc.html | build | Check-ins: one counted check-in per venue per party, a minimum delay between two check-ins; every check-in goe... |
 | TER-04 | P0 | Bars.dc.html | partial | Seasons and takeovers: monthly seasons with a reset, "X just took Bar Y from you" notification, history of rei... |
 | TER-05 | P0 | Bars.dc.html | partial | Venue page: current boss, season top 5, past bosses, drink prices (N-09), happy hours, the crew's latest night... |
@@ -358,8 +358,8 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | RANK-01 | P0 | Classements.dc.html | build | Drinking leaderboard per party, week, month, season and all time. Metrics: number of drinks, grams of pure alc... |
 | RANK-02 | P0 | Classements.dc.html | partial | Live leaderboard on the Party screen (HUB-01): live positions, "X just overtook you" notification, animated ov... |
 | RANK-03 | P0 | Recap.dc.html | build | Podium in the recap (O-41) and on the shareable story card. |
-| RANK-04 | P1 | Classements.dc.html | partial | History and titles: champion of each week, month and season, winning streaks, titles tied to N-34. |
-| RANK-05 | P1 | Classements.dc.html | partial | Secondary leaderboards: most nights out, earliest first drink, last one home, most venues ruled (<bar_territor... |
+| RANK-04 | P1 | Classements.dc.html | build | History and titles: champion of each week, month and season, winning streaks, titles tied to N-34. |
+| RANK-05 | P1 | Classements.dc.html | build | Secondary leaderboards: most nights out, earliest first drink, last one home, most venues ruled (<bar_territor... |
 | RANK-06 | P0 | Classements.dc.html | build | Only verified drinks count (verification in AC-07). Unverified drinks still count in personal stats and BAC. |
 | RANK-07 | P0 | Classements.dc.html | build | Danger cap: above a very high estimated BAC (threshold set by Recon-BAC on the severe-intoxication risk zone),... |
 | RANK-08 | P0 | Classements.dc.html | build | Settings: leaderboard on by default, the crew admin can switch it off, any member can go "off the board" witho... |
