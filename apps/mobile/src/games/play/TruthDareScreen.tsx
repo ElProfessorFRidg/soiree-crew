@@ -14,6 +14,7 @@ import { GameShell } from "../ui/GameShell";
 import { FlipCard } from "../ui/motion";
 import { PenaltyList } from "../ui/PenaltyList";
 import { RoundTimer } from "../ui/RoundTimer";
+import { SwipeCard } from "../ui/SwipeCard";
 import { CardTag, CardText, GameCard, cardColours, ids, useTable, type GameScreenProps } from "./common";
 
 export function TruthDareScreen({ session, content, onAgain }: GameScreenProps) {
@@ -81,6 +82,12 @@ export function TruthDareScreen({ session, content, onAgain }: GameScreenProps) 
   return (
     <GameShell {...shellProps} status={g.t("games.truthDare.turnOf", { name: table.nameOf(player) })} footer={footer} fab="top">
       <RoundTimer seconds={session.timerSeconds} roundKey={state.turns} paused={state.phase !== "card"} />
+      {/* MOT-06: a drawn card goes right when done, left when refused; the buttons do the same. */}
+      <SwipeCard
+        cardKey={`${state.phase}-${state.turns}`}
+        right={state.phase === "card" ? { label: g.t("games.truthDare.done"), onCommit: () => finish({ type: "done" }) } : undefined}
+        left={state.phase === "card" ? { label: g.t("games.truthDare.refuse"), onCommit: () => finish({ type: "refuse" }) } : undefined}
+      >
       <FlipCard
         flipped={state.phase === "card"}
         style={{ height: ui.big ? 320 : 380 }}
@@ -105,6 +112,7 @@ export function TruthDareScreen({ session, content, onAgain }: GameScreenProps) 
           )
         }
       />
+      </SwipeCard>
       <PenaltyList lines={state.lastPenalties} players={table.all} wasted={wasted} forfeits={content.forfeits} />
     </GameShell>
   );

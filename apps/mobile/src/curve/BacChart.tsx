@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { StyleSheet, View, type GestureResponderEvent, type LayoutChangeEvent } from "react-native";
-import Animated, { useAnimatedProps, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
-import Svg, { Circle, Defs, Line, LinearGradient, Path, Stop, Text as SvgText } from "react-native-svg";
-import { duration, palette, radius } from "@crew/design-tokens";
+import { StyleSheet, View, type LayoutChangeEvent } from "react-native";
+import { GestureDetector, usePanGesture, usePinchGesture, useSimultaneousGestures, useTapGesture } from "react-native-gesture-handler";
+import Animated, { runOnJS, useAnimatedProps, useAnimatedReaction, useReducedMotion, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
+import Svg, { Circle, ClipPath, Defs, G, Line, LinearGradient, Path, Rect, Stop, Text as SvgText } from "react-native-svg";
+import { duration, palette, radius, spring } from "@crew/design-tokens";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
+import { clampWindow, FULL_WINDOW, isZoomed, pinchWindow, screenAt, visibleRange, type ChartWindow } from "@/motion/math/zoom";
 import { useTheme } from "@/theme";
+import { Button } from "@/ui/Button";
 import { Text } from "@/ui/Text";
 import type { CurvePoint, CurveSeries } from "./series";
 
@@ -29,6 +32,8 @@ interface Props {
   accessibilityLabel: string;
   /** Second line under the scrub value, e.g. the friend being compared later. */
   onScrub?: (point: CurvePoint | null) => void;
+  /** O-24: the button that shows the whole period again, and the line that says how to zoom. */
+  zoomLabels?: { reset: string; hint: string };
 }
 
 function pathFor(points: { x: number; y: number }[]): string {
@@ -43,13 +48,26 @@ function lengthOf(points: { x: number; y: number }[]): number {
   return length;
 }
 
-export function BacChart({ series, now, legalLimit, personalLimit, formatValue, formatX, legalLabel, personalLabel, accessibilityLabel, onScrub }: Props) {
+export function BacChart({ series, now, legalLimit, personalLimit, formatValue, formatX, legalLabel, personalLabel, accessibilityLabel, onScrub, zoomLabels }: Props) {
   const theme = useTheme();
   const reduceMotion = useReducedMotion();
   const [width, setWidth] = useState(0);
   const [scrubIndex, setScrubIndex] = useState<number | null>(null);
   const lastHapticIndex = useRef<number | null>(null);
   const draw = useSharedValue(1);
+
+  // O-24: pinch to zoom, two fingers to pan, double tap to see it all again. The window lives in
+  // shared values so a release can spring back inside the bounds; React mirrors it to redraw.
+  const zoom = useSharedValue(FULL_WINDOW.zoom);
+  const offset = useSharedValue(FULL_WINDOW.offset);
+  const [view, setView] = useState<ChartWindow>(FULL_WINDOW);
+  useAnimatedReaction(
+    () => ({ zoom: zoom.value, offset: offset.value }),
+    (next, previous) => {
+      if (!previous || next.zoom !== previous.zoom || next.offset !== previous.offset) runOnJS(setView)(next);
+    },
+  );
+  const pinchStart = useRef<{ window: ChartWindow; focal: number } | null>(null);
 
   const { points } = series;
   const first = points[0];
@@ -61,7 +79,7 @@ export function BacChart({ series, now, legalLimit, personalLimit, formatValue, 
     const span = Math.max(1, last.at - first.at);
     const innerW = width - PAD.left - PAD.right;
     const innerH = HEIGHT - PAD.top - PAD.bottom;
-    const x = (at: number) => PAD.left + ((at - first.at) / span) * innerW;
+    const x = (at: number) => PAD.left + screenAt(view, (at - first.at) / span) * innerW;
     const y = (value: number) => PAD.top + innerH - (Math.min(value, maxValue) / maxValue) * innerH;
     const xy = points.map((p) => ({ x: x(p.at), y: y(p.value), at: p.at }));
     const past = series.kind === "timeline" ? xy.filter((p) => p.at <= now) : xy;
@@ -69,9 +87,64 @@ export function BacChart({ series, now, legalLimit, personalLimit, formatValue, 
     // Join the projection to the last past point so the line has no gap.
     if (future.length && past.length) future.unshift(past[past.length - 1]!);
     return { x, y, xy, past, future, maxValue, innerW };
-  }, [points, first, last, width, legalLimit, personalLimit, series.kind, now]);
+  }, [points, first, last, width, legalLimit, personalLimit, series.kind, now, view]);
 
   const pastLength = geometry ? lengthOf(geometry.past) : 0;
+
+  // One finger scrubs and the trace follows it; two fingers zoom and pan; a double tap resets.
+  const scrubRef = useRef<(touchX: number) => void>(() => undefined);
+  const pinching = useRef(false);
+  const innerW = Math.max(1, width - PAD.left - PAD.right);
+  const settle = (target: ChartWindow) => {
+    if (reduceMotion) {
+      zoom.value = target.zoom;
+      offset.value = target.offset;
+      return;
+    }
+    zoom.value = withSpring(target.zoom, spring.snap);
+    offset.value = withSpring(target.offset, spring.snap);
+  };
+  const scrubGesture = usePanGesture({
+    runOnJS: true,
+    maxPointers: 1,
+    minDistance: 0,
+    onBegin: (event) => {
+      if (!pinching.current) scrubRef.current(event.x);
+    },
+    onUpdate: (event) => {
+      if (!pinching.current && event.numberOfPointers <= 1) scrubRef.current(event.x);
+    },
+  });
+  const pinchGesture = usePinchGesture({
+    runOnJS: true,
+    onActivate: (event) => {
+      pinching.current = true;
+      pinchStart.current = { window: { zoom: zoom.value, offset: offset.value }, focal: (event.focalX - PAD.left) / innerW };
+    },
+    onUpdate: (event) => {
+      const start = pinchStart.current;
+      if (!start) return;
+      const next = pinchWindow(start.window, event.scale, start.focal, (event.focalX - PAD.left) / innerW);
+      zoom.value = next.zoom;
+      offset.value = next.offset;
+    },
+    onFinalize: () => {
+      pinching.current = false;
+      pinchStart.current = null;
+      const target = clampWindow({ zoom: zoom.value, offset: offset.value });
+      if (target.zoom !== zoom.value || target.offset !== offset.value) settle(target);
+    },
+  });
+  const resetGesture = useTapGesture({
+    runOnJS: true,
+    numberOfTaps: 2,
+    onActivate: () => {
+      if (!isZoomed({ zoom: zoom.value, offset: offset.value })) return;
+      haptic.select();
+      settle(FULL_WINDOW);
+    },
+  });
+  const gesture = useSimultaneousGestures(scrubGesture, pinchGesture, resetGesture);
 
   useEffect(() => {
     // MOT-04: the trace draws itself on every period change.
@@ -95,14 +168,16 @@ export function BacChart({ series, now, legalLimit, personalLimit, formatValue, 
   const stop = (value: number) => Math.min(1, Math.max(0, value / maxValue));
   const scrubbed = scrubIndex !== null ? xy[scrubIndex] : undefined;
 
+  // Hour labels follow the visible part only, still spaced so they never overlap.
+  const shown = visibleRange(view, first!.at, last!.at);
   const labelCount = Math.max(2, Math.min(6, Math.floor(geometry.innerW / LABEL_SPACING)));
   const ticks = Array.from({ length: labelCount }, (_, i) => {
-    const at = first!.at + ((last!.at - first!.at) * i) / (labelCount - 1);
+    const at = shown.from + ((shown.to - shown.from) * i) / (labelCount - 1);
     return { at, x: x(at) };
   });
+  const zoomed = isZoomed(view);
 
-  const scrubAt = (event: GestureResponderEvent) => {
-    const touchX = event.nativeEvent.locationX;
+  scrubRef.current = (touchX: number) => {
     let best = 0;
     for (let i = 1; i < xy.length; i++) {
       if (Math.abs(xy[i]!.x - touchX) < Math.abs(xy[best]!.x - touchX)) best = i;
@@ -121,18 +196,13 @@ export function BacChart({ series, now, legalLimit, personalLimit, formatValue, 
           {scrubbed ? formatValue(points[scrubIndex!]!.value) : series.peak ? formatValue(series.peak.value) : formatValue(0)}
         </Text>
       </View>
-      <View
-        accessible
-        accessibilityRole="image"
-        accessibilityLabel={accessibilityLabel}
-        onStartShouldSetResponder={() => true}
-        onMoveShouldSetResponder={() => true}
-        onResponderTerminationRequest={() => false}
-        onResponderGrant={scrubAt}
-        onResponderMove={scrubAt}
-      >
+      <GestureDetector gesture={gesture}>
+      <View collapsable={false} accessible accessibilityRole="image" accessibilityLabel={accessibilityLabel}>
         <Svg width={width} height={HEIGHT}>
           <Defs>
+            <ClipPath id="plot">
+              <Rect x={PAD.left - 6} y={0} width={Math.max(0, width - PAD.left - PAD.right + 12)} height={HEIGHT - PAD.bottom + 4} />
+            </ClipPath>
             <LinearGradient id="threshold" x1="0" y1={y(0)} x2="0" y2={y(maxValue)} gradientUnits="userSpaceOnUse">
               <Stop offset={0} stopColor={palette.bacThreshold.low} />
               <Stop offset={stop(lowTop)} stopColor={palette.bacThreshold.low} />
@@ -160,6 +230,7 @@ export function BacChart({ series, now, legalLimit, personalLimit, formatValue, 
             </>
           ) : null}
 
+          <G clipPath="url(#plot)">
           {future.length > 1 ? (
             <Path d={pathFor(future)} stroke="url(#threshold)" strokeWidth={3.5} strokeLinecap="round" strokeLinejoin="round" fill="none" strokeDasharray="1 7" opacity={0.7} />
           ) : null}
@@ -186,6 +257,7 @@ export function BacChart({ series, now, legalLimit, personalLimit, formatValue, 
               <Circle cx={scrubbed.x} cy={scrubbed.y} r={6} fill={theme.amber} />
             </>
           ) : null}
+          </G>
 
           {ticks.map((tick, i) => (
             <SvgText
@@ -202,11 +274,34 @@ export function BacChart({ series, now, legalLimit, personalLimit, formatValue, 
           ))}
         </Svg>
       </View>
+      </GestureDetector>
+      {zoomLabels ? (
+        <View style={styles.zoomRow}>
+          <Text variant="small" style={styles.flex}>
+            {zoomLabels.hint}
+          </Text>
+          {zoomed ? (
+            <Button
+              label={zoomLabels.reset}
+              icon="undo"
+              iconSize={18}
+              variant="secondary"
+              height={40}
+              onPress={() => {
+                haptic.select();
+                settle(FULL_WINDOW);
+              }}
+            />
+          ) : null}
+        </View>
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   box: { minHeight: HEIGHT + 30, borderRadius: radius.card, gap: 4 },
+  zoomRow: { flexDirection: "row", alignItems: "center", gap: 10, minHeight: 40, paddingHorizontal: 4 },
+  flex: { flex: 1 },
   scrubRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", paddingHorizontal: 4 },
 });

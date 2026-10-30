@@ -18,6 +18,7 @@ import { Dealt } from "../ui/motion";
 import { PenaltyList } from "../ui/PenaltyList";
 import { PlayerGrid } from "../ui/PlayerGrid";
 import { RoundTimer } from "../ui/RoundTimer";
+import { SwipeCard } from "../ui/SwipeCard";
 import { CardTag, CardText, GameCard, cardColours, ids, useTable, type GameScreenProps } from "./common";
 
 const KIND_COLOUR: Record<BigDeckKind, string> = { dare: cardColours.amber, rule: cardColours.water, vote: cardColours.mint, minigame: cardColours.lavender };
@@ -108,15 +109,24 @@ export function BigDeckScreen({ session, content, onAgain }: GameScreenProps) {
       ) : null}
 
       {current ? (
-        <Dealt dealKey={state.deck.length}>
-          <GameCard minHeight={ui.big ? 300 : 340}>
-            <CardTag label={g.t(KIND_LABEL[current.card.kind])} colour={KIND_COLOUR[current.card.kind]} />
-            <CardText>{fillCard(current.card.text, names)}</CardText>
-            <Text variant="small" color={cardColours.muted}>
-              {table.nameOf(current.playerId)}
-            </Text>
-          </GameCard>
-        </Dealt>
+        // MOT-06: a dare goes right when done, left when refused; a rule either way once noted.
+        // Votes and mini-games need someone picked first, so their card stays put.
+        <SwipeCard
+          cardKey={state.deck.length}
+          right={resolveKind === "dare" ? { label: g.t("games.bigDeck.done"), onCommit: () => dispatch({ type: "done" }) } : undefined}
+          left={resolveKind === "dare" ? { label: g.t("games.bigDeck.refuse"), onCommit: () => dispatch({ type: "refuse" }) } : undefined}
+          either={resolveKind === "rule" ? { label: g.t("games.bigDeck.ruleNoted"), onCommit: () => dispatch({ type: "done" }) } : undefined}
+        >
+          <Dealt dealKey={state.deck.length}>
+            <GameCard minHeight={ui.big ? 300 : 340}>
+              <CardTag label={g.t(KIND_LABEL[current.card.kind])} colour={KIND_COLOUR[current.card.kind]} />
+              <CardText>{fillCard(current.card.text, names)}</CardText>
+              <Text variant="small" color={cardColours.muted}>
+                {table.nameOf(current.playerId)}
+              </Text>
+            </GameCard>
+          </Dealt>
+        </SwipeCard>
       ) : (
         <ScalePressable
           accessibilityLabel={g.t("games.bigDeck.draw")}

@@ -1,11 +1,14 @@
-import { router } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet, View, useWindowDimensions } from "react-native";
-import Animated, { FadeIn, ZoomIn } from "react-native-reanimated";
+import Animated, { FadeIn, useReducedMotion } from "react-native-reanimated";
 import { avatarColor, duration, palette } from "@crew/design-tokens";
 import { useT } from "@/i18n";
-import { easings } from "@/motion/easing";
+import { haptic } from "@/motion/haptics";
+import { takeoversBetween, type BossSnapshot } from "@/motion/math/takeover";
+import { CrownDrop, LivePulse, TakeoverWash } from "@/map/VenueMotion";
 import { fitRegion, TileMap, type LatLng } from "@/map/TileMap";
+import { useLevelNow } from "@/state/levelNow";
 import { useCrewData, useLiveParty } from "@/server/crewData";
 import { useSession } from "@/server/session";
 import { refreshVenues, useVenueData, type VenueSummary } from "@/server/venueData";
@@ -23,32 +26,36 @@ import { Avatar } from "@/ui/Avatar";
 type Filter = "all" | "friends" | "fog";
 const MAP_HEIGHT_RATIO = 0.46;
 
-function VenuePin({ venue, selected, onPress }: { venue: VenueSummary; selected: boolean; onPress: () => void }) {
+function VenuePin({ venue, selected, onPress, takeoverAt, still }: { venue: VenueSummary; selected: boolean; onPress: () => void; takeoverAt: number; still: boolean }) {
   const theme = useTheme();
   const color = venue.bossId ? avatarColor(venue.bossId) : theme.surfaceRaised;
   const size = selected ? 40 : 30;
   return (
     <ScalePressable accessibilityLabel={venue.name} onPress={onPress} style={{ alignItems: "center" }}>
       {venue.bossId ? (
-        <Animated.View entering={ZoomIn.duration(duration.crownDrop).easing(easings.overshoot)}>
+        <CrownDrop takeoverAt={takeoverAt} still={still}>
           <Icon name="crown" size={16} color={theme.amber} />
-        </Animated.View>
+        </CrownDrop>
       ) : null}
-      <View
-        style={{
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          backgroundColor: color,
-          borderWidth: selected ? 3 : 2,
-          borderColor: selected ? theme.text : theme.bg,
-          // TER-08 fog of war: never-visited venues are faded.
-          opacity: venue.explored ? 1 : 0.45,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Icon name={venue.kind === "club" ? "star" : venue.kind === "home" ? "home" : "glass"} size={selected ? 20 : 15} color={palette.accent.onAccent} />
+      <View>
+        {venue.bossId ? <TakeoverWash takeoverAt={takeoverAt} color={color} size={size} still={still} /> : null}
+        <LivePulse live={venue.hereNow > 0} color={theme.ok} size={size} still={still} />
+        <View
+          style={{
+            width: size,
+            height: size,
+            borderRadius: size / 2,
+            backgroundColor: color,
+            borderWidth: selected ? 3 : 2,
+            borderColor: selected ? theme.text : theme.bg,
+            // TER-08 fog of war: never-visited venues are faded.
+            opacity: venue.explored ? 1 : 0.45,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Icon name={venue.kind === "club" ? "star" : venue.kind === "home" ? "home" : "glass"} size={selected ? 20 : 15} color={palette.accent.onAccent} />
+        </View>
       </View>
       {venue.hereNow > 0 ? (
         <View style={[styles.hereBadge, { backgroundColor: theme.ok }]}>
@@ -94,10 +101,38 @@ export default function BarsScreen() {
     if (!crewId && crews[0]) setCrewId(crews[0].id);
   }, [crews, crewId]);
 
+  // MOT-09: while the map is on screen it follows the crew, so a crown changing hands shows up live.
+  useFocusEffect(
+    useCallback(() => {
+      if (!crewId || !session) return;
+      const load = () => void refreshVenues(crewId).catch(() => undefined);
+      load();
+      const timer = setInterval(load, pollMs);
+      return () => clearInterval(timer);
+    }, [crewId, session, pollMs]),
+  );
+
+  // MOT-09: a venue whose boss changed since the last load gets the takeover moment.
+  const reduceMotion = useReducedMotion();
+  const level = useLevelNow((state) => state.level);
+  const still = reduceMotion || level >= 2;
+  const lastBosses = useRef<{ crewId: string; venues: BossSnapshot[] } | null>(null);
+  const [takeovers, setTakeovers] = useState<Record<string, number>>({});
   useEffect(() => {
-    if (!crewId || !session) return;
-    void refreshVenues(crewId).catch(() => undefined);
-  }, [crewId, session]);
+    if (!crewId || !data) return;
+    const snapshot = data.venues.map((v) => ({ id: v.id, bossId: v.bossId }));
+    const previous = lastBosses.current?.crewId === crewId ? lastBosses.current.venues : null;
+    lastBosses.current = { crewId, venues: snapshot };
+    const changed = takeoversBetween(previous, snapshot);
+    if (!changed.length) return;
+    haptic.heavy();
+    const at = Date.now();
+    setTakeovers((current) => {
+      const next = { ...current };
+      for (const t of changed) next[t.venueId] = at;
+      return next;
+    });
+  }, [crewId, data]);
 
   const venues = useMemo(() => {
     const all = data?.venues ?? [];
@@ -150,7 +185,9 @@ export default function BarsScreen() {
             id: venue.id,
             lat: venue.lat,
             lng: venue.lng,
-            render: () => <VenuePin venue={venue} selected={venue.id === selectedId} onPress={() => setSelectedId(venue.id)} />,
+            render: () => (
+              <VenuePin venue={venue} selected={venue.id === selectedId} onPress={() => setSelectedId(venue.id)} takeoverAt={takeovers[venue.id] ?? 0} still={still} />
+            ),
           })),
           ...friends.map((f) => ({
             id: `friend-${f.userId}`,
