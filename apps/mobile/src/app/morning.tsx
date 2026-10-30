@@ -4,6 +4,7 @@ import { StyleSheet, View } from "react-native";
 import { formatMoney } from "@crew/money";
 import { logWater } from "@/drinks/actions";
 import { useT } from "@/i18n";
+import { useCrewNames } from "@/crew/names";
 import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
 import { fetchPool, fetchPools } from "@/server/moneyData";
@@ -41,6 +42,7 @@ export default function MorningScreen() {
   const [debts, setDebts] = useState<Debt[]>([]);
   const [poolId, setPoolId] = useState<string | null>(null);
   const [waterDone, setWaterDone] = useState(false);
+  const crewName = useCrewNames(recap?.party.crewId);
 
   useEffect(() => {
     void fetchRecap(id)
@@ -98,17 +100,17 @@ export default function MorningScreen() {
       {debts.length === 0 ? <Text color={theme.textMuted}>{i18n.t("morning.allSquare")}</Text> : null}
       {debts.map((debt) => (
         <View key={`${debt.otherId}-${debt.currency}`} style={[styles.debt, { borderBottomColor: theme.line }]}>
-          <Avatar personId={debt.otherId} name={debt.name} size={34} faded />
+          <Avatar personId={debt.otherId} name={crewName(debt.otherId, debt.name)} size={34} faded />
           <Text style={styles.flex} color={theme.textMuted}>
             {debt.iOwe
-              ? i18n.t("money.youPay", { to: debt.name, amount: money(debt.amount, debt.currency) })
-              : i18n.t("money.paysYou", { from: debt.name, amount: money(debt.amount, debt.currency) })}
+              ? i18n.t("money.youPay", { to: crewName(debt.otherId, debt.name), amount: money(debt.amount, debt.currency) })
+              : i18n.t("money.paysYou", { from: crewName(debt.otherId, debt.name), amount: money(debt.amount, debt.currency) })}
           </Text>
         </View>
       ))}
       {poolId ? <Button label={i18n.t("morning.seePool")} variant="outline" height={44} onPress={() => router.push({ pathname: "/pool", params: { id: poolId } })} /> : null}
 
-      <Alibi names={(recap?.participants ?? []).filter((p) => p.userId !== me).map((p) => p.name)} />
+      <Alibi names={(recap?.participants ?? []).filter((p) => p.userId !== me).map((p) => crewName(p.userId, p.name))} />
 
       <Panel tint="water">
         <View style={styles.water}>

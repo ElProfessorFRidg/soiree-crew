@@ -10,11 +10,14 @@ import type { DrinkEntry, StoredProfile } from "@/sync/types";
 import { api } from "./api";
 import { refreshCrews, refreshLiveParty, refreshParties, useCrewData } from "./crewData";
 import { refreshRadar, refreshSos } from "./radarData";
+import { emitLiveHint } from "./liveHints";
+import { clearInvitations, pulseFeed, refreshInvitations } from "./socialData";
 import { useSession, type ServerSession } from "./session";
 import { showToast } from "@/ui/Toast";
 import { backupIfDue } from "@/chat/backup";
 import { onChatHint, onTyping, startChat } from "@/chat/engine";
 import { onCheers } from "@/party/cheers";
+import { checkBudget } from "@/money/budgetAlert";
 
 type Deleted = { id: string; deleted: true };
 interface SyncResponse {
@@ -107,21 +110,31 @@ function openSocket(session: ServerSession): void {
     retry = 0;
     // Anything that arrived while the socket was down is picked up now.
     void startChat().then(() => backupIfDue());
+    // O-43: open lists (friends, notices) refetch after a reconnect.
+    emitLiveHint("open");
   };
   ws.onmessage = (event) => {
     try {
-      const message = JSON.parse(String(event.data)) as { type: string; partyId?: string; crewId?: string; conversationId?: string; userId?: string; withName?: string; proof?: boolean };
+      const message = JSON.parse(String(event.data)) as { type: string; partyId?: string; crewId?: string; conversationId?: string; userId?: string; withName?: string; proof?: boolean; mention?: boolean };
+      emitLiveHint(message.type);
       if (message.type === "cheers") onCheers(message.withName ?? "", Boolean(message.proof));
       if (message.type === "chat.typing" && message.conversationId && message.userId) onTyping(message.conversationId, message.userId);
       else if (message.type.startsWith("chat.")) onChatHint(message.type, message.conversationId);
       if (message.type === "party.changed" && message.partyId) void refreshLiveParty(message.partyId).catch(() => undefined);
       if (message.type === "party.changed" || message.type === "crew.changed") void refreshParties().catch(() => undefined);
+      // N-20: an expense or a round may have pushed tonight past the budget.
+      if (message.type === "party.changed" || message.type === "crew.changed") void checkBudget();
       if (message.type === "crew.changed") {
         void refreshCrews().catch(() => undefined);
         void refreshSos().catch(() => undefined);
         if (message.crewId) void refreshRadar(message.crewId).catch(() => undefined);
       }
       if (message.type === "sync") void pull().catch(() => undefined);
+      // O-36: the Crew tab badge follows anything that adds or answers an invitation; N-31 mentions too.
+      if (["invites.changed", "friends.changed", "party.changed", "crew.changed"].includes(message.type) || (message.type === "feed.changed" && message.mention)) {
+        void refreshInvitations().catch(() => undefined);
+      }
+      if (message.type === "feed.changed" && message.crewId) pulseFeed(message.crewId);
       if (message.type === "party.unwell" && message.partyId) {
         // N-36: a quiet heads-up; the banner on the party screen says who.
         haptic.error();
@@ -147,7 +160,7 @@ function openSocket(session: ServerSession): void {
 
 async function refreshAll(): Promise<void> {
   await flush();
-  await Promise.allSettled([pull(), refreshCrews(), refreshParties(), refreshSos()]);
+  await Promise.allSettled([pull(), refreshCrews(), refreshParties(), refreshSos(), refreshInvitations()]);
   await Promise.allSettled(useCrewData.getState().crews.map((crew) => refreshRadar(crew.id)));
 }
 
@@ -164,6 +177,7 @@ export function connect(session: ServerSession | null): void {
   unsubscribeSync?.();
 
   if (!session) {
+    clearInvitations();
     setTransport(new LocalTransport());
     return;
   }

@@ -2,6 +2,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import { useT } from "@/i18n";
+import { useCrewNames } from "@/crew/names";
 import { haptic } from "@/motion/haptics";
 import { refreshLiveParty, setGoingHome, setPartyStatus, useCrewData, type HomeMode, type LiveMember } from "@/server/crewData";
 import { useSession } from "@/server/session";
@@ -27,6 +28,7 @@ export default function GoingHomeScreen() {
   const theme = useTheme();
   const me = useSession((state) => state.session?.userId);
   const live = useCrewData((state) => state.live[id]);
+  const crewName = useCrewNames(live?.party.crewId);
   const rideApp = useAppStore((state) => state.preferences.rideApp);
 
   useEffect(() => {
@@ -37,7 +39,7 @@ export default function GoingHomeScreen() {
   const mine = going.find((m) => m.userId === me);
   const home = going.filter((m) => m.homeSafeAt !== null).length;
   const driver = going.find((m) => m.designatedDriver);
-  const nameOf = (userId: string | null) => (userId === me ? i18n.t("common.you") : (going.find((m) => m.userId === userId)?.displayName ?? "?"));
+  const nameOf = (userId: string | null) => (userId === me ? i18n.t("common.you") : crewName(userId, going.find((m) => m.userId === userId)?.displayName));
   const offline = showFailure(i18n);
   const act = (input: Parameters<typeof setGoingHome>[1]) => {
     haptic.select();
@@ -58,7 +60,7 @@ export default function GoingHomeScreen() {
         <Text>{i18n.t("goingHome.homeCount", { home, total: going.length })}</Text>
         <View style={styles.row}>
           {going.map((m) => (
-            <Avatar key={m.userId} personId={m.userId} name={m.displayName} size={34} faded={m.homeSafeAt === null} />
+            <Avatar key={m.userId} personId={m.userId} name={crewName(m.userId, m.displayName)} size={34} faded={m.homeSafeAt === null} />
           ))}
         </View>
         {mine ? (
@@ -99,7 +101,7 @@ export default function GoingHomeScreen() {
           <Panel key={leader}>
             <View style={styles.row}>
               {members.map((m) => (
-                <Avatar key={m.userId} personId={m.userId} name={m.displayName} size={34} />
+                <Avatar key={m.userId} personId={m.userId} name={crewName(m.userId, m.displayName)} size={34} />
               ))}
             </View>
             <Text variant="h3">{members.map((m) => nameOf(m.userId)).join(", ")}</Text>
@@ -114,8 +116,8 @@ export default function GoingHomeScreen() {
       })}
       {alone.map((m) => (
         <View key={m.userId} style={[styles.alone, { borderBottomColor: theme.line }]}>
-          <Avatar personId={m.userId} name={m.displayName} size={34} />
-          <Text style={styles.flex}>{i18n.t("goingHome.alone", { name: m.displayName })}</Text>
+          <Avatar personId={m.userId} name={crewName(m.userId, m.displayName)} size={34} />
+          <Text style={styles.flex}>{i18n.t("goingHome.alone", { name: crewName(m.userId, m.displayName) })}</Text>
           {m.homeOfferFrom === me ? (
             <Tag label={i18n.t("goingHome.offered")} tone="ok" />
           ) : (

@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Field } from "@/crew/Field";
+import { moodIcon } from "@/crew/moods";
 import { useT } from "@/i18n";
 import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
@@ -30,7 +31,8 @@ function atMinutes(dayStart: Date, minutes: number): number {
 export default function NewPartyScreen() {
   const i18n = useT();
   const crews = useCrewData((state) => state.crews);
-  const params = useLocalSearchParams<{ outCallId?: string; crewId?: string; name?: string }>();
+  // QOL-21: a birthday reminder opens this screen with the name, the mood and the day filled in.
+  const params = useLocalSearchParams<{ outCallId?: string; crewId?: string; name?: string; mood?: string; date?: string }>();
   const hourCycle = useAppStore((state) => state.preferences.hourCycle);
   const boundary = useAppStore((state) => state.preferences.dayBoundaryHour);
   // QOL-02: before the day boundary, "tonight" is the night already under way.
@@ -42,10 +44,16 @@ export default function NewPartyScreen() {
   });
   const minutesNow = Math.floor((Date.now() - nightBase) / 60_000);
   const [crewId, setCrewId] = useState(params.crewId ?? crews[0]?.id ?? "");
-  const [mood, setMood] = useState<PartyMood>("party");
+  const [mood, setMood] = useState<PartyMood>(() => ((MOODS as readonly string[]).includes(params.mood ?? "") ? (params.mood as PartyMood) : "party"));
   const [name, setName, clearName] = useDraft("new-party:name", params.name ?? "");
   const [kind, setKind] = useState<"party" | "trip">("party");
-  const [dayOffset, setDayOffset] = useState(0);
+  const [dayOffset, setDayOffset] = useState(() => {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(params.date ?? "");
+    if (!match) return 0;
+    const offset = Math.round((new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3])).getTime() - nightBase) / DAY_MS);
+    // Only the seven days the picker offers.
+    return Math.min(6, Math.max(0, offset));
+  });
   // Minutes after midnight of the start day; the end may run past midnight.
   // A party created during the night starts now, rounded down to the half hour.
   const [start, setStart] = useState(() => (minutesNow > 21 * 60 ? Math.floor(minutesNow / STEP_MIN) * STEP_MIN : 21 * 60));
@@ -131,6 +139,7 @@ export default function NewPartyScreen() {
             <Chip
               key={value}
               label={i18n.t(`newParty.moods.${value}`)}
+              icon={moodIcon(value)}
               selected={value === mood}
               onPress={() => {
                 haptic.select();

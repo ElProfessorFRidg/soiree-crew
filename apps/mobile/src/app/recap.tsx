@@ -19,6 +19,7 @@ import {
   formatBacValue,
 } from "@crew/units";
 import { useT, type Translator } from "@/i18n";
+import { useCrewNames } from "@/crew/names";
 import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
 import { RollingNumber } from "@/party/RollingNumber";
@@ -102,6 +103,7 @@ function Reactions({
   i18n: Translator;
 }) {
   const theme = useTheme();
+  const crewName = useCrewNames(recap.party.crewId);
   const [open, setOpen] = useState(false);
   const mine = recap.reactions.find(
     (r) => r.fromId === me && r.toId === toId,
@@ -109,7 +111,7 @@ function Reactions({
   const counts = new Map<RecapEmoji, number>();
   for (const r of recap.reactions)
     if (r.toId === toId) counts.set(r.emoji, (counts.get(r.emoji) ?? 0) + 1);
-  const name = recap.participants.find((p) => p.userId === toId)?.name ?? "";
+  const name = crewName(toId, recap.participants.find((p) => p.userId === toId)?.name ?? "");
   const choose = (emoji: RecapEmoji) => {
     haptic.select();
     setOpen(false);
@@ -167,6 +169,7 @@ export default function RecapScreen() {
   const me = useSession((state) => state.session?.userId);
   const preferences = useAppStore((state) => state.preferences);
   const [recap, setRecap] = useState<Recap | null>(null);
+  const crewName = useCrewNames(recap?.party.crewId);
   const [podium, setPodium] = useState<{
     disabled: boolean;
     entries: PodiumEntry[];
@@ -257,7 +260,7 @@ export default function RecapScreen() {
   };
 
   const nameOf = (userId: string | undefined) =>
-    recap?.participants.find((p) => p.userId === userId)?.name ?? "";
+    crewName(userId, recap?.participants.find((p) => p.userId === userId)?.name ?? "");
 
   if (!recap) {
     return <View style={[styles.screen, { backgroundColor: theme.bg }]} />;
@@ -366,10 +369,10 @@ export default function RecapScreen() {
             key={p.userId}
             style={[styles.person, { borderBottomColor: theme.line }]}
           >
-            <Avatar personId={p.userId} name={p.name} />
+            <Avatar personId={p.userId} name={crewName(p.userId, p.name)} />
             <View style={styles.flex}>
               <Text variant="h3">
-                {p.userId === me ? i18n.t("common.you") : p.name}
+                {p.userId === me ? i18n.t("common.you") : crewName(p.userId, p.name)}
               </Text>
               <Text variant="small">
                 {i18n.plural("recap.drinksOf", p.drinks)}
@@ -531,9 +534,9 @@ export default function RecapScreen() {
                 >
                   {entry.rank}
                 </Text>
-                <Avatar personId={entry.userId} name={entry.name} size={30} />
+                <Avatar personId={entry.userId} name={crewName(entry.userId, entry.name)} size={30} />
                 <Text variant="h3" style={styles.flex}>
-                  {entry.name}
+                  {crewName(entry.userId, entry.name)}
                 </Text>
               </View>
             ))}

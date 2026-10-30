@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { crewTimeZone } from "../territory";
-import { nightOf } from "../time";
+import { dayBoundaryOf, nightOf } from "../time";
 
 const uuid = z.string().uuid();
 const HOUR_MS = 3_600_000;
@@ -210,7 +210,7 @@ export function pollRoutes(app: FastifyInstance, ctx: Context): void {
     );
     const members = rows.map((r) => ({ userId: r.user_id, name: r.display_name, weekdays: r.weekdays ? (JSON.parse(r.weekdays) as number[]) : [] }));
     const timeZone = await crewTimeZone(ctx.db, request.params.id);
-    const tonight = nightOf(ctx.now(), timeZone);
+    const tonight = nightOf(ctx.now(), timeZone, await dayBoundaryOf(ctx.db, user.id));
     const nights = Array.from({ length: 14 }, (_, i) => {
       const night = new Date(Date.parse(`${tonight}T12:00:00Z`) + i * DAY_MS).toISOString().slice(0, 10);
       const weekday = weekdayOf(night);

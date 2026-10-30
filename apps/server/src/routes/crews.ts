@@ -7,6 +7,20 @@ import { invitePage, pickLanguage } from "../invitePage";
 import { RateLimiter } from "../ratelimit";
 
 const INVITE_TTL_MS = 7 * 24 * 3_600_000;
+/** QOL-11: short enough to fit under an avatar. */
+export const NICKNAME_MAX = 24;
+
+/**
+ * QOL-11: a nickname is shown to the whole crew, so it is cleaned like a name: no control,
+ * zero-width or direction-override characters (they hide or flip text), spaces collapsed.
+ */
+export function cleanNickname(raw: string): string {
+  return raw
+    .normalize("NFC")
+    .replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028-\u202e\u2060-\u2069\ufeff]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
 export function crewRoutes(app: FastifyInstance, ctx: Context): void {
   const joins = new RateLimiter(20, 60 * 60_000, ctx.now);
@@ -45,8 +59,8 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
       [user.id],
     );
     const members = crews.length
-      ? await ctx.db.query<{ crew_id: string; user_id: string; username: string; display_name: string; role: string; nickname: string | null }>(
-          `select m.crew_id, m.user_id, u.username, u.display_name, m.role, m.nickname
+      ? await ctx.db.query<{ crew_id: string; user_id: string; username: string; display_name: string; role: string; nickname: string | null; nickname_set_by: string | null }>(
+          `select m.crew_id, m.user_id, u.username, u.display_name, m.role, m.nickname, m.nickname_set_by
            from crew_members m join users u on u.id = m.user_id
            where m.crew_id = any($1::uuid[]) order by m.joined_at`,
           [crews.map((c) => c.id)],
@@ -68,9 +82,42 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
         me: { leaderboardOptOut: crew.leaderboard_opt_out, territoryOptOut: crew.territory_opt_out },
         members: members
           .filter((m) => m.crew_id === crew.id)
-          .map((m) => ({ id: m.user_id, username: m.username, displayName: m.display_name, nickname: m.nickname, role: m.role })),
+          .map((m) => ({ id: m.user_id, username: m.username, displayName: m.display_name, nickname: m.nickname, nicknameSetBy: m.nickname_set_by, role: m.role })),
       })),
     };
+  });
+
+  /**
+   * QOL-11: any crew member names a crew mate for this crew (or themself); null or empty clears it.
+   * Who gave it is kept and shown, so a mean one is easy to trace and anyone can undo it.
+   */
+  const nicknames = new RateLimiter(30, 60 * 60_000, ctx.now);
+  app.put<{ Params: { id: string; userId: string } }>("/v1/crews/:id/members/:userId/nickname", async (request) => {
+    const user = requireUser(request);
+    nicknames.check(user.id);
+    const crewId = z.string().uuid().parse(request.params.id);
+    const targetId = z.string().uuid().parse(request.params.userId);
+    await assertCrewMember(ctx, crewId, user.id);
+    const target = (await ctx.db.query<{ display_name: string }>(
+      "select u.display_name from crew_members m join users u on u.id = m.user_id where m.crew_id = $1 and m.user_id = $2",
+      [crewId, targetId],
+    ))[0];
+    if (!target) throw new HttpError(404, "not_found");
+    const { nickname } = z.object({ nickname: z.string().max(200).nullable() }).parse(request.body);
+    const cleaned = nickname === null ? "" : cleanNickname(nickname);
+    if ([...cleaned].length > NICKNAME_MAX) throw new HttpError(400, "too_long");
+    // A nickname equal to the name adds nothing: it is cleared instead.
+    const value = cleaned && cleaned.toLocaleLowerCase() !== target.display_name.toLocaleLowerCase() ? cleaned : null;
+    await ctx.db.query("update crew_members set nickname = $3, nickname_set_by = $4, nickname_at = $5 where crew_id = $1 and user_id = $2", [
+      crewId,
+      targetId,
+      value,
+      value ? user.id : null,
+      value ? ctx.now() : null,
+    ]);
+    const members = await ctx.db.query<{ user_id: string }>("select user_id from crew_members where crew_id = $1", [crewId]);
+    ctx.live.notify(members.map((m) => m.user_id), { type: "crew.changed", crewId });
+    return { nickname: value };
   });
 
   app.post<{ Params: { id: string } }>("/v1/crews/:id/invites", async (request, reply) => {

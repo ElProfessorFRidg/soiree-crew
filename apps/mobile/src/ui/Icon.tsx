@@ -1,8 +1,8 @@
 import Svg, { Path } from "react-native-svg";
-import { extraIcons, glassIcons, icons, iconStroke, type ExtraIconName, type GlassIconName, type IconName } from "@crew/design-tokens";
+import { extraIcons, glassIcons, icons, iconStroke, moodIcons, type ExtraIconName, type GlassIconName, type IconName, type MoodIconName } from "@crew/design-tokens";
 import { useTheme } from "@/theme";
 
-export type AnyIconName = IconName | `glass:${GlassIconName}` | `x:${ExtraIconName}`;
+export type AnyIconName = IconName | `glass:${GlassIconName}` | `x:${ExtraIconName}` | `mood:${MoodIconName}`;
 
 interface Props {
   name: AnyIconName;
@@ -18,7 +18,9 @@ export function Icon({ name, size = 22, color, strokeWidth = iconStroke.width }:
     ? glassIcons[name.slice(6) as GlassIconName]
     : name.startsWith("x:")
       ? extraIcons[name.slice(2) as ExtraIconName]
-      : icons[name as IconName];
+      : name.startsWith("mood:")
+        ? moodIcons[name.slice(5) as MoodIconName]
+        : icons[name as IconName];
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
       <Path

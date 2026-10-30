@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Field } from "@/crew/Field";
 import { useT } from "@/i18n";
+import { useCrewNames } from "@/crew/names";
 import { haptic } from "@/motion/haptics";
 import { api } from "@/server/api";
 import { useCrewData } from "@/server/crewData";
@@ -32,6 +33,9 @@ export default function ItemsScreen() {
   const theme = useTheme();
   const me = useSession((state) => state.session?.userId);
   const crews = useCrewData((state) => state.crews);
+  // QOL-11: names as the party's crew knows them.
+  const partyCrewId = useCrewData((state) => state.parties.find((p) => p.id === partyId)?.crewId ?? state.live[partyId]?.party.crewId);
+  const crewName = useCrewNames(partyCrewId);
   const [items, setItems] = useState<Item[] | null>(null);
   const [label, setLabel] = useState("");
   const offline = showFailure(i18n);
@@ -55,11 +59,7 @@ export default function ItemsScreen() {
   };
   const nameOf = (id: string) => {
     if (id === me) return i18n.t("common.you");
-    for (const crew of crews) {
-      const m = crew.members.find((x) => x.id === id);
-      if (m) return m.nickname ?? m.displayName;
-    }
-    return "?";
+    return crewName(id);
   };
 
   return (

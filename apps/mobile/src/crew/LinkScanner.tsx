@@ -5,6 +5,7 @@ import { radius } from "@crew/design-tokens";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
 import { Button } from "@/ui/Button";
+import { Text } from "@/ui/Text";
 import { OpenSettingsButton } from "@/system/OpenSettingsButton";
 
 /** MSG-11: what the signed-in phone shows and the new one scans: the server and a one-time code. */
@@ -15,8 +16,11 @@ export function parseLink(data: string): { url: string; code: string } | null {
   return m ? { url: m[1]!, code: m[2]! } : null;
 }
 
-/** Scans the code shown on the phone already signed in, and fills the server and the code. */
-export function LinkScanner({ onLink }: { onLink: (link: { url: string; code: string }) => void }) {
+/**
+ * A button that opens the camera and reads QR codes until `parse` accepts one. Used to link a phone
+ * (MSG-11) and to join a crew from its invite QR (O-36).
+ */
+export function QrScanner<T>({ label, hint, parse, onScan }: { label: string; hint?: string; parse: (data: string) => T | null; onScan: (value: T) => void }) {
   const i18n = useT();
   const [open, setOpen] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
@@ -24,7 +28,7 @@ export function LinkScanner({ onLink }: { onLink: (link: { url: string; code: st
   if (!open) {
     return (
       <Button
-        label={i18n.t("account.scanLink")}
+        label={label}
         icon="x:scan"
         variant="secondary"
         height={44}
@@ -45,21 +49,32 @@ export function LinkScanner({ onLink }: { onLink: (link: { url: string; code: st
             facing="back"
             barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
             onBarcodeScanned={({ data }) => {
-              const link = parseLink(data);
-              if (!link || done.current) return;
+              const value = parse(data);
+              if (value === null || done.current) return;
               done.current = true;
               haptic.confirmed();
               setOpen(false);
-              onLink(link);
+              onScan(value);
             }}
           />
         </View>
       ) : permission && !permission.canAskAgain ? (
         <OpenSettingsButton />
       ) : null}
+      {hint ? (
+        <Text variant="small" align="center">
+          {hint}
+        </Text>
+      ) : null}
       <Button label={i18n.t("chat.cancel")} variant="outline" height={44} onPress={() => setOpen(false)} />
     </View>
   );
+}
+
+/** Scans the code shown on the phone already signed in, and fills the server and the code. */
+export function LinkScanner({ onLink }: { onLink: (link: { url: string; code: string }) => void }) {
+  const i18n = useT();
+  return <QrScanner label={i18n.t("account.scanLink")} parse={parseLink} onScan={onLink} />;
 }
 
 const styles = StyleSheet.create({

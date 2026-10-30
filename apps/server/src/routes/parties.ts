@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { estimateBac, type BodyProfile, type DrinkIntake } from "@crew/bac";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
+import { assertPublishable } from "../posting";
 import { partySchema, responseSchema } from "../schemas";
 
 const HOUR_MS = 3_600_000;
@@ -23,6 +24,7 @@ interface PartyRow {
   ends_at: number;
   closed_at: number | null;
   created_by: string;
+  open_venue_id: string | null;
 }
 
 function partyView(row: PartyRow, now: number) {
@@ -36,6 +38,8 @@ function partyView(row: PartyRow, now: number) {
     endsAt: row.ends_at,
     closedAt: row.closed_at,
     live: row.closed_at === null && row.starts_at <= now && row.ends_at >= now,
+    // COM-05: the place where the hosts opened the party to join requests, if they did.
+    openVenueId: row.open_venue_id ?? null,
   };
 }
 
@@ -51,13 +55,25 @@ async function closeEnded(ctx: Context): Promise<void> {
   );
 }
 
-async function loadPartyForMember(ctx: Context, partyId: string, userId: string): Promise<PartyRow> {
+/** The party's crew, or a guest invited from outside it (COM-05). Anyone else gets a 404. */
+export async function loadPartyForMember(ctx: Context, partyId: string, userId: string): Promise<PartyRow> {
   const rows = await ctx.db.query<PartyRow>(
-    `select p.* from parties p join crew_members c on c.crew_id = p.crew_id and c.user_id = $2 where p.id = $1`,
+    `select p.* from parties p where p.id = $1 and (
+       exists (select 1 from crew_members c where c.crew_id = p.crew_id and c.user_id = $2)
+       or exists (select 1 from party_members g where g.party_id = p.id and g.user_id = $2 and g.guest))`,
     [partyId, userId],
   );
   if (!rows[0]) throw new HttpError(404, "not_found");
   return rows[0];
+}
+
+/** Who hears about a party: its crew and its guests from outside the crew (COM-05). */
+export async function partyAudience(ctx: Context, party: { id: string; crew_id: string }): Promise<string[]> {
+  const rows = await ctx.db.query<{ user_id: string }>(
+    "select user_id from crew_members where crew_id = $1 union select user_id from party_members where party_id = $2 and guest",
+    [party.crew_id, party.id],
+  );
+  return rows.map((r) => r.user_id);
 }
 
 export function partyRoutes(app: FastifyInstance, ctx: Context): void {
@@ -65,6 +81,8 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
     const user = requireUser(request);
     const input = partySchema.parse(request.body);
     await assertCrewMember(ctx, input.crewId, user.id);
+    // COM-08: the party name is read by the whole crew.
+    await assertPublishable(ctx, user.id, [input.name]);
     const span = input.endsAt - input.startsAt;
     if (span <= 0 || span > (input.kind === "trip" ? MAX_TRIP_MS : MAX_PARTY_MS)) throw new HttpError(400, "invalid_dates");
     const now = ctx.now();
@@ -94,12 +112,24 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
     const user = requireUser(request);
     await closeEnded(ctx);
     const now = ctx.now();
-    const rows = await ctx.db.query<PartyRow & { response: string }>(
-      `select p.*, m.response from parties p join party_members m on m.party_id = p.id and m.user_id = $1
+    const rows = await ctx.db.query<PartyRow & { response: string; guest: boolean; may_bring_crew: boolean; invited_by_name: string | null; crew_role: string | null }>(
+      `select p.*, m.response, m.guest, m.may_bring_crew, u.display_name as invited_by_name, cm.role as crew_role
+       from parties p join party_members m on m.party_id = p.id and m.user_id = $1
+       left join users u on u.id = m.invited_by
+       left join crew_members cm on cm.crew_id = p.crew_id and cm.user_id = $1
        where p.closed_at is null or p.closed_at > $2 order by p.starts_at`,
       [user.id, now - 24 * HOUR_MS],
     );
-    return { parties: rows.map((row) => ({ ...partyView(row, now), myResponse: row.response })) };
+    return {
+      parties: rows.map((row) => ({
+        ...partyView(row, now),
+        myResponse: row.response,
+        // COM-05: the creator and the crew's admins decide on join requests and opening the party.
+        host: row.created_by === user.id || row.crew_role === "admin",
+        // COM-05: a party of another crew I was invited to, who asked me, and whether I may bring my crew.
+        ...(row.guest ? { guest: { invitedBy: row.invited_by_name, mayBringCrew: row.may_bring_crew } } : {}),
+      })),
+    };
   });
 
   app.post<{ Params: { id: string } }>("/v1/parties/:id/response", async (request) => {
@@ -120,8 +150,7 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
        on conflict (party_id, user_id) do update set response = $3`,
       [party.id, user.id, response],
     );
-    const members = await ctx.db.query<{ user_id: string }>("select user_id from crew_members where crew_id = $1", [party.crew_id]);
-    ctx.live.notify(members.map((m) => m.user_id), { type: "party.changed", partyId: party.id });
+    ctx.live.notify(await partyAudience(ctx, party), { type: "party.changed", partyId: party.id });
     return { response };
   });
 
@@ -383,7 +412,8 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
     // The crew watches over the night from home too, but levels are not for someone who walked in
     // through an open crew and is not there.
     const viewer = (await ctx.db.query<{ via_open: boolean }>("select via_open from crew_members where crew_id = $1 and user_id = $2", [party.crew_id, user.id]))[0];
-    const seesLevels = going.includes(user.id) || !viewer?.via_open;
+    // A guest from outside the crew (no crew row) sees levels only once going (COM-05).
+    const seesLevels = going.includes(user.id) || (viewer !== undefined && !viewer.via_open);
     const drinkRows = going.length
       ? await ctx.db.query<{ id: string; user_id: string; sealed: string; consumed_at: number; party_id: string | null }>(
           `select id, user_id, sealed, consumed_at, party_id from drinks

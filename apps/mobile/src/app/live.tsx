@@ -6,6 +6,7 @@ import { duration } from "@crew/design-tokens";
 import { breathRatio, countryRules, formatBacValue } from "@crew/units";
 import { bacColor } from "@/drinks/display";
 import { useT } from "@/i18n";
+import { useCrewNames } from "@/crew/names";
 import { formatClock } from "@/i18n/format";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
@@ -25,12 +26,16 @@ import { ScalePressable } from "@/ui/Pressable";
 import { startSharing, stopSharing, useLiveShare } from "@/location/liveShare";
 import { showFailure } from "@/server/errors";
 import { confirmAction } from "@/ui/confirm";
+import { OpenPartyPanel } from "@/crew/OpenParty";
+import { ReportPanel } from "@/moderation/ReportPanel";
 
 /** Live dashboard refresh while the screen is open, on top of socket hints (O-37). */
 const REFRESH_MS = 20_000;
 
-function MemberRow({ member, me }: { member: LiveMember; me: boolean }) {
+function MemberRow({ member, me, crewId }: { member: LiveMember; me: boolean; crewId?: string }) {
   const i18n = useT();
+  // QOL-11: the crew's name for this person, told apart from a namesake.
+  const name = useCrewNames(crewId)(member.userId, member.displayName);
   const theme = useTheme();
   const preferences = useAppStore((state) => state.preferences);
   const rules = countryRules(preferences.legalCountry);
@@ -45,12 +50,12 @@ function MemberRow({ member, me }: { member: LiveMember; me: boolean }) {
       pressedScale={0.99}
       onPress={() => router.push({ pathname: "/profile", params: { id: member.userId } })}
       accessibilityRole="button"
-      accessibilityLabel={member.displayName}
+      accessibilityLabel={name}
       style={[styles.member, { borderBottomColor: theme.line }]}
     >
-      <Avatar personId={member.userId} name={member.displayName} size={44} faded={home || absent} />
+      <Avatar personId={member.userId} name={name} size={44} faded={home || absent} />
       <View style={styles.flex}>
-        <Text variant="h3">{me ? `${member.displayName} (${i18n.t("crew.you")})` : member.displayName}</Text>
+        <Text variant="h3">{me ? `${name} (${i18n.t("crew.you")})` : name}</Text>
         <View style={styles.tags}>
           {absent ? <Tag label={member.response === "declined" ? i18n.t("live.notGoing") : i18n.t("live.invited")} /> : null}
           {home ? <Tag label={i18n.t("live.homeSafe")} tone="ok" icon="home" /> : null}
@@ -116,7 +121,7 @@ export default function LiveScreen() {
       <View>
         {members.map((member) => (
           <Animated.View key={member.userId} layout={LinearTransition.duration(duration.reorder).easing(easings.reorder)}>
-            <MemberRow member={member} me={member.userId === me} />
+            <MemberRow member={member} me={member.userId === me} crewId={live?.party.crewId} />
           </Animated.View>
         ))}
       </View>
@@ -168,6 +173,10 @@ export default function LiveScreen() {
           }
         />
       ) : null}
+      {/* COM-05: the hosts can open the party at one of the crew's bars. */}
+      <OpenPartyPanel partyId={id} />
+      {/* COM-08, O-77: a party (its name, its notes) can go to the crew's admins. */}
+      <ReportPanel targetKind="party" targetId={id} compact />
       <Text variant="disclaimer">{i18n.t("party.notice")}</Text>
     </Screen>
   );

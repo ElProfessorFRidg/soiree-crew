@@ -22,6 +22,7 @@ import { useTheme } from "@/theme";
 import { Button, IconButton } from "@/ui/Button";
 import { Panel, Row, Segmented, Tag } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
+import { moodIcon } from "@/crew/moods";
 import { LiveDot } from "@/ui/LiveDot";
 import { Numeral, Text } from "@/ui/Text";
 import { AddDrinkButton } from "./AddDrinkButton";
@@ -445,6 +446,8 @@ function PartyTitle({ i18n }: { i18n: Translator }) {
     <View style={styles.titleRow}>
       {/* The live dot only shows while a party is really live (DESIGN.md §5). */}
       <LiveDot />
+      {/* O-35: the mood picked at creation, as its icon. */}
+      <Icon name={moodIcon(current.party.mood)} size={20} />
       <Text variant="h3" style={styles.flex}>
         {current.party.name}
       </Text>

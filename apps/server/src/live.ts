@@ -8,6 +8,10 @@ export type LiveEvent =
   /** N-36: someone at the party does not feel well. */
   | { type: "party.unwell"; partyId: string; userId: string }
   | { type: "crew.changed"; crewId: string }
+  /** O-36, COM-05: something waiting for my answer changed (party invitation, join request, friend request). */
+  | { type: "invites.changed" }
+  /** N-31: someone mentioned me, or reacted, in the crew feed. */
+  | { type: "feed.changed"; crewId: string; mention?: boolean }
   | { type: "sync"; reason: "own_write" }
   | { type: "security.newDevice" }
   /** MSG-01: a conversation's group changed (devices, timer); without an id, look at all of them. */
@@ -15,7 +19,11 @@ export type LiveEvent =
   | { type: "chat.message"; conversationId: string }
   | { type: "chat.typing"; conversationId: string; userId: string }
   /** JOY-01: the other phone of a knock; `proof` when it also confirmed both check-ins. */
-  | { type: "cheers"; withUserId: string; withName: string; proof: boolean };
+  | { type: "cheers"; withUserId: string; withName: string; proof: boolean }
+  /** O-43: a friend request, an answer or a removal; the friends list refetches. */
+  | { type: "friends.changed" }
+  /** COM-08: a moderation decision about my content or my report (statement of reasons). */
+  | { type: "moderation.notice" };
 
 /**
  * Pushes hints, never data: a device that hears "party.changed" refetches what

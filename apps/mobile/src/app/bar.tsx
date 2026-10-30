@@ -43,6 +43,8 @@ export default function BarScreen() {
         ))}
       </View>
       <Button label={i18n.t("bar.mixer")} icon="filter" variant="secondary" height={52} onPress={() => router.push("/mixer")} />
+      {/* O-76: the alibi generator, also here (not only the morning after). */}
+      <Button label={i18n.t("morning.alibi")} icon="sparkdot" variant="outline" height={52} onPress={() => router.push("/alibi")} />
       {list.length === 0 ? <Text>{i18n.t("bar.none", { query: query.trim() })}</Text> : null}
       <View>
         {list.map((recipe, index) => {
