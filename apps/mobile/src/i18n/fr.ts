@@ -393,6 +393,7 @@ export const fr = {
     },
   },
   bars: {
+    openCrew: "Ouvrir l'onglet Crew",
     tab: "Bars",
     title: "Nos bars",
     needCrew: "La carte montre les bars de ton crew. Rejoins ou crée un crew dans l'onglet Crew.",
@@ -521,6 +522,7 @@ export const fr = {
     staffNames: "Bosse ici : {names}",
   },
   ranking: {
+    empty: "Personne au classement sur cette période.",
     bars: "Les bars",
     barsHint: "Bars tenus cette saison et titres gagnés en sortant.",
     ruled: { one: "{count} bar tenu", other: "{count} bars tenus" },
@@ -1969,7 +1971,7 @@ export const fr = {
   history: {
     title: "Ce que t'as bu",
     nightUntil: "Jusqu'à {time}",
-    boundaryNote: "Une soirée compte jusqu'à {time} du matin.",
+    boundaryNote: "Une soirée compte jusqu'à {time}.",
     empty: "Rien de noté ce soir.",
     remove: "Supprimer",
     removed: "Verre supprimé",

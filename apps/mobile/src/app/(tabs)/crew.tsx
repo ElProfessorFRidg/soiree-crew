@@ -272,7 +272,7 @@ function CrewCard({ crew }: { crew: Crew }) {
             ["feed.title", "bell", () => router.push({ pathname: "/feed", params: { crewId: crew.id } })],
             ["polls.title", "cal", () => router.push({ pathname: "/polls", params: { crewId: crew.id } })],
             ["crewStats.open", "trophy", () => router.push({ pathname: "/crew-stats", params: { crewId: crew.id } })],
-            ["recap.list", "sparkdot", () => router.push("/recaps")],
+            ["recap.list", "x:sparkle", () => router.push("/recaps")],
             ["stickers.title", "image", () => router.push({ pathname: "/stickers", params: { crewId: crew.id } })],
             ["crew.nicknames", "edit", () => setNaming((on) => !on)],
             ...(crew.role === "admin" ? ([["people.reports", "flag", () => router.push({ pathname: "/reports", params: { crewId: crew.id } })]] as const) : []),

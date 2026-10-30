@@ -393,6 +393,7 @@ export const de: Messages = {
     },
   },
   bars: {
+    openCrew: "Crew-Tab öffnen",
     tab: "Bars",
     title: "Unsere Bars",
     needCrew: "Die Karte zeigt die Bars deiner Crew. Tritt im Tab „Crew“ einer Crew bei oder gründe eine.",
@@ -521,6 +522,7 @@ export const de: Messages = {
     staffNames: "Arbeitet hier: {names}",
   },
   ranking: {
+    empty: "Für diesen Zeitraum steht niemand in der Rangliste.",
     bars: "Die Bars",
     barsHint: "Bars, die du diese Saison hältst, und Titel vom Ausgehen.",
     ruled: { one: "{count} Bar gehalten", other: "{count} Bars gehalten" },

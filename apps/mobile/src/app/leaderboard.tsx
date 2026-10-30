@@ -35,6 +35,7 @@ import { Avatar } from "@/ui/Avatar";
 import { Button } from "@/ui/Button";
 import { Chip, Panel, Row, Segmented, Switch, Tag } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
+import { EmptyState } from "@/ui/EmptyState";
 import { Screen } from "@/ui/Screen";
 import { Numeral, Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
@@ -165,6 +166,10 @@ export default function LeaderboardScreen() {
 
       {disabled ? <Text>{i18n.t("ranking.disabled")}</Text> : null}
       {period === "party" && !live ? <Text>{i18n.t("ranking.noParty")}</Text> : null}
+
+      {!disabled && !(period === "party" && !live) && !podium.length && !rest.length ? (
+        <EmptyState icon="trophy" text={i18n.t("ranking.empty")} />
+      ) : null}
 
       {podium.length ? (
         <View style={styles.podium}>

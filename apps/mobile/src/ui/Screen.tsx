@@ -81,6 +81,8 @@ export function Screen({ title, back, trailing, children, footer, withToasts, on
         {Children.toArray(children).map((child, index) => (
           <Animated.View
             key={isValidElement(child) && child.key != null ? child.key : index}
+            // A child that renders a fragment (a settings page, say) keeps the gap between its blocks.
+            style={styles.block}
             entering={FadeInUp.delay(scaled(Math.min(index, 8) * 45))
               .duration(duration.enter)
               .withInitialValues({ opacity: 0, transform: [{ translateY: 12 }] })}
@@ -103,6 +105,7 @@ export function Screen({ title, back, trailing, children, footer, withToasts, on
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   content: { paddingHorizontal: space.screenX, gap: space.sectionGap },
+  block: { gap: space.sectionGap },
   top: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
   footer: { paddingHorizontal: space.screenX, paddingTop: 12 },
   band: { position: "absolute", top: 0, left: 0, right: 0, borderBottomWidth: StyleSheet.hairlineWidth },

@@ -40,13 +40,16 @@ export default function LimitsScreen() {
       : Math.round(preferences.personalLimit * 10);
   const { driving } = live;
   // O-87: the same conservative reading as the Party screen.
-  const underText = driving.rising
+  // A verdict reads on its own; only a time or "now" follows the "under the limit at" label.
+  const verdict = driving.rising
     ? i18n.t("party.drivingRising")
     : driving.tooCloseToCall
       ? i18n.t("party.tooClose")
-      : driving.underLimitAt === null || driving.underLimitAt <= now
-        ? i18n.t("limits.underNow")
-        : formatClock(driving.underLimitAt, i18n.language, preferences.hourCycle);
+      : null;
+  const underText =
+    driving.underLimitAt === null || driving.underLimitAt <= now
+      ? i18n.t("limits.underNow")
+      : formatClock(driving.underLimitAt, i18n.language, preferences.hourCycle);
 
   return (
     <Screen back title={i18n.t("limits.title")}>
@@ -130,14 +133,20 @@ export default function LimitsScreen() {
             `countries.${preferences.legalCountry}` as "countries.FR",
           )}
           trailing={<Icon name="chev" color={theme.textMuted} />}
-          onPress={() => router.push("/(tabs)/me")}
+          onPress={() => router.push({ pathname: "/settings", params: { section: "region" } })}
         />
-        <View style={styles.switchRow}>
-          <Text style={styles.flex}>{i18n.t("limits.underAt")}</Text>
+        {verdict ? (
           <Text variant="h3" color={theme.amber}>
-            {underText}
+            {verdict}
           </Text>
-        </View>
+        ) : (
+          <View style={styles.switchRow}>
+            <Text style={styles.flex}>{i18n.t("limits.underAt")}</Text>
+            <Text variant="h3" color={theme.amber}>
+              {underText}
+            </Text>
+          </View>
+        )}
         <Text variant="small">{i18n.t("limits.changeInMe")}</Text>
       </Panel>
       <Text variant="disclaimer">{i18n.t("party.notice")}</Text>

@@ -44,7 +44,7 @@ export default function RecapsScreen() {
             key={recap.id}
             title={recap.name}
             subtitle={`${date(recap.startsAt)}, ${i18n.number(recap.going)} ${i18n.plural("recap.present", recap.going)}`}
-            leading={<Icon name="sparkdot" color={theme.textMuted} />}
+            leading={<Icon name="x:sparkle" color={theme.textMuted} />}
             trailing={recap.seenAt === null ? <Tag label={i18n.t("recap.title")} tone="amber" /> : <Icon name="chev" color={theme.textMuted} />}
             onPress={() => router.push({ pathname: "/recap", params: { id: recap.id } })}
             last={index === recaps.length - 1}

@@ -52,12 +52,12 @@ export function TravelPrompt() {
         <Text variant="h3">{i18n.t("travel.zoneTitle")}</Text>
         <Text>{i18n.t("travel.zoneBody", { zone: zoneCity(zone!) })}</Text>
         <View style={styles.actions}>
-          <Button label={i18n.t("travel.zoneFine")} variant="outline" height={44} style={styles.flex} onPress={seen} />
+          <Button label={i18n.t("travel.zoneFine")} variant="outline" height={44} onPress={seen} />
           <Button
             label={i18n.t("travel.zoneCheck")}
             variant="secondary"
             height={44}
-            style={styles.flex}
+           
             onPress={() => {
               seen();
               router.push({ pathname: "/settings", params: { section: "region" } });
@@ -80,14 +80,14 @@ export function TravelPrompt() {
           label={i18n.t("travel.keep")}
           variant="outline"
           height={44}
-          style={styles.flex}
+         
           onPress={() => useAppStore.setState({ travelDismissed: country, ...(zoneSuggests ? { lastTimeZone: zone } : {}) })}
         />
         <Button
           label={i18n.t("travel.switch", { country: name })}
           variant="secondary"
           height={44}
-          style={styles.flex}
+         
           onPress={() => {
             const rules = countryRules(country);
             setPreferences({ legalCountry: country, unitSystem: rules.unitSystem, bacUnit: rules.bacUnits[0] ?? "g_per_l_blood" });
@@ -100,6 +100,6 @@ export function TravelPrompt() {
 }
 
 const styles = StyleSheet.create({
-  actions: { flexDirection: "row", gap: 10 },
-  flex: { flex: 1 },
+  // Stacked: side by side, a country name such as "États-Unis" broke over two lines.
+  actions: { gap: 8 },
 });

@@ -156,7 +156,7 @@ export default function CrewStatsScreen() {
       {allNights > 0 ? (
         <Button
           label={i18n.t("wrapped.open")}
-          icon="sparkdot"
+          icon="x:sparkle"
           variant="secondary"
           height={52}
           onPress={() =>

@@ -394,6 +394,7 @@ export const pt: Messages = {
     },
   },
   bars: {
+    openCrew: "Abrir a aba Crew",
     tab: "Bares",
     title: "Os nossos bares",
     needCrew: "O mapa mostra os bares da tua crew. Entra numa crew ou cria uma no separador Crew.",
@@ -522,6 +523,7 @@ export const pt: Messages = {
     staffNames: "Trabalha aqui: {names}",
   },
   ranking: {
+    empty: "Ninguém na classificação neste período.",
     bars: "Os bares",
     barsHint: "Bares dominados nesta temporada e títulos ganhos a sair.",
     ruled: { one: "{count} bar dominado", other: "{count} bares dominados" },
@@ -1970,7 +1972,7 @@ export const pt: Messages = {
   history: {
     title: "O que bebeste",
     nightUntil: "Até às {time}",
-    boundaryNote: "Uma noite conta até às {time} da manhã.",
+    boundaryNote: "Uma noite conta até às {time}.",
     empty: "Nada registado esta noite.",
     remove: "Apagar",
     removed: "Copo apagado",

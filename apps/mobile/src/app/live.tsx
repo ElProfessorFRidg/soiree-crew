@@ -178,7 +178,7 @@ export default function LiveScreen() {
         // JOY-09: once the party is over, the photo strip is offered right here.
         <Panel>
           <Text>{i18n.t("strip.ended")}</Text>
-          <Button label={i18n.t("strip.open")} icon="sparkdot" height={52} onPress={() => router.push({ pathname: "/photo-strip", params: { partyId: id } })} />
+          <Button label={i18n.t("strip.open")} icon="x:film" height={52} onPress={() => router.push({ pathname: "/photo-strip", params: { partyId: id } })} />
           <Button label={i18n.t("strip.seeRecap")} variant="outline" height={48} onPress={() => router.push({ pathname: "/recap", params: { id } })} />
         </Panel>
       ) : null}

@@ -171,7 +171,16 @@ export function Segmented<T extends string | number>({
             hitSlop={{ top: 3, bottom: 3 }}
             style={[styles.segItem, { minHeight: height, backgroundColor: on && pillWidth <= 0 ? theme.text : "transparent" }]}
           >
-            <Text variant="chip" style={{ fontSize: 13 }} color={on ? theme.bg : theme.textSoft} align="center">
+            {/* One line in every segment: a label that wrapped made its pill taller than its neighbours. */}
+            <Text
+              variant="chip"
+              style={{ fontSize: 13 }}
+              color={on ? theme.bg : theme.textSoft}
+              align="center"
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+            >
               {item.label}
             </Text>
           </Pressable>

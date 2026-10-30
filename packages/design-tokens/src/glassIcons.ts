@@ -36,6 +36,10 @@ export const extraIcons = {
   scan: "M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10",
   /** One step down on a stepper, the pair of "plus". */
   minus: "M5 12h14",
+  /** Something made for you: alibi, recap, wrapped. "sparkdot" is only the end dot of a sparkline. */
+  sparkle: "M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM18.5 15.5l.7 1.8l1.8.7l-1.8.7l-.7 1.8l-.7-1.8l-1.8-.7l1.8-.7z",
+  /** The photo strip. */
+  film: "M7 3h10a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM6 9h12M6 15h12",
 } as const;
 
 export type ExtraIconName = keyof typeof extraIcons;

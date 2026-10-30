@@ -21,6 +21,7 @@ import { Button, IconButton } from "@/ui/Button";
 import { Chip, Panel, Tag } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { ScalePressable } from "@/ui/Pressable";
+import { EmptyState } from "@/ui/EmptyState";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import {
@@ -229,7 +230,11 @@ export default function BarsScreen() {
   if (!session || !crews.length || !crewId) {
     return (
       <Screen title={i18n.t("bars.title")}>
-        <Text>{i18n.t("bars.needCrew")}</Text>
+        <EmptyState
+          icon="pin"
+          text={i18n.t("bars.needCrew")}
+          action={{ label: i18n.t("bars.openCrew"), onPress: () => router.navigate("/(tabs)/crew") }}
+        />
       </Screen>
     );
   }

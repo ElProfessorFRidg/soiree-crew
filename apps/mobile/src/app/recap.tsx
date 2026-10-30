@@ -596,7 +596,7 @@ export default function RecapScreen() {
       {/* JOY-09: the photo strip, offered with the recap. */}
       <Button
         label={i18n.t("strip.open")}
-        icon="sparkdot"
+        icon="x:film"
         variant="outline"
         height={48}
         onPress={() => router.push({ pathname: "/photo-strip", params: { partyId: recap.party.id } })}

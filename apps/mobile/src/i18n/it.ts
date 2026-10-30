@@ -394,6 +394,7 @@ export const it: Messages = {
     },
   },
   bars: {
+    openCrew: "Apri la scheda Crew",
     tab: "Bar",
     title: "I nostri bar",
     needCrew: "La mappa mostra i bar della tua crew. Entra in una crew o creane una nella scheda Crew.",
@@ -522,6 +523,7 @@ export const it: Messages = {
     staffNames: "Lavora qui: {names}",
   },
   ranking: {
+    empty: "Nessuno in classifica in questo periodo.",
     bars: "I bar",
     barsHint: "Bar conquistati in questa stagione e titoli guadagnati uscendo.",
     ruled: { one: "{count} bar conquistato", other: "{count} bar conquistati" },
@@ -1970,7 +1972,7 @@ export const it: Messages = {
   history: {
     title: "Cosa hai bevuto",
     nightUntil: "Fino alle {time}",
-    boundaryNote: "Una serata conta fino alle {time} del mattino.",
+    boundaryNote: "Una serata conta fino alle {time}.",
     empty: "Niente segnato stasera.",
     remove: "Elimina",
     removed: "Bicchiere eliminato",

@@ -59,7 +59,7 @@ export default function AlbumScreen() {
         <Button label={i18n.t("album.pick")} icon="image" variant="secondary" height={52} style={styles.flex} onPress={() => add("library")} />
       </View>
       {photos.length >= 2 ? (
-        <Button label={i18n.t("strip.open")} icon="sparkdot" variant="outline" height={48} onPress={() => router.push({ pathname: "/photo-strip", params: { partyId } })} />
+        <Button label={i18n.t("strip.open")} icon="x:film" variant="outline" height={48} onPress={() => router.push({ pathname: "/photo-strip", params: { partyId } })} />
       ) : null}
       {photos.length ? <Text variant="label">{i18n.plural("album.count", photos.length)}</Text> : null}
       {!photos.length && !pending.length ? <EmptyState icon="camera" text={i18n.t("album.empty")} /> : null}

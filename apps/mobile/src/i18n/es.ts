@@ -394,6 +394,7 @@ export const es: Messages = {
     },
   },
   bars: {
+    openCrew: "Abrir la pestaña Crew",
     tab: "Bares",
     title: "Nuestros bares",
     needCrew: "El mapa muestra los bares de tu crew. Únete a una crew o crea la tuya en la pestaña Crew.",
@@ -522,6 +523,7 @@ export const es: Messages = {
     staffNames: "Trabaja aquí: {names}",
   },
   ranking: {
+    empty: "Nadie en la clasificación en este periodo.",
     bars: "Los bares",
     barsHint: "Bares conquistados esta temporada y títulos ganados saliendo.",
     ruled: { one: "{count} bar conquistado", other: "{count} bares conquistados" },

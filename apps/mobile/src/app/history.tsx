@@ -116,6 +116,8 @@ export default function HistoryScreen() {
                       friction={2}
                       rightThreshold={60}
                       overshootRight={false}
+                      // The swipe clips its row: without the radius the row lost its right corners.
+                      containerStyle={styles.swipe}
                       renderRightActions={() => (
                         <Button
                           label={i18n.t("history.remove")}
@@ -167,6 +169,7 @@ const styles = StyleSheet.create({
   groupHeader: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 54 },
   itemWrap: { marginLeft: 12 },
   item: { flexDirection: "row", alignItems: "center", gap: 12, borderRadius: radius.button, paddingVertical: 8, paddingHorizontal: 14 },
+  swipe: { borderRadius: radius.button },
   swipeAction: { marginLeft: 8, minWidth: 110 },
   flex: { flex: 1 },
 });

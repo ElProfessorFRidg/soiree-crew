@@ -100,7 +100,7 @@ export default function MorningScreen() {
             present: `${i18n.number(recap.figures.participants)} ${i18n.plural("recap.present", recap.figures.participants)}`,
             drinks: `${i18n.number(recap.figures.drinks)} ${i18n.plural("recap.drinks", recap.figures.drinks)}`,
           })}
-          leading={<Icon name="sparkdot" color={theme.textMuted} />}
+          leading={<Icon name="x:sparkle" color={theme.textMuted} />}
           trailing={<Icon name="chev" color={theme.textMuted} />}
           onPress={() => router.replace({ pathname: "/recap", params: { id } })}
           last
@@ -124,7 +124,7 @@ export default function MorningScreen() {
             ))}
           </ScrollView>
           {photos.length >= 2 ? (
-            <Button label={i18n.t("strip.open")} icon="sparkdot" variant="outline" height={44} onPress={() => router.push({ pathname: "/photo-strip", params: { partyId: id } })} />
+            <Button label={i18n.t("strip.open")} icon="x:film" variant="outline" height={44} onPress={() => router.push({ pathname: "/photo-strip", params: { partyId: id } })} />
           ) : null}
         </>
       ) : null}

@@ -395,6 +395,7 @@ export const en: Messages = {
     },
   },
   bars: {
+    openCrew: "Open the Crew tab",
     tab: "Bars",
     title: "Our bars",
     needCrew: "The map shows your crew's bars. Join or start a crew in the Crew tab.",
@@ -523,6 +524,7 @@ export const en: Messages = {
     staffNames: "Works here: {names}",
   },
   ranking: {
+    empty: "Nobody on the board for this period.",
     bars: "Bars",
     barsHint: "Bars held this season and titles earned going out.",
     ruled: { one: "{count} bar held", other: "{count} bars held" },
