@@ -96,3 +96,22 @@ export function myStats(
     topKinds: [...kinds.values()].sort((a, b) => b.count - a.count).slice(0, 5),
   };
 }
+
+/**
+ * Profil board, "Mes stats": nights out per week over the last `weeks` weeks, oldest first, for
+ * the year heatmap. A night counts once, whatever was drunk.
+ */
+export function nightsByWeek(drinks: readonly DrinkEntry[], to: number, dayBoundaryHour: number, weeks = 52): number[] {
+  const offset = (at: number) => -new Date(at).getTimezoneOffset();
+  const from = to - weeks * 7 * 86_400_000;
+  const seen = new Set<string>();
+  const counts = new Array<number>(weeks).fill(0);
+  for (const d of drinks) {
+    if (d.abv <= 0 || d.consumedAt < from || d.consumedAt >= to) continue;
+    const night = nightKey(d.consumedAt, offset(d.consumedAt), dayBoundaryHour);
+    if (seen.has(night)) continue;
+    seen.add(night);
+    counts[Math.min(weeks - 1, Math.floor((d.consumedAt - from) / (7 * 86_400_000)))]! += 1;
+  }
+  return counts;
+}

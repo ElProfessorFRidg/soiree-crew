@@ -1,12 +1,15 @@
+import { router } from "expo-router";
 import { useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { drinkLabel } from "@/drinks/display";
-import { DRINK_FAMILIES, myStats, type DrinkFamily } from "@/drinks/myStats";
+import { DRINK_FAMILIES, myStats, nightsByWeek, type DrinkFamily } from "@/drinks/myStats";
 import { useT } from "@/i18n";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Bars } from "@/ui/Bars";
-import { Chip, Panel, Segmented } from "@/ui/controls";
+import { Chip, Panel, Row, Segmented } from "@/ui/controls";
+import { Heatmap } from "@/ui/Heatmap";
+import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { Numeral, Text } from "@/ui/Text";
 
@@ -27,6 +30,9 @@ export default function MyStatsScreen() {
     const to = Date.now();
     return myStats(drinks, water, { from: to - Number(period) * DAY_MS, to, family, dayBoundaryHour, bucket: period === "365" ? "month" : "week" });
   }, [drinks, water, period, family, dayBoundaryHour]);
+
+  const year = useMemo(() => nightsByWeek(drinks, Date.now(), dayBoundaryHour), [drinks, dayBoundaryHour]);
+  const yearNights = year.reduce((sum, n) => sum + n, 0);
 
   const weekdayLabels = Array.from({ length: 7 }, (_, i) => new Intl.DateTimeFormat(i18n.locale, { weekday: "narrow" }).format(new Date(2026, 10, 2 + i)));
   const bucketLabels = stats.buckets.map((b) =>
@@ -100,6 +106,14 @@ export default function MyStatsScreen() {
           ))}
         </Panel>
       ) : null}
+      <Text variant="label">{i18n.t("myStats.yearTitle")}</Text>
+      <Panel>
+        <Heatmap values={year} accessibilityLabel={i18n.plural("myStats.yearCount", yearNights)} />
+        <Text variant="small">{i18n.plural("myStats.yearCount", yearNights)}</Text>
+      </Panel>
+      <Panel>
+        <Row title={i18n.t("wrapped.title")} trailing={<Icon name="chev" color={theme.textMuted} />} onPress={() => router.push("/wrapped")} last />
+      </Panel>
       <Text variant="small">{i18n.t("myStats.note")}</Text>
     </Screen>
   );

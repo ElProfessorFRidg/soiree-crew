@@ -474,6 +474,10 @@ export const fr = {
     failed: "L'alerte n'est pas partie. Réessaie, ou appelle les secours.",
   },
   money: {
+    transfersCount: { one: "Pour tout régler en {count} virement", other: "Pour tout régler en {count} virements" },
+    payLink: "Lien de paiement",
+    nudge: "Rappel gentil",
+    nudgeText: "{name}, petit rappel pour {pool} : {amount} quand tu peux.",
     title: "Cagnottes et tournées",
     open: "Tournées et cagnottes",
     pools: "Cagnottes",
@@ -732,6 +736,7 @@ export const fr = {
     otherServer: "Cette invitation vient d'un autre serveur ({server}). Déconnecte-toi d'abord pour l'accepter.",
   },
   people: {
+    refuse: "Refuser",
     cheatTag: "A tenté de tricher",
     cheatLine: "Check-in refusé à {venue}, {date}. 0 point.",
     cheatRepeat: { one: "{count} check-in refusé cette semaine.", other: "{count} check-ins refusés cette semaine." },
@@ -1030,6 +1035,8 @@ export const fr = {
     quote: "« {text} »",
   },
   myStats: {
+    yearTitle: "Tes sorties sur un an",
+    yearCount: { one: "{count} soirée sur les 52 dernières semaines", other: "{count} soirées sur les 52 dernières semaines" },
     family: {
       all: "Tout",
       beer: "Bières",

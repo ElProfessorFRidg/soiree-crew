@@ -476,6 +476,10 @@ export const en: Messages = {
     failed: "The alert didn't go out. Try again, or call for help.",
   },
   money: {
+    transfersCount: { one: "All square in {count} transfer", other: "All square in {count} transfers" },
+    payLink: "Payment link",
+    nudge: "Gentle reminder",
+    nudgeText: "{name}, small reminder for {pool}: {amount} when you can.",
     title: "Pools and rounds",
     open: "Rounds and pools",
     pools: "Pools",
@@ -734,6 +738,7 @@ export const en: Messages = {
     otherServer: "This invite is from another server ({server}). Sign out first to accept it.",
   },
   people: {
+    refuse: "Decline",
     cheatTag: "Tried to cheat",
     cheatLine: "Check-in refused at {venue}, {date}. 0 points.",
     cheatRepeat: { one: "{count} check-in refused this week.", other: "{count} check-ins refused this week." },
@@ -1032,6 +1037,8 @@ export const en: Messages = {
     quote: "“{text}”",
   },
   myStats: {
+    yearTitle: "Your nights out this year",
+    yearCount: { one: "{count} night in the last 52 weeks", other: "{count} nights in the last 52 weeks" },
     family: {
       all: "All",
       beer: "Beers",

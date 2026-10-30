@@ -81,8 +81,7 @@
         "expo-image-picker",
         {
           "photosPermission": "Your photos fill the party album, seen by your crew only. Their location is removed.",
-          "cameraPermission": "The camera takes photos for the party album and your chats, and scans a friend's safety code. Photos are seen only by the people you share them with.",
-          "microphonePermission": false
+          "cameraPermission": "The camera takes photos for the party album and your chats, and scans a friend's safety code. Photos are seen only by the people you share them with."
         }
       ],
       [
@@ -117,7 +116,6 @@
         "expo-camera",
         {
           "cameraPermission": "The camera takes photos for the party album and your chats, and scans a friend's safety code. Photos are seen only by the people you share them with.",
-          "microphonePermission": false,
           "recordAudioAndroid": false,
           "barcodeScannerEnabled": true
         }

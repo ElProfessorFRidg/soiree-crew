@@ -474,6 +474,10 @@ export const de: Messages = {
     failed: "Der Alarm ist nicht rausgegangen. Versuch es nochmal oder ruf den Notruf.",
   },
   money: {
+    transfersCount: { one: "Alles glatt mit {count} Überweisung", other: "Alles glatt mit {count} Überweisungen" },
+    payLink: "Zahlungslink",
+    nudge: "Nette Erinnerung",
+    nudgeText: "{name}, kleine Erinnerung für {pool}: {amount}, wenn du kannst.",
     title: "Kassen und Runden",
     open: "Runden und Kassen",
     pools: "Kassen",
@@ -732,6 +736,7 @@ export const de: Messages = {
     otherServer: "Diese Einladung kommt von einem anderen Server ({server}). Melde dich zuerst ab, um sie anzunehmen.",
   },
   people: {
+    refuse: "Ablehnen",
     cheatTag: "Hat versucht zu schummeln",
     cheatLine: "Check-in in {venue} abgelehnt, {date}. 0 Punkte.",
     cheatRepeat: { one: "{count} abgelehnter Check-in diese Woche.", other: "{count} abgelehnte Check-ins diese Woche." },
@@ -1030,6 +1035,8 @@ export const de: Messages = {
     quote: "„{text}“",
   },
   myStats: {
+    yearTitle: "Deine Abende im Jahr",
+    yearCount: { one: "{count} Abend in den letzten 52 Wochen", other: "{count} Abende in den letzten 52 Wochen" },
     family: {
       all: "Alles",
       beer: "Bier",

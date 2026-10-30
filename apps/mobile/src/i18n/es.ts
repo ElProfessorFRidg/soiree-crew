@@ -475,6 +475,10 @@ export const es: Messages = {
     failed: "La alerta no ha salido. Reinténtalo o llama a emergencias.",
   },
   money: {
+    transfersCount: { one: "Todo saldado en {count} transferencia", other: "Todo saldado en {count} transferencias" },
+    payLink: "Enlace de pago",
+    nudge: "Recordatorio amable",
+    nudgeText: "{name}, un recordatorio para {pool}: {amount} cuando puedas.",
     title: "Botes y rondas",
     open: "Rondas y botes",
     pools: "Botes",
@@ -733,6 +737,7 @@ export const es: Messages = {
     otherServer: "Esta invitación viene de otro servidor ({server}). Cierra sesión primero para aceptarla.",
   },
   people: {
+    refuse: "Rechazar",
     cheatTag: "Intentó hacer trampa",
     cheatLine: "Check-in rechazado en {venue}, {date}. 0 puntos.",
     cheatRepeat: { one: "{count} check-in rechazado esta semana.", other: "{count} check-ins rechazados esta semana." },
@@ -1031,6 +1036,8 @@ export const es: Messages = {
     quote: "«{text}»",
   },
   myStats: {
+    yearTitle: "Tus salidas en un año",
+    yearCount: { one: "{count} noche en las últimas 52 semanas", other: "{count} noches en las últimas 52 semanas" },
     family: {
       all: "Todo",
       beer: "Cervezas",

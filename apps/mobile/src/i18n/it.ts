@@ -475,6 +475,10 @@ export const it: Messages = {
     failed: "L'allerta non è partita. Riprova o chiama i soccorsi.",
   },
   money: {
+    transfersCount: { one: "Tutto pari in {count} bonifico", other: "Tutto pari in {count} bonifici" },
+    payLink: "Link di pagamento",
+    nudge: "Promemoria gentile",
+    nudgeText: "{name}, piccolo promemoria per {pool}: {amount} quando puoi.",
     title: "Casse comuni e giri",
     open: "Giri e casse comuni",
     pools: "Casse comuni",
@@ -733,6 +737,7 @@ export const it: Messages = {
     otherServer: "Questo invito viene da un altro server ({server}). Prima esci dal tuo account per accettarlo.",
   },
   people: {
+    refuse: "Rifiuta",
     cheatTag: "Ha provato a barare",
     cheatLine: "Check-in rifiutato a {venue}, {date}. 0 punti.",
     cheatRepeat: { one: "{count} check-in rifiutato questa settimana.", other: "{count} check-in rifiutati questa settimana." },
@@ -1031,6 +1036,8 @@ export const it: Messages = {
     quote: "«{text}»",
   },
   myStats: {
+    yearTitle: "Le tue uscite in un anno",
+    yearCount: { one: "{count} serata nelle ultime 52 settimane", other: "{count} serate nelle ultime 52 settimane" },
     family: {
       all: "Tutto",
       beer: "Birre",

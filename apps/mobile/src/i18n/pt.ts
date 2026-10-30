@@ -475,6 +475,10 @@ export const pt: Messages = {
     failed: "O alerta não saiu. Tenta outra vez ou liga para a emergência.",
   },
   money: {
+    transfersCount: { one: "Tudo acertado em {count} transferência", other: "Tudo acertado em {count} transferências" },
+    payLink: "Link de pagamento",
+    nudge: "Lembrete simpático",
+    nudgeText: "{name}, um lembrete para {pool}: {amount} quando puderes.",
     title: "Fundos comuns e rodadas",
     open: "Rodadas e fundos comuns",
     pools: "Fundos comuns",
@@ -733,6 +737,7 @@ export const pt: Messages = {
     otherServer: "Este convite vem de outro servidor ({server}). Termina sessão primeiro para o aceitar.",
   },
   people: {
+    refuse: "Recusar",
     cheatTag: "Tentou fazer batota",
     cheatLine: "Check-in recusado em {venue}, {date}. 0 pontos.",
     cheatRepeat: { one: "{count} check-in recusado esta semana.", other: "{count} check-ins recusados esta semana." },
@@ -1031,6 +1036,8 @@ export const pt: Messages = {
     quote: "«{text}»",
   },
   myStats: {
+    yearTitle: "As tuas saídas num ano",
+    yearCount: { one: "{count} noite nas últimas 52 semanas", other: "{count} noites nas últimas 52 semanas" },
     family: {
       all: "Tudo",
       beer: "Cervejas",

@@ -66,11 +66,25 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            | tail -n 200
+            > xcodebuild.log 2>&1 || {
+              # The real error is usually far above the summary: every error line first, then the end.
+              grep -nE "error:|error \(|Error:|fatal|Command PhaseScriptExecution failed" xcodebuild.log | head -n 120
+              tail -n 120 xcodebuild.log
+              exit 1
+            }
+          tail -n 20 xcodebuild.log
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: xcodebuild-device-log
+          path: apps/mobile/ios/xcodebuild.log
+          retention-days: 7
       - name: Pack the IPA
         working-directory: apps/mobile/ios
         run: |
           APP=$(ls -d build/Build/Products/Release-iphoneos/*.app | head -n 1)
+          # An empty shell of an app must never be packed and released again.
+          test -f "$APP/Info.plist" && test -f "$APP/main.jsbundle" || { echo "::error::The built app is incomplete"; exit 1; }
           mkdir -p Payload
           cp -R "$APP" Payload/
           zip -qry ../../../soiree-crew-unsigned.ipa Payload
@@ -153,7 +167,21 @@ jobs:
         run: |
           WORKSPACE=$(ls -d *.xcworkspace | head -n 1)
           SCHEME="${WORKSPACE%.xcworkspace}"
-          xcodebuild             -workspace "$WORKSPACE"             -scheme "$SCHEME"             -configuration Release             -sdk iphonesimulator             -destination "generic/platform=iOS Simulator"             -derivedDataPath build             CODE_SIGNING_ALLOWED=NO             | tail -n 100
+          xcodebuild \
+            -workspace "$WORKSPACE" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -destination "generic/platform=iOS Simulator" \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            > xcodebuild.log 2>&1 || {
+              grep -nE "error:|error \(|Error:|fatal|Command PhaseScriptExecution failed" xcodebuild.log | head -n 120
+              tail -n 120 xcodebuild.log
+              mkdir -p ../../../launch && cp xcodebuild.log ../../../launch/
+              exit 1
+            }
+          tail -n 20 xcodebuild.log
       - name: Launch and watch for 40 s
         working-directory: apps/mobile/ios
         run: |

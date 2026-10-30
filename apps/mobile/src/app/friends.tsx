@@ -1,10 +1,10 @@
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useT } from "@/i18n";
 import { flyHero, HeroSource } from "@/motion/hero";
 import { haptic } from "@/motion/haptics";
-import { befriend, fetchFriends, searchPeople, unblock, unmute, type FriendsList, type PersonFound } from "@/server/profileData";
+import { befriend, fetchFriends, searchPeople, unblock, unfriend, unmute, type FriendsList, type PersonFound } from "@/server/profileData";
 import { Field } from "@/crew/Field";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
@@ -127,16 +127,20 @@ export default function FriendsScreen() {
         )
       ) : null}
       {list && !list.friends.length && !list.incoming.length ? <Text>{i18n.t("people.noFriends")}</Text> : null}
+      {/* Profil board: accepting moves the request into the list, refusing just removes it. */}
       {section(i18n.t("people.incoming"), list?.incoming ?? [], (userId) => (
-        <Button
-          label={i18n.t("people.accept")}
-          variant="secondary"
-          height={36}
-          onPress={() => {
-            haptic.confirmed();
-            void befriend(userId).then(load).catch(offline);
-          }}
-        />
+        <View style={styles.requestActions}>
+          <Button label={i18n.t("people.refuse")} variant="outline" height={36} onPress={() => void unfriend(userId).then(load).catch(offline)} />
+          <Button
+            label={i18n.t("people.accept")}
+            variant="secondary"
+            height={36}
+            onPress={() => {
+              haptic.confirmed();
+              void befriend(userId).then(load).catch(offline);
+            }}
+          />
+        </View>
       ))}
       {section(i18n.t("people.friends"), list?.friends ?? [], () => <Icon name="chev" color={theme.textMuted} />)}
       {section(i18n.t("people.outgoing"), list?.outgoing ?? [], () => <Text variant="small">{i18n.t("people.requested")}</Text>)}
@@ -149,3 +153,7 @@ export default function FriendsScreen() {
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  requestActions: { flexDirection: "row", gap: 8 },
+});
