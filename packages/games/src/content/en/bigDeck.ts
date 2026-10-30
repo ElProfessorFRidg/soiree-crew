@@ -25,6 +25,10 @@ export const bigDeck: BigDeckContent = {
       "Make up a chant for this table and lead it.",
       "Moonwalk to the bar and back.",
       "Call the last person you texted and pitch them the snack closest to you in the voice of a late-night infomercial host. Keep going until they hang up or agree to buy it.",
+      "Read your last Google review out loud. Never written one? Write one for this place now.",
+      "Explain the plot of your favorite movie in thirty seconds, badly, on purpose.",
+      "Narrate what {other} is doing right now like a golf commentator. Whisper it.",
+      "Play your most recent voicemail.",
     ],
     hard: [
       "Let {other} change your phone wallpaper. It stays all week.",
@@ -40,6 +44,9 @@ export const bigDeck: BigDeckContent = {
       "Recreate a viral dance. The table picks which one.",
       "Tell us about your worst date in exactly three sentences.",
       "Read your last performance review in your boss's voice. Or what you imagine it said.",
+      "Let {other} write your next three texts. You hit send.",
+      "Show the last ten songs you played. Nothing gets skipped, especially that one.",
+      "Text your mom “we need to talk.” Wait two minutes before you explain.",
     ],
     extreme: [
       "Let {other} read your last three DMs out loud, in their sexiest voice.",
@@ -53,6 +60,8 @@ export const bigDeck: BigDeckContent = {
       "Describe your type in detail. The table decides if anyone here fits it.",
       "{other} asks you one question. No lying, no dodging, only the penalty.",
       "Like a three-year-old photo on your ex's profile. Then leave it.",
+      "Open your dating app and read your own bio out loud like a hostage statement.",
+      "Let {other} scroll your following list and pick one account for you to explain.",
     ],
   },
   rule: {
@@ -67,6 +76,9 @@ export const bigDeck: BigDeckContent = {
       "{player} is the table's echo and repeats the last word of every sentence anyone says.",
       "Whispers only. Raise your voice and you break the rule.",
       "No swearing.",
+      "Anyone who checks their phone reads the first notification out loud.",
+      "{player} is the bouncer. Nobody leaves the table without their nod.",
+      "Every sentence starts with “Okay so.”",
     ],
     hard: [
       "No contractions. You cannot say “can't.” You may not say “don't.”",
@@ -76,6 +88,9 @@ export const bigDeck: BigDeckContent = {
       "{player} and {other} finish each other's sentences until the next rule.",
       "Every time someone checks the time, they announce it like an airport gate change, flight number, delay and apology included. Forget one part and you break the rule.",
       "When someone says “bro,” everyone says “bro” back. Last one breaks the rule.",
+      "Everyone signs off like a news anchor: each sentence ends with your name and the city you're reporting from.",
+      "No word may start with the letter S.",
+      "{other} narrates everything {player} does, in the third person, until the next rule.",
     ],
     extreme: [
       "When {player} laughs, everyone says “bless you.” Last one breaks the rule.",
@@ -84,6 +99,8 @@ export const bigDeck: BigDeckContent = {
       "{other} is royalty now. Address them as Your Majesty or break the rule.",
       "Every question gets answered with another question.",
       "Anyone leaving the table takes a bow on the way out and on the way back.",
+      "Touch your face and you owe the person on your left a sincere compliment.",
+      "When {player} claps, everyone swaps seats. Last one sitting down breaks the rule.",
     ],
   },
   vote: {
@@ -101,6 +118,9 @@ export const bigDeck: BigDeckContent = {
       "Who still owes someone here money?",
       "Worst texter?",
       "Biggest flirt here?",
+      "Who would need a search party to get out of an IKEA?",
+      "Who signs up first for a one-way trip to Mars?",
+      "Who has never once returned a shopping cart?",
     ],
     hard: [
       "Who has the most dating apps on their phone right now?",
@@ -112,6 +132,9 @@ export const bigDeck: BigDeckContent = {
       "Who has the messiest group chat drama going on right now?",
       "Who is texting an ex before the night is over?",
       "If we put their last Hinge chat on the big screen, who leaves the country?",
+      "Who has screenshotted the group chat to complain about the group chat?",
+      "Who would sell this whole table out for a blue checkmark?",
+      "Who fakes a phone call when it's their turn to buy the round?",
     ],
     extreme: [
       "Who has the wildest one-night stand story?",
@@ -122,6 +145,8 @@ export const bigDeck: BigDeckContent = {
       "Who has hooked up with a coworker?",
       "Who is the best kisser here? Point, no explaining.",
       "Who has a nude in their camera roll right now?",
+      "Who has hooked up with someone they met at a wedding?",
+      "Who has the most exes in this zip code?",
     ],
   },
   minigame: {
@@ -137,6 +162,9 @@ export const bigDeck: BigDeckContent = {
       "Arm wrestle {other}. Elbows on the table, dignity optional.",
       "Telephone: {player} whispers a long sentence to the person on their left, who passes it on, all the way around the table. The last person says it out loud. Whoever {player} thinks mangled it most loses.",
       "Thumb war with {other}.",
+      "Name a state, going around. First to blank or repeat loses. No arguing about Puerto Rico.",
+      "Heads or tails with {other}. Call it wrong and you lose.",
+      "Everyone balances a coaster on their head. First one to drop it loses.",
     ],
     hard: [
       "{other} hums a song. First to name it picks the loser.",
@@ -146,6 +174,9 @@ export const bigDeck: BigDeckContent = {
       "Build a story one word each. First to hesitate or break the sentence loses.",
       "{player} plays music and cuts it without warning. Last one still moving loses.",
       "Name a Disney movie, going around. First to blank or repeat loses. Sequels count once.",
+      "Name a Friends character, going around. First to blank or repeat loses. Gunther counts.",
+      "{player} picks a letter. Everyone names a band that starts with it. Last to answer loses.",
+      "Alphabet backwards, one letter each, starting at Z. Whoever slips loses.",
     ],
     extreme: [
       "Pickup line battle with {other}. The table picks the worst line, and its author loses.",
@@ -154,6 +185,8 @@ export const bigDeck: BigDeckContent = {
       "Impressions round: everyone does a celebrity and the table guesses. Least recognized loses.",
       "First to find a photo of themselves from high school wins. Last one to find it loses.",
       "Hot seat: the table fires questions at {other} for thirty seconds. Any pause longer than a breath and they lose.",
+      "Everyone shows the last photo they took. The table votes for the least explainable one, and its owner loses.",
+      "Everyone writes down {other}'s middle name. Wrong answers lose. {other} can't play this one.",
     ],
   },
 };

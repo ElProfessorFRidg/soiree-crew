@@ -28,6 +28,10 @@ export const verdict: VerdictContent = {
     "rit à ses propres blagues avant la chute ?",
     "ment le plus mal ?",
     "finit toujours par payer pour tout le monde, sans jamais se faire rembourser ?",
+    "raterait son propre mariage à cause du réveil ?",
+    "garde tous ses tickets de caisse, au cas où ?",
+    "raconte sa vie à la caissière quand il y a la queue derrière ?",
+    "survivrait le plus longtemps sans fromage ?",
   ],
   hard: [
     "a le plus d'applis de rencontre sur son téléphone ?",
@@ -52,6 +56,9 @@ export const verdict: VerdictContent = {
     "craquerait le premier à Pékin Express ?",
     "pourrait vivre uniquement de ses notes de frais ?",
     "a déjà dit du mal de l'autre dans son dos ? Les deux répondent avant le vote.",
+    "ferait semblant de reconnaître quelqu'un pour ne pas le vexer ?",
+    "ment encore à ses parents sur l'heure de son retour ?",
+    "lâcherait l'autre pour une place au premier rang d'un concert ?",
   ],
   extreme: [
     "embrasse le mieux, d'après les sources ?",
@@ -71,5 +78,7 @@ export const verdict: VerdictContent = {
     "regarde le plus de vidéos qu'on ne cite pas à table ?",
     "tiendrait le moins longtemps fidèle ?",
     "a le plus menti sur son nombre de partenaires ?",
+    "aurait le plus de choses à effacer avant de prêter son téléphone ?",
+    "aurait un rencard avec quelqu'un d'ici sans le dire à personne ?",
   ],
 };

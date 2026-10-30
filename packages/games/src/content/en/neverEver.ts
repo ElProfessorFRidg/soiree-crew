@@ -42,6 +42,11 @@ export const neverEver: NeverEverContent = {
     "lied about flossing.",
     "jaywalked.",
     "told a story at a party, realized halfway through that the person it was about was standing right behind me, and changed the ending so fast that it no longer made any sense.",
+    "pretended to know where I was going for an entire walk with someone.",
+    "gotten a parking ticket while I was paying for parking.",
+    "bought a gym membership in January and gone exactly twice.",
+    "found out I'd been using a word wrong for years.",
+    "eaten a whole rotisserie chicken in a parked car.",
   ],
   hard: [
     "checked out my ex's new partner online.",
@@ -78,6 +83,10 @@ export const neverEver: NeverEverContent = {
     "kept using an ex's Netflix for years after we stopped talking.",
     "snooped.",
     "gone to a wedding with someone I'd met that week and let their whole family believe we'd been together for a year, toast included.",
+    "pretended I didn't see a text for three days.",
+    "faked a work call to leave a party early.",
+    "Venmo-requested a friend for less than two dollars.",
+    "read a stranger's texts over their shoulder on the train.",
   ],
   extreme: [
     "joined the mile-high club.",
@@ -110,5 +119,7 @@ export const neverEver: NeverEverContent = {
     "had a hall pass and used it.",
     "sexted.",
     "hooked up with someone, left before they woke up, and then sat across from them at a friend's birthday dinner the following weekend pretending we'd never met.",
+    "hooked up with someone in their childhood bedroom.",
+    "gone home with someone because my phone died and they had a charger.",
   ],
 };

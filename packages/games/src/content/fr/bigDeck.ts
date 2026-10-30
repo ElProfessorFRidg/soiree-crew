@@ -24,6 +24,10 @@ export const bigDeck: BigDeckContent = {
       "Invente un slogan pour la table, et chante-le.",
       "Ta meilleure grimace.",
       "Un câlin à {other}, si {other} est d'accord.",
+      "Fais la visite guidée de ton sac comme un agent immobilier. Chaque ticket de caisse est une pièce de caractère.",
+      "Passe la commande de la table à {other} comme au drive, micro qui grésille compris.",
+      "Raconte ton dernier rêve. La table vote : vrai ou inventé.",
+      "Imite ton réveil.",
     ],
     hard: [
       "Laisse {other} écrire ta prochaine story. Tu la postes, point.",
@@ -40,6 +44,9 @@ export const bigDeck: BigDeckContent = {
       "Donne ton téléphone déverrouillé à {other} pendant une minute. Interdit d'envoyer ou d'effacer quoi que ce soit.",
       "Lis à voix haute le dernier message que t'a envoyé ton patron, avec sa voix.",
       "Tu deviens le serveur parisien le plus aimable de la ville : tu prends la commande de la table avec le soupir, le regard au plafond et un « on n'a plus » à chaque demande. Tu tiens jusqu'à ce que quelqu'un craque.",
+      "Laisse {other} choisir ta sonnerie. Elle reste jusqu'à lundi.",
+      "Lis ton dernier mail envoyé au boulot avec la voix de quelqu'un qui démissionne.",
+      "Appelle la personne la plus âgée de ton répertoire et demande-lui comment elle a rencontré son premier amour. Haut-parleur, et personne ne coupe.",
     ],
     extreme: [
       "Laisse {other} parcourir tes trois dernières discussions et en lire une à voix haute.",
@@ -54,6 +61,8 @@ export const bigDeck: BigDeckContent = {
       "{other} te pose une question. Pas de mensonge possible, seulement la pénalité.",
       "Envoie à ton ex un message qui commence par « petite question ». La table écrit la suite.",
       "Ouvre ta dernière appli de rencontre et laisse {other} choisir à qui tu écris « salut, ça va ? ». Si la réponse arrive avant la fin de la partie, tu la lis à voix haute, sans rien changer.",
+      "Lis à voix haute ton dernier message envoyé après une heure du matin. Contexte interdit.",
+      "Appelle la dernière personne avec qui tu es sorti ou sortie et demande-lui une note sur dix. Haut-parleur.",
     ],
   },
   rule: {
@@ -68,6 +77,9 @@ export const bigDeck: BigDeckContent = {
       "Toute question posée à {player} passe par {other}, son porte-parole officiel.",
       "Montrer quelqu'un du doigt est interdit. On montre avec le coude.",
       "Plus de « merci ».",
+      "Quand quelqu'un dit « attends », toute la table attend en silence jusqu'à cinq. Le premier qui parle est en faute.",
+      "Poser son verre sans dire « atterrissage » est interdit.",
+      "{player} devient DJ. Personne d'autre ne touche à la musique, même pour baisser le son.",
     ],
     hard: [
       "Les « euh » sont interdits. Hésiter, c'est être en faute.",
@@ -78,6 +90,9 @@ export const bigDeck: BigDeckContent = {
       "Les gros mots sont interdits. « Purée » et « mince » passent, le reste non.",
       "Avant de parler, tu lèves la main. Même pour dire que tu lèves la main.",
       "Silence quand {player} boit.",
+      "Quand {other} sort son téléphone, la table crie « photo ! » et prend la pose. La dernière personne à poser est en faute.",
+      "Plus personne ne finit ses phrases. La personne à ta gauche s'en charge.",
+      "Pour parler, il faut tenir la salière. Pas de salière, pas de parole.",
     ],
     extreme: [
       "{player} peut crier « statue » quand ça lui chante. Le dernier à se figer est en faute.",
@@ -86,6 +101,8 @@ export const bigDeck: BigDeckContent = {
       "{other} devient le chef. Pour parler, on attend son signe de tête.",
       "Plus de questions. Une question posée, une faute.",
       "Pour te lever, tu annonces à voix haute où tu vas et pourquoi.",
+      "Chaque rire doit être celui d'un méchant de dessin animé. Un rire normal, une faute.",
+      "{player} choisit en secret un mot banal. Le prononcer, c'est être en faute, et seul {player} sait lequel c'est.",
     ],
   },
   vote: {
@@ -103,6 +120,9 @@ export const bigDeck: BigDeckContent = {
       "Qui organise le prochain week-end ? Celui que tout le monde pointe s'y colle.",
       "Le pire perdant ?",
       "Le meilleur danseur ?",
+      "Qui se lève encore pour danser sur Les Lacs du Connemara ?",
+      "Le meilleur maire de village ?",
+      "Qui serait le dernier à quitter un bateau qui coule, parce que son chargeur est encore branché ?",
     ],
     hard: [
       "Qui a le plus d'ex encore dans ses contacts ?",
@@ -115,6 +135,9 @@ export const bigDeck: BigDeckContent = {
       "Qui enverra ce soir un message regretté demain ?",
       "Si on projetait sa dernière conversation Tinder au mur, qui partirait en courant ?",
       "Le pire ex potentiel ?",
+      "Qui a déjà fait semblant de ne pas voir quelqu'un de cette table dans la rue ?",
+      "Qui a pris la dernière part sans demander, puis juré que ce n'était pas lui ou elle ?",
+      "Qui regarde Netflix sur le compte de quelqu'un qui ne le sait pas ?",
     ],
     extreme: [
       "Qui a déjà tenté sa chance avec quelqu'un de cette table ? Pas besoin de dire avec qui.",
@@ -125,6 +148,8 @@ export const bigDeck: BigDeckContent = {
       "Qui sortirait avec son boss pour une augmentation ?",
       "Qui embrasse le moins bien, d'après les rumeurs ?",
       "Qui a déjà simulé ? Au lit ou ailleurs, on ne fait pas le tri.",
+      "Qui a écrit à un ex après minuit cette année ? On pointe, on ne lit pas.",
+      "Qui retournerait avec son ex pour garder l'appart ?",
     ],
   },
   minigame: {
@@ -140,6 +165,9 @@ export const bigDeck: BigDeckContent = {
       "Bras de fer avec {other}. Le coude reste sur la table, la dignité aussi.",
       "Chifoumi à toute la table, en même temps. Les perdants prennent.",
       "Téléphone sans fil : {player} chuchote une longue phrase à son voisin, qui la répète au suivant, et ainsi de suite jusqu'au dernier, qui la dit à voix haute. Celui qui l'a le plus déformée, d'après {player}, a perdu.",
+      "Chacun son tour, un fromage. Celui qui sèche ou répète a perdu. Le comté ne compte qu'une fois.",
+      "Concours de silence. Le premier qui fait un bruit perd, et les rires comptent.",
+      "{other} cache une pièce dans une main. Tu devines laquelle. Raté, tu perds.",
     ],
     hard: [
       "{other} fredonne une chanson. Le premier qui trouve désigne le perdant.",
@@ -149,6 +177,9 @@ export const bigDeck: BigDeckContent = {
       "Une histoire, un mot chacun. Le premier qui hésite ou casse la phrase a perdu.",
       "{player} lance une musique et la coupe sans prévenir. Le dernier qui bouge encore perd.",
       "Les sept nains, chacun son tour. Celui qui bloque ou répète perd, et Blanche-Neige ne compte pas.",
+      "Petit bac express : {player} dit une lettre, chacun donne une ville qui commence par elle. Le dernier à répondre perd.",
+      "Chacun son tour, un personnage des Simpson. Celui qui bloque ou répète perd.",
+      "{other} raconte une anecdote, puis la raconte encore en changeant un détail. Le premier qui trouve le détail désigne le perdant.",
     ],
     extreme: [
       "Duel de compliments avec {other}. Le premier qui sèche, rit ou ment trop fort perd.",
@@ -157,6 +188,8 @@ export const bigDeck: BigDeckContent = {
       "{other} t'impose un accent étranger jusqu'à ton prochain tour. Si tu le perds, tu as perdu.",
       "{other} dit une lettre. Tu as cinq secondes pour montrer un contact qui commence par elle et raconter d'où tu connais cette personne. Raté, perdu.",
       "Chacun imite la personne à sa gauche. La table vote pour l'imitation la plus ratée.",
+      "Tout le monde ouvre ses emojis récents. La table vote pour la série la plus louche, qui perd.",
+      "Chacun montre son temps d'écran d'hier. Le plus gros chiffre perd.",
     ],
   },
 };

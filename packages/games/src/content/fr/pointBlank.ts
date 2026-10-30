@@ -34,6 +34,10 @@ export const pointBlank: PointBlankContent = {
       "Le pire cuisinier ?",
       "Le plus frileux ?",
       "Qui, à un mariage, finirait au micro à raconter une anecdote gênante sur les mariés pendant que le DJ essaie de reprendre la main ?",
+      "Qui connaît les répliques des Visiteurs par cœur ?",
+      "Les mots de passe sur un post-it collé à l'écran, c'est qui ?",
+      "Qui arrive à la gare avec vingt minutes d'avance, et rate quand même le train ?",
+      "Le meilleur pour négocier au marché ?",
     ],
     hard: [
       "Qui a déjà fouillé le téléphone de quelqu'un ?",
@@ -61,6 +65,9 @@ export const pointBlank: PointBlankContent = {
       "La pire balance ?",
       "Le plus rancunier ?",
       "Qui serait capable de mettre un réveil à trois heures du matin pour vérifier qui a vu sa story, puis de faire l'étonné le lendemain quand quelqu'un en parle ?",
+      "Qui mentirait sur son salaire à un dîner de famille ?",
+      "Qui quitterait un groupe WhatsApp en pleine dispute ?",
+      "Qui relit ses vieilles conversations pour se faire du mal ?",
     ],
     extreme: [
       "Qui a déjà passé la nuit avec quelqu'un sans connaître son nom de famille ?",
@@ -83,6 +90,8 @@ export const pointBlank: PointBlankContent = {
       "Qui serait le plus gêné si ses parents lisaient son historique ?",
       "Le meilleur coup de la table ?",
       "Qui a déjà répondu à un message coquin en plein repas de famille, téléphone sous la nappe, en hochant la tête pendant que le cousin parlait de son crédit immobilier ?",
+      "Embrasser quelqu'un juste pour gagner un pari : qui l'a déjà fait ?",
+      "Qui garderait une appli de rencontre installée le jour de son mariage ?",
     ],
   },
   secret: [
@@ -100,5 +109,8 @@ export const pointBlank: PointBlankContent = {
     "Qui ne serait pas invité à ton mariage ?",
     "Avec qui partagerais-tu un lit une place ce soir, s'il le fallait ?",
     "Ton préféré ici ?",
+    "Qui ici te ferait le plus de peine en arrêtant de te parler ?",
+    "À qui ferais-tu relire ton discours de mariage avant tout le monde ?",
+    "Qui a le plus changé depuis que tu le ou la connais ?",
   ],
 };
