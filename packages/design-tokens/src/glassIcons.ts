@@ -34,6 +34,8 @@ export const extraIcons = {
   play: "M12 3a9 9 0 1 1 0 18a9 9 0 1 1 0-18zM10 8.5v7l6-3.5z",
   /** Scan a code with the camera. */
   scan: "M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10",
+  /** One step down on a stepper, the pair of "plus". */
+  minus: "M5 12h14",
 } as const;
 
 export type ExtraIconName = keyof typeof extraIcons;

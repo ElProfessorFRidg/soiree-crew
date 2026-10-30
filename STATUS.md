@@ -1,11 +1,11 @@
 # Status
 
-Generated from FEATURES.md on 2026-10-28 by `pnpm status`. Edit FEATURES.md, not this file.
+Generated from FEATURES.md on 2026-10-30 by `pnpm status`. Edit FEATURES.md, not this file.
 
 | Status | Count |
 |---|---|
-| Built | 293 |
-| Partly built | 10 |
+| Built | 292 |
+| Partly built | 11 |
 | To do | 2 |
 | Proposed (not in the brief yet) | 4 |
 | Total | 309 |
@@ -13,6 +13,7 @@ Generated from FEATURES.md on 2026-10-28 by `pnpm status`. Edit FEATURES.md, not
 ## Partly built
 
 - **O-33** (P0, Widgets): iOS and Android home-screen widget in 3 sizes: live curve that falls on its own, back-to-zero, interactive but
+- **HUB-02** (P0, Party hub): iOS Live Activity / Dynamic Island and a persistent Android notification during the party: BAC, back-to-zero, 
 - **HUB-03** (P0, Party hub): Lock-screen widgets (BAC, next water, who is out tonight).
 - **QOL-06** (P0, Everyday polish): Native sharing: recap and story cards go straight to Instagram Stories, Snapchat (Creative Kit), TikTok and Wh
 - **QOL-22** (P2, Everyday polish): Last ride home: after midnight, the last night bus / metro departures near the venue on the Party screen, when
@@ -47,7 +48,7 @@ Generated from FEATURES.md on 2026-10-28 by `pnpm status`. Edit FEATURES.md, not
 - Shared expenses: O-70
 - Status, monetisation, extras: O-76, O-77, O-78
 - Requests from S2M users: O-81, O-82, O-83, O-84
-- Party hub: HUB-01, HUB-02
+- Party hub: HUB-01
 - Preferences and units: PREF-01, PREF-02, PREF-03, PREF-04, PREF-05, PREF-06
 - Radar: who is out, and when: N-01, N-02, N-03, N-04, N-05, N-06, N-07
 - Our bars and places: N-08, N-09, N-10, N-11, N-12

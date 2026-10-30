@@ -1,8 +1,9 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
-import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { interpolateColor, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
 import { duration, palette, radius, size, space } from "@crew/design-tokens";
 import { easings } from "@/motion/easing";
+import { haptic } from "@/motion/haptics";
 import { useTheme } from "@/theme";
 import { Icon, type AnyIconName } from "./Icon";
 import { ScalePressable } from "./Pressable";
@@ -46,7 +47,14 @@ export function Chip({
   const fg = selected ? theme.bg : theme.text;
   return (
     <ScalePressable
-      onPress={onPress}
+      onPress={
+        onPress
+          ? () => {
+              haptic.select();
+              onPress();
+            }
+          : undefined
+      }
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ selected: !!selected }}
@@ -90,7 +98,14 @@ export function Switch({
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ checked: value, disabled: !!disabled }}
       aria-checked={value}
-      onPress={disabled ? undefined : () => onValueChange(!value)}
+      onPress={
+        disabled
+          ? undefined
+          : () => {
+              haptic.select();
+              onValueChange(!value);
+            }
+      }
       hitSlop={6}
       style={{ opacity: disabled ? 0.4 : 1 }}
     >
@@ -115,8 +130,30 @@ export function Segmented<T extends string | number>({
   height?: number;
 }) {
   const theme = useTheme();
+  const reduceMotion = useReducedMotion();
+  const [width, setWidth] = useState(0);
+  const index = Math.max(0, items.findIndex((item) => item.value === value));
+  // The light pill slides to the chosen item instead of jumping (DESIGN.md §5, toggle).
+  const pillWidth = items.length ? (width - SEG_PAD * 2 - SEG_GAP * (items.length - 1)) / items.length : 0;
+  const x = useSharedValue(0);
+  useEffect(() => {
+    const target = index * (pillWidth + SEG_GAP);
+    x.value = reduceMotion || pillWidth <= 0 ? target : withTiming(target, { duration: duration.toggle, easing: easings.toggle });
+  }, [index, pillWidth, reduceMotion, x]);
+  const pill = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }] }));
   return (
-    <View accessibilityRole="radiogroup" accessibilityLabel={accessibilityLabel} style={[styles.seg, { backgroundColor: theme.surface2 }]}>
+    <View
+      accessibilityRole="radiogroup"
+      accessibilityLabel={accessibilityLabel}
+      onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
+      style={[styles.seg, { backgroundColor: theme.surface2 }]}
+    >
+      {pillWidth > 0 ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[styles.segPill, { width: pillWidth, top: SEG_PAD, bottom: SEG_PAD, left: SEG_PAD, backgroundColor: theme.text }, pill]}
+        />
+      ) : null}
       {items.map((item) => {
         const on = item.value === value;
         return (
@@ -125,10 +162,14 @@ export function Segmented<T extends string | number>({
             accessibilityRole="radio"
             accessibilityLabel={item.label}
             accessibilityState={{ selected: on }}
-            onPress={() => onChange(item.value)}
+            onPress={() => {
+              if (on) return;
+              haptic.select();
+              onChange(item.value);
+            }}
             // The 38 px token is under the 44 px touch rule: the hit area covers the gap.
             hitSlop={{ top: 3, bottom: 3 }}
-            style={[styles.segItem, { minHeight: height, backgroundColor: on ? theme.text : "transparent" }]}
+            style={[styles.segItem, { minHeight: height, backgroundColor: on && pillWidth <= 0 ? theme.text : "transparent" }]}
           >
             <Text variant="chip" style={{ fontSize: 13 }} color={on ? theme.bg : theme.textSoft} align="center">
               {item.label}
@@ -139,6 +180,9 @@ export function Segmented<T extends string | number>({
     </View>
   );
 }
+
+const SEG_PAD = 3;
+const SEG_GAP = 3;
 
 /** Surface block ("pan" in the prototype). Never nested in another Panel. */
 export function Panel({ children, style, tint }: { children: ReactNode; style?: StyleProp<ViewStyle>; tint?: TagTone }) {
@@ -226,6 +270,7 @@ const styles = StyleSheet.create({
     padding: 3,
     gap: 3,
   },
+  segPill: { position: "absolute", borderRadius: radius.segmentedItem },
   segItem: {
     flex: 1,
     borderRadius: radius.segmentedItem,

@@ -8,6 +8,7 @@ import type { BottomTabBarProps } from "expo-router/tabs";
 import { useGameT } from "@/games/i18n";
 import { useT } from "@/i18n";
 import { easings } from "@/motion/easing";
+import { haptic } from "@/motion/haptics";
 import { useMorningAfter } from "@/recap/morning";
 import { useHomeScreenActions } from "@/system/quickActions";
 import { useLevelNow } from "@/state/levelNow";
@@ -91,7 +92,9 @@ function TabBar({ state, descriptors, navigateToTab }: BottomTabBarProps) {
           icon={TAB_ICONS[route.name] ?? "more"}
           focused={state.index === index}
           onPress={() => {
-            if (state.index !== index) navigateToTab(route.key);
+            if (state.index === index) return;
+            haptic.select();
+            navigateToTab(route.key);
           }}
         />
       ))}
