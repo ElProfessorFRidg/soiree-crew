@@ -253,7 +253,7 @@ jobs:
           for route in / /crew /games /bars /me /settings /my-stats /add-drink /curve /limits /leaderboard /history; do
             xcrun simctl terminate "$DEVICE" "$BUNDLE" || true
             if [ "$route" = "/" ]; then xcrun simctl launch "$DEVICE" "$BUNDLE"; else xcrun simctl launch "$DEVICE" "$BUNDLE" -ciRoute "$route"; fi
-            sleep 7
+            sleep 10
             name=$(echo "$route" | tr -d '/'); [ -z "$name" ] && name=party
             xcrun simctl io "$DEVICE" screenshot "launch/screens/$(printf %02d $n)-$name.png" || true
             n=$((n + 1))

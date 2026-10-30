@@ -195,11 +195,10 @@ export default function RootLayout() {
                 />
                 <Stack.Screen
                   name="add-drink"
+                  // A page sheet, not a formSheet: on iOS a fixed-detent formSheet gave its scroll
+                  // view no height, so the sheet opened empty except for the add button.
                   options={{
-                    presentation: "formSheet",
-                    sheetAllowedDetents: [0.92],
-                    sheetGrabberVisible: true,
-                    sheetCornerRadius: 26,
+                    presentation: "modal",
                     contentStyle: { backgroundColor: themes.dark.surface },
                   }}
                 />

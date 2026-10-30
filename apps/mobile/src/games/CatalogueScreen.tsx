@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { FlatList, StyleSheet, View, useWindowDimensions, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
+import { FlatList, StyleSheet, View, useWindowDimensions, type NativeScrollEvent, type NativeSyntheticEvent, ScrollView } from "react-native";
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { palette, radius, space, scaled } from "@crew/design-tokens";
@@ -137,18 +137,23 @@ export function CatalogueScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.bg, paddingTop: insets.top + space.screenTop }]}>
+      {/* Title and position on one line, the shortcuts on their own scrolling row underneath. */}
       <View style={styles.header}>
         <Text variant="h1" accessibilityRole="header">
           {g.t("catalogue.title")}
         </Text>
         {games.length > 0 ? <Text variant="small">{g.t("catalogue.position", { index: Math.min(index, games.length - 1) + 1, count: games.length })}</Text> : null}
-        {g.language !== "fr" && g.language !== "en" ? <Text variant="small">{g.t("catalogue.cardsInEnglish")}</Text> : null}
-        <View style={styles.headerButtons}>
-          <Chip label={i18n.t("bar.title")} icon="wine" onPress={() => router.push("/bar")} />
-          <Chip label={g.t("crewCards.open")} icon="edit" onPress={() => router.push("/games/cards")} />
-          <Chip label={g.t("hall.open")} icon="trophy" onPress={() => router.push("/games/hall")} />
-        </View>
       </View>
+      {g.language !== "fr" && g.language !== "en" ? (
+        <Text variant="small" style={styles.padded}>
+          {g.t("catalogue.cardsInEnglish")}
+        </Text>
+      ) : null}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.headerButtons}>
+        <Chip label={i18n.t("bar.title")} icon="wine" onPress={() => router.push("/bar")} />
+        <Chip label={g.t("crewCards.open")} icon="edit" onPress={() => router.push("/games/cards")} />
+        <Chip label={g.t("hall.open")} icon="trophy" onPress={() => router.push("/games/hall")} />
+      </ScrollView>
       <View style={styles.padded}>
         <Segmented
           accessibilityLabel={g.t("catalogue.filterLabel")}
@@ -232,9 +237,9 @@ export function CatalogueScreen() {
 }
 
 const styles = StyleSheet.create({
-  headerButtons: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  headerButtons: { gap: 8, paddingHorizontal: space.screenX, paddingVertical: 4 },
   screen: { flex: 1, gap: space.sectionGap },
-  header: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", paddingHorizontal: space.screenX },
+  header: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", paddingHorizontal: space.screenX },
   padded: { paddingHorizontal: space.screenX },
   carousel: { paddingHorizontal: space.screenX },
   card: { borderRadius: radius.sheet, padding: 22, justifyContent: "space-between", overflow: "hidden" },
