@@ -28,6 +28,7 @@ import { AddDrinkButton } from "./AddDrinkButton";
 import { CrewStrip } from "./CrewStrip";
 import { MoreChips, QuickTiles } from "./QuickTiles";
 import { SosBanner } from "@/crew/SosBanner";
+import { NotificationBell } from "@/notify/NotificationBell";
 import { useEco } from "@/power/eco";
 import { TravelPrompt } from "@/travel/TravelPrompt";
 import { VaultPrompt } from "@/vault/VaultPrompt";
@@ -463,6 +464,7 @@ function LevelZero(props: LevelProps) {
           <Text variant="small">{i18n.t(variantKey(greetingKey(new Date(now).getHours()), new Date(now).toDateString()))}</Text>
           <PartyTitle i18n={i18n} />
         </View>
+        <NotificationBell />
         <IconButton icon="clock" accessibilityLabel={i18n.t("party.history")} onPress={() => router.push("/history")} />
       </View>
       <BacHero {...props} size={124} />
@@ -516,6 +518,7 @@ function LevelOne(props: LevelProps) {
           {i18n.t("party.tonight")}
         </Text>
         <Tag label={i18n.t("party.level", { level: 1 })} tone="amber" />
+        <NotificationBell />
       </View>
       <BacHero {...props} size={140} />
       <CrewStrip big />
@@ -571,6 +574,7 @@ function LevelTwo(props: LevelProps) {
         <Text variant="h3">{i18n.t(`units.${unit}`)}</Text>
         <View style={styles.flex} />
         <Tag label={i18n.t("party.level", { level: 2 })} tone="amber" />
+        <NotificationBell />
       </View>
       <EstimateNotice i18n={i18n} />
       <View style={styles.bigGrid}>

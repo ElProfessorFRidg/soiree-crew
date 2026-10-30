@@ -173,6 +173,16 @@ export default function SettingsScreen() {
       ) : null}
       {section === "notifications" ? (
         <>
+          {/* N-35: which crew notifications ring the phone, per type. */}
+          <Panel>
+            <Row
+              title={i18n.t("notify.settingsOpen")}
+              leading={<Icon name="bell" color={theme.textMuted} />}
+              trailing={<Icon name="chev" color={theme.textMuted} />}
+              onPress={() => router.push("/notification-settings")}
+              last
+            />
+          </Panel>
           <Section title={i18n.t("settings.notifications")}>
             <SwitchRow
               label={i18n.t("settings.lockNumbers")}

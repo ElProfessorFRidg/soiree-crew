@@ -78,10 +78,16 @@ export async function notifyTakeover(ctx: Context, crewId: string, takeover: Tak
   );
 }
 
-/** AC-09: a rejected check-in is a cheat attempt the crew sees. */
+/** AC-09: a rejected check-in is a cheat attempt the crew sees; it opens the venue page, where an admin can overturn it. */
 export async function notifyCheatAttempt(ctx: Context, crewId: string, venueId: string, userId: string, checkInId: string): Promise<void> {
   const venue = (await ctx.db.query<{ name: string }>("select name from venues where id = $1", [venueId]))[0]?.name ?? "";
-  await notifyLater(ctx, await crewMembers(ctx, crewId), { kind: "cheatAttempt", actorId: userId, crewId, refId: checkInId, params: { name: await nameOf(ctx, userId), venue } });
+  await notifyLater(ctx, await crewMembers(ctx, crewId), {
+    kind: "cheatAttempt",
+    actorId: userId,
+    crewId,
+    refId: venueId,
+    params: { name: await nameOf(ctx, userId), venue, checkInId },
+  });
 }
 
 /** O-41: once per person per party, to the people who were really there. */
