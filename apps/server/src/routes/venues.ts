@@ -7,6 +7,7 @@ import { crewStandings, crewTimeZone, currentSeason, seasonRules, updateBoss, va
 import { dayBoundaryOf, nightOf, offsetMinutes } from "../time";
 import { samePlaceIds, venueFacts } from "../hours";
 import { canSetHq, setHq } from "./venueFacts";
+import { RateLimiter } from "../ratelimit";
 
 const venueSchema = z.object({
   id: z.string().uuid(),
@@ -88,6 +89,8 @@ async function notifyCrew(ctx: Context, crewId: string): Promise<void> {
 }
 
 export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string): void {
+  // AC-08: a real night is a handful of check-ins; a script sending hundreds is stopped here.
+  const checkIns = new RateLimiter(30, 60 * 60_000, ctx.now);
   /** TER-06: venues ruled and titles, per member who plays the territory game. */
   app.get<{ Params: { id: string } }>("/v1/crews/:id/titles", async (request) => {
     const user = requireUser(request);
@@ -304,6 +307,7 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
    */
   app.post("/v1/checkins", async (request, reply) => {
     const user = requireUser(request);
+    checkIns.check(user.id);
     const input = checkInSchema.parse(request.body);
     const venue = await venueForMember(ctx, input.venueId, user.id);
     const now = ctx.now();

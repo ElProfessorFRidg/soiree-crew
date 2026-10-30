@@ -345,7 +345,7 @@ export const de: Messages = {
     signOut: "Auf diesem Handy abmelden",
     delete: "Mein Konto löschen",
     deleteTitle: "Dein Konto löschen?",
-    deleteBody: "Dein Profil, deine eingetragenen Getränke und Gläser Wasser, deine Einstellungen und deine eigenen Getränke werden vom Server und von diesem Handy gelöscht. Deine Crews bleiben für die anderen bestehen.",
+    deleteBody: "Dein Profil, deine Getränke und dein Wasser, Check-ins, Bewertungen, Fotos, Nachrichten samt Sicherung, Einstellungen und eigenen Getränke werden vom Server und von diesem Handy gelöscht. Deine Crews bleiben für die anderen bestehen.",
     deleteConfirm: "Mein Konto löschen",
     deleteKeep: "Behalten",
     deleted: "Konto gelöscht. Alle Daten sind entfernt.",

@@ -346,7 +346,7 @@ export const it: Messages = {
     signOut: "Esci da questo telefono",
     delete: "Elimina il mio account",
     deleteTitle: "Eliminare il tuo account?",
-    deleteBody: "Profilo, bicchieri, bicchieri d'acqua, impostazioni e bevande personali vengono cancellati dal server e da questo telefono. Le tue crew restano agli altri membri.",
+    deleteBody: "Profilo, bicchieri e acqua, check-in, recensioni, foto, messaggi e il loro backup, impostazioni e bevande personali vengono cancellati dal server e da questo telefono. Le tue crew restano agli altri membri.",
     deleteConfirm: "Elimina il mio account",
     deleteKeep: "Tienilo",
     deleted: "Account eliminato. È stato cancellato tutto.",

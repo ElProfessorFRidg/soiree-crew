@@ -4,8 +4,8 @@ Generated from FEATURES.md on 2026-10-30 by `pnpm status`. Edit FEATURES.md, not
 
 | Status | Count |
 |---|---|
-| Built | 210 |
-| Partly built | 93 |
+| Built | 212 |
+| Partly built | 91 |
 | To do | 2 |
 | Proposed (not in the brief yet) | 4 |
 | Total | 309 |
@@ -14,7 +14,6 @@ Generated from FEATURES.md on 2026-10-30 by `pnpm status`. Edit FEATURES.md, not
 
 - **O-01** (P0, Account, profile, settings): Sign up / sign in with email and Google (first name and username kept separate). Add Sign in with Apple (requi
 - **O-04** (P0, Account, profile, settings): Profile for the BAC model: weight, sex (check what the model really needs; S2M dropped height because the calc
-- **O-07** (P1, Account, profile, settings): In-app account deletion: states exactly what will be erased, confirms when done.
 - **O-09** (P0, Account, profile, settings): 7 languages: FR, EN, ES, IT, DE, PT, RU. The whole app, not a few screens. See <localization>.
 - **O-11** (P0, Account, profile, settings): Accessibility: large touch targets, respects Reduce Motion, text never truncated, nothing under the notch or c
 - **O-13** (P2, Account, profile, settings): Per-account data isolation on the device (several accounts on one phone without leaks).
@@ -76,7 +75,6 @@ Generated from FEATURES.md on 2026-10-30 by `pnpm status`. Edit FEATURES.md, not
 - **TER-04** (P0, Bar territories): Seasons and takeovers: monthly seasons with a reset, "X just took Bar Y from you" notification, history of rei
 - **RANK-02** (P0, Leaderboards): Live leaderboard on the Party screen (HUB-01): live positions, "X just overtook you" notification, animated ov
 - **MSG-04** (P1, Messaging): Push notifications never carry readable content: the payload is encrypted and decrypted on the device (iOS Not
-- **MSG-12** (P1, Messaging): Group conversation info: members, roles, leave, mute, group key state. Renumbered from design-b MSG-11. Source: design-b.md §2.7 G-12, §5.
 - **AC-02** (P0, Anti-cheat): Location source flags, read but never trusted alone. Check the current official docs before implementing.
 - **AC-03** (P0, Anti-cheat): Server-side plausibility: impossible travel speed between events, accuracy values that are too perfect or froz
 - **AC-04** (P0, Anti-cheat): Physical-world corroboration, the hardest signals to fake alone:
@@ -120,7 +118,7 @@ Generated from FEATURES.md on 2026-10-30 by `pnpm status`. Edit FEATURES.md, not
 
 ## Built, by section
 
-- Account, profile, settings: O-02, O-03, O-05, O-06, O-08, O-10, O-12, O-14
+- Account, profile, settings: O-02, O-03, O-05, O-06, O-07, O-08, O-10, O-12, O-14
 - BAC and drink tracking: O-15, O-16, O-17, O-18, O-20, O-21, O-24, O-25, O-26, O-27, O-28, O-29, O-30, O-31, O-32, O-86, O-87
 - Widgets: O-34
 - Parties and trips: O-35, O-36, O-39, O-40
@@ -146,7 +144,7 @@ Generated from FEATURES.md on 2026-10-30 by `pnpm status`. Edit FEATURES.md, not
 - Leaderboards: RANK-01, RANK-03, RANK-04, RANK-05, RANK-06, RANK-07, RANK-08, RANK-09
 - Community: COM-01, COM-02, COM-03, COM-04, COM-05, COM-06, COM-07, COM-08, COM-09, COM-10, COM-11
 - Profiles and visibility: PROF-01, PROF-02, PROF-03, PROF-04, PROF-05, PROF-06, PROF-07, PROF-08, PROF-09, PROF-10
-- Messaging: MSG-01, MSG-02, MSG-03, MSG-05, MSG-06, MSG-07, MSG-08, MSG-09, MSG-10, MSG-11
+- Messaging: MSG-01, MSG-02, MSG-03, MSG-05, MSG-06, MSG-07, MSG-08, MSG-09, MSG-10, MSG-11, MSG-12
 - Anti-cheat: AC-01, AC-11, AC-12, AC-15
 - AI features: AI-03
 - Anti-slop (process): SLOP-01, SLOP-02, SLOP-05, SLOP-07, SLOP-08, SLOP-10, SLOP-11

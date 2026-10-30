@@ -17,7 +17,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-04 | P0 | Arrivee.dc.html | partial | Profile for the BAC model: weight, sex (check what the model really needs; S2M dropped height because the calc... |
 | O-05 | P0 | Arrivee.dc.html | build | Country (legal limit) + novice / probationary driver mode. |
 | O-06 | P2 | Reglages.dc.html | build | Change password and email from settings. |
-| O-07 | P1 | Reglages.dc.html | partial | In-app account deletion: states exactly what will be erased, confirms when done. |
+| O-07 | P1 | Reglages.dc.html | build | In-app account deletion: states exactly what will be erased, confirms when done. |
 | O-08 | P1 | Arrivee.dc.html | build | Privacy policy readable without an account; analytics consent revocable at any time. |
 | O-09 | P0 | Reglages.dc.html | partial | 7 languages: FR, EN, ES, IT, DE, PT, RU. The whole app, not a few screens. See <localization>. |
 | O-10 | P2 | Reglages.dc.html | build | 12 h / 24 h format following the phone setting. |
@@ -416,7 +416,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | MSG-09 | P1 | Messages.dc.html | build | Search in conversations runs on the device only. AI features (<ai_features>) never receive chat content unless... |
 | MSG-10 | P1 | Messages.dc.html | build | Chat basics: replies, reactions, mentions, voice notes with a big record button (adaptive levels 2 and 3), rea... |
 | MSG-11 | P1 | Backstage (near Messages.dc.html) | build | Linking a new device: QR scan from an existing device, "new device linked" notice to the owner's other devices, plain warning that history does not follow without a backup. Source: security.md §2.2, §5. |
-| MSG-12 | P1 | Backstage (near Messages.dc.html) | partial | Group conversation info: members, roles, leave, mute, group key state. Renumbered from design-b MSG-11. Source: design-b.md §2.7 G-12, §5. |
+| MSG-12 | P1 | Backstage (near Messages.dc.html) | build | Group conversation info: members, roles, leave, mute, group key state. Renumbered from design-b MSG-11. Source: design-b.md §2.7 G-12, §5. |
 
 ## Anti-cheat
 

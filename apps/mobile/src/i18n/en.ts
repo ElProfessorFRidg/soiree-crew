@@ -347,7 +347,7 @@ export const en: Messages = {
     signOut: "Sign out of this phone",
     delete: "Delete my account",
     deleteTitle: "Delete your account?",
-    deleteBody: "This erases your profile, drinks, water logs, settings and custom drinks, on the server and on this phone. Your crews stay for the others.",
+    deleteBody: "This erases your profile, drinks and water, check-ins, reviews, photos, messages and their backup, settings and custom drinks, on the server and on this phone. Your crews stay for the others.",
     deleteConfirm: "Delete my account",
     deleteKeep: "Keep it",
     deleted: "Account deleted. Everything was erased.",

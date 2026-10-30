@@ -346,7 +346,7 @@ export const pt: Messages = {
     signOut: "Terminar sessão neste telemóvel",
     delete: "Apagar a minha conta",
     deleteTitle: "Apagar a tua conta?",
-    deleteBody: "O teu perfil, os teus copos, os copos de água, as definições e as bebidas personalizadas são apagados do servidor e deste telemóvel. As tuas crews continuam para quem lá fica.",
+    deleteBody: "O teu perfil, os teus copos e a água, os check-ins, as avaliações, as fotos, as mensagens e a sua cópia, as definições e as bebidas personalizadas são apagados do servidor e deste telemóvel. As tuas crews continuam para quem lá fica.",
     deleteConfirm: "Apagar a minha conta",
     deleteKeep: "Manter",
     deleted: "Conta apagada. Já não resta nada.",

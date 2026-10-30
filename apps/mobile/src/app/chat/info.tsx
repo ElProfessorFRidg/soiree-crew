@@ -20,6 +20,7 @@ import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { showFailure } from "@/server/errors";
 import { confirmAction } from "@/ui/confirm";
+import { useCrewData } from "@/server/crewData";
 
 /** MSG-12, MSG-06, MSG-10: who is in the conversation, its timer, my receipts and typing, the group's key state. */
 export default function ConversationInfoScreen() {
@@ -37,8 +38,11 @@ export default function ConversationInfoScreen() {
       .catch(() => undefined);
   }, [id]);
 
+  const crews = useCrewData((s) => s.crews);
   if (!conversation) return <Screen back title={i18n.t("chat.info")}>{null}</Screen>;
   const others = conversation.members.filter((m) => m !== me);
+  // MSG-12: a crew or party group shows who runs the crew.
+  const admins = new Set(crews.find((c) => c.id === conversation.crewId)?.members.filter((m) => m.role === "admin").map((m) => m.id) ?? []);
   const setting = (key: "readReceipts" | "typing", value: boolean) => updateMeta((m) => ({ ...m, settings: { ...m.settings, [key]: value } }));
 
   return (
@@ -65,7 +69,9 @@ export default function ConversationInfoScreen() {
               title={name(u)}
               subtitle={verified ? i18n.t("chat.verified") : i18n.t("chat.notVerified")}
               leading={<Avatar personId={u} name={name(u)} />}
-              trailing={meta.keyChanged[u] ? <Tag tone="amber" label={i18n.t("chat.keyNew")} /> : undefined}
+              trailing={
+                meta.keyChanged[u] ? <Tag tone="amber" label={i18n.t("chat.keyNew")} /> : admins.has(u) ? <Tag label={i18n.t("crew.admin")} /> : undefined
+              }
               onPress={() => router.push({ pathname: "/chat/safety", params: { userId: u, conversationId: id } })}
               last={index === others.length - 1}
             />

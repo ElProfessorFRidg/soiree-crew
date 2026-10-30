@@ -345,7 +345,7 @@ export const fr = {
     signOut: "Me déconnecter de ce téléphone",
     delete: "Supprimer mon compte",
     deleteTitle: "Supprimer ton compte ?",
-    deleteBody: "Ton profil, tes verres, tes verres d'eau, tes réglages et tes boissons perso sont effacés du serveur et de ce téléphone. Tes crews restent pour les autres.",
+    deleteBody: "Ton profil, tes verres et ton eau, tes check-ins, tes avis, tes photos, tes messages et leur sauvegarde, tes réglages et tes boissons perso sont effacés du serveur et de ce téléphone. Tes crews restent pour les autres.",
     deleteConfirm: "Supprimer mon compte",
     deleteKeep: "Garder",
     deleted: "Compte supprimé. Tout a été effacé.",
