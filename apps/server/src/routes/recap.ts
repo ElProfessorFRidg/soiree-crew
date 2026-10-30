@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { BacSimulation, distributionVolume, type BodyProfile, type DrinkIntake } from "@crew/bac";
 import { HttpError, requireUser, type Context } from "../context";
+import { assertPublishable } from "../posting";
 import { RateLimiter } from "../ratelimit";
 
 const HOUR_MS = 3_600_000;
@@ -287,6 +288,8 @@ export function recapRoutes(app: FastifyInstance, ctx: Context): void {
     const going = await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1 and response = 'going'", [party.id]);
     const ids = new Set(going.map((g) => g.user_id));
     if (!ids.has(user.id) || (input.saidBy && !ids.has(input.saidBy))) throw new HttpError(403, "not_going");
+    // COM-08: lines of the night are read by the whole party.
+    await assertPublishable(ctx, user.id, [input.text]);
     await ctx.db.query(
       "insert into party_quotes (id, party_id, said_by, added_by, text, created_at) values ($1, $2, $3, $4, $5, $6) on conflict (id) do nothing",
       [input.id, party.id, input.saidBy, user.id, input.text, ctx.now()],

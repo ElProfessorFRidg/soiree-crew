@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
+import { assertPublishable } from "../posting";
 import { RateLimiter } from "../ratelimit";
 
 const uuid = z.string().uuid();
@@ -33,6 +34,8 @@ export function cardRoutes(app: FastifyInstance, ctx: Context): void {
     const input = z
       .object({ id: uuid, kind: z.enum(KINDS), level: z.enum(LEVELS), text: z.string().trim().min(4).max(220) })
       .parse(request.body);
+    // COM-08: the crew reads every card it plays.
+    await assertPublishable(ctx, user.id, [input.text]);
     const pending = await ctx.db.query<{ n: number }>("select count(*)::int as n from crew_cards where crew_id = $1 and status = 'pending'", [request.params.id]);
     if (role !== "admin" && pending[0]!.n >= MAX_PENDING) throw new HttpError(429, "too_many");
     // Only the engines' placeholders survive; anything else in braces would print as is.

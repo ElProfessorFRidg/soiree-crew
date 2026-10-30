@@ -75,7 +75,12 @@ describe("public places (COM-01, COM-02, PROF-04)", () => {
     expect(page.door).toMatchObject({ always: 1, adultsOnly: 1 });
     expect(page.events[0]).toMatchObject({ going: 1, mine: true });
     expect(page.regulars).toEqual([]);
+    // PROF-09: opting in is not enough while the venues section is not public.
     await app.inject({ method: "PUT", url: "/v1/me/profile", headers: a.user.auth, payload: { regularOptIn: true } });
+    clock += 25 * 60 * MIN;
+    expect(((await place(a.user, a.venueId)) as typeof page).regulars).toEqual([]);
+    clock -= 25 * 60 * MIN;
+    await app.inject({ method: "PUT", url: "/v1/me/profile", headers: a.user.auth, payload: { audiences: { venues: "everyone" } } });
     // COM-06: tonight never shows; the visit counts from the next day.
     page = (await place(a.user, a.venueId)) as typeof page;
     expect(page.regulars).toEqual([]);

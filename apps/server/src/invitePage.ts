@@ -71,3 +71,36 @@ export function invitePage(
 <p>${escape(t.noApp)}</p>`,
   );
 }
+
+const referralCopy = {
+  fr: {
+    title: (name: string) => `Ajoute ${name} sur Soirée Crew`,
+    open: "Ouvrir dans l'app",
+    body: "L'app envoie ta demande d'ami. Il ne restera qu'à l'accepter de l'autre côté.",
+    noApp: "Pas encore l'app ? Demande le lien d'installation à qui t'a envoyé ce lien.",
+    expired: "Ce lien ne marche plus. Demande-en un nouveau.",
+  },
+  en: {
+    title: (name: string) => `Add ${name} on Soirée Crew`,
+    open: "Open in the app",
+    body: "The app sends your friend request. Then it only needs accepting on the other side.",
+    noApp: "No app yet? Ask whoever sent you this link for the install link.",
+    expired: "This link no longer works. Ask for a new one.",
+  },
+};
+
+/** O-43: the page a personal referral link opens; the app turns it into a friend request. */
+export function referralPage(language: InviteLanguage, referral: { code: string; name: string; serverUrl: string } | null): string {
+  const t = referralCopy[language];
+  if (!referral) return page(language, t.expired, `<h1>${escape(t.expired)}</h1>`);
+  const deepLink = `soireecrew://befriend?code=${encodeURIComponent(referral.code)}&server=${encodeURIComponent(referral.serverUrl)}`;
+  const title = t.title(referral.name);
+  return page(
+    language,
+    title,
+    `<h1>${escape(title)}</h1>
+<p>${escape(t.body)}</p>
+<a class="button" href="${escape(deepLink)}">${escape(t.open)}</a>
+<p>${escape(t.noApp)}</p>`,
+  );
+}

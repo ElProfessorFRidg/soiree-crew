@@ -4,6 +4,7 @@ import { StyleSheet, View } from "react-native";
 import { Field } from "@/crew/Field";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
+import { ReportPanel } from "@/moderation/ReportPanel";
 import { addQuote, removeQuote, voteQuote, type Recap } from "@/server/recapData";
 import { newId } from "@/state/store";
 import { useTheme } from "@/theme";
@@ -68,6 +69,8 @@ export function Quotes({ recap, me, onChange }: { recap: Recap; me: string | und
           {q.addedBy === me || q.saidBy === me ? (
             <Button label={i18n.t("recap.quoteRemove")} variant="outline" height={32} onPress={() => void removeQuote(q.id).then(onChange).catch(offline)} />
           ) : null}
+          {/* COM-08, O-77: a line someone else added can go to the crew's admins. */}
+          {q.addedBy !== me ? <ReportPanel targetKind="quote" targetId={q.id} compact /> : null}
         </Panel>
       ))}
       <Field label={i18n.t("recap.quoteAdd")} placeholder={i18n.t("recap.quotePlaceholder")} value={text} onChangeText={setText} maxLength={200} />

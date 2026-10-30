@@ -6,6 +6,7 @@ import { Field } from "@/crew/Field";
 import { CREW_CARD_KINDS, deleteCrewCard, refreshCrewCards, reviewCrewCard, useCrewCards, writeCrewCard, type CrewCardKind } from "@/games/crewCards";
 import { useGameT } from "@/games/i18n";
 import { haptic } from "@/motion/haptics";
+import { ReportPanel } from "@/moderation/ReportPanel";
 import { api } from "@/server/api";
 import { useCrewData } from "@/server/crewData";
 import { useSession } from "@/server/session";
@@ -154,6 +155,8 @@ export default function CrewCardsScreen() {
             {c.authorId === me || isAdmin ? (
               <Button label={g.t("crewCards.remove")} variant="outline" height={40} onPress={() => void deleteCrewCard(c.id).then(load).catch(offline)} />
             ) : null}
+            {/* COM-08, O-77: a card someone else wrote can go to the crew's admins. */}
+            {c.authorId !== me ? <ReportPanel targetKind="card" targetId={c.id} compact /> : null}
           </View>
         ))}
     </Screen>

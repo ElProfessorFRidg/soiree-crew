@@ -1,10 +1,12 @@
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Share, StyleSheet, View } from "react-native";
 import { useT } from "@/i18n";
 import { flyHero, HeroSource } from "@/motion/hero";
 import { haptic } from "@/motion/haptics";
-import { befriend, fetchFriends, searchPeople, unblock, unfriend, unmute, type FriendsList, type PersonFound } from "@/server/profileData";
+import { onLiveHint } from "@/server/liveHints";
+import { useConsumePendingReferral } from "@/server/pendingReferral";
+import { befriend, fetchFriends, fetchReferral, searchPeople, unblock, unfriend, unmute, type FriendsList, type PersonFound } from "@/server/profileData";
 import { Field } from "@/crew/Field";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
@@ -26,6 +28,18 @@ export default function FriendsScreen() {
     void fetchFriends().then(setList).catch(() => undefined);
   }, []);
   useFocusEffect(load);
+  // O-43: requests, answers and removals arrive live; a reconnect refetches what was missed.
+  useEffect(() => onLiveHint((hint) => (hint === "friends.changed" || hint === "open" ? load() : undefined)), [load]);
+  useConsumePendingReferral(i18n);
+  const [sharing, setSharing] = useState(false);
+  /** O-43: my personal link through the system share sheet. */
+  const shareReferral = () => {
+    setSharing(true);
+    void fetchReferral()
+      .then(({ url }) => Share.share({ message: i18n.t("people.referralMessage", { url }) }))
+      .catch(offline)
+      .finally(() => setSharing(false));
+  };
 
   const [query, setQuery] = useState("");
   const [found, setFound] = useState<PersonFound[] | null>(null);
@@ -82,7 +96,9 @@ export default function FriendsScreen() {
     ) : null;
 
   return (
-    <Screen back title={i18n.t("people.myFriends")} withToasts>
+    <Screen back title={i18n.t("people.myFriends")} withToasts onRefresh={async () => load()}>
+      <Button label={i18n.t("people.referral")} icon="share" variant="secondary" height={48} loading={sharing} onPress={shareReferral} />
+      <Text variant="small">{i18n.t("people.referralHint")}</Text>
       <Field
         label={i18n.t("people.search")}
         placeholder={i18n.t("people.searchPlaceholder")}

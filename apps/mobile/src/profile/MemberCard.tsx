@@ -32,7 +32,8 @@ export function MemberCard() {
   if (!view.sections.identity) return <Text variant="small">{i18n.t("people.cardEmpty")}</Text>;
   const s = view.sections;
   const held = (s.titles ?? []).filter((t) => t.kind === "mayor").length;
-  const favourite = s.drinks?.favourites[0];
+  // PROF-03: the owner may have hidden the favourites.
+  const favourite = s.drinks?.favourites?.[0];
 
   const share = async () => {
     if (!card.current) return;

@@ -26,7 +26,7 @@ async function account(username: string): Promise<User> {
   return { id: body.user.id, auth: { authorization: `Bearer ${body.token}` } };
 }
 
-const SECTIONS = ["identity", "crews", "titles", "venues", "drinks", "records", "nights"] as const;
+const SECTIONS = ["identity", "crews", "titles", "venues", "reviews", "drinks", "records", "nights", "games"] as const;
 const AUDIENCES = ["me", "crews", "friends", "everyone"] as const;
 
 async function setup() {

@@ -4,6 +4,9 @@ import { Share, StyleSheet, View } from "react-native";
 import { palette, radius } from "@crew/design-tokens";
 import { standings, type EndReason, type GameId, type PenaltyLedger } from "@crew/games";
 import { haptic } from "@/motion/haptics";
+import { postGameWin } from "@/server/profileData";
+import { useSession } from "@/server/session";
+import { newId } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
 import { Button } from "@/ui/Button";
@@ -41,6 +44,7 @@ export function EndScreen({ gameId, players, ledger, endReason, startedAt, recor
   const theme = useTheme();
   const g = useGameT();
   const ui = useGameUi();
+  const userId = useSession((s) => s.session?.userId ?? null);
   const ranking = standings(players.map(toEnginePlayer), ledger);
   const recordName = record ? players.find((p) => p.id === record.playerId)?.name : undefined;
   const recordLine = record && recordName ? g.plural(record.key, record.count, { name: recordName }) : null;
@@ -52,6 +56,13 @@ export function EndScreen({ gameId, players, ledger, endReason, startedAt, recor
     if (endReason === "completed" && players.length >= 2) {
       const holder = record ? players.find((p) => p.id === record.playerId)?.name : undefined;
       recordResult(gameId, ranking, record && holder ? { key: record.key, name: holder, count: record.count } : null);
+      // PROF-02 games: a win by an account holder at the table goes to the server for profiles.
+      const [first, second] = ranking;
+      const winner = first && second && first.penalties < second.penalties ? players.find((p) => p.id === first.player.id) : undefined;
+      const accountIds = [...new Set(players.map((p) => p.crewMemberId).filter((x): x is string => Boolean(x)))];
+      if (winner?.crewMemberId && userId && accountIds.includes(userId) && accountIds.length >= 2) {
+        void postGameWin({ id: newId(), gameId, winnerId: winner.crewMemberId, accountIds, players: players.length }).catch(() => undefined);
+      }
     }
   }, [endReason, gameId, startedAt]);
 

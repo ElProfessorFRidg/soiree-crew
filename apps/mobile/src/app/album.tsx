@@ -15,6 +15,7 @@ import { showToast } from "@/ui/Toast";
 import { showFailure } from "@/server/errors";
 import { confirmAction } from "@/ui/confirm";
 import { showPermissionDenied } from "@/system/permissions";
+import { ReportPanel } from "@/moderation/ReportPanel";
 
 const COLUMNS = 3;
 const GAP = 6;
@@ -112,6 +113,8 @@ export default function AlbumScreen() {
               }
             />
           ) : null}
+          {/* COM-08, O-77: someone else's photo goes to the crew's admins. */}
+          {open && open.userId !== me ? <ReportPanel targetKind="photo" targetId={open.id} /> : null}
         </View>
       </Modal>
     </Screen>

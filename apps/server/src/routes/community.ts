@@ -3,14 +3,21 @@ import { z } from "zod";
 import { distanceMeters } from "../anticheat";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { RateLimiter } from "../ratelimit";
-import { currentSeason } from "../territory";
+import { crewTimeZone, currentSeason } from "../territory";
+import { venueFacts } from "../hours";
 import { nightOf, offsetMinutes } from "../time";
 import { newId } from "../crypto";
 import { seasonBounds } from "@crew/territory";
+import { unlink } from "node:fs/promises";
+import { assertCanPost, assertPublishable } from "../posting";
+import { audiencesOf, defaultReviewAudience } from "../profileRules";
 import { placeOwner } from "./claims";
+import { photoPath, signedPhotoUrl, storeJpeg } from "./photos";
 
 const uuid = z.string().uuid();
 const DAY_MS = 86_400_000;
+/** COM-02: photos per review; a review is a few words, not an album. */
+const MAX_REVIEW_PHOTOS = 3;
 /** Venues of different crews closer than this are one place (TER-07). */
 const SAME_PLACE_M = 40;
 /** Places the discovery searches around a point. */
@@ -130,6 +137,21 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
     );
     const doorCount = (key: string) => door.filter((d) => d.id_check === key).reduce((s, d) => s + d.n, 0);
     const reports = door.reduce((s, d) => s + d.n, 0);
+    // COM-07: the official age policy has its own count, so its confidence reads like the ID check's.
+    const ageCount = (key: string) => door.filter((d) => d.age_policy === key).reduce((s, d) => s + d.n, 0);
+    const myDoor = (
+      await ctx.db.query<{ id_check: string; age_policy: string | null }>(
+        "select id_check, age_policy from door_reports where venue_id = any($1::uuid[]) and user_id = $2 order by at desc limit 1",
+        [ids, user.id],
+      )
+    )[0];
+    // COM-02: photos travel with their review, so they follow its audience (PROF-04).
+    const reviewPhotos = visible.length
+      ? await ctx.db.query<{ id: string; review_id: string }>("select id, review_id from review_photos where review_id = any($1::uuid[]) order by created_at", [visible.map((r) => r.id)])
+      : [];
+    // PROF-04: a new review starts with the audience of my profile's reviews section.
+    const myAudiences = (await ctx.db.query<{ audiences: string }>("select audiences from profiles where user_id = $1", [user.id]))[0]?.audiences;
+    const reviewAudience = defaultReviewAudience(audiencesOf(myAudiences ? (JSON.parse(myAudiences) as Record<string, unknown>) : {}).reviews);
 
     const events = await ctx.db.query<{ id: string; title: string; kind: string; starts_at: number; going: number; mine: number; official: boolean }>(
       `select e.id, e.title, e.kind, e.starts_at, e.official, (select count(*)::int from event_rsvps r where r.event_id = e.id) as going,
@@ -144,15 +166,19 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
     // COM-03: regulars by distinct nights there this season, among people who opted in.
     const season = currentSeason(now, PLACE_TZ);
     const { start } = seasonBounds(season, offsetMinutes(now, PLACE_TZ));
-    const visits = await ctx.db.query<{ user_id: string; display_name: string; at: number; open: boolean | null }>(
-      `select c.user_id, u.display_name, c.at, p.open_to_meet as open from check_ins c join users u on u.id = c.user_id
+    const visits = await ctx.db.query<{ user_id: string; display_name: string; at: number; open: boolean | null; audiences: string; hidden_venues: string }>(
+      `select c.user_id, u.display_name, c.at, p.open_to_meet as open, p.audiences, p.hidden_venues from check_ins c join users u on u.id = c.user_id
        join profiles p on p.user_id = c.user_id and p.regular_opt_in = true
-       where c.venue_id = any($1::uuid[]) and c.verdict = 'accepted' and c.private = false and c.at >= $2 and c.at < $3`,
-      // COM-06: regulars come from past visits; tonight shows up tomorrow.
+       where c.venue_id = any($1::uuid[]) and c.verdict = 'accepted' and c.private = false and c.at >= $2 and c.at < $3
+         and not exists (select 1 from workplace_exclusions w where w.venue_id = any($1::uuid[]) and w.user_id = c.user_id and w.status = 'approved')`,
+      // COM-06: regulars come from past visits; tonight shows up tomorrow. TER-11: approved staff are never regulars.
       [ids, start, now - PRESENCE_DELAY_MS],
     );
     const nightsBy = new Map<string, { name: string; nights: Set<string>; open: boolean }>();
     for (const v of visits) {
+      // PROF-09: a public list, so only people whose venues section is public, and not if they hid this place (PROF-03).
+      if (audiencesOf(JSON.parse(v.audiences) as Record<string, unknown>).venues !== "everyone") continue;
+      if ((JSON.parse(v.hidden_venues) as string[]).some((id) => ids.includes(id))) continue;
       const entry = nightsBy.get(v.user_id) ?? { name: v.display_name, nights: new Set<string>(), open: Boolean(v.open) };
       entry.nights.add(nightOf(v.at, PLACE_TZ));
       nightsBy.set(v.user_id, entry);
@@ -166,6 +192,8 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
     // COM-11: a claimed page says so; the owner's hours and replies come with it.
     const owner = await placeOwner(ctx, ids);
     const info = (await ctx.db.query<{ hours: string; happy_hours: string }>("select hours, happy_hours from place_info where venue_id = any($1::uuid[]) order by updated_at desc limit 1", [ids]))[0];
+    // COM-01: the owner's hours, else the ones crews entered, labelled as such; "open now" from either.
+    const facts = await venueFacts(ctx, ids, await crewTimeZone(ctx.db, venue.crew_id));
     const replies = new Map(
       (await ctx.db.query<{ review_id: string; text: string; at: number }>("select review_id, text, at from review_replies where review_id = any($1::uuid[])", [reviews.map((r) => r.id)])).map((r) => [
         r.review_id,
@@ -194,6 +222,7 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
         ratings: JSON.parse(r.ratings) as Record<string, number>,
         text: r.text,
         reply: replies.get(r.id) ?? null,
+        photos: reviewPhotos.filter((p) => p.review_id === r.id).map((p) => ({ id: p.id, url: signedPhotoUrl(ctx, p.id) })),
         visitedAt: r.visited_at,
         useful: r.useful,
         markedUseful: r.mine > 0,
@@ -203,7 +232,25 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
       claimed: owner !== null,
       isOwner: owner === user.id,
       info: info && (info.hours || info.happy_hours) ? { hours: info.hours, happyHours: info.happy_hours } : null,
-      door: { always: doorCount("always"), sometimes: doorCount("sometimes"), never: doorCount("never"), adultsOnly: door.filter((d) => d.age_policy === "adults").reduce((s, d) => s + d.n, 0), reports },
+      facts: {
+        source: facts.source,
+        hoursText: facts.hoursText,
+        happyText: facts.happyText,
+        schedule: facts.schedule,
+        openNow: facts.openNow,
+        happyNow: facts.happyNow,
+        updatedAt: facts.updatedAt,
+      },
+      door: {
+        always: doorCount("always"),
+        sometimes: doorCount("sometimes"),
+        never: doorCount("never"),
+        adultsOnly: ageCount("adults"),
+        allAgesEarly: ageCount("allAgesEarly"),
+        reports,
+        mine: myDoor ? { idCheck: myDoor.id_check, agePolicy: myDoor.age_policy } : null,
+      },
+      reviewAudience,
       events: events.map((e) => ({
         id: e.id,
         title: e.title,
@@ -230,33 +277,97 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
       .object({
         ratings: z.object({ prices: rating, vibe: rating, music: rating, service: rating, queue: rating, safe: rating }).partial(),
         text: z.string().trim().max(280).default(""),
-        audience: z.enum(["public", "anonymous", "friends", "me"]),
+        // PROF-04: left out, the audience follows the profile's reviews section.
+        audience: z.enum(["public", "anonymous", "friends", "me"]).optional(),
       })
       .parse(request.body);
+    // COM-02, COM-08: no insults, no personal data, no named staff or customers; the app says which.
+    await assertPublishable(ctx, user.id, [input.text], { names: true });
     const now = ctx.now();
-    const existing = (await ctx.db.query<{ id: string }>("select id from place_reviews where venue_id = any($1::uuid[]) and user_id = $2", [ids, user.id]))[0];
+    const existing = (await ctx.db.query<{ id: string; audience: string }>("select id, audience from place_reviews where venue_id = any($1::uuid[]) and user_id = $2", [ids, user.id]))[0];
+    const stored = (await ctx.db.query<{ audiences: string }>("select audiences from profiles where user_id = $1", [user.id]))[0]?.audiences;
+    const audience = input.audience ?? existing?.audience ?? defaultReviewAudience(audiencesOf(stored ? (JSON.parse(stored) as Record<string, unknown>) : {}).reviews);
+    const id = existing?.id ?? newId();
     if (existing) {
       await ctx.db.query("update place_reviews set ratings = $2, text = $3, audience = $4, visited_at = $5, updated_at = $6 where id = $1", [
         existing.id,
         JSON.stringify(input.ratings),
         input.text,
-        input.audience,
+        audience,
         visited,
         now,
       ]);
     } else {
       await ctx.db.query(
         "insert into place_reviews (id, venue_id, user_id, ratings, text, audience, visited_at, created_at, updated_at) values ($1, $2, $3, $4, $5, $6, $7, $8, $8)",
-        [newId(), venue.id, user.id, JSON.stringify(input.ratings), input.text, input.audience, visited, now],
+        [id, venue.id, user.id, JSON.stringify(input.ratings), input.text, audience, visited, now],
       );
     }
+    return { ok: true, id, audience };
+  });
+
+  /**
+   * PROF-04: who sees one review, changed on its own. The place page and the profile both read
+   * the stored audience, so they change together; ratings keep counting public and anonymous ones.
+   */
+  app.patch<{ Params: { id: string } }>("/v1/reviews/:id", async (request) => {
+    const user = requireUser(request);
+    const { audience } = z.object({ audience: z.enum(["public", "anonymous", "friends", "me"]) }).parse(request.body);
+    const rows = await ctx.db.query("update place_reviews set audience = $3 where id = $1 and user_id = $2 returning id", [uuid.parse(request.params.id), user.id, audience]);
+    if (!rows.length) throw new HttpError(404, "not_found");
     return { ok: true };
+  });
+
+  /** COM-02, QOL-09: a few photos on my own review, resized and stripped of metadata by the app. */
+  const reviewPhotoUploads = new RateLimiter(30, 24 * 3_600_000, ctx.now);
+  app.post<{ Params: { id: string } }>("/v1/places/:id/review/photos", { bodyLimit: 8 * 1024 * 1024 }, async (request, reply) => {
+    const user = requireUser(request);
+    const { ids } = await placeOf(ctx, request.params.id);
+    const review = (await ctx.db.query<{ id: string }>("select id from place_reviews where venue_id = any($1::uuid[]) and user_id = $2", [ids, user.id]))[0];
+    if (!review) throw new HttpError(404, "not_found");
+    await assertCanPost(ctx, user.id);
+    const input = z
+      .object({ id: uuid, data: z.string().min(100).max(7_000_000), width: z.number().int().min(1).max(8000), height: z.number().int().min(1).max(8000) })
+      .parse(request.body);
+    const existing = (await ctx.db.query<{ user_id: string }>("select user_id from review_photos where id = $1", [input.id]))[0];
+    if (existing) {
+      if (existing.user_id !== user.id) throw new HttpError(409, "conflict");
+      return reply.status(200).send({ id: input.id });
+    }
+    const count = (await ctx.db.query<{ n: number }>("select count(*)::int as n from review_photos where review_id = $1", [review.id]))[0]!.n;
+    if (count >= MAX_REVIEW_PHOTOS) throw new HttpError(409, "too_many_photos");
+    reviewPhotoUploads.check(user.id);
+    const bytes = await storeJpeg(ctx, input.id, input.data);
+    await ctx.db.query("insert into review_photos (id, review_id, user_id, width, height, bytes, created_at) values ($1, $2, $3, $4, $5, $6, $7)", [
+      input.id,
+      review.id,
+      user.id,
+      input.width,
+      input.height,
+      bytes,
+      ctx.now(),
+    ]);
+    return reply.status(201).send({ id: input.id });
+  });
+
+  app.delete<{ Params: { id: string } }>("/v1/review-photos/:id", async (request, reply) => {
+    const user = requireUser(request);
+    const rows = await ctx.db.query("delete from review_photos where id = $1 and user_id = $2 returning id", [uuid.parse(request.params.id), user.id]);
+    if (!rows.length) throw new HttpError(404, "not_found");
+    await unlink(photoPath(ctx, request.params.id)).catch(() => undefined);
+    return reply.status(204).send();
   });
 
   app.delete<{ Params: { id: string } }>("/v1/places/:id/review", async (request, reply) => {
     const user = requireUser(request);
     const { ids } = await placeOf(ctx, request.params.id);
+    // COM-02: the review's photo files go with it (the rows follow by cascade).
+    const photos = await ctx.db.query<{ id: string }>(
+      "select p.id from review_photos p join place_reviews r on r.id = p.review_id where r.venue_id = any($1::uuid[]) and r.user_id = $2",
+      [ids, user.id],
+    );
     await ctx.db.query("delete from place_reviews where venue_id = any($1::uuid[]) and user_id = $2", [ids, user.id]);
+    for (const p of photos) await unlink(photoPath(ctx, p.id)).catch(() => undefined);
     return reply.status(204).send();
   });
 
@@ -311,6 +422,8 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
       .object({ id: uuid, title: z.string().trim().min(3).max(60), kind: z.enum(["dj", "student", "match", "concert", "quiz", "other"]), startsAt: z.number().int() })
       .parse(request.body);
     if (input.startsAt < now - 3_600_000 || input.startsAt > now + 120 * DAY_MS) throw new HttpError(400, "invalid_dates");
+    // COM-08: an event title is public text.
+    await assertPublishable(ctx, user.id, [input.title]);
     await ctx.db.query(
       "insert into place_events (id, venue_id, created_by, title, kind, starts_at, created_at, official) values ($1, $2, $3, $4, $5, $6, $7, $8) on conflict (id) do nothing",
       [input.id, venue.id, user.id, input.title, input.kind, input.startsAt, now, official],
@@ -342,6 +455,7 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
         maxPint: z.coerce.number().int().positive().optional(),
         strict: z.enum(["1"]).optional(),
         tag: z.enum(VIBE_TAGS).optional(),
+        open: z.enum(["1"]).optional(),
       })
       .parse(request.query);
     const box = NEARBY_M / 111_000;
@@ -379,7 +493,12 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
       if (q.maxPint && (pint === null || pint > q.maxPint)) continue;
       if (q.strict && !strict) continue;
       if (q.tag && !tags.includes(q.tag)) continue;
+      // COM-10: "open now" keeps only places whose hours (owner's, else a crew's) say so.
+      const { openNow, happyNow } = await venueFacts(ctx, p.ids, await crewTimeZone(ctx.db, p.lead.crew_id));
+      if (q.open && openNow !== true) continue;
       out.push({
+        openNow,
+        happyNow,
         venueId: p.lead.id,
         name: p.lead.name,
         distanceM: Math.round(distanceMeters(p.lead, q)),
