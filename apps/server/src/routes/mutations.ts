@@ -3,6 +3,7 @@ import type { FastifyInstance } from "fastify";
 import { z, type ZodError } from "zod";
 import { requireUser, type Context } from "../context";
 import type { Db } from "../db";
+import { checkDanger } from "../nightWatch";
 import { mutationBatchSchema, mutationSchema, type MutationInput } from "../schemas";
 
 /** Tolerance for clock skew between the phone and the server. */
@@ -85,15 +86,29 @@ async function partyAt(db: Db, userId: string, at: number): Promise<string | nul
 
 async function touchParty(ctx: Context, db: Db, partyId: string | null, userId: string, at: number, changed: Set<string>) {
   if (!partyId) return;
-  await db.query("update party_members set last_activity_at = greatest(coalesce(last_activity_at, 0), $3) where party_id = $1 and user_id = $2", [
-    partyId,
-    userId,
-    at,
-  ]);
+  // O-37: the first sign of life is the arrival.
+  await db.query(
+    "update party_members set last_activity_at = greatest(coalesce(last_activity_at, 0), $3), arrived_at = coalesce(arrived_at, $3) where party_id = $1 and user_id = $2",
+    [partyId, userId, at],
+  );
   changed.add(partyId);
 }
 
-async function apply(ctx: Context, db: Db, userId: string, mutation: MutationInput, changedParties: Set<string>, proof: Proof | null): Promise<void> {
+function sealDrink(ctx: Context, d: MutationInput & { kind: "drink.add" | "drink.edit" }): string {
+  const { drink } = d;
+  return ctx.sealer.seal({ volumeMl: drink.volumeMl, abv: drink.abv, withFood: drink.food ? drink.food !== "none" : drink.withFood, food: drink.food ?? null, name: drink.name ?? null });
+}
+
+/** RANK-06: a friend confirmed this drink as it was. Changing its volume, strength or time drops the confirmation. */
+async function dropStaleConfirmations(ctx: Context, db: Db, before: { sealed: string; consumed_at: number }, after: { volumeMl: number; abv: number; consumedAt: number }, id: string) {
+  if (!before.sealed) return;
+  const old = ctx.sealer.open<{ volumeMl: number; abv: number }>(before.sealed);
+  if (old.volumeMl !== after.volumeMl || old.abv !== after.abv || before.consumed_at !== after.consumedAt) {
+    await db.query("delete from drink_confirmations where drink_id = $1", [id]);
+  }
+}
+
+async function apply(ctx: Context, db: Db, userId: string, mutation: MutationInput, changedParties: Set<string>, proof: Proof | null, dangerChecks: Set<string>): Promise<void> {
   const now = ctx.now();
   switch (mutation.kind) {
     case "drink.add": {
@@ -101,15 +116,9 @@ async function apply(ctx: Context, db: Db, userId: string, mutation: MutationInp
       if (d.consumedAt > now + FUTURE_TOLERANCE_MS) throw new Rejection("future_drink");
       const owner = await db.query<{ user_id: string; sealed: string; consumed_at: number }>("select user_id, sealed, consumed_at from drinks where id = $1", [d.id]);
       if (owner[0] && owner[0].user_id !== userId) throw new Rejection("invalid");
-      if (owner[0]?.sealed) {
-        // RANK-06: a friend confirmed this drink as it was. Changing it drops the confirmation.
-        const before = ctx.sealer.open<{ volumeMl: number; abv: number }>(owner[0].sealed);
-        if (before.volumeMl !== d.volumeMl || before.abv !== d.abv || owner[0].consumed_at !== d.consumedAt) {
-          await db.query("delete from drink_confirmations where drink_id = $1", [d.id]);
-        }
-      }
+      if (owner[0]) await dropStaleConfirmations(ctx, db, owner[0], d, d.id);
       const partyId = await partyAt(db, userId, d.consumedAt);
-      const sealed = ctx.sealer.seal({ volumeMl: d.volumeMl, abv: d.abv, withFood: d.withFood, name: d.name ?? null });
+      const sealed = sealDrink(ctx, mutation);
       await db.query(
         `insert into drinks (id, user_id, party_id, kind, preset_id, sealed, consumed_at, logged_at, updated_at, envelope_trust)
          values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
@@ -120,6 +129,35 @@ async function apply(ctx: Context, db: Db, userId: string, mutation: MutationInp
         [d.id, userId, partyId, d.kind, d.presetId, sealed, d.consumedAt, proof?.eventTime ?? now, now, proof?.trust ?? null],
       );
       await touchParty(ctx, db, partyId, userId, now, changedParties);
+      if (partyId && d.abv > 0) dangerChecks.add(partyId);
+      return;
+    }
+    case "drink.edit": {
+      const d = mutation.drink;
+      if (d.consumedAt > now + FUTURE_TOLERANCE_MS) throw new Rejection("future_drink");
+      const rows = await db.query<{ user_id: string; sealed: string; consumed_at: number; party_id: string | null; deleted_at: number | null }>(
+        "select user_id, sealed, consumed_at, party_id, deleted_at from drinks where id = $1",
+        [d.id],
+      );
+      const before = rows[0];
+      if (!before || before.user_id !== userId || before.deleted_at !== null) throw new Rejection("invalid");
+      await dropStaleConfirmations(ctx, db, before, d, d.id);
+      // A new time can move the drink to another night.
+      const partyId = await partyAt(db, userId, d.consumedAt);
+      await db.query("update drinks set kind = $2, preset_id = $3, sealed = $4, consumed_at = $5, party_id = $6, updated_at = $7 where id = $1", [
+        d.id,
+        d.kind,
+        d.presetId,
+        sealDrink(ctx, mutation),
+        d.consumedAt,
+        partyId,
+        now,
+      ]);
+      if (before.party_id) changedParties.add(before.party_id);
+      if (partyId) {
+        changedParties.add(partyId);
+        dangerChecks.add(partyId);
+      }
       return;
     }
     case "drink.remove": {
@@ -188,6 +226,7 @@ export function mutationRoutes(app: FastifyInstance, ctx: Context): void {
     const batch = mutationBatchSchema.parse(request.body);
     const results: MutationResult[] = [];
     const changedParties = new Set<string>();
+    const dangerChecks = new Set<string>();
 
     for (const { key, mutation, envelope } of batch.mutations) {
       const stored = await ctx.db.query<{ result: string }>("select result from mutation_log where user_id = $1 and key = $2", [user.id, key]);
@@ -207,7 +246,7 @@ export function mutationRoutes(app: FastifyInstance, ctx: Context): void {
           // The chain moves on even if the write itself is then refused for its content (a future drink):
           // otherwise the next event would look like a gap.
           const proof = env?.success ? await ctx.db.transaction((tx) => checkEnvelope(tx, ctx.now(), user.id, key, mutation, env.data)) : null;
-          await ctx.db.transaction((tx) => apply(ctx, tx, user.id, parsed.data, changedParties, proof));
+          await ctx.db.transaction((tx) => apply(ctx, tx, user.id, parsed.data, changedParties, proof, dangerChecks));
           result = { key, status: "accepted", serverTime: ctx.now() };
         } catch (error) {
           if (!(error instanceof Rejection)) throw error;
@@ -228,6 +267,11 @@ export function mutationRoutes(app: FastifyInstance, ctx: Context): void {
       ctx.live.notify(members.map((m) => m.user_id), { type: "party.changed", partyId });
     }
     ctx.live.notify([user.id], { type: "sync", reason: "own_write" });
+    // O-88: a drink can carry the estimate past 2.0 g/L; the minute sweep catches the rise that follows.
+    for (const partyId of dangerChecks) {
+      const party = (await ctx.db.query<{ id: string; starts_at: number }>("select id, starts_at from parties where id = $1", [partyId]))[0];
+      if (party) await checkDanger(ctx, party, user.id);
+    }
     return { results };
   });
 

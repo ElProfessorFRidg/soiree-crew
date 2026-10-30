@@ -133,6 +133,18 @@ describe("T3b: very high BAC never caps and never stops at 24 h", () => {
 });
 
 describe("T4: food slows absorption and speeds elimination", () => {
+  it("O-85: a light meal sits between an empty stomach and a full meal", () => {
+    const peak = (extra: Partial<DrinkIntake>) => peakOf(sim([wine(0, extra), wine(0.5, extra), wine(1, extra)], woman60), T0, T0 + 6 * H).bac;
+    const none = peak({ food: "none" });
+    const light = peak({ food: "light" });
+    const full = peak({ food: "full" });
+    expect(light).toBeLessThan(none);
+    expect(light).toBeGreaterThan(full);
+    // The level wins over the old switch; the switch alone still reads as a full meal.
+    expect(peak({ withFood: true, food: "none" })).toBeCloseTo(none, 6);
+    expect(peak({ withFood: true })).toBeCloseTo(full, 6);
+  });
+
   it("T4: one beer with food", () => {
     const s = sim([pint(0, { withFood: true })], man80);
     const peak = peakOf(s, T0, T0 + 3 * H);

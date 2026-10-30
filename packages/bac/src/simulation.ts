@@ -1,8 +1,10 @@
 import {
   ABSORPTION_HALF_LIFE_FASTED_MIN,
   ABSORPTION_HALF_LIFE_FED_MIN,
+  ABSORPTION_HALF_LIFE_LIGHT_MIN,
   BETA_CENTRAL,
   BETA_FED,
+  BETA_LIGHT,
   BETA_SAFE,
   ETHANOL_DENSITY_G_PER_ML,
   KM,
@@ -18,6 +20,10 @@ const DOSE_WINDOW_MS = 24 * HOUR_MS;
 /** A meal logged with a drink keeps elimination at the fed rate for this long. */
 const FED_WINDOW_MS = 6 * HOUR_MS;
 
+/** O-85: what was in the stomach. Unknown counts as "none", so a peak is never under-estimated. */
+export type FoodLevel = "none" | "light" | "full";
+export const FOOD_LEVELS: readonly FoodLevel[] = ["none", "light", "full"];
+
 export interface DrinkIntake {
   id: string;
   volumeMl: number;
@@ -25,8 +31,23 @@ export interface DrinkIntake {
   abv: number;
   /** UTC epoch milliseconds. */
   consumedAt: number;
+  /** Older entries carry only this switch: true reads as a full meal. */
   withFood?: boolean;
+  /** Wins over `withFood` when set. */
+  food?: FoodLevel;
 }
+
+/** The food level of a drink, from the level when known, else from the old switch. */
+export function foodOf(drink: Pick<DrinkIntake, "food" | "withFood">): FoodLevel {
+  return drink.food ?? (drink.withFood ? "full" : "none");
+}
+
+const FOOD_RANK: Record<FoodLevel, 0 | 1 | 2> = { none: 0, light: 1, full: 2 };
+const HALF_LIFE_MIN: Record<FoodLevel, number> = {
+  none: ABSORPTION_HALF_LIFE_FASTED_MIN,
+  light: ABSORPTION_HALF_LIFE_LIGHT_MIN,
+  full: ABSORPTION_HALF_LIFE_FED_MIN,
+};
 
 /** `central` is the number the BAC shows; `safe` is the slow-elimination model behind every driving estimate. */
 export type EliminationModel = "central" | "safe";
@@ -44,7 +65,8 @@ interface Dose {
   grams: number;
   /** Absorption rate constant, per millisecond. */
   ka: number;
-  withFood: boolean;
+  /** 0 fasted, 1 light meal, 2 full meal. */
+  fed: 0 | 1 | 2;
 }
 
 export function ethanolGrams(volumeMl: number, abv: number): number {
@@ -60,12 +82,12 @@ function toDoses(drinks: readonly DrinkIntake[], now: number): Dose[] {
     seen.add(drink.id);
     const grams = ethanolGrams(drink.volumeMl, drink.abv);
     if (!(grams > 0)) continue;
-    const halfLifeMin = drink.withFood ? ABSORPTION_HALF_LIFE_FED_MIN : ABSORPTION_HALF_LIFE_FASTED_MIN;
+    const food = foodOf(drink);
     doses.push({
       at: drink.consumedAt,
       grams,
-      ka: Math.LN2 / (halfLifeMin * MINUTE_MS),
-      withFood: drink.withFood === true,
+      ka: Math.LN2 / (HALF_LIFE_MIN[food] * MINUTE_MS),
+      fed: FOOD_RANK[food],
     });
   }
   return doses.sort((a, b) => a.at - b.at);
@@ -82,6 +104,7 @@ export class BacSimulation {
   private readonly doses: Dose[];
   private readonly betaPerMs: number;
   private readonly fedBetaPerMs: number;
+  private readonly lightBetaPerMs: number;
   private points: BacPoint[] | undefined;
   private computedUntil = Number.NEGATIVE_INFINITY;
 
@@ -94,6 +117,7 @@ export class BacSimulation {
     this.doses = toDoses(drinks, now);
     this.betaPerMs = (model === "safe" ? BETA_SAFE : BETA_CENTRAL) / HOUR_MS;
     this.fedBetaPerMs = (model === "safe" ? BETA_SAFE : BETA_FED) / HOUR_MS;
+    this.lightBetaPerMs = (model === "safe" ? BETA_SAFE : BETA_LIGHT) / HOUR_MS;
   }
 
   get firstDrinkAt(): number | undefined {
@@ -125,24 +149,24 @@ export class BacSimulation {
     // `activeEnd` is exclusive. During a step only the doses started at its
     // beginning count: a dose that starts exactly at the step's end belongs to
     // the next step, otherwise RK4 would feed it into k4 and overshoot.
-    const evaluate = (time: number, activeEnd: number): { gut: number; input: number; fed: boolean } => {
+    const evaluate = (time: number, activeEnd: number): { gut: number; input: number; fed: 0 | 1 | 2 } => {
       let gut = 0;
       let input = 0;
-      let fed = false;
+      let fed: 0 | 1 | 2 = 0;
       for (let i = windowStart; i < activeEnd; i++) {
         const dose = doses[i]!;
         if (dose.at > time) break;
         const amount = dose.grams * Math.exp(-dose.ka * (time - dose.at));
         gut += amount;
         input += dose.ka * amount;
-        if (dose.withFood && time - dose.at < FED_WINDOW_MS) fed = true;
+        if (dose.fed > fed && time - dose.at < FED_WINDOW_MS) fed = dose.fed;
       }
       return { gut, input: input / this.distributionVolumeL, fed };
     };
 
     const derivative = (time: number, conc: number): number => {
       const { input, fed } = evaluate(time, nextDose);
-      const beta = fed ? this.fedBetaPerMs : this.betaPerMs;
+      const beta = fed === 2 ? this.fedBetaPerMs : fed === 1 ? this.lightBetaPerMs : this.betaPerMs;
       const positive = Math.max(conc, 0);
       return input - (beta * positive) / (KM + positive);
     };

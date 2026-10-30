@@ -5,6 +5,8 @@ import { buildApp } from "./app";
 import { Sealer } from "./crypto";
 import { connectPglite, connectPostgres, migrate } from "./db";
 import { LiveHub } from "./live";
+import { sweepLiveParties } from "./nightWatch";
+import type { Context } from "./context";
 
 // Configuration comes from the environment only.
 //   DATABASE_URL  postgres://... (falls back to an on-disk PGlite database in ./data for local use)
@@ -36,28 +38,31 @@ function trustProxy(value: string | undefined): boolean | number {
   const hops = Number.parseInt(value, 10);
   return Number.isFinite(hops) && hops > 0 ? hops : false;
 }
-const app = await buildApp(
-  {
-    db,
-    sealer: new Sealer(dataKey),
-    live: new LiveHub(),
-    now: () => Date.now(),
-    publicUrl: process.env.PUBLIC_URL ?? `http://localhost:${port}`,
-    hashSecret: createHash("sha256").update(`fix-hash:${dataKey}`).digest("hex"),
-    uploadDir: process.env.UPLOAD_DIR ?? "./data/uploads",
-    ai: aiProvider(),
-    ...(process.env.DOWNLOADS_DIR ? { downloadsDir: process.env.DOWNLOADS_DIR } : {}),
-    serverInfo: { name: process.env.SERVER_NAME ?? "", description: process.env.SERVER_DESCRIPTION ?? "", public: process.env.PUBLIC_SERVER === "true" },
-    operators: [process.env.OPERATOR_IDS, process.env.OPERATOR_USERNAMES]
-      .join(",")
-      .split(",")
-      .map((u) => u.trim().toLowerCase())
-      .filter(Boolean),
-  },
-  { logger: true, trustProxy: trustProxy(process.env.TRUST_PROXY) },
-);
+const context: Context = {
+  db,
+  sealer: new Sealer(dataKey),
+  live: new LiveHub(),
+  now: () => Date.now(),
+  publicUrl: process.env.PUBLIC_URL ?? `http://localhost:${port}`,
+  hashSecret: createHash("sha256").update(`fix-hash:${dataKey}`).digest("hex"),
+  uploadDir: process.env.UPLOAD_DIR ?? "./data/uploads",
+  ai: aiProvider(),
+  ...(process.env.DOWNLOADS_DIR ? { downloadsDir: process.env.DOWNLOADS_DIR } : {}),
+  serverInfo: { name: process.env.SERVER_NAME ?? "", description: process.env.SERVER_DESCRIPTION ?? "", public: process.env.PUBLIC_SERVER === "true" },
+  operators: [process.env.OPERATOR_IDS, process.env.OPERATOR_USERNAMES]
+    .join(",")
+    .split(",")
+    .map((u) => u.trim().toLowerCase())
+    .filter(Boolean),
+};
+const app = await buildApp(context, { logger: true, trustProxy: trustProxy(process.env.TRUST_PROXY) });
 
 await app.listen({ port, host: "0.0.0.0" });
+
+// N-29, N-36, O-88: once a minute the server looks over the live parties and tells the crews.
+setInterval(() => {
+  sweepLiveParties(context).catch((error: unknown) => app.log.error(error));
+}, 60_000).unref();
 
 let closing = false;
 const shutdown = () => {

@@ -17,6 +17,7 @@ interface SealedDrink {
   volumeMl: number;
   abv: number;
   withFood: boolean;
+  food?: "none" | "light" | "full" | null;
   name: string | null;
 }
 
@@ -57,6 +58,7 @@ export function syncRoutes(app: FastifyInstance, ctx: Context): void {
           volumeMl: body.volumeMl,
           abv: body.abv,
           withFood: body.withFood,
+          ...(body.food ? { food: body.food } : {}),
           ...(body.name ? { name: body.name } : {}),
           consumedAt: row.consumed_at,
           loggedAt: row.logged_at,
