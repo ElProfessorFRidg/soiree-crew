@@ -1,6 +1,7 @@
 import { Redirect, Tabs } from "expo-router";
+import { NativeTabs } from "expo-router/native-tabs";
 import { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 import { duration } from "@crew/design-tokens";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -116,6 +117,52 @@ function TabBar({ state, descriptors, navigateToTab }: BottomTabBarProps) {
   );
 }
 
+/**
+ * iOS: the system tab bar (Liquid Glass from iOS 26, shrinks while scrolling), SF Symbols that fill
+ * when selected, the system badge and selection haptic. Same tabs, titles and amber as Android's.
+ */
+function IosTabs({ toastOffset, largeToasts }: { toastOffset: number; largeToasts: boolean }) {
+  const i18n = useT();
+  const games = useGameT();
+  const theme = useTheme();
+  const invitations = useInvitations((s) => s.total);
+  return (
+    <View style={{ flex: 1 }}>
+      <NativeTabs
+        tintColor={theme.amber}
+        iconColor={{ default: theme.tabInactive, selected: theme.amber }}
+        labelStyle={{ default: { color: theme.tabInactive }, selected: { color: theme.amber } }}
+        badgeBackgroundColor={theme.danger}
+        minimizeBehavior="onScrollDown"
+        screenListeners={{ tabPress: () => haptic.select() }}
+      >
+        <NativeTabs.Trigger name="index" contentStyle={{ backgroundColor: theme.bg }}>
+          <NativeTabs.Trigger.Label>{i18n.t("tabs.party")}</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon sf={{ default: "mug", selected: "mug.fill" }} />
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="crew" contentStyle={{ backgroundColor: theme.bg }}>
+          <NativeTabs.Trigger.Label>{i18n.t("crew.tab")}</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon sf={{ default: "person.2", selected: "person.2.fill" }} />
+          {invitations > 0 ? <NativeTabs.Trigger.Badge>{invitations > 99 ? "99+" : String(invitations)}</NativeTabs.Trigger.Badge> : null}
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="games" contentStyle={{ backgroundColor: theme.bg }}>
+          <NativeTabs.Trigger.Label>{games.t("catalogue.title")}</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon sf={{ default: "dice", selected: "dice.fill" }} />
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="bars" contentStyle={{ backgroundColor: theme.bg }}>
+          <NativeTabs.Trigger.Label>{i18n.t("bars.tab")}</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon sf={{ default: "mappin.and.ellipse", selected: "mappin.circle.fill" }} />
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="me" contentStyle={{ backgroundColor: theme.bg }}>
+          <NativeTabs.Trigger.Label>{i18n.t("tabs.me")}</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon sf={{ default: "person.crop.circle", selected: "person.crop.circle.fill" }} />
+        </NativeTabs.Trigger>
+      </NativeTabs>
+      <ToastHost bottomOffset={toastOffset} large={largeToasts} />
+    </View>
+  );
+}
+
 export default function TabsLayout() {
   const i18n = useT();
   const games = useGameT();
@@ -126,6 +173,7 @@ export default function TabsLayout() {
   // ADP-09: at levels 2 and 3 the undo button grows like everything else.
   const level = useLevelNow((state) => state.level);
   if (!onboarded) return <Redirect href="/onboarding" />;
+  if (Platform.OS === "ios") return <IosTabs toastOffset={insets.bottom + 64} largeToasts={level >= 2} />;
   return (
     <View style={{ flex: 1 }}>
       <Tabs screenOptions={{ headerShown: false }} tabBar={(props) => <TabBar {...props} />}>

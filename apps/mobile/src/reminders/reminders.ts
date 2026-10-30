@@ -274,6 +274,8 @@ export async function scheduleBirthdayReminders(birthdays: readonly { userId: st
     }).catch(() => undefined);
   }
   useAppStore.setState({ birthdayNotified: [...birthdayNotified, ...seen].slice(-60) });
+}
+
 const homeCheckId = (partyId: string) => `home-check-${partyId}`;
 
 /**

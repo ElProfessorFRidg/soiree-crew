@@ -26,6 +26,7 @@ import { useCrewData } from "@/server/crewData";
 import { useTheme } from "@/theme";
 import { Button, IconButton } from "@/ui/Button";
 import { Chip } from "@/ui/controls";
+import { hasNativeTimePicker, TimePicker } from "@/ui/native/TimePicker";
 import { Stepper } from "@/ui/Stepper";
 import { Icon } from "@/ui/Icon";
 import { ScalePressable } from "@/ui/Pressable";
@@ -251,7 +252,24 @@ export default function AddDrinkSheet() {
 
         <View style={styles.time}>
           <Text variant="label">{i18n.t("addDrink.drankAt")}</Text>
-          {/* O-22: one minute per tap, faster while held; never in the future. */}
+          {/* O-22: never in the future. iOS: the system time picker; elsewhere one minute per tap, faster while held. */}
+          {hasNativeTimePicker ? (
+            <View style={styles.timeRow}>
+              <Text style={styles.flex} muted={minutesAgo !== 0}>
+                {minutesAgo === 0 ? i18n.t("addDrink.noFuture") : formatClock(consumedAt, i18n.language, preferences.hourCycle)}
+              </Text>
+              <TimePicker
+                value={consumedAt}
+                min={now - MAX_MINUTES_AGO * MINUTE_MS}
+                max={now}
+                tintColor={theme.amber}
+                onChange={(at) => {
+                  haptic.select();
+                  setMinutesAgo(Math.min(MAX_MINUTES_AGO, Math.max(0, Math.round((now - at) / MINUTE_MS))));
+                }}
+              />
+            </View>
+          ) : (
           <Stepper
             value={-minutesAgo}
             min={-MAX_MINUTES_AGO}
@@ -264,6 +282,7 @@ export default function AddDrinkSheet() {
             increaseLabel={i18n.t("addDrink.later")}
             boundMessage={minutesAgo === 0 ? i18n.t("addDrink.noFuture") : undefined}
           />
+          )}
         </View>
 
         <FoodPicker value={food} onChange={setFood} hint={i18n.t("addDrink.withFoodHint")} />
@@ -419,5 +438,6 @@ const styles = StyleSheet.create({
   customMain: { flex: 1, flexDirection: "row", alignItems: "center", gap: 12, minHeight: 60, paddingHorizontal: 14 },
   menu: { flexDirection: "row", gap: 8, marginTop: 8 },
   time: { gap: 8 },
+  timeRow: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 48 },
   flex: { flex: 1 },
 });

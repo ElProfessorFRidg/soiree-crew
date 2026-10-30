@@ -1543,6 +1543,7 @@ export const ru: Messages = {
       party: { one: "{who} создаёт вечеринки ({count})", few: "{who} создаёт вечеринки ({count})", many: "{who} создаёт вечеринки ({count})", other: "{who} создаёт вечеринки ({count})" },
       poll: { one: "{who} предлагает даты ({count})", few: "{who} предлагает даты ({count})", many: "{who} предлагает даты ({count})", other: "{who} предлагает даты ({count})" },
       takeover: { one: "{who} забирает короны ({count})", few: "{who} забирает короны ({count})", many: "{who} забирает короны ({count})", other: "{who} забирает короны ({count})" },
+      cheat: { one: "{who}: {count} отметка отклонена", few: "{who}: {count} отметки отклонены", many: "{who}: {count} отметки отклонены", other: "{who}: {count} отметки отклонены" },
       joined: { one: "{who} теперь в тусовке", few: "{who} теперь в тусовке", many: "{who} теперь в тусовке", other: "{who} теперь в тусовке" },
       quote: { one: "Цитаты вечера ({count})", few: "Цитаты вечера ({count})", many: "Цитаты вечера ({count})", other: "Цитаты вечера ({count})" },
       reactions: { one: "Реакции на итоги ({count})", few: "Реакции на итоги ({count})", many: "Реакции на итоги ({count})", other: "Реакции на итоги ({count})" },

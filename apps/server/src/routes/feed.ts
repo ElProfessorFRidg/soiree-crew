@@ -54,6 +54,7 @@ function peopleOf(item: KeyedItem): string[] {
     case "poll":
       return [item.by];
     case "takeover":
+    case "cheat":
       return [item.userId];
     case "quote":
       return item.saidBy ? [item.saidBy] : [];

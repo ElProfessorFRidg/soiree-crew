@@ -1518,6 +1518,7 @@ export const it: Messages = {
       party: { one: "{count} serata creata da {who}", other: "{count} serate create da {who}" },
       poll: { one: "{count} sondaggio di date di {who}", other: "{count} sondaggi di date di {who}" },
       takeover: { one: "{who}: {count} corona presa", other: "{who}: {count} corone prese" },
+      cheat: { one: "{who}: {count} check-in rifiutato", other: "{who}: {count} check-in rifiutati" },
       joined: { one: "{who} entra nel crew", other: "{who} entrano nel crew" },
       quote: { one: "{count} frase della serata", other: "{count} frasi della serata" },
       reactions: { one: "Reazioni su {count} riepilogo", other: "Reazioni su {count} riepiloghi" },

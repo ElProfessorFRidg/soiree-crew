@@ -1517,6 +1517,7 @@ export const fr = {
       party: { one: "{count} soirée lancée par {who}", other: "{count} soirées lancées par {who}" },
       poll: { one: "{count} sondage de dates par {who}", other: "{count} sondages de dates par {who}" },
       takeover: { one: "{who} : {count} couronne prise", other: "{who} : {count} couronnes prises" },
+      cheat: { one: "{who} : {count} check-in refusé", other: "{who} : {count} check-ins refusés" },
       joined: { one: "{who} rejoint le crew", other: "{who} rejoignent le crew" },
       quote: { one: "{count} phrase culte", other: "{count} phrases cultes" },
       reactions: { one: "Des réactions sur {count} récap", other: "Des réactions sur {count} récaps" },

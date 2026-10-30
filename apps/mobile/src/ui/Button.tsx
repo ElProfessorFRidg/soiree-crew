@@ -1,5 +1,6 @@
 import { type ReactNode } from "react";
-import { ActivityIndicator, StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
+import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
+import { ActivityIndicator, Platform, StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 import { radius, size, type } from "@crew/design-tokens";
 import { useTheme } from "@/theme";
 import { Icon, type AnyIconName } from "./Icon";
@@ -104,6 +105,9 @@ interface IconButtonProps {
   size?: number;
 }
 
+/** iOS 26 and later: round buttons are made of Liquid Glass, the material of the system's own. */
+const liquidGlass = Platform.OS === "ios" && isLiquidGlassAvailable();
+
 export function IconButton({ icon, accessibilityLabel, onPress, tone = "default", size: box = size.iconButton }: IconButtonProps) {
   const theme = useTheme();
   return (
@@ -111,8 +115,11 @@ export function IconButton({ icon, accessibilityLabel, onPress, tone = "default"
       onPress={onPress}
       accessibilityLabel={accessibilityLabel}
       hitSlop={box < 44 ? (44 - box) / 2 : 0}
-      style={[styles.iconButton, { width: box, height: box, backgroundColor: theme.surface2 }]}
+      style={[styles.iconButton, { width: box, height: box, backgroundColor: liquidGlass ? "transparent" : theme.surface2 }]}
     >
+      {liquidGlass ? (
+        <GlassView pointerEvents="none" glassEffectStyle="regular" colorScheme="dark" style={[StyleSheet.absoluteFill, styles.glass]} />
+      ) : null}
       <Icon name={icon} color={tone === "amber" ? theme.amber : theme.text} />
     </ScalePressable>
   );
@@ -134,6 +141,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     gap: 10,
   },
+  glass: { borderRadius: radius.iconButton },
   iconButton: {
     borderRadius: radius.iconButton,
     alignItems: "center",

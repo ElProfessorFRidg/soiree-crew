@@ -6,12 +6,14 @@ import { moodIcon } from "@/crew/moods";
 import { useT } from "@/i18n";
 import { formatClock } from "@/i18n/format";
 import { haptic } from "@/motion/haptics";
+import { useTheme } from "@/theme";
 import { createParty, fetchHabits, useCrewData, type CrewHabits, type PartyMood } from "@/server/crewData";
 import { linkCallToParty } from "@/server/radarData";
 import { useAppStore } from "@/state/store";
 import { Button } from "@/ui/Button";
 import { Chip, Panel, Segmented } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
+import { hasNativeTimePicker, TimePicker } from "@/ui/native/TimePicker";
 import { Stepper } from "@/ui/Stepper";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
@@ -21,6 +23,18 @@ import { failureMessage } from "@/server/errors";
 const MOODS: readonly PartyMood[] = ["party", "birthday", "champagne", "sunset", "costume", "wine", "fire", "night", "home", "tropical"];
 const STEP_MIN = 30;
 const DAY_MS = 86_400_000;
+
+/**
+ * The wheel gives a clock time; the party counts minutes from the day it starts, past 24 h after
+ * midnight. A time earlier than `from` is the next morning. Snapped to the stepper's step.
+ */
+function pickedMinutes(at: number, from: number): number {
+  const picked = new Date(at);
+  let minutes = picked.getHours() * 60 + picked.getMinutes();
+  while (minutes < from) minutes += 24 * 60;
+  if (minutes - 24 * 60 >= from) minutes -= 24 * 60;
+  return Math.round(minutes / STEP_MIN) * STEP_MIN;
+}
 
 function atMinutes(dayStart: Date, minutes: number): number {
   const date = new Date(dayStart);
@@ -59,6 +73,7 @@ export default function NewPartyScreen() {
   const [start, setStart] = useState(() => (minutesNow > 21 * 60 ? Math.floor(minutesNow / STEP_MIN) * STEP_MIN : 21 * 60));
   const [end, setEnd] = useState(() => Math.max(27 * 60, Math.ceil((minutesNow + 3 * 60) / STEP_MIN) * STEP_MIN));
   const [tripDays, setTripDays] = useState(2);
+  const theme = useTheme();
   const [busy, setBusy] = useState(false);
   // QOL-16: what this crew's nights usually look like, until the user sets things by hand.
   const [habits, setHabits] = useState<CrewHabits | null>(null);
@@ -191,17 +206,35 @@ export default function NewPartyScreen() {
       </Panel>
 
       <Panel>
-        <Text variant="label">{i18n.t("newParty.start")}</Text>
-        <Stepper
-          value={start}
-          min={12 * 60}
-          max={Math.min(end - STEP_MIN, 30 * 60)}
-          step={STEP_MIN}
-          format={clock}
-          onChange={setStart}
-          decreaseLabel={i18n.t("newParty.earlier")}
-          increaseLabel={i18n.t("newParty.later")}
-        />
+        {hasNativeTimePicker ? (
+          <View style={styles.timeRow}>
+            <Text variant="label" style={styles.flex}>{i18n.t("newParty.start")}</Text>
+            <TimePicker
+              value={atMinutes(day, start)}
+              min={day.getTime()}
+              max={day.getTime() + 2 * DAY_MS}
+              tintColor={theme.amber}
+              onChange={(at) => {
+                haptic.select();
+                setStart(Math.min(Math.max(pickedMinutes(at, 12 * 60), 12 * 60), Math.min(end - STEP_MIN, 30 * 60)));
+              }}
+            />
+          </View>
+        ) : (
+          <>
+            <Text variant="label">{i18n.t("newParty.start")}</Text>
+            <Stepper
+              value={start}
+              min={12 * 60}
+              max={Math.min(end - STEP_MIN, 30 * 60)}
+              step={STEP_MIN}
+              format={clock}
+              onChange={setStart}
+              decreaseLabel={i18n.t("newParty.earlier")}
+              increaseLabel={i18n.t("newParty.later")}
+            />
+          </>
+        )}
         {kind === "trip" ? (
           <>
             <Text variant="label">{i18n.t("newParty.endDay")}</Text>
@@ -216,20 +249,39 @@ export default function NewPartyScreen() {
             />
           </>
         ) : null}
-        <Text variant="label">{i18n.t("newParty.end")}</Text>
-        <Stepper
-          value={end}
-          min={start + STEP_MIN}
-          max={start + 16 * 60}
-          step={STEP_MIN}
-          format={clock}
-          onChange={(next) => {
-            setEndTouched(true);
-            setEnd(next);
-          }}
-          decreaseLabel={i18n.t("newParty.earlier")}
-          increaseLabel={i18n.t("newParty.later")}
-        />
+        {hasNativeTimePicker && kind === "party" ? (
+          <View style={styles.timeRow}>
+            <Text variant="label" style={styles.flex}>{i18n.t("newParty.end")}</Text>
+            <TimePicker
+              value={atMinutes(day, end)}
+              min={day.getTime()}
+              max={day.getTime() + 2 * DAY_MS}
+              tintColor={theme.amber}
+              onChange={(at) => {
+                haptic.select();
+                setEndTouched(true);
+                setEnd(Math.min(Math.max(pickedMinutes(at, start + STEP_MIN), start + STEP_MIN), start + 16 * 60));
+              }}
+            />
+          </View>
+        ) : (
+          <>
+            <Text variant="label">{i18n.t("newParty.end")}</Text>
+            <Stepper
+              value={end}
+              min={start + STEP_MIN}
+              max={start + 16 * 60}
+              step={STEP_MIN}
+              format={clock}
+              onChange={(next) => {
+                setEndTouched(true);
+                setEnd(next);
+              }}
+              decreaseLabel={i18n.t("newParty.earlier")}
+              increaseLabel={i18n.t("newParty.later")}
+            />
+          </>
+        )}
         {habits?.endMinutes != null && kind === "party" ? <Text variant="small">{i18n.t("newParty.usualEnd", { time: clock(habits.endMinutes) })}</Text> : null}
       </Panel>
       {habits?.friends.length ? (
@@ -241,4 +293,6 @@ export default function NewPartyScreen() {
 
 const styles = StyleSheet.create({
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  timeRow: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 48 },
+  flex: { flex: 1 },
 });
