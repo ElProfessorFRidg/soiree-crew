@@ -6,6 +6,27 @@
   "Other": [
     {
       "name": "Soirée Crew",
+      "version": "0.1.6",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.6%2Bbuild.73/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "• The source step runs after every release, even when the APK job was skipped\n• One card per version with its own picture, notes for people and release link; screenshots kept per version and recovered from older builds; source header; simulator screenshots set to France\n• Shorter arrival, permissions asked at first use with an explanation, going on without the estimate, first-run cards",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew 0.1.5",
       "version": "0.1.5",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.5%2Bbuild.72/soiree-crew-unsigned.ipa",
