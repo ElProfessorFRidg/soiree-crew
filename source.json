@@ -47,7 +47,7 @@
           "version": "0.1.6",
           "buildVersion": "73",
           "date": "2026-10-31T02:25:43Z",
-          "localizedDescription": "• The source step runs after every release, even when the APK job was skipped\n• One card per version with its own picture, notes for people and release link; screenshots kept per version and recovered from older builds; source header; simulator screenshots set to France\n• Shorter arrival, permissions asked at first use with an explanation, going on without the estimate, first-run cards",
+          "localizedDescription": "• Premier lancement plus court : un compte seulement si tu le choisis, le serveur officiel déjà choisi, un pseudo suffit.\n• La localisation, l'appareil photo et les notifications sont demandés au moment où tu en as besoin, avec une phrase qui dit pourquoi.\n• Tu peux utiliser l'app sans le calcul du taux et l'activer plus tard.\n• Si tu fermes l'app pendant l'accueil, tu reprends où tu en étais.\n• Écran Soirée : le pays de ta limite en un coup d'œil et une petite liste pour bien démarrer.",
           "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.6%2Bbuild.73/soiree-crew-unsigned.ipa",
           "size": 22198618,
           "minOSVersion": "16.4",
@@ -172,7 +172,7 @@
       ],
       "version": "0.1.6",
       "versionDate": "2026-10-31T02:25:43Z",
-      "versionDescription": "• The source step runs after every release, even when the APK job was skipped\n• One card per version with its own picture, notes for people and release link; screenshots kept per version and recovered from older builds; source header; simulator screenshots set to France\n• Shorter arrival, permissions asked at first use with an explanation, going on without the estimate, first-run cards",
+      "versionDescription": "• Premier lancement plus court : un compte seulement si tu le choisis, le serveur officiel déjà choisi, un pseudo suffit.\n• La localisation, l'appareil photo et les notifications sont demandés au moment où tu en as besoin, avec une phrase qui dit pourquoi.\n• Tu peux utiliser l'app sans le calcul du taux et l'activer plus tard.\n• Si tu fermes l'app pendant l'accueil, tu reprends où tu en étais.\n• Écran Soirée : le pays de ta limite en un coup d'œil et une petite liste pour bien démarrer.",
       "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.6%2Bbuild.73/soiree-crew-unsigned.ipa",
       "size": 22198618,
       "screenshotURLs": [
@@ -193,7 +193,7 @@
     {
       "identifier": "release-0.1.6",
       "title": "Soirée Crew 0.1.6",
-      "caption": "• The source step runs after every release, even when the APK job was skipped\n• One card per version with its own picture, notes for people and release link; screenshots kept per version and recovered from older builds; source header; simulator screenshots set to France\n• Shorter arrival, permissions asked at first use with an explanation, going on without the estimate, first-run cards",
+      "caption": "• Premier lancement plus court : un compte seulement si tu le choisis, le serveur officiel déjà choisi, un pseudo suffit.\n• La localisation, l'appareil photo et les notifications sont demandés au moment où tu en as besoin, avec une phrase qui dit pourquoi.\n• Tu peux utiliser l'app sans le calcul du taux et l'activer plus tard.\n• Si tu fermes l'app pendant l'accueil, tu reprends où tu en étais.\n• Écran Soirée : le pays de ta limite en un coup d'œil et une petite liste pour bien démarrer.",
       "date": "2026-10-31T02:25:43Z",
       "tintColor": "F4B33D",
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/banner.png",
