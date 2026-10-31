@@ -23,6 +23,7 @@ Not set yet: the private build runs on a server the crew hosts itself. Before an
 | Chat devices and keys | Adding each phone to its groups | `chat_devices` (public signature key), `chat_key_packages` (public, single use) | Public keys kept for checking old groups; packages until used |
 | Chat membership metadata | Routing ciphertext | `conversations`, `conversation_devices`: who is in which chat, timer, order of messages | Leaving the crew, party or friendship; account deletion |
 | Chat history backup (optional) | A new phone gets its history back (MSG-08) | `chat_backups` and a file, sealed with the user's recovery key only | Turning the backup off or account deletion |
+| Copy kept on the phone (native apps) | A reinstall on the same phone picks up where the person was | iOS Keychain or Android Keystore, `THIS_DEVICE_ONLY`, never synced: age check, consent, body profile, settings, custom drinks, drinks and water of the last 45 days (`apps/mobile/src/system/keptCopy.ts`) | The reset in Settings (account deletion or erasing everything); deleting the app does not remove it on iOS |
 | Reported chat messages | Moderation (MSG-07) | `reports.evidence`, sealed: the message and up to 3 around it, sent by the reporter's phone | Handled reports, then account deletion |
 
 Alcohol consumption and BAC are treated as health data (GDPR article 9).
@@ -39,6 +40,8 @@ Explicit consent (article 9(2)(a)), asked before any body or drink data is typed
 - Objection to leaderboards and territories: per crew, in Settings.
 
 ## Backups
+
+Phone backups: the app's local data is included in the iPhone's iCloud backup (`RCTAsyncStorageExcludeFromBackup` off) and in Android's Google backup (`allowBackup` on; secrets in the Keystore are excluded by the expo-secure-store backup rules). Apple or Google encrypt them, and the person manages them in the phone's settings. The reset in Settings cannot reach a backup already made; the in-app privacy page says so.
 
 Database backups are the host's job. The stated delay for a deleted account to leave the backups: 30 days (assumption A-ORCH-8, to confirm with the host).
 

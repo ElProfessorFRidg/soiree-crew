@@ -9,6 +9,7 @@ const SECTIONS = [
   ["privacy.who", "privacy.whoBody"],
   ["privacy.where", "privacy.whereBody"],
   ["privacy.never", "privacy.neverBody"],
+  ["privacy.backup", "privacy.backupBody"],
   ["privacy.rights", "privacy.rightsBody"],
 ] as const;
 
