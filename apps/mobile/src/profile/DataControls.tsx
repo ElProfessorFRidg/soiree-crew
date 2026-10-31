@@ -21,7 +21,7 @@ export type DataCategory = (typeof DATA_CATEGORIES)[number];
 /** This phone's copy goes too, with anything of that kind still waiting to be sent. */
 function forgetLocally(category: DataCategory): void {
   const pending = (prefix: string) => (item: { mutation: { kind: string } }) => !item.mutation.kind.startsWith(prefix);
-  if (category === "drinks") useAppStore.setState((s) => ({ drinks: [], drinkVenues: {}, levelState: null, outbox: s.outbox.filter(pending("drink.")) }));
+  if (category === "drinks") useAppStore.setState((s) => ({ drinks: [], drinkVenues: {}, learnedSpellings: {}, levelState: null, outbox: s.outbox.filter(pending("drink.")) }));
   if (category === "water") useAppStore.setState((s) => ({ water: [], outbox: s.outbox.filter(pending("water.")) }));
   if (category === "customDrinks") useAppStore.setState((s) => ({ customDrinks: [], outbox: s.outbox.filter(pending("customDrink.")) }));
   if (category === "checkIns") {

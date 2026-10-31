@@ -1,5 +1,5 @@
 import { catalogueNames, comboOf, DRINK_CATALOGUE, strengthFits, type CatalogueDrink, type DrinkGroup, type ServingId } from "./catalogue";
-import { normalise, scoreNormalised, type Candidate } from "./match";
+import { isEverydayWord, normalise, scoreNormalised, type Candidate } from "./match";
 
 /**
  * ADP-05: one parser for everything typed in the add sheet. "2 pintes et un shoot" is two pints and
@@ -16,6 +16,10 @@ export interface OrderLine<P> {
   volumeMl: number | null;
   /** A strength said in the text ("8", "8,5 %"), as a fraction; dropped when it cannot fit the drink. */
   abv: number | null;
+  /** The drink was found despite a misspelling: the app shows "did you mean". */
+  guess: boolean;
+  /** The words that named the drink, as typed, so the app can learn a person's own spelling. */
+  typed: string | null;
 }
 
 export interface OrderOptions<P> {
@@ -27,6 +31,11 @@ export interface OrderOptions<P> {
   presetVolume?: (preset: P) => number;
   /** What kind of drink a preset is, so "pinte jager" stays two drinks and "pinte 40" no strength. */
   presetGroup?: (preset: P) => DrinkGroup | null;
+  /**
+   * How much to favour a brand between near ties, 0 to 0.3: the person's own habits and country.
+   * It only breaks closeness; it never makes a far name match.
+   */
+  bonus?: (drink: CatalogueDrink) => number;
 }
 
 const NUMBER_WORDS: Record<string, number> = {
@@ -117,9 +126,11 @@ interface Draft<P> {
   serving: ServingWord | null;
   volumeMl: number | null;
   abv: number | null;
+  guess: boolean;
+  typed: string | null;
 }
 
-const emptyDraft = <P>(): Draft<P> => ({ quantity: null, preset: null, drink: null, serving: null, volumeMl: null, abv: null });
+const emptyDraft = <P>(): Draft<P> => ({ quantity: null, preset: null, drink: null, serving: null, volumeMl: null, abv: null, guess: false, typed: null });
 
 export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[], options: OrderOptions<P> = {}): OrderLine<P>[] {
   const catalogue = options.catalogue ?? DRINK_CATALOGUE;
@@ -135,7 +146,7 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
   const boundary = (word: string) => SEPARATORS.has(word) || GLUE.has(word) || UNITS.has(word) || PERCENT.has(word) || Object.hasOwn(NUMBER_WORDS, word);
 
   // Longest phrase first: "grand verre de vin" before "verre", "castel rouge" before "rouge".
-  const matchAt = (start: number): { entry: Entry<P>; span: number } | null => {
+  const matchAt = (start: number): { entry: Entry<P>; span: number; guess: boolean; phrase: string } | null => {
     for (let span = Math.min(4, words.length - start); span >= 1; span--) {
       const slice = words.slice(start, start + span);
       if (boundary(slice[0]!) || boundary(slice[span - 1]!)) continue;
@@ -162,13 +173,21 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
         }
         // On equal scores, a name said in full wins: "rouge" is red wine before Kasteel Rouge.
         const exact = candidate.scored.includes(query);
+        // Habits and country tip a near tie only, never a match that is not there.
+        if (Number.isFinite(score) && score > 0 && candidate.kind === "drink" && options.bonus) score = Math.max(0.01, score - Math.min(0.3, options.bonus(candidate.drink)));
         if (score < bestScore || (score === bestScore && exact && !bestExact)) {
           bestScore = score;
           best = candidate;
           bestExact = exact;
         }
       }
-      if (best && bestScore <= span) return { entry: best, span };
+      // A phrase opened by an everyday word must be a name written exactly: "on se voit" is no Sex on the beach.
+      if (best && span > 1 && isEverydayWord(slice[0]!) && !bestExact) continue;
+      if (best && bestScore <= span) {
+        // Exact or the start of a name is sure; anything reached through a misspelling is a guess.
+        const guess = !bestExact && bestScore > 0 && !best.scored.some((name) => name.startsWith(query));
+        return { entry: best, span, guess, phrase };
+      }
     }
     return null;
   };
@@ -199,6 +218,8 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
       drink: draft.drink,
       volumeMl,
       abv,
+      guess: draft.guess,
+      typed: draft.typed,
     };
   };
 
@@ -261,6 +282,11 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
     const found = matchAt(i);
     if (found) {
       place(found.entry);
+      if (found.entry.kind !== "serving") {
+        // The line now names this drink: remember how it was typed and whether it was a guess.
+        if (found.entry.kind === "drink") line.typed = found.phrase;
+        if (found.guess) line.guess = true;
+      }
       i += found.span;
       continue;
     }

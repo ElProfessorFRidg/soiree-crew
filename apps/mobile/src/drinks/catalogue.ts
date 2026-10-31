@@ -1,6 +1,7 @@
 import {
   bestScore,
   countryRank,
+  normalise,
   DRINK_CATALOGUE,
   GROUP_SPECS,
   sizesFor,
@@ -11,6 +12,7 @@ import {
   type SizeOption,
 } from "@crew/fuzzy";
 import { createTranslator, type Translator } from "@/i18n";
+import { useAppStore } from "@/state/store";
 import { drinkLabel, strengthText } from "./display";
 import { CATALOGUE_PREFIX, type CustomDrink, type DrinkKind, type DrinkPreset } from "./presets";
 
@@ -110,14 +112,47 @@ export function presetFromLine(line: OrderLine<string>, presets: readonly DrinkP
  * The add sheet's reading of what was typed: the user's own drinks and the grid's presets in the
  * user's language, French and English, plus the brand catalogue. Custom drinks come back as presets.
  */
+/** Spellings learnt from picked guesses, at most this many: the oldest go first. */
+const MAX_LEARNED = 300;
+
+/** ADP-05: the person picked this drink for what they typed; next time the word is read exactly. */
+export function learnSpelling(typed: string, drinkId: string): void {
+  const key = normalise(typed);
+  if (key.length < 3) return;
+  const current = useAppStore.getState().learnedSpellings;
+  if (current[key] === drinkId) return;
+  const entries = Object.entries(current).filter(([word]) => word !== key);
+  useAppStore.setState({ learnedSpellings: Object.fromEntries([...entries.slice(-(MAX_LEARNED - 1)), [key, drinkId]]) });
+}
+
+/**
+ * Between near ties, the drink this person logs most comes first (up to 0.2), then one known in
+ * their country (0.1). Read from this phone's own history; it never turns a far name into a match.
+ */
+function habitBonus(): (drink: CatalogueDrink) => number {
+  const { drinks, preferences } = useAppStore.getState();
+  const counts = new Map<string, number>();
+  for (const entry of drinks.slice(-400)) {
+    if (entry.presetId.startsWith(CATALOGUE_PREFIX)) {
+      const id = entry.presetId.slice(CATALOGUE_PREFIX.length);
+      counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+  }
+  const most = Math.max(1, ...counts.values());
+  return (drink) => ((counts.get(drink.id) ?? 0) / most) * 0.2 + (countryRank(drink, preferences.legalCountry) === 0 ? 0.1 : 0);
+}
+
 export function readOrder(text: string, presets: readonly DrinkPreset[], i18n: Translator): OrderLine<string>[] {
+  const learned = new Map<string, string[]>();
+  for (const [word, id] of Object.entries(useAppStore.getState().learnedSpellings)) learned.set(id, [...(learned.get(id) ?? []), word]);
   const candidates = presets.map((p) => ({
     value: p.id,
     names: p.kind === "custom" ? [p.name ?? ""] : [drinkLabel(p, i18n), drinkLabel(p, FR), drinkLabel(p, EN)],
   }));
   const byId = new Map(presets.map((p) => [p.id, p]));
   return parseDrinkOrder(text, candidates, {
-    names: (drink) => (drink.generic ? [catalogueLabel(drink, i18n), catalogueLabel(drink, FR), catalogueLabel(drink, EN)] : []),
+    names: (drink) => [...(drink.generic ? [catalogueLabel(drink, i18n), catalogueLabel(drink, FR), catalogueLabel(drink, EN)] : []), ...(learned.get(drink.id) ?? [])],
+    bonus: habitBonus(),
     presetVolume: (id) => byId.get(id)?.volumeMl ?? 0,
     presetGroup: (id) => {
       const preset = byId.get(id);

@@ -2449,6 +2449,7 @@ export const it: Messages = {
   },
   // Brand catalogue, typed orders, group details, house pint and the party screen's row of my drinks.
   drinkCatalogue: {
+    didYouMean: "Intendevi",
     brandFilter: "Cerca una marca",
     brandNone: "Nessuna marca con questo nome.",
     generic: { redWine: "Vino rosso", whiteWine: "Vino bianco", roseWine: "Rosato", champagne: "Champagne", cider: "Sidro", whisky: "Whisky", rum: "Rum", vodka: "Vodka", gin: "Gin", tequila: "Tequila", orangeJuice: "Succo d'arancia" },

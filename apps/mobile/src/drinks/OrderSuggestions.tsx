@@ -23,6 +23,11 @@ export interface Suggestion {
   key: string;
   preset: DrinkPreset;
   quantity: number;
+  /** Found through a misspelling: the card says "did you mean" instead of claiming it. */
+  guess?: boolean;
+  /** What was typed for it and the catalogue drink it became, to learn the spelling once picked. */
+  typed?: string | null;
+  catalogueId?: string | null;
 }
 
 interface Props {
@@ -95,6 +100,11 @@ export function SuggestionCard({ suggestion, unit, onQuantity, onAdd }: Props) {
           <Icon name={`glass:${preset.icon}`} size={24} color={theme.amber} />
         </View>
         <View style={styles.flex}>
+          {suggestion.guess ? (
+            <Text variant="small" color={theme.amber}>
+              {i18n.t("drinkCatalogue.didYouMean")}
+            </Text>
+          ) : null}
           <Text variant="h3">{name}</Text>
           <Text variant="small">{sizeAndStrength(preset, unit, i18n)}</Text>
         </View>

@@ -125,3 +125,31 @@ describe("spelling by ear, without any alias written for it", () => {
     expect(soundOf("guiness")).toEqual(soundOf("guinness"));
   });
 });
+
+describe("a wrong first letter, guesses and everyday words", () => {
+  const presets = [{ value: "m-pint", names: ["pinte", "pint"] }, { value: "m-shot", names: ["shot"] }];
+  const read = (text: string) => parseDrinkOrder(text, presets).map((line) => [line.drink?.id ?? line.preset, line.guess]);
+
+  it("finds a name whose first letter is wrong, and says it is a guess", () => {
+    expect(read("xubrikov")).toEqual([["zubrowka", true]]);
+    expect(read("habsolut")).toEqual([["absolut", true]]);
+    expect(read("dacardi")).toEqual([["bacardi", true]]);
+    expect(read("beineken")).toEqual([["heineken", true]]);
+  });
+
+  it("is sure of exact names, nicknames, starts and plurals", () => {
+    expect(read("2 kro")).toEqual([["kronenbourg", false]]);
+    expect(read("2 pintes et un shot")).toEqual([["m-pint", false], ["m-shot", false]]);
+    expect(read("sex on the beach")).toEqual([["sex-on-the-beach", false]]);
+  });
+
+  it("keeps everyday words, days and chatter out", () => {
+    for (const text of ["on se voit demain", "mardi", "lundi soir", "bonjour la team", "merci beaucoup", "hola amigos", "danke"]) expect(read(text)).toEqual([]);
+  });
+
+  it("lets habits tip a near tie, never a far name", () => {
+    const tie = parseDrinkOrder("jager", presets, { bonus: (d) => (d.id === "jagerbomb" ? 0.3 : 0) });
+    expect(tie[0]!.drink?.id).toBe("jagermeister");
+    expect(parseDrinkOrder("merci", presets, { bonus: () => 0.3 })).toEqual([]);
+  });
+});

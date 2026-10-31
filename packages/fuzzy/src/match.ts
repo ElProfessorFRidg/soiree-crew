@@ -146,6 +146,37 @@ function sameStart(a: string, b: string): boolean {
   return (a.startsWith("ph") && b[0] === "f") || (b.startsWith("ph") && a[0] === "f");
 }
 
+/**
+ * Everyday words of the app's seven languages that are never a drink: they match a name only when
+ * written exactly. They are what a person types around an order ("bonjour la team, 2 kro stp"), and
+ * keeping them out is what lets the rest of the matching be generous.
+ */
+const EVERYDAY = new Set(
+  [
+    // fr
+    "bonjour bonsoir salut coucou merci beaucoup stp svp demain aujourd hui ce soir cette nuit avec pour dans sur chez moi toi nous vous eux elle il ils elles on ca va bien tres trop encore aussi mais donc oui non team ok bon bonne soiree maison ici la le les des du au aux et ou je tu mon ma mes ton ta tes son sa ses notre votre leur qui que quoi quand comment pourquoi tout tous toute rien plus moins peu petit petite puis apres avant deja jamais toujours vite allez allons viens venez faut veux voulez peux pote potes mec meuf frere soeur copain copine gars se te me voit vois voir lundi mardi mercredi jeudi vendredi samedi dimanche matin midi heure heures minute minutes",
+    // en
+    "hello hi hey thanks thank please you the and with for tonight tomorrow today my your our their team guys mate mates good great very too also just then now here there what when how why yes yeah no nope all more less some monday tuesday wednesday thursday friday saturday sunday see",
+    // es, it, pt
+    "hola gracias manana noche esta este con para por muy bien que vamos amigo amigos ciao grazie domani sera stasera molto bene per andiamo amici ola obrigado obrigada amanha noite hoje com muito bem vamos",
+    // de
+    "hallo danke bitte morgen heute abend mit fur sehr gut und noch auch los freunde montag dienstag mittwoch donnerstag freitag samstag sonntag",
+    // ru
+    "привет спасибо пожалуиста завтра сегодня вечер очень хорошо даваи еще тоже друзья",
+  ]
+    .join(" ")
+    .split(/\s+/),
+);
+
+export function isEverydayWord(word: string): boolean {
+  return EVERYDAY.has(word);
+}
+
+/** Two Double Metaphone keys of the same name: equal, or one a final sound longer ("SPRK", "SPRKF"). */
+function soundsClose(a: readonly string[], b: readonly string[]): boolean {
+  return a.some((x) => b.some((y) => x === y || (Math.min(x.length, y.length) >= 4 && Math.abs(x.length - y.length) <= 1 && (x.startsWith(y) || y.startsWith(x)))));
+}
+
 /** Below four letters, likeness and sound say nothing: "vin" and "gin" are both drinks. */
 const LIKENESS_MIN = 4;
 /** Jaro-Winkler from which two words are the same name misspelled. */
@@ -156,6 +187,9 @@ const LIKENESS = 0.86;
  * kindest of the keyboard distance, the likeness of the spelling and the sound.
  */
 export function wordScore(typed: string, name: string): number | null {
+  // An everyday word is never one word of a longer name: "on" is not in Sex on the beach for this.
+  // The whole name typed exactly is matched before words are compared.
+  if (EVERYDAY.has(typed)) return null;
   if (typed === name) return 0;
   let best = Number.POSITIVE_INFINITY;
   if (name.startsWith(typed) && typed.length >= 2) best = 0.5;
@@ -167,8 +201,16 @@ export function wordScore(typed: string, name: string): number | null {
     const likeness = jaroWinkler(typed, name);
     // 0.86 reads as 0.7, 0.9 as 0.5, 0.95 as 0.25: as good as one or half a typo.
     if (likeness >= LIKENESS) best = Math.min(best, (1 - likeness) * 5);
-    const typedSound = soundOf(typed);
-    if (typedSound.length && soundOf(name).some((key) => typedSound.includes(key))) best = Math.min(best, 0.75);
+    if (soundsClose(soundOf(typed), soundOf(name))) best = Math.min(best, 0.75);
+  } else if (Math.min(typed.length, name.length) >= LIKENESS_MIN + 2) {
+    // The first letter missed ("xubrowka", "habsolut"): the rest of the word decides, at a cost,
+    // smaller when the wrong key sits next to the right one.
+    const miss = adjacentKeys(typed[0]!, name[0]!) ? 0.25 : 0.5;
+    const restTyped = typed.slice(1);
+    const restName = name.slice(1);
+    const likeness = jaroWinkler(restTyped, restName);
+    if (likeness >= LIKENESS + 0.04) best = Math.min(best, miss + (1 - likeness) * 5);
+    if (soundsClose(soundOf(restTyped), soundOf(restName))) best = Math.min(best, miss + 0.75);
   }
   return Number.isFinite(best) ? best : null;
 }

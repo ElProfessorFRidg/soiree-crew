@@ -14,6 +14,7 @@ import {
   genericAt,
   presetFromCatalogue,
   presetFromLine,
+  learnSpelling,
   readOrder,
   searchCatalogue,
   SIZED_KINDS,
@@ -480,7 +481,7 @@ function QuickType({ presets, consumedAt, food, houseAbv, unit, onDone }: QuickT
 
   const suggestions = useMemo<Suggestion[]>(() => {
     const byId = new Map(presets.map((p) => [p.id, p]));
-    let found: { preset: DrinkPreset; quantity: number }[];
+    let found: { preset: DrinkPreset; quantity: number; guess?: boolean; typed?: string | null; catalogueId?: string | null }[];
     if (fromAi) {
       found = ai.items.flatMap((item) => {
         const preset = byId.get(item.value);
@@ -489,7 +490,7 @@ function QuickType({ presets, consumedAt, food, houseAbv, unit, onDone }: QuickT
     } else if (lines.length) {
       found = lines.flatMap((line) => {
         const preset = presetFromLine(line, presets, i18n, houseAbv);
-        return preset ? [{ preset, quantity: line.quantity }] : [];
+        return preset ? [{ preset, quantity: line.quantity, guess: line.guess, typed: line.typed, catalogueId: line.drink?.id ?? null }] : [];
       });
     } else if (text.trim()) {
       // Nothing read as an order: the closest brands and drinks, one of each, to tap.
@@ -499,7 +500,13 @@ function QuickType({ presets, consumedAt, food, houseAbv, unit, onDone }: QuickT
           const preset = byId.get(id);
           return preset ? [{ preset: withHousePint(preset, houseAbv), quantity: 1 }] : [];
         }),
-        ...searchCatalogue(text, i18n, 3, useAppStore.getState().preferences.legalCountry).map((drink) => ({ preset: presetFromCatalogue(drink, i18n), quantity: 1 })),
+        ...searchCatalogue(text, i18n, 3, useAppStore.getState().preferences.legalCountry).map((drink) => ({
+          preset: presetFromCatalogue(drink, i18n),
+          quantity: 1,
+          guess: true,
+          typed: text.trim(),
+          catalogueId: drink.id,
+        })),
       ];
     } else {
       found = [];
@@ -520,6 +527,8 @@ function QuickType({ presets, consumedAt, food, houseAbv, unit, onDone }: QuickT
     let count = 0;
     let single: ReturnType<typeof logDrink> = null;
     for (const card of cards) {
+      // A guess the person confirmed teaches the app their spelling.
+      if (card.guess && card.typed && card.catalogueId) learnSpelling(card.typed, card.catalogueId);
       for (let n = 0; n < card.quantity; n++) {
         const drink = logDrink(card.preset, at, food, count > 0);
         if (drink) {

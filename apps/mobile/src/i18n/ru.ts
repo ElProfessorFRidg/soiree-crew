@@ -2496,6 +2496,7 @@ export const ru: Messages = {
   },
   // Brand catalogue, typed orders, group details, house pint and the party screen's row of my drinks.
   drinkCatalogue: {
+    didYouMean: "Возможно",
     brandFilter: "Найти марку",
     brandNone: "Нет марки с таким названием.",
     generic: { redWine: "Красное вино", whiteWine: "Белое вино", roseWine: "Розовое вино", champagne: "Шампанское", cider: "Сидр", whisky: "Виски", rum: "Ром", vodka: "Водка", gin: "Джин", tequila: "Текила", orangeJuice: "Апельсиновый сок" },
