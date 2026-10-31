@@ -100,7 +100,44 @@ export const accountSchema = z.object({
 export const passwordSchema = z.string().min(10).max(200);
 
 export const CREW_KINDS = ["friends", "school", "family", "work", "sport", "other"] as const;
-export const crewSchema = z.object({ name: z.string().trim().min(1).max(40), kind: z.enum(CREW_KINDS).default("friends") });
+/** What a public crew is, for people browsing the listing (migration 042). */
+export const CREW_CATEGORIES = ["bars", "students", "sport", "flatmates", "colleagues", "other"] as const;
+export const CITY_MAX = 60;
+export const CREW_DESCRIPTION_MAX = 200;
+
+/**
+ * Text strangers read in the public listing stays on one line: no control, zero-width or
+ * direction-override characters, spaces collapsed.
+ */
+export function oneLine(raw: string): string {
+  return raw.normalize("NFC").replace(HIDDEN_CHARS, " ").replace(/\s+/g, " ").trim();
+}
+
+/** Control (C0, C1), zero-width, line-separator and bidi characters, built from code points. */
+const HIDDEN_CHARS = new RegExp(
+  `[${(
+    [
+      [0x00, 0x1f],
+      [0x7f, 0x9f],
+      [0x200b, 0x200f],
+      [0x2028, 0x202e],
+      [0x2060, 0x2069],
+      [0xfeff, 0xfeff],
+    ] as const
+  )
+    .map(([from, to]) => `${String.fromCharCode(from)}-${String.fromCharCode(to)}`)
+    .join("")}]`,
+  "g",
+);
+
+export const crewSchema = z.object({
+  name: z.string().trim().min(1).max(40),
+  kind: z.enum(CREW_KINDS).default("friends"),
+  /** Public: listed on the server and joinable without an invite. Private by default. */
+  open: z.boolean().default(false),
+  category: z.enum(CREW_CATEGORIES).optional(),
+  city: z.string().max(CITY_MAX * 2).transform(oneLine).pipe(z.string().max(CITY_MAX)).optional(),
+});
 
 export const partySchema = z.object({
   id: uuid,

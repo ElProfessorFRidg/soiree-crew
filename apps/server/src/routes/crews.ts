@@ -6,7 +6,8 @@ import { offsetMinutes } from "../time";
 import { photoPath } from "./photos";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { newCode, newId } from "../crypto";
-import { crewSchema } from "../schemas";
+import { CREW_CATEGORIES, crewSchema } from "../schemas";
+import { assertCleanText } from "../textFilter";
 import { invitePage, pickLanguage } from "../invitePage";
 import { RateLimiter } from "../ratelimit";
 
@@ -37,13 +38,27 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
   app.post("/v1/crews", async (request, reply) => {
     const user = requireUser(request);
     const input = crewSchema.parse(request.body);
+    // COM-08: a public crew's name and city are read by strangers, so they go through the filters.
+    if (input.open) {
+      assertCleanText(input.name);
+      assertCleanText(input.city);
+    }
     const id = newId();
     const now = ctx.now();
     await ctx.db.transaction(async (tx) => {
-      await tx.query("insert into crews (id, name, created_by, created_at, kind) values ($1, $2, $3, $4, $5)", [id, input.name, user.id, now, input.kind]);
+      await tx.query("insert into crews (id, name, created_by, created_at, kind, open, category, city) values ($1, $2, $3, $4, $5, $6, $7, $8)", [
+        id,
+        input.name,
+        user.id,
+        now,
+        input.kind,
+        input.open,
+        input.category ?? null,
+        input.city || null,
+      ]);
       await tx.query("insert into crew_members (crew_id, user_id, role, joined_at) values ($1, $2, 'admin', $3)", [id, user.id, now]);
     });
-    return reply.status(201).send({ crew: { id, name: input.name, role: "admin", kind: input.kind } });
+    return reply.status(201).send({ crew: { id, name: input.name, role: "admin", kind: input.kind, open: input.open } });
   });
 
   /** My crews and their members. Members see each other's display name and username only (SEC-01). */
@@ -59,10 +74,12 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
       kind: string;
       open: boolean;
       description: string;
+      category: string | null;
+      city: string | null;
       leaderboard_opt_out: boolean;
       territory_opt_out: boolean;
     }>(
-      `select c.id, c.name, m.role, c.leaderboard_enabled, c.ai_enabled, c.public_name, c.kind, c.open, c.description, m.leaderboard_opt_out, m.territory_opt_out
+      `select c.id, c.name, m.role, c.leaderboard_enabled, c.ai_enabled, c.public_name, c.kind, c.open, c.description, c.category, c.city, m.leaderboard_opt_out, m.territory_opt_out
        from crews c join crew_members m on m.crew_id = c.id where m.user_id = $1 order by c.created_at`,
       [user.id],
     );
@@ -86,6 +103,8 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
         kind: crew.kind,
         open: crew.open,
         description: crew.description,
+        category: crew.category,
+        city: crew.city,
         // My own participation (RANK-08, TER-07): only ever sent to me.
         me: { leaderboardOptOut: crew.leaderboard_opt_out, territoryOptOut: crew.territory_opt_out },
         members: members
@@ -174,18 +193,34 @@ export function crewRoutes(app: FastifyInstance, ctx: Context): void {
       .send(invitePage(language, valid ? { code, crewName: row.name, members: row.members, serverUrl: ctx.publicUrl } : null));
   });
 
-  /** Open crews on this server that I am not in yet, by name. Members are not listed, only how many. */
-  app.get<{ Querystring: { q?: string } }>("/v1/crews/open", async (request) => {
-    const user = requireUser(request);
+  /**
+   * The public listing: open crews on this server, by name, city or description, optionally of one
+   * category. Readable before signing up on a server that calls itself public (PUBLIC_SERVER), so
+   * people can look before making an account; signed in, the crews I am already in are left out.
+   * Only what a stranger needs to choose (SEC-01): never who is in it, only how many.
+   */
+  const listings = new RateLimiter(60, 60_000, ctx.now);
+  app.get<{ Querystring: { q?: string; category?: string } }>("/v1/crews/open", async (request) => {
+    listings.check(request.ip);
+    const user = request.user ?? null;
+    if (!user && !ctx.serverInfo?.public) throw new HttpError(401, "unauthenticated");
     const q = z.string().trim().max(40).parse(request.query.q ?? "");
-    const rows = await ctx.db.query<{ id: string; name: string; kind: string; description: string; members: number }>(
-      `select c.id, c.name, c.kind, c.description, (select count(*)::int from crew_members m where m.crew_id = c.id) as members
-       from crews c where c.open and not exists (select 1 from crew_members m where m.crew_id = c.id and m.user_id = $1)
-         and ($2 = '' or c.name ilike '%' || $2 || '%')
+    const category = z.enum(CREW_CATEGORIES).nullable().parse(request.query.category || null);
+    // The search text is matched literally: a % or _ someone types is not a wildcard.
+    const pattern = q ? `%${q.replace(/[\\%_]/g, (c) => `\\${c}`)}%` : "";
+    const rows = await ctx.db.query<{ id: string; name: string; category: string | null; city: string | null; description: string; members: number }>(
+      `select c.id, c.name, c.category, c.city, c.description, (select count(*)::int from crew_members m where m.crew_id = c.id) as members
+       from crews c
+       where c.open
+         and ($1::uuid is null or not exists (select 1 from crew_members m where m.crew_id = c.id and m.user_id = $1))
+         and ($2 = '' or c.name ilike $2 or c.city ilike $2 or c.description ilike $2)
+         and ($3::text is null or c.category = $3)
        order by members desc, c.created_at limit 30`,
-      [user.id, q],
+      [user?.id ?? null, pattern, category],
     );
-    return { crews: rows };
+    return {
+      crews: rows.map((row) => ({ id: row.id, name: row.name, category: row.category, city: row.city, description: row.description, members: row.members })),
+    };
   });
 
   /** Joining an open crew needs no invite; a closed one answers 404, like any id I may not see. */

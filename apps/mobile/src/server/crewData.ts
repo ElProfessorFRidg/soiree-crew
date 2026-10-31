@@ -20,14 +20,23 @@ export interface CrewMember {
 export const CREW_KINDS = ["friends", "school", "family", "work", "sport", "other"] as const;
 export type CrewKind = (typeof CREW_KINDS)[number];
 
+/** What a public crew is, in the listing (server migration 042). */
+export const CREW_CATEGORIES = ["bars", "students", "sport", "flatmates", "colleagues", "other"] as const;
+export type CrewCategory = (typeof CREW_CATEGORIES)[number];
+/** Same caps as the server's: the fields stop there instead of failing on save. */
+export const CREW_CITY_MAX = 60;
+export const CREW_DESCRIPTION_MAX = 200;
+
 export interface Crew {
   id: string;
   name: string;
   /** Friends, school, family...: one person is often in several. */
   kind?: CrewKind;
-  /** Listed on the server, joinable without an invite. */
+  /** Public: listed on the server, joinable without an invite. */
   open?: boolean;
   description?: string;
+  category?: CrewCategory | null;
+  city?: string | null;
   role: "admin" | "member";
   leaderboardEnabled: boolean;
   /** <ai_features>: opt-in per crew, off by default. */
@@ -155,8 +164,8 @@ export async function refreshLiveParty(partyId: string): Promise<void> {
   useCrewData.setState((state) => ({ live: { ...state.live, [partyId]: { ...data, fetchedAt: Date.now() } } }));
 }
 
-export async function createCrew(name: string, kind: CrewKind = "friends"): Promise<string> {
-  const { crew } = await api<{ crew: { id: string } }>("/v1/crews", { method: "POST", body: { name, kind } });
+export async function createCrew(name: string, kind: CrewKind = "friends", listing: { open?: boolean; category?: CrewCategory } = {}): Promise<string> {
+  const { crew } = await api<{ crew: { id: string } }>("/v1/crews", { method: "POST", body: { name, kind, ...listing } });
   await refreshCrews();
   return crew.id;
 }
@@ -306,24 +315,36 @@ export async function setCrewLeaderboard(crewId: string, leaderboardEnabled: boo
   }
 }
 
+/** A public crew as the listing shows it: never who is in it, only how many. */
 export interface OpenCrew {
   id: string;
   name: string;
-  kind: CrewKind;
+  category: CrewCategory | null;
+  city: string | null;
   description: string;
   members: number;
 }
 
-/** Open crews on this server, by name, that I am not in yet. */
-export const fetchOpenCrews = (q: string) => api<{ crews: OpenCrew[] }>(`/v1/crews/open?q=${encodeURIComponent(q)}`);
+/**
+ * Public crews on a server, by name, city or description, optionally of one category. Signed in,
+ * the session's server (minus my crews); before signing up, the server picked on the Crew tab.
+ */
+export function fetchOpenCrews(q: string, category: CrewCategory | null = null, server?: string): Promise<{ crews: OpenCrew[] }> {
+  const query = [`q=${encodeURIComponent(q)}`, ...(category ? [`category=${category}`] : [])].join("&");
+  const path = `/v1/crews/open?${query}`;
+  return server ? api(path, { baseUrl: server, token: null }) : api(path);
+}
 
 export async function joinOpenCrew(crewId: string): Promise<void> {
   await api(`/v1/crews/${crewId}/join`, { method: "POST" });
   await refreshCrews();
 }
 
-/** Admin only: what the crew is, and whether anyone on the server may join it. */
-export async function updateCrew(crewId: string, change: { kind?: CrewKind; open?: boolean; description?: string }): Promise<void> {
+/** Admin only: what the crew is, whether anyone on the server may find and join it, and its public details. */
+export async function updateCrew(
+  crewId: string,
+  change: { kind?: CrewKind; open?: boolean; description?: string; category?: CrewCategory | null; city?: string | null },
+): Promise<void> {
   await api(`/v1/crews/${crewId}/settings`, { method: "PATCH", body: change });
   useCrewData.setState((state) => ({ crews: state.crews.map((c) => (c.id === crewId ? { ...c, ...change } : c)) }));
 }
