@@ -29,7 +29,7 @@ export default function DiscoverScreen() {
 
   const load = useCallback(async () => {
     setFailed(false);
-    const fix = await currentFix();
+    const fix = await currentFix("nearby");
     if (!fix.ok) {
       setFailed(true);
       setPlaces([]);

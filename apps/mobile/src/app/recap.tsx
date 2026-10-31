@@ -50,6 +50,7 @@ import { showToast, ToastHost } from "@/ui/Toast";
 import { Quotes } from "@/recap/Quotes";
 import { failureMessage } from "@/server/errors";
 import { showPermissionDenied } from "@/system/permissions";
+import { askPermission } from "@/system/askPermission";
 import { canShareImages } from "@/system/share";
 
 const SLIDES = 5;
@@ -224,9 +225,9 @@ export default function RecapScreen() {
 
   /** O-30: a photo for the top of the story, taken now; it stays on the phone and in the shared image. */
   const takeSelfie = async (camera: "front" | "back") => {
-    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    const permission = await askPermission("camera", "photo");
     if (!permission.granted) {
-      showPermissionDenied(i18n, i18n.t("album.denied"), permission.canAskAgain);
+      if (!permission.declined) showPermissionDenied(i18n, i18n.t("album.denied"), permission.canAskAgain);
       return;
     }
     const result = await ImagePicker.launchCameraAsync({

@@ -49,6 +49,7 @@ import { LaunchCurtain } from "@/ui/LaunchCurtain";
 import { purgePlainFiles } from "@/chat/media";
 import { watchLiveActivity } from "@/system/liveActivity";
 import { PrivacyCover } from "@/ui/PrivacyCover";
+import { PermissionPrompt } from "@/system/PermissionPrompt";
 import { handleNotificationResponse, prepareNotifications } from "@/notify/push";
 
 /** Expo Router shows this instead of a crashed screen (any route below this layout). */
@@ -290,6 +291,7 @@ export default function RootLayout() {
                 <Stack.Screen name="place" />
                 <Stack.Screen name="discover" />
                 <Stack.Screen name="estimate" />
+                <Stack.Screen name="health-consent" />
                 <Stack.Screen name="morning" options={{ animation: "fade" }} />
                 <Stack.Screen
                   name="quick/[action]"
@@ -304,6 +306,7 @@ export default function RootLayout() {
                 />
               </Stack>
               <HeroOverlay />
+              <PermissionPrompt />
               <PrivacyCover />
             </I18nProvider>
           </NavigationThemeProvider>

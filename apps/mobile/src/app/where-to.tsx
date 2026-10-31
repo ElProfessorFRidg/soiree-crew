@@ -1,4 +1,3 @@
-import * as Location from "expo-location";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -9,6 +8,8 @@ import { useT, type Translator } from "@/i18n";
 import { haptic } from "@/motion/haptics";
 import { api } from "@/server/api";
 import { useCrewData } from "@/server/crewData";
+import { permissionStatus } from "@/system/askPermission";
+import { showPermissionDenied } from "@/system/permissions";
 import { currentFix, fetchWhereTo, type WhereToOption, type WhereToReason, type WhereToResult } from "@/server/venueData";
 import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
@@ -100,17 +101,19 @@ export default function WhereToScreen() {
     void load();
   }, [load]);
 
+  // Distances come from the position only once allowed: opening the screen never asks, the
+  // "Près de moi" chip does, with its explanation first.
+  const locate = useCallback(async (asked: boolean) => {
+    const fix = await currentFix(asked ? "nearby" : null);
+    if (fix.ok) setHere({ lat: fix.fix.lat, lng: fix.fix.lng });
+    else if (asked && !fix.declined) showPermissionDenied(i18n, fix.failure === "denied" ? i18n.t("permissions.nearbyDenied") : i18n.t("addVenue.locationUnavailable"), fix.canAskAgain !== false);
+  }, [i18n]);
+
   useEffect(() => {
-    // Distance only if location is already allowed: this screen never asks on its own.
-    void Location.getForegroundPermissionsAsync()
-      .then((p) => (p.granted ? currentFix() : null))
-      .then((fix) => {
-        if (fix?.ok) setHere({ lat: fix.fix.lat, lng: fix.fix.lng });
-      })
-      .catch(() => undefined);
+    void permissionStatus("location").then((p) => (p.granted ? locate(false) : undefined));
     const pending = timers.current;
     return () => pending.forEach(clearTimeout);
-  }, []);
+  }, [locate]);
 
   const options = result?.options ?? [];
   const countOf = (venueId: string) => votes.find((v) => v.venueId === venueId)?.count ?? 0;
@@ -200,6 +203,7 @@ export default function WhereToScreen() {
   return (
     <Screen back title={i18n.t("whereTo.title")} withToasts onRefresh={load}>
       <View style={styles.chips}>
+        <Chip label={i18n.t("permissions.nearMe")} icon="pin" selected={here !== null} onPress={() => (here ? setHere(null) : void locate(true))} />
         <Chip label={i18n.t("whereTo.openNow")} selected={openNow} onPress={() => setOpenNow(!openNow)} />
         <Chip label={i18n.t("whereTo.happyNow")} selected={happyNow} onPress={() => setHappyNow(!happyNow)} />
         {BUDGETS.map((cap) => (

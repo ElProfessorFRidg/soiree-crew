@@ -1,6 +1,7 @@
 import { Directory, File, Paths } from "expo-file-system";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
+import { askPermission } from "@/system/askPermission";
 import { Platform } from "react-native";
 import { fromBase64, openMedia, sealMedia, toBase64 } from "@crew/mls";
 import { api } from "@/server/api";
@@ -50,9 +51,9 @@ async function sendVideo(conversationId: string, asset: ImagePicker.ImagePickerA
 
 /** Opens the camera or the library, re-encodes photos (which drops the location), encrypts and sends. -1 or -2: no permission. */
 export async function sendPhoto(conversationId: string, source: "camera" | "library", reply?: string): Promise<number> {
-  const permission = source === "camera" ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
-  // -1: refused, the system may ask again; -2: refused for good, only the settings can help.
-  if (!permission.granted) return permission.canAskAgain ? -1 : -2;
+  const permission = await askPermission(source === "camera" ? "camera" : "photos", source === "camera" ? "photo" : "library");
+  // 0: "Pas maintenant" on the explanation; -1: refused, the system may ask again; -2: refused for good.
+  if (!permission.granted) return permission.declined ? 0 : permission.canAskAgain ? -1 : -2;
   const options: ImagePicker.ImagePickerOptions = { mediaTypes: ["images", "videos"], quality: 1, exif: false, videoMaxDuration: MAX_VIDEO_S, videoQuality: ImagePicker.UIImagePickerControllerQualityType.Medium };
   const result = source === "camera" ? await ImagePicker.launchCameraAsync(options) : await ImagePicker.launchImageLibraryAsync(options);
   if (result.canceled || !result.assets[0]) return 0;

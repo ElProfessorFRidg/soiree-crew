@@ -18,6 +18,7 @@ import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { failureMessage } from "@/server/errors";
 import { OpenSettingsButton } from "@/system/OpenSettingsButton";
+import { askPermission } from "@/system/askPermission";
 
 /** DESIGN.md §5: check-in steps appear one by one, every 650 ms. They show progress, never which signal decided. */
 const STEP_MS = 650;
@@ -66,10 +67,18 @@ export default function CheckInScreen() {
 
   const run = async () => {
     if (!venueId) return;
+    // The explanation and the system prompt come before the steps start moving.
+    const permission = await askPermission("location", "checkin");
+    if (!permission.granted) {
+      setMessage(permission.declined ? null : i18n.t("addVenue.locationDenied"));
+      setBlocked(!permission.canAskAgain);
+      return;
+    }
+    setMessage(null);
     setPhase("working");
     setSteps(1);
     const timer = setInterval(() => setSteps((s) => Math.min(3, s + 1)), scaled(STEP_MS));
-    const fix = await currentFix();
+    const fix = await currentFix("checkin");
     if (!fix.ok) {
       clearInterval(timer);
       setPhase("idle");
@@ -161,7 +170,7 @@ export default function CheckInScreen() {
             height={52}
             style={styles.flex}
             onPress={() =>
-              void currentFix().then(async (fix) => {
+              void currentFix("checkin").then(async (fix) => {
                 if (fix.ok && (await stillHere(fix.fix).catch(() => false))) {
                   haptic.confirmed();
                   showToast({ message: i18n.t("checkin.stillHereDone") });

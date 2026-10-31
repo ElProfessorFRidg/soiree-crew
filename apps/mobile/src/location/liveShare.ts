@@ -1,4 +1,5 @@
 import * as Location from "expo-location";
+import { askPermission } from "@/system/askPermission";
 import { Platform } from "react-native";
 import { create } from "zustand";
 import { api } from "@/server/api";
@@ -11,7 +12,8 @@ import { useCrewData } from "@/server/crewData";
 interface ShareState {
   partyId: string | null;
   lastSentAt: number | null;
-  error: "denied" | "unavailable" | null;
+  /** "blocked": refused for good, only the phone settings can turn it back on. */
+  error: "denied" | "blocked" | "unavailable" | null;
 }
 
 export const useLiveShare = create<ShareState>(() => ({ partyId: null, lastSentAt: null, error: null }));
@@ -38,9 +40,10 @@ async function send(partyId: string, coords: Location.LocationObjectCoords): Pro
 }
 
 export async function startSharing(partyId: string): Promise<boolean> {
-  const permission = await Location.requestForegroundPermissionsAsync();
+  const permission = await askPermission("location", "share");
   if (!permission.granted) {
-    useLiveShare.setState({ error: "denied" });
+    // "Pas maintenant" leaves the switch off without calling it a refusal.
+    useLiveShare.setState({ error: permission.declined ? null : permission.canAskAgain ? "denied" : "blocked" });
     return false;
   }
   await stopSharing();

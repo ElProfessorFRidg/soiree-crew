@@ -2,7 +2,7 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    include: ["packages/*/src/**/*.test.ts", "apps/server/src/**/*.test.ts", "apps/mobile/src/bar/**/*.test.ts", "apps/mobile/src/drinks/customOrder.test.ts", "apps/mobile/src/drinks/myRow.test.ts", "apps/mobile/src/crew/celebrate.test.ts","apps/mobile/src/ui/pure/**/*.test.ts","apps/mobile/src/motion/math/**/*.test.ts","apps/mobile/src/games/results.test.ts","apps/mobile/src/party/**/*.test.ts","tools/**/*.test.mjs"],
+    include: ["packages/*/src/**/*.test.ts", "apps/server/src/**/*.test.ts", "apps/mobile/src/bar/**/*.test.ts", "apps/mobile/src/drinks/customOrder.test.ts", "apps/mobile/src/drinks/myRow.test.ts", "apps/mobile/src/crew/celebrate.test.ts","apps/mobile/src/ui/pure/**/*.test.ts","apps/mobile/src/motion/math/**/*.test.ts","apps/mobile/src/games/results.test.ts","apps/mobile/src/party/**/*.test.ts","apps/mobile/src/onboarding/**/*.test.ts","tools/**/*.test.mjs"],
     // Server tests boot a PGlite database per test: slow on a loaded machine, so give them room.
     testTimeout: 30_000,
     hookTimeout: 60_000,

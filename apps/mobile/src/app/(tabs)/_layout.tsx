@@ -14,7 +14,7 @@ import { useMorningAfter } from "@/recap/morning";
 import { useHomeScreenActions } from "@/system/quickActions";
 import { useLevelNow } from "@/state/levelNow";
 import { useInvitations } from "@/server/socialData";
-import { useAppStore } from "@/state/store";
+import { isOnboarded, useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Icon, type AnyIconName } from "@/ui/Icon";
 import { ScalePressable } from "@/ui/Pressable";
@@ -167,7 +167,7 @@ export default function TabsLayout() {
   const i18n = useT();
   const games = useGameT();
   const insets = useSafeAreaInsets();
-  const onboarded = useAppStore((state) => state.ageConfirmedAt !== null && state.profile !== null);
+  const onboarded = useAppStore(isOnboarded);
   useMorningAfter();
   useHomeScreenActions(i18n);
   // ADP-09: at levels 2 and 3 the undo button grows like everything else.

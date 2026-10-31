@@ -9,6 +9,7 @@ import { defaultPreferences, type UserPreferences } from "@crew/units";
 import type { VaultItem } from "@/vault/vault";
 import type { CustomDrink, DrinkPreset } from "@/drinks/presets";
 import type { DrinkEntry, Mutation, PendingMutation, StoredProfile, SyncState, WaterEntry } from "@/sync/types";
+import type { FirstRun, OnboardingDraft } from "@/onboarding/flow";
 
 function deviceDefaults(): UserPreferences {
   const locales = getLocales();
@@ -103,6 +104,18 @@ export interface AppState {
    * Żubrówka id). Kept on this phone only; the next time the word is read exactly.
    */
   learnedSpellings: Record<string, string>;
+  // First run (O-01 to O-05): the arrival flow, then the first days after it.
+  /** The arrival step reached and the choices made so far: a closed app reopens there. */
+  onboarding: OnboardingDraft | null;
+  /** When the arrival flow was finished, with or without the health consent. */
+  onboardedAt: number | null;
+  /** Cards of the first days on the Party screen, and what they wait for. */
+  firstRun: FirstRun;
+}
+
+/** In the app: past the age gate, and through the arrival flow (older installs have a profile instead). */
+export function isOnboarded(state: Pick<AppState, "ageConfirmedAt" | "profile" | "onboardedAt">): boolean {
+  return state.ageConfirmedAt !== null && (state.profile !== null || state.onboardedAt !== null);
 }
 
 export const useAppStore = create<AppState>()(
@@ -154,6 +167,9 @@ export const useAppStore = create<AppState>()(
       drinkVenues: {},
       hiddenRowDrinks: [],
       learnedSpellings: {},
+      onboarding: null,
+      onboardedAt: null,
+      firstRun: { active: false, dismissed: [], invitedAt: null, playedAt: null },
     }),
     {
       name: "crew-app-v1",
