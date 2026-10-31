@@ -1,6 +1,7 @@
 import * as Device from "expo-device";
 import { Platform } from "react-native";
 import * as Location from "expo-location";
+import { askPermission, type PermissionUse } from "@/system/askPermission";
 import { create } from "zustand";
 import { newId } from "@/state/store";
 import type { VenueFacts, WeekSchedule } from "@/venues/hours";
@@ -175,14 +176,19 @@ export function fetchWhereTo(
 
 export type LocationFailure = "denied" | "unavailable";
 
-/** One fresh fix, never a cached one (anticheat.md §2.2 stale fix). */
-export async function currentFix(): Promise<
-  { ok: true; fix: { lat: number; lng: number; accuracy: number; mocked: boolean } } | { ok: false; failure: LocationFailure; canAskAgain?: boolean }
+/**
+ * One fresh fix, never a cached one (anticheat.md §2.2 stale fix). `use` says why, for the
+ * explanation shown before the system asks the first time; the SOS passes null: nothing may delay it.
+ * `declined`: the person said "Pas maintenant" on the explanation, the system was not asked.
+ */
+export async function currentFix(use: PermissionUse | null): Promise<
+  | { ok: true; fix: { lat: number; lng: number; accuracy: number; mocked: boolean } }
+  | { ok: false; failure: LocationFailure; canAskAgain?: boolean; declined?: boolean }
 > {
   // Never throws: the SOS waits on this, and a browser without the permissions API throws on the request.
   try {
-    const permission = await Location.requestForegroundPermissionsAsync();
-    if (!permission.granted) return { ok: false, failure: "denied", canAskAgain: permission.canAskAgain };
+    const permission = await askPermission("location", use);
+    if (!permission.granted) return { ok: false, failure: "denied", canAskAgain: permission.canAskAgain, declined: permission.declined };
     // AC-02 on iOS: the native module reads how the system produced the fix, in parallel.
     const [position, source] = await Promise.all([
       Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High }),

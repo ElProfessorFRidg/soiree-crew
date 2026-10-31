@@ -31,16 +31,15 @@ Notifications.setNotificationHandler({
   }),
 });
 
-/** Asked at most once a session; the answer itself is read again each time, so a change in the settings counts at once. */
-let asked = false;
-
+/**
+ * Reminders never ask for the permission themselves: a system prompt in the middle of a party
+ * comes out of nowhere. It is asked with an explanation, on the arrival notifications step or when
+ * a reminder is switched on (askPermission). The answer is read each time, so a change in the
+ * phone's settings counts at once.
+ */
 async function allowed(): Promise<boolean> {
   if (!supported) return false;
-  const current = await Notifications.getPermissionsAsync();
-  if (current.granted) return true;
-  if (!current.canAskAgain || asked) return false;
-  asked = true;
-  return (await Notifications.requestPermissionsAsync()).granted;
+  return (await Notifications.getPermissionsAsync()).granted;
 }
 
 function intakes(): DrinkIntake[] {

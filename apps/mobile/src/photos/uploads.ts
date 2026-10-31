@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { File } from "expo-file-system";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
+import { askPermission } from "@/system/askPermission";
 import { Platform } from "react-native";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -83,9 +84,9 @@ export async function addReviewPhotos(venueId: string, source: "camera" | "libra
 
 async function pickAndQueue(source: "camera" | "library", limit: number, target: { partyId: string; reviewVenueId?: string }): Promise<number> {
   if (limit <= 0) return 0;
-  const permission = source === "camera" ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
-  // -1: refused, the system may ask again; -2: refused for good, only the settings can help.
-  if (!permission.granted) return permission.canAskAgain ? -1 : -2;
+  const permission = await askPermission(source === "camera" ? "camera" : "photos", source === "camera" ? "photo" : "library");
+  // 0: "Pas maintenant" on the explanation; -1: refused, the system may ask again; -2: refused for good.
+  if (!permission.granted) return permission.declined ? 0 : permission.canAskAgain ? -1 : -2;
   const result =
     source === "camera"
       ? await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 1, exif: false })
@@ -112,8 +113,8 @@ async function pickAndQueue(source: "camera" | "library", limit: number, target:
  * Returns the JPEG as base64 and a uri to preview it, null when cancelled, -1 / -2 when refused.
  */
 export async function pickReceipt(source: "camera" | "library"): Promise<{ uri: string; data: string } | null | -1 | -2> {
-  const permission = source === "camera" ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
-  if (!permission.granted) return permission.canAskAgain ? -1 : -2;
+  const permission = await askPermission(source === "camera" ? "camera" : "photos", source === "camera" ? "photo" : "library");
+  if (!permission.granted) return permission.declined ? null : permission.canAskAgain ? -1 : -2;
   const result =
     source === "camera"
       ? await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 1, exif: false })

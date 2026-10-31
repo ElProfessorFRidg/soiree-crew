@@ -104,8 +104,9 @@ export async function registerForPush(): Promise<void> {
     if (zone) await api("/v1/notifications/settings", { method: "PUT", body: { timeZone: zone } }).catch(() => undefined);
     return;
   }
-  let permission = await Notifications.getPermissionsAsync();
-  if (!permission.granted && permission.canAskAgain) permission = await Notifications.requestPermissionsAsync();
+  // Signing in never asks: the permission comes with an explanation (arrival step, askPermission),
+  // and registering runs again once it is given.
+  const permission = await Notifications.getPermissionsAsync();
   if (!permission.granted) return;
   const token = await Notifications.getDevicePushTokenAsync();
   if (typeof token.data === "string") await sendToken(token.data);

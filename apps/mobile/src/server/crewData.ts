@@ -1,3 +1,4 @@
+import { markFirstRun } from "@/onboarding/firstRunMarks";
 import { useMemo } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
@@ -171,7 +172,10 @@ export async function createCrew(name: string, kind: CrewKind = "friends", listi
 }
 
 export async function createInvite(crewId: string): Promise<{ code: string; url: string; expiresAt: number }> {
-  return api(`/v1/crews/${crewId}/invites`, { method: "POST" });
+  const invite = await api<{ code: string; url: string; expiresAt: number }>(`/v1/crews/${crewId}/invites`, { method: "POST" });
+  // The first-run checklist: "Invite un pote" ticks once a link exists to send.
+  markFirstRun("invited");
+  return invite;
 }
 
 export async function acceptInvite(code: string): Promise<string> {

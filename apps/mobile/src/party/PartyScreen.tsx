@@ -54,6 +54,8 @@ import { setEveningFood, useEveningFood } from "@/drinks/food";
 import { greetingKey } from "./greeting";
 import { NightAlerts } from "./NightAlerts";
 import { PartyBoard } from "./PartyBoard";
+import { DetectedSettingsCard, FirstNightPreview, FirstRunChecklist, NoEstimateCard } from "@/onboarding/FirstRun";
+import { EstimatePreview } from "@/onboarding/ValueCards";
 
 /** JOY-02: the line above the title, from the night as it goes. */
 function Greeting({ i18n, live, now, drinksTonight }: { i18n: Translator; live: LiveBac; now: number; drinksTonight: number }) {
@@ -190,7 +192,8 @@ export function PartyScreen() {
   const units = live ? unitCycle(live.rules, preferences.bacUnit) : [preferences.bacUnit];
   const unit = units[unitIndex % units.length] ?? preferences.bacUnit;
 
-  if (!live) return null;
+  // Without the health consent there is no estimate: the rest of the night still works.
+  if (!live) return <NoEstimateParty />;
 
   const again = (() => {
     const last = lastDrink();
@@ -259,6 +262,59 @@ export function PartyScreen() {
           {level === 3 ? <LevelThree {...common} /> : null}
         </Animated.View>
         {live.estimate.bac >= POISONING_CARD_THRESHOLD ? <PoisoningCard live={live} i18n={i18n} /> : null}
+      </ScrollView>
+    </View>
+  );
+}
+
+/**
+ * The Party screen of someone who went on without the health consent: no figure, a calm word on
+ * what the estimate needs with a button to give it, and the parts of the night that work anyway.
+ */
+function NoEstimateParty() {
+  const i18n = useT();
+  const theme = useTheme();
+  const insets = useSafeAreaInsets();
+  const tiles: { label: string; icon: "dice" | "wine" | "users" | "alert"; variant?: "danger"; go: () => void }[] = [
+    { label: i18n.t("party.tileGames"), icon: "dice", go: () => router.push("/(tabs)/games") },
+    { label: i18n.t("bar.title"), icon: "wine", go: () => router.push("/bar") },
+    { label: i18n.t("crew.tab"), icon: "users", go: () => router.push("/(tabs)/crew") },
+    { label: i18n.t("party.sos"), icon: "alert", variant: "danger", go: () => router.push("/sos") },
+  ];
+  return (
+    <View style={[styles.screen, { backgroundColor: theme.bg }]}>
+      <MoodBand />
+      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + space.screenTop }]} contentInsetAdjustmentBehavior="never">
+        <SosBanner />
+        <View style={styles.header}>
+          <View style={styles.flex}>
+            <PartyTitle i18n={i18n} />
+          </View>
+          <NotificationBell />
+        </View>
+        <DetectedSettingsCard />
+        <Animated.View entering={FadeIn.duration(duration.enter).easing(easings.out)} style={styles.level}>
+          <NoEstimateCard />
+          <EstimatePreview accent={false} sample />
+        </Animated.View>
+        <FirstRunChecklist />
+        <View style={styles.actions}>
+          {tiles.map((tile) => (
+            <Button
+              key={tile.label}
+              label={tile.label}
+              icon={tile.icon}
+              vertical
+              height={76}
+              fontSize={13}
+              variant={tile.variant ?? "secondary"}
+              style={styles.noEstimateTile}
+              onPress={tile.go}
+            />
+          ))}
+        </View>
+        <CrewStrip />
+        <PartyBoard />
       </ScrollView>
     </View>
   );
@@ -502,6 +558,7 @@ function LevelZero(props: LevelProps) {
         <NotificationBell />
         <IconButton icon="clock" accessibilityLabel={i18n.t("party.history")} onPress={() => router.push("/history")} />
       </View>
+      <DetectedSettingsCard />
       <BacHero {...props} size={124} />
       <Text>{trendLine(props, hourCycle)}</Text>
       <DrivingPanels {...props} />
@@ -529,6 +586,8 @@ function LevelZero(props: LevelProps) {
       </View>
       <MyDrinksRow now={now} exclude={props.againKey} big={false} />
       <StatusRow {...props} />
+      <FirstNightPreview />
+      <FirstRunChecklist />
       <EveningFood i18n={i18n} now={now} />
       <CrewStrip />
       <QuickTiles i18n={i18n} />
@@ -735,4 +794,5 @@ const styles = StyleSheet.create({
   levelThreeTitle: { fontSize: 20, lineHeight: 26, fontFamily: "Archivo-Bold" },
   titleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   level: { gap: 14 },
+  noEstimateTile: { flex: 1, paddingHorizontal: 4 },
 });

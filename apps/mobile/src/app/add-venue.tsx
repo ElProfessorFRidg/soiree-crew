@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Field } from "@/crew/Field";
 import { useT } from "@/i18n";
@@ -37,15 +37,22 @@ export default function AddVenueScreen() {
   const [blocked, setBlocked] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    void currentFix().then((result) => {
+  const [declined, setDeclined] = useState(false);
+  const locate = useCallback(() => {
+    setDeclined(false);
+    setLocationError(null);
+    void currentFix("venue").then((result) => {
       if (result.ok) setPosition({ lat: result.fix.lat, lng: result.fix.lng });
-      else {
+      else if (result.declined) {
+        setDeclined(true);
+        setLocationError(i18n.t("permissions.venueNeeded"));
+      } else {
         setLocationError(result.failure === "denied" ? i18n.t("addVenue.locationDenied") : i18n.t("addVenue.locationUnavailable"));
         setBlocked(result.failure === "denied" && result.canAskAgain === false);
       }
     });
   }, [i18n]);
+  useEffect(locate, [locate]);
 
   return (
     <Screen
@@ -111,6 +118,7 @@ export default function AddVenueScreen() {
           <>
             <Text color={theme.danger}>{locationError}</Text>
             {blocked ? <OpenSettingsButton /> : null}
+            {declined ? <Button label={i18n.t("permissions.allowLocation")} icon="pin" variant="outline" height={44} onPress={locate} /> : null}
           </>
         ) : !position ? (
           <Text variant="small">{i18n.t("addVenue.locating")}</Text>

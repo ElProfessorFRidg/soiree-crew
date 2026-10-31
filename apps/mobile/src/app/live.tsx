@@ -30,6 +30,7 @@ import { showFailure } from "@/server/errors";
 import { confirmAction } from "@/ui/confirm";
 import { OpenPartyPanel } from "@/crew/OpenParty";
 import { ReportPanel } from "@/moderation/ReportPanel";
+import { OpenSettingsButton } from "@/system/OpenSettingsButton";
 
 /** Live dashboard refresh while the screen is open, on top of socket hints (O-37). */
 const REFRESH_MS = 20_000;
@@ -239,7 +240,7 @@ export default function LiveScreen() {
             <View style={styles.flex}>
               <Text>{i18n.t("live.shareLocation")}</Text>
               <Text variant="small">
-                {share.error === "denied"
+                {share.error === "denied" || share.error === "blocked"
                   ? i18n.t("live.shareLocationDenied")
                   : share.partyId === id && share.lastSentAt
                     ? i18n.t("live.shareLocationOn", { time: formatClock(share.lastSentAt, i18n.language, hourCycle) })
@@ -255,6 +256,7 @@ export default function LiveScreen() {
               accessibilityLabel={i18n.t("live.shareLocation")}
             />
           </View>
+          {share.error === "blocked" ? <OpenSettingsButton /> : null}
           <Button label={i18n.t("goingHome.open")} icon="car" variant="outline" height={48} onPress={() => router.push({ pathname: "/home", params: { id } })} />
         </Panel>
       ) : null}

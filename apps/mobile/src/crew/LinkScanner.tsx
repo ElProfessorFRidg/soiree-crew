@@ -1,4 +1,5 @@
 import { CameraView, useCameraPermissions } from "expo-camera";
+import { askPermission } from "@/system/askPermission";
 import { useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { radius } from "@crew/design-tokens";
@@ -23,7 +24,7 @@ export function parseLink(data: string): { url: string; code: string } | null {
 export function QrScanner<T>({ label, hint, parse, onScan }: { label: string; hint?: string; parse: (data: string) => T | null; onScan: (value: T) => void }) {
   const i18n = useT();
   const [open, setOpen] = useState(false);
-  const [permission, requestPermission] = useCameraPermissions();
+  const [permission, , readPermission] = useCameraPermissions();
   const done = useRef(false);
   if (!open) {
     return (
@@ -34,8 +35,12 @@ export function QrScanner<T>({ label, hint, parse, onScan }: { label: string; hi
         height={44}
         onPress={() => {
           done.current = false;
-          setOpen(true);
-          if (!permission?.granted) void requestPermission();
+          // The explanation, then the system prompt, the first time only (askPermission).
+          void askPermission("camera", "scan").then(async (answer) => {
+            if (answer.declined) return;
+            await readPermission();
+            setOpen(true);
+          });
         }}
       />
     );
