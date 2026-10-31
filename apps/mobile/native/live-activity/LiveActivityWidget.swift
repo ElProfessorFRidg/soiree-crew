@@ -364,7 +364,7 @@ private struct SoloLockView: View {
         Facts(p: p)
         Spacer(minLength: 4)
         if p.show, let zero = p.zeroClock {
-          Text("(p.backToZero ?? "") (zero)").font(.system(size: 12, weight: .bold)).foregroundStyle(NightColors.muted).lineLimit(1).minimumScaleFactor(0.75)
+          Text((p.backToZero ?? "") + " " + zero).font(.system(size: 12, weight: .bold)).foregroundStyle(NightColors.muted).lineLimit(1).minimumScaleFactor(0.75)
         }
       }
       HStack(spacing: 8) {
