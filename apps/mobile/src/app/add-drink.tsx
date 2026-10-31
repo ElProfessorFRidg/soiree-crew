@@ -499,7 +499,7 @@ function QuickType({ presets, consumedAt, food, houseAbv, unit, onDone }: QuickT
           const preset = byId.get(id);
           return preset ? [{ preset: withHousePint(preset, houseAbv), quantity: 1 }] : [];
         }),
-        ...searchCatalogue(text, i18n, 3).map((drink) => ({ preset: presetFromCatalogue(drink, i18n), quantity: 1 })),
+        ...searchCatalogue(text, i18n, 3, useAppStore.getState().preferences.legalCountry).map((drink) => ({ preset: presetFromCatalogue(drink, i18n), quantity: 1 })),
       ];
     } else {
       found = [];

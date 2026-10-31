@@ -3,14 +3,16 @@
  * not matter; "2 pintes et un shoot" becomes two pints and one shot, "demi kro" a Kronenbourg.
  */
 
-export { bestScore, editDistance, matchScore, normalise, scoreNormalised, search, type Candidate } from "./match";
+export { adjacentKeys, bestScore, editDistance, matchScore, normalise, scoreNormalised, search, typoDistance, type Candidate } from "./match";
 export { parseDrinkOrder, parseOrder, tokenize, type OrderLine, type OrderOptions } from "./order";
 export {
   catalogueDrink,
   catalogueNames,
   comboOf,
+  countryRank,
   DRINK_CATALOGUE,
   GROUP_SPECS,
+  sizesFor,
   strengthFits,
   type CatalogueDrink,
   type DrinkGroup,

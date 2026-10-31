@@ -11,6 +11,7 @@ import { ScalePressable } from "@/ui/Pressable";
 import { Chip, Panel } from "@/ui/controls";
 import { Stepper } from "@/ui/Stepper";
 import { Text } from "@/ui/Text";
+import { useAppStore } from "@/state/store";
 import { catalogueLabel, searchCatalogue } from "./catalogue";
 import { CUSTOM_BOUNDS, type CustomDrinkDraft } from "./customDrinks";
 import { CUSTOM_ICONS, guessIcon } from "./customOrder";
@@ -42,7 +43,8 @@ export function CustomDrinkEditor({ unitSystem, initial, prefill, onSave, onCanc
   const [pickedIcon, setPickedIcon] = useState<GlassIconName | null>(start?.icon ?? null);
   // A brand typed here fills name, size, strength and glass; every field stays editable after.
   const [brandQuery, setBrandQuery] = useState("");
-  const brands = useMemo(() => searchCatalogue(brandQuery, i18n), [brandQuery, i18n]);
+  const country = useAppStore((state) => state.preferences.legalCountry);
+  const brands = useMemo(() => searchCatalogue(brandQuery, i18n, 6, country), [brandQuery, i18n, country]);
   const icon = pickedIcon ?? guessIcon(toMillilitres(volume, unit), abvTenths / 1000);
 
   const unitLabel = unit === "us_fl_oz" ? "oz" : unit;

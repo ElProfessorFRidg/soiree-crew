@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { editDistance, matchScore, normalise, parseOrder, search } from "./index";
+import { adjacentKeys, countryRank, DRINK_CATALOGUE, editDistance, matchScore, normalise, parseOrder, search, sizesFor, strengthFits } from "./index";
 
 // parseOrder is the brand-aware parser restricted to generic drinks; these cases predate the brands.
 
@@ -61,5 +61,41 @@ describe("fuzzy input (ADP-05)", () => {
       { quantity: 2, value: "pint" },
       { quantity: 1, value: "shot" },
     ]);
+  });
+});
+
+describe("typos from a phone keyboard (AZERTY and QWERTY)", () => {
+  it("forgives a neighbouring key, a doubled or dropped letter, and spaces", () => {
+    expect(adjacentKeys("a", "z")).toBe(true); // AZERTY
+    expect(adjacentKeys("a", "s")).toBe(true); // QWERTY
+    expect(adjacentKeys("a", "p")).toBe(false);
+    expect(matchScore("jqck", "jack")).not.toBeNull();
+    expect(matchScore("abslut", "absolut")).not.toBeNull();
+    expect(matchScore("jaggermeister", "jagermeister")).not.toBeNull();
+    expect(matchScore("redbull", "red bull")).not.toBeNull();
+    expect(matchScore("heinekn", "heineken")).not.toBeNull();
+    expect(matchScore("heinejen", "heineken")).not.toBeNull(); // j and k are neighbours
+    // A different word is still a different word.
+    expect(matchScore("vin", "gin")).toBeNull();
+  });
+});
+
+describe("catalogue across countries", () => {
+  it("knows brands from several countries, with sane strengths and unique ids", () => {
+    const ids = DRINK_CATALOGUE.map((d) => d.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const name of ["Absolut", "Eristoff", "Jack Daniel's", "Estrella Damm", "Baltika 7", "Bud Light", "Strongbow", "Aperol"]) {
+      expect(DRINK_CATALOGUE.some((d) => d.brand === name)).toBe(true);
+    }
+    for (const drink of DRINK_CATALOGUE) expect(strengthFits(drink.group, drink.abv)).toBe(true);
+  });
+
+  it("offers the country's own sizes and ranks its household names first", () => {
+    expect(sizesFor("beer", "GB").some((s) => s.volumeMl === 568 && s.serving === "pint")).toBe(true);
+    expect(sizesFor("beer", "ES").some((s) => s.volumeMl === 200)).toBe(true);
+    expect(sizesFor("spirit", null).some((s) => s.volumeMl === 700)).toBe(true);
+    const baltika = DRINK_CATALOGUE.find((d) => d.id === "baltika-7")!;
+    expect(countryRank(baltika, "RU")).toBe(0);
+    expect(countryRank(baltika, "FR")).toBe(1);
   });
 });

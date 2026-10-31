@@ -2449,8 +2449,10 @@ export const it: Messages = {
   },
   // Brand catalogue, typed orders, group details, house pint and the party screen's row of my drinks.
   drinkCatalogue: {
+    brandFilter: "Cerca una marca",
+    brandNone: "Nessuna marca con questo nome.",
     generic: { redWine: "Vino rosso", whiteWine: "Vino bianco", roseWine: "Rosato", champagne: "Champagne", cider: "Sidro", whisky: "Whisky", rum: "Rum", vodka: "Vodka", gin: "Gin", tequila: "Tequila", orangeJuice: "Succo d'arancia" },
-    servings: { demi: "Piccola", pint: "Pinta", litre: "Litro", glass: "Bicchiere", largeGlass: "Bicchiere grande", bottle: "Bottiglia", dose: "Dose", shot: "Shot", double: "Doppio", flash: "Bottiglietta", flask: "Fiaschetta", can: "Lattina" },
+    servings: { demi: "Piccola", halfPint: "Mezza pinta", pint: "Pinta", litre: "Litro", glass: "Bicchiere", largeGlass: "Bicchiere grande", bottle: "Bottiglia", dose: "Dose", shot: "Shot", double: "Doppio", flash: "Bottiglietta", flask: "Fiaschetta", can: "Lattina" },
     abv: "{value}%",
     litres: "{value} L",
     sizeAndStrength: "{size}, {abv}",

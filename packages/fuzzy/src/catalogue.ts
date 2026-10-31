@@ -5,6 +5,8 @@
  * drinks (red wine, rum) carry a `generic` id that the app translates.
  */
 
+import { FIRST_LIST_COUNTRIES, MORE_DRINKS } from "./brands";
+
 export type DrinkGroup = "beer" | "wine" | "spirit" | "cocktail" | "cider" | "soft";
 
 /** The glass drawn for a drink; the same names as the app's glass icons. */
@@ -37,6 +39,10 @@ interface CatalogueBase {
   aliases: readonly string[];
   /** Sold in cans: "a can of" it means its own size, not 33 cl. */
   can?: boolean;
+  /** Where it is a household name (ISO country codes): shown first there. Absent: everywhere. */
+  countries?: readonly string[];
+  /** Other sizes it comes in, in ml, offered as chips with the group's own. */
+  sizes?: readonly number[];
   /**
    * A spirit poured into a mixer, logged as one drink. Only the spirit counts: the mixer adds
    * volume, not alcohol. `parts` are the two catalogue ids it is made of.
@@ -80,7 +86,7 @@ const soft = (id: string, brand: string, volumeMl: number, aliases: readonly str
 
 // Strengths are the ones printed on the French label. Sizes: a draught brand comes as a demi
 // (25 cl), a Belgian bottle as 33 cl, the strong supermarket beers as 50 cl cans.
-export const DRINK_CATALOGUE: readonly CatalogueDrink[] = [
+const FIRST_LIST: readonly CatalogueDrink[] = [
   beer("kronenbourg", "Kronenbourg", 0.042, 250, "demi", ["kro", "krone", "kronen"]),
   beer("1664", "1664", 0.055, 250, "demi", ["seize", "1664 blonde"]),
   beer("heineken", "Heineken", 0.05, 250, "demi", ["heine", "heinek"]),
@@ -166,8 +172,17 @@ export const DRINK_CATALOGUE: readonly CatalogueDrink[] = [
   { id: "orange-juice", generic: "orangeJuice", group: "soft", abv: 0, volumeMl: 250, glass: "soft", aliases: ["jus d orange", "jus orange", "orange juice", "jus"] },
 ];
 
+/** Every drink the app knows: the French list first, then the other countries' (brands.ts). */
+export const DRINK_CATALOGUE: readonly CatalogueDrink[] = [
+  ...FIRST_LIST.map((drink) => {
+    const countries = FIRST_LIST_COUNTRIES[drink.id] ?? ["FR"];
+    return countries.length ? { ...drink, countries } : drink;
+  }),
+  ...MORE_DRINKS,
+];
+
 /** Names a size chip or a typed word can carry. The app translates them. */
-export type ServingId = "demi" | "pint" | "litre" | "glass" | "largeGlass" | "bottle" | "dose" | "shot" | "double" | "flash" | "flask" | "can";
+export type ServingId = "demi" | "pint" | "halfPint" | "litre" | "glass" | "largeGlass" | "bottle" | "dose" | "shot" | "double" | "flash" | "flask" | "can";
 
 export interface SizeOption {
   volumeMl: number;
@@ -202,6 +217,7 @@ export const GROUP_SPECS: Readonly<Record<DrinkGroup, GroupSpec>> = {
       { volumeMl: 60, serving: "double" },
       { volumeMl: 200, serving: "flash" },
       { volumeMl: 350, serving: "flask" },
+      { volumeMl: 700, serving: "bottle" },
     ],
     strengths: [0.18, 0.25, 0.35, 0.375, 0.4, 0.45],
     maxAbv: 0.8,
@@ -222,6 +238,43 @@ export const GROUP_SPECS: Readonly<Record<DrinkGroup, GroupSpec>> = {
     maxAbv: 0,
   },
 };
+
+/**
+ * Sizes a country pours that the group's list lacks: the British pint and half pint, American
+ * ounces, the Spanish caña, the Italian media, the German Maß, the Russian 1.5 L bottle.
+ */
+const COUNTRY_SIZES: Readonly<Record<string, Partial<Record<DrinkGroup, readonly SizeOption[]>>>> = {
+  GB: { beer: [{ volumeMl: 284, serving: "halfPint" }, { volumeMl: 440, serving: "can" }, { volumeMl: 568, serving: "pint" }], cider: [{ volumeMl: 284, serving: "halfPint" }, { volumeMl: 568, serving: "pint" }], wine: [{ volumeMl: 175 }, { volumeMl: 250, serving: "largeGlass" }], spirit: [{ volumeMl: 25, serving: "shot" }, { volumeMl: 50, serving: "double" }] },
+  IE: { beer: [{ volumeMl: 284, serving: "halfPint" }, { volumeMl: 568, serving: "pint" }], cider: [{ volumeMl: 568, serving: "pint" }] },
+  US: { beer: [{ volumeMl: 355 }, { volumeMl: 473, serving: "pint" }, { volumeMl: 710, serving: "can" }], wine: [{ volumeMl: 150, serving: "glass" }], spirit: [{ volumeMl: 44, serving: "shot" }, { volumeMl: 88, serving: "double" }, { volumeMl: 750, serving: "bottle" }], cocktail: [{ volumeMl: 355 }] },
+  CA: { beer: [{ volumeMl: 341 }, { volumeMl: 473, serving: "pint" }], spirit: [{ volumeMl: 43, serving: "shot" }] },
+  DE: { beer: [{ volumeMl: 300 }, { volumeMl: 400 }, { volumeMl: 1000, serving: "litre" }], spirit: [{ volumeMl: 20, serving: "dose" }] },
+  AT: { beer: [{ volumeMl: 300 }, { volumeMl: 1000, serving: "litre" }] },
+  ES: { beer: [{ volumeMl: 200, serving: "demi" }, { volumeMl: 330 }, { volumeMl: 500, serving: "pint" }] },
+  IT: { beer: [{ volumeMl: 200, serving: "demi" }, { volumeMl: 400, serving: "pint" }, { volumeMl: 660, serving: "bottle" }] },
+  PT: { beer: [{ volumeMl: 200, serving: "demi" }, { volumeMl: 400 }, { volumeMl: 500, serving: "pint" }] },
+  RU: { beer: [{ volumeMl: 450 }, { volumeMl: 1500, serving: "bottle" }], spirit: [{ volumeMl: 50, serving: "shot" }, { volumeMl: 100, serving: "double" }, { volumeMl: 500, serving: "bottle" }] },
+  BE: { beer: [{ volumeMl: 250, serving: "demi" }, { volumeMl: 330 }, { volumeMl: 750, serving: "bottle" }] },
+  NL: { beer: [{ volumeMl: 250, serving: "demi" }, { volumeMl: 500, serving: "pint" }] },
+};
+
+/**
+ * The size chips of a group in a country: the country's own measures first replace a size the
+ * group already has under the same volume, then everything is sorted, smallest first.
+ */
+export function sizesFor(group: DrinkGroup, country?: string | null): SizeOption[] {
+  const local = (country && COUNTRY_SIZES[country]?.[group]) || [];
+  const list = new Map<number, SizeOption>();
+  for (const size of GROUP_SPECS[group].sizes) list.set(size.volumeMl, size);
+  for (const size of local) list.set(size.volumeMl, size);
+  return [...list.values()].sort((a, b) => a.volumeMl - b.volumeMl);
+}
+
+/** 0 when the drink is a household name in the country (or everywhere), 1 otherwise: for sorting. */
+export function countryRank(drink: CatalogueDrink, country?: string | null): number {
+  if (!drink.countries || !drink.countries.length || !country) return 0;
+  return drink.countries.includes(country) ? 0 : 1;
+}
 
 /** Whether a strength makes sense for the group: 8 % is a beer, 40 % is not. */
 export function strengthFits(group: DrinkGroup, abv: number): boolean {

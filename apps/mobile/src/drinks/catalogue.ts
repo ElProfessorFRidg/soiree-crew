@@ -1,7 +1,9 @@
 import {
   bestScore,
+  countryRank,
   DRINK_CATALOGUE,
   GROUP_SPECS,
+  sizesFor,
   parseDrinkOrder,
   type CatalogueDrink,
   type DrinkGroup,
@@ -42,9 +44,26 @@ export function catalogueLabel(drink: CatalogueDrink, i18n: Translator): string 
   return drink.brand ?? i18n.t(`drinkCatalogue.generic.${drink.generic}`);
 }
 
-export function brandsOf(group: DrinkGroup): CatalogueDrink[] {
-  return DRINK_CATALOGUE.filter((drink) => drink.group === group);
+/** The group's brands, those known in the user's country first (the order of the list otherwise). */
+export function brandsOf(group: DrinkGroup, country?: string | null): CatalogueDrink[] {
+  return DRINK_CATALOGUE.filter((drink) => drink.group === group)
+    .map((drink, index) => ({ drink, index, rank: countryRank(drink, country) }))
+    .sort((a, b) => a.rank - b.rank || a.index - b.index)
+    .map((hit) => hit.drink);
 }
+
+/** Brands of the group whose name or nickname is close to what was typed, typos forgiven. */
+export function filterBrands(brands: readonly CatalogueDrink[], query: string, i18n: Translator): CatalogueDrink[] {
+  if (!query.trim()) return [...brands];
+  return brands
+    .map((drink) => ({ drink, score: bestScore(query, [catalogueLabel(drink, i18n), catalogueLabel(drink, FR), ...drink.aliases]) }))
+    .filter((hit) => Number.isFinite(hit.score) && hit.score <= MAX_SCORE)
+    .sort((a, b) => a.score - b.score)
+    .map((hit) => hit.drink);
+}
+
+/** How far a name may be from what was typed: a word of slips, or one real typo per short word. */
+const MAX_SCORE = 1.5;
 
 /** A catalogue drink as something to log, at the size and strength picked. */
 export function presetFromCatalogue(drink: CatalogueDrink, i18n: Translator, volumeMl = drink.volumeMl, abv = drink.abv): DrinkPreset {
@@ -107,11 +126,14 @@ export function readOrder(text: string, presets: readonly DrinkPreset[], i18n: T
   });
 }
 
-/** Brands for a typed name, best first: "cast" finds Kasteel Rouge. Combos answer to their full name too. */
-export function searchCatalogue(query: string, i18n: Translator, limit = 6): CatalogueDrink[] {
+/**
+ * Brands for a typed name, best first: "cast" finds Kasteel Rouge, "abslut" Absolut, "jqck" Jack
+ * Daniel's (a neighbouring key). At equal distance, a drink known in the user's country comes first.
+ */
+export function searchCatalogue(query: string, i18n: Translator, limit = 6, country?: string | null): CatalogueDrink[] {
   if (!query.trim()) return [];
-  return DRINK_CATALOGUE.map((drink) => ({ drink, score: bestScore(query, [catalogueLabel(drink, i18n), catalogueLabel(drink, FR), ...drink.aliases]) }))
-    .filter((hit) => Number.isFinite(hit.score) && hit.score <= 1)
+  return DRINK_CATALOGUE.map((drink) => ({ drink, score: bestScore(query, [catalogueLabel(drink, i18n), catalogueLabel(drink, FR), ...drink.aliases]) + countryRank(drink, country) * 0.3 }))
+    .filter((hit) => Number.isFinite(hit.score) && hit.score <= MAX_SCORE)
     .sort((a, b) => a.score - b.score)
     .slice(0, limit)
     .map((hit) => hit.drink);
@@ -132,9 +154,12 @@ export function savedMatch(preset: DrinkPreset, saved: readonly CustomDrink[], i
   return saved.find((d) => d.name.trim().toLowerCase() === name && d.volumeMl === preset.volumeMl && Math.abs(d.abv - preset.abv) < 0.0005);
 }
 
-/** The chips of a group, with the drink's own value added when the list lacks it (a 40 cl whisky, 8.6 %). */
-export function sizeOptions(group: DrinkGroup, ...extra: number[]): SizeOption[] {
-  const list: SizeOption[] = [...GROUP_SPECS[group].sizes];
+/**
+ * The size chips of a group in the user's country (a British pint, a Spanish caña), with the
+ * sizes the brand comes in and the drink's own value added when the list lacks them.
+ */
+export function sizeOptions(group: DrinkGroup, country: string | null | undefined, ...extra: number[]): SizeOption[] {
+  const list: SizeOption[] = sizesFor(group, country);
   for (const volumeMl of extra) if (volumeMl > 0 && !list.some((s) => s.volumeMl === volumeMl)) list.push({ volumeMl });
   return list.sort((a, b) => a.volumeMl - b.volumeMl);
 }
