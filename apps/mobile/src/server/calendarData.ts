@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { scheduleBirthdayReminders, schedulePartyReminders } from "@/reminders/reminders";
+import { scheduleBirthdayReminders, scheduleComeback, schedulePartyReminders } from "@/reminders/reminders";
 import { useAppStore } from "@/state/store";
 import { phoneTimeZone } from "@/system/timeZone";
 import { api } from "./api";
@@ -66,6 +66,7 @@ export async function refreshCalendarReminders(): Promise<void> {
   await schedulePartyReminders(parties.map((p) => ({ ...p, crewName: crewName.get(p.crewId) ?? "" }))).catch(() => undefined);
   const lists = await Promise.all(crews.map((c) => refreshBirthdays(c.id).then((list) => list.map((b) => ({ ...b, crewId: c.id }))).catch(() => [])));
   await scheduleBirthdayReminders(lists.flat()).catch(() => undefined);
+  await scheduleComeback().catch(() => undefined);
 }
 
 let watching = false;

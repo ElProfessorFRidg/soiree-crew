@@ -1,8 +1,8 @@
 import { useAppStore } from "@/state/store";
 import type { MessageKey } from "./types";
 
-/** Recurring lines with written variants (SLOP-11): `${base}.v1` to `${base}.v3` in every catalogue. */
-export const VARIANTS = 3;
+/** Recurring lines with written variants (SLOP-11): `${base}.v1` to `${base}.v8` in every catalogue. */
+export const VARIANTS = 8;
 /** The water reminders come back often in a night: they get a longer list, from v1 to v12. */
 const COUNTS: Partial<Record<Base, number>> = { "reminders.waterSince": 12, "reminders.waterNone": 12 };
 
@@ -17,7 +17,15 @@ type Base =
   | "greeting.firstRound"
   | "greeting.climbing"
   | "reminders.waterSince"
-  | "reminders.waterNone";
+  | "reminders.waterNone"
+  | "reminders.limitBody"
+  | "reminders.partySoonBody"
+  | "reminders.peakBody"
+  | "reminders.launchBody"
+  | "reminders.comebackBody"
+  | "reminders.birthdayBody"
+  | "homeCheck.notifBody"
+  | "recap.notifBody";
 
 /**
  * SLOP-11: the same line never shows twice in a row for this person. One pick per occasion (a day

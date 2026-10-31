@@ -11,12 +11,18 @@ import { REMOTE_PUSH } from "@/notify/remote";
 const MINUTE_MS = 60_000;
 const WATER_ID = "water-reminder";
 const LIMIT_ID = "limit-reminder";
+const PEAK_ID = "peak-reminder";
+/** The peak warning goes this long before the estimated peak. */
+const PEAK_LEAD_MS = 10 * MINUTE_MS;
 /** bac.md §2.5: a drink with no water since the previous one gets a reminder 20 min later. */
 const WATER_AFTER_DRY_DRINK_MS = 20 * MINUTE_MS;
 /** Never two water reminders closer than this. */
 const WATER_MIN_GAP_MS = 20 * MINUTE_MS;
 /** Warn this far below the personal limit (O-26). */
 const LIMIT_MARGIN = 0.05;
+
+/** One occasion per night for the variant picks: noon to noon. */
+const nightOf = (at: number) => new Date(at - 12 * 60 * MINUTE_MS).toDateString();
 
 const supported = Platform.OS === "ios" || Platform.OS === "android";
 
@@ -132,6 +138,7 @@ export async function muteUntilMorning(): Promise<void> {
   useAppStore.setState({ remindersMutedUntil: morning.getTime() });
   await Notifications.cancelScheduledNotificationAsync(WATER_ID).catch(() => undefined);
   await Notifications.cancelScheduledNotificationAsync(LIMIT_ID).catch(() => undefined);
+  await Notifications.cancelScheduledNotificationAsync(PEAK_ID).catch(() => undefined);
 }
 
 /**
@@ -139,11 +146,35 @@ export async function muteUntilMorning(): Promise<void> {
  * water nudge, no limit warning, no night notification, pending or already in the list.
  */
 async function clearNightReminders(): Promise<void> {
-  for (const id of [WATER_ID, LIMIT_ID]) {
+  for (const id of [WATER_ID, LIMIT_ID, PEAK_ID]) {
     await Notifications.cancelScheduledNotificationAsync(id).catch(() => undefined);
     await Notifications.dismissNotificationAsync(id).catch(() => undefined);
   }
   await Notifications.dismissNotificationAsync(NIGHT_ID).catch(() => undefined);
+  // The next night gets its own peak warning.
+  if (useAppStore.getState().peakWarnedAt !== null) useAppStore.setState({ peakWarnedAt: null });
+}
+
+/**
+ * A funny "you are about to peak" line shortly before the estimated peak. One per night: once it
+ * went off, later drinks of the same night do not bring it back (clearNightReminders resets it).
+ */
+async function schedulePeakWarning(estimate: BacEstimate, i18n: Translator, preferences: UserPreferences, now: number): Promise<void> {
+  const { peakWarnedAt } = useAppStore.getState();
+  if (peakWarnedAt !== null && peakWarnedAt <= now) return;
+  const peak = estimate.peak;
+  const at = peak ? peak.at - PEAK_LEAD_MS : 0;
+  if (!peak || at <= now + MINUTE_MS) {
+    if (peakWarnedAt !== null) {
+      await Notifications.cancelScheduledNotificationAsync(PEAK_ID).catch(() => undefined);
+      useAppStore.setState({ peakWarnedAt: null });
+    }
+    return;
+  }
+  const time = formatClock(peak.at, preferences.language, preferences.hourCycle);
+  const body = i18n.t(variantKey("reminders.peakBody", nightOf(now)), { time });
+  await schedule(PEAK_ID, at, i18n.t("reminders.peakTitle"), body, WATER_CATEGORY);
+  useAppStore.setState({ peakWarnedAt: at });
 }
 
 export async function refreshReminders(): Promise<void> {
@@ -152,6 +183,8 @@ export async function refreshReminders(): Promise<void> {
   const now = Date.now();
   const estimate = profile ? estimateBac(intakes(), profile, now) : null;
   if (!profile || !estimate || estimate.bac <= 0 || estimate.backToZeroAt === null) return clearNightReminders();
+  // Something is drunk: the night is launched, the "it has started" nudges are pointless.
+  await cancelStale(LAUNCH_PREFIX, new Set());
   if (remindersMutedUntil !== null && remindersMutedUntil > now) return;
   const i18n = createTranslator(preferences.language);
 
@@ -184,6 +217,8 @@ export async function refreshReminders(): Promise<void> {
     }
   }
 
+  await schedulePeakWarning(estimate, i18n, preferences, now);
+
   // Personal limit (O-26): one warning before the estimate reaches it, not every drink.
   const limit = preferences.personalLimit;
   if (limit === null || !preferences.warnNearLimit || !estimate.peak || estimate.peak.bac < limit - LIMIT_MARGIN) {
@@ -195,7 +230,7 @@ export async function refreshReminders(): Promise<void> {
     LIMIT_ID,
     Math.max(now + MINUTE_MS, estimate.peak.at - 15 * MINUTE_MS),
     i18n.t("reminders.limitTitle"),
-    i18n.t("reminders.limitBody", { time }),
+    i18n.t(variantKey("reminders.limitBody", nightOf(now)), { time }),
     WATER_CATEGORY,
   );
 }
@@ -213,6 +248,13 @@ export function crossesPersonalLimit(): { crosses: boolean; at: number | null } 
 /** N-06: a party I said yes to is announced this long before it starts. */
 const PARTY_LEAD_MS = 60 * MINUTE_MS;
 const PARTY_PREFIX = "party-soon-";
+/** A party I said yes to that started without me opening it or logging a drink gets a nudge. */
+const LAUNCH_AFTER_MS = 30 * MINUTE_MS;
+const LAUNCH_PREFIX = "party-launch-";
+const COMEBACK_ID = "comeback";
+/** The comeback nudge waits this many days without the app being opened. */
+const COMEBACK_AFTER_DAYS = 4;
+const COMEBACK_HOUR = 19;
 /** QOL-21: a crew mate's birthday is announced this many days before, early evening. */
 const BIRTHDAY_LEAD_DAYS = 3;
 const BIRTHDAY_HOUR = 18;
@@ -237,15 +279,38 @@ export async function schedulePartyReminders(
   const upcoming = parties.filter((p) => p.myResponse === "going" && p.closedAt === null && p.startsAt - PARTY_LEAD_MS > now);
   const keep = new Set(upcoming.map((p) => `${PARTY_PREFIX}${p.id}`));
   await cancelStale(PARTY_PREFIX, keep);
-  if (!upcoming.length || !(await allowed())) return;
-  const { preferences } = useAppStore.getState();
+  const { preferences, nudgesOn, launchedParties, drinks, remindersMutedUntil } = useAppStore.getState();
+  // "It has started, launch it": never in the quiet hours, never once I opened it or drank something.
+  const launches = parties.filter((p) => {
+    const at = p.startsAt + LAUNCH_AFTER_MS;
+    return (
+      nudgesOn &&
+      p.myResponse === "going" &&
+      p.closedAt === null &&
+      at > now &&
+      !launchedParties.includes(p.id) &&
+      !drinks.some((d) => d.consumedAt >= p.startsAt - LAUNCH_AFTER_MS) &&
+      afterQuietHours(at, preferences.quietFromHour, preferences.quietToHour) === at &&
+      !(remindersMutedUntil !== null && remindersMutedUntil > at)
+    );
+  });
+  await cancelStale(LAUNCH_PREFIX, new Set(launches.map((p) => `${LAUNCH_PREFIX}${p.id}`)));
+  if ((!upcoming.length && !launches.length) || !(await allowed())) return;
   const i18n = createTranslator(preferences.language);
+  for (const p of launches) {
+    const name = p.name || i18n.t(`newParty.moods.${p.mood}` as "newParty.moods.party");
+    await Notifications.scheduleNotificationAsync({
+      identifier: `${LAUNCH_PREFIX}${p.id}`,
+      content: { title: i18n.t("reminders.launchTitle", { party: name }), body: i18n.t(variantKey("reminders.launchBody", p.id)), data: { url: `/live?id=${p.id}` } },
+      trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: new Date(p.startsAt + LAUNCH_AFTER_MS) },
+    }).catch(() => undefined);
+  }
   for (const p of upcoming) {
     const name = p.name || i18n.t(`newParty.moods.${p.mood}` as "newParty.moods.party");
     const time = formatClock(p.startsAt, preferences.language, preferences.hourCycle);
     await Notifications.scheduleNotificationAsync({
       identifier: `${PARTY_PREFIX}${p.id}`,
-      content: { title: i18n.t("reminders.partySoonTitle", { party: name, time }), body: i18n.t("reminders.partySoonBody", { crew: p.crewName }), data: { url: `/live?id=${p.id}` } },
+      content: { title: i18n.t("reminders.partySoonTitle", { party: name, time }), body: i18n.t(variantKey("reminders.partySoonBody", p.id), { crew: p.crewName }), data: { url: `/live?id=${p.id}` } },
       trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: new Date(p.startsAt - PARTY_LEAD_MS) },
     }).catch(() => undefined);
   }
@@ -280,7 +345,7 @@ export async function scheduleBirthdayReminders(birthdays: readonly { userId: st
     const url = `/new-party?crewId=${encodeURIComponent(b.crewId)}&mood=birthday&date=${b.date}&name=${encodeURIComponent(partyName)}`;
     await Notifications.scheduleNotificationAsync({
       identifier: `${BIRTHDAY_PREFIX}${b.userId}-${b.date}`,
-      content: { title: i18n.t("radar.birthdayOn", { name: b.name, date: when }), body: i18n.t("radar.birthdayPlanQuestion"), data: { url } },
+      content: { title: i18n.t("radar.birthdayOn", { name: b.name, date: when }), body: i18n.t(variantKey("reminders.birthdayBody", `${b.userId}:${b.date}`)), data: { url } },
       trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: new Date(at) },
     }).catch(() => undefined);
   }
@@ -299,7 +364,7 @@ export async function scheduleHomeCheck(party: { id: string; name: string; endsA
   await Notifications.cancelScheduledNotificationAsync(homeCheckId(party.id)).catch(() => undefined);
   await Notifications.scheduleNotificationAsync({
     identifier: homeCheckId(party.id),
-    content: { title: i18n.t("homeCheck.notifTitle"), body: i18n.t("homeCheck.notifBody", { party: party.name }), data: { url: "/(tabs)" } },
+    content: { title: i18n.t("homeCheck.notifTitle"), body: i18n.t(variantKey("homeCheck.notifBody", party.id), { party: party.name }), data: { url: "/(tabs)" } },
     trigger: party.endsAt <= Date.now() + MINUTE_MS ? null : { type: Notifications.SchedulableTriggerInputTypes.DATE, date: new Date(party.endsAt) },
   });
 }
@@ -322,7 +387,38 @@ export async function notifyRecapReady(party: { id: string; name: string }): Pro
   const at = afterQuietHours(Date.now(), preferences.quietFromHour, preferences.quietToHour);
   await Notifications.scheduleNotificationAsync({
     identifier: `recap-${party.id}`,
-    content: { title: i18n.t("recap.notifTitle"), body: i18n.t("recap.notifBody", { party: party.name }), data: { url: `/recap?id=${party.id}` } },
+    content: { title: i18n.t("recap.notifTitle"), body: i18n.t(variantKey("recap.notifBody", party.id), { party: party.name }), data: { url: `/recap?id=${party.id}` } },
     trigger: at <= Date.now() + MINUTE_MS ? null : { type: Notifications.SchedulableTriggerInputTypes.DATE, date: new Date(at) },
   });
+}
+
+/** The live screen of a party was opened: its "it has started" nudge is no longer needed. */
+export async function markPartyLaunched(partyId: string): Promise<void> {
+  const { launchedParties } = useAppStore.getState();
+  if (!launchedParties.includes(partyId)) useAppStore.setState({ launchedParties: [...launchedParties, partyId].slice(-40) });
+  if (!supported) return;
+  await Notifications.cancelScheduledNotificationAsync(`${LAUNCH_PREFIX}${partyId}`).catch(() => undefined);
+}
+
+/**
+ * The weekend comeback nudge: the first Friday or Saturday 7 pm a few days away at least. Every
+ * time the app is used it moves further, so it only goes off after days without opening the app.
+ */
+export async function scheduleComeback(): Promise<void> {
+  if (!supported) return;
+  await Notifications.cancelScheduledNotificationAsync(COMEBACK_ID).catch(() => undefined);
+  const { preferences, nudgesOn } = useAppStore.getState();
+  if (!nudgesOn || !(await allowed())) return;
+  const day = new Date();
+  day.setDate(day.getDate() + COMEBACK_AFTER_DAYS);
+  day.setHours(COMEBACK_HOUR, 0, 0, 0);
+  while (day.getDay() !== 5 && day.getDay() !== 6) day.setDate(day.getDate() + 1);
+  const at = day.getTime();
+  if (afterQuietHours(at, preferences.quietFromHour, preferences.quietToHour) !== at) return;
+  const i18n = createTranslator(preferences.language);
+  await Notifications.scheduleNotificationAsync({
+    identifier: COMEBACK_ID,
+    content: { title: i18n.t("reminders.comebackTitle"), body: i18n.t(variantKey("reminders.comebackBody", String(at))), data: { url: "/(tabs)" } },
+    trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: day },
+  }).catch(() => undefined);
 }

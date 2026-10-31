@@ -22,6 +22,7 @@ import { Button } from "@/ui/Button";
 import { checkForUpdate, currentBuild, currentVersion } from "@/system/updates";
 import { AppIconPicker } from "@/profile/AppIconPicker";
 import { refreshReminders } from "@/reminders/reminders";
+import { refreshCalendarReminders } from "@/server/calendarData";
 import { AccountSection } from "@/profile/AccountSection";
 import { RegionRules } from "@/profile/RegionRules";
 import { UpdateNotice } from "@/system/UpdateNotice";
@@ -115,6 +116,7 @@ export default function SettingsScreen() {
   const soundsOn = useAppStore((state) => state.soundsOn);
   const hapticsOn = useAppStore((state) => state.hapticsOn);
   const lockScreenNumbers = useAppStore((state) => state.lockScreenNumbers);
+  const nudgesOn = useAppStore((state) => state.nudgesOn);
   const crews = useCrewData((state) => state.crews);
   const hour = (h: number) => formatClock(new Date(2026, 0, 1, h).getTime(), i18n.language, preferences.hourCycle);
   const offline = showFailure(i18n);
@@ -223,6 +225,15 @@ export default function SettingsScreen() {
               <Text variant="small">{i18n.t("settings.remindersAppOnly")}</Text>
             ) : (
               <>
+                <SwitchRow
+                  label={i18n.t("settings.nudges")}
+                  hint={i18n.t("settings.nudgesHint")}
+                  value={nudgesOn}
+                  onChange={(on) => {
+                    useAppStore.setState({ nudgesOn: on });
+                    void refreshCalendarReminders().catch(() => undefined);
+                  }}
+                />
                 <SwitchRow
                   label={i18n.t("settings.water")}
                   value={preferences.waterReminderMinutes !== null}

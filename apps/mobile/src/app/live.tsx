@@ -16,6 +16,7 @@ import { Stepper } from "@/ui/Stepper";
 import { useSession } from "@/server/session";
 import { useNow } from "@/state/hooks";
 import { useAppStore } from "@/state/store";
+import { markPartyLaunched } from "@/reminders/reminders";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
 import { Button } from "@/ui/Button";
@@ -187,6 +188,10 @@ export default function LiveScreen() {
   const refreshMs = useEcoInterval(REFRESH_MS);
   const share = useLiveShare();
   const crewRole = useCrewData((state) => state.crews.find((c) => c.id === party?.crewId)?.role);
+
+  useEffect(() => {
+    if (id) void markPartyLaunched(id).catch(() => undefined);
+  }, [id]);
 
   useEffect(() => {
     if (!id) return;

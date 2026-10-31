@@ -82,6 +82,12 @@ export interface AppState {
   nudgeDismissedAt: number | null;
   /** QOL-30: party reminders muted until this morning time. */
   remindersMutedUntil: number | null;
+  /** Nudges to launch a party already started, and the weekend comeback nudge. */
+  nudgesOn: boolean;
+  /** Parties whose live screen I opened, so the "it has started" nudge stays quiet. */
+  launchedParties: string[];
+  /** Time of the peak warning already scheduled tonight: one per night. */
+  peakWarnedAt: number | null;
   /** PREF-02: first day of the week picked in Settings (0 = Sunday); null follows the phone. */
   weekStartOverride: number | null;
   /** PREF-05: the time zone seen at the last launch, to notice a trip even inside one country. */
@@ -161,6 +167,9 @@ export const useAppStore = create<AppState>()(
       nonceBook: [],
       nudgeDismissedAt: null,
       remindersMutedUntil: null,
+      nudgesOn: true,
+      launchedParties: [],
+      peakWarnedAt: null,
       weekStartOverride: null,
       lastTimeZone: null,
       travelZoneDismissed: null,
@@ -327,6 +336,8 @@ export function clearAccountHistory(): void {
     recapNotified: [],
     nudgeDismissedAt: null,
     remindersMutedUntil: null,
+    launchedParties: [],
+    peakWarnedAt: null,
     // AC-12: the server ties an install's chain to one account; another account starts a new one.
     installId: null,
     eventSeq: 0,
