@@ -35,7 +35,7 @@ import { venueRoutes } from "./routes/venues";
 import { venueFactRoutes } from "./routes/venueFacts";
 import { notificationRoutes } from "./notifications/routes";
 
-const PUBLIC_ROUTES = new Set(["POST /v1/accounts", "POST /v1/sessions/claim", "POST /v1/sessions/password", "GET /v1/health", "GET /v1/info", "GET /download/android.json", "GET /download/soiree-crew.apk", "GET /v1/invites/:code", "GET /v1/live", "GET /i/:code", "GET /f/:code","GET /v1/photos/:id", "GET /v1/receipts/:id","GET /v1/calendar/:token.ics"]);
+const PUBLIC_ROUTES = new Set(["POST /v1/accounts", "POST /v1/sessions/claim", "POST /v1/sessions/password", "GET /v1/health", "GET /v1/info", "GET /download/android.json", "GET /download/soiree-crew.apk", "GET /v1/invites/:code", "GET /v1/crews/open", "GET /v1/live", "GET /i/:code", "GET /f/:code","GET /v1/photos/:id", "GET /v1/receipts/:id","GET /v1/calendar/:token.ics"]);
 
 export async function buildApp(ctx: Context, options: { logger?: boolean; trustProxy?: boolean | number } = {}): Promise<FastifyInstance> {
   const app = Fastify({

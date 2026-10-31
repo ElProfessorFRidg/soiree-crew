@@ -7,7 +7,8 @@ import { assertCrewMember, HttpError, requireUser, type Context } from "../conte
 import { crewTimeZone, currentSeason } from "../territory";
 import { gameWins } from "./games";
 import { dayBoundaries, dayBoundaryOf, nightOf, offsetMinutes } from "../time";
-import { CREW_KINDS } from "../schemas";
+import { CITY_MAX, CREW_CATEGORIES, CREW_DESCRIPTION_MAX, CREW_KINDS, oneLine } from "../schemas";
+import { assertCleanText } from "../textFilter";
 import { checkOvertakes } from "../notifications/producers";
 
 const DAY_MS = 86_400_000;
@@ -308,12 +309,30 @@ export function leaderboardRoutes(app: FastifyInstance, ctx: Context): void {
         publicName: z.boolean().optional(),
         kind: z.enum(CREW_KINDS).optional(),
         open: z.boolean().optional(),
-        description: z.string().trim().max(200).optional(),
+        description: z.string().max(CREW_DESCRIPTION_MAX * 2).transform(oneLine).pipe(z.string().max(CREW_DESCRIPTION_MAX)).optional(),
+        category: z.enum(CREW_CATEGORIES).nullable().optional(),
+        city: z.string().max(CITY_MAX * 2).transform(oneLine).pipe(z.string().max(CITY_MAX)).nullable().optional(),
       })
       .parse(request.body);
+    // COM-08: what the public listing shows is read by strangers: it goes through the filters,
+    // and a crew whose name would not pass is not listed.
+    assertCleanText(input.description);
+    assertCleanText(input.city);
+    if (input.open) {
+      const name = (await ctx.db.query<{ name: string }>("select name from crews where id = $1", [request.params.id]))[0]?.name;
+      assertCleanText(name);
+    }
     if (input.kind !== undefined) await ctx.db.query("update crews set kind = $2 where id = $1", [request.params.id, input.kind]);
+    // Turning a crew private takes it out of the listing at once: the listing reads this column.
     if (input.open !== undefined) await ctx.db.query("update crews set open = $2 where id = $1", [request.params.id, input.open]);
     if (input.description !== undefined) await ctx.db.query("update crews set description = $2 where id = $1", [request.params.id, input.description]);
+    if (input.category !== undefined) await ctx.db.query("update crews set category = $2 where id = $1", [request.params.id, input.category]);
+    if (input.city !== undefined) await ctx.db.query("update crews set city = $2 where id = $1", [request.params.id, input.city || null]);
+    if (input.open !== undefined || input.description !== undefined || input.category !== undefined || input.city !== undefined || input.kind !== undefined) {
+      // The rest of the crew sees the public / private tag and the new details without pulling.
+      const members = await ctx.db.query<{ user_id: string }>("select user_id from crew_members where crew_id = $1", [request.params.id]);
+      ctx.live.notify(members.map((m) => m.user_id), { type: "crew.changed", crewId: request.params.id });
+    }
     if (input.publicName !== undefined) await ctx.db.query("update crews set public_name = $2 where id = $1", [request.params.id, input.publicName]);
     if (input.aiEnabled !== undefined) await ctx.db.query("update crews set ai_enabled = $2 where id = $1", [request.params.id, input.aiEnabled]);
     if (input.leaderboardEnabled !== undefined) {
