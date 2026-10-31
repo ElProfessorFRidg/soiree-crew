@@ -46,6 +46,27 @@ interface OutingState {
   /** Tonight's nudges the server knows of (the crew ones too): one budget for both. */
   serverNudges: number[];
   lastReportAt: number;
+  /** Where the phone spent the night, and which nights: a place slept in twice is home. */
+  sleeps: { lat: number; lng: number; nights: string[] }[];
+}
+
+/** Within this of a place slept in twice, the phone is at home: an evening in is not a night out. */
+const HOME_RADIUS_M = 300;
+const isHome = (state: OutingState, here: { lat: number; lng: number }) =>
+  state.sleeps.some((s) => s.nights.length >= 2 && metersBetween(s, here) < HOME_RADIUS_M);
+
+/** The first position after 4 am, still where it stopped before: the night was spent there. */
+function learnSleep(state: OutingState, now: number): void {
+  const anchor = state.anchor;
+  const morning = new Date(now);
+  if (!anchor || morning.getHours() < NIGHT_TO_HOUR || morning.getHours() >= 12) return;
+  morning.setHours(NIGHT_TO_HOUR, 0, 0, 0);
+  if (anchor.since > morning.getTime()) return;
+  const night = nightOf(now - 12 * 60 * MINUTE_MS);
+  const spot = state.sleeps.find((s) => metersBetween(s, anchor) < HOME_RADIUS_M);
+  if (spot) {
+    if (!spot.nights.includes(night)) spot.nights = [...spot.nights, night].slice(-10);
+  } else state.sleeps = [...state.sleeps, { lat: anchor.lat, lng: anchor.lng, nights: [night] }].slice(-5);
 }
 
 interface ServerOuting {
@@ -88,12 +109,13 @@ async function readState(): Promise<OutingState> {
         nudges: Array.isArray(saved.nudges) ? saved.nudges : [],
         serverNudges: Array.isArray(saved.serverNudges) ? saved.serverNudges : [],
         lastReportAt: typeof saved.lastReportAt === "number" ? saved.lastReportAt : 0,
+        sleeps: Array.isArray(saved.sleeps) ? saved.sleeps : [],
       };
     }
   } catch {
     // Unreadable: start over.
   }
-  return { anchor: null, nudges: [], serverNudges: [], lastReportAt: 0 };
+  return { anchor: null, nudges: [], serverNudges: [], lastReportAt: 0, sleeps: [] };
 }
 
 const writeState = (state: OutingState) => AsyncStorage.setItem(STATE_KEY, JSON.stringify(state)).catch(() => undefined);
@@ -137,6 +159,7 @@ async function mayNudge(at: number, now: number, state: OutingState): Promise<bo
   // The crew nudges the server sent count too; a local one it already knows is counted once.
   const crewOnly = state.serverNudges.filter((t) => nightOf(t) === nightOf(at) && !tonight.some((n) => n.at === t));
   if (tonight.length + crewOnly.length >= (outingHabit?.maxPerNight ?? MAX_PER_NIGHT)) return false;
+  if (state.anchor && isHome(state, state.anchor)) return false;
   if (state.anchor && tonight.some((n) => metersBetween(n, state.anchor!) < NEW_PLACE_M)) return false;
   if (nightGoingOn(now)) return false;
   return (await Notifications.getPermissionsAsync()).granted;
@@ -155,6 +178,7 @@ async function onLocations(locations: readonly Location.LocationObject[]): Promi
   const now = Date.now();
   const here = { lat: last.coords.latitude, lng: last.coords.longitude };
   const state = await readState();
+  learnSleep(state, now);
 
   if (!state.anchor || metersBetween(state.anchor, here) > STAY_RADIUS_M) {
     // Moved: a new place, a new wait. A nudge still pending for the old place is dropped.
