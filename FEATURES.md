@@ -50,7 +50,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-32 | P0 | JeuxCartes.dc.html | build | Small floating button in every game to add a drink without leaving the game. |
 | O-85 | P1 | Backstage (near Soiree.dc.html) | build | Food input for the BAC model ("ate / light meal / empty stomach", per evening or per drink, changeable mid-party) feeding absorption and elimination within Recon-BAC bounds. Merges app.md O-85 and bac.md BAC-FOOD-01. Source: app.md §5, bac.md §5. |
 | O-86 | P1 | Backstage (near Soiree.dc.html) | build | "How this is estimated" sheet one tap from the BAC: inputs used, standard-drink equivalent per country, model limits, why it differs from a breathalyser. Source: app.md §5. |
-| O-87 | P0 | Backstage (near Soiree.dc.html) | build | Conservative driving timer: "under the limit at" uses the slow elimination rate (0.10 g/L/h), is never shown while BAC is rising, and says "too close to call" within 0.10 g/L or 1 h of the limit. Renumbered from BAC-SAFE-01. Source: bac.md §5. |
+| O-87 | P0 | Backstage (near Soiree.dc.html) | build | Conservative driving timer: "under the limit at" uses the slow elimination rate (0.10 g/L/h) and reads as a floor ("not before 3:40"); while BAC is still rising it says the time can only move later, and it says "too close to call" within 0.10 g/L or 1 h of the limit. "Under the limit" only with a clear margin. Renumbered from BAC-SAFE-01. Source: bac.md §5. |
 | O-88 | P0 | Backstage (near Securite.dc.html) | build | Alcohol-poisoning signs card above 2.0 g/L estimated, with the local emergency number, aimed at the person and the crew, linked to SOS. Renumbered from BAC-DANGER-01. Source: bac.md §2.5, §5. |
 
 ## Widgets

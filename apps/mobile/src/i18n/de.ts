@@ -3,6 +3,7 @@ import type { Messages } from "./types";
 // German copy, written for German speakers rather than translated from French.
 export const de: Messages = {
   common: {
+    appName: "Soirée Crew",
     openSettings: "Einstellungen öffnen",
     permissionWeb: "Erlaube es in den Website-Einstellungen deines Browsers.",
     crashTitle: "Dieser Bildschirm ist abgestürzt.",
@@ -62,6 +63,11 @@ export const de: Messages = {
     driving: "Fahren",
     drivingOk: "Unter dem Limit (geschätzt)",
     tooClose: "Zu knapp",
+    notBefore: "Nicht vor",
+    mayMoveLater: "Steigt noch: diese Uhrzeit kann sich nach hinten verschieben.",
+    inDuration: "in {duration}",
+    around: "gegen {time}",
+    earliestAt: "Frühestens {time}",
     zeroTolerance: "Alkoholverbot",
     notice: "Eine Schätzung, kein Alkoholtester. Entscheide nie anhand dieser Zahl, ob du fahren kannst.",
     otherDrink: "Anderes Getränk",

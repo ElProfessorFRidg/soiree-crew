@@ -1,4 +1,16 @@
 {
+  "0.1.9": {
+    "fr": [
+      "Écran Soirée : le volant affiche l'heure « Pas avant », en couleur selon ta situation, et précise quand elle peut encore reculer.",
+      "Retour à 0 donne aussi l'heure.",
+      "L'icône et le nom de l'app en haut de l'écran Soirée, pour que tes captures disent d'où elles viennent."
+    ],
+    "en": [
+      "Party screen: driving shows a \"not before\" time, coloured by your situation, and says when it can still move later.",
+      "Back to 0 also gives the time.",
+      "The app's icon and name at the top of the Party screen, so your screenshots say where they come from."
+    ]
+  },
   "0.1.8": {
     "fr": [
       "« Flash vodka » : c'est maintenant le nom du flash de Poliakov avec un Red Bull, et tu peux le taper tel quel (« 2 flash vodka »).",

@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Linking, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -23,6 +23,7 @@ import { useLiveBac, useNow, useUiLevel, type LiveBac } from "@/state/hooks";
 import { useAppStore } from "@/state/store";
 import { submit } from "@/sync/engine";
 import { useTheme } from "@/theme";
+import { BrandMark } from "@/ui/BrandMark";
 import { Button, IconButton } from "@/ui/Button";
 import { Panel, Row, Segmented, Tag } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
@@ -292,6 +293,7 @@ function NoEstimateParty() {
         <SosBanner />
         <View style={styles.header}>
           <View style={styles.flex}>
+            <BrandMark />
             <PartyTitle i18n={i18n} />
           </View>
           <NotificationBell />
@@ -406,54 +408,71 @@ function trendLine({ i18n, live, unit }: LevelProps, hourCycle: "h12" | "h23"): 
 function DrivingPanels(props: LevelProps) {
   const { i18n, live, now } = props;
   const theme = useTheme();
+  const hourCycle = useAppStore((state) => state.preferences.hourCycle);
   const { estimate, driving } = live;
   const zeroTolerance = driving.limitBac === 0;
+  const clock = (at: number) => formatClock(at, i18n.language, hourCycle);
 
   const backToZero = estimate.backToZeroAt ? formatDuration(estimate.backToZeroAt - now, i18n.language) : null;
-  let drivingValue: string;
-  let drivingColor: string;
-  // A duration is a figure (numeral font); a verdict is a phrase and reads as one.
-  let drivingIsPhrase = true;
-  // O-87: still climbing towards the limit, or within 0.10 g/L or an hour of it, the app does not
-  // call it; only a clear margin is "under the limit", and a countdown shows only once falling.
-  if (driving.rising) {
-    drivingValue = i18n.t("party.drivingRising");
-    drivingColor = theme.danger;
-  } else if (driving.tooCloseToCall) {
-    drivingValue = i18n.t("party.tooClose");
-    drivingColor = theme.amber;
-  } else if (driving.underLimitAt === null || driving.underLimitAt <= now) {
-    drivingValue = i18n.t("party.drivingOk");
-    drivingColor = theme.ok;
+  const later = driving.underLimitAt !== null && driving.underLimitAt > now ? driving.underLimitAt : null;
+  // O-87, read as a floor: the conservative time back under the limit (slow elimination) is the
+  // earliest it can be, so it shows as "not before" even while the level still climbs, with a line
+  // saying it can only move later. Only a clear margin reads "under the limit"; near it, "too close".
+  let tint: "danger" | "amber" | "ok";
+  let body: ReactNode;
+  if (driving.tooCloseToCall) {
+    tint = "amber";
+    body = (
+      <>
+        <Text variant="h2" color={theme.amber}>
+          {i18n.t("party.tooClose")}
+        </Text>
+        {later ? <Text variant="small">{i18n.t("party.earliestAt", { time: clock(later) })}</Text> : null}
+      </>
+    );
+  } else if (later) {
+    tint = "danger";
+    body = (
+      <>
+        <Text variant="small" color={theme.text}>
+          {i18n.t("party.notBefore")}
+        </Text>
+        <Numeral size={34} color={theme.text}>
+          {clock(later)}
+        </Numeral>
+        <Text variant="small">{driving.rising ? i18n.t("party.mayMoveLater") : i18n.t("party.inDuration", { duration: formatDuration(later - now, i18n.language) })}</Text>
+      </>
+    );
   } else {
-    drivingValue = formatDuration(driving.underLimitAt - now, i18n.language);
-    drivingColor = theme.danger;
-    drivingIsPhrase = false;
+    tint = "ok";
+    body = (
+      <Text variant="h2" color={theme.ok}>
+        {i18n.t("party.drivingOk")}
+      </Text>
+    );
   }
 
   return (
     <View style={styles.grid2}>
-      <Panel style={styles.flex}>
+      <Panel style={[styles.flex, styles.drivingPanel]}>
         <Text variant="label">{i18n.t("party.backToZero")}</Text>
-        {backToZero ? (
-          <Numeral size={34}>{backToZero}</Numeral>
+        {backToZero && estimate.backToZeroAt ? (
+          <>
+            <Numeral size={34}>{backToZero}</Numeral>
+            <Text variant="small">{i18n.t("party.around", { time: clock(estimate.backToZeroAt) })}</Text>
+          </>
         ) : (
           <Text variant="h2" color={theme.ok}>
             {i18n.t("party.alreadyZero")}
           </Text>
         )}
       </Panel>
-      <Panel style={styles.flex}>
-        <Text variant="label">{i18n.t("party.driving")}</Text>
-        {drivingIsPhrase ? (
-          <Text variant="h2" color={drivingColor}>
-            {drivingValue}
-          </Text>
-        ) : (
-          <Numeral size={34} color={drivingColor}>
-            {drivingValue}
-          </Numeral>
-        )}
+      <Panel tint={tint} style={[styles.flex, styles.drivingPanel]}>
+        <View style={styles.titleRow}>
+          <Icon name="car" size={16} color={tint === "ok" ? theme.ok : tint === "amber" ? theme.amber : theme.danger} />
+          <Text variant="label">{i18n.t("party.driving")}</Text>
+        </View>
+        {body}
         {zeroTolerance && estimate.bac > 0 ? <Text variant="small">{i18n.t("party.zeroTolerance")}</Text> : null}
       </Panel>
     </View>
@@ -558,6 +577,7 @@ function LevelZero(props: LevelProps) {
     <>
       <View style={styles.header}>
         <View style={styles.flex}>
+          <BrandMark />
           <Greeting i18n={i18n} live={props.live} now={now} drinksTonight={props.tonight.drinks.length} />
           <PartyTitle i18n={i18n} />
         </View>
@@ -618,6 +638,7 @@ function LevelOne(props: LevelProps) {
     <>
       <View style={styles.header}>
         <View style={styles.flex}>
+          <BrandMark />
           <Greeting i18n={i18n} live={props.live} now={props.now} drinksTonight={props.tonight.drinks.length} />
           <Text variant="h3">{i18n.t("party.tonight")}</Text>
         </View>
@@ -792,6 +813,7 @@ const styles = StyleSheet.create({
   heroRow: { flexDirection: "row", alignItems: "flex-end", gap: 12, flexWrap: "wrap" },
   heroUnit: { paddingBottom: 14, gap: 2, flexShrink: 1 },
   grid2: { flexDirection: "row", gap: 10 },
+  drivingPanel: { gap: 4 },
   actions: { flexDirection: "row", gap: 10 },
   square: { width: size.partyAction, paddingHorizontal: 0 },
   statusRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" },

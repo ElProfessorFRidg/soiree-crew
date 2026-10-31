@@ -3,6 +3,7 @@
 
 export const fr = {
   common: {
+    appName: "Soirée Crew",
     openSettings: "Ouvrir les réglages",
     permissionWeb: "Autorise l'accès dans les réglages du site, dans ton navigateur.",
     crashTitle: "Cet écran a planté.",
@@ -62,6 +63,11 @@ export const fr = {
     driving: "Volant",
     drivingOk: "Sous la limite estimée",
     tooClose: "Trop juste",
+    notBefore: "Pas avant",
+    mayMoveLater: "Ça monte encore : cette heure peut reculer.",
+    inDuration: "dans {duration}",
+    around: "vers {time}",
+    earliestAt: "Au plus tôt {time}",
     zeroTolerance: "Aucun verre autorisé",
     notice: "Estimation, pas un éthylotest. Ne prends jamais le volant sur cette base.",
     otherDrink: "Autre verre",

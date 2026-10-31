@@ -5,6 +5,7 @@ import type { Messages } from "./types";
 
 export const en: Messages = {
   common: {
+    appName: "Soirée Crew",
     openSettings: "Open settings",
     permissionWeb: "Allow it in this site's settings, in your browser.",
     crashTitle: "This screen crashed.",
@@ -64,6 +65,11 @@ export const en: Messages = {
     driving: "Driving",
     drivingOk: "Under the limit (estimate)",
     tooClose: "Too close to call",
+    notBefore: "Not before",
+    mayMoveLater: "Still rising: this time can move later.",
+    inDuration: "in {duration}",
+    around: "around {time}",
+    earliestAt: "{time} at the earliest",
     zeroTolerance: "No drinks allowed",
     notice: "An estimate, not a breathalyser. Never decide to drive based on this number.",
     otherDrink: "Other drink",
