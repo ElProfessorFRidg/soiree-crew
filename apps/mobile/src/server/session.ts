@@ -1,6 +1,7 @@
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 import { create } from "zustand";
+import { withDeadline } from "@/system/launchGuard";
 
 // The session token lives in the iOS Keychain / Android Keystore (SEC-05), never in AsyncStorage.
 const TOKEN_KEY = "crew.session.token";
@@ -48,7 +49,7 @@ async function write(key: string, value: string | null): Promise<void> {
 
 export async function loadSession(): Promise<void> {
   try {
-    const [token, raw] = await Promise.all([read(TOKEN_KEY), read(URL_KEY)]);
+    const [token, raw] = await withDeadline("keychain", Promise.all([read(TOKEN_KEY), read(URL_KEY)]), [null, null] as [string | null, string | null]);
     const meta = raw ? (JSON.parse(raw) as Omit<ServerSession, "token">) : null;
     useSession.setState({ ready: true, session: token && meta ? { ...meta, token } : null });
   } catch {

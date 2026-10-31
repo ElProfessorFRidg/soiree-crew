@@ -1,4 +1,12 @@
 {
+  "0.1.11": {
+    "fr": [
+      "L'app ne reste plus bloquée sur son icône au lancement (TrollStore, iPad) : chaque étape du démarrage a un délai, et l'app continue sans celle qui ne répond pas."
+    ],
+    "en": [
+      "The app no longer stays stuck on its icon at launch (TrollStore, iPad): each launch step has a deadline, and the app goes on without the one that does not answer."
+    ]
+  },
   "0.1.10": {
     "fr": [
       "Les boissons comme on les commande : « Flash vodka Red Bull » en entier, « Flash vodka » quand la place manque, et pareil pour les noms longs.",

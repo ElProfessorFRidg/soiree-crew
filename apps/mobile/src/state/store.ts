@@ -11,6 +11,7 @@ import type { VaultItem } from "@/vault/vault";
 import type { CustomDrink, DrinkPreset } from "@/drinks/presets";
 import type { DrinkEntry, Mutation, PendingMutation, StoredProfile, SyncState, WaterEntry } from "@/sync/types";
 import type { FirstRun, OnboardingDraft } from "@/onboarding/flow";
+import { withDeadline } from "@/system/launchGuard";
 
 function deviceDefaults(): UserPreferences {
   const locales = getLocales();
@@ -187,7 +188,7 @@ export const useAppStore = create<AppState>()(
       onRehydrateStorage: () => (state) => {
         // A reinstall finds an empty store: the copy kept in the Keychain fills it before anything
         // is shown, so the person lands where they were (system/keptCopy.ts).
-        void keptCopyFor(state)
+        void withDeadline("keychain", keptCopyFor(state), null)
           .then((kept) => useAppStore.setState({ ...(kept ?? {}), hydrated: true }))
           .catch(() => useAppStore.setState({ hydrated: true }))
           .finally(followPhoneHourCycle);

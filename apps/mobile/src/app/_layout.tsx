@@ -14,7 +14,7 @@ import { AT_LAUNCH_MS, checkAndAnnounce, installLatest, ON_RETURN_MS } from "@/s
 import { showToast } from "@/ui/Toast";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AppState as RNAppState, Platform, Settings } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
@@ -53,6 +53,7 @@ import { watchKeptCopy } from "@/system/keptCopy";
 import { PrivacyCover } from "@/ui/PrivacyCover";
 import { PermissionPrompt } from "@/system/PermissionPrompt";
 import { handleNotificationResponse, prepareNotifications } from "@/notify/push";
+import { LAUNCH_STEP_MS } from "@/system/launchGuard";
 
 /** Expo Router shows this instead of a crashed screen (any route below this layout). */
 export { CrashScreen as ErrorBoundary };
@@ -100,12 +101,28 @@ const NAVIGATION_THEME = {
 void SystemUI.setBackgroundColorAsync(themes.dark.bg).catch(() => undefined);
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts(fonts);
+  const [fontsReady, fontError] = useFonts(fonts);
+  // launchGuard: fonts that fail or never load fall back to the system ones instead of a stuck splash.
+  const [fontsLate, setFontsLate] = useState(false);
+  const fontsLoaded = fontsReady || !!fontError || fontsLate;
+  // The store itself (AsyncStorage) gets the same deadline: past it, the app starts from defaults.
+  const [storeLate, setStoreLate] = useState(false);
   const hydrated = useAppStore((state) => state.hydrated);
   const language = useAppStore((state) => state.preferences.language);
   const sessionReady = useSession((state) => state.ready);
   const session = useSession((state) => state.session);
-  const ready = fontsLoaded && hydrated && sessionReady;
+  const ready = fontsLoaded && (hydrated || storeLate) && sessionReady;
+
+  useEffect(() => {
+    const fontTimer = setTimeout(() => setFontsLate(true), LAUNCH_STEP_MS);
+    const storeTimer = setTimeout(() => {
+      if (!useAppStore.getState().hydrated) setStoreLate(true);
+    }, LAUNCH_STEP_MS * 2);
+    return () => {
+      clearTimeout(fontTimer);
+      clearTimeout(storeTimer);
+    };
+  }, []);
 
   const eco = useEco((state) => state.eco);
   // MOT-12: with Reduce Motion, screens cross-fade instead of sliding in.
