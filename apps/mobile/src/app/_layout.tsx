@@ -47,6 +47,7 @@ import { watchWidget } from "@/widgets/sync";
 import { CrashScreen } from "@/ui/CrashScreen";
 import { LaunchCurtain } from "@/ui/LaunchCurtain";
 import { purgePlainFiles } from "@/chat/media";
+import { pruneDrinkPhotos } from "@/drinks/drinkPhotos";
 import { watchLiveActivity } from "@/system/liveActivity";
 import { watchKeptCopy } from "@/system/keptCopy";
 import { PrivacyCover } from "@/ui/PrivacyCover";
@@ -123,6 +124,11 @@ export default function RootLayout() {
     // QOL-03: action buttons and Android channels speak the app's language.
     if (ready) void prepareNotifications().catch(() => undefined);
   }, [ready, language]);
+
+  useEffect(() => {
+    // O-21: photos of drinks removed meanwhile (here, on another phone, by another account) go.
+    if (hydrated) pruneDrinkPhotos();
+  }, [hydrated]);
 
   useEffect(() => {
     // Server transport, socket and delta sync follow the session (ADR 0002).

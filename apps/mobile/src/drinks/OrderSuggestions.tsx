@@ -16,6 +16,8 @@ import { showToast } from "@/ui/Toast";
 import { savedMatch } from "./catalogue";
 import { removeCustomDrink, restoreCustomDrink } from "./customDrinks";
 import { drinkLabel, sizeAndStrength } from "./display";
+import { customIdOf } from "./drinkPhotos";
+import { DrinkThumb } from "./DrinkThumb";
 import { keepInMyDrinks } from "./keep";
 import type { DrinkPreset } from "./presets";
 
@@ -97,7 +99,7 @@ export function SuggestionCard({ suggestion, unit, onQuantity, onAdd }: Props) {
     >
       <View style={styles.head}>
         <View style={[styles.glass, { backgroundColor: theme.surfaceRaised }]}>
-          <Icon name={`glass:${preset.icon}`} size={24} color={theme.amber} />
+          <DrinkThumb drinkId={customIdOf(preset.id)} icon={preset.icon} size={24} photoSize={44} color={theme.amber} />
         </View>
         <View style={styles.flex}>
           {suggestion.guess ? (

@@ -21,6 +21,8 @@ import {
   withHousePint,
 } from "@/drinks/catalogue";
 import { CustomDrinkEditor } from "@/drinks/CustomDrinkEditor";
+import { DrinkThumb } from "@/drinks/DrinkThumb";
+import { readParts, recipeText } from "@/drinks/mixedGlass";
 import { moveCustomDrink, removeCustomDrink, restoreCustomDrink, saveCustomDrink, sortedCustomDrinks, type CustomDrinkDraft } from "@/drinks/customDrinks";
 import { eveningFood } from "@/drinks/food";
 import { FoodPicker } from "@/drinks/FoodPicker";
@@ -248,6 +250,8 @@ export default function AddDrinkSheet() {
           {customDrinks.map((drink, index) => {
             const asPreset = presetFromCustom(drink);
             const on = selection.type === "custom" && selection.id === drink.id;
+            const parts = readParts(drink);
+            const recipe = parts ? recipeText(parts, unit, i18n.locale, { unnamed: i18n.t("myGlass.unnamedPour"), soft: i18n.t("myGlass.softFallback") }) : null;
             if (editing?.mode === "edit" && editing.drink.id === drink.id) {
               return (
                 <View key={drink.id} onLayout={(event) => editorLayout(event.nativeEvent.layout.y)}>
@@ -270,7 +274,7 @@ export default function AddDrinkSheet() {
                     pressedScale={0.99}
                     accessibilityRole="radio"
                     accessibilityState={{ selected: on }}
-                    accessibilityLabel={`${drink.name}, ${sizeAndStrength(asPreset, unit, i18n)}`}
+                    accessibilityLabel={[drink.name, sizeAndStrength(asPreset, unit, i18n), recipe].filter(Boolean).join(", ")}
                     onPress={() => pickCustom(drink.id)}
                     onLongPress={() => {
                       haptic.select();
@@ -278,7 +282,7 @@ export default function AddDrinkSheet() {
                     }}
                     style={styles.customMain}
                   >
-                    <Icon name={`glass:${drink.icon}`} size={24} color={on ? theme.bg : theme.amber} />
+                    <DrinkThumb drinkId={drink.id} icon={drink.icon} size={24} photoSize={44} color={on ? theme.bg : theme.amber} />
                     <View style={styles.flex}>
                       <Text variant="h3" color={on ? theme.bg : theme.text}>
                         {drink.name}
@@ -286,6 +290,12 @@ export default function AddDrinkSheet() {
                       <Text variant="small" color={on ? theme.bg : theme.textMuted}>
                         {sizeAndStrength(asPreset, unit, i18n)}
                       </Text>
+                      {/* A mixed glass shows what is in it ("Whisky 4 cl, Rhum 4 cl, Cola 20 cl"). */}
+                      {recipe ? (
+                        <Text variant="small" color={on ? theme.bg : theme.textMuted} numberOfLines={2}>
+                          {recipe}
+                        </Text>
+                      ) : null}
                     </View>
                   </ScalePressable>
                   {/* Long press is a shortcut, never the only way in (ADP-04). */}
@@ -607,7 +617,7 @@ const styles = StyleSheet.create({
   },
   section: { gap: 16 },
   customRow: { flexDirection: "row", alignItems: "center", borderRadius: radius.tile, paddingRight: 6 },
-  customMain: { flex: 1, flexDirection: "row", alignItems: "center", gap: 12, minHeight: 60, paddingHorizontal: 14 },
+  customMain: { flex: 1, flexDirection: "row", alignItems: "center", gap: 12, minHeight: 60, paddingHorizontal: 14, paddingVertical: 8 },
   menu: { flexDirection: "row", gap: 8, marginTop: 8 },
   time: { gap: 8 },
   timeRow: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 48 },

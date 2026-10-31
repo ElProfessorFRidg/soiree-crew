@@ -148,6 +148,28 @@ describe("every mutation (SYNC-08)", () => {
     });
     expect(await send(jade, randomUUID(), { kind: "drink.teleport" })).toMatchObject({ status: "rejected" });
   });
+
+  it("keeps the pours of a mixed glass, refuses broken ones, and drops what is not listed", async () => {
+    const jade = await account("jademix");
+    const id = randomUUID();
+    const parts = [
+      { name: "Whisky", volumeMl: 40, abv: 0.4 },
+      { name: "Rhum", volumeMl: 40, abv: 0.4 },
+      { name: "Cola", volumeMl: 200, abv: 0 },
+    ];
+    // A photo never leaves the phone: a field sent by mistake is not stored.
+    const mixed = { ...custom(id), name: "Whisky rhum cola", volumeMl: 280, abv: 0.11429, icon: "cocktail", parts, photo: "file:///x.jpg" };
+    expect(await send(jade, randomUUID(), { kind: "customDrink.set", drink: mixed })).toMatchObject({ status: "accepted" });
+    const stored = (await sync(jade)).customDrinks as { id: string; parts?: unknown; photo?: unknown }[];
+    expect(stored.find((d) => d.id === id)?.parts).toEqual(parts);
+    expect(stored.find((d) => d.id === id)?.photo).toBeUndefined();
+
+    for (const broken of [[], [{ name: "Gin", volumeMl: -4, abv: 0.4 }], [{ name: "Gin", volumeMl: 40, abv: 4 }]]) {
+      expect(await send(jade, randomUUID(), { kind: "customDrink.set", drink: { ...custom(randomUUID()), parts: broken } })).toMatchObject({ status: "rejected" });
+    }
+    // A drink saved before mixed glasses existed is still accepted as it was.
+    expect(await send(jade, randomUUID(), { kind: "customDrink.set", drink: custom(randomUUID()) })).toMatchObject({ status: "accepted" });
+  });
 });
 
 describe("offline replay protection (AC-12)", () => {

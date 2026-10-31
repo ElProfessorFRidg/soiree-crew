@@ -1,6 +1,7 @@
 import type { GlassIconName } from "@crew/design-tokens";
 import { catalogueDrink } from "@crew/fuzzy";
 import { ML_PER_UK_PINT, ML_PER_US_FL_OZ, type UnitSystem } from "@crew/units";
+import type { DrinkPart } from "./mixedGlass";
 
 /** Preset ids of drinks logged from the brand catalogue: `cat:kasteel-rouge`. */
 export const CATALOGUE_PREFIX = "cat:";
@@ -94,6 +95,8 @@ export interface CustomDrink {
   icon: GlassIconName;
   /** Position in "Mes boissons", lowest first. */
   order: number;
+  /** A mixed glass: its pours, the soft included. volumeMl and abv are their totals. */
+  parts?: DrinkPart[];
 }
 
 export function presetFromCustom(custom: CustomDrink): DrinkPreset {

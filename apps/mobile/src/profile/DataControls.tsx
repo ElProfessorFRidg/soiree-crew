@@ -4,6 +4,7 @@ import { haptic } from "@/motion/haptics";
 import { api } from "@/server/api";
 import { showFailure } from "@/server/errors";
 import { useVenueData } from "@/server/venueData";
+import { pruneDrinkPhotos } from "@/drinks/drinkPhotos";
 import { useAppStore } from "@/state/store";
 import { Button } from "@/ui/Button";
 import { Row } from "@/ui/controls";
@@ -23,7 +24,11 @@ function forgetLocally(category: DataCategory): void {
   const pending = (prefix: string) => (item: { mutation: { kind: string } }) => !item.mutation.kind.startsWith(prefix);
   if (category === "drinks") useAppStore.setState((s) => ({ drinks: [], drinkVenues: {}, learnedSpellings: {}, levelState: null, outbox: s.outbox.filter(pending("drink.")) }));
   if (category === "water") useAppStore.setState((s) => ({ water: [], outbox: s.outbox.filter(pending("water.")) }));
-  if (category === "customDrinks") useAppStore.setState((s) => ({ customDrinks: [], outbox: s.outbox.filter(pending("customDrink.")) }));
+  if (category === "customDrinks") {
+    useAppStore.setState((s) => ({ customDrinks: [], outbox: s.outbox.filter(pending("customDrink.")) }));
+    // Their photos only ever lived here.
+    pruneDrinkPhotos();
+  }
   if (category === "checkIns") {
     useVenueData.setState({ openCheckIn: null });
     // Which bar each drink was logged at is check-in history too.

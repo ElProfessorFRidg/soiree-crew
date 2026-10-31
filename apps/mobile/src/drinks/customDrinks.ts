@@ -2,6 +2,8 @@ import type { GlassIconName } from "@crew/design-tokens";
 import { newId, useAppStore } from "@/state/store";
 import { submit } from "@/sync/engine";
 import { guessIcon, moveInOrder } from "./customOrder";
+import { keepDrinkPhoto, pruneDrinkPhotos } from "./drinkPhotos";
+import type { DrinkPart } from "./mixedGlass";
 import type { CustomDrink } from "./presets";
 
 export interface CustomDrinkDraft {
@@ -10,6 +12,10 @@ export interface CustomDrinkDraft {
   abv: number;
   /** Picked in the editor; guessed from size and strength when left alone. */
   icon?: GlassIconName;
+  /** A mixed glass: its pours; volumeMl and abv are then their totals. */
+  parts?: DrinkPart[];
+  /** A new photo picked in the editor, null to take it off; left out, the photo stays as it was. */
+  photo?: string | null;
 }
 
 export const CUSTOM_BOUNDS = {
@@ -27,13 +33,20 @@ export function saveCustomDrink(draft: CustomDrinkDraft, existing?: CustomDrink)
     abv: draft.abv,
     icon: draft.icon ?? existing?.icon ?? guessIcon(draft.volumeMl, draft.abv),
     order: existing?.order ?? all.reduce((max, d) => Math.max(max, d.order), -1) + 1,
+    ...(draft.parts?.length ? { parts: draft.parts } : {}),
   };
   submit({ kind: "customDrink.set", drink, previous: existing ?? null });
+  // The photo stays on this phone: it is not part of what is synced.
+  if (draft.photo !== undefined) keepDrinkPhoto(drink.id, draft.photo);
   return drink;
 }
 
+/** The undo toast of a removal lasts 5 s: its photo is deleted once it can no longer come back. */
+const PHOTO_GRACE_MS = 8_000;
+
 export function removeCustomDrink(drink: CustomDrink): void {
   submit({ kind: "customDrink.remove", drink });
+  setTimeout(pruneDrinkPhotos, PHOTO_GRACE_MS);
 }
 
 export function restoreCustomDrink(drink: CustomDrink): void {
