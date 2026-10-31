@@ -1,6 +1,8 @@
-// The AltStore / SideStore / Feather / ESign source and the Scarlet one (docs/ALTSTORE.md), rebuilt
-// from the releases published on GitHub: every version with its notes, size, date and own download
-// link, the screenshots kept on the `altstore` branch, and the permissions read from the app config.
+// The AltStore / SideStore / Feather / KSign / ESign source and the Scarlet one (docs/ALTSTORE.md),
+// rebuilt from the releases published on GitHub: every version with its notes for people
+// (apps/mobile/store/release-notes.json), size, date, own download link, its own screenshots and card
+// kept on the `altstore` branch (tools/ci/altstore-images.py), and the permissions read from the app
+// config.
 //
 //   node tools/ci/altstore-source.mjs <altstore branch folder> <releases.json>
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -10,7 +12,9 @@ import { fileURLToPath } from "node:url";
 const OWNER_REPO = "ElProfessorFRidg/soiree-crew";
 const RAW = `https://raw.githubusercontent.com/${OWNER_REPO}/altstore`;
 const KEEP_VERSIONS = 40;
-const KEEP_NEWS = 10;
+const KEEP_NEWS = 20;
+/** The screens that show the app best, in this order; the others (settings, an empty crew) stay out. */
+export const SHOWCASE = ["party", "add-drink", "curve", "games", "my-stats", "history", "leaderboard", "bars", "me", "limits"];
 /** Expo SDK 58 builds for iOS 16.4 and later (ExpoModulesCore.podspec). */
 const MIN_IOS = "16.4";
 const TINT = "F4B33D";
@@ -31,6 +35,12 @@ export function privacyFrom(appJson) {
     NSCalendarsUsageDescription: option("expo-calendar", "calendarPermission"),
   };
   return Object.fromEntries(Object.entries(privacy).filter(([, v]) => v));
+}
+
+/** A version's screenshot files ("01-party.png"…) in showcase order, the ones not shown left out. */
+export function showcase(files) {
+  const byName = new Map(files.filter((f) => f.endsWith(".png")).map((f) => [f.slice(0, -4).replace(/^\d+-/, ""), f]));
+  return SHOWCASE.filter((name) => byName.has(name)).map((name) => byName.get(name));
 }
 
 /** Newest first by version number (0.1.10 after 0.1.9), whatever order the releases came in. */
@@ -74,7 +84,7 @@ export function scarletOf(source) {
       category: "Other",
       description: v.localizedDescription,
       bundleID: app.bundleIdentifier,
-      screenshots: index === 0 ? app.screenshots : [],
+      screenshots: v.screenshots ?? (index === 0 ? app.screenshots : []),
     })),
   };
 }
@@ -91,11 +101,14 @@ export function addRelease(source, appJson, release) {
     iconURL: `${RAW}/icon.png`,
     tintColor: TINT,
     category: "lifestyle",
-    screenshots: release.screenshots.map((name) => `${RAW}/screens/${name}`),
+    screenshots: [],
     appPermissions: { entitlements: [], privacy: privacyFrom(appJson) },
     versions: [],
   };
   const previous = source?.apps?.find((a) => a.bundleIdentifier === app.bundleIdentifier);
+  const own = showcase(release.screenshots ?? []).map((name) => `${RAW}/screens/${release.version}/${name}`);
+  // A version whose screenshots are gone (its build's artifact expired) keeps showing the last ones.
+  app.screenshots = own.length > 0 ? own : (previous?.screenshots ?? []);
   const version = {
     version: release.version,
     buildVersion: String(release.build),
@@ -104,16 +117,23 @@ export function addRelease(source, appJson, release) {
     downloadURL: `https://github.com/${OWNER_REPO}/releases/download/${encodeURIComponent(release.tag)}/soiree-crew-unsigned.ipa`,
     size: release.size,
     minOSVersion: MIN_IOS,
+    // Not in the AltStore format (readers skip it): what the Scarlet source shows for this version.
+    ...(own.length > 0 ? { screenshots: own } : {}),
   };
   app.versions = sortVersions([version, ...(previous?.versions ?? []).filter((v) => v.version !== release.version)]).slice(0, KEEP_VERSIONS);
   withLegacyFields(app);
+  // The cards at the top of the source: the version's own picture, everything it brings, and its
+  // release page behind "Open".
+  const image = release.banner ? `${RAW}/screens/${release.version}/banner.png` : release.header ? `${RAW}/header.png` : null;
   const news = [
     {
       identifier: `release-${release.version}`,
       title: `Soirée Crew ${release.version}`,
-      caption: release.notes.split("\n").find((line) => line.trim()) ?? "",
+      caption: release.notes,
       date: release.date,
       tintColor: TINT,
+      ...(image ? { imageURL: image } : {}),
+      url: `https://github.com/${OWNER_REPO}/releases/tag/${encodeURIComponent(release.tag)}`,
       appID: app.bundleIdentifier,
       notify: false,
     },
@@ -125,6 +145,7 @@ export function addRelease(source, appJson, release) {
     subtitle: "Les versions de Soirée Crew",
     description: "Chaque version publiée de Soirée Crew, installable et mise à jour depuis AltStore ou SideStore.",
     iconURL: `${RAW}/icon.png`,
+    ...(release.header ? { headerURL: `${RAW}/header.png` } : {}),
     website: `https://github.com/${OWNER_REPO}`,
     tintColor: TINT,
     featuredApps: [app.bundleIdentifier],
@@ -133,21 +154,29 @@ export function addRelease(source, appJson, release) {
   };
 }
 
-/** A release's notes for the source: its own text, without the install lines meant for GitHub. */
-function notesOf(body) {
-  return (body ?? "")
-    .split("\n")
-    .filter((line) => !/^- (iOS|Android|AltStore)/.test(line.trim()))
-    .join("\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
+/**
+ * What a version brings, for people: the lines written for it in release-notes.json, or failing
+ * that the release's own list of changes, without the build line, the install lines meant for
+ * GitHub and the commit prefixes.
+ */
+export function notesOf(body, written) {
+  const lines = written?.length
+    ? written
+    : (body ?? "")
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line.startsWith("- ") && !/^- (iOS|Android|AltStore)/.test(line))
+        .map((line) => line.slice(2).replace(/^[a-z]+(\([^)]*\))?!?:\s*/, ""))
+        .map((line) => line.charAt(0).toUpperCase() + line.slice(1));
+  return lines.map((line) => `• ${line}`).join("\n");
 }
 
 /**
  * The whole source from the releases published on GitHub, the only record that counts: every
- * version, newest first, with the screenshots kept on the branch.
+ * version, newest first. `media` is what the branch holds: `{ versions: { "0.1.5": { screenshots,
+ * banner } }, header }`; `notes` is release-notes.json.
  */
-export function fromReleases(appJson, releases, screenshots) {
+export function fromReleases(appJson, releases, media = {}, notes = {}) {
   let source = null;
   const named = releases
     .map((r) => ({ release: r, match: /^v(\d+\.\d+\.\d+)\+build\.(\d+)$/.exec(r.tag_name ?? "") }))
@@ -161,9 +190,11 @@ export function fromReleases(appJson, releases, screenshots) {
       build: Number(match[2]),
       tag: release.tag_name,
       date: release.published_at ?? release.created_at,
-      notes: notesOf(release.body),
+      notes: notesOf(release.body, notes[match[1]]?.fr),
       size: ipa.size,
-      screenshots,
+      screenshots: media.versions?.[match[1]]?.screenshots ?? [],
+      banner: !!media.versions?.[match[1]]?.banner,
+      header: !!media.header,
     });
   }
   return source;
@@ -173,9 +204,16 @@ export function fromReleases(appJson, releases, screenshots) {
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   const [dir, releasesPath] = process.argv.slice(2);
   const appJson = JSON.parse(readFileSync(new URL("../../apps/mobile/app.json", import.meta.url), "utf8"));
+  const notes = JSON.parse(readFileSync(new URL("../../apps/mobile/store/release-notes.json", import.meta.url), "utf8"));
   const screensDir = join(dir, "screens");
-  const screenshots = existsSync(screensDir) ? readdirSync(screensDir).filter((f) => f.endsWith(".png")).sort() : [];
-  const source = fromReleases(appJson, JSON.parse(readFileSync(releasesPath, "utf8")), screenshots);
+  const versions = {};
+  for (const version of existsSync(screensDir) ? readdirSync(screensDir) : []) {
+    if (!/^\d+\.\d+\.\d+$/.test(version)) continue;
+    const files = readdirSync(join(screensDir, version));
+    versions[version] = { screenshots: files.filter((f) => f !== "banner.png"), banner: files.includes("banner.png") };
+  }
+  const media = { versions, header: existsSync(join(dir, "header.png")) };
+  const source = fromReleases(appJson, JSON.parse(readFileSync(releasesPath, "utf8")), media, notes);
   if (!source) {
     console.log("No release with an IPA yet: nothing to publish.");
     process.exit(0);
@@ -183,5 +221,6 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
   writeFileSync(join(dir, "source.json"), `${JSON.stringify(source, null, 2)}\n`);
   writeFileSync(join(dir, "scarlet.json"), `${JSON.stringify(scarletOf(source), null, 2)}\n`);
   const latest = source.apps[0].versions[0];
-  console.log(`AltStore source: ${latest.version} (build ${latest.buildVersion}) first, ${source.apps[0].versions.length} versions, ${screenshots.length} screenshots`);
+  const shown = Object.keys(versions).filter((v) => versions[v].banner);
+  console.log(`AltStore source: ${latest.version} (build ${latest.buildVersion}) first, ${source.apps[0].versions.length} versions, cards for ${shown.join(", ") || "none"}`);
 }

@@ -1,21 +1,23 @@
 name: AltStore source
 
-# Rewrites the AltStore / SideStore / Feather / ESign source and the Scarlet one from the releases
-# already published on GitHub (docs/ALTSTORE.md). Nothing is compiled: a change to the source's own
-# script or icon publishes in under a minute. The Build workflow calls it after each release, with
-# that build's screenshots.
+# Rewrites the AltStore / SideStore / Feather / KSign / ESign source and the Scarlet one from the
+# releases already published on GitHub (docs/ALTSTORE.md). Nothing is compiled: a change to the
+# source's script, pictures, release notes or icon publishes in about a minute. The Build workflow
+# calls it after each release, with that build's screenshots.
 on:
   push:
     branches: [main]
     paths:
       - "tools/ci/altstore-source.mjs"
+      - "tools/ci/altstore-images.py"
+      - "apps/mobile/store/**"
       - ".github/workflows/altstore.yml"
       - "apps/mobile/assets/icon.png"
   workflow_dispatch:
   workflow_call:
     inputs:
       screenshots:
-        description: Replace the screenshots with the ones of the calling build (its ios-launch artifact)
+        description: Give the version just released the screenshots of the calling build (its ios-launch artifact)
         type: boolean
         default: false
 
@@ -25,6 +27,8 @@ concurrency:
 
 permissions:
   contents: write
+  # Older versions' screenshots come from their build's artifact.
+  actions: read
 
 jobs:
   source:
@@ -52,13 +56,38 @@ jobs:
           else
             git worktree add --orphan -b altstore altstore-src
           fi
-          mkdir -p altstore-src/screens
-          if [ -d launch/screens ] && ls launch/screens/*.png > /dev/null 2>&1; then
-            rm -f altstore-src/screens/*.png
-            cp launch/screens/*.png altstore-src/screens/
-          fi
-          cp apps/mobile/assets/icon.png altstore-src/icon.png
           gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100" > releases.json
+          NAMED='^v[0-9]+\.[0-9]+\.[0-9]+\+build\.[0-9]+$'
+          mkdir -p altstore-src/screens
+          # Each version keeps its own screenshots in screens/<version>/. This build's go to the
+          # version it just released, the newest named release.
+          if [ -d launch/screens ] && ls launch/screens/*.png > /dev/null 2>&1; then
+            TAG=$(jq -r --arg re "$NAMED" '[.[] | select(.tag_name | test($re))][0].tag_name' releases.json)
+            V=${TAG#v}; V=${V%%+*}
+            rm -rf "altstore-src/screens/$V"
+            mkdir -p "altstore-src/screens/$V"
+            cp launch/screens/*.png "altstore-src/screens/$V/"
+          fi
+          # A version without screenshots yet takes them from its own build (the tag's build number
+          # is the Build run number) while GitHub still keeps that artifact.
+          gh run list --workflow build.yml --limit 300 --json databaseId,number > runs.json
+          for TAG in $(jq -r --arg re "$NAMED" '.[] | select(.tag_name | test($re)) | .tag_name' releases.json); do
+            V=${TAG#v}; V=${V%%+*}; N=${TAG##*.}
+            [ -d "altstore-src/screens/$V" ] && continue
+            ID=$(jq -r --argjson n "$N" '.[] | select(.number == $n) | .databaseId' runs.json)
+            [ -n "$ID" ] || continue
+            if gh run download "$ID" -n ios-launch -D "old/$V" 2> /dev/null && ls "old/$V"/screens/*.png > /dev/null 2>&1; then
+              mkdir -p "altstore-src/screens/$V"
+              cp "old/$V"/screens/*.png "altstore-src/screens/$V/"
+              echo "Screenshots of $V from run $ID"
+            fi
+          done
+          # The first sources kept one flat set of screenshots.
+          rm -f altstore-src/screens/*.png
+          cp apps/mobile/assets/icon.png altstore-src/icon.png
+          python3 -m venv "$RUNNER_TEMP/pictures"
+          "$RUNNER_TEMP/pictures/bin/pip" install --quiet pillow
+          "$RUNNER_TEMP/pictures/bin/python" tools/ci/altstore-images.py altstore-src
           node tools/ci/altstore-source.mjs altstore-src releases.json
           cd altstore-src
           git add -A

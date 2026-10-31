@@ -9,6 +9,8 @@ on:
       - "docs/**"
       - "research/**"
       - "tools/ci/altstore-source*.mjs"
+      - "tools/ci/altstore-images.py"
+      - "apps/mobile/store/**"
       - ".github/workflows/altstore.yml"
   pull_request:
   workflow_dispatch:
@@ -252,6 +254,13 @@ jobs:
           BUNDLE=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Info.plist")
           DEVICE=$(xcrun simctl list devices booted -j | python3 -c 'import json,sys; d=json.load(sys.stdin)["devices"]; print(next(x["udid"] for v in d.values() for x in v))')
           xcrun simctl terminate "$DEVICE" "$BUNDLE" || true
+          # A phone set up in France, like the profile below: a US region would show the "abroad?"
+          # banner, ounces and 12-hour times on every screenshot. The region is read at boot.
+          xcrun simctl spawn "$DEVICE" defaults write -g AppleLocale -string fr_FR
+          xcrun simctl spawn "$DEVICE" defaults write -g AppleLanguages -array fr
+          xcrun simctl shutdown "$DEVICE"
+          xcrun simctl boot "$DEVICE"
+          xcrun simctl bootstatus "$DEVICE" -b > /dev/null
           xcrun simctl status_bar "$DEVICE" override --time 21:42 --batteryLevel 80 || true
           DATA=$(xcrun simctl get_app_container "$DEVICE" "$BUNDLE" data)
           STORE="$DATA/Library/Application Support/$BUNDLE/RCTAsyncLocalStorage_V1"
@@ -278,7 +287,8 @@ jobs:
           # ask "Open in ...?" on recent simulators, which no script can answer).
           for route in / /crew /games /bars /me /settings /my-stats /add-drink /curve /limits /leaderboard /history; do
             xcrun simctl terminate "$DEVICE" "$BUNDLE" || true
-            if [ "$route" = "/" ]; then xcrun simctl launch "$DEVICE" "$BUNDLE"; else xcrun simctl launch "$DEVICE" "$BUNDLE" -ciRoute "$route"; fi
+            # SIMCTL_CHILD_ variables reach the app: Paris time, as the phone above.
+            if [ "$route" = "/" ]; then SIMCTL_CHILD_TZ=Europe/Paris xcrun simctl launch "$DEVICE" "$BUNDLE"; else SIMCTL_CHILD_TZ=Europe/Paris xcrun simctl launch "$DEVICE" "$BUNDLE" -ciRoute "$route"; fi
             sleep 10
             name=$(echo "$route" | tr -d '/'); [ -z "$name" ] && name=party
             xcrun simctl io "$DEVICE" screenshot "launch/screens/$(printf %02d $n)-$name.png" || true
@@ -343,6 +353,7 @@ jobs:
     needs: release
     permissions:
       contents: write
+      actions: read
     uses: ./.github/workflows/altstore.yml
     with:
       screenshots: true
