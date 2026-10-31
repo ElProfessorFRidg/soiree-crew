@@ -8,7 +8,7 @@ import { duration, palette, size, space } from "@crew/design-tokens";
 import type { BacUnit } from "@crew/units";
 import { lastDrink, logDrink, logWater } from "@/drinks/actions";
 import { offerUndo, offerWaterUndo } from "@/drinks/undoToast";
-import { againLabel, alternateUnit, bacText, drinkLabel, unitCycle } from "@/drinks/display";
+import { againLabel, alternateUnit, bacText, drinkShortLabel, unitCycle } from "@/drinks/display";
 import { defaultPreset, presetFromEntry } from "@/drinks/presets";
 import { withHousePint } from "@/drinks/catalogue";
 import { useHousePintHere } from "@/drinks/housePint";
@@ -199,9 +199,9 @@ export function PartyScreen() {
   const again = (() => {
     const last = lastDrink();
     const preset = withHousePint(last ? presetFromEntry(last) : defaultPreset(preferences.unitSystem), houseAbv);
-    // A named drink shows its name alone next to the "+", which already says "again": "Encore : Flash
-    // vodka" does not fit the button. Screen readers still hear the whole sentence.
-    const shown = preset.kind === "custom" ? drinkLabel(preset, i18n) : againLabel(preset, i18n);
+    // A named drink shows its short name alone next to the "+", which already says "again": "Encore :
+    // Flash vodka Red Bull" does not fit the button. Screen readers still hear the whole sentence.
+    const shown = preset.kind === "custom" ? drinkShortLabel(preset, i18n) : againLabel(preset, i18n);
     return { preset, label: againLabel(preset, i18n), shown, key: drinkKey({ presetId: preset.id, kind: preset.kind, volumeMl: preset.volumeMl, abv: preset.abv, name: preset.name }) };
   })();
 

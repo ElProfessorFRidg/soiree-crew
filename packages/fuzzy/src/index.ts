@@ -12,6 +12,9 @@ export {
   countryRank,
   DRINK_CATALOGUE,
   GROUP_SPECS,
+  localName,
+  SHELF_ORDER,
+  shownNames,
   sizesFor,
   strengthFits,
   type CatalogueDrink,
@@ -19,6 +22,8 @@ export {
   type GenericDrinkId,
   type GlassName,
   type GroupSpec,
+  type LocalName,
   type ServingId,
+  type ShownName,
   type SizeOption,
 } from "./catalogue";

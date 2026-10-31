@@ -1,8 +1,11 @@
 import {
   bestScore,
+  catalogueNames,
   countryRank,
+  localName,
   normalise,
   DRINK_CATALOGUE,
+  SHELF_ORDER,
   GROUP_SPECS,
   sizesFor,
   parseDrinkOrder,
@@ -42,14 +45,25 @@ export const SIZED_KINDS: ReadonlySet<DrinkKind> = new Set(["demi", "pint", "hal
 /** Draught kinds poured from the bar's tap: the house pint strength applies to them. */
 const DRAUGHT_KINDS: ReadonlySet<DrinkKind> = new Set(["demi", "pint", "halfPint"]);
 
-export function catalogueLabel(drink: CatalogueDrink, i18n: Translator): string {
+/**
+ * A catalogue drink's name in the app language and the country the user drinks in: "Panaché" in
+ * French, "Radler" in German, "Cubata" in Spanish, the brand where it has no local name.
+ */
+export function catalogueLabel(drink: CatalogueDrink, i18n: Translator, country: string | null = useAppStore.getState().preferences.legalCountry): string {
+  const local = localName(drink, i18n.language, country);
+  if (local) return local.name;
   return drink.brand ?? i18n.t(`drinkCatalogue.generic.${drink.generic}`);
 }
 
-/** The group's brands, those known in the user's country first (the order of the list otherwise). */
+/** What a catalogue drink answers to in a search: its name here, in French, and every other name. */
+function searchNames(drink: CatalogueDrink, i18n: Translator): string[] {
+  return [catalogueLabel(drink, i18n), catalogueLabel(drink, FR), ...catalogueNames(drink)];
+}
+
+/** The group's brands, those known in the user's country first (the shelf's order otherwise). */
 export function brandsOf(group: DrinkGroup, country?: string | null): CatalogueDrink[] {
   return DRINK_CATALOGUE.filter((drink) => drink.group === group)
-    .map((drink, index) => ({ drink, index, rank: countryRank(drink, country) }))
+    .map((drink, index) => ({ drink, index: SHELF_ORDER.get(drink.id) ?? index, rank: countryRank(drink, country) }))
     .sort((a, b) => a.rank - b.rank || a.index - b.index)
     .map((hit) => hit.drink);
 }
@@ -58,7 +72,7 @@ export function brandsOf(group: DrinkGroup, country?: string | null): CatalogueD
 export function filterBrands(brands: readonly CatalogueDrink[], query: string, i18n: Translator): CatalogueDrink[] {
   if (!query.trim()) return [...brands];
   return brands
-    .map((drink) => ({ drink, score: bestScore(query, [catalogueLabel(drink, i18n), catalogueLabel(drink, FR), ...drink.aliases]) }))
+    .map((drink) => ({ drink, score: bestScore(query, searchNames(drink, i18n)) }))
     .filter((hit) => Number.isFinite(hit.score) && hit.score <= MAX_SCORE)
     .sort((a, b) => a.score - b.score)
     .map((hit) => hit.drink);
@@ -167,7 +181,7 @@ export function readOrder(text: string, presets: readonly DrinkPreset[], i18n: T
  */
 export function searchCatalogue(query: string, i18n: Translator, limit = 6, country?: string | null): CatalogueDrink[] {
   if (!query.trim()) return [];
-  return DRINK_CATALOGUE.map((drink) => ({ drink, score: bestScore(query, [catalogueLabel(drink, i18n), catalogueLabel(drink, FR), ...drink.aliases]) + countryRank(drink, country) * 0.3 }))
+  return DRINK_CATALOGUE.map((drink) => ({ drink, score: bestScore(query, searchNames(drink, i18n)) + countryRank(drink, country) * 0.3 }))
     .filter((hit) => Number.isFinite(hit.score) && hit.score <= MAX_SCORE)
     .sort((a, b) => a.score - b.score)
     .slice(0, limit)

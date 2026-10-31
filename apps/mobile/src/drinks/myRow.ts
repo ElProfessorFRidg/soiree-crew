@@ -4,6 +4,8 @@
  * it runs on every render without a server round trip.
  */
 
+import { currentName } from "./names";
+
 const HOUR_MS = 3_600_000;
 const DAY_MS = 24 * HOUR_MS;
 /** A night out belongs to the day it started: 1 am on Saturday is still Friday night. */
@@ -19,10 +21,14 @@ export interface DrinkIdentity {
   name?: string;
 }
 
-/** The same drink at the same size and strength is one entry of the row, however it was logged. */
+/**
+ * The same drink at the same size and strength is one entry of the row, however it was logged, and
+ * under whichever name the catalogue gave it then ("Flash vodka" is the "Flash vodka Red Bull").
+ */
 export function drinkKey(drink: DrinkIdentity): string {
   const measure = `${Math.round(drink.volumeMl)}|${Math.round(drink.abv * 1000)}`;
-  if (drink.kind === "custom" && drink.name) return `n:${drink.name.trim().toLowerCase()}|${measure}`;
+  const name = currentName(drink);
+  if (drink.kind === "custom" && name) return `n:${name.trim().toLowerCase()}|${measure}`;
   return `p:${drink.presetId}|${measure}`;
 }
 

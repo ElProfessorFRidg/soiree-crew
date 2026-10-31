@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { drinkKey, rankRow, type PastDrink } from "./myRow";
+import { catalogueName, currentName } from "./names";
 
 const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
@@ -20,6 +21,22 @@ describe("my drinks row", () => {
     expect(drinkKey({ presetId: "custom:1", kind: "custom", volumeMl: 330, abv: 0.08, name: "Kasteel Rouge" })).toBe(
       drinkKey({ presetId: "cat:kasteel-rouge", kind: "custom", volumeMl: 330, abv: 0.08, name: "kasteel rouge " }),
     );
+  });
+
+  it("keeps one entry for a drink logged under its older catalogue names", () => {
+    const flash = (name: string) => drinkKey({ presetId: "cat:poliakov-red-bull", kind: "custom", volumeMl: 200, abv: 0.375, name });
+    expect(flash("Flash Poliakov + Red Bull")).toBe(flash("Flash vodka Red Bull"));
+    expect(flash("Flash vodka")).toBe(flash("Flash vodka Red Bull"));
+    // A saved drink of my own called "Flash vodka" stays mine.
+    expect(currentName({ id: "custom:1", kind: "custom", name: "Flash vodka" })).toBe("Flash vodka");
+  });
+
+  it("finds the short name of a catalogue drink, logged or saved", () => {
+    expect(catalogueName({ presetId: "cat:poliakov-red-bull", kind: "custom", name: "Flash Poliakov + Red Bull" })).toEqual({ name: "Flash vodka Red Bull", short: "Flash vodka" });
+    expect(catalogueName({ id: "custom:2", kind: "custom", name: "Johnnie Walker Red Label" })?.short).toBe("Red Label");
+    expect(catalogueName({ presetId: "cat:shandy", kind: "custom", name: "Panaché" })?.short).toBe("Panaché");
+    expect(catalogueName({ presetId: "m-pint", kind: "pint" })).toBeNull();
+    expect(catalogueName({ id: "custom:3", kind: "custom", name: "Mon mélange" })).toBeNull();
   });
 
   it("puts what I drink on Friday nights above what I drink on Tuesday afternoons", () => {
