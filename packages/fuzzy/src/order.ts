@@ -61,7 +61,8 @@ const MAX_QUANTITY = 12;
 const MAX_VOLUME_ML = 3000;
 
 interface ServingWord {
-  serving: ServingId;
+  /** A capful is read from text only: no size chip carries it. */
+  serving: ServingId | "capful";
   names: readonly string[];
   volumeMl: Partial<Record<DrinkGroup, number>>;
 }
@@ -75,11 +76,17 @@ const SERVING_WORDS: readonly ServingWord[] = [
   { serving: "glass", names: ["verre", "glass"], volumeMl: { wine: 120, beer: 250, cider: 250, soft: 250 } },
   { serving: "largeGlass", names: ["grand verre", "large glass", "big glass"], volumeMl: { wine: 180, beer: 500, soft: 500 } },
   { serving: "double", names: ["double"], volumeMl: { spirit: 60 } },
-  { serving: "dose", names: ["dose"], volumeMl: { spirit: 20 } },
-  { serving: "litre", names: ["litre", "liter", "pichet", "pitcher"], volumeMl: { beer: 1000, cider: 1000, cocktail: 1000, soft: 1000 } },
+  // A German "Kurzer" is the 2 cl measure.
+  { serving: "dose", names: ["dose", "kurzer", "kurzen", "kurze"], volumeMl: { spirit: 20 } },
+  { serving: "litre", names: ["litre", "liter", "pichet", "pitcher", "maß", "mass"], volumeMl: { beer: 1000, cider: 1000, cocktail: 1000, soft: 1000 } },
   { serving: "demi", names: ["demi"], volumeMl: { beer: 250, cider: 250 } },
-  { serving: "pint", names: ["pinte", "pint"], volumeMl: { beer: 500, cider: 500 } },
-  { serving: "shot", names: ["shot", "shooter"], volumeMl: { spirit: 30 } },
+  // A Bavarian "Halbe" is the half litre; a Spanish "tercio" the 33 cl bottle.
+  { serving: "pint", names: ["pinte", "pint", "halbe"], volumeMl: { beer: 500, cider: 500 } },
+  { serving: "bottle", names: ["tercio"], volumeMl: { beer: 330, cider: 330 } },
+  { serving: "shot", names: ["shot", "shooter", "chupito", "shottino", "cicchetto"], volumeMl: { spirit: 30 } },
+  // "Un bouchon de vodka": the bottle's cap used as a measure. Assumed to hold 10 ml, what the screw
+  // cap of a 70 cl spirit bottle holds filled to the brim. Said this way in French and English only.
+  { serving: "capful", names: ["bouchon", "capful"], volumeMl: { spirit: 10 } },
 ];
 
 /** Words kept as typed except accents and case; "8,5" stays one number, "50cl" becomes "50 cl". */
@@ -140,6 +147,7 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
     ...presets.map((c) => entry<P>({ kind: "preset", preset: c.value }, c.names)),
     ...SERVING_WORDS.map((serving) => entry<P>({ kind: "serving", serving }, serving.names)),
   ];
+  const exactNames = new Set(vocabulary.flatMap((candidate) => candidate.scored));
   const words = tokenize(text);
   const groupOfPreset = (preset: { value: P } | null): DrinkGroup | null => (preset && options.presetGroup ? options.presetGroup(preset.value) : null);
   const compatible = (a: DrinkGroup | null, b: DrinkGroup) => a === null || a === b;
@@ -149,8 +157,9 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
   const matchAt = (start: number): { entry: Entry<P>; span: number; guess: boolean; phrase: string } | null => {
     for (let span = Math.min(4, words.length - start); span >= 1; span--) {
       const slice = words.slice(start, start + span);
-      if (boundary(slice[0]!) || boundary(slice[span - 1]!)) continue;
       const phrase = slice.join(" ");
+      // Unless it is a name written in full: the German "Wodka-E" ends with the Italian "and".
+      if ((boundary(slice[0]!) || boundary(slice[span - 1]!)) && !(span > 1 && exactNames.has(normalise(phrase)))) continue;
       const numericOnly = slice.every((w) => isNumber(w));
       const query = normalise(phrase);
       let best: Entry<P> | null = null;

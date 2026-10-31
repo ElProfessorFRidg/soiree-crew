@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { catalogueDrink, DRINK_CATALOGUE, GROUP_SPECS, strengthFits, type DrinkGroup } from "./catalogue";
+import { catalogueDrink, DRINK_CATALOGUE, GROUP_SPECS, localName, SHELF_ORDER, shownNames, strengthFits, type DrinkGroup } from "./catalogue";
+import { strengthOf } from "./mixes";
 import { parseDrinkOrder, tokenize } from "./order";
 
 // The app's metric presets, as the add sheet passes them: id, French and English labels, size, group.
@@ -124,5 +125,121 @@ describe("order parser with brands", () => {
     expect(parse("bonjour la team")).toEqual([]);
     expect(parse("flash")).toEqual([]);
     expect(parse("la pinte")[0]!.preset).toBe("m-pint");
+  });
+});
+
+describe("names people order by, in their language", () => {
+  const id = (text: string) => parse(text).map((line) => line.drink ?? line.preset);
+  const named = (drinkId: string, language: string, country: string | null) => localName(catalogueDrink(drinkId)!, language, country)?.name ?? catalogueDrink(drinkId)!.brand;
+
+  it("gives long names a short form for tight spots", () => {
+    expect(shownNames(catalogueDrink("poliakov-red-bull")!)[0]).toEqual({ name: "Flash vodka Red Bull", short: "Flash vodka" });
+    expect(shownNames(catalogueDrink("johnnie-walker-red")!)[0]).toEqual({ name: "Johnnie Walker Red Label", short: "Red Label" });
+    expect(shownNames(catalogueDrink("monaco")!)[0]).toEqual({ name: "Monaco", short: "Monaco" });
+  });
+
+  it("shows the name said in the app language and country", () => {
+    expect(named("shandy", "fr", "FR")).toBe("Panaché");
+    expect(named("shandy", "de", "DE")).toBe("Radler");
+    expect(named("shandy", "de", "CH")).toBe("Panaché");
+    expect(named("shandy", "es", "ES")).toBe("Clara");
+    expect(named("shandy", "en", "GB")).toBe("Shandy");
+    expect(named("rum-coke", "fr", "FR")).toBe("Rhum coca");
+    expect(named("rum-coke", "es", "ES")).toBe("Cubata");
+    expect(named("rum-coke", "en", "US")).toBe("Rum and Coke");
+    expect(named("screwdriver", "ru", "RU")).toBe("Отвёртка");
+    expect(named("screwdriver", "de", "DE")).toBe("Wodka-O");
+    expect(named("yorsh", "ru", "RU")).toBe("Ёрш");
+    expect(named("tequila-slammer", "fr", "BE")).toBe("Tequila paf");
+  });
+
+  it("reads every local name from any language", () => {
+    expect(id("2 flash vodka")).toEqual(["poliakov-red-bull"]);
+    expect(id("flash vodka red bull")).toEqual(["poliakov-red-bull"]);
+    expect(id("un monaco")).toEqual(["monaco"]);
+    expect(id("2 panachés")).toEqual(["shandy"]);
+    expect(id("un radler")).toEqual(["shandy"]);
+    expect(id("una clara")).toEqual(["shandy"]);
+    expect(id("picon bière")).toEqual(["picon-biere"]);
+    expect(id("un kir")).toEqual(["kir"]);
+    expect(id("un perroquet et une mauresque")).toEqual(["perroquet", "mauresque"]);
+    expect(id("une tomate")).toEqual(["tomate"]);
+    expect(id("un ti punch")).toEqual(["ti-punch"]);
+    expect(id("2 rhum coca")).toEqual(["rum-coke"]);
+    expect(id("rhum avec coca")).toEqual(["rum-coke"]);
+    expect(id("un whisky coca")).toEqual(["whisky-coke"]);
+    expect(id("dos cubatas")).toEqual(["rum-coke"]);
+    expect(id("un calimocho")).toEqual(["calimocho"]);
+    expect(id("kalimotxo")).toEqual(["calimocho"]);
+    expect(id("whiscola")).toEqual(["whisky-coke"]);
+    expect(id("zwei Diesel")).toEqual(["diesel"]);
+    expect(id("colabier")).toEqual(["diesel"]);
+    expect(id("eine Goaßmaß")).toEqual(["goassmass"]);
+    expect(id("Wodka-E")).toEqual(["vodka-red-bull"]);
+    expect(id("ein Wodka-O")).toEqual(["screwdriver"]);
+    expect(id("Jacky-Cola")).toEqual(["jack-coke"]);
+    expect(id("2 snakebites")).toEqual(["snakebite"]);
+    expect(id("3 VK")).toEqual(["vk"]);
+    expect(id("vodka red bull")).toEqual(["vodka-red-bull"]);
+    expect(id("vodka redbull")).toEqual(["vodka-red-bull"]);
+    expect(id("un spritz")).toEqual(["spritz"]);
+    expect(id("ёрш")).toEqual(["yorsh"]);
+    expect(id("отвёртка")).toEqual(["screwdriver"]);
+    // The flask alone stays the spirit alone.
+    expect(id("flash polia")).toEqual(["poliakov"]);
+    expect(id("flash de vodka")).toEqual(["vodka"]);
+  });
+
+  it("knows the common shots, with strengths from their recipe", () => {
+    expect(parse("2 TGV")).toEqual([{ quantity: 2, preset: null, drink: "tgv", volumeMl: null, abv: null }]);
+    expect(id("un tequila paf")).toEqual(["tequila-slammer"]);
+    expect(id("tequila boom")).toEqual(["tequila-slammer"]);
+    for (const [text, drink] of [
+      ["un b52", "b-52"],
+      ["b-52", "b-52"],
+      ["kamikaze", "kamikaze"],
+      ["zwei Mexikaner", "mexikaner"],
+      ["kleiner feigling", "kleiner-feigling"],
+      ["une sambuca", "sambuca"],
+      ["baby guinness", "baby-guinness"],
+      ["slippery nipple", "slippery-nipple"],
+      ["lemon drop", "lemon-drop"],
+      ["flaming lamborghini", "flaming-lamborghini"],
+      ["licor 43", "licor-43"],
+      ["get 27", "get-27"],
+      ["un malibu", "malibu"],
+      ["2 jager", "jagermeister"],
+      ["jagerbomb", "jagerbomb"],
+      ["боярский", "boyarsky"],
+      ["wściekły pies", "wsciekly-pies"],
+    ] as const) {
+      expect(id(text), text).toEqual([drink]);
+    }
+    expect(catalogueDrink("tgv")).toMatchObject({ abv: 0.393, volumeMl: 30, glass: "shot", group: "spirit" });
+    expect(catalogueDrink("b-52")).toMatchObject({ abv: 0.243, volumeMl: 45 });
+    expect(catalogueDrink("shandy")).toMatchObject({ abv: 0.025, volumeMl: 250 });
+    expect(strengthOf([[38, 10], [40, 10], [40, 10]])).toBe(0.393);
+    // The shot glass shows them before the bottles of the other countries.
+    expect(SHELF_ORDER.get("tgv")!).toBeLessThan(SHELF_ORDER.get("absolut")!);
+    expect(SHELF_ORDER.get("jagermeister")!).toBeLessThan(SHELF_ORDER.get("tgv")!);
+  });
+
+  it("keeps a long drink at its spirit's measure and strength", () => {
+    for (const drink of DRINK_CATALOGUE.filter((d) => d.combo)) {
+      const spirit = catalogueDrink(drink.combo!.parts[0])!;
+      expect(drink.abv, drink.id).toBe(spirit.abv);
+      expect(drink.group, drink.id).toBe("spirit");
+    }
+  });
+
+  it("reads a capful and the local words for a shot", () => {
+    expect(parse("un bouchon de vodka")).toEqual([{ quantity: 1, preset: null, drink: "vodka", volumeMl: 10, abv: null }]);
+    expect(parse("2 bouchons de whisky")).toEqual([{ quantity: 2, preset: null, drink: "whisky", volumeMl: 10, abv: null }]);
+    expect(parse("a capful of rum")[0]).toMatchObject({ drink: "rum", volumeMl: 10 });
+    expect(parse("un chupito de tequila")[0]).toMatchObject({ drink: "tequila", volumeMl: 30 });
+    expect(parse("ein Kurzer Jäger")[0]).toMatchObject({ drink: "jagermeister", volumeMl: 20 });
+    expect(parse("dos tercios de mahou")[0]).toMatchObject({ quantity: 2, drink: "mahou", volumeMl: 330 });
+    // A capful means nothing alone.
+    expect(parse("bouchon")).toEqual([]);
   });
 });

@@ -1,6 +1,7 @@
 import { convertBac, formatBacValue, formatVolume, type BacUnit, type CountryRules, type VolumeUnit } from "@crew/units";
 import { palette } from "@crew/design-tokens";
 import type { Translator } from "@/i18n";
+import { catalogueName, currentName } from "./names";
 import type { DrinkKind } from "./presets";
 
 export interface BacText {
@@ -41,14 +42,20 @@ export function bacColor(gPerL: number, legalLimit: number): string {
 interface Labelled {
   kind: DrinkKind;
   name?: string;
+  /** The preset's id, or a logged drink's preset id: a catalogue drink's short name comes from it. */
+  id?: string;
+  presetId?: string;
 }
 
-/** Catalogue names changed since drinks were logged with them: the old drinks show the new name. */
-const RENAMED: Readonly<Record<string, string>> = { "Flash Poliakov + Red Bull": "Flash vodka" };
-
+/** The full name: lists, history, the add sheet, details. */
 export function drinkLabel(drink: Labelled, i18n: Translator): string {
   if (drink.kind !== "custom") return i18n.t(`drinks.${drink.kind}`);
-  return drink.name ? (RENAMED[drink.name] ?? drink.name) : i18n.t("drinks.custom");
+  return currentName(drink) ?? i18n.t("drinks.custom");
+}
+
+/** The name for tight spots (the Encore button, the my-drinks row): "Flash vodka" for "Flash vodka Red Bull". */
+export function drinkShortLabel(drink: Labelled, i18n: Translator): string {
+  return catalogueName(drink)?.short ?? drinkLabel(drink, i18n);
 }
 
 export function againLabel(drink: Labelled, i18n: Translator): string {

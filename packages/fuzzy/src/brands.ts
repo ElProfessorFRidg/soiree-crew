@@ -243,6 +243,56 @@ const SELTZERS = rows("cocktail", [
 
 export const MORE_DRINKS: readonly CatalogueDrink[] = [...SPIRITS, ...APERITIFS, ...BEERS, ...CIDERS, ...SELTZERS];
 
+/**
+ * The name people say for a brand whose label name is long, for tight spots (the Encore button,
+ * the my-drinks row). The full name stays everywhere there is room.
+ */
+export const SHORT_NAMES: Readonly<Record<string, string>> = {
+  karmeliet: "Karmeliet",
+  "delirium-tremens": "Delirium",
+  "amsterdam-navigator": "Amsterdam",
+  "johnnie-walker-red": "Red Label",
+  "johnnie-walker-black": "Black Label",
+  nikka: "Nikka",
+  bacardi: "Bacardí",
+  "havana-club-3": "Havana Club",
+  "captain-morgan": "Captain Morgan",
+  clement: "Clément",
+  "trois-rivieres": "Trois Rivières",
+  patron: "Patrón",
+  chartreuse: "Chartreuse",
+  fischer: "Fischer",
+  jenlain: "Jenlain",
+  licorne: "Licorne",
+  kriek: "Kriek",
+  "westmalle-tripel": "Westmalle",
+  "la-trappe": "La Trappe",
+  "paulaner-weiss": "Paulaner",
+  erdinger: "Erdinger",
+  augustiner: "Augustiner",
+  krombacher: "Krombacher",
+  oettinger: "Oettinger",
+  stiegl: "Stiegl",
+  "punk-ipa": "Punk IPA",
+  "newcastle-brown": "Newcastle",
+  "old-speckled-hen": "Speckled Hen",
+  peroni: "Peroni",
+  "sierra-nevada": "Sierra Nevada",
+  "samuel-adams": "Sam Adams",
+  pbr: "PBR",
+  modelo: "Modelo",
+  mahou: "Mahou",
+  alhambra: "Alhambra",
+  budvar: "Budvar",
+  asahi: "Asahi",
+  kirin: "Kirin",
+  "bacardi-breezer": "Breezer",
+  "saurer-apfel": "Saurer Apfel",
+  unicum: "Unicum",
+  montenegro: "Montenegro",
+  "kaku-highball": "Highball",
+};
+
 /** Where the drinks of the first list are household names; the rest of the first list is French. */
 export const FIRST_LIST_COUNTRIES: Readonly<Record<string, readonly string[]>> = {
   heineken: ["NL", "FR", "GB", "US", "DE", "ES", "IT"],

@@ -5,7 +5,8 @@
  * drinks (red wine, rum) carry a `generic` id that the app translates.
  */
 
-import { FIRST_LIST_COUNTRIES, MORE_DRINKS } from "./brands";
+import { FIRST_LIST_COUNTRIES, MORE_DRINKS, SHORT_NAMES } from "./brands";
+import { MIXES_AND_SHOTS } from "./mixes";
 
 export type DrinkGroup = "beer" | "wine" | "spirit" | "cocktail" | "cider" | "soft";
 
@@ -25,6 +26,20 @@ export type GenericDrinkId =
   | "gin"
   | "tequila"
   | "orangeJuice";
+
+/**
+ * A name a drink goes by in some languages or countries: a Shandy is a "Panaché" in France and a
+ * "Radler" in Germany. Every such name is also something people can type, from any language.
+ */
+export interface LocalName {
+  name: string;
+  /** For tight spots (the Encore button, the my-drinks row) when the name is long. */
+  short?: string;
+  /** App languages that say it; absent: every language. */
+  languages?: readonly string[];
+  /** Countries where it is said; absent: everywhere the language is spoken. */
+  countries?: readonly string[];
+}
 
 interface CatalogueBase {
   /** Stable id, also the suffix of the logged drink's preset id (`cat:<id>`). */
@@ -48,6 +63,10 @@ interface CatalogueBase {
    * volume, not alcohol. `parts` are the two catalogue ids it is made of.
    */
   combo?: { parts: readonly [string, string]; mixerMl: number };
+  /** The brand's own name shortened, for tight spots: "Flash vodka" for "Flash vodka Red Bull". */
+  short?: string;
+  /** Local names, most specific first: the first that fits the app language and country is shown. */
+  names?: readonly LocalName[];
 }
 
 export type CatalogueDrink = CatalogueBase & ({ brand: string; generic?: undefined } | { generic: GenericDrinkId; brand?: undefined });
@@ -123,7 +142,8 @@ const FIRST_LIST: readonly CatalogueDrink[] = [
   {
     id: "poliakov-red-bull",
     // What it is called in France: a 20 cl flask of vodka (Poliakov, the usual one) with a Red Bull.
-    brand: "Flash vodka",
+    brand: "Flash vodka Red Bull",
+    short: "Flash vodka",
     group: "spirit",
     abv: 0.375,
     volumeMl: 200,
@@ -154,7 +174,8 @@ const FIRST_LIST: readonly CatalogueDrink[] = [
   cocktail("mojito", "Mojito", 0.1, 250, []),
   cocktail("margarita", "Margarita", 0.2, 150, ["marga"]),
   cocktail("pina-colada", "Piña colada", 0.08, 250, ["pina"]),
-  cocktail("cuba-libre", "Cuba libre", 0.1, 250, ["rhum coca", "rum coke"]),
+  // Rum and Coke without the lime is a drink of its own (mixes.ts): "rhum coca", "cubata".
+  cocktail("cuba-libre", "Cuba libre", 0.1, 250, ["cubalibre"]),
   cocktail("gin-tonic", "Gin tonic", 0.1, 250, ["gin and tonic", "gin to"]),
   cocktail("sex-on-the-beach", "Sex on the beach", 0.08, 250, ["sotb"]),
   cocktail("moscow-mule", "Moscow mule", 0.09, 250, ["mule"]),
@@ -173,14 +194,30 @@ const FIRST_LIST: readonly CatalogueDrink[] = [
   { id: "orange-juice", generic: "orangeJuice", group: "soft", abv: 0, volumeMl: 250, glass: "soft", aliases: ["jus d orange", "jus orange", "orange juice", "jus"] },
 ];
 
-/** Every drink the app knows: the French list first, then the other countries' (brands.ts). */
+/**
+ * Every drink the app knows: the French list first, then the other countries' brands (brands.ts),
+ * then the mixes and shots ordered by name (mixes.ts). A misspelling as close to a brand as to a
+ * mix named after it ("zubrikov") goes to the brand: the earlier drink wins a tie.
+ */
 export const DRINK_CATALOGUE: readonly CatalogueDrink[] = [
   ...FIRST_LIST.map((drink) => {
     const countries = FIRST_LIST_COUNTRIES[drink.id] ?? ["FR"];
     return countries.length ? { ...drink, countries } : drink;
   }),
   ...MORE_DRINKS,
-];
+  ...MIXES_AND_SHOTS,
+].map((drink) => {
+  const short = SHORT_NAMES[drink.id];
+  return short && !drink.short ? { ...drink, short } : drink;
+});
+
+/**
+ * The order of the add sheet's brand chips: the French list, then the mixes and shots (the shot
+ * glass shows TGV and B-52 before the seventy bottles), then the other brands.
+ */
+export const SHELF_ORDER: ReadonlyMap<string, number> = new Map(
+  [...FIRST_LIST.map((d) => d.id), ...MIXES_AND_SHOTS.map((d) => d.id), ...MORE_DRINKS.map((d) => d.id)].map((id, index) => [id, index]),
+);
 
 /** Names a size chip or a typed word can carry. The app translates them. */
 export type ServingId = "demi" | "pint" | "halfPint" | "litre" | "glass" | "largeGlass" | "bottle" | "dose" | "shot" | "double" | "flash" | "flask" | "can";
@@ -284,11 +321,35 @@ export function strengthFits(group: DrinkGroup, abv: number): boolean {
 
 /**
  * Every name a catalogue drink answers to, for matching. Generic drinks add the app's translations.
- * A combo answers to its aliases only: its full name could be read as its spirit alone,
- * and "flash polia" means the spirit alone.
+ * Local names and short names count too: "Cubata" and "Flash vodka" are typed as they are said.
+ * A combo's names never start with its spirit's nickname ("flash polia" is the spirit alone).
  */
 export function catalogueNames(drink: CatalogueDrink, translated: readonly string[] = []): string[] {
-  return [...(drink.brand && !drink.combo ? [drink.brand] : []), ...translated, ...drink.aliases];
+  const local = (drink.names ?? []).flatMap((n) => (n.short ? [n.name, n.short] : [n.name]));
+  const own = drink.brand ? [drink.brand, ...(drink.short ? [drink.short] : [])] : [];
+  return [...own, ...translated, ...local, ...drink.aliases];
+}
+
+/** A name to show and its form for tight spots (the name itself when it is short already). */
+export interface ShownName {
+  name: string;
+  short: string;
+}
+
+/**
+ * The drink's local name in this app language and country, or null when it has none there and
+ * goes by its brand (or the app's translation of a generic drink).
+ */
+export function localName(drink: CatalogueDrink, language: string, country?: string | null): ShownName | null {
+  const fits = (n: LocalName) => (!n.languages || n.languages.includes(language)) && (!n.countries || (!!country && n.countries.includes(country)));
+  const found = drink.names?.find(fits);
+  return found ? { name: found.name, short: found.short ?? found.name } : null;
+}
+
+/** Every name the drink is shown under, brand first, each with its short form. */
+export function shownNames(drink: CatalogueDrink): ShownName[] {
+  const own = drink.brand ? [{ name: drink.brand, short: drink.short ?? drink.brand }] : [];
+  return [...own, ...(drink.names ?? []).map((n) => ({ name: n.name, short: n.short ?? n.name }))];
 }
 
 export function catalogueDrink(id: string, catalogue: readonly CatalogueDrink[] = DRINK_CATALOGUE): CatalogueDrink | undefined {

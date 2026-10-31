@@ -17,7 +17,7 @@ import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { logDrink } from "./actions";
 import { sortedCustomDrinks } from "./customDrinks";
-import { drinkLabel, sizeAndStrength } from "./display";
+import { drinkLabel, drinkShortLabel, sizeAndStrength } from "./display";
 import { drinkKey, rankRow } from "./myRow";
 import { presetFromCustom, presetFromEntry, type CustomDrink, type DrinkPreset } from "./presets";
 import { offerUndo } from "./undoToast";
@@ -124,6 +124,8 @@ export function MyDrinksRow({ now, exclude, big }: { now: number; exclude: strin
       >
         {items.map((item) => {
           const name = drinkLabel(item.preset, i18n);
+          // The chip is narrow: the short name, the full one for screen readers.
+          const shown = drinkShortLabel(item.preset, i18n);
           const details = sizeAndStrength(item.preset, unit, i18n);
           const on = item.key === menuFor;
           return (
@@ -153,7 +155,7 @@ export function MyDrinksRow({ now, exclude, big }: { now: number; exclude: strin
                 <View style={styles.text}>
                   {/* Names wrap to a second line rather than lose their end (O-11). */}
                   <Text variant="h3" color={on ? theme.bg : theme.text} numberOfLines={2}>
-                    {name}
+                    {shown}
                   </Text>
                   <Text variant="small" color={on ? theme.bg : theme.textMuted} numberOfLines={1}>
                     {details}
