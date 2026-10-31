@@ -1,0 +1,70 @@
+{
+  "name": "Soirée Crew",
+  "identifier": "app.soireecrew.source",
+  "subtitle": "Les versions de Soirée Crew",
+  "description": "Chaque version publiée de Soirée Crew, installable et mise à jour depuis AltStore ou SideStore.",
+  "iconURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+  "website": "https://github.com/ElProfessorFRidg/soiree-crew",
+  "tintColor": "F4B33D",
+  "featuredApps": [
+    "app.soireecrew.mobile"
+  ],
+  "apps": [
+    {
+      "name": "Soirée Crew",
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "developerName": "Soirée Crew",
+      "subtitle": "Ta soirée, ton crew, ton taux.",
+      "localizedDescription": "Note tes verres et vois ton taux estimé, sa courbe et l'heure du retour à zéro. Sors avec ton crew : soirées, bars, jeux, chat, cagnottes et récap du lendemain. Estimation, pas un éthylotest : ne prends jamais le volant sur cette base.",
+      "iconURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "tintColor": "F4B33D",
+      "category": "lifestyle",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/02-crew.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/06-settings.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/10-limits.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/12-history.png"
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {
+          "NSLocationWhenInUseUsageDescription": "Your location is used to check in at a bar with your crew, and to share it during a party if you turn that on. It is checked, then deleted.",
+          "NSPhotoLibraryUsageDescription": "Your photos fill the party album, seen by your crew only. Their location is removed.",
+          "NSCameraUsageDescription": "The camera takes photos for the party album and your chats, and scans a friend's safety code. Photos are seen only by the people you share them with.",
+          "NSMicrophoneUsageDescription": "Voice notes in your chats use the microphone, only while you record one. They are encrypted on your phone before they are sent.",
+          "NSCalendarsUsageDescription": "The calendar gets the parties you add to it, nothing else is read."
+        }
+      },
+      "versions": [
+        {
+          "version": "0.1.4",
+          "buildVersion": "70",
+          "date": "2026-10-31T01:29:34.855Z",
+          "localizedDescription": "Version 0.1.4\n\n- feat(updates): checked at every launch and announced once with Install, small Check now button in Settings, AltStore/SideStore hand-off; release notes list the changes and an AltStore source on the altstore branch is rewritten by every release\n- feat(search): a wrong first letter is recovered from the rest of the word, everyday words of seven languages never match by guess, guesses say \"did you mean\", picked guesses teach the app the person's spelling, habits break near ties\n- feat(search): drink names found by sound (Double Metaphone) and likeness (Jaro-Winkler) on top of the keyboard-aware distance; hand-written misspellings removed from the catalogue\n- feat(drinks): brands from many countries with every size they come in, country sizes (pint 568, caña, Maß, 12 oz), country brands first, brand filter; search forgives neighbouring keys, stutters and missing spaces",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.4%2Bbuild.70/soiree-crew-unsigned.ipa",
+          "size": 22165049,
+          "minOSVersion": "16.4"
+        }
+      ]
+    }
+  ],
+  "news": [
+    {
+      "identifier": "release-0.1.4",
+      "title": "Soirée Crew 0.1.4",
+      "caption": "Version 0.1.4",
+      "date": "2026-10-31T01:29:34.855Z",
+      "tintColor": "F4B33D",
+      "appID": "app.soireecrew.mobile",
+      "notify": false
+    }
+  ]
+}
