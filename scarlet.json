@@ -6,6 +6,27 @@
   "Other": [
     {
       "name": "Soirée Crew",
+      "version": "0.1.10",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.10%2Bbuild.77/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "• Les boissons comme on les commande : « Flash vodka Red Bull » en entier, « Flash vodka » quand la place manque, et pareil pour les noms longs.\n• Les vrais noms de chaque pays, dans la langue de l'app : Monaco, Picon bière, Perroquet, Cubata, Calimocho, Wodka-E, Radler, Snakebite, Ёрш, Отвёртка…\n• Des dizaines de shots et de mélanges : TGV, B-52, Kamikaze, Tequila paf, Mexikaner, Baby Guinness, Jägerbomb, Rhum coca, Whisky coca…\n• « Un bouchon de vodka » ou « 2 bouchons de whisky » se tapent tels quels (1 cl le bouchon).\n• Verre mélangé : moitié whisky, moitié rhum, un soft par-dessus… Mets les doses, l'app calcule la taille et le degré du verre.\n• Prends ou choisis une photo de ta boisson perso : elle remplace l'icône partout, et reste sur ton téléphone.",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.10/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.10/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.10/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.10/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.10/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.10/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.10/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.10/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.10/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.10/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew 0.1.9",
       "version": "0.1.9",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.9%2Bbuild.76/soiree-crew-unsigned.ipa",
