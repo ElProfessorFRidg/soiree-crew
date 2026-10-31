@@ -1,0 +1,70 @@
+name: AltStore source
+
+# Rewrites the AltStore / SideStore / Feather / ESign source and the Scarlet one from the releases
+# already published on GitHub (docs/ALTSTORE.md). Nothing is compiled: a change to the source's own
+# script or icon publishes in under a minute. The Build workflow calls it after each release, with
+# that build's screenshots.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tools/ci/altstore-source.mjs"
+      - ".github/workflows/altstore.yml"
+      - "apps/mobile/assets/icon.png"
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      screenshots:
+        description: Replace the screenshots with the ones of the calling build (its ios-launch artifact)
+        type: boolean
+        default: false
+
+concurrency:
+  group: altstore-source
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Screenshots of the build that just shipped
+        if: inputs.screenshots
+        uses: actions/download-artifact@v8
+        with:
+          name: ios-launch
+          path: launch
+      - name: Rewrite the source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin altstore > /dev/null; then
+            git fetch origin altstore
+            git worktree add altstore-src -B altstore origin/altstore
+          else
+            git worktree add --orphan -b altstore altstore-src
+          fi
+          mkdir -p altstore-src/screens
+          if [ -d launch/screens ] && ls launch/screens/*.png > /dev/null 2>&1; then
+            rm -f altstore-src/screens/*.png
+            cp launch/screens/*.png altstore-src/screens/
+          fi
+          cp apps/mobile/assets/icon.png altstore-src/icon.png
+          gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100" > releases.json
+          node tools/ci/altstore-source.mjs altstore-src releases.json
+          cd altstore-src
+          git add -A
+          if git diff --cached --quiet; then
+            echo "The source is already up to date."
+          else
+            git commit -m "AltStore source from ${GITHUB_SHA::7}"
+            git push origin altstore
+          fi

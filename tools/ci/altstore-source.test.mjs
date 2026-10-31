@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addRelease, backfill, privacyFrom, scarletOf } from "./altstore-source.mjs";
+import { addRelease, fromReleases, privacyFrom, scarletOf } from "./altstore-source.mjs";
 
 const appJson = {
   expo: {
@@ -34,14 +34,14 @@ describe("old versions and other sideloading apps", () => {
     { tag_name: "v0.1.1+build.67", published_at: "2026-10-30T01:00:00Z", body: "one", assets: [asset] },
   ];
 
-  it("lists every release published before the source, newest first, once", () => {
-    let source = backfill(null, appJson, releases);
-    source = backfill(source, appJson, releases);
-    expect(source.apps[0].versions.map((v) => v.version)).toEqual(["0.1.2", "0.1.1"]);
+  it("lists every named release, newest first, with its notes minus the install lines", () => {
+    const source = fromReleases(appJson, [...releases, { tag_name: "v0.1.3+build.69", body: "Version 0.1.3\n\n- fix\n\n- iOS: install it", assets: [asset] }], ["01-party.png"]);
+    expect(source.apps[0].versions.map((v) => v.version)).toEqual(["0.1.3", "0.1.2", "0.1.1"]);
+    expect(source.apps[0].versions[0].localizedDescription).toBe("Version 0.1.3\n\n- fix");
   });
 
   it("keeps the first format's fields on the app and writes the Scarlet format", () => {
-    const source = addRelease(backfill(null, appJson, releases), appJson, release("0.1.10", 80));
+    const source = addRelease(fromReleases(appJson, releases, []), appJson, release("0.1.10", 80));
     expect(source.apps[0]).toMatchObject({ version: "0.1.10", downloadURL: expect.stringContaining("v0.1.10%2Bbuild.80") });
     expect(source.apps[0].versions.map((v) => v.version)).toEqual(["0.1.10", "0.1.2", "0.1.1"]);
     const scarlet = scarletOf(source);

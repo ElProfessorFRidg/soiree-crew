@@ -16,9 +16,10 @@ Soirée Crew then shows up with every published version, its notes, its size and
 
 How it is kept up to date:
 
-- The `release` job of `.github/workflows/build.yml` publishes the GitHub release, then runs `tools/ci/altstore-source.mjs`. The script puts the new version on top of `source.json`, keeps the last 40, refreshes the screenshots taken by the `ios-launch` job, the icon, and the privacy strings read from `apps/mobile/app.json`.
-- The source lives on the `altstore` branch, never on `main`: pushing it does not start a build.
-- Releases published before the source, or missing from it, are added back from the GitHub releases API on every run, so the history is complete from 0.1.1 on.
+- `.github/workflows/altstore.yml` rebuilds `source.json` and `scarlet.json` from the releases published on GitHub, the only record that counts. Every version comes with its notes, minus the install lines meant for GitHub. The workflow keeps the last 40, the icon, and the privacy strings read from `apps/mobile/app.json`. It compiles nothing and takes under a minute.
+- It runs on its own after each release of the Build workflow, with that build's screenshots. It also runs when its script, its workflow or the app icon changes on `main`, and from the Actions tab (Run workflow).
+- The Build workflow ignores pushes that only touch Markdown, `docs/`, `research/` or the source's script and workflow: changing the source never rebuilds the app.
+- The source lives on the `altstore` branch, never on `main`: updating it does not start a build either.
 - Each version links to its own release asset (`releases/download/<tag>/soiree-crew-unsigned.ipa`), so an older version stays installable.
 
 In the app (O-12), the check runs on its own:
