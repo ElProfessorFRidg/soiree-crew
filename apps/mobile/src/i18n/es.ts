@@ -1392,6 +1392,11 @@ export const es: Messages = {
     sos: "SOS",
   },
   updates: {
+    install: "Instalar",
+    checkNow: "Comprobar ahora",
+    upToDate: "Tienes la última versión ({version}).",
+    unavailable: "No se puede comprobar: sin red, o versión de prueba.",
+    altstore: "Actualizar con AltStore",
     available: "Ya salió la versión {version}.",
     download: "Descargar",
     check: "Buscar versiones nuevas",

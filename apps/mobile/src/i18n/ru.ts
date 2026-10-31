@@ -1417,6 +1417,11 @@ export const ru: Messages = {
     sos: "SOS",
   },
   updates: {
+    install: "Установить",
+    checkNow: "Проверить сейчас",
+    upToDate: "У тебя последняя версия ({version}).",
+    unavailable: "Не удалось проверить: нет сети или тестовая сборка.",
+    altstore: "Обновить через AltStore",
     available: "Вышла версия {version}.",
     download: "Скачать",
     check: "Искать новые версии",

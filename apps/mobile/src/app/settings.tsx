@@ -18,6 +18,7 @@ import { Screen } from "@/ui/Screen";
 import { Stepper } from "@/ui/Stepper";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { Button } from "@/ui/Button";
 import { checkForUpdate, currentBuild, currentVersion } from "@/system/updates";
 import { AppIconPicker } from "@/profile/AppIconPicker";
 import { refreshReminders } from "@/reminders/reminders";
@@ -216,6 +217,7 @@ export default function SettingsScreen() {
                 if (on) void checkForUpdate(true).catch(() => undefined);
               }}
             />
+            <CheckNow />
             {/* Reminders are local notifications: a browser tab cannot send them (reminders.ts). */}
             {Platform.OS === "web" ? (
               <Text variant="small">{i18n.t("settings.remindersAppOnly")}</Text>
@@ -353,6 +355,8 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
+  // A small pill under the switch, not a full-width call to action.
+  small: { alignSelf: "flex-start", paddingHorizontal: 14 },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   switchRow: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 54 },
   pair: { flexDirection: "row", gap: 12 },
@@ -362,6 +366,36 @@ const styles = StyleSheet.create({
 const SCALES = [0.1, 0.25, 1, 2, 10] as const;
 
 /** MOT-14, dev builds only: slows or speeds every animation for the frame-by-frame review. */
+/** O-12: ask GitHub now, and say the answer: up to date, or the newer version (the banner offers it). */
+function CheckNow() {
+  const i18n = useT();
+  const [busy, setBusy] = useState(false);
+  if (Platform.OS === "web") return null;
+  return (
+    <Button
+      label={i18n.t("updates.checkNow")}
+      icon="x:refresh"
+      variant="secondary"
+      height={40}
+      fontSize={14}
+      style={styles.small}
+      loading={busy}
+      onPress={() => {
+        setBusy(true);
+        void checkForUpdate(true)
+          .catch(() => "unavailable" as const)
+          .then((result) => {
+            const latest = useAppStore.getState().latestRelease;
+            if (result === "newer" && latest) showToast({ message: i18n.t("updates.available", { version: latest.version ?? String(latest.build) }) });
+            else if (result === "latest") showToast({ message: i18n.t("updates.upToDate", { version: currentVersion }) });
+            else showToast({ tone: "danger", message: i18n.t("updates.unavailable") });
+          })
+          .finally(() => setBusy(false));
+      }}
+    />
+  );
+}
+
 function MotionScale() {
   const i18n = useT();
   const [scale, setScale] = useState(getMotionScale());

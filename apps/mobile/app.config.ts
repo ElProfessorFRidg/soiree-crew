@@ -34,6 +34,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       buildNumber: build,
       appVersion: version ?? null,
       releasesApi: "https://api.github.com/repos/ElProfessorFRidg/soiree-crew/releases/latest",
+      // AltStore / SideStore source, rewritten by every release on the altstore branch (docs/ALTSTORE.md).
+      altstoreSource: "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/source.json",
       defaultServerUrl: process.env.CREW_SERVER_URL || null,
       // Builds made by a server (deploy/android) check that server for updates instead of GitHub.
       updateServer: process.env.CREW_UPDATE_SERVER || null,

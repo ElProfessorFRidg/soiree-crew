@@ -49,6 +49,8 @@ export interface AppState {
   hourCycleFollowsPhone: boolean;
   /** O-12: ask GitHub once a day whether a newer build exists. */
   checkUpdates: boolean;
+  /** O-12: the build already announced by a toast, so a newer release is announced once. */
+  updateAnnounced: number | null;
   updateCheckedAt: number | null;
   /** O-12: `version` is null for releases named before version names (build number only). */
   latestRelease: { build: number; version?: string | null; url: string } | null;
@@ -125,6 +127,7 @@ export const useAppStore = create<AppState>()(
       travelDismissed: null,
       hourCycleFollowsPhone: true,
       checkUpdates: true,
+      updateAnnounced: null,
       updateCheckedAt: null,
       latestRelease: null,
       recentSearches: [],

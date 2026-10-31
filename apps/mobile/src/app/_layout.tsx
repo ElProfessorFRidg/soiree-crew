@@ -10,7 +10,8 @@ import {
 } from "expo-router";
 import * as SystemUI from "expo-system-ui";
 import { HeroOverlay } from "@/motion/hero";
-import { checkForUpdate } from "@/system/updates";
+import { AT_LAUNCH_MS, checkAndAnnounce, installLatest, ON_RETURN_MS } from "@/system/updates";
+import { showToast } from "@/ui/Toast";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
@@ -23,7 +24,7 @@ import {
 } from "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { themes } from "@crew/design-tokens";
-import { I18nProvider } from "@/i18n";
+import { createTranslator, I18nProvider } from "@/i18n";
 import { connect } from "@/server/connection";
 import { loadSession, useSession } from "@/server/session";
 import { refreshCalendarReminders, sendClock, watchCalendarReminders } from "@/server/calendarData";
@@ -139,11 +140,16 @@ export default function RootLayout() {
     // Whatever was queued before the app was killed goes out now (SYNC-06).
     void flush();
     void flushGameResults();
-    void checkForUpdate().catch(() => undefined);
+    // O-12: a newer release is looked for at every launch, with nothing to do; found once, said once.
+    const announce = (version: string) => {
+      const i18n = createTranslator(useAppStore.getState().preferences.language);
+      showToast({ message: i18n.t("updates.available", { version }), durationMs: 10_000, action: { label: i18n.t("updates.install"), onPress: () => void installLatest() } });
+    };
+    void checkAndAnnounce(AT_LAUNCH_MS, announce).catch(() => undefined);
     const subscription = RNAppState.addEventListener("change", (status) => {
       if (status === "active") {
         followPhoneHourCycle();
-        void checkForUpdate().catch(() => undefined);
+        void checkAndAnnounce(ON_RETURN_MS, announce).catch(() => undefined);
         void flush();
         void flushUploads();
         void flushGameResults();

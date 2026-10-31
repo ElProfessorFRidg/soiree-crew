@@ -1391,6 +1391,11 @@ export const fr = {
     sos: "SOS",
   },
   updates: {
+    install: "Installer",
+    checkNow: "Vérifier maintenant",
+    upToDate: "Tu as la dernière version ({version}).",
+    unavailable: "Vérification impossible : pas de réseau, ou version de test.",
+    altstore: "Mettre à jour avec AltStore",
     available: "La version {version} est sortie.",
     download: "Télécharger",
     check: "Chercher les nouvelles versions",

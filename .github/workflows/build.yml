@@ -297,6 +297,9 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v7
+        with:
+          # The whole history and the tags: the notes list what changed since the last release.
+          fetch-depth: 0
       - uses: actions/download-artifact@v8
         with:
           path: dist
@@ -308,14 +311,43 @@ jobs:
           VERSION="${{ needs.version.outputs.version }}"
           # Semver build metadata after "+": older apps read the build number from the tag.
           TAG="v${VERSION}+build.${GITHUB_RUN_NUMBER}"
+          PREVIOUS=$(git tag --list 'v*+build.*' --sort=-creatordate | head -1)
+          RANGE=${PREVIOUS:+$PREVIOUS..}HEAD
+          # What changed since the previous release, one line per commit, merges and docs left out.
+          git log "$RANGE" --no-merges --pretty=format:'- %s' | grep -v '^- docs' | head -40 > changes.md || true
           {
             echo "Version ${VERSION}, build ${GITHUB_RUN_NUMBER} of ${GITHUB_SHA::7}."
             echo
-            echo "- iOS: \`soiree-crew-unsigned.ipa\`, unsigned. Sign it with your sideloading tool."
-            if [ -f dist/soiree-crew.apk ]; then echo "- Android: \`soiree-crew.apk\`, signed with the debug key. Allow installs from this source."; fi
+            cat changes.md
             echo
-            git log -1 --pretty=format:'%s'
+            echo
+            echo "- iOS: \`soiree-crew-unsigned.ipa\`, unsigned. Install it with AltStore or SideStore (source below), or sign it with your sideloading tool."
+            echo "- AltStore / SideStore source: https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/altstore/source.json"
+            if [ -f dist/soiree-crew.apk ]; then echo "- Android: \`soiree-crew.apk\`, signed with the debug key. Allow installs from this source."; fi
           } > notes.md
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           FILES="dist/soiree-crew-unsigned.ipa"
           [ -f dist/soiree-crew.apk ] && FILES="$FILES dist/soiree-crew.apk"
           gh release create "$TAG" $FILES             --title "Soirée Crew ${VERSION}"             --notes-file notes.md             --target "$GITHUB_SHA"             --latest
+      # docs/ALTSTORE.md: the source lives on its own branch, so updating it never starts a build.
+      - name: Update the AltStore source
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin altstore > /dev/null; then
+            git fetch origin altstore
+            git worktree add altstore-src -B altstore origin/altstore
+          else
+            git worktree add --orphan -b altstore altstore-src
+          fi
+          mkdir -p altstore-src/screens
+          rm -f altstore-src/screens/*.png
+          cp dist/screens/*.png altstore-src/screens/ 2>/dev/null || true
+          cp apps/mobile/assets/icon.png altstore-src/icon.png
+          { echo "Version ${VERSION}"; echo; cat changes.md; } > altstore-notes.md
+          node tools/ci/altstore-source.mjs altstore-src/source.json dist/soiree-crew-unsigned.ipa altstore-notes.md "$VERSION" "$GITHUB_RUN_NUMBER" "$TAG" altstore-src/screens
+          cd altstore-src
+          git add -A
+          git commit -m "AltStore source: ${VERSION} (build ${GITHUB_RUN_NUMBER})"
+          git push origin altstore
