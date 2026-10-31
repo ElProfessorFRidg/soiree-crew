@@ -1,7 +1,7 @@
 import { router, useSegments } from "expo-router";
 import { Children, isValidElement, useState, type ReactNode } from "react";
 import { KeyboardAvoidingView, Platform, RefreshControl, StyleSheet, View } from "react-native";
-import Animated, { FadeInUp, interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
+import Animated, { FadeInUp, interpolate, runOnJS, useAnimatedReaction, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { duration, scaled, space } from "@crew/design-tokens";
 import { useT } from "@/i18n";
@@ -10,10 +10,14 @@ import { IconButton } from "./Button";
 import { PullGlass } from "./PullGlass";
 import { Text } from "./Text";
 import { ToastHost } from "./Toast";
+import { BrandMark } from "./BrandMark";
+import { haptic } from "@/motion/haptics";
 import { useKeyboardShown } from "./useKeyboardShown";
 
 interface Props {
   title?: string;
+  /** The app's icon and name above the title, on the screens people screenshot and share. */
+  brand?: boolean;
   back?: boolean;
   trailing?: ReactNode;
   children: ReactNode;
@@ -26,7 +30,7 @@ interface Props {
   scrollEnabled?: boolean;
 }
 
-export function Screen({ title, back, trailing, children, footer, withToasts, onRefresh, scrollEnabled = true }: Props) {
+export function Screen({ title, brand, back, trailing, children, footer, withToasts, onRefresh, scrollEnabled = true }: Props) {
   const [refreshing, setRefreshing] = useState(false);
   const theme = useTheme();
   const i18n = useT();
@@ -47,6 +51,20 @@ export function Screen({ title, back, trailing, children, footer, withToasts, on
   // MOT-10: on iOS the pull shows as a filling glass and the system spinner stays hidden. Android's
   // list does not scroll past its top, so it keeps the native spinner, tinted amber.
   const customPull = Platform.OS === "ios";
+  // MOT-10, iOS: the pull is felt as well as seen. A light tick each third of the glass while it
+  // fills, a firmer one when it lets go and the refresh starts, then success or a warning when the
+  // answer comes. Ticks re-arm only once the list is back at its top.
+  const pullStep = useSharedValue(0);
+  useAnimatedReaction(
+    () => (onRefresh && customPull ? Math.min(3, Math.floor(Math.max(0, -scrollY.value) / 28)) : 0),
+    (step, previous) => {
+      if (step === 0) pullStep.value = 0;
+      else if (previous !== null && step > previous && step > pullStep.value) {
+        pullStep.value = step;
+        runOnJS(haptic.pullTick)();
+      }
+    },
+  );
   return (
     // QOL-08: the keyboard never covers the field being typed, and the footer button rides above it.
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={[styles.screen, { backgroundColor: theme.bg }]}>
@@ -65,8 +83,10 @@ export function Screen({ title, back, trailing, children, footer, withToasts, on
               progressBackgroundColor={theme.surface}
               onRefresh={() => {
                 setRefreshing(true);
+                haptic.pullRelease();
                 void onRefresh()
-                  .catch(() => undefined)
+                  .then(() => haptic.confirmed())
+                  .catch(() => haptic.error())
                   .finally(() => setRefreshing(false));
               }}
             />
@@ -80,6 +100,7 @@ export function Screen({ title, back, trailing, children, footer, withToasts, on
             {trailing}
           </View>
         ) : null}
+        {brand ? <BrandMark /> : null}
         {title ? (
           <Text variant="h1" accessibilityRole="header">
             {title}

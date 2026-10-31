@@ -30,6 +30,9 @@ export const haptic = {
     run(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium));
   },
   water: () => run(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)),
+  /** Pull to refresh: a soft tick per third of the pull, then a firmer one when it lets go. */
+  pullTick: () => run(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft)),
+  pullRelease: () => run(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid)),
   confirmed: () => run(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)),
   error: () => run(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning)),
   heavy: () => {

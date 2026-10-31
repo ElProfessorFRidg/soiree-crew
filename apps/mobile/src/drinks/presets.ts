@@ -115,7 +115,9 @@ export function presetFromCustom(custom: CustomDrink): DrinkPreset {
 export function presetFromEntry(entry: { presetId: string; kind: DrinkKind; volumeMl: number; abv: number; name?: string }): DrinkPreset {
   const known = findPreset(entry.presetId);
   // A brand from the catalogue keeps its own glass: "Encore : Desperados" shows a bottle.
-  const brand = entry.presetId.startsWith(CATALOGUE_PREFIX) ? catalogueDrink(entry.presetId.slice(CATALOGUE_PREFIX.length)) : undefined;
+  // A drink synced from another phone or an old version can come without a preset id.
+  const presetId = entry.presetId ?? "";
+  const brand = presetId.startsWith(CATALOGUE_PREFIX) ? catalogueDrink(presetId.slice(CATALOGUE_PREFIX.length)) : undefined;
   return {
     id: entry.presetId,
     kind: entry.kind,

@@ -1,4 +1,16 @@
 {
+  "0.1.12": {
+    "fr": [
+      "L'icône et le nom de l'app en haut de Crew et de la soirée en direct, pour tes captures.",
+      "Tirer pour actualiser se sent : petits crans pendant que tu tires, un clic quand ça part, et une vibration de réussite ou d'échec à la fin.",
+      "Corrige un plantage de l'écran Soirée avec un verre venu d'un autre téléphone, et blinde l'affichage des profils."
+    ],
+    "en": [
+      "The app's icon and name at the top of Crew and the live party, for your screenshots.",
+      "Pull to refresh can be felt: soft ticks while you pull, a click when it goes, and a success or failure buzz at the end.",
+      "Fixes a Party screen crash with a drink from another phone, and hardens how profiles show."
+    ]
+  },
   "0.1.11": {
     "fr": [
       "L'app ne reste plus bloquée sur son icône au lancement (TrollStore, iPad) : chaque étape du démarrage a un délai, et l'app continue sans celle qui ne répond pas.",

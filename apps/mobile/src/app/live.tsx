@@ -211,7 +211,7 @@ export default function LiveScreen() {
   };
 
   return (
-    <Screen back title={party?.name || live?.party.name || i18n.t("live.title")} withToasts>
+    <Screen back brand title={party?.name || live?.party.name || i18n.t("live.title")} withToasts>
       {live ? <Text variant="small">{i18n.t("live.updated", { time: formatClock(live.fetchedAt, i18n.language, hourCycle) })}</Text> : null}
       <View>
         {members.map((member) => (

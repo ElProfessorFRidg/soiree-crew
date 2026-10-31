@@ -279,6 +279,7 @@ export default function CrewScreen() {
 
   return (
     <Screen
+      brand
       title={i18n.t("crew.tab")}
       trailing={
         <View style={styles.headerActions}>

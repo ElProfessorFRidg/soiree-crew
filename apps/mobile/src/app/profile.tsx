@@ -226,13 +226,13 @@ export default function ProfileScreen() {
                 {r.audience && r.audience !== "public" ? <Tag label={i18n.t(`place.audience.${r.audience}`)} /> : null}
               </View>
               <Text variant="small">
-                {CRITERIA.filter((c) => r.ratings[c])
+                {CRITERIA.filter((c) => r.ratings?.[c])
                   .map((c) => `${i18n.t(`place.criteria.${c}`)} ${r.ratings[c]}/5`)
                   .join(", ")}
                 {r.visitedAt ? `, ${date(r.visitedAt)}` : ""}
               </Text>
               {r.text ? <Text>{r.text}</Text> : null}
-              {r.photos.length ? (
+              {r.photos?.length ? (
                 <View style={styles.photos}>
                   {r.photos.map((p) => (
                     <Image key={p.id} source={{ uri: p.url }} accessibilityLabel={i18n.t("place.reviewPhoto")} style={[styles.photo, { backgroundColor: theme.surfaceRaised }]} />
@@ -280,7 +280,7 @@ export default function ProfileScreen() {
               <Text variant="small">{i18n.t("people.nightHistory")}</Text>
               {s.nights.history.map((n) => (
                 <Text key={n.at} variant="small">
-                  {`${date(n.at)}, ${n.name || i18n.t("people.aNightOut")}${n.venues.length ? ` · ${n.venues.join(", ")}` : ""}`}
+                  {`${date(n.at)}, ${n.name || i18n.t("people.aNightOut")}${n.venues?.length ? ` · ${n.venues.join(", ")}` : ""}`}
                 </Text>
               ))}
             </>
