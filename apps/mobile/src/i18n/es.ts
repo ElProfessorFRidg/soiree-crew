@@ -157,6 +157,10 @@ export const es: Messages = {
     muteNow: "Silenciar recordatorios hasta mañana",
   },
   liveActivity: {
+    again: "Otra",
+    water: "Agua",
+    lastDrink: "Última copa",
+    underLimit: "Bajo el límite",
     title: "Vuelta a 0 hacia las {time}",
     ended: "Vuelta a 0",
     tonight: "Esta noche",

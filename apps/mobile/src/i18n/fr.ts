@@ -156,6 +156,10 @@ export const fr = {
     muteNow: "Couper les rappels jusqu'à demain matin",
   },
   liveActivity: {
+    again: "Encore",
+    water: "Eau",
+    lastDrink: "Dernier verre",
+    underLimit: "Sous la limite",
     title: "Retour à 0 vers {time}",
     ended: "Retour à 0",
     tonight: "Ce soir",

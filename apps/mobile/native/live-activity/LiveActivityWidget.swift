@@ -71,6 +71,19 @@ struct NightPayload: Decodable {
     let url: String
   }
 
+  struct Drive: Decodable {
+    let label: String
+    let value: String
+    let tone: String
+
+    var ink: Color {
+      tone == "ok" ? NightColors.okText : tone == "amber" ? NightColors.tagText : NightColors.dangerText
+    }
+    var fill: Color {
+      tone == "ok" ? NightColors.okBg : tone == "amber" ? NightColors.tagBg : NightColors.dangerBg
+    }
+  }
+
   struct Actions: Decodable {
     let again: String
     let water: String
@@ -94,7 +107,12 @@ struct NightPayload: Decodable {
   let drinks: String
   let water: String
   let under: String?
+  let drive: Drive?
   let zeroLabel: String?
+  let zeroClock: String?
+  let backToZero: String?
+  let lastAt: Double?
+  let last: String?
   let zeroIn: String
   let tonight: String
   let estimate: String
@@ -119,6 +137,10 @@ struct NightPayload: Decodable {
 
   var startDate: Date {
     startAt.map { Date(timeIntervalSince1970: $0 / 1000) } ?? Date()
+  }
+
+  var lastDate: Date? {
+    lastAt.map { Date(timeIntervalSince1970: $0 / 1000) }
   }
 }
 
@@ -153,14 +175,70 @@ private func link(_ path: String) -> URL {
 
 // MARK: - Shared pieces
 
+/// Time left in hours and minutes ("8 h 5 min"), drawn by iOS: no seconds ticking on the lock screen.
 private struct Countdown: View {
   let end: Date
   let size: CGFloat
   var body: some View {
-    Text(timerInterval: Date()...max(Date(), end), countsDown: true)
-      .font(numeral(size))
+    Text(max(Date(), end), style: .relative)
+      .font(.system(size: size, weight: .bold))
       .monospacedDigit()
+      .lineLimit(1)
+      .minimumScaleFactor(0.7)
       .multilineTextAlignment(.trailing)
+  }
+}
+
+/// Driving, as on the party screen: a tinted pill with the car, its verdict or its "not before" time.
+private struct DrivePill: View {
+  let drive: NightPayload.Drive
+  var compact = false
+  var body: some View {
+    VStack(alignment: .trailing, spacing: 2) {
+      if !compact {
+        HStack(spacing: 4) {
+          Glyph(systemName: "car.fill", color: drive.ink, size: 11)
+          Text(drive.label).font(.system(size: 11, weight: .bold)).foregroundStyle(drive.ink.opacity(0.8))
+        }
+      }
+      HStack(spacing: 4) {
+        if compact { Glyph(systemName: "car.fill", color: drive.ink, size: 11) }
+        Text(drive.value)
+          .font(.system(size: compact ? 13 : 15, weight: .heavy))
+          .foregroundStyle(drive.ink)
+          .lineLimit(1)
+          .minimumScaleFactor(0.75)
+      }
+    }
+    .padding(.horizontal, 10)
+    .padding(.vertical, compact ? 5 : 7)
+    .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(drive.fill))
+  }
+}
+
+/// Glasses, water and how long ago the last glass was: what the night looks like at a glance.
+private struct Facts: View {
+  let p: NightPayload
+  var body: some View {
+    HStack(spacing: 12) {
+      HStack(spacing: 4) {
+        Glyph(systemName: "mug.fill", color: NightColors.amber, size: 12)
+        Text("\(p.drinksN)").foregroundStyle(NightColors.text)
+      }
+      HStack(spacing: 4) {
+        Glyph(systemName: "drop.fill", color: NightColors.water, size: 12)
+        Text("\(p.waterN)").foregroundStyle(NightColors.water)
+      }
+      if let last = p.lastDate, let label = p.last {
+        HStack(spacing: 4) {
+          Text(label).foregroundStyle(NightColors.muted)
+          Text(last, style: .relative).foregroundStyle(NightColors.text).lineLimit(1)
+        }
+        .lineLimit(1)
+        .minimumScaleFactor(0.8)
+      }
+    }
+    .font(.system(size: 13, weight: .bold))
   }
 }
 
@@ -195,15 +273,17 @@ private struct ActionButton: View {
   let path: String
   let fill: Color
   let ink: Color
+  var icon: String? = nil
   var body: some View {
     Link(destination: link(path)) {
-      Text(label)
-        .font(.system(size: 15, weight: .bold))
-        .lineLimit(1)
-        .minimumScaleFactor(0.7)
-        .frame(maxWidth: .infinity, minHeight: 40)
-        .foregroundStyle(ink)
-        .background(fill, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+      HStack(spacing: 5) {
+        if let icon { Image(systemName: icon).font(.system(size: 13, weight: .heavy)) }
+        Text(label).font(.system(size: 15, weight: .bold)).lineLimit(1).minimumScaleFactor(0.7)
+      }
+      .padding(.horizontal, 10)
+      .frame(maxWidth: .infinity, minHeight: 40)
+      .foregroundStyle(ink)
+      .background(fill, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
   }
 }
@@ -266,56 +346,43 @@ private struct SoloLockView: View {
             .background(Capsule().fill(NightColors.tagBg))
         }
       }
-      if p.show, let bac = p.bac {
-        HStack(alignment: .bottom, spacing: 12) {
-          HStack(alignment: .firstTextBaseline, spacing: 5) {
-            Text(bac).font(numeral(60)).foregroundStyle(p.figureColor)
-            Text(p.unit ?? "").font(.system(size: 15, weight: .bold)).foregroundStyle(NightColors.text)
-          }
-          Spacer(minLength: 0)
-          VStack(alignment: .trailing, spacing: 5) {
-            HStack(spacing: 10) {
-              Label { Text("\(p.drinksN)") } icon: { Glyph(systemName: "mug", color: NightColors.text, size: 13) }
-                .foregroundStyle(NightColors.text)
-              Label { Text("\(p.waterN)") } icon: { Glyph(systemName: "drop", color: NightColors.water, size: 13) }
-                .foregroundStyle(NightColors.water)
+      // The hero: the figure when figures are on, otherwise the time back to zero; driving beside it.
+      HStack(alignment: .center, spacing: 12) {
+        if p.show, let bac = p.bac {
+          VStack(alignment: .leading, spacing: 2) {
+            HStack(alignment: .firstTextBaseline, spacing: 5) {
+              Text(bac).font(numeral(56)).foregroundStyle(p.figureColor)
+              Text(p.unit ?? "").font(.system(size: 15, weight: .bold)).foregroundStyle(NightColors.text)
             }
-            .font(.system(size: 15, weight: .bold))
             if let status = p.status {
-              Text(status)
-                .font(.system(size: 12))
-                .foregroundStyle(NightColors.muted)
-                .multilineTextAlignment(.trailing)
-                .lineLimit(2)
+              Text(status).font(.system(size: 12, weight: .semibold)).foregroundStyle(NightColors.muted).lineLimit(1)
             }
           }
-        }
-      } else if let zero = p.zeroLabel {
-        HStack(spacing: 10) {
-          Glyph(systemName: "clock", color: NightColors.amber, size: 18)
+        } else if let zero = p.zeroClock {
+          VStack(alignment: .leading, spacing: 0) {
+            Text(p.backToZero ?? "").font(.system(size: 12, weight: .bold)).foregroundStyle(NightColors.muted)
+            Text(zero).font(numeral(44)).foregroundStyle(NightColors.text).lineLimit(1).minimumScaleFactor(0.7)
+          }
+        } else if let zero = p.zeroLabel {
           Text(zero).font(.system(size: 16, weight: .bold)).foregroundStyle(NightColors.text)
         }
+        Spacer(minLength: 0)
+        if let drive = p.drive { DrivePill(drive: drive) }
       }
       NightBar(payload: p, height: 6)
-      HStack {
-        if p.show, let under = p.under {
-          Text(under).font(.system(size: 12)).foregroundStyle(NightColors.dangerText)
-        } else {
-          Text(p.show ? p.stamp : p.drinks).font(.system(size: 12)).foregroundStyle(NightColors.muted)
-        }
+      HStack(spacing: 8) {
+        Facts(p: p)
         Spacer(minLength: 6)
         if let end = p.endDate {
           HStack(spacing: 4) {
-            Text(p.zeroIn).font(.system(size: 12, weight: .bold)).foregroundStyle(NightColors.text)
-            Countdown(end: end, size: 15).foregroundStyle(NightColors.text).frame(maxWidth: 70)
+            Text(p.zeroIn).font(.system(size: 12, weight: .bold)).foregroundStyle(NightColors.muted)
+            Countdown(end: end, size: 13).foregroundStyle(NightColors.text).frame(maxWidth: 86)
           }
         }
       }
-      if p.show {
-        HStack(spacing: 8) {
-          ActionButton(label: p.actions.again, path: "quick/again", fill: NightColors.amber, ink: NightColors.onAmber)
-          ActionButton(label: p.actions.water, path: "quick/water", fill: NightColors.waterBg, ink: NightColors.waterText)
-        }
+      HStack(spacing: 8) {
+        ActionButton(label: p.actions.again, path: "quick/again", fill: NightColors.amber, ink: NightColors.onAmber, icon: "plus")
+        ActionButton(label: p.actions.water, path: "quick/water", fill: NightColors.waterBg, ink: NightColors.waterText, icon: "drop.fill")
       }
     }
     .padding(16)
@@ -482,7 +549,10 @@ struct LiveActivityWidget: Widget {
         Text(bac).font(numeral(17)).foregroundStyle(p.figureColor)
       }
     } else {
-      Glyph(systemName: "mug.fill", color: NightColors.amber, size: 14)
+      HStack(spacing: 3) {
+        Glyph(systemName: "mug.fill", color: NightColors.amber, size: 12)
+        Text("\(p.drinksN)").font(.system(size: 15, weight: .heavy)).foregroundStyle(NightColors.amber)
+      }
     }
   }
 
@@ -493,8 +563,13 @@ struct LiveActivityWidget: Widget {
         Glyph(systemName: "mug.fill", color: NightColors.amber, size: 12)
         Text("\(p.drinksN)").font(.system(size: 15, weight: .heavy)).foregroundStyle(NightColors.amber)
       }
-    } else if let end = p.endDate {
-      Countdown(end: end, size: 15).foregroundStyle(NightColors.text).frame(maxWidth: 56)
+    } else if let zero = p.zeroClock {
+      // The time back to zero, fixed: a ticking timer by the camera says less and moves all night.
+      HStack(spacing: 3) {
+        Glyph(systemName: "arrow.down.right", color: NightColors.muted, size: 10)
+        Text(zero).font(.system(size: 14, weight: .heavy)).foregroundStyle(NightColors.text).lineLimit(1).minimumScaleFactor(0.7)
+      }
+      .frame(maxWidth: 70)
     }
   }
 
@@ -524,6 +599,9 @@ struct LiveActivityWidget: Widget {
           Text(bac).font(numeral(p.inParty ? 30 : 44)).foregroundStyle(p.figureColor)
           Text(p.unit ?? "").font(.system(size: 12, weight: .bold)).foregroundStyle(NightColors.text)
         }
+      } else if !p.inParty, let zero = p.zeroClock {
+        Text(p.backToZero ?? "").font(.system(size: 11, weight: .bold)).foregroundStyle(NightColors.muted)
+        Text(zero).font(numeral(34)).foregroundStyle(NightColors.text).lineLimit(1).minimumScaleFactor(0.7)
       } else if let zero = p.zeroLabel {
         Text(zero).font(.system(size: 14, weight: .bold)).foregroundStyle(NightColors.text)
       }
@@ -532,12 +610,19 @@ struct LiveActivityWidget: Widget {
 
   @ViewBuilder
   private func expandedTrailing(_ p: NightPayload) -> some View {
-    VStack(alignment: .trailing, spacing: 4) {
-      Text(p.drinks).font(.system(size: 14, weight: .bold)).foregroundStyle(NightColors.text)
-      Text(p.water).font(.system(size: 14, weight: .bold)).foregroundStyle(NightColors.water)
-      if p.show, let under = p.under {
-        Text(under).font(.system(size: 11)).foregroundStyle(NightColors.dangerText).multilineTextAlignment(.trailing)
+    VStack(alignment: .trailing, spacing: 6) {
+      HStack(spacing: 10) {
+        HStack(spacing: 3) {
+          Glyph(systemName: "mug.fill", color: NightColors.amber, size: 12)
+          Text("\(p.drinksN)").foregroundStyle(NightColors.text)
+        }
+        HStack(spacing: 3) {
+          Glyph(systemName: "drop.fill", color: NightColors.water, size: 12)
+          Text("\(p.waterN)").foregroundStyle(NightColors.water)
+        }
       }
+      .font(.system(size: 15, weight: .heavy))
+      if let drive = p.drive { DrivePill(drive: drive, compact: true) }
     }
   }
 
@@ -559,11 +644,11 @@ struct LiveActivityWidget: Widget {
       }
       NightBar(payload: p, height: 6)
       HStack(spacing: 8) {
-        ActionButton(label: p.actions.again, path: "quick/again", fill: NightColors.amber, ink: NightColors.onAmber)
+        ActionButton(label: p.actions.again, path: "quick/again", fill: NightColors.amber, ink: NightColors.onAmber, icon: "plus")
         if p.inParty, let home = p.actions.home {
-          ActionButton(label: home, path: "quick/home", fill: NightColors.okBg, ink: NightColors.okText)
+          ActionButton(label: home, path: "quick/home", fill: NightColors.okBg, ink: NightColors.okText, icon: "house.fill")
         } else {
-          ActionButton(label: p.actions.water, path: "quick/water", fill: NightColors.waterBg, ink: NightColors.waterText)
+          ActionButton(label: p.actions.water, path: "quick/water", fill: NightColors.waterBg, ink: NightColors.waterText, icon: "drop.fill")
         }
         ActionButton(label: p.actions.sos, path: "sos", fill: NightColors.dangerBg, ink: NightColors.dangerText)
           .frame(maxWidth: 76)

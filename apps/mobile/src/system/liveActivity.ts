@@ -49,7 +49,14 @@ export interface NightPayload {
   drinks: string;
   water: string;
   under: string | null;
+  /** Driving as on the party screen: "not before" a time (O-87 floor), too close, or under the limit. */
+  drive: { label: string; value: string; tone: "danger" | "amber" | "ok" } | null;
   zeroLabel: string | null;
+  /** Back-to-zero as a clock time ("22 h 11"), shown big when the figure is hidden. */
+  zeroClock: string | null;
+  backToZero: string;
+  lastAt: number | null;
+  last: string;
   zeroIn: string;
   tonight: string;
   estimate: string;
@@ -67,6 +74,15 @@ export interface NightPayload {
     url: string;
   } | null;
   actions: { again: string; water: string; sos: string; home: string | null };
+}
+
+function driveOf(driving: ReturnType<typeof estimateDriving> | null, now: number, i18n: Translator, clock: (at: number) => string): NightPayload["drive"] {
+  if (!driving) return null;
+  const label = i18n.t("party.driving");
+  const later = driving.underLimitAt !== null && driving.underLimitAt > now ? driving.underLimitAt : null;
+  if (driving.tooCloseToCall) return { label, value: i18n.t("party.tooClose"), tone: "amber" };
+  if (later) return { label, value: `${i18n.t("party.notBefore")} ${clock(later)}`, tone: "danger" };
+  return { label, value: i18n.t("liveActivity.underLimit"), tone: "ok" };
 }
 
 const FACES = 4;
@@ -169,14 +185,20 @@ export function buildNightPayload(input: {
     drinks: i18n.plural("party.drinks", alcohol.length),
     water: i18n.plural("party.waters", waterN),
     under: !show || !driving ? null : driving.rising ? i18n.t("party.drivingRising") : driving.tooCloseToCall ? i18n.t("liveActivity.driveClose") : under !== null ? i18n.t("liveActivity.under", { value: value(limit), time: clock(under) }) : null,
+    // Driving gives no more away than back-to-zero, so it shows in discreet mode too.
+    drive: drinking ? driveOf(driving, now, i18n, clock) : null,
     zeroLabel: zeroAt !== null ? i18n.t("liveActivity.title", { time: clock(zeroAt) }) : null,
+    zeroClock: zeroAt !== null ? clock(zeroAt) : null,
+    backToZero: i18n.t("party.backToZero"),
+    lastAt: alcohol.length ? Math.max(...alcohol.map((d) => d.consumedAt)) : null,
+    last: i18n.t("liveActivity.lastDrink"),
     zeroIn: zeroAt !== null ? i18n.t("liveActivity.zeroIn") : "",
     tonight: i18n.t("liveActivity.tonight"),
     estimate: i18n.t("liveActivity.estimate"),
     party: partyPart,
     actions: {
-      again: i18n.t("quick.again"),
-      water: i18n.t("quick.water"),
+      again: i18n.t("liveActivity.again"),
+      water: i18n.t("liveActivity.water"),
       sos: i18n.t("quick.sos"),
       home: party ? i18n.t("liveActivity.homeAction") : null,
     },

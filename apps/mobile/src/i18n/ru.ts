@@ -157,6 +157,10 @@ export const ru: Messages = {
     muteNow: "Выключить напоминания до утра",
   },
   liveActivity: {
+    again: "Ещё",
+    water: "Вода",
+    lastDrink: "Последний бокал",
+    underLimit: "Ниже лимита",
     title: "Вернёшься к нулю около {time}",
     ended: "Снова ноль",
     tonight: "Сегодня",

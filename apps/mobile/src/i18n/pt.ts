@@ -157,6 +157,10 @@ export const pt: Messages = {
     muteNow: "Silenciar lembretes até amanhã de manhã",
   },
   liveActivity: {
+    again: "Outra",
+    water: "Água",
+    lastDrink: "Último copo",
+    underLimit: "Abaixo do limite",
     title: "Volta a 0 por volta das {time}",
     ended: "Volta a 0",
     tonight: "Esta noite",

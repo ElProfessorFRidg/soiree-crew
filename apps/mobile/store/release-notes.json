@@ -3,12 +3,14 @@
     "fr": [
       "Écran Soirée : le volant affiche l'heure « Pas avant », en couleur selon ta situation, et précise quand elle peut encore reculer.",
       "Retour à 0 donne aussi l'heure.",
-      "L'icône et le nom de l'app en haut de l'écran Soirée, pour que tes captures disent d'où elles viennent."
+      "L'icône et le nom de l'app en haut de l'écran Soirée, pour que tes captures disent d'où elles viennent.",
+      "Live Activity plus utile, même en mode discret : l'heure du retour à 0 en grand, le volant en couleur, tes verres, ton eau et ton dernier verre, des boutons Encore et Eau, et plus de secondes qui défilent."
     ],
     "en": [
       "Party screen: driving shows a \"not before\" time, coloured by your situation, and says when it can still move later.",
       "Back to 0 also gives the time.",
-      "The app's icon and name at the top of the Party screen, so your screenshots say where they come from."
+      "The app's icon and name at the top of the Party screen, so your screenshots say where they come from.",
+      "A more useful Live Activity, even in discreet mode: back-to-zero time in big, driving in colour, your drinks, water and last drink, Again and Water buttons, and no more ticking seconds."
     ]
   },
   "0.1.8": {

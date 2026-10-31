@@ -158,6 +158,10 @@ export const en: Messages = {
     muteNow: "Mute reminders until tomorrow morning",
   },
   liveActivity: {
+    again: "Again",
+    water: "Water",
+    lastDrink: "Last drink",
+    underLimit: "Under the limit",
     title: "Back to zero around {time}",
     ended: "Back to zero",
     tonight: "Tonight",
