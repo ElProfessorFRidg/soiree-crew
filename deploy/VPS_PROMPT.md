@@ -24,12 +24,13 @@ Ask me for the domain (for example `crew.mydomain.tld`). Check the DNS A/AAAA re
   - `POSTGRES_PASSWORD`: generate 40+ random characters.
   - `DATA_KEY`: `openssl rand -base64 32`. Show it to me once so I store it offline, and tell me plainly that losing it makes the sealed data unreadable for good. Never rotate it afterwards.
   - `PUBLIC_URL=https://<the domain>` (no trailing slash).
-  - `SERVER_NAME`, `SERVER_DESCRIPTION`: ask me. `PUBLIC_SERVER=true`.
+  - `SERVER_NAME`, `SERVER_DESCRIPTION`: ask me. `PUBLIC_SERVER=true`. Check `deploy/docker-compose.yml` passes each variable you set to the `server` service (Coolify only fills the ones the compose file names).
   - `OPERATOR_IDS`: leave empty for now (see step 7).
   - Leave the AI variables empty unless I give you a key.
   - Push notifications (O-38): leave `APNS_*` and `FCM_*` empty unless I give you an APNs .p8 key (with its key id, my team id, `APNS_TOPIC=app.soireecrew.mobile`, and `APNS_PRODUCTION=true` only for TestFlight or App Store builds) or a Firebase service-account JSON. Store them as secrets, never in a file in the repo. The server works without them: the in-app inbox and the live socket carry notifications. After a deploy with them, check the start log says `push: iOS on`. The server must reach `api.push.apple.com` (or `api.sandbox.push.apple.com`) on 443 over HTTP/2, and `oauth2.googleapis.com` plus `fcm.googleapis.com` for Android.
 - Make sure nothing publishes port 8787 or 5432 on the host: only the proxy reaches the API, and PostgreSQL is reachable from the API container only.
 - Persistent volumes: `pgdata` and `uploads` must survive redeploys.
+- Database: nothing to create by hand. The `db` service creates the `crew` database and user, and the API applies every migration in `apps/server/migrations` on start. After the first deploy, check the start log has no error and that `docker compose exec db psql -U crew -d crew -c "select count(*) from schema_migrations"` equals the number of `.sql` files in `apps/server/migrations`.
 - Turn on automatic deploys on push to `main` only if I say yes.
 
 ## 4. Fit the protection layers
@@ -77,7 +78,7 @@ Tell me:
 
 Then remind me to:
 - create my own account in the app on this server and send you my username, so you look up its id (`select id from users where username = '<it>'`), set `OPERATOR_IDS=<that id>` and redeploy (it lets me review venue claims);
-- set the GitHub variable so the next app builds suggest this server:
+- set the GitHub variable so the next app builds open on this server, with nothing to type (or give the URL to the Claude session working on the app, which sets it and starts a build):
   `gh variable set CREW_SERVER_URL --body "https://<domain>" --repo ElProfessorFRidg/soiree-crew`
 
 Never paste secrets into the repository, an issue or a commit.

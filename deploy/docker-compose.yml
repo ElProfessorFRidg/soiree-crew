@@ -13,8 +13,17 @@ services:
       PUBLIC_URL: ${PUBLIC_URL:?set PUBLIC_URL, e.g. https://crew.example.com}
       UPLOAD_DIR: /data/uploads
       TRUST_PROXY: "1"
+      # How the server presents itself on the connect screen and in the list of public servers.
+      SERVER_NAME: ${SERVER_NAME:-}
+      SERVER_DESCRIPTION: ${SERVER_DESCRIPTION:-}
+      PUBLIC_SERVER: ${PUBLIC_SERVER:-}
+      # Accounts that review venue claims (COM-11), comma-separated ids.
+      OPERATOR_IDS: ${OPERATOR_IDS:-}
+      OPERATOR_USERNAMES: ${OPERATOR_USERNAMES:-}
+      DRINKING_LEADERBOARD: ${DRINKING_LEADERBOARD:-}
       AI_PROVIDER: ${AI_PROVIDER:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      AI_MODEL: ${AI_MODEL:-}
       SEASON_VARIANTS: ${SEASON_VARIANTS:-}
       # Push (O-38), optional: deploy/README.md.
       APNS_KEY_ID: ${APNS_KEY_ID:-}
