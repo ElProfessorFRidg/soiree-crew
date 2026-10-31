@@ -6,25 +6,44 @@
   "Other": [
     {
       "name": "Soirée Crew",
+      "version": "0.1.5",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.5%2Bbuild.72/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "• Supprimer l'app ne supprime plus tes données : en la réinstallant, tu retrouves ton profil, tes réglages, tes boissons et tes 45 derniers jours.\n• Tes données font maintenant partie de la sauvegarde iCloud ou Google du téléphone.\n• Réglages, Sécurité et données : supprimer ton compte ou tout effacer remet le téléphone comme si l'app n'avait jamais été installée.\n• La politique de confidentialité explique les sauvegardes et la copie gardée sur le téléphone.",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.5/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.5/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.5/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.5/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.5/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.5/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.5/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.5/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.5/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.5/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew 0.1.4",
       "version": "0.1.4",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.4%2Bbuild.70/soiree-crew-unsigned.ipa",
       "category": "Other",
-      "description": "Version 0.1.4, build 70 of 8585473.\n\n- feat(updates): checked at every launch and announced once with Install, small Check now button in Settings, AltStore/SideStore hand-off; release notes list the changes and an AltStore source on the altstore branch is rewritten by every release\n- feat(search): a wrong first letter is recovered from the rest of the word, everyday words of seven languages never match by guess, guesses say \"did you mean\", picked guesses teach the app the person's spelling, habits break near ties\n- feat(search): drink names found by sound (Double Metaphone) and likeness (Jaro-Winkler) on top of the keyboard-aware distance; hand-written misspellings removed from the catalogue\n- feat(drinks): brands from many countries with every size they come in, country sizes (pint 568, caña, Maß, 12 oz), country brands first, brand filter; search forgives neighbouring keys, stutters and missing spaces",
+      "description": "• L'app regarde s'il y a une nouvelle version à chaque ouverture et te propose de l'installer, une seule fois.\n• Réglages : un bouton pour vérifier tout de suite.\n• Recherche des boissons bien plus maligne : elle retrouve « zubrikov », une première lettre ratée, une touche voisine, un mot écrit au son.\n• Elle propose « Tu voulais dire… ? » et retient ta façon d'écrire.\n• Des marques de nombreux pays avec toutes leurs tailles : pinte anglaise, caña, Maß, 12 oz.",
       "bundleID": "app.soireecrew.mobile",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/02-crew.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/06-settings.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/10-limits.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/12-history.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.4/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.4/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.4/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.4/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.4/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.4/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.4/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.4/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.4/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.4/10-limits.png"
       ]
     },
     {
@@ -33,9 +52,20 @@
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.3%2Bbuild.69/soiree-crew-unsigned.ipa",
       "category": "Other",
-      "description": "Version 0.1.3, build 69 of cabf610.\n\nmerge: drink catalogue, smart typed orders, group details, house pint per bar, my drinks row under Encore; restore the catalogue seam between the two branches",
+      "description": "• Catalogue de marques : bières, vins, alcools forts et shots, avec la pinte maison de chaque bar.\n• Tape ta commande comme tu la dirais (« 2 pintes de Kasteel ») et elle est comprise.\n• Une rangée « Mes boissons » selon l'heure et tes habitudes.\n• Rejoindre un crew sans adresse de serveur, liste des crews publics, onglet Crew réorganisé.",
       "bundleID": "app.soireecrew.mobile",
-      "screenshots": []
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.3/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.3/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.3/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.3/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.3/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.3/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.3/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.3/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.3/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.3/10-limits.png"
+      ]
     },
     {
       "name": "Soirée Crew 0.1.2",
@@ -43,9 +73,20 @@
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.2%2Bbuild.68/soiree-crew-unsigned.ipa",
       "category": "Other",
-      "description": "Version 0.1.2, build 68 of 3e9a2ce.\n\nfix(ios): games screen scrolls with Play above the tab bar and normal chips, calm number field without the tall caret, tab footers and toasts above the floating bar, iOS system buttons in the app languages",
+      "description": "• L'écran Jeux défile jusqu'en bas et le bouton Jouer reste au-dessus de la barre d'onglets.\n• Champ de saisie des nombres plus calme, sans le grand curseur.\n• Boutons et messages toujours au-dessus de la barre flottante, boutons système dans la langue de l'app.",
       "bundleID": "app.soireecrew.mobile",
-      "screenshots": []
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.2/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.2/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.2/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.2/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.2/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.2/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.2/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.2/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.2/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.2/10-limits.png"
+      ]
     },
     {
       "name": "Soirée Crew 0.1.1",
@@ -53,9 +94,20 @@
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.1%2Bbuild.67/soiree-crew-unsigned.ipa",
       "category": "Other",
-      "description": "Version 0.1.1, build 67 of a36ed26.\n\nfeat: version names 0.1.1, 0.1.2... computed by CI from release tags; build number and version reach the JS bundle; alibi gets a mask icon",
+      "description": "• Numéros de version lisibles : 0.1.1, 0.1.2…\n• Nouvelle icône pour ton alibi du jour.\n• Live Activity et Dynamic Island : ton taux, tes verres et ta soirée sur l'écran verrouillé.\n• Barre d'onglets iOS native, en verre liquide.",
       "bundleID": "app.soireecrew.mobile",
-      "screenshots": []
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.1/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.1/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.1/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.1/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.1/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.1/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.1/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.1/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.1/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.1/10-limits.png"
+      ]
     }
   ]
 }
