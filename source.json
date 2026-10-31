@@ -47,12 +47,58 @@
         {
           "version": "0.1.4",
           "buildVersion": "70",
-          "date": "2026-10-31T01:29:34.855Z",
-          "localizedDescription": "Version 0.1.4\n\n- feat(updates): checked at every launch and announced once with Install, small Check now button in Settings, AltStore/SideStore hand-off; release notes list the changes and an AltStore source on the altstore branch is rewritten by every release\n- feat(search): a wrong first letter is recovered from the rest of the word, everyday words of seven languages never match by guess, guesses say \"did you mean\", picked guesses teach the app the person's spelling, habits break near ties\n- feat(search): drink names found by sound (Double Metaphone) and likeness (Jaro-Winkler) on top of the keyboard-aware distance; hand-written misspellings removed from the catalogue\n- feat(drinks): brands from many countries with every size they come in, country sizes (pint 568, caña, Maß, 12 oz), country brands first, brand filter; search forgives neighbouring keys, stutters and missing spaces",
+          "date": "2026-10-31T01:29:33Z",
+          "localizedDescription": "Version 0.1.4, build 70 of 8585473.\n\n- feat(updates): checked at every launch and announced once with Install, small Check now button in Settings, AltStore/SideStore hand-off; release notes list the changes and an AltStore source on the altstore branch is rewritten by every release\n- feat(search): a wrong first letter is recovered from the rest of the word, everyday words of seven languages never match by guess, guesses say \"did you mean\", picked guesses teach the app the person's spelling, habits break near ties\n- feat(search): drink names found by sound (Double Metaphone) and likeness (Jaro-Winkler) on top of the keyboard-aware distance; hand-written misspellings removed from the catalogue\n- feat(drinks): brands from many countries with every size they come in, country sizes (pint 568, caña, Maß, 12 oz), country brands first, brand filter; search forgives neighbouring keys, stutters and missing spaces",
           "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.4%2Bbuild.70/soiree-crew-unsigned.ipa",
           "size": 22165049,
           "minOSVersion": "16.4"
+        },
+        {
+          "version": "0.1.3",
+          "buildVersion": "69",
+          "date": "2026-10-31T01:01:38Z",
+          "localizedDescription": "Version 0.1.3, build 69 of cabf610.\n\nmerge: drink catalogue, smart typed orders, group details, house pint per bar, my drinks row under Encore; restore the catalogue seam between the two branches",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.3%2Bbuild.69/soiree-crew-unsigned.ipa",
+          "size": 22139679,
+          "minOSVersion": "16.4"
+        },
+        {
+          "version": "0.1.2",
+          "buildVersion": "68",
+          "date": "2026-10-31T00:30:20Z",
+          "localizedDescription": "Version 0.1.2, build 68 of 3e9a2ce.\n\nfix(ios): games screen scrolls with Play above the tab bar and normal chips, calm number field without the tall caret, tab footers and toasts above the floating bar, iOS system buttons in the app languages",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.2%2Bbuild.68/soiree-crew-unsigned.ipa",
+          "size": 22070860,
+          "minOSVersion": "16.4"
+        },
+        {
+          "version": "0.1.1",
+          "buildVersion": "67",
+          "date": "2026-10-31T00:01:59Z",
+          "localizedDescription": "Version 0.1.1, build 67 of a36ed26.\n\nfeat: version names 0.1.1, 0.1.2... computed by CI from release tags; build number and version reach the JS bundle; alibi gets a mask icon",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.1%2Bbuild.67/soiree-crew-unsigned.ipa",
+          "size": 22070794,
+          "minOSVersion": "16.4"
         }
+      ],
+      "version": "0.1.4",
+      "versionDate": "2026-10-31T01:29:33Z",
+      "versionDescription": "Version 0.1.4, build 70 of 8585473.\n\n- feat(updates): checked at every launch and announced once with Install, small Check now button in Settings, AltStore/SideStore hand-off; release notes list the changes and an AltStore source on the altstore branch is rewritten by every release\n- feat(search): a wrong first letter is recovered from the rest of the word, everyday words of seven languages never match by guess, guesses say \"did you mean\", picked guesses teach the app the person's spelling, habits break near ties\n- feat(search): drink names found by sound (Double Metaphone) and likeness (Jaro-Winkler) on top of the keyboard-aware distance; hand-written misspellings removed from the catalogue\n- feat(drinks): brands from many countries with every size they come in, country sizes (pint 568, caña, Maß, 12 oz), country brands first, brand filter; search forgives neighbouring keys, stutters and missing spaces",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.4%2Bbuild.70/soiree-crew-unsigned.ipa",
+      "size": 22165049,
+      "screenshotURLs": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/02-crew.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/06-settings.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/10-limits.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/12-history.png"
       ]
     }
   ],
@@ -60,8 +106,35 @@
     {
       "identifier": "release-0.1.4",
       "title": "Soirée Crew 0.1.4",
-      "caption": "Version 0.1.4",
-      "date": "2026-10-31T01:29:34.855Z",
+      "caption": "Version 0.1.4, build 70 of 8585473.",
+      "date": "2026-10-31T01:29:33Z",
+      "tintColor": "F4B33D",
+      "appID": "app.soireecrew.mobile",
+      "notify": false
+    },
+    {
+      "identifier": "release-0.1.3",
+      "title": "Soirée Crew 0.1.3",
+      "caption": "Version 0.1.3, build 69 of cabf610.",
+      "date": "2026-10-31T01:01:38Z",
+      "tintColor": "F4B33D",
+      "appID": "app.soireecrew.mobile",
+      "notify": false
+    },
+    {
+      "identifier": "release-0.1.2",
+      "title": "Soirée Crew 0.1.2",
+      "caption": "Version 0.1.2, build 68 of 3e9a2ce.",
+      "date": "2026-10-31T00:30:20Z",
+      "tintColor": "F4B33D",
+      "appID": "app.soireecrew.mobile",
+      "notify": false
+    },
+    {
+      "identifier": "release-0.1.1",
+      "title": "Soirée Crew 0.1.1",
+      "caption": "Version 0.1.1, build 67 of a36ed26.",
+      "date": "2026-10-31T00:01:59Z",
       "tintColor": "F4B33D",
       "appID": "app.soireecrew.mobile",
       "notify": false
