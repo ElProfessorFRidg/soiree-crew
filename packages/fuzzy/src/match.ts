@@ -1,7 +1,10 @@
 /**
- * ADP-05, AI-01 fallback: forgiving text matching for a drunk thumb. Accents, case and small typos
- * do not matter.
+ * ADP-05, AI-01 fallback: forgiving text matching for a drunk thumb. Three measures, the kindest
+ * wins: an edit distance that knows the phone keyboard (a neighbouring key is half a typo), a
+ * Jaro-Winkler similarity that rewards a right beginning ("zubrikov" for Żubrówka), and the sound
+ * of the word through Double Metaphone ("jeger" sounds like "jager"). Accents and case never count.
  */
+import { doubleMetaphone } from "double-metaphone";
 
 export function normalise(text: string): string {
   return text
@@ -90,6 +93,87 @@ export function typoDistance(a: string, b: string): number {
 }
 
 /**
+ * Jaro-Winkler similarity, 0 to 1: how many letters two words share in roughly the same places,
+ * with a bonus for the same first letters, where people rarely get it wrong.
+ */
+export function jaroWinkler(a: string, b: string): number {
+  if (a === b) return 1;
+  if (!a.length || !b.length) return 0;
+  const window = Math.max(0, Math.floor(Math.max(a.length, b.length) / 2) - 1);
+  const aHit = new Array<boolean>(a.length).fill(false);
+  const bHit = new Array<boolean>(b.length).fill(false);
+  let matches = 0;
+  for (let i = 0; i < a.length; i++) {
+    for (let j = Math.max(0, i - window); j <= Math.min(b.length - 1, i + window); j++) {
+      if (bHit[j] || a[i] !== b[j]) continue;
+      aHit[i] = bHit[j] = true;
+      matches++;
+      break;
+    }
+  }
+  if (!matches) return 0;
+  let k = 0;
+  let swaps = 0;
+  for (let i = 0; i < a.length; i++) {
+    if (!aHit[i]) continue;
+    while (!bHit[k]) k++;
+    if (a[i] !== b[k]) swaps++;
+    k++;
+  }
+  const jaro = (matches / a.length + matches / b.length + (matches - swaps / 2) / matches) / 3;
+  let prefix = 0;
+  while (prefix < 4 && a[prefix] === b[prefix]) prefix++;
+  return jaro + prefix * 0.1 * (1 - jaro);
+}
+
+const sounds = new Map<string, readonly string[]>();
+/** Double Metaphone keys of a Latin-script word (cached: the catalogue's names come back often). */
+export function soundOf(word: string): readonly string[] {
+  let keys = sounds.get(word);
+  if (!keys) {
+    keys = /^[a-z]+$/.test(word) ? [...new Set(doubleMetaphone(word))].filter(Boolean) : [];
+    if (sounds.size > 5000) sounds.clear();
+    sounds.set(word, keys);
+  }
+  return keys;
+}
+
+/** Same first letter, or two that sound the same at the start of a word (c/k/q, f/ph, g/j, i/y, s/z/c). */
+function sameStart(a: string, b: string): boolean {
+  if (a[0] === b[0]) return true;
+  const group = (c: string) => ("ckq".includes(c) ? "k" : "sz".includes(c) ? "s" : "iy".includes(c) ? "i" : "gj".includes(c) ? "j" : c);
+  if (group(a[0]!) === group(b[0]!)) return true;
+  return (a.startsWith("ph") && b[0] === "f") || (b.startsWith("ph") && a[0] === "f");
+}
+
+/** Below four letters, likeness and sound say nothing: "vin" and "gin" are both drinks. */
+const LIKENESS_MIN = 4;
+/** Jaro-Winkler from which two words are the same name misspelled. */
+const LIKENESS = 0.86;
+
+/**
+ * How far one typed word is from one name word: 0 is the same, null is a different word. The
+ * kindest of the keyboard distance, the likeness of the spelling and the sound.
+ */
+export function wordScore(typed: string, name: string): number | null {
+  if (typed === name) return 0;
+  let best = Number.POSITIVE_INFINITY;
+  if (name.startsWith(typed) && typed.length >= 2) best = 0.5;
+  const distance = typoDistance(typed, name);
+  if (distance <= tolerance(Math.max(typed.length, name.length))) best = Math.min(best, distance);
+  // Likeness and sound only between words that start alike: people get the first letter right,
+  // and "team" must not become Damm because both end in a hum.
+  if (Math.min(typed.length, name.length) >= LIKENESS_MIN && sameStart(typed, name)) {
+    const likeness = jaroWinkler(typed, name);
+    // 0.86 reads as 0.7, 0.9 as 0.5, 0.95 as 0.25: as good as one or half a typo.
+    if (likeness >= LIKENESS) best = Math.min(best, (1 - likeness) * 5);
+    const typedSound = soundOf(typed);
+    if (typedSound.length && soundOf(name).some((key) => typedSound.includes(key))) best = Math.min(best, 0.75);
+  }
+  return Number.isFinite(best) ? best : null;
+}
+
+/**
  * Typos allowed for a word of this length: none up to three letters (vin and gin are neighbours on
  * the keyboard, and both are drinks), then one, then two. Neighbour keys and stutters cost half.
  */
@@ -121,7 +205,8 @@ export function scoreNormalised(q: string, n: string): number | null {
   // Spaces typed or forgotten: "redbull" is "red bull", "jager bomb" is "jagerbomb".
   const qJoined = q.replace(/ /g, "");
   const nJoined = n.replace(/ /g, "");
-  if (qJoined === nJoined) return 0.25;
+  // Not for bits of chatter: "ca va" is not Cava.
+  if (qJoined === nJoined && qJoined.length >= 5) return 0.25;
   if (qJoined.length >= 4 && nJoined.startsWith(qJoined)) return 0.75;
   if (q.includes(" ") !== n.includes(" ")) {
     const joined = typoDistance(qJoined, nJoined);
@@ -133,9 +218,8 @@ export function scoreNormalised(q: string, n: string): number | null {
   for (const qw of qWords) {
     let best = Number.POSITIVE_INFINITY;
     for (const nw of nWords) {
-      if (nw.startsWith(qw) && qw.length >= 2) best = Math.min(best, 0.5);
-      const dist = typoDistance(qw, nw);
-      if (dist <= tolerance(Math.max(qw.length, nw.length))) best = Math.min(best, dist);
+      const score = wordScore(qw, nw);
+      if (score !== null) best = Math.min(best, score);
     }
     if (!Number.isFinite(best)) return null;
     total += best;

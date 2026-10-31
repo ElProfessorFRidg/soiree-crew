@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { adjacentKeys, countryRank, DRINK_CATALOGUE, editDistance, matchScore, normalise, parseOrder, search, sizesFor, strengthFits } from "./index";
+import { adjacentKeys, countryRank, jaroWinkler, parseDrinkOrder, soundOf, DRINK_CATALOGUE, editDistance, matchScore, normalise, parseOrder, search, sizesFor, strengthFits } from "./index";
 
 // parseOrder is the brand-aware parser restricted to generic drinks; these cases predate the brands.
 
@@ -97,5 +97,31 @@ describe("catalogue across countries", () => {
     const baltika = DRINK_CATALOGUE.find((d) => d.id === "baltika-7")!;
     expect(countryRank(baltika, "RU")).toBe(0);
     expect(countryRank(baltika, "FR")).toBe(1);
+  });
+});
+
+describe("spelling by ear, without any alias written for it", () => {
+  const presets = [{ value: "m-pint", names: ["pinte", "pint"] }];
+  const brandOf = (text: string) => parseDrinkOrder(text, presets).map((line) => line.drink?.id ?? line.preset);
+
+  it("finds a brand written the way it sounds", () => {
+    expect(brandOf("2 zubrikov")).toEqual(["zubrowka"]);
+    expect(brandOf("un jeger")).toEqual(["jagermeister"]);
+    expect(brandOf("une guiness")).toEqual(["guinness"]);
+    expect(brandOf("un tekila")).toEqual(["tequila"]);
+    expect(brandOf("une bakardi")).toEqual(["bacardi"]);
+    expect(brandOf("un hennesi")).toEqual(["cognac-hennessy"]);
+    expect(brandOf("une smirnof")).toEqual(["smirnoff"]);
+  });
+
+  it("leaves everyday words alone", () => {
+    expect(brandOf("bonjour la team")).toEqual([]);
+    expect(brandOf("merci beaucoup")).toEqual([]);
+    expect(matchScore("vin", "gin")).toBeNull();
+  });
+
+  it("measures likeness and sound", () => {
+    expect(jaroWinkler("zubrikov", "zubrowka")).toBeGreaterThan(0.86);
+    expect(soundOf("guiness")).toEqual(soundOf("guinness"));
   });
 });

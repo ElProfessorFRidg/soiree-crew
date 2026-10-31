@@ -7,5 +7,8 @@
   "types": "src/index.ts",
   "scripts": {
     "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "double-metaphone": "2.0.1"
   }
 }
