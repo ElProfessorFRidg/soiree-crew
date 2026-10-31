@@ -91,6 +91,11 @@ export interface AppState {
   foodByNight: Record<string, FoodLevel>;
   /** N-28: someone to call or text from the SOS screen. Kept on this phone only. */
   emergencyContact: { name: string; phone: string } | null;
+  // My drinks row on the party screen: kept on this phone only, never sent.
+  /** Drink id to the bar I was checked in at when I logged it, so the row knows what I order where. */
+  drinkVenues: Record<string, string>;
+  /** Drinks taken off the row by a long press, by their row key. */
+  hiddenRowDrinks: string[];
 }
 
 export const useAppStore = create<AppState>()(
@@ -138,6 +143,8 @@ export const useAppStore = create<AppState>()(
       clockSent: null,
       foodByNight: {},
       emergencyContact: null,
+      drinkVenues: {},
+      hiddenRowDrinks: [],
     }),
     {
       name: "crew-app-v1",
@@ -277,6 +284,8 @@ export function clearAccountHistory(): void {
     manualLevel: null,
     foodByNight: {},
     emergencyContact: null,
+    drinkVenues: {},
+    hiddenRowDrinks: [],
     morningShown: [],
     recapNotified: [],
     nudgeDismissedAt: null,

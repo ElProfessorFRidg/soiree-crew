@@ -7,7 +7,7 @@ import { notifyCheatAttempt, notifyTakeover } from "../notifications/producers";
 import { crewStandings, crewTimeZone, currentSeason, seasonRules, updateBoss, validatedVenues } from "../territory";
 import { dayBoundaryOf, nightOf, offsetMinutes } from "../time";
 import { samePlaceIds, venueFacts } from "../hours";
-import { canSetHq, setHq } from "./venueFacts";
+import { canSetHq, housePints, setHq } from "./venueFacts";
 import { RateLimiter } from "../ratelimit";
 
 const venueSchema = z.object({
@@ -194,6 +194,7 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
       const f = await venueFacts(ctx, await samePlaceIds(ctx, v), timeZone, v.id);
       facts.set(v.id, { openNow: f.openNow, happyNow: f.happyNow });
     }
+    const pints = await housePints(ctx, venues.map((v) => v.id));
     return {
       season,
       variant: seasonRules(season).variant,
@@ -218,6 +219,8 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
           hereNow: here.find((h) => h.venue_id === v.id)?.n ?? 0,
           openNow: facts.get(v.id)?.openNow ?? null,
           happyNow: facts.get(v.id)?.happyNow ?? false,
+          // The bar's house pint strength, when someone of the crew set it.
+          housePintAbv: pints.get(v.id)?.abv ?? null,
         };
       }),
     };
@@ -271,8 +274,12 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
     const validated = (await validatedVenues(ctx.db, venue.crew_id, timeZone)).has(venue.id);
     const facts = await venueFacts(ctx, await samePlaceIds(ctx, venue), timeZone, venue.id);
     const { role } = await assertCrewMember(ctx, venue.crew_id, user.id);
+    const housePint = (await housePints(ctx, [venue.id])).get(venue.id);
     return {
       validated,
+      housePint: housePint
+        ? { abv: housePint.abv, updatedAt: housePint.updatedAt, updatedByName: housePint.updatedBy ? (nameOf.get(housePint.updatedBy) ?? null) : null }
+        : null,
       variant: seasonRules(season).variant,
       venue: { id: venue.id, crewId: venue.crew_id, name: venue.name, kind: venue.kind, lat: venue.lat, lng: venue.lng, address: venue.address, isHq: venue.is_hq },
       // N-08, COM-11: the crew writes hours until an owner claims the place; then the owner's win.
