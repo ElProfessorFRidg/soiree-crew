@@ -21,16 +21,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -43,6 +43,27 @@
         }
       },
       "versions": [
+        {
+          "version": "0.1.7",
+          "buildVersion": "74",
+          "date": "2026-10-31T11:58:12Z",
+          "localizedDescription": "• Dans tous les champs de saisie, le curseur et le texte sont enfin alignés, texte d'exemple compris.\n• Avec le clavier ouvert, le bouton du bas se pose juste au-dessus, au lieu de flotter au milieu de l'écran.\n• En tapant une valeur (poids, taille …), l'unité reste alignée sur la case.",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.7%2Bbuild.74/soiree-crew-unsigned.ipa",
+          "size": 22199119,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/10-limits.png"
+          ]
+        },
         {
           "version": "0.1.6",
           "buildVersion": "73",
@@ -170,26 +191,37 @@
           ]
         }
       ],
-      "version": "0.1.6",
-      "versionDate": "2026-10-31T02:25:43Z",
-      "versionDescription": "• Premier lancement plus court : un compte seulement si tu le choisis, le serveur officiel déjà choisi, un pseudo suffit.\n• La localisation, l'appareil photo et les notifications sont demandés au moment où tu en as besoin, avec une phrase qui dit pourquoi.\n• Tu peux utiliser l'app sans le calcul du taux et l'activer plus tard.\n• Si tu fermes l'app pendant l'accueil, tu reprends où tu en étais.\n• Écran Soirée : le pays de ta limite en un coup d'œil et une petite liste pour bien démarrer.",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.6%2Bbuild.73/soiree-crew-unsigned.ipa",
-      "size": 22198618,
+      "version": "0.1.7",
+      "versionDate": "2026-10-31T11:58:12Z",
+      "versionDescription": "• Dans tous les champs de saisie, le curseur et le texte sont enfin alignés, texte d'exemple compris.\n• Avec le clavier ouvert, le bouton du bas se pose juste au-dessus, au lieu de flotter au milieu de l'écran.\n• En tapant une valeur (poids, taille …), l'unité reste alignée sur la case.",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.7%2Bbuild.74/soiree-crew-unsigned.ipa",
+      "size": 22199119,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.6/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "release-0.1.7",
+      "title": "Soirée Crew 0.1.7",
+      "caption": "• Dans tous les champs de saisie, le curseur et le texte sont enfin alignés, texte d'exemple compris.\n• Avec le clavier ouvert, le bouton du bas se pose juste au-dessus, au lieu de flotter au milieu de l'écran.\n• En tapant une valeur (poids, taille …), l'unité reste alignée sur la case.",
+      "date": "2026-10-31T11:58:12Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.7/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/tag/v0.1.7%2Bbuild.74",
+      "appID": "app.soireecrew.mobile",
+      "notify": false
+    },
     {
       "identifier": "release-0.1.6",
       "title": "Soirée Crew 0.1.6",
