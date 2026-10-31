@@ -20,7 +20,7 @@ import { showToast } from "@/ui/Toast";
 import { useDraft } from "@/state/drafts";
 import { failureMessage } from "@/server/errors";
 
-const MOODS: readonly PartyMood[] = ["party", "birthday", "champagne", "sunset", "costume", "wine", "fire", "night", "home", "tropical"];
+const MOODS: readonly PartyMood[] = ["party", "home", "apero", "dinner", "games", "movie", "birthday", "champagne", "sunset", "costume", "wine", "fire", "night", "tropical"];
 const STEP_MIN = 30;
 const DAY_MS = 86_400_000;
 

@@ -60,6 +60,7 @@ export function removeDrink(drink: DrinkEntry): void {
 
 export function restoreDrink(drink: DrinkEntry): void {
   submit({ kind: "drink.add", drink: { ...drink, sync: "pending" } });
+  void refreshReminders();
 }
 
 let lastWaterAt = 0;
@@ -78,6 +79,7 @@ export function logWater(): WaterEntry | null {
 
 export function removeWater(water: WaterEntry): void {
   submit({ kind: "water.remove", water });
+  void refreshReminders();
 }
 
 /** "Same again" (QOL-01): the most recent drink by the time it was drunk. */

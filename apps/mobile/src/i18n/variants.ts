@@ -3,6 +3,8 @@ import type { MessageKey } from "./types";
 
 /** Recurring lines with written variants (SLOP-11): `${base}.v1` to `${base}.v3` in every catalogue. */
 export const VARIANTS = 3;
+/** The water reminders come back often in a night: they get a longer list, from v1 to v12. */
+const COUNTS: Partial<Record<Base, number>> = { "reminders.waterSince": 12, "reminders.waterNone": 12 };
 
 type Base =
   | "greeting.lateNight"
@@ -24,7 +26,7 @@ type Base =
 export function variantKey(base: Base, occasion: string): MessageKey {
   const memory = useAppStore.getState().copyVariants[base];
   if (memory?.occasion === occasion) return `${base}.v${memory.index}` as MessageKey;
-  const others = Array.from({ length: VARIANTS }, (_, i) => i + 1).filter((i) => i !== memory?.index);
+  const others = Array.from({ length: COUNTS[base] ?? VARIANTS }, (_, i) => i + 1).filter((i) => i !== memory?.index);
   const index = others[Math.floor(Math.random() * others.length)]!;
   // Written after render, in a microtask: a store update during render would warn.
   queueMicrotask(() => useAppStore.setState((s) => ({ copyVariants: { ...s.copyVariants, [base]: { index, occasion } } })));

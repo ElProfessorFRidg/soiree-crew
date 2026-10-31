@@ -50,7 +50,7 @@ export interface Crew {
   members: CrewMember[];
 }
 
-export type PartyMood = "party" | "birthday" | "champagne" | "sunset" | "costume" | "wine" | "fire" | "night" | "home" | "tropical";
+export type PartyMood = "party" | "home" | "apero" | "dinner" | "games" | "movie" | "birthday" | "champagne" | "sunset" | "costume" | "wine" | "fire" | "night" | "tropical";
 export type PartyResponse = "invited" | "going" | "declined";
 
 export interface Party {

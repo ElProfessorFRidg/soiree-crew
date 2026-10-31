@@ -18,6 +18,12 @@ export const moodIcons = {
   fire: iconsJson.icons.flame,
   night: iconsJson.icons.moon,
   home: iconsJson.icons.home,
+  apero: iconsJson.icons.glass,
+  /** Fork and knife. */
+  dinner: "M7 3v18M4.5 3v5a2.5 2.5 0 0 0 5 0V3M17 21V3c-2.2 1.2-3.5 3.6-3.5 7v3H17",
+  games: iconsJson.icons.dice,
+  /** Screen on its stand. */
+  movie: "M3 5h18v11H3zM8 20h8M12 16v4M10 8.5v4l3.5-2z",
   /** Palm tree. */
   tropical: "M12.5 21c0-4.5.4-8 1.5-11M14 10c-1.4-2.8-4.6-3.8-7.5-2.4M14 10c2.6-2 5.6-1.6 7 .4M14 10c-2.8-.3-5.4 1.2-6.4 3.8M14 10c2.4.6 4.2 2.4 4.8 4.8M8.5 21h8",
 } as const;

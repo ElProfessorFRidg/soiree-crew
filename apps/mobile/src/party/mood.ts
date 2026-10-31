@@ -1,7 +1,7 @@
 import { palette } from "@crew/design-tokens";
 
 /** Same list as the server's party moods (O-35); kept here so the widget task needs no screen code. */
-export type Mood = "party" | "birthday" | "champagne" | "sunset" | "costume" | "wine" | "fire" | "night" | "home" | "tropical";
+export type Mood = "party" | "home" | "apero" | "dinner" | "games" | "movie" | "birthday" | "champagne" | "sunset" | "costume" | "wine" | "fire" | "night" | "tropical";
 
 /**
  * JOY-04: the mood picked for a party tints the Party screen band, the Android widget, the iOS
@@ -17,6 +17,10 @@ const MOOD_COLOURS: Record<Mood, string> = {
   fire: palette.avatar[5]!,
   night: palette.avatar[2]!,
   home: palette.avatar[1]!,
+  apero: palette.avatar[3]!,
+  dinner: palette.avatar[6]!,
+  games: palette.avatar[2]!,
+  movie: palette.avatar[4]!,
   tropical: palette.avatar[1]!,
 };
 

@@ -21,6 +21,7 @@ import { showToast } from "@/ui/Toast";
 import { guarded } from "@/vault/vault";
 import { confirmAction } from "@/ui/confirm";
 import { eraseEverything } from "@/system/factoryReset";
+import { refreshReminders } from "@/reminders/reminders";
 
 /**
  * O-07: deletes the account on the server first (nothing is erased here if that fails), then this
@@ -50,6 +51,7 @@ export async function withdrawHealthConsent(i18n: Translator): Promise<void> {
       levelState: null,
       outbox: state.outbox.filter((item) => !health.has(item.mutation.kind)),
     }));
+    void refreshReminders();
     showToast({ message: i18n.t("account.withdrawn") });
     router.replace("/onboarding");
   } catch (error) {

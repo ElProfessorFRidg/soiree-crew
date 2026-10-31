@@ -134,14 +134,26 @@ export async function muteUntilMorning(): Promise<void> {
   await Notifications.cancelScheduledNotificationAsync(LIMIT_ID).catch(() => undefined);
 }
 
+/**
+ * No night going on (nothing drunk, drinks deleted, back to zero, data or profile erased): no
+ * water nudge, no limit warning, no night notification, pending or already in the list.
+ */
+async function clearNightReminders(): Promise<void> {
+  for (const id of [WATER_ID, LIMIT_ID]) {
+    await Notifications.cancelScheduledNotificationAsync(id).catch(() => undefined);
+    await Notifications.dismissNotificationAsync(id).catch(() => undefined);
+  }
+  await Notifications.dismissNotificationAsync(NIGHT_ID).catch(() => undefined);
+}
+
 export async function refreshReminders(): Promise<void> {
   if (!supported) return;
   const { profile, preferences, drinks, water, remindersMutedUntil } = useAppStore.getState();
-  if (!profile) return;
-  if (remindersMutedUntil !== null && remindersMutedUntil > Date.now()) return;
-  const i18n = createTranslator(preferences.language);
   const now = Date.now();
-  const estimate = estimateBac(intakes(), profile, now);
+  const estimate = profile ? estimateBac(intakes(), profile, now) : null;
+  if (!profile || !estimate || estimate.bac <= 0 || estimate.backToZeroAt === null) return clearNightReminders();
+  if (remindersMutedUntil !== null && remindersMutedUntil > now) return;
+  const i18n = createTranslator(preferences.language);
 
   if (!(await allowed())) return;
 
