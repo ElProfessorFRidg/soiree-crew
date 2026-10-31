@@ -34,6 +34,80 @@ export function privacyFrom(appJson) {
   return Object.fromEntries(Object.entries(privacy).filter(([, v]) => v));
 }
 
+/** Newest first by version number (0.1.10 after 0.1.9), whatever order the releases came in. */
+function sortVersions(versions) {
+  const key = (v) => v.version.split(".").map(Number);
+  return [...versions].sort((a, b) => {
+    const [x, y] = [key(a), key(b)];
+    for (let i = 0; i < 3; i++) if ((y[i] ?? 0) !== (x[i] ?? 0)) return (y[i] ?? 0) - (x[i] ?? 0);
+    return Number(b.buildVersion) - Number(a.buildVersion);
+  });
+}
+
+/**
+ * The fields of the first AltStore format, on the app itself: older AltStore builds, ESign, Feather
+ * and other sideloading apps read the latest version there instead of in `versions`.
+ */
+function withLegacyFields(app) {
+  const latest = app.versions[0];
+  if (!latest) return app;
+  Object.assign(app, {
+    version: latest.version,
+    versionDate: latest.date,
+    versionDescription: latest.localizedDescription,
+    downloadURL: latest.downloadURL,
+    size: latest.size,
+    screenshotURLs: app.screenshots,
+  });
+  return app;
+}
+
+/**
+ * Releases already on GitHub that the source lacks (the ones before it existed): added from the
+ * releases API answer, with their own notes, date, size and download link.
+ */
+export function backfill(source, appJson, releases) {
+  let next = source;
+  const known = new Set(next?.apps?.[0]?.versions?.map((v) => v.version) ?? []);
+  const named = releases
+    .map((r) => ({ release: r, match: /^v(\d+\.\d+\.\d+)\+build\.(\d+)$/.exec(r.tag_name ?? "") }))
+    .filter(({ release, match }) => match && !release.draft && !release.prerelease)
+    .sort((a, b) => Number(a.match[2]) - Number(b.match[2]));
+  for (const { release, match } of named) {
+    const ipa = release.assets?.find((a) => a.name === "soiree-crew-unsigned.ipa");
+    if (!ipa || known.has(match[1])) continue;
+    next = addRelease(next, appJson, {
+      version: match[1],
+      build: Number(match[2]),
+      tag: release.tag_name,
+      date: release.published_at ?? release.created_at,
+      notes: (release.body ?? "").trim(),
+      size: ipa.size,
+      screenshots: next?.apps?.[0]?.screenshots?.map((url) => url.split("/").pop()) ?? [],
+    });
+    known.add(match[1]);
+  }
+  return next;
+}
+
+/** The same releases in the Scarlet repo format, for apps that read that one instead. */
+export function scarletOf(source) {
+  const app = source.apps[0];
+  return {
+    META: { repoName: source.name, repoIcon: source.iconURL },
+    Other: app.versions.map((v, index) => ({
+      name: index === 0 ? app.name : `${app.name} ${v.version}`,
+      version: v.version,
+      icon: app.iconURL,
+      down: v.downloadURL,
+      category: "Other",
+      description: v.localizedDescription,
+      bundleID: app.bundleIdentifier,
+      screenshots: index === 0 ? app.screenshots : [],
+    })),
+  };
+}
+
 /** Adds this release to the source (replacing a same version), newest first, the oldest dropped. */
 export function addRelease(source, appJson, release) {
   const app = {
@@ -60,7 +134,8 @@ export function addRelease(source, appJson, release) {
     size: release.size,
     minOSVersion: MIN_IOS,
   };
-  app.versions = [version, ...(previous?.versions ?? []).filter((v) => v.version !== release.version)].slice(0, KEEP_VERSIONS);
+  app.versions = sortVersions([version, ...(previous?.versions ?? []).filter((v) => v.version !== release.version)]).slice(0, KEEP_VERSIONS);
+  withLegacyFields(app);
   const news = [
     {
       identifier: `release-${release.version}`,
@@ -88,9 +163,11 @@ export function addRelease(source, appJson, release) {
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
-  const [sourcePath, ipa, notesPath, version, build, tag, screensDir] = process.argv.slice(2);
+  const [sourcePath, ipa, notesPath, version, build, tag, screensDir, releasesPath] = process.argv.slice(2);
   const appJson = JSON.parse(readFileSync(new URL("../../apps/mobile/app.json", import.meta.url), "utf8"));
-  const source = existsSync(sourcePath) ? JSON.parse(readFileSync(sourcePath, "utf8")) : null;
+  let source = existsSync(sourcePath) ? JSON.parse(readFileSync(sourcePath, "utf8")) : null;
+  // Versions published before the source existed, or missing from it, come back from GitHub.
+  if (releasesPath && existsSync(releasesPath)) source = backfill(source, appJson, JSON.parse(readFileSync(releasesPath, "utf8")));
   const screenshots = existsSync(screensDir) ? readdirSync(screensDir).filter((f) => f.endsWith(".png")).sort().map((f) => basename(f)) : [];
   const next = addRelease(source, appJson, {
     version,
@@ -102,5 +179,6 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
     screenshots,
   });
   writeFileSync(sourcePath, `${JSON.stringify(next, null, 2)}\n`);
+  writeFileSync(sourcePath.replace(/source\.json$/, "scarlet.json"), `${JSON.stringify(scarletOf(next), null, 2)}\n`);
   console.log(`AltStore source: ${version} (build ${build}), ${next.apps[0].versions.length} versions, ${screenshots.length} screenshots`);
 }

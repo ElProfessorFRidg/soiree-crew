@@ -6,12 +6,19 @@ Add this source once in AltStore or SideStore (Browse, then Sources, then +):
 https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/source.json
 ```
 
+The same file works in SideStore, Feather, ESign and the other apps that read AltStore sources: it carries both the current format (`versions`) and the first one (`version`, `downloadURL` on the app). Scarlet reads its own format:
+
+```
+https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/scarlet.json
+```
+
 Soirée Crew then shows up with every published version, its notes, its size and the screenshots of the build. New versions appear as updates in AltStore, which re-signs and installs them over the old one (data kept).
 
 How it is kept up to date:
 
 - The `release` job of `.github/workflows/build.yml` publishes the GitHub release, then runs `tools/ci/altstore-source.mjs`. The script puts the new version on top of `source.json`, keeps the last 40, refreshes the screenshots taken by the `ios-launch` job, the icon, and the privacy strings read from `apps/mobile/app.json`.
 - The source lives on the `altstore` branch, never on `main`: pushing it does not start a build.
+- Releases published before the source, or missing from it, are added back from the GitHub releases API on every run, so the history is complete from 0.1.1 on.
 - Each version links to its own release asset (`releases/download/<tag>/soiree-crew-unsigned.ipa`), so an older version stays installable.
 
 In the app (O-12), the check runs on its own:

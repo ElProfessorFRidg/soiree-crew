@@ -332,6 +332,8 @@ jobs:
           gh release create "$TAG" $FILES             --title "Soirée Crew ${VERSION}"             --notes-file notes.md             --target "$GITHUB_SHA"             --latest
       # docs/ALTSTORE.md: the source lives on its own branch, so updating it never starts a build.
       - name: Update the AltStore source
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -346,7 +348,9 @@ jobs:
           cp dist/screens/*.png altstore-src/screens/ 2>/dev/null || true
           cp apps/mobile/assets/icon.png altstore-src/icon.png
           { echo "Version ${VERSION}"; echo; cat changes.md; } > altstore-notes.md
-          node tools/ci/altstore-source.mjs altstore-src/source.json dist/soiree-crew-unsigned.ipa altstore-notes.md "$VERSION" "$GITHUB_RUN_NUMBER" "$TAG" altstore-src/screens
+          # Every release published so far, so versions from before the source (or missing) are listed too.
+          gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100" > releases.json
+          node tools/ci/altstore-source.mjs altstore-src/source.json dist/soiree-crew-unsigned.ipa altstore-notes.md "$VERSION" "$GITHUB_RUN_NUMBER" "$TAG" altstore-src/screens releases.json
           cd altstore-src
           git add -A
           git commit -m "AltStore source: ${VERSION} (build ${GITHUB_RUN_NUMBER})"
