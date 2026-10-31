@@ -1,5 +1,9 @@
 import type { GlassIconName } from "@crew/design-tokens";
+import { catalogueDrink } from "@crew/fuzzy";
 import { ML_PER_UK_PINT, ML_PER_US_FL_OZ, type UnitSystem } from "@crew/units";
+
+/** Preset ids of drinks logged from the brand catalogue: `cat:kasteel-rouge`. */
+export const CATALOGUE_PREFIX = "cat:";
 
 export type DrinkKind =
   | "demi"
@@ -107,12 +111,14 @@ export function presetFromCustom(custom: CustomDrink): DrinkPreset {
 /** QOL-01: "same again" repeats the last drink exactly, custom or not. */
 export function presetFromEntry(entry: { presetId: string; kind: DrinkKind; volumeMl: number; abv: number; name?: string }): DrinkPreset {
   const known = findPreset(entry.presetId);
+  // A brand from the catalogue keeps its own glass: "Encore : Desperados" shows a bottle.
+  const brand = entry.presetId.startsWith(CATALOGUE_PREFIX) ? catalogueDrink(entry.presetId.slice(CATALOGUE_PREFIX.length)) : undefined;
   return {
     id: entry.presetId,
     kind: entry.kind,
     volumeMl: entry.volumeMl,
     abv: entry.abv,
-    icon: known?.icon ?? "pint",
+    icon: known?.icon ?? brand?.glass ?? "pint",
     feminine: known?.feminine ?? false,
     ...(entry.name ? { name: entry.name } : {}),
   };

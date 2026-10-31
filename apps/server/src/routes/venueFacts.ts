@@ -43,6 +43,26 @@ async function memberVenue(ctx: Context, venueId: string, userId: string) {
   return { venue, role };
 }
 
+/** House pint strength bounds, as a fraction. The table's check constraint holds the same range. */
+export const HOUSE_PINT_ABV = { min: 0.02, max: 0.14 } as const;
+
+export interface HousePint {
+  abv: number;
+  updatedAt: number;
+  updatedBy: string | null;
+}
+
+/** The house pint of each venue that has one, keyed by venue id. */
+export async function housePints(ctx: Context, venueIds: string[]): Promise<Map<string, HousePint>> {
+  if (!venueIds.length) return new Map();
+  const rows = await ctx.db.query<{ venue_id: string; abv: number; updated_by: string | null; updated_at: number }>(
+    "select venue_id, abv, updated_by, updated_at from venue_house_pints where venue_id = any($1::uuid[])",
+    [venueIds],
+  );
+  // `numeric` comes back as a string from the driver.
+  return new Map(rows.map((r) => [r.venue_id, { abv: Math.round(Number(r.abv) * 1000) / 1000, updatedAt: Number(r.updated_at), updatedBy: r.updated_by }]));
+}
+
 async function notifyCrew(ctx: Context, crewId: string): Promise<void> {
   const members = await ctx.db.query<{ user_id: string }>("select user_id from crew_members where crew_id = $1", [crewId]);
   ctx.live.notify(members.map((m) => m.user_id), { type: "crew.changed", crewId });
@@ -87,6 +107,38 @@ export function venueFactRoutes(app: FastifyInstance, ctx: Context): void {
     }
     await notifyCrew(ctx, venue.crew_id);
     return { ok: true };
+  });
+
+  /**
+   * House pint: "the pint here is 6 %", set by anyone of the crew while checked in at this bar, so
+   * nobody sets a strength for a place they are not drinking at. Null clears it. Shared with the
+   * whole crew, who then log the right strength there.
+   */
+  app.put<{ Params: { id: string } }>("/v1/venues/:id/house-pint", async (request) => {
+    const user = requireUser(request);
+    const { venue } = await memberVenue(ctx, request.params.id, user.id);
+    if (venue.kind === "home") throw new HttpError(400, "invalid");
+    const input = z.object({ abv: z.number().min(HOUSE_PINT_ABV.min).max(HOUSE_PINT_ABV.max).nullable() }).parse(request.body);
+    const now = ctx.now();
+    const here = await ctx.db.query(
+      `select 1 from check_ins where venue_id = $1 and user_id = $2 and verdict in ('accepted', 'unverified')
+         and ended_at is null and at > $3 limit 1`,
+      [venue.id, user.id, now - 12 * 3_600_000],
+    );
+    if (!here.length) throw new HttpError(403, "not_checked_in");
+    if (input.abv === null) {
+      await ctx.db.query("delete from venue_house_pints where venue_id = $1", [venue.id]);
+    } else {
+      // Tenths of a percent: nobody reads a tap label more precisely than 6.5 %.
+      const abv = Math.round(input.abv * 1000) / 1000;
+      await ctx.db.query(
+        `insert into venue_house_pints (venue_id, abv, updated_by, updated_at) values ($1, $2, $3, $4)
+         on conflict (venue_id) do update set abv = excluded.abv, updated_by = excluded.updated_by, updated_at = excluded.updated_at`,
+        [venue.id, abv, user.id, now],
+      );
+    }
+    await notifyCrew(ctx, venue.crew_id);
+    return { housePint: (await housePints(ctx, [venue.id])).get(venue.id) ?? null };
   });
 
   /**

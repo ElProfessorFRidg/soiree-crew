@@ -1,4 +1,4 @@
-import { convertBac, formatBacValue, type BacUnit, type CountryRules } from "@crew/units";
+import { convertBac, formatBacValue, formatVolume, type BacUnit, type CountryRules, type VolumeUnit } from "@crew/units";
 import { palette } from "@crew/design-tokens";
 import type { Translator } from "@/i18n";
 import type { DrinkKind } from "./presets";
@@ -55,6 +55,26 @@ export function againLabel(drink: Labelled, i18n: Translator): string {
 /** "une pinte", "a pint", or the custom drink's own name. */
 export function drinkWithArticle(drink: Labelled, i18n: Translator): string {
   return drink.kind === "custom" ? drinkLabel(drink, i18n) : i18n.t(`drinks.article.${drink.kind}`);
+}
+
+/** "8 %", "8,5 %", "37,5 %": tenths only when the label has them. */
+export function strengthText(abv: number, i18n: Translator): string {
+  const tenths = Math.round(abv * 1000);
+  return i18n.t("drinkCatalogue.abv", { value: i18n.number(tenths / 10, tenths % 10 === 0 ? 0 : 1) });
+}
+
+/** "50 cl", "1 L", "16 oz", in the user's drink unit. */
+export function sizeText(volumeMl: number, unit: VolumeUnit, i18n: Translator): string {
+  if (unit === "cl" && volumeMl >= 1000 && volumeMl % 500 === 0) {
+    return i18n.t("drinkCatalogue.litres", { value: new Intl.NumberFormat(i18n.locale, { maximumFractionDigits: 1 }).format(volumeMl / 1000) });
+  }
+  return `${formatVolume(volumeMl, unit, i18n.locale)} ${unit === "us_fl_oz" ? "oz" : unit}`;
+}
+
+/** "50 cl, 8 %", or the size alone for a soft drink. */
+export function sizeAndStrength(drink: { volumeMl: number; abv: number }, unit: VolumeUnit, i18n: Translator): string {
+  const size = sizeText(drink.volumeMl, unit, i18n);
+  return drink.abv > 0 ? i18n.t("drinkCatalogue.sizeAndStrength", { size, abv: strengthText(drink.abv, i18n) }) : size;
 }
 
 export { convertBac };

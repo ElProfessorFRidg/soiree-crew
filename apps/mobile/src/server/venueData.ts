@@ -29,6 +29,8 @@ export interface VenueSummary {
   /** TER-01 filters, from the owner's or the crew's hours. Null when nobody entered hours. */
   openNow?: boolean | null;
   happyNow?: boolean;
+  /** The bar's house pint strength set by the crew, as a fraction. */
+  housePintAbv?: number | null;
 }
 
 export interface VenuePage {
@@ -54,6 +56,8 @@ export interface VenuePage {
   rivalry?: { crews: number; myRank: number; myPoints: number; leaderPoints: number } | null;
   /** TER-10: my lifetime nights at this venue. */
   myNights?: number;
+  /** The house pint strength, shared with the crew. */
+  housePint?: { abv: number; updatedAt: number; updatedByName: string | null } | null;
 }
 
 export type CheckInVerdict = "accepted" | "unverified" | "rejected" | "not_here";
@@ -97,6 +101,11 @@ export function updateVenue(venueId: string, input: { address?: string; isHq?: b
 /** N-08: the crew's hours for a venue nobody has claimed. */
 export function saveVenueHours(venueId: string, schedule: WeekSchedule): Promise<unknown> {
   return api(`/v1/venues/${venueId}/hours`, { method: "PUT", body: schedule });
+}
+
+/** House pint: "the pint here is 6 %", for the whole crew. Null clears it. Refused unless checked in there. */
+export function saveHousePint(venueId: string, abv: number | null): Promise<{ housePint: { abv: number; updatedAt: number } | null }> {
+  return api(`/v1/venues/${venueId}/house-pint`, { method: "PUT", body: { abv } });
 }
 
 export interface VenuePhoto {

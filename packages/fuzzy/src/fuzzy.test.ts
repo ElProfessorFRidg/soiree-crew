@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { editDistance, matchScore, normalise, parseOrder, search } from "./index";
 
+// parseOrder is the brand-aware parser restricted to generic drinks; these cases predate the brands.
+
 const drinks = [
   { value: "pint", names: ["Pinte", "Pint"] },
   { value: "shot", names: ["Shot", "Shooter"] },

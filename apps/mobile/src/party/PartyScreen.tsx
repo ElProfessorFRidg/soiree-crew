@@ -10,6 +10,10 @@ import { lastDrink, logDrink, logWater } from "@/drinks/actions";
 import { offerUndo, offerWaterUndo } from "@/drinks/undoToast";
 import { againLabel, alternateUnit, bacText, unitCycle } from "@/drinks/display";
 import { defaultPreset, presetFromEntry } from "@/drinks/presets";
+import { withHousePint } from "@/drinks/catalogue";
+import { useHousePintHere } from "@/drinks/housePint";
+import { drinkKey } from "@/drinks/myRow";
+import { MyDrinksRow } from "@/drinks/MyDrinksRow";
 import { useT, type Translator } from "@/i18n";
 import { formatClock, formatDuration } from "@/i18n/format";
 import { easings } from "@/motion/easing";
@@ -170,6 +174,8 @@ export function PartyScreen() {
   const tonight = useTonight(now);
   const { level, manual } = useUiLevel(live?.estimate.bac ?? 0, now);
   const pendingDrink = tonight.drinks.some((d) => d.sync !== "saved");
+  // At a bar whose house pint the crew set, Encore pours that strength.
+  const houseAbv = useHousePintHere()?.abv ?? null;
 
   useEffect(() => {
     useLevelNow.setState({ level });
@@ -188,8 +194,8 @@ export function PartyScreen() {
 
   const again = (() => {
     const last = lastDrink();
-    const preset = last ? presetFromEntry(last) : defaultPreset(preferences.unitSystem);
-    return { preset, label: againLabel(preset, i18n) };
+    const preset = withHousePint(last ? presetFromEntry(last) : defaultPreset(preferences.unitSystem), houseAbv);
+    return { preset, label: againLabel(preset, i18n), key: drinkKey({ presetId: preset.id, kind: preset.kind, volumeMl: preset.volumeMl, abv: preset.abv, name: preset.name }) };
   })();
 
   const onAgain = () => {
@@ -214,6 +220,7 @@ export function PartyScreen() {
     flipUnit,
     tonight,
     againLabel: again.label,
+    againKey: again.key,
     onAgain,
     onWater,
     pendingDrink,
@@ -264,6 +271,8 @@ interface LevelProps {
   flipUnit: () => void;
   tonight: ReturnType<typeof useTonight>;
   againLabel: string;
+  /** The Encore drink, left out of the row of my drinks under it. */
+  againKey: string;
   onAgain: () => void;
   onWater: () => void;
   pendingDrink: boolean;
@@ -518,6 +527,7 @@ function LevelZero(props: LevelProps) {
           onPress={props.onWater}
         />
       </View>
+      <MyDrinksRow now={now} exclude={props.againKey} big={false} />
       <StatusRow {...props} />
       <EveningFood i18n={i18n} now={now} />
       <CrewStrip />
@@ -565,6 +575,7 @@ function LevelOne(props: LevelProps) {
           iconSize={26}
         />
       </View>
+      <MyDrinksRow now={props.now} exclude={props.againKey} big />
       <View style={styles.grid2}>
         <Button label={i18n.t("party.waterShort")} icon="drop" variant="water" height={64} fontSize={18} iconSize={24} style={styles.flex} onPress={props.onWater} />
         <Button

@@ -1,6 +1,7 @@
 import type { FoodLevel } from "@crew/bac";
 import { haptic } from "@/motion/haptics";
 import { refreshReminders } from "@/reminders/reminders";
+import { useVenueData } from "@/server/venueData";
 import { buildDrink, buildWater, useAppStore } from "@/state/store";
 import { submit } from "@/sync/engine";
 import type { DrinkEntry, WaterEntry } from "@/sync/types";
@@ -24,8 +25,23 @@ export function logDrink(preset: DrinkPreset, consumedAt: number, food: FoodLeve
   const drink = buildDrink(preset, at, food ?? eveningFood(at));
   haptic.drinkAdded();
   submit({ kind: "drink.add", drink });
+  rememberVenue(drink.id);
   void refreshReminders();
   return drink;
+}
+
+/** Most drinks a phone remembers the bar of; older links drop off first. */
+const MAX_DRINK_VENUES = 600;
+
+/** The row of my drinks learns what I order where; only on this phone (see myRow.ts). */
+function rememberVenue(drinkId: string): void {
+  const venueId = useVenueData.getState().openCheckIn?.venueId;
+  if (!venueId) return;
+  useAppStore.setState((state) => {
+    const entries = Object.entries(state.drinkVenues);
+    const kept = entries.length >= MAX_DRINK_VENUES ? entries.slice(entries.length - MAX_DRINK_VENUES + 1) : entries;
+    return { drinkVenues: { ...Object.fromEntries(kept), [drinkId]: venueId } };
+  });
 }
 
 /** O-23: a logged drink changed. A time in the future never counts (O-22): it is brought back to now. */

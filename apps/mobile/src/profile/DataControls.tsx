@@ -21,10 +21,14 @@ export type DataCategory = (typeof DATA_CATEGORIES)[number];
 /** This phone's copy goes too, with anything of that kind still waiting to be sent. */
 function forgetLocally(category: DataCategory): void {
   const pending = (prefix: string) => (item: { mutation: { kind: string } }) => !item.mutation.kind.startsWith(prefix);
-  if (category === "drinks") useAppStore.setState((s) => ({ drinks: [], levelState: null, outbox: s.outbox.filter(pending("drink.")) }));
+  if (category === "drinks") useAppStore.setState((s) => ({ drinks: [], drinkVenues: {}, levelState: null, outbox: s.outbox.filter(pending("drink.")) }));
   if (category === "water") useAppStore.setState((s) => ({ water: [], outbox: s.outbox.filter(pending("water.")) }));
   if (category === "customDrinks") useAppStore.setState((s) => ({ customDrinks: [], outbox: s.outbox.filter(pending("customDrink.")) }));
-  if (category === "checkIns") useVenueData.setState({ openCheckIn: null });
+  if (category === "checkIns") {
+    useVenueData.setState({ openCheckIn: null });
+    // Which bar each drink was logged at is check-in history too.
+    useAppStore.setState({ drinkVenues: {} });
+  }
 }
 
 /** N-17, SEC-08: export (JSON or CSV) and erasing one kind of my data, each erase confirmed first. */

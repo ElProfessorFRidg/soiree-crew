@@ -255,3 +255,37 @@ describe("venue photos (TER-05)", () => {
     expect(notThere.photos).toEqual([]);
   });
 });
+
+describe("house pint strength", () => {
+  it("is set by a member checked in at the bar, validated, and shared with the crew", async () => {
+    const [jade, malik, other] = [await account("jade"), await account("malik"), await account("other")];
+    const crewId = await crewOf(jade, malik);
+    const zinc = await addVenue(jade, crewId, { name: "Le Zinc" });
+    const put = (user: User, abv: unknown) => app.inject({ method: "PUT", url: `/v1/venues/${zinc.id}/house-pint`, headers: user.auth, payload: { abv } });
+
+    // Not checked in there: refused, whatever the value.
+    const away = await put(jade, 0.06);
+    expect(away.statusCode).toBe(403);
+    expect(away.body).toContain("not_checked_in");
+    expect((await checkIn(jade, zinc.id)).statusCode).toBe(201);
+    // Out of range: no beer on tap is 40 %.
+    expect((await put(jade, 0.4)).statusCode).toBe(400);
+    expect((await put(jade, 0.01)).statusCode).toBe(400);
+    expect((await put(jade, "6")).statusCode).toBe(400);
+    // Another crew never touches it.
+    expect((await put(other, 0.06)).statusCode).toBe(404);
+
+    const saved = (await put(jade, 0.0649)).json() as { housePint: { abv: number } };
+    expect(saved.housePint.abv).toBe(0.065);
+    // Malik is not checked in, but sees it in the crew's venues and on the venue page.
+    const list = (await app.inject({ method: "GET", url: `/v1/crews/${crewId}/venues`, headers: malik.auth })).json() as { venues: { id: string; housePintAbv: number | null }[] };
+    expect(list.venues.find((v) => v.id === zinc.id)?.housePintAbv).toBe(0.065);
+    const page = (await app.inject({ method: "GET", url: `/v1/venues/${zinc.id}`, headers: malik.auth })).json() as { housePint: { abv: number; updatedByName: string } | null };
+    expect(page.housePint).toMatchObject({ abv: 0.065, updatedByName: "jade" });
+
+    // Null clears it.
+    expect((await put(jade, null)).json()).toEqual({ housePint: null });
+    const cleared = (await app.inject({ method: "GET", url: `/v1/venues/${zinc.id}`, headers: malik.auth })).json() as { housePint: unknown };
+    expect(cleared.housePint).toBeNull();
+  });
+});
