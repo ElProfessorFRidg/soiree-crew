@@ -24,6 +24,7 @@ Not set yet: the private build runs on a server the crew hosts itself. Before an
 | Chat membership metadata | Routing ciphertext | `conversations`, `conversation_devices`: who is in which chat, timer, order of messages | Leaving the crew, party or friendship; account deletion |
 | Chat history backup (optional) | A new phone gets its history back (MSG-08) | `chat_backups` and a file, sealed with the user's recovery key only | Turning the backup off or account deletion |
 | Copy kept on the phone (native apps) | A reinstall on the same phone picks up where the person was | iOS Keychain or Android Keystore, `THIS_DEVICE_ONLY`, never synced: age check, consent, body profile, settings, custom drinks, drinks and water of the last 45 days (`apps/mobile/src/system/keptCopy.ts`) | The reset in Settings (account deletion or erasing everything); deleting the app does not remove it on iOS |
+| Photos of custom drinks | My own glass shown instead of its icon (O-21) | The app's document folder on the phone only, a 480 px square JPEG without location; never uploaded, not in the synced drink nor in the Keychain copy (`apps/mobile/src/drinks/drinkPhotos.ts`) | Replacing the photo, removing the drink, or the reset in Settings; the app's own data also lives in the phone's iCloud or Google backup |
 | Reported chat messages | Moderation (MSG-07) | `reports.evidence`, sealed: the message and up to 3 around it, sent by the reporter's phone | Handled reports, then account deletion |
 
 Alcohol consumption and BAC are treated as health data (GDPR article 9).

@@ -17,6 +17,8 @@ import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { logDrink } from "./actions";
 import { sortedCustomDrinks } from "./customDrinks";
+import { customIdOf } from "./drinkPhotos";
+import { DrinkThumb } from "./DrinkThumb";
 import { drinkLabel, sizeAndStrength } from "./display";
 import { drinkKey, rankRow } from "./myRow";
 import { presetFromCustom, presetFromEntry, type CustomDrink, type DrinkPreset } from "./presets";
@@ -149,7 +151,13 @@ export function MyDrinksRow({ now, exclude, big }: { now: number; exclude: strin
                 delayLongPress={350}
                 style={[styles.item, { minHeight: height, backgroundColor: on ? theme.text : theme.surface2 }]}
               >
-                <Icon name={`glass:${item.preset.icon}`} size={big ? 28 : 24} color={on ? theme.bg : theme.amber} />
+                <DrinkThumb
+                  drinkId={item.saved?.id ?? customIdOf(item.preset.id)}
+                  icon={item.preset.icon}
+                  size={big ? 28 : 24}
+                  photoSize={big ? 52 : 44}
+                  color={on ? theme.bg : theme.amber}
+                />
                 <View style={styles.text}>
                   {/* Names wrap to a second line rather than lose their end (O-11). */}
                   <Text variant="h3" color={on ? theme.bg : theme.text} numberOfLines={2}>

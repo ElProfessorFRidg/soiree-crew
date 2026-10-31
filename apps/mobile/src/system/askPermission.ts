@@ -19,7 +19,10 @@ export type PermissionUse =
   | "photo"
   | "scan"
   | "library"
-  | "reminders";
+  | "reminders"
+  /** A photo of my own drink, kept on this phone (O-21). */
+  | "drinkPhoto"
+  | "drinkLibrary";
 
 export interface PermissionAnswer {
   granted: boolean;

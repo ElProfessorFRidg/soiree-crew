@@ -8,13 +8,18 @@ import { useTheme } from "@/theme";
 import { Button } from "@/ui/Button";
 import { Icon } from "@/ui/Icon";
 import { ScalePressable } from "@/ui/Pressable";
-import { Chip, Panel } from "@/ui/controls";
+import { Chip, Panel, Segmented } from "@/ui/controls";
 import { Stepper } from "@/ui/Stepper";
 import { Text } from "@/ui/Text";
 import { useAppStore } from "@/state/store";
 import { catalogueLabel, searchCatalogue } from "./catalogue";
 import { CUSTOM_BOUNDS, type CustomDrinkDraft } from "./customDrinks";
 import { CUSTOM_ICONS, guessIcon } from "./customOrder";
+import { sizeAndStrength, sizeText } from "./display";
+import { useDrinkPhoto } from "./drinkPhotos";
+import { DrinkPhotoField } from "./DrinkPhotoField";
+import { MixEditor } from "./MixEditor";
+import { defaultMix, mixToParts, mixTotals, nameFromParts, partsToMix, readParts, recipeText, type Mix } from "./mixedGlass";
 import type { CustomDrink } from "./presets";
 import { inputText } from "@/ui/inputText";
 
@@ -35,6 +40,9 @@ export function CustomDrinkEditor({ unitSystem, initial, prefill, onSave, onCanc
   const step = unit === "ml" ? 25 : 1;
   const toUnit = (ml: number) => Math.round(convertVolume(ml, unit));
   const start = initial ?? prefill;
+  const unitLabel = unit === "us_fl_oz" ? "oz" : unit;
+  const minVolume = Math.max(1, toUnit(CUSTOM_BOUNDS.volumeMl.min));
+  const maxVolume = toUnit(CUSTOM_BOUNDS.volumeMl.max);
   const [name, setName] = useState(start?.name ?? "");
   const [volume, setVolume] = useState(toUnit(start?.volumeMl ?? 330));
   // Strength in tenths of a percent, so 8.4 % is exact.
@@ -46,16 +54,49 @@ export function CustomDrinkEditor({ unitSystem, initial, prefill, onSave, onCanc
   const [brandQuery, setBrandQuery] = useState("");
   const country = useAppStore((state) => state.preferences.legalCountry);
   const brands = useMemo(() => searchCatalogue(brandQuery, i18n, 6, country), [brandQuery, i18n, country]);
-  const icon = pickedIcon ?? guessIcon(toMillilitres(volume, unit), abvTenths / 1000);
+  // O-21: a glass of several pours. Older drinks have no recipe and open as one drink, as before.
+  const [mix, setMix] = useState<Mix | null>(() => {
+    const parts = start ? readParts(start) : null;
+    return parts ? partsToMix(parts, unit) : null;
+  });
+  const [mixed, setMixed] = useState(mix !== null);
+  const parts = mixed && mix ? mixToParts(mix, unit) : null;
+  const totals = parts ? mixTotals(parts) : { volumeMl: toMillilitres(volume, unit), abv: abvTenths / 1000 };
+  const tooBig = parts !== null && totals.volumeMl > CUSTOM_BOUNDS.volumeMl.max;
+  const icon = pickedIcon ?? guessIcon(totals.volumeMl, totals.abv);
+  // The photo stays on this phone (drinkPhotos.ts): undefined until the person changes it here.
+  const savedPhoto = useDrinkPhoto(initial?.id);
+  const [photo, setPhoto] = useState<string | null | undefined>(undefined);
+  const shownPhoto = photo === undefined ? savedPhoto : photo;
 
-  const unitLabel = unit === "us_fl_oz" ? "oz" : unit;
-  const minVolume = Math.max(1, toUnit(CUSTOM_BOUNDS.volumeMl.min));
-  const maxVolume = toUnit(CUSTOM_BOUNDS.volumeMl.max);
+  const switchMode = (next: boolean) => {
+    if (next === mixed) return;
+    if (next && !mix) {
+      // A spirit already filled in (from a brand, say) becomes the first pour.
+      const spirit = abvTenths >= 150 ? { name: name.trim(), volumeMl: toMillilitres(volume, unit), abv: abvTenths / 1000 } : undefined;
+      setMix(defaultMix(unit, spirit));
+    }
+    if (!next && parts) {
+      // Back to one drink: the glass keeps its size and strength, so the estimate does not move.
+      setVolume(Math.min(maxVolume, Math.max(minVolume, Math.round(toUnit(totals.volumeMl) / step) * step)));
+      setAbvTenths(Math.round(totals.abv * 1000));
+    }
+    setMixed(next);
+  };
 
   return (
     <Animated.View entering={FadeIn.duration(duration.enter)}>
       <Panel style={{ backgroundColor: theme.bg }}>
-        {initial ? null : (
+        <Segmented
+          items={[
+            { value: "single", label: i18n.t("myGlass.single") },
+            { value: "mixed", label: i18n.t("myGlass.mixed") },
+          ]}
+          value={mixed ? "mixed" : "single"}
+          onChange={(next) => switchMode(next === "mixed")}
+          accessibilityLabel={i18n.t("myGlass.kind")}
+        />
+        {initial || mixed ? null : (
           <>
             <Text variant="label">{i18n.t("drinkCatalogue.brandSearch")}</Text>
             <TextInput
@@ -99,7 +140,7 @@ export function CustomDrinkEditor({ unitSystem, initial, prefill, onSave, onCanc
             setName(text);
             if (text.trim()) setShowNameError(false);
           }}
-          placeholder={i18n.t("addDrink.namePlaceholder")}
+          placeholder={parts ? nameFromParts(parts) || i18n.t("myGlass.namePlaceholder") : i18n.t("addDrink.namePlaceholder")}
           placeholderTextColor={theme.textMuted}
           accessibilityLabel={i18n.t("addDrink.name")}
           autoCapitalize="sentences"
@@ -113,29 +154,50 @@ export function CustomDrinkEditor({ unitSystem, initial, prefill, onSave, onCanc
           ]}
         />
         {showNameError ? <Text variant="small" color={theme.danger}>{i18n.t("addDrink.nameRequired")}</Text> : null}
-        <Text variant="label">{i18n.t("addDrink.volume")}</Text>
-        <Stepper
-          value={volume}
-          min={minVolume}
-          max={maxVolume}
-          step={step}
-          unit={unitLabel}
-          onChange={setVolume}
-          decreaseLabel={i18n.t("addDrink.lessVolume")}
-          increaseLabel={i18n.t("addDrink.moreVolume")}
-        />
-        <Text variant="label">{i18n.t("addDrink.strength")}</Text>
-        <Stepper
-          value={abvTenths}
-          min={CUSTOM_BOUNDS.abvPercent.min * 10}
-          max={CUSTOM_BOUNDS.abvPercent.max * 10}
-          step={5}
-          unit="%"
-          format={(tenths) => i18n.number(tenths / 10, tenths % 10 === 0 ? 0 : 1)}
-          onChange={setAbvTenths}
-          decreaseLabel={i18n.t("addDrink.lessStrength")}
-          increaseLabel={i18n.t("addDrink.moreStrength")}
-        />
+        {mixed && mix ? (
+          <Animated.View key="mixed" entering={FadeIn.duration(duration.enter)} style={styles.block}>
+            <MixEditor mix={mix} unit={unit} onChange={setMix} />
+            <View accessible style={[styles.total, { borderColor: tooBig ? theme.danger : theme.line }]}>
+              <Text variant="h3">{i18n.t("myGlass.total", { details: sizeAndStrength(totals, unit, i18n) })}</Text>
+              {parts?.length ? (
+                <Text variant="small">
+                  {recipeText(parts, unit, i18n.locale, { unnamed: i18n.t("myGlass.unnamedPour"), soft: i18n.t("myGlass.softFallback") })}
+                </Text>
+              ) : null}
+              {tooBig ? (
+                <Text variant="small" color={theme.danger}>
+                  {i18n.t("myGlass.tooBig", { max: sizeText(CUSTOM_BOUNDS.volumeMl.max, unit, i18n) })}
+                </Text>
+              ) : null}
+            </View>
+          </Animated.View>
+        ) : (
+          <Animated.View key="single" entering={FadeIn.duration(duration.enter)} style={styles.block}>
+            <Text variant="label">{i18n.t("addDrink.volume")}</Text>
+            <Stepper
+              value={volume}
+              min={minVolume}
+              max={maxVolume}
+              step={step}
+              unit={unitLabel}
+              onChange={setVolume}
+              decreaseLabel={i18n.t("addDrink.lessVolume")}
+              increaseLabel={i18n.t("addDrink.moreVolume")}
+            />
+            <Text variant="label">{i18n.t("addDrink.strength")}</Text>
+            <Stepper
+              value={abvTenths}
+              min={CUSTOM_BOUNDS.abvPercent.min * 10}
+              max={CUSTOM_BOUNDS.abvPercent.max * 10}
+              step={5}
+              unit="%"
+              format={(tenths) => i18n.number(tenths / 10, tenths % 10 === 0 ? 0 : 1)}
+              onChange={setAbvTenths}
+              decreaseLabel={i18n.t("addDrink.lessStrength")}
+              increaseLabel={i18n.t("addDrink.moreStrength")}
+            />
+          </Animated.View>
+        )}
         <Text variant="label">{i18n.t("addDrink.glass")}</Text>
         <View style={styles.icons} accessibilityRole="radiogroup">
           {CUSTOM_ICONS.map((name) => {
@@ -154,6 +216,7 @@ export function CustomDrinkEditor({ unitSystem, initial, prefill, onSave, onCanc
             );
           })}
         </View>
+        <DrinkPhotoField uri={shownPhoto} icon={icon} name={name} onPick={setPhoto} onRemove={() => setPhoto(null)} />
         <View style={styles.actions}>
           <Button label={i18n.t("addDrink.cancel")} variant="secondary" height={size.buttonSmall + 4} style={styles.flex} onPress={onCancel} />
           <Button
@@ -161,11 +224,16 @@ export function CustomDrinkEditor({ unitSystem, initial, prefill, onSave, onCanc
             height={size.buttonSmall + 4}
             style={styles.flex}
             onPress={() => {
-              if (!name.trim()) {
+              // A mixed glass left unnamed takes the names of its pours.
+              const named = name.trim() || (parts ? nameFromParts(parts) : "");
+              if (!named) {
                 setShowNameError(true);
                 return;
               }
-              onSave({ name, volumeMl: Math.round(toMillilitres(volume, unit)), abv: abvTenths / 1000, icon });
+              if (tooBig) return;
+              const photoChange = photo === undefined || (photo === null && !savedPhoto) ? {} : { photo };
+              if (parts) onSave({ name: named, volumeMl: totals.volumeMl, abv: totals.abv, icon, parts, ...photoChange });
+              else onSave({ name: named, volumeMl: Math.round(toMillilitres(volume, unit)), abv: abvTenths / 1000, icon, ...photoChange });
             }}
           />
         </View>
@@ -177,6 +245,8 @@ export function CustomDrinkEditor({ unitSystem, initial, prefill, onSave, onCanc
 const styles = StyleSheet.create({
   input: { minHeight: 52, borderRadius: radius.input, borderWidth: 1.5, paddingHorizontal: 14 },
   actions: { flexDirection: "row", gap: 10 },
+  block: { gap: 12 },
+  total: { borderWidth: 1.5, borderRadius: radius.tile, padding: 12, gap: 4 },
   icons: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   icon: { width: 48, height: 48, borderRadius: radius.tile, borderWidth: 1.5, alignItems: "center", justifyContent: "center" },
   flex: { flex: 1 },

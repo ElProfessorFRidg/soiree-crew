@@ -59,6 +59,12 @@ export const customDrinkSchema = z.object({
   abv: z.number().min(0).max(1),
   icon: z.string().min(1).max(20),
   order: z.number().int().min(0).max(10_000),
+  /** O-21, a mixed glass: its pours, the soft included (abv 0). volumeMl and abv stay their totals. */
+  parts: z
+    .array(z.object({ name: z.string().max(40), volumeMl: z.number().positive().max(3000), abv: z.number().min(0).max(1) }))
+    .min(1)
+    .max(8)
+    .optional(),
 });
 
 export const mutationSchema = z.discriminatedUnion("kind", [

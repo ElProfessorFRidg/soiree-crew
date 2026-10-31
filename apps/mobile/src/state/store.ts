@@ -100,6 +100,8 @@ export interface AppState {
   drinkVenues: Record<string, string>;
   /** Drinks taken off the row by a long press, by their row key. */
   hiddenRowDrinks: string[];
+  /** O-21: the photo of a saved drink, by its id: a file name in the app's folder (drinks/drinkPhotos.ts). */
+  customDrinkPhotos: Record<string, string>;
   /**
    * ADP-05: how this person spells drinks, learnt from the guesses they picked ("zubrikov" to the
    * Żubrówka id). Kept on this phone only; the next time the word is read exactly.
@@ -167,6 +169,7 @@ export const useAppStore = create<AppState>()(
       emergencyContact: null,
       drinkVenues: {},
       hiddenRowDrinks: [],
+      customDrinkPhotos: {},
       learnedSpellings: {},
       onboarding: null,
       onboardedAt: null,
@@ -316,6 +319,8 @@ export function clearAccountHistory(): void {
     emergencyContact: null,
     drinkVenues: {},
     hiddenRowDrinks: [],
+    // Their files go at the next launch (pruneDrinkPhotos).
+    customDrinkPhotos: {},
     learnedSpellings: {},
     morningShown: [],
     recapNotified: [],
