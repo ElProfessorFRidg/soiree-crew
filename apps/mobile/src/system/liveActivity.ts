@@ -50,13 +50,15 @@ export interface NightPayload {
   water: string;
   under: string | null;
   /** Driving as on the party screen: "not before" a time (O-87 floor), too close, or under the limit. */
-  drive: { label: string; value: string; tone: "danger" | "amber" | "ok" } | null;
+  drive: { label: string; value: string; short: string; tone: "danger" | "amber" | "ok" } | null;
   zeroLabel: string | null;
   /** Back-to-zero as a clock time ("22 h 11"), shown big when the figure is hidden. */
   zeroClock: string | null;
   backToZero: string;
   lastAt: number | null;
   last: string;
+  /** The last glass as a clock time: fixed text, worded by the app, not iOS's "1 hr, 2 min". */
+  lastClock: string | null;
   zeroIn: string;
   tonight: string;
   estimate: string;
@@ -80,9 +82,9 @@ function driveOf(driving: ReturnType<typeof estimateDriving> | null, now: number
   if (!driving) return null;
   const label = i18n.t("party.driving");
   const later = driving.underLimitAt !== null && driving.underLimitAt > now ? driving.underLimitAt : null;
-  if (driving.tooCloseToCall) return { label, value: i18n.t("party.tooClose"), tone: "amber" };
-  if (later) return { label, value: `${i18n.t("party.notBefore")} ${clock(later)}`, tone: "danger" };
-  return { label, value: i18n.t("liveActivity.underLimit"), tone: "ok" };
+  if (driving.tooCloseToCall) return { label, value: i18n.t("party.tooClose"), short: i18n.t("party.tooClose"), tone: "amber" };
+  if (later) return { label, value: `${i18n.t("party.notBefore")} ${clock(later)}`, short: clock(later), tone: "danger" };
+  return { label, value: i18n.t("liveActivity.underLimit"), short: i18n.t("liveActivity.underLimit"), tone: "ok" };
 }
 
 const FACES = 4;
@@ -192,6 +194,7 @@ export function buildNightPayload(input: {
     backToZero: i18n.t("party.backToZero"),
     lastAt: alcohol.length ? Math.max(...alcohol.map((d) => d.consumedAt)) : null,
     last: i18n.t("liveActivity.lastDrink"),
+    lastClock: alcohol.length ? clock(Math.max(...alcohol.map((d) => d.consumedAt))) : null,
     zeroIn: zeroAt !== null ? i18n.t("liveActivity.zeroIn") : "",
     tonight: i18n.t("liveActivity.tonight"),
     estimate: i18n.t("liveActivity.estimate"),

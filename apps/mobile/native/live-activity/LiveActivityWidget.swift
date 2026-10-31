@@ -75,6 +75,7 @@ struct NightPayload: Decodable {
     let label: String
     let value: String
     let tone: String
+    let short: String?
 
     var ink: Color {
       tone == "ok" ? NightColors.okText : tone == "amber" ? NightColors.tagText : NightColors.dangerText
@@ -113,6 +114,7 @@ struct NightPayload: Decodable {
   let backToZero: String?
   let lastAt: Double?
   let last: String?
+  let lastClock: String?
   let zeroIn: String
   let tonight: String
   let estimate: String
@@ -203,7 +205,7 @@ private struct DrivePill: View {
       }
       HStack(spacing: 4) {
         if compact { Glyph(systemName: "car.fill", color: drive.ink, size: 11) }
-        Text(drive.value)
+        Text(compact ? (drive.short ?? drive.value) : drive.value)
           .font(.system(size: compact ? 13 : 15, weight: .heavy))
           .foregroundStyle(drive.ink)
           .lineLimit(1)
@@ -211,7 +213,7 @@ private struct DrivePill: View {
       }
     }
     .padding(.horizontal, 10)
-    .padding(.vertical, compact ? 5 : 7)
+    .padding(.vertical, compact ? 4 : 6)
     .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(drive.fill))
   }
 }
@@ -229,13 +231,13 @@ private struct Facts: View {
         Glyph(systemName: "drop.fill", color: NightColors.water, size: 12)
         Text("\(p.waterN)").foregroundStyle(NightColors.water)
       }
-      if let last = p.lastDate, let label = p.last {
+      if let last = p.lastClock, let label = p.last {
         HStack(spacing: 4) {
           Text(label).foregroundStyle(NightColors.muted)
-          Text(last, style: .relative).foregroundStyle(NightColors.text).lineLimit(1)
+          Text(last).foregroundStyle(NightColors.text)
         }
         .lineLimit(1)
-        .minimumScaleFactor(0.8)
+        .minimumScaleFactor(0.75)
       }
     }
     .font(.system(size: 13, weight: .bold))
@@ -281,7 +283,7 @@ private struct ActionButton: View {
         Text(label).font(.system(size: 15, weight: .bold)).lineLimit(1).minimumScaleFactor(0.7)
       }
       .padding(.horizontal, 10)
-      .frame(maxWidth: .infinity, minHeight: 40)
+      .frame(maxWidth: .infinity, minHeight: 32, maxHeight: 32)
       .foregroundStyle(ink)
       .background(fill, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
@@ -329,55 +331,40 @@ private struct Faces: View {
 
 private struct SoloLockView: View {
   let p: NightPayload
+  // iOS gives the lock screen about 160 pt of height: hero, bar, one line of facts, buttons.
   var body: some View {
-    VStack(alignment: .leading, spacing: 10) {
-      HStack(spacing: 8) {
-        Glyph(systemName: "mug.fill", color: NightColors.amber)
-        Text(p.tonight)
-          .font(.system(size: 13, weight: .bold))
-          .foregroundStyle(NightColors.muted)
-        Spacer(minLength: 4)
-        if p.show {
-          Text(p.estimate)
-            .font(.system(size: 11, weight: .bold))
-            .foregroundStyle(NightColors.tagText)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 3)
-            .background(Capsule().fill(NightColors.tagBg))
-        }
-      }
-      // The hero: the figure when figures are on, otherwise the time back to zero; driving beside it.
-      HStack(alignment: .center, spacing: 12) {
+    VStack(alignment: .leading, spacing: 8) {
+      HStack(alignment: .center, spacing: 10) {
         if p.show, let bac = p.bac {
-          VStack(alignment: .leading, spacing: 2) {
-            HStack(alignment: .firstTextBaseline, spacing: 5) {
-              Text(bac).font(numeral(56)).foregroundStyle(p.figureColor)
-              Text(p.unit ?? "").font(.system(size: 15, weight: .bold)).foregroundStyle(NightColors.text)
+          VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+              Text(bac).font(numeral(40)).foregroundStyle(p.figureColor)
+              Text(p.unit ?? "").font(.system(size: 13, weight: .bold)).foregroundStyle(NightColors.text)
             }
             if let status = p.status {
-              Text(status).font(.system(size: 12, weight: .semibold)).foregroundStyle(NightColors.muted).lineLimit(1)
+              Text(status).font(.system(size: 11, weight: .semibold)).foregroundStyle(NightColors.muted).lineLimit(1)
             }
           }
         } else if let zero = p.zeroClock {
           VStack(alignment: .leading, spacing: 0) {
-            Text(p.backToZero ?? "").font(.system(size: 12, weight: .bold)).foregroundStyle(NightColors.muted)
-            Text(zero).font(numeral(44)).foregroundStyle(NightColors.text).lineLimit(1).minimumScaleFactor(0.7)
+            HStack(spacing: 5) {
+              Glyph(systemName: "mug.fill", color: NightColors.amber, size: 11)
+              Text(p.backToZero ?? "").font(.system(size: 12, weight: .bold)).foregroundStyle(NightColors.muted)
+            }
+            Text(zero).font(numeral(34)).foregroundStyle(NightColors.text).lineLimit(1).minimumScaleFactor(0.7)
           }
         } else if let zero = p.zeroLabel {
-          Text(zero).font(.system(size: 16, weight: .bold)).foregroundStyle(NightColors.text)
+          Text(zero).font(.system(size: 15, weight: .bold)).foregroundStyle(NightColors.text)
         }
         Spacer(minLength: 0)
         if let drive = p.drive { DrivePill(drive: drive) }
       }
-      NightBar(payload: p, height: 6)
+      NightBar(payload: p, height: 5)
       HStack(spacing: 8) {
         Facts(p: p)
-        Spacer(minLength: 6)
-        if let end = p.endDate {
-          HStack(spacing: 4) {
-            Text(p.zeroIn).font(.system(size: 12, weight: .bold)).foregroundStyle(NightColors.muted)
-            Countdown(end: end, size: 13).foregroundStyle(NightColors.text).frame(maxWidth: 86)
-          }
+        Spacer(minLength: 4)
+        if p.show, let zero = p.zeroClock {
+          Text("(p.backToZero ?? "") (zero)").font(.system(size: 12, weight: .bold)).foregroundStyle(NightColors.muted).lineLimit(1).minimumScaleFactor(0.75)
         }
       }
       HStack(spacing: 8) {
@@ -385,7 +372,8 @@ private struct SoloLockView: View {
         ActionButton(label: p.actions.water, path: "quick/water", fill: NightColors.waterBg, ink: NightColors.waterText, icon: "drop.fill")
       }
     }
-    .padding(16)
+    .padding(.horizontal, 16)
+    .padding(.vertical, 12)
   }
 }
 
@@ -397,7 +385,7 @@ private struct PartyLockView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
       Rectangle().fill(p.accentColor).frame(height: 4)
-      VStack(alignment: .leading, spacing: 10) {
+      VStack(alignment: .leading, spacing: 7) {
         HStack(spacing: 6) {
           Text(p.show ? party.name : party.here)
             .font(.system(size: 16, weight: .heavy))
@@ -411,7 +399,7 @@ private struct PartyLockView: View {
         }
         if p.show {
           HStack(spacing: 10) {
-            Faces(people: party.people, more: party.more, size: 28)
+            Faces(people: party.people, more: party.more, size: 24)
             Text(party.here).font(.system(size: 14, weight: .bold)).foregroundStyle(NightColors.text)
             Spacer(minLength: 4)
             if let home = party.home {
@@ -439,7 +427,7 @@ private struct PartyLockView: View {
           }
         }
         .padding(.horizontal, 10)
-        .padding(.vertical, 8)
+        .padding(.vertical, 6)
         .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(NightColors.surface))
         if let alert = party.alert {
           HStack(spacing: 8) {
@@ -460,7 +448,8 @@ private struct PartyLockView: View {
             .frame(maxWidth: 70)
         }
       }
-      .padding(14)
+      .padding(.horizontal, 14)
+      .padding(.vertical, 10)
     }
   }
 }
@@ -592,7 +581,7 @@ struct LiveActivityWidget: Widget {
       if p.inParty, let party = p.party {
         Text(p.show ? party.name : party.here).font(.system(size: 15, weight: .heavy)).foregroundStyle(NightColors.text).lineLimit(1)
       } else {
-        Text(p.show ? p.stamp : p.tonight).font(.system(size: 11, weight: .bold)).foregroundStyle(NightColors.muted)
+        if p.show { Text(p.stamp).font(.system(size: 11, weight: .bold)).foregroundStyle(NightColors.muted) }
       }
       if p.show, let bac = p.bac {
         HStack(alignment: .firstTextBaseline, spacing: 4) {
@@ -601,7 +590,7 @@ struct LiveActivityWidget: Widget {
         }
       } else if !p.inParty, let zero = p.zeroClock {
         Text(p.backToZero ?? "").font(.system(size: 11, weight: .bold)).foregroundStyle(NightColors.muted)
-        Text(zero).font(numeral(34)).foregroundStyle(NightColors.text).lineLimit(1).minimumScaleFactor(0.7)
+        Text(zero).font(numeral(30)).foregroundStyle(NightColors.text).lineLimit(1).minimumScaleFactor(0.7)
       } else if let zero = p.zeroLabel {
         Text(zero).font(.system(size: 14, weight: .bold)).foregroundStyle(NightColors.text)
       }
@@ -628,7 +617,7 @@ struct LiveActivityWidget: Widget {
 
   @ViewBuilder
   private func expandedBottom(_ p: NightPayload) -> some View {
-    VStack(spacing: 8) {
+    VStack(spacing: 6) {
       if p.inParty, let party = p.party, let alert = party.alert {
         Text(alert)
           .font(.system(size: 13, weight: .bold))
