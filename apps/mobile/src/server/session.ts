@@ -1,4 +1,3 @@
-import { clearInstallLeftovers } from "@/system/factoryReset";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 import { create } from "zustand";
@@ -6,7 +5,7 @@ import { create } from "zustand";
 // The session token lives in the iOS Keychain / Android Keystore (SEC-05), never in AsyncStorage.
 const TOKEN_KEY = "crew.session.token";
 const URL_KEY = "crew.server.url";
-/** Kept in the Keychain / Keystore; the factory reset forgets them (system/factoryReset.ts). */
+/** Kept in the Keychain / Keystore, so a reinstall stays signed in; only the reset in Settings forgets them. */
 export const SESSION_KEYS = [TOKEN_KEY, URL_KEY] as const;
 
 export interface ServerSession {
@@ -48,8 +47,6 @@ async function write(key: string, value: string | null): Promise<void> {
 }
 
 export async function loadSession(): Promise<void> {
-  // A reinstall on iOS finds the old install's Keychain items: drop them before reading any.
-  await clearInstallLeftovers();
   try {
     const [token, raw] = await Promise.all([read(TOKEN_KEY), read(URL_KEY)]);
     const meta = raw ? (JSON.parse(raw) as Omit<ServerSession, "token">) : null;

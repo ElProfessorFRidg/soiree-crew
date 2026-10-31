@@ -48,6 +48,7 @@ import { CrashScreen } from "@/ui/CrashScreen";
 import { LaunchCurtain } from "@/ui/LaunchCurtain";
 import { purgePlainFiles } from "@/chat/media";
 import { watchLiveActivity } from "@/system/liveActivity";
+import { watchKeptCopy } from "@/system/keptCopy";
 import { PrivacyCover } from "@/ui/PrivacyCover";
 import { handleNotificationResponse, prepareNotifications } from "@/notify/push";
 
@@ -114,6 +115,7 @@ export default function RootLayout() {
     watchBattery();
     watchWidget();
     watchLiveActivity();
+    watchKeptCopy(useAppStore);
   }, []);
 
   useEffect(() => {

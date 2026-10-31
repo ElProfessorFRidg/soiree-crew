@@ -6,42 +6,19 @@ import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 import { CHAT_KEY_NAME } from "@/chat/secure";
 import { SESSION_KEYS } from "@/server/session";
+import { KEPT_COPY_KEY, stopKeptCopy } from "@/system/keptCopy";
 import { useAppStore } from "@/state/store";
 
 /**
- * O-07: every secret the app ever puts in the iOS Keychain or the Android Keystore (a function:
- * session.ts imports this module too, so the list is read when used, not when loaded). The Keychain is
- * not emptied when the app is deleted, so these are also cleared on the first launch of a new
- * install (clearInstallLeftovers).
+ * O-07: everything the app keeps in the iOS Keychain or the Android Keystore: the session, the chat
+ * key and the copy that survives a reinstall. Only this reset removes them; deleting the app does
+ * not, on purpose (system/keptCopy.ts).
  */
-const secretKeys = (): readonly string[] => [...SESSION_KEYS, CHAT_KEY_NAME];
-
-/** Set on the first launch of an install: its absence with no app data means a fresh install. */
-const INSTALL_MARKER = "crew-installed-v1";
-/** The main store's key: present when the app has been used before the marker existed. */
-const APP_STORE_KEY = "crew-app-v1";
+const secretKeys = (): readonly string[] => [...SESSION_KEYS, CHAT_KEY_NAME, KEPT_COPY_KEY];
 
 async function forgetSecrets(): Promise<void> {
   if (Platform.OS === "web") return;
   await Promise.all(secretKeys().map((key) => SecureStore.deleteItemAsync(key).catch(() => undefined)));
-}
-
-/**
- * iOS keeps Keychain items after the app is deleted: a reinstall would find the old session and the
- * old chat key. On the first launch of an install (no marker and no app data), they are dropped, so
- * a reinstall starts as clean as the first install. An app updated from a version without the
- * marker keeps its data: only the marker is added.
- */
-export async function clearInstallLeftovers(): Promise<void> {
-  if (Platform.OS === "web") return;
-  try {
-    const [marker, appData] = await Promise.all([AsyncStorage.getItem(INSTALL_MARKER), AsyncStorage.getItem(APP_STORE_KEY)]);
-    if (marker) return;
-    if (!appData) await forgetSecrets();
-    await AsyncStorage.setItem(INSTALL_MARKER, "1");
-  } catch {
-    // Storage unreadable: nothing is deleted on a guess.
-  }
 }
 
 /** Everything in the app's own folders: photos waiting to upload, chat media, exports, caches. */
@@ -79,6 +56,7 @@ export async function eraseEverything(): Promise<void> {
     globalThis.location?.reload();
     return;
   }
+  stopKeptCopy();
   const { liveActivityId } = useAppStore.getState();
   if (liveActivityId && Platform.OS === "ios") {
     try {
@@ -96,7 +74,5 @@ export async function eraseEverything(): Promise<void> {
   await forgetSecrets();
   emptyAppFolders();
   await AsyncStorage.clear().catch(() => undefined);
-  // The marker goes back at once: the restarted app must not take its own reset for a reinstall.
-  await AsyncStorage.setItem(INSTALL_MARKER, "1").catch(() => undefined);
   await reloadAppAsync("Erased by the user");
 }

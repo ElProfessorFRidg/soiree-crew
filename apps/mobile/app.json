@@ -18,7 +18,7 @@
         "CFBundleDevelopmentRegion": "fr",
         "CFBundleLocalizations": ["fr", "en", "es", "it", "de", "pt", "ru"],
         "CADisableMinimumFrameDurationOnPhone": true,
-        "RCTAsyncStorageExcludeFromBackup": true
+        "RCTAsyncStorageExcludeFromBackup": false
       }
     },
     "android": {
@@ -30,7 +30,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": true,
-      "allowBackup": false
+      "allowBackup": true
     },
     "web": {
       "favicon": "./assets/favicon.png",

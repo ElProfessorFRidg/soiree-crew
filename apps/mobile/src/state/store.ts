@@ -4,6 +4,7 @@ import { Platform } from "react-native";
 import { getCalendars, getLocales } from "expo-localization";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { keptCopyFor } from "@/system/keptCopy";
 import type { FoodLevel, UiLevel, UiLevelState } from "@crew/bac";
 import { defaultPreferences, type UserPreferences } from "@crew/units";
 import type { VaultItem } from "@/vault/vault";
@@ -164,9 +165,13 @@ export const useAppStore = create<AppState>()(
         const stored = (persisted ?? {}) as Partial<AppState>;
         return { ...current, ...stored, preferences: { ...current.preferences, ...stored.preferences } };
       },
-      onRehydrateStorage: () => () => {
-        useAppStore.setState({ hydrated: true });
-        followPhoneHourCycle();
+      onRehydrateStorage: () => (state) => {
+        // A reinstall finds an empty store: the copy kept in the Keychain fills it before anything
+        // is shown, so the person lands where they were (system/keptCopy.ts).
+        void keptCopyFor(state)
+          .then((kept) => useAppStore.setState({ ...(kept ?? {}), hydrated: true }))
+          .catch(() => useAppStore.setState({ hydrated: true }))
+          .finally(followPhoneHourCycle);
       },
     },
   ),
