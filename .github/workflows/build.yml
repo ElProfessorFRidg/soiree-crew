@@ -351,6 +351,8 @@ jobs:
   altstore:
     # docs/ALTSTORE.md: the source is rewritten from the published releases, with this build's screenshots.
     needs: release
+    # The skipped APK job up the chain would skip this one too without always().
+    if: always() && needs.release.result == 'success'
     permissions:
       contents: write
       actions: read
