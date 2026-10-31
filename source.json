@@ -21,16 +21,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -43,6 +43,27 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.1",
+          "buildVersion": "83",
+          "date": "2026-10-31T19:08:18Z",
+          "localizedDescription": "• Colons instead of stray control characters in the 0.2.0 notes\n• Start the 0.2 series (crew nudges, background location, night notifications); fix control characters in the release notes\n• Never nudge from home, learnt from where the phone spends the night; rewrite the flat French notification lines\n• Food, pace, way home and morning after notifications; a water streak line and 20 water lines in every language\n• Spot me with my crew, and nudges that learn each person's habits\n• Opt-in background location nudge when you settle somewhere at night with no night going on\n• The refresh starts only when a full glass is let go, a firmer click when it arms, ticks on the way; while loading the pint pours again and again with sloshing beer and a head of foam, for at least one fill",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.1%2Bbuild.83/soiree-crew-unsigned.ipa",
+          "size": 22348210,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/10-limits.png"
+          ]
+        },
         {
           "version": "0.1.13",
           "buildVersion": "81",
@@ -317,26 +338,37 @@
           ]
         }
       ],
-      "version": "0.1.13",
-      "versionDate": "2026-10-31T18:14:04Z",
-      "versionDescription": "• Eight or more lines for every recurring notification and greeting in all languages; a once-a-night peak warning, a nudge when a party I said yes to started without me, a weekend comeback nudge, with a settings toggle\n• Twelve casual water lines in every language, no night notification once nothing is drunk or the level is back to zero; home party, apero, dinner, game and movie night moods",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.13%2Bbuild.81/soiree-crew-unsigned.ipa",
-      "size": 22274800,
+      "version": "0.2.1",
+      "versionDate": "2026-10-31T19:08:18Z",
+      "versionDescription": "• Colons instead of stray control characters in the 0.2.0 notes\n• Start the 0.2 series (crew nudges, background location, night notifications); fix control characters in the release notes\n• Never nudge from home, learnt from where the phone spends the night; rewrite the flat French notification lines\n• Food, pace, way home and morning after notifications; a water streak line and 20 water lines in every language\n• Spot me with my crew, and nudges that learn each person's habits\n• Opt-in background location nudge when you settle somewhere at night with no night going on\n• The refresh starts only when a full glass is let go, a firmer click when it arms, ticks on the way; while loading the pint pours again and again with sloshing beer and a head of foam, for at least one fill",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.1%2Bbuild.83/soiree-crew-unsigned.ipa",
+      "size": 22348210,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "release-0.2.1",
+      "title": "Soirée Crew 0.2.1",
+      "caption": "• Colons instead of stray control characters in the 0.2.0 notes\n• Start the 0.2 series (crew nudges, background location, night notifications); fix control characters in the release notes\n• Never nudge from home, learnt from where the phone spends the night; rewrite the flat French notification lines\n• Food, pace, way home and morning after notifications; a water streak line and 20 water lines in every language\n• Spot me with my crew, and nudges that learn each person's habits\n• Opt-in background location nudge when you settle somewhere at night with no night going on\n• The refresh starts only when a full glass is let go, a firmer click when it arms, ticks on the way; while loading the pint pours again and again with sloshing beer and a head of foam, for at least one fill",
+      "date": "2026-10-31T19:08:18Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.1/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/tag/v0.2.1%2Bbuild.83",
+      "appID": "app.soireecrew.mobile",
+      "notify": false
+    },
     {
       "identifier": "release-0.1.13",
       "title": "Soirée Crew 0.1.13",
