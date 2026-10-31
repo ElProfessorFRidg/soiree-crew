@@ -14,6 +14,7 @@ import { pollRoutes } from "./routes/polls";
 import { cardRoutes } from "./routes/cards";
 import { chatRoutes } from "./routes/chat";
 import { cheersRoutes } from "./routes/cheers";
+import { whereaboutsRoutes } from "./routes/whereabouts";
 import { claimRoutes } from "./routes/claims";
 import { downloadRoutes } from "./routes/downloads";
 import { feedRoutes } from "./routes/feed";
@@ -123,6 +124,7 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
   chatRoutes(app, ctx);
   claimRoutes(app, ctx);
   cheersRoutes(app, ctx);
+  whereaboutsRoutes(app, ctx);
   downloadRoutes(app, ctx);
   profileRoutes(app, ctx);
   photoRoutes(app, ctx);

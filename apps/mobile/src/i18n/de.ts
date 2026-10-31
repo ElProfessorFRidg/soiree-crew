@@ -894,6 +894,9 @@ export const de: Messages = {
     outing: "Hinweis, wenn ich unterwegs bin",
     outingHint: "Abends, wenn du ohne gestarteten Abend an einem Ort bleibst, ein kleiner Hinweis. Dein Standort bleibt auf diesem Handy.",
     outingDenied: "Ohne Standort \"Immer\" kein Hinweis. Du kannst ihn in den Einstellungen des Handys erlauben.",
+    crewDetect: "Mich mit meiner Crew erkennen",
+    crewDetectHint: "Abends geht ein auf 100 m gerundeter Standort an den Server, 30 Min gespeichert und niemandem gezeigt, nur um zu sehen, ob die Crew zusammen ist. Braucht den Ausgehhinweis.",
+    crewDetectNeedsOuting: "Schalte zuerst den Hinweis, wenn du unterwegs bist, ein.",
     remindersAppOnly: "Erinnerungen (Wasser, Grenze, Rückblick) gibt es nur in der installierten App, nicht im Browser.",
     sections: { region: "Sprache, Region und Einheiten", notifications: "Benachrichtigungen", security: "Sicherheit und Daten", appearance: "Privatsphäre und Aussehen" },
     notificationsSummary: "Wasser, Grenze, Rückblick, Ruhezeiten",
@@ -1399,7 +1402,7 @@ export const de: Messages = {
     where: "Wohin sie gehen",
     whereBody: "Auf diesem Handy, in seinem Backup und auf dem Server deiner Crew, nirgends sonst. Nichts wird verkauft. Fotos deiner eigenen Getränke bleiben auf diesem Handy.",
     never: "Was es nicht gibt",
-    neverBody: "Keine Werbung, keine Nutzungsstatistik, keine ständige Ortung. Mit dem Ausgehhinweis wird dein Standort im Hintergrund gelesen, verlässt aber nie das Handy.",
+    neverBody: "Keine Werbung, keine Nutzungsstatistik, keine ständige Ortung. Mit dem Ausgehhinweis wird dein Standort im Hintergrund gelesen, verlässt aber nie das Handy. Mit \"Mich mit meiner Crew erkennen\" geht abends ein auf 100 m gerundeter Standort an den Server, 30 Min gespeichert, nie gezeigt, nur um zu sehen, ob die Crew zusammen ist.",
     backup: "Handy-Backups",
     backupBody: "Die Daten der App sind Teil des iCloud-Backups deines iPhones oder des Google-Backups deines Android-Handys, verschlüsselt von Apple oder Google wie der Rest des Handys. Sie kommen zurück, wenn du ein Handy wiederherstellst. Eine Kopie des Wichtigsten (bestätigtes Alter, Einwilligung, Profil, Einstellungen, eigene Getränke, Getränke und Wasser der letzten 45 Tage) bleibt auch im Schlüsselbund dieses Handys: Wenn du die App löschst und neu installierst, machst du da weiter, wo du warst. Diese Kopie verlässt das Handy nie.",
     rights: "Deine Rechte",
@@ -2436,6 +2439,11 @@ export const de: Messages = {
   },
   // O-38, N-35, QOL-03, QOL-30: the notification centre, push text (generic) and actions.
   notify: {
+    crewNearby: {
+      live: { v1: "{name} und die Crew feiern gleich nebenan. Startest du deinen Abend?", v2: "{name} hat den Abend nebenan schon gestartet. Bist du dabei?", v3: "Nebenan wird angestoßen: {name} ist unterwegs. Startest du deinen?", v4: "{name} und die Truppe legen in der Nähe los. Und du?", v5: "{name} feiert nur ein paar Schritte weiter. Starte deinen!", v6: "Die Crew wärmt sich nebenan auf, {name} hat angefangen. Startest du?", v7: "{name} ist schon mittendrin, gleich nebenan. Wir warten!", v8: "Nebenan haben {name} und die Crew angefangen. Startest du deinen Abend?" },
+      pushLive: { v1: "Die Crew feiert gleich nebenan. Startest du deinen Abend?", v2: "Gleich nebenan hat's angefangen. Bist du dabei?", v3: "Nebenan wird angestoßen. Startest du deinen Abend?", v4: "Die Truppe legt in der Nähe los. Und du?", v5: "Ein paar Schritte weiter läuft ein Abend. Starte deinen!", v6: "Die Crew wärmt sich nebenan auf. Startest du?", v7: "Sie sind schon mittendrin, gleich nebenan. Wir warten!", v8: "Nebenan hat die Crew angefangen. Startest du deinen Abend?" },
+      gathered: { v1: "Die Crew ist zusammen. Startet jemand den Abend?", v2: "Die ganze Truppe an einem Ort! Wer startet den Abend?", v3: "Die Crew ist da. Fehlt nur noch, dass jemand startet.", v4: "Ihr seid zusammen, der Abend wartet auf den Startschuss.", v5: "Crew-Treffen erkannt. Wer eröffnet?", v6: "Die Crew ist komplett. Wer startet die Party?", v7: "Heute Abend zusammen? Startet den Abend!", v8: "Die Crew ist zusammen. Wer zuerst startet, gewinnt." },
+    },
     title: "Mitteilungen",
     bell: "Mitteilungen",
     bellUnread: { one: "Mitteilungen, {count} ungelesen", other: "Mitteilungen, {count} ungelesen" },
@@ -2459,6 +2467,7 @@ export const de: Messages = {
     },
     kinds: {
       outCall: "Wer kommt mit?",
+      crewNearby: "Crew in der Nähe zusammen",
       round: "Runden für dich",
       recapReady: "Rückblick fertig",
       takeover: "Bars mit neuem Boss",
@@ -2492,6 +2501,7 @@ export const de: Messages = {
     },
     push: {
       outCall: { title: "Wer kommt mit?", body: "Jemand aus deiner Crew geht heute Abend raus." },
+      crewNearby: { title: "Die Crew ist in der Nähe", body: "Leute aus der Crew sind ganz in der Nähe zusammen." },
       round: { title: "Eine Runde für dich", body: "Jemand gibt dir ein Getränk aus. Zum Bestätigen öffnen." },
       recapReady: { title: "Rückblick fertig", body: "Der Rückblick der Party wartet auf dich." },
       takeover: { title: "Neuer Boss", body: "Eine Bar deiner Crew hat einen neuen Boss." },

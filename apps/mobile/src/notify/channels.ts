@@ -3,6 +3,7 @@ import { isKind, type Channel, type NotificationKind } from "./inbox";
 
 /** QOL-30: each kind's channel, as on the server (apps/server/src/notifications/kinds.ts). */
 export const CHANNEL_OF: Record<NotificationKind, Channel> = {
+  crewNearby: "plans",
   outCall: "plans",
   round: "party",
   recapReady: "party",

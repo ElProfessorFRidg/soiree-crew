@@ -896,6 +896,9 @@ export const en: Messages = {
     outing: "Nudge me when I'm out",
     outingHint: "In the evening, if you stay in one spot with no night started, a little nudge. Your location stays on this phone.",
     outingDenied: "Without \"Always\" location, no nudge. You can allow it in your phone's settings.",
+    crewDetect: "Spot me with my crew",
+    crewDetectHint: "In the evening, a position rounded to 100 m goes to the server, kept 30 min and shown to no one, just to see if the crew is together. Needs the night out nudge.",
+    crewDetectNeedsOuting: "Turn on the night out nudge first.",
     remindersAppOnly: "Reminders (water, limit, recap) only work in the installed app, not in the browser.",
     sections: { region: "Language, region and units", notifications: "Notifications", security: "Security and data", appearance: "Privacy and look" },
     notificationsSummary: "Water, limit, recap, quiet hours",
@@ -1401,7 +1404,7 @@ export const en: Messages = {
     where: "Where it goes",
     whereBody: "On this phone, in its backup and on your crew's server, nowhere else. Nothing is sold. Photos of your own drinks stay on this phone.",
     never: "What there isn't",
-    neverBody: "The app shows no ads and doesn't measure how you use it. Your location is only sent when you check in or share it. With the night out nudge on, your location is read in the background but never leaves the phone.",
+    neverBody: "The app shows no ads and doesn't measure how you use it. Your location is only sent when you check in or share it. With the night out nudge on, your location is read in the background but never leaves the phone. With \"Spot me with my crew\", a position rounded to 100 m goes to the server in the evening, kept 30 min, never shown, only to see if the crew is together.",
     backup: "Phone backups",
     backupBody: "The app's data is part of your iPhone's iCloud backup or your Android's Google backup, encrypted by Apple or Google like the rest of the phone. It comes back when you restore a phone. A copy of what matters most (age check, consent, profile, settings, custom drinks, drinks and water of the last 45 days) also stays in this phone's keychain: if you delete the app and reinstall it, you pick up where you were. That copy never leaves the phone.",
     rights: "Your rights",
@@ -2438,6 +2441,11 @@ export const en: Messages = {
   },
   // O-38, N-35, QOL-03, QOL-30: the notification centre, push text (generic) and actions.
   notify: {
+    crewNearby: {
+      live: { v1: "{name} and the crew are out right next to you. Start yours?", v2: "{name} already kicked off the night nearby. You in?", v3: "Glasses are clinking next door: {name} is out. Start your night?", v4: "{name} and the crew got going close by. And you?", v5: "{name} is out a stone's throw away. Start yours!", v6: "The crew is warming up next door, {name} opened the floor. You in?", v7: "{name} is already at it, right next to you. We're waiting!", v8: "Next door, {name} and the crew have started. Start your night?" },
+      pushLive: { v1: "The crew is out right next to you. Start yours?", v2: "It's started just nearby. You in?", v3: "Glasses are clinking next door. Start your night?", v4: "The crew got going close by. And you?", v5: "A night is on a stone's throw away. Start yours!", v6: "The crew is warming up next door. You in?", v7: "They're already at it, right next to you. We're waiting!", v8: "Next door, the crew has started. Start your night?" },
+      gathered: { v1: "The crew's together, someone start the night?", v2: "The whole crew in one place! Who starts the night?", v3: "The crew is here. Just need someone to hit start.", v4: "You're all together, the night is waiting for its kickoff.", v5: "Crew meetup spotted. Who opens the floor?", v6: "Full crew in the house. Who starts the party?", v7: "Together tonight? Start the night!", v8: "The crew's together. First to start it wins." },
+    },
     title: "Notifications",
     bell: "Notifications",
     bellUnread: { one: "Notifications, {count} unread", other: "Notifications, {count} unread" },
@@ -2461,6 +2469,7 @@ export const en: Messages = {
     },
     kinds: {
       outCall: "Who's in?",
+      crewNearby: "Crew together nearby",
       round: "Rounds for you",
       recapReady: "Recap ready",
       takeover: "Bar takeovers",
@@ -2494,6 +2503,7 @@ export const en: Messages = {
     },
     push: {
       outCall: { title: "Who's in?", body: "Someone in your crew is going out tonight." },
+      crewNearby: { title: "The crew is around", body: "People from the crew are together nearby." },
       round: { title: "A round for you", body: "Someone got you a drink. Open to confirm." },
       recapReady: { title: "Recap ready", body: "The recap of the party is waiting." },
       takeover: { title: "Bar takeover", body: "A bar of your crew has a new boss." },

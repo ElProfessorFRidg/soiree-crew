@@ -23,7 +23,7 @@ export type Delivery = "sent" | "passive" | "held" | "silent";
 const DEFAULT_TIME_ZONE = "Europe/Paris";
 const DEFAULT_QUIET = { from: 22, to: 9 };
 
-interface Recipient {
+export interface Recipient {
   types: Record<string, boolean>;
   timeZone: string;
   quiet: { from: number; to: number };
@@ -52,7 +52,7 @@ export function decideDelivery(kind: NotificationKind, recipient: Recipient, now
   return "sent";
 }
 
-async function loadRecipients(ctx: Context, userIds: string[], partyId: string | null): Promise<Map<string, Recipient>> {
+export async function loadRecipients(ctx: Context, userIds: string[], partyId: string | null): Promise<Map<string, Recipient>> {
   const settings = await ctx.db.query<{ user_id: string; types: string; time_zone: string | null }>(
     "select user_id, types, time_zone from notification_settings where user_id = any($1::uuid[])",
     [userIds],
@@ -179,7 +179,7 @@ async function pushTo(ctx: Context, userId: string, language: string, inboxId: s
   const devices = await devicesOf(ctx, userId);
   if (!devices.length) return;
   const spec = KINDS[event.kind];
-  const copy = pushCopy(pushLanguage(language), event.kind);
+  const copy = pushCopy(pushLanguage(language), event.kind, event.params);
   const data: Record<string, string> = { n: inboxId, k: event.kind };
   if (event.partyId) data.p = event.partyId;
   if (event.crewId) data.c = event.crewId;

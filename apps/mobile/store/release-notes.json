@@ -1,4 +1,16 @@
 {
+  "0.1.13": {
+    "fr": [
+      "Nouveau rappel quand t'es de sortie \u0001 le soir, si tu restes posé quelque part sans soirée lancée, l'app te propose de la lancer. Ta position reste sur ton téléphone. À allumer dans Réglages.",
+      "Me détecter avec mon crew \u0001 quand plusieurs du crew sont ensemble le soir, un petit rappel pour lancer la soirée. Une position arrondie à 100 m part alors au serveur, gardée 30 min et montrée à personne.",
+      "Les rappels s'adaptent à toi \u0001 plus tôt si tu oublies souvent de noter, moins souvent si tu ne t'en sers pas."
+    ],
+    "en": [
+      "New nudge when you're out: in the evening, if you settle somewhere with no night started, the app offers to start it. Your location stays on your phone. Turn it on in Settings.",
+      "Spot me with my crew: when several of the crew are together at night, a little nudge to start the night. A position rounded to 100 m then goes to the server, kept 30 min and shown to no one.",
+      "The nudges adapt to you: earlier if you often forget to log, less often if you don't use them."
+    ]
+  },
   "0.1.12": {
     "fr": [
       "L'icône et le nom de l'app en haut de Crew et de la soirée en direct, pour tes captures.",

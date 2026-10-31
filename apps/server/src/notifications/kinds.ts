@@ -16,6 +16,8 @@ export interface KindSpec {
 }
 
 export const KINDS = {
+  /** Crew members together at night, someone with no night going on: "launch it?" (outing.ts). */
+  crewNearby: { channel: "plans", safety: false, canWait: false, category: null },
   /** N-03: "I'm going out, who's in?" */
   outCall: { channel: "plans", safety: false, canWait: false, category: "outCall" },
   /** N-18: someone logged a round that includes you. */

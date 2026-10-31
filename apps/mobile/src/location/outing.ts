@@ -7,6 +7,7 @@ import { estimateBac } from "@crew/bac";
 import { afterQuietHours } from "@crew/units";
 import { createTranslator } from "@/i18n";
 import { variantKey } from "@/i18n/variants";
+import { api } from "@/server/api";
 import { useAppStore } from "@/state/store";
 
 // "Rappel quand t'es de sortie": with the "Always" location permission, the phone notices it has
@@ -21,8 +22,10 @@ const STATE_KEY = "crew-outing-v1";
 const MINUTE_MS = 60_000;
 /** Within this distance of where it stopped, the phone counts as still there. */
 const STAY_RADIUS_M = 150;
-/** Stopped this long somewhere at night: probably out. */
+/** Stopped this long somewhere at night: probably out (10 min for people who tend to forget). */
 const STAY_MS = 20 * MINUTE_MS;
+/** "Me détecter avec mon crew": one coarse position every 10 min at most, while lingering. */
+const REPORT_EVERY_MS = 10 * MINUTE_MS;
 /** A nudge again tonight only from a place at least this far from the previous nudged ones. */
 const NEW_PLACE_M = 400;
 /** Never two nudges closer than this. */
@@ -40,6 +43,23 @@ interface OutingState {
   anchor: { lat: number; lng: number; since: number } | null;
   /** Nudges scheduled or sent, with the place each one was for: one per place, a few per night. */
   nudges: { at: number; lat: number; lng: number }[];
+  /** Tonight's nudges the server knows of (the crew ones too): one budget for both. */
+  serverNudges: number[];
+  lastReportAt: number;
+}
+
+interface ServerOuting {
+  habit: { stayMinutes: number; maxPerNight: number; pausedUntil: number | null };
+  nudges: number[];
+}
+
+/** About 100 m: three decimals of a degree. Nothing finer ever leaves the phone. */
+const coarse = (value: number) => Math.round(value * 1000) / 1000;
+
+function keepServer(answer: ServerOuting, state: OutingState): void {
+  const { stayMinutes, maxPerNight, pausedUntil } = answer.habit;
+  useAppStore.setState({ outingHabit: { stayMinutes, maxPerNight, pausedUntil } });
+  state.serverNudges = answer.nudges;
 }
 
 /** One night: noon to noon, as for the other reminders. */
@@ -63,12 +83,17 @@ async function readState(): Promise<OutingState> {
     const raw = await AsyncStorage.getItem(STATE_KEY);
     if (raw) {
       const saved = JSON.parse(raw) as Partial<OutingState>;
-      return { anchor: saved.anchor ?? null, nudges: Array.isArray(saved.nudges) ? saved.nudges : [] };
+      return {
+        anchor: saved.anchor ?? null,
+        nudges: Array.isArray(saved.nudges) ? saved.nudges : [],
+        serverNudges: Array.isArray(saved.serverNudges) ? saved.serverNudges : [],
+        lastReportAt: typeof saved.lastReportAt === "number" ? saved.lastReportAt : 0,
+      };
     }
   } catch {
     // Unreadable: start over.
   }
-  return { anchor: null, nudges: [] };
+  return { anchor: null, nudges: [], serverNudges: [], lastReportAt: 0 };
 }
 
 const writeState = (state: OutingState) => AsyncStorage.setItem(STATE_KEY, JSON.stringify(state)).catch(() => undefined);
@@ -102,13 +127,16 @@ function nightGoingOn(now: number): boolean {
 
 /** Every condition for the nudge at `at`, checked when it is scheduled. */
 async function mayNudge(at: number, now: number, state: OutingState): Promise<boolean> {
-  const { outingNudgeOn, nudgesOn, preferences, remindersMutedUntil } = useAppStore.getState();
+  const { outingNudgeOn, nudgesOn, preferences, remindersMutedUntil, outingHabit } = useAppStore.getState();
   if (!outingNudgeOn || !nudgesOn) return false;
+  if (outingHabit?.pausedUntil && outingHabit.pausedUntil > at) return false;
   if (!atNight(at)) return false;
   if (afterQuietHours(at, preferences.quietFromHour, preferences.quietToHour) !== at) return false;
   if (remindersMutedUntil !== null && remindersMutedUntil > at) return false;
   const tonight = state.nudges.filter((n) => nightOf(n.at) === nightOf(at));
-  if (tonight.length >= MAX_PER_NIGHT) return false;
+  // The crew nudges the server sent count too; a local one it already knows is counted once.
+  const crewOnly = state.serverNudges.filter((t) => nightOf(t) === nightOf(at) && !tonight.some((n) => n.at === t));
+  if (tonight.length + crewOnly.length >= (outingHabit?.maxPerNight ?? MAX_PER_NIGHT)) return false;
   if (state.anchor && tonight.some((n) => metersBetween(n, state.anchor!) < NEW_PLACE_M)) return false;
   if (nightGoingOn(now)) return false;
   return (await Notifications.getPermissionsAsync()).granted;
@@ -137,12 +165,25 @@ async function onLocations(locations: readonly Location.LocationObject[]): Promi
     }
   }
 
+  const { crewDetectOn, remindersMutedUntil, outingHabit } = useAppStore.getState();
+  // "Me détecter avec mon crew": still here at night, a coarse position every 10 min at most.
+  if (crewDetectOn && atNight(now) && now - state.anchor.since >= 5 * MINUTE_MS && now - state.lastReportAt >= REPORT_EVERY_MS) {
+    state.lastReportAt = now;
+    const answer = await api<ServerOuting>("/v1/me/whereabouts", {
+      method: "POST",
+      body: { lat: coarse(here.lat), lng: coarse(here.lng), mutedUntil: remindersMutedUntil },
+    }).catch(() => null);
+    if (answer) keepServer(answer, state);
+  }
+
   // Only the last day matters: older nudges are dropped.
   state.nudges = state.nudges.filter((n) => n.at > now - 24 * 60 * MINUTE_MS);
+  state.serverNudges = state.serverNudges.filter((t) => t > now - 24 * 60 * MINUTE_MS);
   const pending = state.nudges.some((n) => n.at > now);
   if (!pending) {
-    const lastNudge = state.nudges.reduce((latest, n) => Math.max(latest, n.at), 0);
-    const at = Math.max(state.anchor.since + STAY_MS, now + MINUTE_MS, lastNudge + NUDGE_GAP_MS);
+    const lastNudge = Math.max(0, ...state.nudges.map((n) => n.at), ...state.serverNudges);
+    const stayMs = outingHabit ? outingHabit.stayMinutes * MINUTE_MS : STAY_MS;
+    const at = Math.max(state.anchor.since + stayMs, now + MINUTE_MS, lastNudge + NUDGE_GAP_MS);
     if (await mayNudge(at, now, state)) {
       const i18n = createTranslator(useAppStore.getState().preferences.language);
       await Notifications.scheduleNotificationAsync({
@@ -151,6 +192,9 @@ async function onLocations(locations: readonly Location.LocationObject[]): Promi
         trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: new Date(at) },
       }).catch(() => undefined);
       state.nudges.push({ at, lat: state.anchor.lat, lng: state.anchor.lng });
+      // The time only, never the place: the server learns from what follows and shares the budget.
+      const answer = await api<ServerOuting>("/v1/me/outing-nudges", { method: "POST", body: { at } }).catch(() => null);
+      if (answer) keepServer(answer, state);
     }
   }
   await writeState(state);
@@ -193,6 +237,7 @@ export async function startOuting(): Promise<boolean> {
 
 /** Off: no more updates, no pending nudge, the last place forgotten. */
 export async function stopOuting(): Promise<void> {
+  if (useAppStore.getState().crewDetectOn) await stopCrewDetect();
   if (!supported) return;
   if (await Location.hasStartedLocationUpdatesAsync(OUTING_TASK).catch(() => false)) {
     await Location.stopLocationUpdatesAsync(OUTING_TASK).catch(() => undefined);
@@ -206,6 +251,7 @@ export async function syncOuting(): Promise<void> {
   if (!supported) return;
   if (useAppStore.getState().outingNudgeOn) {
     if (!(await startOuting())) useAppStore.setState({ outingNudgeOn: false });
+    else void refreshOutingHabit();
   } else {
     await stopOuting();
   }
@@ -220,4 +266,20 @@ export async function cancelOutingNudge(): Promise<void> {
     // Kept in the list: this place counts as nudged, the gap and the nightly cap still apply.
     await writeState(state);
   }
+}
+
+/** "Me détecter avec mon crew" off: the server forgets the last position at once. */
+export async function stopCrewDetect(): Promise<void> {
+  useAppStore.setState({ crewDetectOn: false });
+  await api("/v1/me/whereabouts", { method: "DELETE" }).catch(() => undefined);
+}
+
+/** At launch: the habit the server learnt, for the phone's own nudge. */
+export async function refreshOutingHabit(): Promise<void> {
+  if (!useAppStore.getState().outingNudgeOn) return;
+  const answer = await api<ServerOuting>("/v1/me/outing-habit").catch(() => null);
+  if (!answer) return;
+  const state = await readState();
+  keepServer(answer, state);
+  await writeState(state);
 }

@@ -5,6 +5,7 @@ import { api } from "@/server/api";
 
 /** QOL-30: the server's fixed taxonomy (apps/server/src/notifications/kinds.ts). */
 export const NOTIFICATION_KINDS = [
+  "crewNearby",
   "outCall",
   "round",
   "recapReady",

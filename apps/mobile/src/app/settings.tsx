@@ -18,7 +18,7 @@ import { Screen } from "@/ui/Screen";
 import { Stepper } from "@/ui/Stepper";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
-import { startOuting, stopOuting } from "@/location/outing";
+import { startOuting, stopCrewDetect, stopOuting } from "@/location/outing";
 import { askPermission, permissionStatus } from "@/system/askPermission";
 import { Button } from "@/ui/Button";
 import { checkForUpdate, currentBuild, currentVersion } from "@/system/updates";
@@ -120,6 +120,7 @@ export default function SettingsScreen() {
   const lockScreenNumbers = useAppStore((state) => state.lockScreenNumbers);
   const nudgesOn = useAppStore((state) => state.nudgesOn);
   const outingNudgeOn = useAppStore((state) => state.outingNudgeOn);
+  const crewDetectOn = useAppStore((state) => state.crewDetectOn);
   const crews = useCrewData((state) => state.crews);
   const hour = (h: number) => formatClock(new Date(2026, 0, 1, h).getTime(), i18n.language, preferences.hourCycle);
   const offline = showFailure(i18n);
@@ -257,6 +258,23 @@ export default function SettingsScreen() {
                       useAppStore.setState({ outingNudgeOn: false });
                       if (!background.declined) showToast({ tone: "danger", message: i18n.t("settings.outingDenied") });
                     })();
+                  }}
+                />
+                <SwitchRow
+                  label={i18n.t("settings.crewDetect")}
+                  hint={i18n.t("settings.crewDetectHint")}
+                  value={crewDetectOn}
+                  onChange={(on) => {
+                    if (!on) {
+                      void stopCrewDetect();
+                      return;
+                    }
+                    // It rides on the outing nudge and its "Always" permission.
+                    if (!outingNudgeOn) {
+                      showToast({ message: i18n.t("settings.crewDetectNeedsOuting") });
+                      return;
+                    }
+                    useAppStore.setState({ crewDetectOn: true });
                   }}
                 />
                 <SwitchRow

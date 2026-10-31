@@ -894,6 +894,9 @@ export const fr = {
     outing: "Rappel quand t'es de sortie",
     outingHint: "Le soir, si tu restes posé au même endroit sans soirée lancée, un petit rappel. Ta position reste sur ce téléphone.",
     outingDenied: "Sans la position « Toujours », pas de rappel. Tu peux l'autoriser dans les réglages du téléphone.",
+    crewDetect: "Me détecter avec mon crew",
+    crewDetectHint: "Le soir, une position arrondie à 100 m part au serveur, gardée 30 min et montrée à personne, juste pour voir si le crew est réuni. Il faut le rappel de sortie.",
+    crewDetectNeedsOuting: "Allume d'abord le rappel quand t'es de sortie.",
     remindersAppOnly: "Les rappels (eau, limite, récap) ne marchent que dans l'app installée, pas dans le navigateur.",
     sections: { region: "Langue, région et unités", notifications: "Notifications", security: "Sécurité et données", appearance: "Confidentialité et apparence" },
     notificationsSummary: "Eau, limite, récap, heures calmes",
@@ -1399,7 +1402,7 @@ export const fr = {
     where: "Où elles vont",
     whereBody: "Sur ce téléphone, dans sa sauvegarde et sur le serveur de ton crew, nulle part ailleurs. Rien n'est vendu. Les photos de tes verres perso restent sur ce téléphone.",
     never: "Ce qu'il n'y a pas",
-    neverBody: "L'app n'affiche aucune pub et ne mesure pas ton usage. Ta position part seulement au check-in ou quand tu la partages. Avec le rappel de sortie allumé, ta position est lue en arrière-plan mais ne quitte jamais le téléphone.",
+    neverBody: "L'app n'affiche aucune pub et ne mesure pas ton usage. Ta position part seulement au check-in ou quand tu la partages. Avec le rappel de sortie allumé, ta position est lue en arrière-plan mais ne quitte jamais le téléphone. Avec « Me détecter avec mon crew », une position arrondie à 100 m part au serveur le soir, gardée 30 min, jamais montrée, seulement pour voir si le crew est réuni.",
     backup: "Sauvegardes du téléphone",
     backupBody: "Les données de l'app font partie de la sauvegarde iCloud de ton iPhone ou de la sauvegarde Google de ton Android, chiffrées par Apple ou Google comme le reste du téléphone. Elles reviennent quand tu restaures un téléphone. Une copie de l'essentiel (âge confirmé, accord, profil, réglages, boissons perso, verres et eau des 45 derniers jours) reste aussi dans le trousseau de ce téléphone : si tu supprimes l'app puis la réinstalles, tu reprends où tu étais. Cette copie ne quitte jamais le téléphone.",
     rights: "Tes droits",
@@ -2436,6 +2439,11 @@ export const fr = {
   },
   // O-38, N-35, QOL-03, QOL-30: the notification centre, push text (generic) and actions.
   notify: {
+    crewNearby: {
+      live: { v1: "{name} et le crew sont en soirée à côté, tu lances ?", v2: "{name} a déjà lancé la soirée juste à côté. Tu suis ?", v3: "Ça trinque à côté : {name} est en soirée. Tu lances la tienne ?", v4: "{name} et le crew sont lancés pas loin. Et toi ?", v5: "{name} est en soirée à deux pas. Lance la tienne !", v6: "Le crew est chaud à côté, {name} a ouvert le bal. Tu lances ?", v7: "{name} est déjà dedans, juste à côté. On t'attend !", v8: "À côté, {name} et le crew ont commencé. Tu lances ta soirée ?" },
+      pushLive: { v1: "Le crew est en soirée à côté, tu lances ?", v2: "Ça a commencé juste à côté. Tu suis ?", v3: "Ça trinque à côté. Tu lances ta soirée ?", v4: "Le crew est lancé pas loin. Et toi ?", v5: "Une soirée tourne à deux pas. Lance la tienne !", v6: "Le crew est chaud à côté. Tu lances ?", v7: "Ils sont déjà dedans, juste à côté. On t'attend !", v8: "À côté, le crew a commencé. Tu lances ta soirée ?" },
+      gathered: { v1: "Le crew est réuni, quelqu'un lance la soirée ?", v2: "Tout le crew au même endroit ! Qui lance la soirée ?", v3: "Le crew est là. Il manque juste quelqu'un pour lancer.", v4: "Tout le monde est là, la soirée attend son top départ.", v5: "Réunion du crew repérée. Quelqu'un ouvre le bal ?", v6: "Le crew est au complet. Qui dégaine la soirée ?", v7: "Tout le crew ce soir ? Faut lancer la soirée !", v8: "Le crew est réuni. Premier qui lance gagne." },
+    },
     title: "Notifications",
     bell: "Notifications",
     bellUnread: { one: "Notifications, {count} non lue", other: "Notifications, {count} non lues" },
@@ -2459,6 +2467,7 @@ export const fr = {
     },
     kinds: {
       outCall: "Qui vient ?",
+      crewNearby: "Le crew réuni à côté",
       round: "Tournées pour toi",
       recapReady: "Récap prêt",
       takeover: "Bars qui changent de boss",
@@ -2492,6 +2501,7 @@ export const fr = {
     },
     push: {
       outCall: { title: "Qui vient ?", body: "Quelqu'un du crew sort ce soir." },
+      crewNearby: { title: "Le crew est dans le coin", body: "Des gens du crew sont ensemble pas loin." },
       round: { title: "Une tournée pour toi", body: "Quelqu'un t'offre un verre. Ouvre pour confirmer." },
       recapReady: { title: "Récap prêt", body: "Le récap de la soirée t'attend." },
       takeover: { title: "Changement de boss", body: "Un bar du crew a un nouveau boss." },

@@ -3,6 +3,7 @@ import type { Context } from "../context";
 import { computeBoard, drinkingLeaderboardEnabled } from "../routes/leaderboards";
 import { crewTimeZone, type Takeover } from "../territory";
 import { claimMark, notifyLater, releaseHeld } from "./notify";
+import { sweepOuting } from "../outing";
 
 const MINUTE_MS = 60_000;
 const HOUR_MS = 60 * MINUTE_MS;
@@ -165,6 +166,8 @@ export async function checkOvertakes(ctx: Context, partyId: string): Promise<voi
  */
 export async function sweepNotifications(ctx: Context): Promise<void> {
   const now = ctx.now();
+  // Coarse positions past their 30 min go; settled nudges teach each habit.
+  await sweepOuting(ctx);
 
   // N-29 quiet members are found by the night watch (nightWatch.ts), with each party's own threshold.
 

@@ -895,6 +895,9 @@ export const es: Messages = {
     outing: "Aviso cuando sales",
     outingHint: "Por la noche, si te quedas en un sitio sin noche lanzada, un pequeño aviso. Tu ubicación se queda en este móvil.",
     outingDenied: "Sin la ubicación \"Siempre\", no hay aviso. Puedes permitirla en los ajustes del móvil.",
+    crewDetect: "Detectarme con mi crew",
+    crewDetectHint: "Por la noche, una posición redondeada a 100 m va al servidor, guardada 30 min y sin mostrarse a nadie, solo para ver si el crew está junto. Necesita el aviso cuando sales.",
+    crewDetectNeedsOuting: "Activa primero el aviso cuando sales.",
     remindersAppOnly: "Los recordatorios (agua, límite, resumen) solo funcionan en la app instalada, no en el navegador.",
     sections: { region: "Idioma, región y unidades", notifications: "Notificaciones", security: "Seguridad y datos", appearance: "Privacidad y apariencia" },
     notificationsSummary: "Agua, límite, resumen, horas tranquilas",
@@ -1400,7 +1403,7 @@ export const es: Messages = {
     where: "Adónde van",
     whereBody: "En este teléfono, en su copia de seguridad y en el servidor de tu crew, en ningún otro sitio. No se vende nada. Las fotos de tus bebidas propias se quedan en este teléfono.",
     never: "Lo que no hay",
-    neverBody: "Ni anuncios, ni estadísticas de uso, ni seguimiento continuo de tu ubicación. Con el aviso de salida activado, tu ubicación se lee en segundo plano pero nunca sale del móvil.",
+    neverBody: "Ni anuncios, ni estadísticas de uso, ni seguimiento continuo de tu ubicación. Con el aviso de salida activado, tu ubicación se lee en segundo plano pero nunca sale del móvil. Con \"Detectarme con mi crew\", una posición redondeada a 100 m va al servidor por la noche, guardada 30 min, nunca mostrada, solo para ver si el crew está junto.",
     backup: "Copias de seguridad del teléfono",
     backupBody: "Los datos de la app forman parte de la copia de iCloud de tu iPhone o de la copia de Google de tu Android, cifrados por Apple o Google como el resto del teléfono. Vuelven cuando restauras un teléfono. Una copia de lo esencial (edad confirmada, consentimiento, perfil, ajustes, bebidas personalizadas, bebidas y agua de los últimos 45 días) también se queda en el llavero de este teléfono: si borras la app y la reinstalas, sigues donde estabas. Esa copia nunca sale del teléfono.",
     rights: "Tus derechos",
@@ -2437,6 +2440,11 @@ export const es: Messages = {
   },
   // O-38, N-35, QOL-03, QOL-30: the notification centre, push text (generic) and actions.
   notify: {
+    crewNearby: {
+      live: { v1: "{name} y el crew están de fiesta al lado. ¿Lanzas la tuya?", v2: "{name} ya lanzó la noche aquí al lado. ¿Te apuntas?", v3: "Se brinda al lado: {name} está de fiesta. ¿Lanzas la tuya?", v4: "{name} y la peña ya arrancaron cerca. ¿Y tú?", v5: "{name} está de fiesta a dos pasos. ¡Lanza la tuya!", v6: "El crew se calienta al lado, {name} abrió la pista. ¿Lanzas?", v7: "{name} ya está en ello, aquí al lado. ¡Te esperamos!", v8: "Al lado, {name} y el crew empezaron. ¿Lanzas tu noche?" },
+      pushLive: { v1: "El crew está de fiesta al lado. ¿Lanzas la tuya?", v2: "Ya empezó aquí al lado. ¿Te apuntas?", v3: "Se brinda al lado. ¿Lanzas tu noche?", v4: "La peña ya arrancó cerca. ¿Y tú?", v5: "Hay fiesta a dos pasos. ¡Lanza la tuya!", v6: "El crew se calienta al lado. ¿Lanzas?", v7: "Ya están en ello, aquí al lado. ¡Te esperamos!", v8: "Al lado, el crew empezó. ¿Lanzas tu noche?" },
+      gathered: { v1: "El crew está junto, ¿alguien lanza la noche?", v2: "¡Toda la peña en el mismo sitio! ¿Quién lanza la noche?", v3: "El crew está aquí. Solo falta que alguien la lance.", v4: "Estáis juntos, la noche espera su pistoletazo.", v5: "Quedada del crew detectada. ¿Quién abre la pista?", v6: "El crew al completo. ¿Quién lanza la fiesta?", v7: "¿Juntos esta noche? ¡Lanzad la noche!", v8: "El crew está junto. El primero que la lance gana." },
+    },
     title: "Notificaciones",
     bell: "Notificaciones",
     bellUnread: { one: "Notificaciones, {count} sin leer", other: "Notificaciones, {count} sin leer" },
@@ -2460,6 +2468,7 @@ export const es: Messages = {
     },
     kinds: {
       outCall: "¿Quién se apunta?",
+      crewNearby: "El crew junto cerca",
       round: "Rondas para ti",
       recapReady: "Resumen listo",
       takeover: "Bares que cambian de jefe",
@@ -2493,6 +2502,7 @@ export const es: Messages = {
     },
     push: {
       outCall: { title: "¿Quién se apunta?", body: "Alguien del crew sale esta noche." },
+      crewNearby: { title: "El crew anda cerca", body: "Gente del crew está junta cerca de ti." },
       round: { title: "Una ronda para ti", body: "Alguien te invita a una bebida. Abre para confirmar." },
       recapReady: { title: "Resumen listo", body: "El resumen de la fiesta te espera." },
       takeover: { title: "Cambio de jefe", body: "Un bar del crew tiene jefe nuevo." },

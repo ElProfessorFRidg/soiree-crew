@@ -86,6 +86,10 @@ export interface AppState {
   nudgesOn: boolean;
   /** "Rappel quand t'es de sortie": background location, off until switched on (location/outing.ts). */
   outingNudgeOn: boolean;
+  /** "Me détecter avec mon crew": a coarse position to the server at night, off until switched on. */
+  crewDetectOn: boolean;
+  /** How this person answers the "go out?" nudges, as the server learnt it (outing.ts on both sides). */
+  outingHabit: { stayMinutes: number; maxPerNight: number; pausedUntil: number | null } | null;
   /** Parties whose live screen I opened, so the "it has started" nudge stays quiet. */
   launchedParties: string[];
   /** Time of the peak warning already scheduled tonight: one per night. */
@@ -171,6 +175,8 @@ export const useAppStore = create<AppState>()(
       remindersMutedUntil: null,
       nudgesOn: true,
       outingNudgeOn: false,
+      crewDetectOn: false,
+      outingHabit: null,
       launchedParties: [],
       peakWarnedAt: null,
       weekStartOverride: null,

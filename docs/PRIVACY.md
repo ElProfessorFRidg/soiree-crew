@@ -25,6 +25,8 @@ Not set yet: the private build runs on a server the crew hosts itself. Before an
 | Chat history backup (optional) | A new phone gets its history back (MSG-08) | `chat_backups` and a file, sealed with the user's recovery key only | Turning the backup off or account deletion |
 | Copy kept on the phone (native apps) | A reinstall on the same phone picks up where the person was | iOS Keychain or Android Keystore, `THIS_DEVICE_ONLY`, never synced: age check, consent, body profile, settings, custom drinks, drinks and water of the last 45 days (`apps/mobile/src/system/keptCopy.ts`) | The reset in Settings (account deletion or erasing everything); deleting the app does not remove it on iOS |
 | Photos of custom drinks | My own glass shown instead of its icon (O-21) | The app's document folder on the phone only, a 480 px square JPEG without location; never uploaded, not in the synced drink nor in the Keychain copy (`apps/mobile/src/drinks/drinkPhotos.ts`) | Replacing the photo, removing the drink, or the reset in Settings; the app's own data also lives in the phone's iCloud or Google backup |
+| Coarse position (optional, "Me détecter avec mon crew") | Noticing crew members together at night to suggest starting the night | `whereabouts`: the latest position only, rounded to about 100 m by the phone and again by the server, never shown to anyone | 30 min after it was sent, or at once when the switch goes off; account deletion |
+| "Go out?" nudges and their outcome | Fewer nudges for people who ignore them, earlier ones for people who forget to log | `outing_nudges` (times only, no place), `outing_habits` (a score, a count of ignored nights, a pause) | Account deletion |
 | Reported chat messages | Moderation (MSG-07) | `reports.evidence`, sealed: the message and up to 3 around it, sent by the reporter's phone | Handled reports, then account deletion |
 
 Alcohol consumption and BAC are treated as health data (GDPR article 9).
@@ -58,5 +60,5 @@ TLS in transit (the server sits behind HTTPS), health data sealed with AES-256-G
 
 - Risk: a crew member learns someone's drinking. Mitigation: BACs are shared only inside the crew and only during a party; leaving the leaderboard keeps everything else.
 - Risk: server compromise exposes health data. Mitigation: sealed columns; the key is outside the database.
-- Risk: location tracking. Mitigation: no continuous location; check-ins keep no coordinates; the radar shares a status, never a position.
+- Risk: location tracking. Mitigation: check-ins keep no coordinates; the radar shares a status, never a position. The night out nudge reads the position in the background only when switched on, and keeps it on the phone. "Me détecter avec mon crew", a separate switch, sends a position rounded to 100 m at most every 10 min while lingering at night; the server keeps the latest one for 30 min, shows it to no one and uses it only to spot crew members together.
 - Residual risk: the crew admin who hosts the server holds `DATA_KEY`. Acceptable for a private build between friends; not for a public one.

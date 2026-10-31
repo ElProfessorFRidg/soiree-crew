@@ -895,6 +895,9 @@ export const pt: Messages = {
     outing: "Lembrete quando sais",
     outingHint: "À noite, se ficares no mesmo sítio sem noite lançada, um pequeno lembrete. A tua localização fica neste telemóvel.",
     outingDenied: "Sem a localização \"Sempre\", não há lembrete. Podes permiti-la nas definições do telemóvel.",
+    crewDetect: "Detetar-me com o meu crew",
+    crewDetectHint: "À noite, uma posição arredondada a 100 m vai para o servidor, guardada 30 min e mostrada a ninguém, só para ver se o crew está junto. Precisa do lembrete quando sais.",
+    crewDetectNeedsOuting: "Liga primeiro o lembrete quando sais.",
     remindersAppOnly: "Os lembretes (água, limite, resumo) só funcionam na app instalada, não no navegador.",
     sections: { region: "Idioma, região e unidades", notifications: "Notificações", security: "Segurança e dados", appearance: "Privacidade e aparência" },
     notificationsSummary: "Água, limite, resumo, horas de silêncio",
@@ -1400,7 +1403,7 @@ export const pt: Messages = {
     where: "Para onde vão",
     whereBody: "Neste telemóvel, na sua cópia de segurança e no servidor do teu crew, em mais lado nenhum. Nada é vendido. As fotos das tuas bebidas ficam neste telemóvel.",
     never: "O que não há",
-    neverBody: "Sem publicidade, sem estatísticas de utilização, sem localização seguida em contínuo. Com o lembrete de saída ligado, a localização é lida em segundo plano mas nunca sai do telemóvel.",
+    neverBody: "Sem publicidade, sem estatísticas de utilização, sem localização seguida em contínuo. Com o lembrete de saída ligado, a localização é lida em segundo plano mas nunca sai do telemóvel. Com \"Detetar-me com o meu crew\", uma posição arredondada a 100 m vai para o servidor à noite, guardada 30 min, nunca mostrada, só para ver se o crew está junto.",
     backup: "Cópias de segurança do telemóvel",
     backupBody: "Os dados da app fazem parte da cópia iCloud do teu iPhone ou da cópia Google do teu Android, cifrados pela Apple ou pela Google como o resto do telemóvel. Voltam quando restauras um telemóvel. Uma cópia do essencial (idade confirmada, consentimento, perfil, definições, bebidas personalizadas, bebidas e água dos últimos 45 dias) também fica no porta-chaves deste telemóvel: se apagares a app e a reinstalares, continuas onde estavas. Essa cópia nunca sai do telemóvel.",
     rights: "Os teus direitos",
@@ -2437,6 +2440,11 @@ export const pt: Messages = {
   },
   // O-38, N-35, QOL-03, QOL-30: the notification centre, push text (generic) and actions.
   notify: {
+    crewNearby: {
+      live: { v1: "{name} e o crew estão na festa ao lado. Lanças a tua?", v2: "{name} já lançou a noite aqui ao lado. Alinhas?", v3: "Brinda-se ao lado: {name} está na festa. Lanças a tua?", v4: "{name} e a malta já arrancaram perto. E tu?", v5: "{name} está na festa a dois passos. Lança a tua!", v6: "O crew aquece ao lado, {name} abriu a pista. Lanças?", v7: "{name} já está nisso, mesmo ao lado. Estamos à tua espera!", v8: "Ao lado, {name} e o crew começaram. Lanças a tua noite?" },
+      pushLive: { v1: "O crew está na festa ao lado. Lanças a tua?", v2: "Já começou aqui ao lado. Alinhas?", v3: "Brinda-se ao lado. Lanças a tua noite?", v4: "A malta já arrancou perto. E tu?", v5: "Há festa a dois passos. Lança a tua!", v6: "O crew aquece ao lado. Lanças?", v7: "Já estão nisso, mesmo ao lado. Estamos à tua espera!", v8: "Ao lado, o crew começou. Lanças a tua noite?" },
+      gathered: { v1: "O crew está junto, alguém lança a noite?", v2: "A malta toda no mesmo sítio! Quem lança a noite?", v3: "O crew está cá. Só falta alguém lançar.", v4: "Estão juntos, a noite espera o arranque.", v5: "Encontro do crew detetado. Quem abre a pista?", v6: "O crew está completo. Quem lança a festa?", v7: "Juntos esta noite? Lancem a noite!", v8: "O crew está junto. Ganha quem lançar primeiro." },
+    },
     title: "Notificações",
     bell: "Notificações",
     bellUnread: { one: "Notificações, {count} por ler", other: "Notificações, {count} por ler" },
@@ -2460,6 +2468,7 @@ export const pt: Messages = {
     },
     kinds: {
       outCall: "Quem vem?",
+      crewNearby: "O crew junto aqui perto",
       round: "Rodadas para ti",
       recapReady: "Resumo pronto",
       takeover: "Bares que mudam de chefe",
@@ -2493,6 +2502,7 @@ export const pt: Messages = {
     },
     push: {
       outCall: { title: "Quem vem?", body: "Alguém do crew sai hoje à noite." },
+      crewNearby: { title: "O crew anda por perto", body: "Malta do crew está junta aqui perto." },
       round: { title: "Uma rodada para ti", body: "Alguém te paga uma bebida. Abre para confirmar." },
       recapReady: { title: "Resumo pronto", body: "O resumo da noite está à tua espera." },
       takeover: { title: "Mudança de chefe", body: "Um bar do crew tem um chefe novo." },
