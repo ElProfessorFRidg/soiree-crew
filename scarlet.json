@@ -10,7 +10,7 @@
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.13%2Bbuild.81/soiree-crew-unsigned.ipa",
       "category": "Other",
-      "description": "• Eight or more lines for every recurring notification and greeting in all languages; a once-a-night peak warning, a nudge when a party I said yes to started without me, a weekend comeback nudge, with a settings toggle\n• Twelve casual water lines in every language, no night notification once nothing is drunk or the level is back to zero; home party, apero, dinner, game and movie night moods",
+      "description": "• Nouveau rappel quand t'es de sortie \u0001 le soir, si tu restes posé quelque part sans soirée lancée, l'app te propose de la lancer. Ta position reste sur ton téléphone. À allumer dans Réglages.\n• Me détecter avec mon crew \u0001 quand plusieurs du crew sont ensemble le soir, un petit rappel pour lancer la soirée. Une position arrondie à 100 m part alors au serveur, gardée 30 min et montrée à personne.\n• Les rappels s'adaptent à toi \u0001 plus tôt si tu oublies souvent de noter, moins souvent si tu ne t'en sers pas.\n• Plein de nouveaux messages pendant la soirée : pense à manger, tu vas vite là, prévois ton retour, et un petit mot le lendemain matin. Chacun se coupe dans Réglages. Les rappels d'eau ont deux fois plus de phrases, et une nouvelle quand tu enchaînes sans eau.",
       "bundleID": "app.soireecrew.mobile",
       "screenshots": [
         "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.13/01-party.png",
