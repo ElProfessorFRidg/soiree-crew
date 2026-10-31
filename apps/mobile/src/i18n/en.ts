@@ -390,6 +390,9 @@ export const en: Messages = {
     notifBody: "{party} is over. One tap tells the crew you're home.",
   },
   account: {
+    eraseAll: "Erase everything",
+    eraseAllTitle: "Erase everything on this phone?",
+    eraseAllBody: "Your profile, drinks and water, settings, custom drinks and photos waiting to upload are erased from this phone, reminders included. The app restarts as on its first launch.",
     withdraw: "Withdraw consent for health data",
     withdrawTitle: "Withdraw your consent?",
     withdrawBody: "Your weight, body, drinks and water are erased from the server and this phone. Without consent, the app can't estimate your BAC.",
@@ -403,7 +406,7 @@ export const en: Messages = {
     signOut: "Sign out of this phone",
     delete: "Delete my account",
     deleteTitle: "Delete your account?",
-    deleteBody: "This erases your profile, drinks and water, check-ins, reviews, photos, messages and their backup, settings and custom drinks, on the server and on this phone. Your crews stay for the others.",
+    deleteBody: "This erases your profile, drinks and water, check-ins, reviews, photos, messages and their backup, settings and custom drinks, on the server and on this phone. Your crews stay for the others. The app then restarts as on its first launch.",
     deleteConfirm: "Delete my account",
     deleteKeep: "Keep it",
     deleted: "Account deleted. Everything was erased.",

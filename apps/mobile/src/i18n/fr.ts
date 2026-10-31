@@ -388,6 +388,9 @@ export const fr = {
     notifBody: "Fin de {party}. Un geste pour dire au crew que tu es chez toi.",
   },
   account: {
+    eraseAll: "Tout effacer",
+    eraseAllTitle: "Tout effacer de ce téléphone ?",
+    eraseAllBody: "Ton profil, tes verres et ton eau, tes réglages, tes boissons perso et tes photos en attente sont effacés de ce téléphone, rappels compris. L'app redémarre comme au premier lancement.",
     withdraw: "Retirer mon accord pour les données de santé",
     withdrawTitle: "Retirer ton accord ?",
     withdrawBody: "Ton poids, ta morphologie, tes verres et tes verres d'eau sont effacés du serveur et de ce téléphone. Sans accord, l'app ne calcule plus ton taux.",
@@ -401,7 +404,7 @@ export const fr = {
     signOut: "Me déconnecter de ce téléphone",
     delete: "Supprimer mon compte",
     deleteTitle: "Supprimer ton compte ?",
-    deleteBody: "Ton profil, tes verres et ton eau, tes check-ins, tes avis, tes photos, tes messages et leur sauvegarde, tes réglages et tes boissons perso sont effacés du serveur et de ce téléphone. Tes crews restent pour les autres.",
+    deleteBody: "Ton profil, tes verres et ton eau, tes check-ins, tes avis, tes photos, tes messages et leur sauvegarde, tes réglages et tes boissons perso sont effacés du serveur et de ce téléphone. Tes crews restent pour les autres. L'app redémarre ensuite comme au premier lancement.",
     deleteConfirm: "Supprimer mon compte",
     deleteKeep: "Garder",
     deleted: "Compte supprimé. Tout a été effacé.",

@@ -1,7 +1,6 @@
 import QRCode from "react-native-qrcode-svg";
 import { palette } from "@crew/design-tokens";
 import { linkValue } from "@/crew/LinkScanner";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { View } from "react-native";
@@ -11,7 +10,6 @@ import { formatClock } from "@/i18n/format";
 import { DataControls } from "./DataControls";
 import { api, ApiError } from "@/server/api";
 import { serverMessage, showFailure, failureMessage } from "@/server/errors";
-import { useCrewData } from "@/server/crewData";
 import { forgetChat } from "@/chat/engine";
 import { wipePreviousAccount } from "@/server/connection";
 import { saveSession, useSession } from "@/server/session";
@@ -22,38 +20,19 @@ import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { guarded } from "@/vault/vault";
 import { confirmAction } from "@/ui/confirm";
+import { eraseEverything } from "@/system/factoryReset";
 
-/** Wipes everything this phone holds about the user, then sends them back to the age gate. */
-async function wipeDevice(): Promise<void> {
-  const userId = useSession.getState().session?.userId;
-  if (userId) await forgetChat(userId);
-  await saveSession(null);
-  useCrewData.setState({ crews: [], parties: [], live: {} });
-  useAppStore.setState({
-    ageConfirmedAt: null,
-    profile: null,
-    drinks: [],
-    water: [],
-    customDrinks: [],
-    outbox: [],
-    manualLevel: null,
-    levelState: null,
-    syncCursor: null,
-    uploadedToServerAt: null,
-    accountUserId: null,
-    vault: [],
-  });
-  await AsyncStorage.multiRemove(["crew-app-v1", "crew-data-v1"]);
-}
-
-/** O-07: deletes the account on the server, then everything on this phone. */
+/**
+ * O-07: deletes the account on the server first (nothing is erased here if that fails), then this
+ * phone as if the app had never been installed, and restarts it at the age gate.
+ */
 export async function deleteAccount(i18n: Translator): Promise<void> {
   const remote = useSession.getState().session ? api("/v1/me", { method: "DELETE" }) : Promise.resolve();
   try {
     await remote;
-    await wipeDevice();
-    showToast({ message: i18n.t("account.deleted") });
-    router.replace("/onboarding");
+    const userId = useSession.getState().session?.userId;
+    if (userId) await forgetChat(userId).catch(() => undefined);
+    await eraseEverything();
   } catch (error) {
     showToast({ tone: "danger", message: failureMessage(error, i18n) });
   }
@@ -248,11 +227,12 @@ export function AccountSection() {
   const session = useSession((state) => state.session);
   const [transfer, setTransfer] = useState<string | null>(null);
 
+  // Without an account there is nothing on the server: the same reset, said for this phone only.
   const onDelete = () => {
     void confirmAction({
-      title: i18n.t("account.deleteTitle"),
-      body: i18n.t("account.deleteBody"),
-      confirmLabel: i18n.t("account.deleteConfirm"),
+      title: session ? i18n.t("account.deleteTitle") : i18n.t("account.eraseAllTitle"),
+      body: session ? i18n.t("account.deleteBody") : i18n.t("account.eraseAllBody"),
+      confirmLabel: session ? i18n.t("account.deleteConfirm") : i18n.t("account.eraseAll"),
       cancelLabel: i18n.t("account.deleteKeep"),
     }).then((ok) => {
       if (ok && !guarded({ kind: "deleteAccount" }, () => void deleteAccount(i18n))) showToast({ message: i18n.t("vault.queued") });
@@ -321,7 +301,7 @@ export function AccountSection() {
         <Text variant="small">{i18n.t("account.notConnected")}</Text>
       )}
       <Button label={i18n.t("account.withdraw")} variant="outline" height={44} onPress={onWithdraw} />
-      <Button label={i18n.t("account.delete")} variant="danger" height={44} onPress={onDelete} />
+      <Button label={session ? i18n.t("account.delete") : i18n.t("account.eraseAll")} variant="danger" height={44} onPress={onDelete} />
     </Panel>
   );
 }

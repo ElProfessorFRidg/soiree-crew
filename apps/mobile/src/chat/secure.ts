@@ -6,6 +6,7 @@ import { fromBase64, newLocalKey, openLocal, sealLocal, toBase64, utf8 } from "@
 // SEC-05 for chats: history, group state and keys are sealed with one key that lives in the
 // Keychain / Keystore. AsyncStorage only ever holds ciphertext.
 const KEY_NAME = "crew.chat.localKey";
+export const CHAT_KEY_NAME = KEY_NAME;
 const PREFIX = "crew.chat.";
 
 function tabStorage(): Storage | null {

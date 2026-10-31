@@ -388,6 +388,9 @@ export const de: Messages = {
     notifBody: "{party} ist vorbei. Ein Tippen sagt der Crew, dass du zu Hause bist.",
   },
   account: {
+    eraseAll: "Alles löschen",
+    eraseAllTitle: "Alles auf diesem Handy löschen?",
+    eraseAllBody: "Dein Profil, deine Getränke und dein Wasser, Einstellungen, eigene Getränke und wartende Fotos werden von diesem Handy gelöscht, Erinnerungen inklusive. Die App startet wie beim ersten Mal.",
     withdraw: "Einwilligung für Gesundheitsdaten widerrufen",
     withdrawTitle: "Einwilligung widerrufen?",
     withdrawBody: "Gewicht, Körperbau, Drinks und Wasser werden vom Server und von diesem Handy gelöscht. Ohne Einwilligung schätzt die App deine Promille nicht mehr.",
@@ -401,7 +404,7 @@ export const de: Messages = {
     signOut: "Auf diesem Handy abmelden",
     delete: "Mein Konto löschen",
     deleteTitle: "Dein Konto löschen?",
-    deleteBody: "Dein Profil, deine Getränke und dein Wasser, Check-ins, Bewertungen, Fotos, Nachrichten samt Sicherung, Einstellungen und eigenen Getränke werden vom Server und von diesem Handy gelöscht. Deine Crews bleiben für die anderen bestehen.",
+    deleteBody: "Dein Profil, deine Getränke und dein Wasser, Check-ins, Bewertungen, Fotos, Nachrichten samt Sicherung, Einstellungen und eigenen Getränke werden vom Server und von diesem Handy gelöscht. Deine Crews bleiben für die anderen bestehen. Danach startet die App wie beim ersten Mal.",
     deleteConfirm: "Mein Konto löschen",
     deleteKeep: "Behalten",
     deleted: "Konto gelöscht. Alle Daten sind entfernt.",

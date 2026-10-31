@@ -389,6 +389,9 @@ export const pt: Messages = {
     notifBody: "{party} acabou. Um toque diz à crew que estás em casa.",
   },
   account: {
+    eraseAll: "Apagar tudo",
+    eraseAllTitle: "Apagar tudo deste telemóvel?",
+    eraseAllBody: "O teu perfil, as bebidas e a água, as definições, as bebidas personalizadas e as fotos em espera são apagados deste telemóvel, lembretes incluídos. A app reinicia como na primeira vez.",
     withdraw: "Retirar o meu acordo para os dados de saúde",
     withdrawTitle: "Retirar o teu acordo?",
     withdrawBody: "O teu peso, a tua morfologia, as tuas bebidas e os copos de água são apagados do servidor e deste telemóvel. Sem acordo, a app deixa de calcular a tua taxa.",
@@ -402,7 +405,7 @@ export const pt: Messages = {
     signOut: "Terminar sessão neste telemóvel",
     delete: "Apagar a minha conta",
     deleteTitle: "Apagar a tua conta?",
-    deleteBody: "O teu perfil, os teus copos e a água, os check-ins, as avaliações, as fotos, as mensagens e a sua cópia, as definições e as bebidas personalizadas são apagados do servidor e deste telemóvel. As tuas crews continuam para quem lá fica.",
+    deleteBody: "O teu perfil, os teus copos e a água, os check-ins, as avaliações, as fotos, as mensagens e a sua cópia, as definições e as bebidas personalizadas são apagados do servidor e deste telemóvel. As tuas crews continuam para quem lá fica. Depois a app reinicia como na primeira vez.",
     deleteConfirm: "Apagar a minha conta",
     deleteKeep: "Manter",
     deleted: "Conta apagada. Já não resta nada.",

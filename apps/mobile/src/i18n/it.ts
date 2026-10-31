@@ -389,6 +389,9 @@ export const it: Messages = {
     notifBody: "{party} è finita. Un tocco dice alla crew che sei a casa.",
   },
   account: {
+    eraseAll: "Cancella tutto",
+    eraseAllTitle: "Cancellare tutto da questo telefono?",
+    eraseAllBody: "Il tuo profilo, i drink e l'acqua, le impostazioni, i drink personalizzati e le foto in attesa vengono cancellati da questo telefono, promemoria compresi. L'app riparte come al primo avvio.",
     withdraw: "Ritira il consenso per i dati sanitari",
     withdrawTitle: "Ritirare il consenso?",
     withdrawBody: "Peso, corporatura, drink e bicchieri d'acqua vengono cancellati dal server e da questo telefono. Senza consenso, l'app non calcola più il tuo tasso.",
@@ -402,7 +405,7 @@ export const it: Messages = {
     signOut: "Esci da questo telefono",
     delete: "Elimina il mio account",
     deleteTitle: "Eliminare il tuo account?",
-    deleteBody: "Profilo, bicchieri e acqua, check-in, recensioni, foto, messaggi e il loro backup, impostazioni e bevande personali vengono cancellati dal server e da questo telefono. Le tue crew restano agli altri membri.",
+    deleteBody: "Profilo, bicchieri e acqua, check-in, recensioni, foto, messaggi e il loro backup, impostazioni e bevande personali vengono cancellati dal server e da questo telefono. Le tue crew restano agli altri membri. Poi l'app riparte come al primo avvio.",
     deleteConfirm: "Elimina il mio account",
     deleteKeep: "Tienilo",
     deleted: "Account eliminato. È stato cancellato tutto.",

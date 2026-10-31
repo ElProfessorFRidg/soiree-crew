@@ -389,6 +389,9 @@ export const es: Messages = {
     notifBody: "{party} ha terminado. Un toque avisa a la crew de que estás en casa.",
   },
   account: {
+    eraseAll: "Borrarlo todo",
+    eraseAllTitle: "¿Borrarlo todo de este teléfono?",
+    eraseAllBody: "Tu perfil, tus bebidas y el agua, tus ajustes, tus bebidas personalizadas y las fotos pendientes se borran de este teléfono, recordatorios incluidos. La app se reinicia como la primera vez.",
     withdraw: "Retirar mi permiso para los datos de salud",
     withdrawTitle: "¿Retirar tu permiso?",
     withdrawBody: "Tu peso, tu morfología, tus copas y tus vasos de agua se borran del servidor y de este teléfono. Sin permiso, la app ya no calcula tu tasa.",
@@ -402,7 +405,7 @@ export const es: Messages = {
     signOut: "Cerrar sesión en este móvil",
     delete: "Eliminar mi cuenta",
     deleteTitle: "¿Eliminar tu cuenta?",
-    deleteBody: "Se borran del servidor y de este móvil tu perfil, tus bebidas y tu agua, tus check-ins, tus reseñas, tus fotos, tus mensajes y su copia, tus ajustes y tus bebidas personalizadas. Tus crews siguen ahí para el resto.",
+    deleteBody: "Se borran del servidor y de este móvil tu perfil, tus bebidas y tu agua, tus check-ins, tus reseñas, tus fotos, tus mensajes y su copia, tus ajustes y tus bebidas personalizadas. Tus crews siguen ahí para el resto. Después la app se reinicia como la primera vez.",
     deleteConfirm: "Eliminar mi cuenta",
     deleteKeep: "Mantenerla",
     deleted: "Cuenta eliminada. Se ha borrado todo.",
