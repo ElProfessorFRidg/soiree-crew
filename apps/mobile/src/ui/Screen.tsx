@@ -13,6 +13,7 @@ import { ToastHost } from "./Toast";
 import { BrandMark } from "./BrandMark";
 import { haptic } from "@/motion/haptics";
 import { useKeyboardShown } from "./useKeyboardShown";
+import { PULL_DISTANCE, pullProgress } from "./pure/pullProgress";
 
 interface Props {
   title?: string;
@@ -44,8 +45,17 @@ export function Screen({ title, brand, back, trailing, children, footer, withToa
   const footerBottom = keyboard ? 12 : insets.bottom + 12 + overTabBar;
   // The band under the status bar fills in once content scrolls under the clock.
   const scrollY = useSharedValue(0);
-  const onScroll = useAnimatedScrollHandler((event) => {
-    scrollY.value = event.contentOffset.y;
+  // MOT-10, iOS: the refresh starts when the finger lets go of a full glass, never before and
+  // never on a glass short of full, so what is felt and seen always matches what happens.
+  const armed = useSharedValue(false);
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+    onEndDrag: (event) => {
+      if (armed.value && event.contentOffset.y <= -PULL_DISTANCE) runOnJS(startRefresh)();
+      armed.value = false;
+    },
   });
   const band = useAnimatedStyle(() => ({ opacity: interpolate(scrollY.value, [0, 16], [0, 1], "clamp") }));
   // MOT-10: on iOS the pull shows as a filling glass and the system spinner stays hidden. Android's
@@ -56,15 +66,45 @@ export function Screen({ title, brand, back, trailing, children, footer, withToa
   // answer comes. Ticks re-arm only once the list is back at its top.
   const pullStep = useSharedValue(0);
   useAnimatedReaction(
-    () => (onRefresh && customPull ? Math.min(3, Math.floor(Math.max(0, -scrollY.value) / 28)) : 0),
+    () => (onRefresh && customPull && !refreshing ? Math.min(3, Math.floor((pullProgress(scrollY.value) * 3) + 0.0001)) : 0),
     (step, previous) => {
-      if (step === 0) pullStep.value = 0;
-      else if (previous !== null && step > previous && step > pullStep.value) {
+      if (step === 0) {
+        pullStep.value = 0;
+        armed.value = false;
+      } else if (previous !== null && step > previous && step > pullStep.value) {
+        pullStep.value = step;
+        // The last third arms the refresh: a firmer click says "let go now".
+        if (step === 3) {
+          armed.value = true;
+          runOnJS(haptic.pullArmed)();
+        } else runOnJS(haptic.pullTick)();
+      } else if (previous !== null && step < 3 && previous === 3) {
+        // Pushed back under full before letting go: disarmed, felt as a light tick.
+        armed.value = false;
         pullStep.value = step;
         runOnJS(haptic.pullTick)();
       }
     },
+    [refreshing],
   );
+  function startRefresh() {
+    if (!onRefresh || refreshing) return;
+    setRefreshing(true);
+    haptic.pullRelease();
+    const shown = Date.now();
+    // The glass gets at least one fill to be seen, even when the answer is instant.
+    const settle = () => new Promise<void>((resolve) => setTimeout(resolve, Math.max(0, MIN_REFRESH_MS - (Date.now() - shown))));
+    void onRefresh()
+      .then(async () => {
+        await settle();
+        haptic.confirmed();
+      })
+      .catch(async () => {
+        await settle();
+        haptic.error();
+      })
+      .finally(() => setRefreshing(false));
+  }
   return (
     // QOL-08: the keyboard never covers the field being typed, and the footer button rides above it.
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={[styles.screen, { backgroundColor: theme.bg }]}>
@@ -75,10 +115,10 @@ export function Screen({ title, brand, back, trailing, children, footer, withToa
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         refreshControl={
-          onRefresh ? (
+          onRefresh && !customPull ? (
             <RefreshControl
               refreshing={refreshing}
-              tintColor={customPull ? "transparent" : theme.amber}
+              tintColor={theme.amber}
               colors={[theme.amber]}
               progressBackgroundColor={theme.surface}
               onRefresh={() => {
@@ -130,6 +170,9 @@ export function Screen({ title, brand, back, trailing, children, footer, withToa
     </KeyboardAvoidingView>
   );
 }
+
+/** Shortest time the refresh glass stays, so one fill is always seen. */
+const MIN_REFRESH_MS = 900;
 
 /** Height of iOS's floating tab bar above the home indicator. */
 const TAB_BAR = 64;
