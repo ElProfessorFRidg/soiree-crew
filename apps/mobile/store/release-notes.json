@@ -1,10 +1,12 @@
 {
   "0.1.11": {
     "fr": [
-      "L'app ne reste plus bloquée sur son icône au lancement (TrollStore, iPad) : chaque étape du démarrage a un délai, et l'app continue sans celle qui ne répond pas."
+      "L'app ne reste plus bloquée sur son icône au lancement (TrollStore, iPad) : chaque étape du démarrage a un délai, et l'app continue sans celle qui ne répond pas.",
+      "La Live Activity tient dans son cadre, sur l'écran verrouillé comme dans la Dynamic Island."
     ],
     "en": [
-      "The app no longer stays stuck on its icon at launch (TrollStore, iPad): each launch step has a deadline, and the app goes on without the one that does not answer."
+      "The app no longer stays stuck on its icon at launch (TrollStore, iPad): each launch step has a deadline, and the app goes on without the one that does not answer.",
+      "The Live Activity fits its frame, on the lock screen and in the Dynamic Island."
     ]
   },
   "0.1.10": {
