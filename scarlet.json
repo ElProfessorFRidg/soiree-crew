@@ -6,6 +6,27 @@
   "Other": [
     {
       "name": "Soirée Crew",
+      "version": "0.1.9",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.9%2Bbuild.76/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "• Écran Soirée : le volant affiche l'heure « Pas avant », en couleur selon ta situation, et précise quand elle peut encore reculer.\n• Retour à 0 donne aussi l'heure.\n• L'icône et le nom de l'app en haut de l'écran Soirée, pour que tes captures disent d'où elles viennent.\n• Live Activity plus utile, même en mode discret : l'heure du retour à 0 en grand, le volant en couleur, tes verres, ton eau et ton dernier verre, des boutons Encore et Eau, et plus de secondes qui défilent.",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew 0.1.8",
       "version": "0.1.8",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.8%2Bbuild.75/soiree-crew-unsigned.ipa",

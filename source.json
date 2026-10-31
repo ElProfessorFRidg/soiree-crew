@@ -21,16 +21,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -43,6 +43,27 @@
         }
       },
       "versions": [
+        {
+          "version": "0.1.9",
+          "buildVersion": "76",
+          "date": "2026-10-31T13:57:31Z",
+          "localizedDescription": "• Écran Soirée : le volant affiche l'heure « Pas avant », en couleur selon ta situation, et précise quand elle peut encore reculer.\n• Retour à 0 donne aussi l'heure.\n• L'icône et le nom de l'app en haut de l'écran Soirée, pour que tes captures disent d'où elles viennent.\n• Live Activity plus utile, même en mode discret : l'heure du retour à 0 en grand, le volant en couleur, tes verres, ton eau et ton dernier verre, des boutons Encore et Eau, et plus de secondes qui défilent.",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.9%2Bbuild.76/soiree-crew-unsigned.ipa",
+          "size": 22225925,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/10-limits.png"
+          ]
+        },
         {
           "version": "0.1.8",
           "buildVersion": "75",
@@ -212,26 +233,37 @@
           ]
         }
       ],
-      "version": "0.1.8",
-      "versionDate": "2026-10-31T13:25:24Z",
-      "versionDescription": "• « Flash vodka » : c'est maintenant le nom du flash de Poliakov avec un Red Bull, et tu peux le taper tel quel (« 2 flash vodka »).\n• Le bouton Encore montre juste le nom de ta boisson à côté du +, sur une ligne.\n• Les boutons avec une icône gardent leur texte sur une ligne, l'icône collée à côté.",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.8%2Bbuild.75/soiree-crew-unsigned.ipa",
-      "size": 22199529,
+      "version": "0.1.9",
+      "versionDate": "2026-10-31T13:57:31Z",
+      "versionDescription": "• Écran Soirée : le volant affiche l'heure « Pas avant », en couleur selon ta situation, et précise quand elle peut encore reculer.\n• Retour à 0 donne aussi l'heure.\n• L'icône et le nom de l'app en haut de l'écran Soirée, pour que tes captures disent d'où elles viennent.\n• Live Activity plus utile, même en mode discret : l'heure du retour à 0 en grand, le volant en couleur, tes verres, ton eau et ton dernier verre, des boutons Encore et Eau, et plus de secondes qui défilent.",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.9%2Bbuild.76/soiree-crew-unsigned.ipa",
+      "size": 22225925,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.8/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "release-0.1.9",
+      "title": "Soirée Crew 0.1.9",
+      "caption": "• Écran Soirée : le volant affiche l'heure « Pas avant », en couleur selon ta situation, et précise quand elle peut encore reculer.\n• Retour à 0 donne aussi l'heure.\n• L'icône et le nom de l'app en haut de l'écran Soirée, pour que tes captures disent d'où elles viennent.\n• Live Activity plus utile, même en mode discret : l'heure du retour à 0 en grand, le volant en couleur, tes verres, ton eau et ton dernier verre, des boutons Encore et Eau, et plus de secondes qui défilent.",
+      "date": "2026-10-31T13:57:31Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.9/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/tag/v0.1.9%2Bbuild.76",
+      "appID": "app.soireecrew.mobile",
+      "notify": false
+    },
     {
       "identifier": "release-0.1.8",
       "title": "Soirée Crew 0.1.8",
