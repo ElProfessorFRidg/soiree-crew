@@ -1,4 +1,14 @@
 {
+  "0.1.10": {
+    "fr": [
+      "Verre mélangé : moitié whisky, moitié rhum, un soft par-dessus… Mets les doses, l'app calcule la taille et le degré du verre.",
+      "Prends ou choisis une photo de ta boisson perso : elle remplace l'icône partout, et reste sur ton téléphone."
+    ],
+    "en": [
+      "Mixed glass: half whisky, half rum, a soft on top… Enter the pours, the app works out the glass's size and strength.",
+      "Take or pick a photo of your own drink: it replaces the icon everywhere, and stays on your phone."
+    ]
+  },
   "0.1.9": {
     "fr": [
       "Écran Soirée : le volant affiche l'heure « Pas avant », en couleur selon ta situation, et précise quand elle peut encore reculer.",
