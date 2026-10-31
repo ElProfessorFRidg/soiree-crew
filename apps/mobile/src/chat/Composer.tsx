@@ -1,7 +1,7 @@
 import { RecordingPresets, requestRecordingPermissionsAsync, setAudioModeAsync, useAudioRecorder } from "expo-audio";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
-import { radius, type } from "@crew/design-tokens";
+import { radius } from "@crew/design-tokens";
 import { MAX_BODY } from "@crew/mls";
 import { useT } from "@/i18n";
 import { showPermissionDenied } from "@/system/permissions";
@@ -17,6 +17,7 @@ import { sendText, sendTyping } from "./engine";
 import { clip } from "./format";
 import { sendPhoto, sendVoice, VideoTooLarge } from "./media";
 import { useDraft } from "@/state/drafts";
+import { inputText } from "@/ui/inputText";
 
 /** Shorter than this, a press on the record button was a slip, not a voice note. */
 const MIN_VOICE_MS = 700;
@@ -192,7 +193,7 @@ export function Composer({ conversationId, members, reply, onClearReply, big }: 
           placeholderTextColor={theme.textMuted}
           accessibilityLabel={i18n.t("chat.placeholder")}
           multiline
-          style={[styles.input, type.body, { color: theme.text, backgroundColor: theme.inputBg, borderColor: theme.inputBorder }]}
+          style={[styles.input, inputText({ multiline: true }), { color: theme.text, backgroundColor: theme.inputBg, borderColor: theme.inputBorder }]}
         />
         {draft.trim() ? (
           <ScalePressable accessibilityRole="button" accessibilityLabel={i18n.t("chat.send")} onPress={send} style={[styles.send, { backgroundColor: theme.amber }]}>

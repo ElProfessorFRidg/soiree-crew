@@ -1,4 +1,16 @@
 {
+  "0.1.7": {
+    "fr": [
+      "Dans tous les champs de saisie, le curseur et le texte sont enfin alignés, texte d'exemple compris.",
+      "Avec le clavier ouvert, le bouton du bas se pose juste au-dessus, au lieu de flotter au milieu de l'écran.",
+      "En tapant une valeur (poids, taille …), l'unité reste alignée sur la case."
+    ],
+    "en": [
+      "In every text field, the caret and the text finally line up, placeholder included.",
+      "With the keyboard open, the bottom button sits right above it instead of floating mid-screen.",
+      "When typing a value (weight, height…), the unit stays lined up with the box."
+    ]
+  },
   "0.1.6": {
     "fr": [
       "Premier lancement plus court : un compte seulement si tu le choisis, le serveur officiel déjà choisi, un pseudo suffit.",

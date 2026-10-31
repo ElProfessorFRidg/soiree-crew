@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
 import { Alert, Image, StyleSheet, TextInput, View } from "react-native";
-import { radius, type } from "@crew/design-tokens";
+import { radius } from "@crew/design-tokens";
 import { convertAmount, formatMoney, parseAmount, parseRate, type Split } from "@crew/money";
 import { Field } from "@/crew/Field";
 import { useT } from "@/i18n";
@@ -23,6 +23,7 @@ import { showToast } from "@/ui/Toast";
 import { BIG_EXPENSE, guarded } from "@/vault/vault";
 import { useDraft } from "@/state/drafts";
 import { showFailure, failureMessage } from "@/server/errors";
+import { inputText } from "@/ui/inputText";
 
 type Mode = Split["kind"];
 /** N-19: how many of the crew's latest parties and venues are offered as chips. */
@@ -337,7 +338,7 @@ export default function NewExpenseScreen() {
                 keyboardType="decimal-pad"
                 placeholder={mode === "shares" ? "1" : "0"}
                 placeholderTextColor={theme.textMuted}
-                style={[styles.input, type.body, { color: theme.text, backgroundColor: theme.inputBg, borderColor: theme.inputBorder }]}
+                style={[styles.input, inputText(), { color: theme.text, backgroundColor: theme.inputBg, borderColor: theme.inputBorder }]}
               />
             </View>
           ))}

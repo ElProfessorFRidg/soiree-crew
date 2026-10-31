@@ -10,6 +10,7 @@ import { IconButton } from "./Button";
 import { PullGlass } from "./PullGlass";
 import { Text } from "./Text";
 import { ToastHost } from "./Toast";
+import { useKeyboardShown } from "./useKeyboardShown";
 
 interface Props {
   title?: string;
@@ -34,6 +35,9 @@ export function Screen({ title, back, trailing, children, footer, withToasts, on
   // tab (a pinned button, the end of the list, a toast) goes above it, not under it.
   const segments = useSegments() as string[];
   const overTabBar = Platform.OS === "ios" && segments[0] === "(tabs)" ? TAB_BAR : 0;
+  // With the keyboard up the footer sits right on it: no home indicator nor tab bar to clear.
+  const keyboard = useKeyboardShown();
+  const footerBottom = keyboard ? 12 : insets.bottom + 12 + overTabBar;
   // The band under the status bar fills in once content scrolls under the clock.
   const scrollY = useSharedValue(0);
   const onScroll = useAnimatedScrollHandler((event) => {
@@ -100,7 +104,7 @@ export function Screen({ title, back, trailing, children, footer, withToasts, on
         pointerEvents="none"
         style={[styles.band, { height: insets.top, backgroundColor: theme.bg, borderBottomColor: theme.line }, band]}
       />
-      {footer ? <View style={[styles.footer, { paddingBottom: insets.bottom + 12 + overTabBar }]}>{footer}</View> : null}
+      {footer ? <View style={[styles.footer, { paddingBottom: footerBottom }]}>{footer}</View> : null}
       {withToasts ? <ToastHost bottomOffset={insets.bottom + 24 + overTabBar} /> : null}
     </KeyboardAvoidingView>
   );

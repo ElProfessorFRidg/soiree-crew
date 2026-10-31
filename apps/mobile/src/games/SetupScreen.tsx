@@ -28,6 +28,7 @@ import {
   type TimerSeconds,
 } from "./store";
 import { RuleCards } from "./ui/Rules";
+import { inputText } from "@/ui/inputText";
 
 const TIMERS: readonly TimerSeconds[] = [0, 30, 60];
 
@@ -189,7 +190,7 @@ const styles = StyleSheet.create({
   player: { flexDirection: "row", alignItems: "center", gap: 8, minHeight: 60, borderBottomWidth: 1, paddingVertical: 6 },
   noAlcohol: { alignItems: "center", gap: 2 },
   addRow: { flexDirection: "row", gap: 8 },
-  input: { flex: 1, minHeight: size.input, borderRadius: radius.input, borderWidth: 1.5, paddingHorizontal: 14, fontSize: 16, fontFamily: "Archivo-Medium" },
+  input: { flex: 1, minHeight: size.input, borderRadius: radius.input, borderWidth: 1.5, paddingHorizontal: 14, ...inputText({ fontSize: 16, fontFamily: "Archivo-Medium" }) },
   square: { width: size.button, paddingHorizontal: 0 },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   timerRow: { flexDirection: "row", alignItems: "center", gap: 12 },

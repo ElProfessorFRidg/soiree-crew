@@ -136,7 +136,7 @@ export function Stepper({ value, min, max, step = 1, onChange, format, unit, dec
           onPress={() => setEditing(value.toFixed(decimals))}
           style={styles.valueTouch}
         >
-          <Animated.View style={[styles.value, pop]} accessibilityLiveRegion="polite">
+          <Animated.View style={[styles.value, editing !== null && styles.valueEditing, pop]} accessibilityLiveRegion="polite">
             {editing !== null ? (
               <TextInput
                 value={editing}
@@ -181,5 +181,7 @@ const styles = StyleSheet.create({
   button: { width: 52, height: 52, borderRadius: radius.button, alignItems: "center", justifyContent: "center" },
   valueTouch: { flex: 1, minHeight: 56, justifyContent: "center" },
   value: { flexDirection: "row", alignItems: "flex-end", justifyContent: "center", gap: 6 },
+  // The box is taller than the digits it holds: the unit centres on it instead of sinking under it.
+  valueEditing: { alignItems: "center" },
   input: { minWidth: 96, height: 56, textAlign: "center", borderWidth: 1.5, borderRadius: radius.input, paddingHorizontal: 14, paddingVertical: 0, letterSpacing: -0.5 },
 });

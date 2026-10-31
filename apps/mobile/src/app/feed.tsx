@@ -2,7 +2,7 @@ import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { duration, radius, type } from "@crew/design-tokens";
+import { duration, radius } from "@crew/design-tokens";
 import { useCrewLabels } from "@/crew/names";
 import { useT, type Translator } from "@/i18n";
 import { haptic } from "@/motion/haptics";
@@ -35,6 +35,7 @@ import { Screen } from "@/ui/Screen";
 import { SkeletonRows } from "@/ui/Skeleton";
 import { Text } from "@/ui/Text";
 import { EmptyState } from "@/ui/EmptyState";
+import { inputText } from "@/ui/inputText";
 
 type Line = FeedLine & FeedSocial;
 
@@ -143,7 +144,7 @@ function Composer({ crewId, itemKey, onSent }: { crewId: string; itemKey: string
           maxLength={280}
           multiline
           autoFocus
-          style={[styles.input, type.body, { color: theme.text, backgroundColor: theme.inputBg, borderColor: theme.inputBorder }]}
+          style={[styles.input, inputText({ multiline: true }), { color: theme.text, backgroundColor: theme.inputBg, borderColor: theme.inputBorder }]}
         />
         <Button label={i18n.t("feed.send")} variant="secondary" height={44} loading={sending} disabled={!text.trim()} onPress={send} />
       </View>

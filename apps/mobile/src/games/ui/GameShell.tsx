@@ -20,6 +20,7 @@ import { addTablePlayer, useGamesStore, type TablePlayer } from "../store";
 import { DrinkFab } from "./DrinkFab";
 import { RulesList } from "./Rules";
 import { Sheet } from "./Sheet";
+import { inputText } from "@/ui/inputText";
 
 interface Props {
   gameId: GameId;
@@ -220,5 +221,5 @@ const styles = StyleSheet.create({
   fabBottom: { position: "absolute", right: 16 },
   fabTop: { position: "absolute", right: 16 },
   addRow: { flexDirection: "row", gap: 8, alignItems: "center" },
-  input: { flex: 1, minHeight: size.input, borderRadius: radius.input, borderWidth: 1.5, paddingHorizontal: 14, fontSize: 16, fontFamily: "Archivo-Medium" },
+  input: { flex: 1, minHeight: size.input, borderRadius: radius.input, borderWidth: 1.5, paddingHorizontal: 14, ...inputText({ fontSize: 16, fontFamily: "Archivo-Medium" }) },
 });

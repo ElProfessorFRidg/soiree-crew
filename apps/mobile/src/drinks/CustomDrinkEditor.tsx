@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { duration, radius, size, type, type GlassIconName } from "@crew/design-tokens";
+import { duration, radius, size, type GlassIconName } from "@crew/design-tokens";
 import { convertVolume, drinkVolumeUnit, toMillilitres, type UnitSystem } from "@crew/units";
 import { useT } from "@/i18n";
 import { useTheme } from "@/theme";
@@ -16,6 +16,7 @@ import { catalogueLabel, searchCatalogue } from "./catalogue";
 import { CUSTOM_BOUNDS, type CustomDrinkDraft } from "./customDrinks";
 import { CUSTOM_ICONS, guessIcon } from "./customOrder";
 import type { CustomDrink } from "./presets";
+import { inputText } from "@/ui/inputText";
 
 interface Props {
   unitSystem: UnitSystem;
@@ -67,7 +68,7 @@ export function CustomDrinkEditor({ unitSystem, initial, prefill, onSave, onCanc
               autoCorrect={false}
               autoCapitalize="none"
               returnKeyType="search"
-              style={[styles.input, type.body, { color: theme.text, backgroundColor: theme.inputBg, borderColor: theme.inputBorder }]}
+              style={[styles.input, inputText(), { color: theme.text, backgroundColor: theme.inputBg, borderColor: theme.inputBorder }]}
             />
             {brands.length ? (
               <Animated.View entering={FadeIn.duration(duration.enter)} style={styles.icons}>
@@ -107,7 +108,7 @@ export function CustomDrinkEditor({ unitSystem, initial, prefill, onSave, onCanc
           maxLength={40}
           style={[
             styles.input,
-            type.body,
+            inputText(),
             { color: theme.text, backgroundColor: theme.inputBg, borderColor: showNameError ? theme.danger : theme.inputBorder },
           ]}
         />

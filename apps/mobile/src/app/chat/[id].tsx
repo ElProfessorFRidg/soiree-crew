@@ -2,7 +2,7 @@ import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { radius, space, type } from "@crew/design-tokens";
+import { radius, space } from "@crew/design-tokens";
 import { Bubble } from "@/chat/Bubble";
 import { Composer } from "@/chat/Composer";
 import { canChange, deleteForEveryone, editMessage, markRead, purgeExpired, react, reportMessage, startChat, syncConversation } from "@/chat/engine";
@@ -22,6 +22,8 @@ import { Icon } from "@/ui/Icon";
 import { ScalePressable } from "@/ui/Pressable";
 import { Text } from "@/ui/Text";
 import { showToast, ToastHost } from "@/ui/Toast";
+import { inputText } from "@/ui/inputText";
+import { useKeyboardShown } from "@/ui/useKeyboardShown";
 
 const REACTIONS = ["😂", "❤️", "🍻", "👍", "😮", "🔑"];
 const REASONS = ["harassment", "inappropriate", "fake", "other"] as const;
@@ -34,6 +36,7 @@ export default function ConversationScreen() {
   const i18n = useT();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const keyboard = useKeyboardShown();
   const name = useNames();
   const me = useSession((s) => s.session?.userId ?? "");
   const conversation = useChat((s) => s.conversations.find((c) => c.id === id));
@@ -143,7 +146,7 @@ export default function ConversationScreen() {
             placeholder={i18n.t("chat.searchHerePlaceholder")}
             placeholderTextColor={theme.textMuted}
             accessibilityLabel={i18n.t("chat.searchHere")}
-            style={[styles.search, type.body, { color: theme.text, backgroundColor: theme.inputBg, borderColor: theme.inputBorder }]}
+            style={[styles.search, inputText(), { color: theme.text, backgroundColor: theme.inputBg, borderColor: theme.inputBorder }]}
           />
         </View>
       ) : null}
@@ -219,7 +222,7 @@ export default function ConversationScreen() {
           </Text>
         </View>
       ) : waiting ? null : (
-        <View style={{ paddingBottom: insets.bottom + 10 }}>
+        <View style={{ paddingBottom: keyboard ? 10 : insets.bottom + 10 }}>
           <Composer conversationId={id} members={members} reply={reply} onClearReply={() => setReply(null)} big={level >= 2} />
         </View>
       )}
@@ -316,7 +319,7 @@ export default function ConversationScreen() {
           multiline
           autoFocus
           accessibilityLabel={i18n.t("chat.edit")}
-          style={[styles.search, type.body, { color: theme.text, backgroundColor: theme.inputBg, borderColor: theme.inputBorder }]}
+          style={[styles.search, inputText({ multiline: true }), { color: theme.text, backgroundColor: theme.inputBg, borderColor: theme.inputBorder }]}
         />
         <Text variant="small">{i18n.t("chat.editNote")}</Text>
       </Sheet>

@@ -1,8 +1,9 @@
 import { forwardRef, type ComponentRef } from "react";
 import { StyleSheet, TextInput, View, type TextInputProps } from "react-native";
-import { radius, type } from "@crew/design-tokens";
+import { radius } from "@crew/design-tokens";
 import { useTheme } from "@/theme";
 import { Text } from "@/ui/Text";
+import { inputText } from "@/ui/inputText";
 
 interface Props extends TextInputProps {
   label: string;
@@ -23,7 +24,7 @@ export const Field = forwardRef<ComponentRef<typeof TextInput>, Props>(function 
         {...input}
         style={[
           styles.input,
-          type.body,
+          inputText({ multiline: !!input.multiline }),
           { color: theme.text, backgroundColor: theme.inputBg, borderColor: error ? theme.danger : theme.inputBorder },
           style,
         ]}

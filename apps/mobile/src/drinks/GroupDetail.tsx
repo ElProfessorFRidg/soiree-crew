@@ -12,6 +12,7 @@ import { Text } from "@/ui/Text";
 import { useAppStore } from "@/state/store";
 import { brandsOf, catalogueLabel, filterBrands, sizeOptions, strengthOptions } from "./catalogue";
 import { sizeText, strengthText } from "./display";
+import { inputText } from "@/ui/inputText";
 
 /** What the open tile will log: a brand or none, a size, a strength, and whether to keep it. */
 export interface GroupChoice {
@@ -148,7 +149,7 @@ const styles = StyleSheet.create({
   bleed: { marginHorizontal: -space.cardPadding },
   scrollRow: { paddingHorizontal: space.cardPadding, gap: 8, paddingVertical: 6 },
   wrap: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  filter: { minHeight: 44, borderRadius: radius.input, borderWidth: 1.5, paddingHorizontal: 14, fontSize: 16 },
+  filter: { minHeight: 44, borderRadius: radius.input, borderWidth: 1.5, paddingHorizontal: 14, ...inputText({ fontSize: 16 }) },
   none: { alignSelf: "center" },
   keep: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 44 },
   flex: { flex: 1 },
