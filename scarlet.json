@@ -6,6 +6,27 @@
   "Other": [
     {
       "name": "Soirée Crew",
+      "version": "0.1.12",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.12%2Bbuild.80/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "• L'icône et le nom de l'app en haut de Crew et de la soirée en direct, pour tes captures.\n• Tirer pour actualiser se sent : petits crans pendant que tu tires, un clic quand ça part, et une vibration de réussite ou d'échec à la fin.\n• Corrige un plantage de l'écran Soirée avec un verre venu d'un autre téléphone, et blinde l'affichage des profils.",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.12/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.12/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.12/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.12/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.12/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.12/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.12/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.12/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.12/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.12/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew 0.1.11",
       "version": "0.1.11",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.11%2Bbuild.79/soiree-crew-unsigned.ipa",
