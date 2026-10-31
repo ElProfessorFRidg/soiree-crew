@@ -85,9 +85,14 @@ export function Button({
         {loading ? <ActivityIndicator color={colors.fg} /> : icon ? <Icon name={icon} size={iconSize} color={colors.fg} /> : null}
         {label ? (
           <Text
-            style={[textStyle, fontSize ? { fontSize, lineHeight: Math.round(fontSize * 1.2) } : null]}
+            style={[textStyle, styles.label, fontSize ? { fontSize, lineHeight: Math.round(fontSize * 1.2) } : null]}
             color={colors.fg}
             align="center"
+            // One line beside an icon (two otherwise): a long name shrinks a little, then ends in "…",
+            // and the icon stays next to it instead of being pushed against the edge.
+            numberOfLines={icon && !vertical ? 1 : 2}
+            adjustsFontSizeToFit
+            minimumFontScale={0.8}
           >
             {label}
           </Text>
@@ -141,6 +146,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     gap: 10,
   },
+  label: { flexShrink: 1 },
   glass: { borderRadius: radius.iconButton },
   iconButton: {
     borderRadius: radius.iconButton,

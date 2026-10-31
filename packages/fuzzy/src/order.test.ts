@@ -107,6 +107,8 @@ describe("order parser with brands", () => {
   it("makes a spirit and its mixer one drink", () => {
     expect(parse("polia redbull")).toEqual([{ quantity: 1, preset: null, drink: "poliakov-red-bull", volumeMl: null, abv: null }]);
     expect(parse("poliakov avec red bull")[0]!.drink).toBe("poliakov-red-bull");
+    // What people call it in France.
+    expect(parse("2 flash vodka")).toEqual([{ quantity: 2, preset: null, drink: "poliakov-red-bull", volumeMl: null, abv: null }]);
     expect(parse("2 jager red bull")).toEqual([{ quantity: 2, preset: null, drink: "jagerbomb", volumeMl: null, abv: null }]);
     // "et" keeps them apart.
     expect(parse("polia et redbull").map((l) => l.drink)).toEqual(["poliakov", "red-bull"]);

@@ -8,6 +8,8 @@ import { Button } from "@/ui/Button";
 
 interface Props {
   label: string;
+  /** What screen readers say when it differs from the label ("Encore : Flash vodka"). */
+  accessibilityLabel?: string;
   /** True while the last drink waits for the server: the fill stays up until it answers. */
   pending: boolean;
   onPress: () => void;
@@ -17,7 +19,7 @@ interface Props {
 }
 
 /** MOT-03: amber fill rises inside the button on tap, drains when the server confirms. */
-export function AddDrinkButton({ label, pending, onPress, height, fontSize = 18, iconSize = 22 }: Props) {
+export function AddDrinkButton({ label, accessibilityLabel, pending, onPress, height, fontSize = 18, iconSize = 22 }: Props) {
   const theme = useTheme();
   const reduceMotion = useReducedMotion();
   const fill = useSharedValue(0);
@@ -37,6 +39,7 @@ export function AddDrinkButton({ label, pending, onPress, height, fontSize = 18,
   return (
     <Button
       label={label}
+      accessibilityLabel={accessibilityLabel}
       icon="plus"
       iconSize={iconSize}
       height={height}

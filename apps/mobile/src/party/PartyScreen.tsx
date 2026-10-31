@@ -8,7 +8,7 @@ import { duration, palette, size, space } from "@crew/design-tokens";
 import type { BacUnit } from "@crew/units";
 import { lastDrink, logDrink, logWater } from "@/drinks/actions";
 import { offerUndo, offerWaterUndo } from "@/drinks/undoToast";
-import { againLabel, alternateUnit, bacText, unitCycle } from "@/drinks/display";
+import { againLabel, alternateUnit, bacText, drinkLabel, unitCycle } from "@/drinks/display";
 import { defaultPreset, presetFromEntry } from "@/drinks/presets";
 import { withHousePint } from "@/drinks/catalogue";
 import { useHousePintHere } from "@/drinks/housePint";
@@ -198,7 +198,10 @@ export function PartyScreen() {
   const again = (() => {
     const last = lastDrink();
     const preset = withHousePint(last ? presetFromEntry(last) : defaultPreset(preferences.unitSystem), houseAbv);
-    return { preset, label: againLabel(preset, i18n), key: drinkKey({ presetId: preset.id, kind: preset.kind, volumeMl: preset.volumeMl, abv: preset.abv, name: preset.name }) };
+    // A named drink shows its name alone next to the "+", which already says "again": "Encore : Flash
+    // vodka" does not fit the button. Screen readers still hear the whole sentence.
+    const shown = preset.kind === "custom" ? drinkLabel(preset, i18n) : againLabel(preset, i18n);
+    return { preset, label: againLabel(preset, i18n), shown, key: drinkKey({ presetId: preset.id, kind: preset.kind, volumeMl: preset.volumeMl, abv: preset.abv, name: preset.name }) };
   })();
 
   const onAgain = () => {
@@ -223,6 +226,7 @@ export function PartyScreen() {
     flipUnit,
     tonight,
     againLabel: again.label,
+    againShown: again.shown,
     againKey: again.key,
     onAgain,
     onWater,
@@ -327,6 +331,8 @@ interface LevelProps {
   flipUnit: () => void;
   tonight: ReturnType<typeof useTonight>;
   againLabel: string;
+  /** What the Encore button shows: the drink's name alone when it has one. */
+  againShown: string;
   /** The Encore drink, left out of the row of my drinks under it. */
   againKey: string;
   onAgain: () => void;
@@ -564,7 +570,7 @@ function LevelZero(props: LevelProps) {
       <DrivingPanels {...props} />
       <EstimateNotice i18n={i18n} />
       <View style={styles.actions}>
-        <AddDrinkButton label={props.againLabel} pending={props.pendingDrink} onPress={props.onAgain} height={size.partyAction} />
+        <AddDrinkButton label={props.againShown} accessibilityLabel={props.againLabel} pending={props.pendingDrink} onPress={props.onAgain} height={size.partyAction} />
         <Button
           label=""
           icon="glass"
@@ -626,7 +632,8 @@ function LevelOne(props: LevelProps) {
       <EstimateNotice i18n={i18n} />
       <View style={styles.actions}>
         <AddDrinkButton
-          label={props.againLabel}
+          label={props.againShown}
+          accessibilityLabel={props.againLabel}
           pending={props.pendingDrink}
           onPress={props.onAgain}
           height={72}

@@ -122,12 +122,13 @@ const FIRST_LIST: readonly CatalogueDrink[] = [
   { id: "gin", generic: "gin", group: "spirit", abv: 0.4, volumeMl: 40, glass: "shot", aliases: ["gin"] },
   {
     id: "poliakov-red-bull",
-    brand: "Flash Poliakov + Red Bull",
+    // What it is called in France: a 20 cl flask of vodka (Poliakov, the usual one) with a Red Bull.
+    brand: "Flash vodka",
     group: "spirit",
     abv: 0.375,
     volumeMl: 200,
     glass: "can",
-    aliases: ["polia redbull", "polia red bull", "poliakov redbull", "poliakov red bull", "flash redbull", "flash red bull"],
+    aliases: ["flash vodka", "flash vodka redbull", "flash vodka red bull", "polia redbull", "polia red bull", "poliakov redbull", "poliakov red bull", "flash redbull", "flash red bull"],
     combo: { parts: ["poliakov", "red-bull"], mixerMl: 250 },
   },
   {
@@ -283,7 +284,7 @@ export function strengthFits(group: DrinkGroup, abv: number): boolean {
 
 /**
  * Every name a catalogue drink answers to, for matching. Generic drinks add the app's translations.
- * A combo answers to its aliases only: its full name starts like its spirit's ("Flash Poliakov + …"),
+ * A combo answers to its aliases only: its full name could be read as its spirit alone,
  * and "flash polia" means the spirit alone.
  */
 export function catalogueNames(drink: CatalogueDrink, translated: readonly string[] = []): string[] {

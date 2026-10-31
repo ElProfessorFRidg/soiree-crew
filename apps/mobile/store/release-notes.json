@@ -1,4 +1,16 @@
 {
+  "0.1.8": {
+    "fr": [
+      "« Flash vodka » : c'est maintenant le nom du flash de Poliakov avec un Red Bull, et tu peux le taper tel quel (« 2 flash vodka »).",
+      "Le bouton Encore montre juste le nom de ta boisson à côté du +, sur une ligne.",
+      "Les boutons avec une icône gardent leur texte sur une ligne, l'icône collée à côté."
+    ],
+    "en": [
+      "\"Flash vodka\": the new name of the Poliakov flask with a Red Bull, and you can type it as is (\"2 flash vodka\").",
+      "The Again button shows just your drink's name next to the +, on one line.",
+      "Buttons with an icon keep their text on one line, the icon right beside it."
+    ]
+  },
   "0.1.7": {
     "fr": [
       "Dans tous les champs de saisie, le curseur et le texte sont enfin alignés, texte d'exemple compris.",

@@ -4,7 +4,7 @@ import { isEverydayWord, normalise, scoreNormalised, type Candidate } from "./ma
 /**
  * ADP-05: one parser for everything typed in the add sheet. "2 pintes et un shoot" is two pints and
  * a shot; "2 castel" two Kasteel Rouge; "pinte 8" a pint at 8 %; "demi kro" a Kronenbourg in a demi;
- * "33 despe" a 33 cl Desperados; "polia redbull" one Flash Poliakov + Red Bull. Unknown words are
+ * "33 despe" a 33 cl Desperados; "polia redbull" or "flash vodka" one Flash vodka (Poliakov and Red Bull). Unknown words are
  * skipped, never guessed at random.
  */
 export interface OrderLine<P> {

@@ -43,8 +43,12 @@ interface Labelled {
   name?: string;
 }
 
+/** Catalogue names changed since drinks were logged with them: the old drinks show the new name. */
+const RENAMED: Readonly<Record<string, string>> = { "Flash Poliakov + Red Bull": "Flash vodka" };
+
 export function drinkLabel(drink: Labelled, i18n: Translator): string {
-  return drink.kind === "custom" ? (drink.name ?? i18n.t("drinks.custom")) : i18n.t(`drinks.${drink.kind}`);
+  if (drink.kind !== "custom") return i18n.t(`drinks.${drink.kind}`);
+  return drink.name ? (RENAMED[drink.name] ?? drink.name) : i18n.t("drinks.custom");
 }
 
 export function againLabel(drink: Labelled, i18n: Translator): string {
