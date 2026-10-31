@@ -4,7 +4,15 @@ import type { MessageKey } from "./types";
 /** Recurring lines with written variants (SLOP-11): `${base}.v1` to `${base}.v8` in every catalogue. */
 export const VARIANTS = 8;
 /** The water reminders come back often in a night: they get a longer list, from v1 to v12. */
-const COUNTS: Partial<Record<Base, number>> = { "reminders.waterSince": 12, "reminders.waterNone": 12 };
+const COUNTS: Partial<Record<Base, number>> = {
+  "reminders.waterSince": 20,
+  "reminders.waterNone": 20,
+  "reminders.waterStreak": 10,
+  "reminders.foodBody": 10,
+  "reminders.paceBody": 10,
+  "reminders.rideBody": 10,
+  "reminders.morningBody": 10,
+};
 
 type Base =
   | "greeting.lateNight"
@@ -18,6 +26,11 @@ type Base =
   | "greeting.climbing"
   | "reminders.waterSince"
   | "reminders.waterNone"
+  | "reminders.waterStreak"
+  | "reminders.foodBody"
+  | "reminders.paceBody"
+  | "reminders.rideBody"
+  | "reminders.morningBody"
   | "reminders.limitBody"
   | "reminders.partySoonBody"
   | "reminders.peakBody"

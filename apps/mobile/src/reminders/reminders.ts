@@ -13,6 +13,24 @@ const MINUTE_MS = 60_000;
 const WATER_ID = "water-reminder";
 const LIMIT_ID = "limit-reminder";
 const PEAK_ID = "peak-reminder";
+const FOOD_ID = "food-reminder";
+const PACE_ID = "pace-reminder";
+const RIDE_ID = "ride-reminder";
+const MORNING_ID = "morning-after";
+/** Any two night notifications at least this far apart. */
+const NIGHT_GAP_MS = 20 * MINUTE_MS;
+/** "Eat something" once the night has gone on this long with nothing eaten. */
+const FOOD_AFTER_MS = 2 * 60 * MINUTE_MS;
+/** "You're going fast": this many drinks within this window. */
+const PACE_DRINKS = 3;
+const PACE_WINDOW_MS = 45 * MINUTE_MS;
+/** "Plan your way home" at 1:30 at night, when the estimate is still at or over the driving limit then. */
+const RIDE_HOUR = 1;
+const RIDE_MINUTE = 30;
+/** The morning after, at this hour (later when the quiet hours say so). */
+const MORNING_HOUR = 10;
+/** Water streak line from this many drinks in a row without water. */
+const STREAK_FROM = 2;
 /** The peak warning goes this long before the estimated peak. */
 const PEAK_LEAD_MS = 10 * MINUTE_MS;
 /** bac.md §2.5: a drink with no water since the previous one gets a reminder 20 min later. */
@@ -73,13 +91,13 @@ async function setCategories(): Promise<void> {
   ]).catch(() => undefined);
 }
 
-async function schedule(identifier: string, at: number, title: string, body: string, categoryIdentifier?: string): Promise<void> {
+async function schedule(identifier: string, at: number, title: string, body: string, categoryIdentifier?: string, url?: string): Promise<void> {
   await Notifications.cancelScheduledNotificationAsync(identifier).catch(() => undefined);
   if (at <= Date.now()) return;
   if (categoryIdentifier) await setCategories();
   await Notifications.scheduleNotificationAsync({
     identifier,
-    content: { title, body, ...(categoryIdentifier ? { categoryIdentifier } : {}) },
+    content: { title, body, ...(categoryIdentifier ? { categoryIdentifier } : {}), ...(url ? { data: { url } } : {}) },
     trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: new Date(at) },
   });
 }
@@ -140,6 +158,8 @@ export async function muteUntilMorning(): Promise<void> {
   await Notifications.cancelScheduledNotificationAsync(WATER_ID).catch(() => undefined);
   await Notifications.cancelScheduledNotificationAsync(LIMIT_ID).catch(() => undefined);
   await Notifications.cancelScheduledNotificationAsync(PEAK_ID).catch(() => undefined);
+  // The morning after stays: it comes once the mute is over.
+  for (const id of [FOOD_ID, PACE_ID, RIDE_ID]) await Notifications.cancelScheduledNotificationAsync(id).catch(() => undefined);
 }
 
 /**
@@ -147,13 +167,18 @@ export async function muteUntilMorning(): Promise<void> {
  * water nudge, no limit warning, no night notification, pending or already in the list.
  */
 async function clearNightReminders(): Promise<void> {
-  for (const id of [WATER_ID, LIMIT_ID, PEAK_ID]) {
+  for (const id of [WATER_ID, LIMIT_ID, PEAK_ID, FOOD_ID, PACE_ID, RIDE_ID]) {
     await Notifications.cancelScheduledNotificationAsync(id).catch(() => undefined);
     await Notifications.dismissNotificationAsync(id).catch(() => undefined);
   }
   await Notifications.dismissNotificationAsync(NIGHT_ID).catch(() => undefined);
-  // The next night gets its own peak warning.
-  if (useAppStore.getState().peakWarnedAt !== null) useAppStore.setState({ peakWarnedAt: null });
+  // The next night gets its own peak warning and its own extras.
+  const { peakWarnedAt, nightNudgesAt, drinks } = useAppStore.getState();
+  if (peakWarnedAt !== null) useAppStore.setState({ peakWarnedAt: null });
+  const recent = drinks.some((d) => d.abv > 0 && d.consumedAt > Date.now() - 18 * 60 * MINUTE_MS);
+  if (Object.keys(nightNudgesAt).length) useAppStore.setState({ nightNudgesAt: recent && nightNudgesAt.morning ? { morning: nightNudgesAt.morning } : {} });
+  // The morning after stays scheduled after the night, unless the drinks are gone.
+  if (!recent) await Notifications.cancelScheduledNotificationAsync(MORNING_ID).catch(() => undefined);
 }
 
 /**
@@ -178,6 +203,86 @@ async function schedulePeakWarning(estimate: BacEstimate, i18n: Translator, pref
   useAppStore.setState({ peakWarnedAt: at });
 }
 
+/** The first free moment from `at` on, at least NIGHT_GAP_MS away from every time in `taken`. */
+function spaced(at: number, taken: readonly number[]): number {
+  let next = at;
+  for (let guard = 0; guard < 10; guard++) {
+    const clash = taken.find((t) => Math.abs(t - next) < NIGHT_GAP_MS);
+    if (clash === undefined) return next;
+    next = clash + NIGHT_GAP_MS;
+  }
+  return next;
+}
+
+type Extra = "food" | "pace" | "ride";
+
+/**
+ * Food, pace and the way home: one of each per night, only while the night goes on (cleared with
+ * the others), never closer than 20 min to another night notification. They speak during the
+ * night itself, so the quiet hours do not hold them; the mute until morning does.
+ */
+async function scheduleNightExtras(estimate: BacEstimate, i18n: Translator, preferences: UserPreferences, now: number, taken: number[]): Promise<void> {
+  const { drinks, nightNudges, nightNudgesAt } = useAppStore.getState();
+  const backToZero = estimate.backToZeroAt;
+  if (backToZero === null) return;
+  // Tonight's drinks: those of the current episode, up to 12 h back.
+  const tonight = drinks.filter((d) => d.abv > 0 && d.consumedAt > now - 12 * 60 * MINUTE_MS && d.consumedAt <= now).sort((a, b) => a.consumedAt - b.consumedAt);
+  const first = tonight[0];
+  if (!first) return;
+  const done = (kind: Extra) => {
+    const at = nightNudgesAt[kind];
+    return at !== undefined && at <= now && nightOf(at) === nightOf(now);
+  };
+  const plan = async (kind: Extra, id: string, wanted: number | null, title: string, body: string, url: string) => {
+    if (!nightNudges[kind] || done(kind) || wanted === null) {
+      if (!done(kind)) await Notifications.cancelScheduledNotificationAsync(id).catch(() => undefined);
+      return;
+    }
+    const at = spaced(Math.max(wanted, now + MINUTE_MS), taken);
+    if (at >= backToZero) return Notifications.cancelScheduledNotificationAsync(id).catch(() => undefined);
+    await Notifications.cancelScheduledNotificationAsync(id).catch(() => undefined);
+    await Notifications.scheduleNotificationAsync({
+      identifier: id,
+      content: { title, body, data: { url } },
+      trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: new Date(at) },
+    }).catch(() => undefined);
+    taken.push(at);
+    useAppStore.setState((s) => ({ nightNudgesAt: { ...s.nightNudgesAt, [kind]: at } }));
+  };
+
+  // Food: two hours in and nothing eaten with any drink of the night.
+  const ate = tonight.some((d) => d.withFood);
+  await plan("food", FOOD_ID, ate ? null : first.consumedAt + FOOD_AFTER_MS, i18n.t("reminders.foodTitle"), i18n.t(variantKey("reminders.foodBody", nightOf(now))), "/(tabs)");
+
+  // Pace: three drinks within 45 min, the last one just now.
+  const last = tonight.slice(-PACE_DRINKS);
+  const fast = last.length === PACE_DRINKS && last[PACE_DRINKS - 1]!.consumedAt - last[0]!.consumedAt <= PACE_WINDOW_MS && last[PACE_DRINKS - 1]!.consumedAt > now - 15 * MINUTE_MS;
+  await plan("pace", PACE_ID, fast ? now + MINUTE_MS : null, i18n.t("reminders.paceTitle"), i18n.t(variantKey("reminders.paceBody", nightOf(now))), "/curve");
+
+  // The way home: 1:30 at night, when the estimate then is still at or over the driving limit.
+  const ride = new Date(first.consumedAt);
+  ride.setHours(RIDE_HOUR, RIDE_MINUTE, 0, 0);
+  if (ride.getTime() <= first.consumedAt) ride.setDate(ride.getDate() + 1);
+  const rideAt = Math.max(ride.getTime(), now + MINUTE_MS);
+  const { profile } = useAppStore.getState();
+  const limit = countryRules(preferences.legalCountry).limitBlood || 0.2;
+  const high = profile ? estimateBac(intakes(), profile, rideAt).bac >= limit : false;
+  const stillNight = new Date(rideAt).getHours() < 5;
+  await plan("ride", RIDE_ID, high && stillNight ? rideAt : null, i18n.t("reminders.rideTitle"), i18n.t(variantKey("reminders.rideBody", nightOf(now))), "/home");
+
+  // The morning after: the next morning at a decent hour, opening the morning screen.
+  if (nightNudges.morning) {
+    const morning = new Date(now);
+    if (morning.getHours() >= MORNING_HOUR) morning.setDate(morning.getDate() + 1);
+    morning.setHours(MORNING_HOUR, 0, 0, 0);
+    const at = afterQuietHours(Math.max(morning.getTime(), backToZero), preferences.quietFromHour, preferences.quietToHour);
+    await schedule(MORNING_ID, at, i18n.t("reminders.morningTitle"), i18n.t(variantKey("reminders.morningBody", nightOf(now))), undefined, "/morning");
+    useAppStore.setState((s) => ({ nightNudgesAt: { ...s.nightNudgesAt, morning: at } }));
+  } else {
+    await Notifications.cancelScheduledNotificationAsync(MORNING_ID).catch(() => undefined);
+  }
+}
+
 export async function refreshReminders(): Promise<void> {
   if (!supported) return;
   const { profile, preferences, drinks, water, remindersMutedUntil } = useAppStore.getState();
@@ -196,6 +301,8 @@ export async function refreshReminders(): Promise<void> {
 
   // Water (O-27).
   const interval = preferences.waterReminderMinutes;
+  /** Times of the night notifications scheduled in this pass, to keep them apart. */
+  const taken: number[] = [];
   const backToZero = estimate.backToZeroAt;
   if (interval === null || backToZero === null) {
     await Notifications.cancelScheduledNotificationAsync(WATER_ID).catch(() => undefined);
@@ -209,17 +316,24 @@ export async function refreshReminders(): Promise<void> {
     if (dryDrink) at = Math.min(at, lastDrink + WATER_AFTER_DRY_DRINK_MS);
     at = Math.max(at, now + WATER_MIN_GAP_MS);
     if (at < backToZero) {
-      const body =
-        lastWater > 0
+      // Two drinks or more in a row with no water between: the streak line, with the count.
+      const streak = sortedDrinks.filter((t) => t > lastWater).length;
+      const body = streak >= STREAK_FROM
+        ? i18n.t(variantKey("reminders.waterStreak", String(at)), { count: streak })
+        : lastWater > 0
           ? i18n.t(variantKey("reminders.waterSince", String(at)), { minutes: Math.round((at - lastWater) / MINUTE_MS) })
           : i18n.t(variantKey("reminders.waterNone", String(at)));
       await schedule(WATER_ID, at, i18n.t("reminders.waterTitle"), body, WATER_CATEGORY);
+      taken.push(at);
     } else {
       await Notifications.cancelScheduledNotificationAsync(WATER_ID).catch(() => undefined);
     }
   }
 
   await schedulePeakWarning(estimate, i18n, preferences, now);
+  const { peakWarnedAt } = useAppStore.getState();
+  if (peakWarnedAt !== null && peakWarnedAt > now) taken.push(peakWarnedAt);
+  await scheduleNightExtras(estimate, i18n, preferences, now, taken).catch(() => undefined);
 
   // Personal limit (O-26): one warning before the estimate reaches it, not every drink.
   const limit = preferences.personalLimit;

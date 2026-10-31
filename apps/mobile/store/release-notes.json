@@ -3,12 +3,14 @@
     "fr": [
       "Nouveau rappel quand t'es de sortie \u0001 le soir, si tu restes posé quelque part sans soirée lancée, l'app te propose de la lancer. Ta position reste sur ton téléphone. À allumer dans Réglages.",
       "Me détecter avec mon crew \u0001 quand plusieurs du crew sont ensemble le soir, un petit rappel pour lancer la soirée. Une position arrondie à 100 m part alors au serveur, gardée 30 min et montrée à personne.",
-      "Les rappels s'adaptent à toi \u0001 plus tôt si tu oublies souvent de noter, moins souvent si tu ne t'en sers pas."
+      "Les rappels s'adaptent à toi \u0001 plus tôt si tu oublies souvent de noter, moins souvent si tu ne t'en sers pas.",
+      "Plein de nouveaux messages pendant la soirée : pense à manger, tu vas vite là, prévois ton retour, et un petit mot le lendemain matin. Chacun se coupe dans Réglages. Les rappels d'eau ont deux fois plus de phrases, et une nouvelle quand tu enchaînes sans eau."
     ],
     "en": [
       "New nudge when you're out: in the evening, if you settle somewhere with no night started, the app offers to start it. Your location stays on your phone. Turn it on in Settings.",
       "Spot me with my crew: when several of the crew are together at night, a little nudge to start the night. A position rounded to 100 m then goes to the server, kept 30 min and shown to no one.",
-      "The nudges adapt to you: earlier if you often forget to log, less often if you don't use them."
+      "The nudges adapt to you: earlier if you often forget to log, less often if you don't use them.",
+      "Lots of new messages during the night: eat something, you are going fast, plan your way home, and a little word the morning after. Each one can be turned off in Settings. Water reminders have twice as many lines, plus a new one when you drink several in a row with no water."
     ]
   },
   "0.1.12": {

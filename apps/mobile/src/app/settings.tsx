@@ -121,6 +121,7 @@ export default function SettingsScreen() {
   const nudgesOn = useAppStore((state) => state.nudgesOn);
   const outingNudgeOn = useAppStore((state) => state.outingNudgeOn);
   const crewDetectOn = useAppStore((state) => state.crewDetectOn);
+  const nightNudges = useAppStore((state) => state.nightNudges);
   const crews = useCrewData((state) => state.crews);
   const hour = (h: number) => formatClock(new Date(2026, 0, 1, h).getTime(), i18n.language, preferences.hourCycle);
   const offline = showFailure(i18n);
@@ -292,6 +293,26 @@ export default function SettingsScreen() {
                 ) : null}
                 <SwitchRow label={i18n.t("settings.limit")} value={preferences.warnNearLimit} onChange={(warnNearLimit) => setPreferences({ warnNearLimit })} />
                 <SwitchRow label={i18n.t("settings.recap")} value={preferences.notifyRecap} onChange={(notifyRecap) => setPreferences({ notifyRecap })} />
+                {/* The extra night notifications, together: food, pace, the way home, the morning after. */}
+                <Text variant="label">{i18n.t("settings.nightExtras")}</Text>
+                {(
+                  [
+                    ["food", "settings.nightFood"],
+                    ["pace", "settings.nightPace"],
+                    ["ride", "settings.nightRide"],
+                    ["morning", "settings.nightMorning"],
+                  ] as const
+                ).map(([kind, label]) => (
+                  <SwitchRow
+                    key={kind}
+                    label={i18n.t(label)}
+                    value={nightNudges[kind]}
+                    onChange={(on) => {
+                      useAppStore.setState((s) => ({ nightNudges: { ...s.nightNudges, [kind]: on } }));
+                      void refreshReminders().catch(() => undefined);
+                    }}
+                  />
+                ))}
                 <Text variant="label">{i18n.t("settings.quiet")}</Text>
                 <View style={styles.pair}>
                   <View style={styles.flex}>

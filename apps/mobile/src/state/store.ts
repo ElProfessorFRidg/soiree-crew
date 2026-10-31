@@ -94,6 +94,10 @@ export interface AppState {
   launchedParties: string[];
   /** Time of the peak warning already scheduled tonight: one per night. */
   peakWarnedAt: number | null;
+  /** The extra night notifications switched on in Settings (food, pace, ride home, morning after). */
+  nightNudges: { food: boolean; pace: boolean; ride: boolean; morning: boolean };
+  /** When each extra night notification was scheduled tonight: one of each per night. */
+  nightNudgesAt: Record<string, number>;
   /** PREF-02: first day of the week picked in Settings (0 = Sunday); null follows the phone. */
   weekStartOverride: number | null;
   /** PREF-05: the time zone seen at the last launch, to notice a trip even inside one country. */
@@ -179,6 +183,8 @@ export const useAppStore = create<AppState>()(
       outingHabit: null,
       launchedParties: [],
       peakWarnedAt: null,
+      nightNudges: { food: true, pace: true, ride: true, morning: true },
+      nightNudgesAt: {},
       weekStartOverride: null,
       lastTimeZone: null,
       travelZoneDismissed: null,
