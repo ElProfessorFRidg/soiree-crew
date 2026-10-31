@@ -1,4 +1,20 @@
 {
+  "0.1.6": {
+    "fr": [
+      "Premier lancement plus court : un compte seulement si tu le choisis, le serveur officiel déjà choisi, un pseudo suffit.",
+      "La localisation, l'appareil photo et les notifications sont demandés au moment où tu en as besoin, avec une phrase qui dit pourquoi.",
+      "Tu peux utiliser l'app sans le calcul du taux et l'activer plus tard.",
+      "Si tu fermes l'app pendant l'accueil, tu reprends où tu en étais.",
+      "Écran Soirée : le pays de ta limite en un coup d'œil et une petite liste pour bien démarrer."
+    ],
+    "en": [
+      "A shorter first launch: an account only if you choose one, the official server already picked, a nickname is enough.",
+      "Location, camera and notifications are asked when you need them, with a line saying why.",
+      "You can use the app without the level estimate and turn it on later.",
+      "Close the app during the welcome and you pick up where you were.",
+      "Party screen: your limit's country at a glance and a short list to get started."
+    ]
+  },
   "0.1.5": {
     "fr": [
       "Supprimer l'app ne supprime plus tes données : en la réinstallant, tu retrouves ton profil, tes réglages, tes boissons et tes 45 derniers jours.",
