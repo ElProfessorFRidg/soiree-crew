@@ -50,6 +50,7 @@ import { purgePlainFiles } from "@/chat/media";
 import { pruneDrinkPhotos } from "@/drinks/drinkPhotos";
 import { watchLiveActivity } from "@/system/liveActivity";
 import { watchKeptCopy } from "@/system/keptCopy";
+import { syncOuting } from "@/location/outing";
 import { PrivacyCover } from "@/ui/PrivacyCover";
 import { PermissionPrompt } from "@/system/PermissionPrompt";
 import { handleNotificationResponse, prepareNotifications } from "@/notify/push";
@@ -140,6 +141,8 @@ export default function RootLayout() {
   useEffect(() => {
     // QOL-03: action buttons and Android channels speak the app's language.
     if (ready) void prepareNotifications().catch(() => undefined);
+    // The outing nudge follows its setting and the location permission given in the phone's settings.
+    if (ready) void syncOuting().catch(() => undefined);
   }, [ready, language]);
 
   useEffect(() => {

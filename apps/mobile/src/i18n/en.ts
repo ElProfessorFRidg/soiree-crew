@@ -201,6 +201,8 @@ export const en: Messages = {
     launchBody: { v1: "The party's started, launch it!", v2: "It started without you? Open the party.", v3: "The crew is rolling. You?", v4: "It's time! Open the party to follow the crew.", v5: "Your night is waiting, one tap and go.", v6: "We saved you a spot. Launch the party.", v7: "The party's on, your counter is still asleep.", v8: "Chop chop, the party is open!" },
     comebackTitle: "Long time no see",
     comebackBody: { v1: "What's the crew planning this weekend?", v2: "Plans tonight? Check on the crew.", v3: "We miss you! Come see what's up.", v4: "Friday night, the crew might be up for it.", v5: "Weekend's here. A night out in sight?", v6: "Your crew might be out tonight. Go look!", v7: "Nothing planned? Start a party.", v8: "Don't forget your mates: check on the crew." },
+    outingTitle: "Out tonight?",
+    outingBody: { v1: "Out and about? Kick off the night.", v2: "Smells like drinks around here. Start the party?", v3: "Settled in somewhere? Let the crew know.", v4: "Looks like you're out. The night starts when you say so.", v5: "First round in sight? Start the night, the crew will follow.", v6: "You look comfy. Got a night to launch?", v7: "Night out spotted! Open the app and get it going.", v8: "Does the crew know you're out? Start the night." },
     birthdayBody: { v1: "Plan a party?", v2: "Shall we set something up?", v3: "Cake, candles, crew. Plan it?", v4: "A birthday with no party is sad. Plan one?", v5: "Time for a surprise party.", v6: "Get the toast ready!", v7: "Three days to plan a great night.", v8: "Birthdays are for celebrating. Kick it off?" },
   },
   crew: {
@@ -891,6 +893,9 @@ export const en: Messages = {
   settings: {
     nudges: "Nudges to launch the party",
     nudgesHint: "A party started without you, or the app has been asleep for days: a little nudge, never in quiet hours.",
+    outing: "Nudge me when I'm out",
+    outingHint: "In the evening, if you stay in one spot with no night started, a little nudge. Your location stays on this phone.",
+    outingDenied: "Without \"Always\" location, no nudge. You can allow it in your phone's settings.",
     remindersAppOnly: "Reminders (water, limit, recap) only work in the installed app, not in the browser.",
     sections: { region: "Language, region and units", notifications: "Notifications", security: "Security and data", appearance: "Privacy and look" },
     notificationsSummary: "Water, limit, recap, quiet hours",
@@ -1396,7 +1401,7 @@ export const en: Messages = {
     where: "Where it goes",
     whereBody: "On this phone, in its backup and on your crew's server, nowhere else. Nothing is sold. Photos of your own drinks stay on this phone.",
     never: "What there isn't",
-    neverBody: "The app shows no ads and doesn't measure how you use it. Your location is only sent when you check in or share it.",
+    neverBody: "The app shows no ads and doesn't measure how you use it. Your location is only sent when you check in or share it. With the night out nudge on, your location is read in the background but never leaves the phone.",
     backup: "Phone backups",
     backupBody: "The app's data is part of your iPhone's iCloud backup or your Android's Google backup, encrypted by Apple or Google like the rest of the phone. It comes back when you restore a phone. A copy of what matters most (age check, consent, profile, settings, custom drinks, drinks and water of the last 45 days) also stays in this phone's keychain: if you delete the app and reinstall it, you pick up where you were. That copy never leaves the phone.",
     rights: "Your rights",
@@ -2308,6 +2313,11 @@ export const en: Messages = {
       title: "Your photos",
       what: "You pick one photo of your glass: the app reads only that one.",
       after: "The photo stays on this phone and is never sent.",
+    },
+    outing: {
+      title: "Location in the background",
+      what: "In the evening, the app checks whether you stay in one place, even when it's closed. Pick \"Always\" when your phone asks.",
+      after: "Your location stays on this phone, nothing goes to the server. Turn the nudge off whenever you like.",
     },
     reminders: {
       title: "Let reminders ring",

@@ -4,6 +4,8 @@
     "NSCameraUsageDescription": "La fotocamera serve per aggiungere foto all'album della serata, visibile solo alla tua crew.",
     "NSPhotoLibraryUsageDescription": "Le tue foto servono per riempire l'album della serata, visibile solo alla tua crew. La loro posizione viene rimossa.",
     "NSCalendarsUsageDescription": "Il calendario riceve le serate che aggiungi. Non viene letto altro.",
-    "NSCalendarsWriteOnlyAccessUsageDescription": "Il calendario riceve le serate che aggiungi. Non viene letto altro."
+    "NSCalendarsWriteOnlyAccessUsageDescription": "Il calendario riceve le serate che aggiungi. Non viene letto altro.",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "Con il promemoria di uscita attivo, la tua posizione viene letta in background la sera per capire se ti sei fermato da qualche parte. Resta su questo telefono, niente va al server.",
+    "NSLocationAlwaysUsageDescription": "Con il promemoria di uscita attivo, la tua posizione viene letta in background la sera per capire se ti sei fermato da qualche parte. Resta su questo telefono, niente va al server."
   }
 }

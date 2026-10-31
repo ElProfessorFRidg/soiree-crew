@@ -4,6 +4,8 @@
     "NSCameraUsageDescription": "Mit der Kamera fügst du Fotos zum Album des Abends hinzu. Nur deine Crew sieht sie.",
     "NSPhotoLibraryUsageDescription": "Mit deinen Fotos füllst du das Album des Abends. Nur deine Crew sieht sie. Ihr Standort wird entfernt.",
     "NSCalendarsUsageDescription": "Der Kalender bekommt die Abende, die du hinzufügst. Sonst wird nichts gelesen.",
-    "NSCalendarsWriteOnlyAccessUsageDescription": "Der Kalender bekommt die Abende, die du hinzufügst. Sonst wird nichts gelesen."
+    "NSCalendarsWriteOnlyAccessUsageDescription": "Der Kalender bekommt die Abende, die du hinzufügst. Sonst wird nichts gelesen.",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "Mit dem Ausgehhinweis wird dein Standort abends im Hintergrund gelesen, um zu sehen, ob du irgendwo bleibst. Er bleibt auf diesem Handy, nichts geht an den Server.",
+    "NSLocationAlwaysUsageDescription": "Mit dem Ausgehhinweis wird dein Standort abends im Hintergrund gelesen, um zu sehen, ob du irgendwo bleibst. Er bleibt auf diesem Handy, nichts geht an den Server."
   }
 }

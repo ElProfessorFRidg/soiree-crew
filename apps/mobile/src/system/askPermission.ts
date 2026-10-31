@@ -8,7 +8,8 @@ import { create } from "zustand";
 // needed, a short sheet says what it is for and what leaves the phone, then the system asks.
 // A refusal is left to the caller, which knows where to say it and links to the settings.
 
-export type PermissionKind = "location" | "camera" | "photos" | "notifications";
+/** "locationAlways" is the background ("Always") location, asked after the foreground one. */
+export type PermissionKind = "location" | "locationAlways" | "camera" | "photos" | "notifications";
 
 /** Why it is needed right now: each one has its own explanation. */
 export type PermissionUse =
@@ -22,7 +23,9 @@ export type PermissionUse =
   | "reminders"
   /** A photo of my own drink, kept on this phone (O-21). */
   | "drinkPhoto"
-  | "drinkLibrary";
+  | "drinkLibrary"
+  /** "Rappel quand t'es de sortie": the background location, kept on this phone. */
+  | "outing";
 
 export interface PermissionAnswer {
   granted: boolean;
@@ -47,6 +50,8 @@ async function status(kind: PermissionKind): Promise<{ granted: boolean; canAskA
   switch (kind) {
     case "location":
       return Location.getForegroundPermissionsAsync();
+    case "locationAlways":
+      return Location.getBackgroundPermissionsAsync();
     case "camera":
       return ImagePicker.getCameraPermissionsAsync();
     case "photos":
@@ -61,6 +66,8 @@ async function systemRequest(kind: PermissionKind): Promise<{ granted: boolean; 
   switch (kind) {
     case "location":
       return Location.requestForegroundPermissionsAsync();
+    case "locationAlways":
+      return Location.requestBackgroundPermissionsAsync();
     case "camera":
       return ImagePicker.requestCameraPermissionsAsync();
     case "photos":

@@ -4,6 +4,8 @@
     "NSCameraUsageDescription": "La cámara sirve para añadir fotos al álbum de la fiesta, que solo ve tu crew.",
     "NSPhotoLibraryUsageDescription": "Tus fotos sirven para llenar el álbum de la fiesta, que solo ve tu crew. Se les quita la ubicación.",
     "NSCalendarsUsageDescription": "El calendario recibe las fiestas que añades. No se lee nada más.",
-    "NSCalendarsWriteOnlyAccessUsageDescription": "El calendario recibe las fiestas que añades. No se lee nada más."
+    "NSCalendarsWriteOnlyAccessUsageDescription": "El calendario recibe las fiestas que añades. No se lee nada más.",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "Con el aviso de salida activado, tu ubicación se lee en segundo plano por la noche para ver si estás en algún sitio. Se queda en este móvil, nada va al servidor.",
+    "NSLocationAlwaysUsageDescription": "Con el aviso de salida activado, tu ubicación se lee en segundo plano por la noche para ver si estás en algún sitio. Se queda en este móvil, nada va al servidor."
   }
 }

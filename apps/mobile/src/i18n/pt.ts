@@ -200,6 +200,8 @@ export const pt: Messages = {
     launchBody: { v1: "A festa começou, lança-a!", v2: "Começou sem ti? Abre a festa.", v3: "O crew já arrancou. E tu?", v4: "Está na hora! Abre a festa para seguir o crew.", v5: "A tua noite está à espera, um toque e bora.", v6: "Guardámos-te um lugar. Lança a festa.", v7: "A festa começou, o teu contador ainda dorme.", v8: "Vamos lá, a festa está aberta!" },
     comebackTitle: "Há quanto tempo",
     comebackBody: { v1: "O que planeia o crew este fim de semana?", v2: "Planos para hoje? Espreita o crew.", v3: "Temos saudades tuas! Vem ver o que se passa.", v4: "Sexta à noite, o crew talvez alinhe.", v5: "Chegou o fim de semana. Alguma festa à vista?", v6: "O teu crew talvez saia hoje. Vai ver!", v7: "Nada planeado? Lança uma festa.", v8: "Não te esqueças da malta: passa pelo crew." },
+    outingTitle: "Saíste esta noite?",
+    outingBody: { v1: "Saíste? Lança a noite.", v2: "Cheira a imperial por aqui. Lanças a festa?", v3: "Já assentaste nalgum sítio? Avisa o crew.", v4: "Parece que estás na rua. A noite começa quando quiseres.", v5: "Primeira rodada à vista? Lança a noite, o crew segue-te.", v6: "Pareces bem instalado. Uma noite para lançar?", v7: "Saída detetada! Abre a app e arranca.", v8: "O crew sabe que saíste? Lança a noite." },
     birthdayBody: { v1: "Preparar uma festa?", v2: "Organizamos-lhe alguma coisa?", v3: "Bolo, velas, crew. Organizamos?", v4: "Um aniversário sem festa é triste. Planeamos?", v5: "Hora de uma festa surpresa.", v6: "Prepara o brinde!", v7: "Três dias para preparar uma grande noite.", v8: "Aniversários celebram-se. Lanças tu?" },
   },
   crew: {
@@ -890,6 +892,9 @@ export const pt: Messages = {
   settings: {
     nudges: "Lembretes para lançar a festa",
     nudgesHint: "Uma festa começou sem ti, ou a app dorme há dias: um pequeno lembrete, nunca nas horas de silêncio.",
+    outing: "Lembrete quando sais",
+    outingHint: "À noite, se ficares no mesmo sítio sem noite lançada, um pequeno lembrete. A tua localização fica neste telemóvel.",
+    outingDenied: "Sem a localização \"Sempre\", não há lembrete. Podes permiti-la nas definições do telemóvel.",
     remindersAppOnly: "Os lembretes (água, limite, resumo) só funcionam na app instalada, não no navegador.",
     sections: { region: "Idioma, região e unidades", notifications: "Notificações", security: "Segurança e dados", appearance: "Privacidade e aparência" },
     notificationsSummary: "Água, limite, resumo, horas de silêncio",
@@ -1395,7 +1400,7 @@ export const pt: Messages = {
     where: "Para onde vão",
     whereBody: "Neste telemóvel, na sua cópia de segurança e no servidor do teu crew, em mais lado nenhum. Nada é vendido. As fotos das tuas bebidas ficam neste telemóvel.",
     never: "O que não há",
-    neverBody: "Sem publicidade, sem estatísticas de utilização, sem localização seguida em contínuo.",
+    neverBody: "Sem publicidade, sem estatísticas de utilização, sem localização seguida em contínuo. Com o lembrete de saída ligado, a localização é lida em segundo plano mas nunca sai do telemóvel.",
     backup: "Cópias de segurança do telemóvel",
     backupBody: "Os dados da app fazem parte da cópia iCloud do teu iPhone ou da cópia Google do teu Android, cifrados pela Apple ou pela Google como o resto do telemóvel. Voltam quando restauras um telemóvel. Uma cópia do essencial (idade confirmada, consentimento, perfil, definições, bebidas personalizadas, bebidas e água dos últimos 45 dias) também fica no porta-chaves deste telemóvel: se apagares a app e a reinstalares, continuas onde estavas. Essa cópia nunca sai do telemóvel.",
     rights: "Os teus direitos",
@@ -2307,6 +2312,11 @@ export const pt: Messages = {
       title: "As tuas fotos",
       what: "Escolhes uma foto do teu copo: a app só lê essa.",
       after: "A foto fica neste telemóvel e nunca é enviada.",
+    },
+    outing: {
+      title: "A tua localização em segundo plano",
+      what: "À noite, a app vê se ficas no mesmo sítio, mesmo fechada. Escolhe \"Sempre\" quando o telemóvel perguntar.",
+      after: "A tua localização fica neste telemóvel, nada vai para o servidor. Desliga o lembrete quando quiseres.",
     },
     reminders: {
       title: "Deixar tocar os lembretes",

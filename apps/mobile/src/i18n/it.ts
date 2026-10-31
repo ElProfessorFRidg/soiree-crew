@@ -200,6 +200,8 @@ export const it: Messages = {
     launchBody: { v1: "La serata è iniziata, lanciala!", v2: "È partita senza di te? Apri la serata.", v3: "Il crew è partito. E tu?", v4: "È ora! Apri la serata per seguire il crew.", v5: "La tua serata ti aspetta, un tocco e via.", v6: "Ti abbiamo tenuto il posto. Lancia la serata.", v7: "La festa è iniziata, il tuo contatore dorme ancora.", v8: "Forza forza, la serata è aperta!" },
     comebackTitle: "Da quanto tempo",
     comebackBody: { v1: "Cosa organizza il crew questo weekend?", v2: "Piani per stasera? Dai un'occhiata al crew.", v3: "Ci manchi! Vieni a vedere cosa bolle in pentola.", v4: "Venerdì sera, il crew forse è carico.", v5: "È arrivato il weekend. Una serata in vista?", v6: "Il tuo crew forse esce stasera. Vai a vedere!", v7: "Niente in programma? Lancia una serata.", v8: "Non dimenticare gli amici: passa dal crew." },
+    outingTitle: "Fuori stasera?",
+    outingBody: { v1: "Sei uscito? Lancia la serata.", v2: "Qui c'è aria di aperitivo. Lanci la serata?", v3: "Ti sei fermato da qualche parte? Avvisa il crew.", v4: "Sembra che tu sia fuori. La serata parte quando vuoi.", v5: "Primo giro in vista? Lancia la serata, il crew ti segue.", v6: "Ti vedo comodo. Una serata da lanciare?", v7: "Uscita avvistata! Apri l'app e dai il via.", v8: "Il crew sa che sei fuori? Lancia la serata." },
     birthdayBody: { v1: "Organizzare una serata?", v2: "Gli organizziamo qualcosa?", v3: "Torta, candeline, crew. Ci organizziamo?", v4: "Un compleanno senza festa è triste. Pianifichiamo?", v5: "È il momento di una festa a sorpresa.", v6: "Prepara il brindisi!", v7: "Tre giorni per preparare una bella serata.", v8: "I compleanni si festeggiano. Lanci tu?" },
   },
   crew: {
@@ -890,6 +892,9 @@ export const it: Messages = {
   settings: {
     nudges: "Promemoria per lanciare la serata",
     nudgesHint: "Una serata è iniziata senza di te, o l'app dorme da giorni: un piccolo promemoria, mai nelle ore di silenzio.",
+    outing: "Promemoria quando sei fuori",
+    outingHint: "La sera, se resti fermo nello stesso posto senza serata lanciata, un piccolo promemoria. La tua posizione resta su questo telefono.",
+    outingDenied: "Senza la posizione \"Sempre\", niente promemoria. Puoi consentirla nelle impostazioni del telefono.",
     remindersAppOnly: "I promemoria (acqua, limite, riepilogo) funzionano solo nell'app installata, non nel browser.",
     sections: { region: "Lingua, regione e unità", notifications: "Notifiche", security: "Sicurezza e dati", appearance: "Privacy e aspetto" },
     notificationsSummary: "Acqua, limite, riepilogo, ore di quiete",
@@ -1395,7 +1400,7 @@ export const it: Messages = {
     where: "Dove vanno",
     whereBody: "Su questo telefono, nel suo backup e sul server della tua crew, da nessun'altra parte. Niente viene venduto. Le foto delle tue bevande restano su questo telefono.",
     never: "Cosa non c'è",
-    neverBody: "Niente pubblicità, niente statistiche d'uso, nessun tracciamento continuo della posizione.",
+    neverBody: "Niente pubblicità, niente statistiche d'uso, nessun tracciamento continuo della posizione. Con il promemoria di uscita attivo, la posizione viene letta in background ma non lascia mai il telefono.",
     backup: "Backup del telefono",
     backupBody: "I dati dell'app fanno parte del backup iCloud del tuo iPhone o del backup Google del tuo Android, cifrati da Apple o Google come il resto del telefono. Tornano quando ripristini un telefono. Una copia dell'essenziale (età confermata, consenso, profilo, impostazioni, drink personalizzati, drink e acqua degli ultimi 45 giorni) resta anche nel portachiavi di questo telefono: se elimini l'app e la reinstalli, riprendi da dove eri. Quella copia non lascia mai il telefono.",
     rights: "I tuoi diritti",
@@ -2307,6 +2312,11 @@ export const it: Messages = {
       title: "Le tue foto",
       what: "Scegli una foto del tuo bicchiere: l'app legge solo quella.",
       after: "La foto resta su questo telefono e non viene mai inviata.",
+    },
+    outing: {
+      title: "La posizione in background",
+      what: "La sera, l'app guarda se resti nello stesso posto, anche da chiusa. Scegli \"Sempre\" quando il telefono te lo chiede.",
+      after: "La tua posizione resta su questo telefono, niente va al server. Spegni il promemoria quando vuoi.",
     },
     reminders: {
       title: "Far suonare i promemoria",

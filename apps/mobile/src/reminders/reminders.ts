@@ -7,6 +7,7 @@ import { formatClock } from "@/i18n/format";
 import { variantKey } from "@/i18n/variants";
 import { useAppStore } from "@/state/store";
 import { REMOTE_PUSH } from "@/notify/remote";
+import { cancelOutingNudge } from "@/location/outing";
 
 const MINUTE_MS = 60_000;
 const WATER_ID = "water-reminder";
@@ -185,6 +186,7 @@ export async function refreshReminders(): Promise<void> {
   if (!profile || !estimate || estimate.bac <= 0 || estimate.backToZeroAt === null) return clearNightReminders();
   // Something is drunk: the night is launched, the "it has started" nudges are pointless.
   await cancelStale(LAUNCH_PREFIX, new Set());
+  await cancelOutingNudge();
   if (remindersMutedUntil !== null && remindersMutedUntil > now) return;
   const i18n = createTranslator(preferences.language);
 

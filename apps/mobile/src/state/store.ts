@@ -84,6 +84,8 @@ export interface AppState {
   remindersMutedUntil: number | null;
   /** Nudges to launch a party already started, and the weekend comeback nudge. */
   nudgesOn: boolean;
+  /** "Rappel quand t'es de sortie": background location, off until switched on (location/outing.ts). */
+  outingNudgeOn: boolean;
   /** Parties whose live screen I opened, so the "it has started" nudge stays quiet. */
   launchedParties: string[];
   /** Time of the peak warning already scheduled tonight: one per night. */
@@ -168,6 +170,7 @@ export const useAppStore = create<AppState>()(
       nudgeDismissedAt: null,
       remindersMutedUntil: null,
       nudgesOn: true,
+      outingNudgeOn: false,
       launchedParties: [],
       peakWarnedAt: null,
       weekStartOverride: null,

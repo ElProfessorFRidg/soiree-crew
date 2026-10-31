@@ -200,6 +200,8 @@ export const es: Messages = {
     launchBody: { v1: "La fiesta empezó, ¡lánzala!", v2: "¿Empezó sin ti? Abre la fiesta.", v3: "El crew ya arrancó. ¿Y tú?", v4: "¡Es la hora! Abre la fiesta para seguir al crew.", v5: "Tu noche te espera, un toque y listo.", v6: "Te guardamos un sitio. Lanza la fiesta.", v7: "La fiesta empezó y tu contador sigue dormido.", v8: "¡Venga, venga, la fiesta está abierta!" },
     comebackTitle: "Cuánto tiempo",
     comebackBody: { v1: "¿Qué planea el crew este finde?", v2: "¿Plan esta noche? Mira el crew.", v3: "¡Te echamos de menos! Ven a ver qué se cuece.", v4: "Viernes noche, el crew igual se anima.", v5: "Llegó el finde. ¿Alguna fiesta a la vista?", v6: "Tu crew igual sale esta noche. ¡Echa un ojo!", v7: "¿Nada planeado? Lanza una fiesta.", v8: "No olvides a los colegas: pásate por el crew." },
+    outingTitle: "¿De fiesta esta noche?",
+    outingBody: { v1: "¿Has salido? Arranca la noche.", v2: "Aquí huele a cañas. ¿Lanzas la fiesta?", v3: "¿Ya estás en algún sitio? Avisa al crew.", v4: "Parece que estás fuera. La noche empieza cuando tú digas.", v5: "¿Primera ronda a la vista? Lanza la noche, el crew te sigue.", v6: "Te veo muy a gusto. ¿Lanzamos la noche?", v7: "¡Salida detectada! Abre la app y dale caña.", v8: "¿Sabe el crew que has salido? Lanza la noche." },
     birthdayBody: { v1: "¿Preparar una fiesta?", v2: "¿Le montamos algo?", v3: "Tarta, velas, crew. ¿Lo organizamos?", v4: "Un cumple sin fiesta es triste. ¿Planeamos?", v5: "Momento de una fiesta sorpresa.", v6: "¡Prepara el brindis!", v7: "Tres días para montarle una gran noche.", v8: "Los cumples se celebran. ¿Arrancas?" },
   },
   crew: {
@@ -890,6 +892,9 @@ export const es: Messages = {
   settings: {
     nudges: "Avisos para lanzar la fiesta",
     nudgesHint: "Una fiesta empezó sin ti, o la app lleva días dormida: un pequeño aviso, nunca en horas de silencio.",
+    outing: "Aviso cuando sales",
+    outingHint: "Por la noche, si te quedas en un sitio sin noche lanzada, un pequeño aviso. Tu ubicación se queda en este móvil.",
+    outingDenied: "Sin la ubicación \"Siempre\", no hay aviso. Puedes permitirla en los ajustes del móvil.",
     remindersAppOnly: "Los recordatorios (agua, límite, resumen) solo funcionan en la app instalada, no en el navegador.",
     sections: { region: "Idioma, región y unidades", notifications: "Notificaciones", security: "Seguridad y datos", appearance: "Privacidad y apariencia" },
     notificationsSummary: "Agua, límite, resumen, horas tranquilas",
@@ -1395,7 +1400,7 @@ export const es: Messages = {
     where: "Adónde van",
     whereBody: "En este teléfono, en su copia de seguridad y en el servidor de tu crew, en ningún otro sitio. No se vende nada. Las fotos de tus bebidas propias se quedan en este teléfono.",
     never: "Lo que no hay",
-    neverBody: "Ni anuncios, ni estadísticas de uso, ni seguimiento continuo de tu ubicación.",
+    neverBody: "Ni anuncios, ni estadísticas de uso, ni seguimiento continuo de tu ubicación. Con el aviso de salida activado, tu ubicación se lee en segundo plano pero nunca sale del móvil.",
     backup: "Copias de seguridad del teléfono",
     backupBody: "Los datos de la app forman parte de la copia de iCloud de tu iPhone o de la copia de Google de tu Android, cifrados por Apple o Google como el resto del teléfono. Vuelven cuando restauras un teléfono. Una copia de lo esencial (edad confirmada, consentimiento, perfil, ajustes, bebidas personalizadas, bebidas y agua de los últimos 45 días) también se queda en el llavero de este teléfono: si borras la app y la reinstalas, sigues donde estabas. Esa copia nunca sale del teléfono.",
     rights: "Tus derechos",
@@ -2307,6 +2312,11 @@ export const es: Messages = {
       title: "Tus fotos",
       what: "Eliges una foto de tu vaso: la app solo lee esa.",
       after: "La foto se queda en este teléfono y nunca se envía.",
+    },
+    outing: {
+      title: "Tu ubicación en segundo plano",
+      what: "Por la noche, la app mira si te quedas en el mismo sitio, aunque esté cerrada. Elige \"Siempre\" cuando el móvil te pregunte.",
+      after: "Tu ubicación se queda en este móvil, nada va al servidor. Apaga el aviso cuando quieras.",
     },
     reminders: {
       title: "Dejar sonar los avisos",

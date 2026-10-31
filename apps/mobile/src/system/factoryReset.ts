@@ -6,6 +6,7 @@ import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 import { CHAT_KEY_NAME } from "@/chat/secure";
 import { SESSION_KEYS } from "@/server/session";
+import { stopOuting } from "@/location/outing";
 import { KEPT_COPY_KEY, stopKeptCopy } from "@/system/keptCopy";
 import { useAppStore } from "@/state/store";
 
@@ -40,7 +41,7 @@ function emptyAppFolders(): void {
 }
 
 /**
- * O-07: this phone as if the app had never been installed. Stops the Live Activity, cancels every
+ * O-07: this phone as if the app had never been installed. Stops the background location, the Live Activity, cancels every
  * reminder and the badge, forgets the Keychain / Keystore secrets, deletes the app's files and its
  * whole storage, then restarts the app at the age gate. What lives on the server is deleted before
  * this by the caller (DELETE /v1/me), never by this function.
@@ -57,6 +58,7 @@ export async function eraseEverything(): Promise<void> {
     return;
   }
   stopKeptCopy();
+  await stopOuting().catch(() => undefined);
   const { liveActivityId } = useAppStore.getState();
   if (liveActivityId && Platform.OS === "ios") {
     try {

@@ -24,6 +24,7 @@ const ICONS: Record<PermissionUse, AnyIconName> = {
   reminders: "bell",
   drinkPhoto: "camera",
   drinkLibrary: "image",
+  outing: "pin",
 };
 
 /** iOS draws it in a window of its own, above the modal screens (add a drink, the recap) too. */

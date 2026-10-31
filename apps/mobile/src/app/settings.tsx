@@ -18,6 +18,8 @@ import { Screen } from "@/ui/Screen";
 import { Stepper } from "@/ui/Stepper";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
+import { startOuting, stopOuting } from "@/location/outing";
+import { askPermission, permissionStatus } from "@/system/askPermission";
 import { Button } from "@/ui/Button";
 import { checkForUpdate, currentBuild, currentVersion } from "@/system/updates";
 import { AppIconPicker } from "@/profile/AppIconPicker";
@@ -117,6 +119,7 @@ export default function SettingsScreen() {
   const hapticsOn = useAppStore((state) => state.hapticsOn);
   const lockScreenNumbers = useAppStore((state) => state.lockScreenNumbers);
   const nudgesOn = useAppStore((state) => state.nudgesOn);
+  const outingNudgeOn = useAppStore((state) => state.outingNudgeOn);
   const crews = useCrewData((state) => state.crews);
   const hour = (h: number) => formatClock(new Date(2026, 0, 1, h).getTime(), i18n.language, preferences.hourCycle);
   const offline = showFailure(i18n);
@@ -232,6 +235,28 @@ export default function SettingsScreen() {
                   onChange={(on) => {
                     useAppStore.setState({ nudgesOn: on });
                     void refreshCalendarReminders().catch(() => undefined);
+                  }}
+                />
+                <SwitchRow
+                  label={i18n.t("settings.outing")}
+                  hint={i18n.t("settings.outingHint")}
+                  value={outingNudgeOn}
+                  onChange={(on) => {
+                    if (!on) {
+                      useAppStore.setState({ outingNudgeOn: false });
+                      void stopOuting();
+                      return;
+                    }
+                    useAppStore.setState({ outingNudgeOn: true });
+                    void (async () => {
+                      // The reason first (one sheet), then the system asks "while using", then "always".
+                      const before = await permissionStatus("location");
+                      const foreground = await askPermission("location", "outing");
+                      const background = foreground.granted ? await askPermission("locationAlways", before.granted ? "outing" : null) : foreground;
+                      if (background.granted && (await startOuting())) return;
+                      useAppStore.setState({ outingNudgeOn: false });
+                      if (!background.declined) showToast({ tone: "danger", message: i18n.t("settings.outingDenied") });
+                    })();
                   }}
                 />
                 <SwitchRow

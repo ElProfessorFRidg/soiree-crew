@@ -199,6 +199,8 @@ export const de: Messages = {
     launchBody: { v1: "Die Party hat begonnen, starte sie!", v2: "Ohne dich angefangen? Öffne die Party.", v3: "Die Crew legt los. Und du?", v4: "Es ist so weit! Öffne die Party und folge der Crew.", v5: "Dein Abend wartet, ein Tipp und los.", v6: "Wir haben dir einen Platz frei gehalten. Starte die Party.", v7: "Die Party läuft, dein Zähler schläft noch.", v8: "Hopp hopp, die Party ist offen!" },
     comebackTitle: "Lange nicht gesehen",
     comebackBody: { v1: "Was plant die Crew am Wochenende?", v2: "Pläne für heute Abend? Schau bei der Crew vorbei.", v3: "Wir vermissen dich! Schau, was läuft.", v4: "Freitagabend, vielleicht hat die Crew Bock.", v5: "Das Wochenende ist da. Eine Party in Sicht?", v6: "Deine Crew ist heute vielleicht unterwegs. Schau nach!", v7: "Nichts geplant? Starte eine Party.", v8: "Vergiss deine Leute nicht: schau bei der Crew rein." },
+    outingTitle: "Heute unterwegs?",
+    outingBody: { v1: "Unterwegs? Starte den Abend.", v2: "Hier riecht's nach Feierabendbier. Startest du die Party?", v3: "Irgendwo gelandet? Sag der Crew Bescheid.", v4: "Sieht aus, als wärst du draußen. Der Abend startet, wann du willst.", v5: "Erste Runde in Sicht? Starte den Abend, die Crew zieht nach.", v6: "Du machst es dir gemütlich. Party starten?", v7: "Ausgehen erkannt! Öffne die App und leg los.", v8: "Weiß die Crew, dass du unterwegs bist? Starte den Abend." },
     birthdayBody: { v1: "Eine Party planen?", v2: "Sollen wir was organisieren?", v3: "Kuchen, Kerzen, Crew. Planen wir was?", v4: "Ein Geburtstag ohne Party ist traurig. Planen?", v5: "Zeit für eine Überraschungsparty.", v6: "Bereite den Toast vor!", v7: "Drei Tage, um einen tollen Abend zu planen.", v8: "Geburtstage werden gefeiert. Legst du los?" },
   },
   crew: {
@@ -889,6 +891,9 @@ export const de: Messages = {
   settings: {
     nudges: "Hinweise zum Starten der Party",
     nudgesHint: "Eine Party hat ohne dich begonnen oder die App schläft seit Tagen: ein kleiner Hinweis, nie in den Ruhezeiten.",
+    outing: "Hinweis, wenn ich unterwegs bin",
+    outingHint: "Abends, wenn du ohne gestarteten Abend an einem Ort bleibst, ein kleiner Hinweis. Dein Standort bleibt auf diesem Handy.",
+    outingDenied: "Ohne Standort \"Immer\" kein Hinweis. Du kannst ihn in den Einstellungen des Handys erlauben.",
     remindersAppOnly: "Erinnerungen (Wasser, Grenze, Rückblick) gibt es nur in der installierten App, nicht im Browser.",
     sections: { region: "Sprache, Region und Einheiten", notifications: "Benachrichtigungen", security: "Sicherheit und Daten", appearance: "Privatsphäre und Aussehen" },
     notificationsSummary: "Wasser, Grenze, Rückblick, Ruhezeiten",
@@ -1394,7 +1399,7 @@ export const de: Messages = {
     where: "Wohin sie gehen",
     whereBody: "Auf diesem Handy, in seinem Backup und auf dem Server deiner Crew, nirgends sonst. Nichts wird verkauft. Fotos deiner eigenen Getränke bleiben auf diesem Handy.",
     never: "Was es nicht gibt",
-    neverBody: "Keine Werbung, keine Nutzungsstatistik, keine ständige Ortung.",
+    neverBody: "Keine Werbung, keine Nutzungsstatistik, keine ständige Ortung. Mit dem Ausgehhinweis wird dein Standort im Hintergrund gelesen, verlässt aber nie das Handy.",
     backup: "Handy-Backups",
     backupBody: "Die Daten der App sind Teil des iCloud-Backups deines iPhones oder des Google-Backups deines Android-Handys, verschlüsselt von Apple oder Google wie der Rest des Handys. Sie kommen zurück, wenn du ein Handy wiederherstellst. Eine Kopie des Wichtigsten (bestätigtes Alter, Einwilligung, Profil, Einstellungen, eigene Getränke, Getränke und Wasser der letzten 45 Tage) bleibt auch im Schlüsselbund dieses Handys: Wenn du die App löschst und neu installierst, machst du da weiter, wo du warst. Diese Kopie verlässt das Handy nie.",
     rights: "Deine Rechte",
@@ -2306,6 +2311,11 @@ export const de: Messages = {
       title: "Deine Fotos",
       what: "Du wählst ein Foto deines Glases: Die App liest nur dieses.",
       after: "Das Foto bleibt auf diesem Handy und wird nie gesendet.",
+    },
+    outing: {
+      title: "Standort im Hintergrund",
+      what: "Abends schaut die App, ob du an einem Ort bleibst, auch wenn sie geschlossen ist. Wähle \"Immer\", wenn dein Handy fragt.",
+      after: "Dein Standort bleibt auf diesem Handy, nichts geht an den Server. Schalte den Hinweis aus, wann du willst.",
     },
     reminders: {
       title: "Erinnerungen klingeln lassen",

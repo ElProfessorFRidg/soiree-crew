@@ -199,6 +199,8 @@ export const fr = {
     launchBody: { v1: "La soirée a commencé, lance-la !", v2: "Ça a démarré sans toi ? Ouvre la soirée.", v3: "Le crew est lancé. Et toi ?", v4: "C'est l'heure ! Ouvre la soirée pour suivre le crew.", v5: "Ta soirée t'attend, un tap et c'est parti.", v6: "On t'a gardé une place. Lance la soirée.", v7: "Ça a commencé, ton compteur dort encore.", v8: "Hop hop hop, la soirée est ouverte !" },
     comebackTitle: "Ça fait un bail",
     comebackBody: { v1: "Le crew prévoit quoi ce week-end ?", v2: "Un petit plan ce soir ? Jette un œil au crew.", v3: "Tu nous manques ! Viens voir ce qui se trame.", v4: "Vendredi soir, le crew est peut-être chaud.", v5: "Le week-end est là. Une soirée en vue ?", v6: "Ton crew bouge peut-être ce soir. Va voir !", v7: "Rien de prévu ? Lance une soirée.", v8: "On n'oublie pas les copains : passe voir le crew." },
+    outingTitle: "De sortie ce soir ?",
+    outingBody: { v1: "T'es de sortie ? Lance la soirée.", v2: "Ça sent l'apéro par ici. Tu lances la soirée ?", v3: "Posé quelque part ce soir ? Préviens le crew.", v4: "On dirait que t'es dehors. La soirée commence quand tu veux.", v5: "Premier verre en vue ? Lance la soirée, le crew suivra.", v6: "T'as l'air bien installé. Une soirée à lancer ?", v7: "Sortie repérée ! Ouvre l'app et lance la nuit.", v8: "Le crew sait que t'es de sortie ? Lance la soirée." },
     birthdayBody: { v1: "Préparer une soirée ?", v2: "On lui organise un truc ?", v3: "Gâteau, bougies, crew. On s'organise ?", v4: "Un anniv sans soirée, c'est triste. On prévoit ?", v5: "C'est le moment de lancer une soirée surprise.", v6: "Prépare le toast !", v7: "Trois jours pour lui préparer une belle soirée.", v8: "Un anniv, ça se célèbre. Tu lances ?" },
   },
   crew: {
@@ -889,6 +891,9 @@ export const fr = {
   settings: {
     nudges: "Rappels pour lancer la soirée",
     nudgesHint: "Une soirée a commencé sans toi, ou l'app dort depuis des jours : un petit rappel, jamais en heures calmes.",
+    outing: "Rappel quand t'es de sortie",
+    outingHint: "Le soir, si tu restes posé au même endroit sans soirée lancée, un petit rappel. Ta position reste sur ce téléphone.",
+    outingDenied: "Sans la position « Toujours », pas de rappel. Tu peux l'autoriser dans les réglages du téléphone.",
     remindersAppOnly: "Les rappels (eau, limite, récap) ne marchent que dans l'app installée, pas dans le navigateur.",
     sections: { region: "Langue, région et unités", notifications: "Notifications", security: "Sécurité et données", appearance: "Confidentialité et apparence" },
     notificationsSummary: "Eau, limite, récap, heures calmes",
@@ -1394,7 +1399,7 @@ export const fr = {
     where: "Où elles vont",
     whereBody: "Sur ce téléphone, dans sa sauvegarde et sur le serveur de ton crew, nulle part ailleurs. Rien n'est vendu. Les photos de tes verres perso restent sur ce téléphone.",
     never: "Ce qu'il n'y a pas",
-    neverBody: "L'app n'affiche aucune pub et ne mesure pas ton usage. Ta position part seulement au check-in ou quand tu la partages.",
+    neverBody: "L'app n'affiche aucune pub et ne mesure pas ton usage. Ta position part seulement au check-in ou quand tu la partages. Avec le rappel de sortie allumé, ta position est lue en arrière-plan mais ne quitte jamais le téléphone.",
     backup: "Sauvegardes du téléphone",
     backupBody: "Les données de l'app font partie de la sauvegarde iCloud de ton iPhone ou de la sauvegarde Google de ton Android, chiffrées par Apple ou Google comme le reste du téléphone. Elles reviennent quand tu restaures un téléphone. Une copie de l'essentiel (âge confirmé, accord, profil, réglages, boissons perso, verres et eau des 45 derniers jours) reste aussi dans le trousseau de ce téléphone : si tu supprimes l'app puis la réinstalles, tu reprends où tu étais. Cette copie ne quitte jamais le téléphone.",
     rights: "Tes droits",
@@ -2306,6 +2311,11 @@ export const fr = {
       title: "Tes photos",
       what: "Tu choisis une photo de ton verre : l'app ne lit que celle-là.",
       after: "La photo reste sur ce téléphone et n'est jamais envoyée.",
+    },
+    outing: {
+      title: "Ta position en arrière-plan",
+      what: "Le soir, l'app regarde si tu restes au même endroit, même fermée. Choisis « Toujours » quand le téléphone te le demande.",
+      after: "Ta position reste sur ce téléphone, rien ne part au serveur. Coupe le rappel quand tu veux.",
     },
     reminders: {
       title: "Laisser sonner les rappels",

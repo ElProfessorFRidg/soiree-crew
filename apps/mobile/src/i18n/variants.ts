@@ -23,6 +23,7 @@ type Base =
   | "reminders.peakBody"
   | "reminders.launchBody"
   | "reminders.comebackBody"
+  | "reminders.outingBody"
   | "reminders.birthdayBody"
   | "homeCheck.notifBody"
   | "recap.notifBody";

@@ -4,6 +4,8 @@
     "NSCameraUsageDescription": "L'appareil photo sert à ajouter des photos à l'album de la soirée, visible par ton crew seulement.",
     "NSPhotoLibraryUsageDescription": "Tes photos servent à remplir l'album de la soirée, visible par ton crew seulement. Leur position est retirée.",
     "NSCalendarsUsageDescription": "Le calendrier reçoit les soirées que tu y ajoutes. Rien d'autre n'est lu.",
-    "NSCalendarsWriteOnlyAccessUsageDescription": "Le calendrier reçoit les soirées que tu y ajoutes. Rien d'autre n'est lu."
+    "NSCalendarsWriteOnlyAccessUsageDescription": "Le calendrier reçoit les soirées que tu y ajoutes. Rien d'autre n'est lu.",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "Avec le rappel de sortie allumé, ta position est lue en arrière-plan le soir pour voir si tu es posé quelque part. Elle reste sur ce téléphone, rien ne part au serveur.",
+    "NSLocationAlwaysUsageDescription": "Avec le rappel de sortie allumé, ta position est lue en arrière-plan le soir pour voir si tu es posé quelque part. Elle reste sur ce téléphone, rien ne part au serveur."
   }
 }
