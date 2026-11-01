@@ -9,7 +9,9 @@ import { join, relative, sep } from "node:path";
  * The prototype's only functional gradients (DESIGN.md): SOS ring, roulette and wheel, BAC curve,
  * plus the recipe drawings, where the gradient is the drink's own light (O-66, asked for explicitly).
  */
-const GRADIENT_ALLOWED = [/sos/i, /roulette/i, /wheel/i, /curve/i, /RecipeArt/];
+const GRADIENT_ALLOWED = [/sos/i, /roulette/i, /wheel/i, /curve/i, /RecipeArt/, /drive-warning/];
+/** The drink-driving warning's red glow, asked for explicitly: the only radial gradient allowed. */
+const RADIAL_ALLOWED = [/drive-warning/];
 /** Repeating motion is allowed where it shows a state that is really changing. */
 const REPEAT_ALLOWED = [/Skeleton/, /sos/i, /fuse/i, /bomb/i, /timer/i, /roulette/i, /wheel/i, /Spinner/i];
 
@@ -35,7 +37,7 @@ export function checkSource(text, file) {
   const add = (rule, match, severity) => out.push({ rule, match, ...(severity ? { severity } : {}) });
 
   if (/from "expo-blur"|<BlurView\b|backdropFilter/.test(text)) add("D-02 glassmorphism", "blur behind content");
-  if (/<RadialGradient\b|radial-gradient\(/.test(text)) add("D-01 radial halo", "radial gradient");
+  if (/<RadialGradient\b|radial-gradient\(/.test(text) && !RADIAL_ALLOWED.some((re) => re.test(file))) add("D-01 radial halo", "radial gradient");
   if (/from "expo-linear-gradient"|<LinearGradient\b|linear-gradient\(/.test(text) && !GRADIENT_ALLOWED.some((re) => re.test(file)))
     add("D-01 decorative gradient", "linear gradient outside the SOS ring, wheels and BAC curve");
   if (/textShadow(Radius|Color)|text-shadow/.test(text)) add("D-03 glow", "text shadow");
