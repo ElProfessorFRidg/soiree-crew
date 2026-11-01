@@ -29,6 +29,13 @@ const RIDE_HOUR = 1;
 const RIDE_MINUTE = 30;
 /** The morning after, at this hour (later when the quiet hours say so). */
 const MORNING_HOUR = 10;
+/**
+ * A capful, a sip or a tasting (under about half a standard drink, 5 g of alcohol) still counts in
+ * the estimate, but not as "a drink" in a streak or a fast pace.
+ */
+const FULL_DRINK_GRAMS = 5;
+const fullDrink = (d: { volumeMl: number; abv: number }) => d.volumeMl * d.abv * 0.789 >= FULL_DRINK_GRAMS;
+
 /** Water streak line from this many drinks in a row without water. */
 const STREAK_FROM = 2;
 /** The peak warning goes this long before the estimated peak. */
@@ -254,8 +261,8 @@ async function scheduleNightExtras(estimate: BacEstimate, i18n: Translator, pref
   const ate = tonight.some((d) => d.withFood);
   await plan("food", FOOD_ID, ate ? null : first.consumedAt + FOOD_AFTER_MS, i18n.t("reminders.foodTitle"), i18n.t(variantKey("reminders.foodBody", nightOf(now))), "/(tabs)");
 
-  // Pace: three drinks within 45 min, the last one just now.
-  const last = tonight.slice(-PACE_DRINKS);
+  // Pace: three drinks within 45 min, the last one just now. Capfuls and sips do not count.
+  const last = tonight.filter(fullDrink).slice(-PACE_DRINKS);
   const fast = last.length === PACE_DRINKS && last[PACE_DRINKS - 1]!.consumedAt - last[0]!.consumedAt <= PACE_WINDOW_MS && last[PACE_DRINKS - 1]!.consumedAt > now - 15 * MINUTE_MS;
   await plan("pace", PACE_ID, fast ? now + MINUTE_MS : null, i18n.t("reminders.paceTitle"), i18n.t(variantKey("reminders.paceBody", nightOf(now))), "/curve");
 
@@ -317,7 +324,7 @@ export async function refreshReminders(): Promise<void> {
     at = Math.max(at, now + WATER_MIN_GAP_MS);
     if (at < backToZero) {
       // Two drinks or more in a row with no water between: the streak line, with the count.
-      const streak = sortedDrinks.filter((t) => t > lastWater).length;
+      const streak = drinks.filter((d) => d.abv > 0 && fullDrink(d) && d.consumedAt > lastWater).length;
       const body = streak >= STREAK_FROM
         ? i18n.t(variantKey("reminders.waterStreak", String(at)), { count: streak })
         : lastWater > 0
