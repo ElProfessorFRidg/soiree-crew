@@ -42,6 +42,7 @@ import {
   refreshReminders,
 } from "@/reminders/reminders";
 import { flushUploads } from "@/photos/uploads";
+import { DRIVE_URL, PASSENGER_ACTION, silenceAsPassenger } from "@/location/driving";
 import { flushGameResults } from "@/server/gameData";
 import { watchWidget } from "@/widgets/sync";
 import { CrashScreen } from "@/ui/CrashScreen";
@@ -208,6 +209,10 @@ export default function RootLayout() {
         void muteUntilMorning();
         return;
       }
+      if (response.actionIdentifier === PASSENGER_ACTION) {
+        void silenceAsPassenger();
+        return;
+      }
       // O-38, QOL-03: crew notifications and their action buttons.
       if (handleNotificationResponse(response)) return;
       const url = response.notification.request.content.data?.url;
@@ -219,6 +224,14 @@ export default function RootLayout() {
       Notifications.addNotificationResponseReceivedListener(open);
     return () => subscription.remove();
   }, [ready]);
+
+  // A driving warning raised while the app is open (location/driving.ts): the full screen at once.
+  const driveWarningAt = useAppStore((state) => state.driveWarningAt);
+  useEffect(() => {
+    if (!ready || driveWarningAt === null) return;
+    useAppStore.setState({ driveWarningAt: null });
+    router.push(DRIVE_URL as never);
+  }, [ready, driveWarningAt]);
 
   // CI only: the launch test opens each main screen with `-ciRoute /path` (an iOS launch argument,
   // read from the user defaults); a person launching the app never passes one.
@@ -283,6 +296,15 @@ export default function RootLayout() {
                   options={{
                     presentation: "fullScreenModal",
                     animation: "fade",
+                  }}
+                />
+                <Stack.Screen
+                  name="drive-warning"
+                  options={{
+                    presentation: "fullScreenModal",
+                    animation: reduceMotion ? "none" : "fade",
+                    gestureEnabled: false,
+                    contentStyle: { backgroundColor: "#7A0010" },
                   }}
                 />
                 <Stack.Screen name="recaps" />

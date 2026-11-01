@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { StyleSheet, View, Platform } from "react-native";
 import { getMotionScale, setMotionScale } from "@crew/design-tokens";
 import type { UnitSystem } from "@crew/units";
@@ -18,7 +18,7 @@ import { Screen } from "@/ui/Screen";
 import { Stepper } from "@/ui/Stepper";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
-import { startOuting, stopCrewDetect, stopOuting } from "@/location/outing";
+import { startOuting, stopCrewDetect, stopOuting, syncLocationUpdates } from "@/location/outing";
 import { askPermission, permissionStatus } from "@/system/askPermission";
 import { Button } from "@/ui/Button";
 import { checkForUpdate, currentBuild, currentVersion } from "@/system/updates";
@@ -423,8 +423,45 @@ export default function SettingsScreen() {
           {__DEV__ ? <MotionScale /> : null}
         </>
       ) : null}
+      {section === "security" && Platform.OS !== "web" ? <DriveAlertSection /> : null}
       {section === "security" ? <AccountSection /> : null}
     </Screen>
+  );
+}
+
+/** "Alerte si je conduis après avoir bu": on by default once the "Always" location is granted (location/driving.ts). */
+function DriveAlertSection() {
+  const i18n = useT();
+  const chosen = useAppStore((state) => state.driveAlertOn);
+  const [background, setBackground] = useState(false);
+  useEffect(() => {
+    void permissionStatus("locationAlways").then((answer) => setBackground(answer.granted));
+  }, []);
+  const value = chosen ?? background;
+  return (
+    <Section title={i18n.t("settings.driveSection")}>
+      <SwitchRow
+        label={i18n.t("settings.driveAlert")}
+        hint={i18n.t("settings.driveAlertHint")}
+        value={value}
+        onChange={(on) => {
+          useAppStore.setState({ driveAlertOn: on });
+          if (!on) {
+            void syncLocationUpdates();
+            return;
+          }
+          void (async () => {
+            const before = await permissionStatus("location");
+            const foreground = await askPermission("location", "drive");
+            const always = foreground.granted ? await askPermission("locationAlways", before.granted ? "drive" : null) : foreground;
+            setBackground(always.granted);
+            if (always.granted && (await syncLocationUpdates())) return;
+            useAppStore.setState({ driveAlertOn: false });
+            if (!always.declined) showToast({ tone: "danger", message: i18n.t("settings.driveDenied") });
+          })();
+        }}
+      />
+    </Section>
   );
 }
 

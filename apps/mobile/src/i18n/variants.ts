@@ -12,6 +12,12 @@ const COUNTS: Partial<Record<Base, number>> = {
   "reminders.paceBody": 10,
   "reminders.rideBody": 10,
   "reminders.morningBody": 10,
+  "drive.notifBody": 6,
+  "drive.notifBodyOver": 6,
+  "drive.drank": 4,
+  "drive.dontDrink": 4,
+  "drive.phone": 4,
+  "drive.options": 4,
 };
 
 type Base =
@@ -39,7 +45,13 @@ type Base =
   | "reminders.outingBody"
   | "reminders.birthdayBody"
   | "homeCheck.notifBody"
-  | "recap.notifBody";
+  | "recap.notifBody"
+  | "drive.notifBody"
+  | "drive.notifBodyOver"
+  | "drive.drank"
+  | "drive.dontDrink"
+  | "drive.phone"
+  | "drive.options";
 
 /**
  * SLOP-11: the same line never shows twice in a row for this person. One pick per occasion (a day

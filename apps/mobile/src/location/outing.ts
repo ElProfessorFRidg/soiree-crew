@@ -9,6 +9,7 @@ import { createTranslator } from "@/i18n";
 import { variantKey } from "@/i18n/variants";
 import { api } from "@/server/api";
 import { useAppStore } from "@/state/store";
+import { driveAlertEnabled, forgetDriving, onDriveLocations } from "./driving";
 
 // "Rappel quand t'es de sortie": with the "Always" location permission, the phone notices it has
 // stayed in one place at night while no night is logged, and nudges to launch it: once per
@@ -174,6 +175,8 @@ async function onLocations(locations: readonly Location.LocationObject[]): Promi
   const last = locations[locations.length - 1];
   if (!last) return;
   await hydrated();
+  // The driving warning rides on the same updates (driving.ts).
+  await onDriveLocations(locations).catch(() => undefined);
   if (!useAppStore.getState().outingNudgeOn) return;
   const now = Date.now();
   const here = { lat: last.coords.latitude, lng: last.coords.longitude };
@@ -235,39 +238,62 @@ if (supported) {
   });
 }
 
-/** Turns the low-power background updates on, once both permissions are there. */
+/** The options the updates were started with in this run: a change, or a new launch, restarts them. */
+let startedFor: boolean | null = null;
+
+/**
+ * Turns the background updates on, once both permissions are there. Low power for the outing
+ * nudge alone; with the driving warning, a fix about every minute at about 100 m, enough to read
+ * a car's speed between two of them.
+ */
 export async function startOuting(): Promise<boolean> {
   if (!supported) return false;
   const background = await Location.getBackgroundPermissionsAsync().catch(() => null);
   if (!background?.granted) return false;
-  if (await Location.hasStartedLocationUpdatesAsync(OUTING_TASK).catch(() => false)) return true;
+  const drive = await driveAlertEnabled();
+  if (await Location.hasStartedLocationUpdatesAsync(OUTING_TASK).catch(() => false)) {
+    if (startedFor === drive) return true;
+    await Location.stopLocationUpdatesAsync(OUTING_TASK).catch(() => undefined);
+  }
   try {
     await Location.startLocationUpdatesAsync(OUTING_TASK, {
       // Cell and Wi-Fi level: enough to tell "still at the same bar" from "moved on".
-      accuracy: Location.Accuracy.Low,
+      accuracy: drive ? Location.Accuracy.Balanced : Location.Accuracy.Low,
       distanceInterval: 100,
-      deferredUpdatesDistance: 200,
-      deferredUpdatesInterval: 5 * MINUTE_MS,
-      timeInterval: 5 * MINUTE_MS,
+      deferredUpdatesDistance: drive ? 0 : 200,
+      deferredUpdatesInterval: (drive ? 1 : 5) * MINUTE_MS,
+      timeInterval: (drive ? 1 : 5) * MINUTE_MS,
       activityType: Location.ActivityType.Other,
       pausesUpdatesAutomatically: true,
       showsBackgroundLocationIndicator: false,
     });
+    startedFor = drive;
     return true;
   } catch {
     return false;
   }
 }
 
-/** Off: no more updates, no pending nudge, the last place forgotten. */
+/** Off: no more updates (unless the driving warning still needs them), no pending nudge, the last place forgotten. */
 export async function stopOuting(): Promise<void> {
   if (useAppStore.getState().crewDetectOn) await stopCrewDetect();
   if (!supported) return;
+  await syncLocationUpdates();
+  await cancelNudge();
+  await AsyncStorage.removeItem(STATE_KEY).catch(() => undefined);
+}
+
+/** The updates run while the outing nudge or the driving warning wants them, and stop otherwise. */
+export async function syncLocationUpdates(): Promise<boolean> {
+  if (!supported) return false;
+  const drive = await driveAlertEnabled();
+  if (!drive) await forgetDriving();
+  if (useAppStore.getState().outingNudgeOn || drive) return startOuting();
   if (await Location.hasStartedLocationUpdatesAsync(OUTING_TASK).catch(() => false)) {
     await Location.stopLocationUpdatesAsync(OUTING_TASK).catch(() => undefined);
   }
-  await cancelNudge();
-  await AsyncStorage.removeItem(STATE_KEY).catch(() => undefined);
+  startedFor = null;
+  return false;
 }
 
 /** At launch: keeps the updates in line with the setting and the permission given in the phone's settings. */

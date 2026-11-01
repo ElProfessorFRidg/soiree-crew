@@ -88,6 +88,14 @@ export interface AppState {
   outingNudgeOn: boolean;
   /** "Me détecter avec mon crew": a coarse position to the server at night, off until switched on. */
   crewDetectOn: boolean;
+  /** "Alerte si je conduis après avoir bu": null follows the "Always" location permission (location/driving.ts). */
+  driveAlertOn: boolean | null;
+  /** "Je suis passager": no driving warning until then. */
+  drivePassengerUntil: number | null;
+  /** The last driving warning: at most one every 20 min. */
+  driveAlertedAt: number | null;
+  /** A driving warning raised while the app is open: the root layout opens the screen. */
+  driveWarningAt: number | null;
   /** How this person answers the "go out?" nudges, as the server learnt it (outing.ts on both sides). */
   outingHabit: { stayMinutes: number; maxPerNight: number; pausedUntil: number | null } | null;
   /** Parties whose live screen I opened, so the "it has started" nudge stays quiet. */
@@ -180,6 +188,10 @@ export const useAppStore = create<AppState>()(
       nudgesOn: true,
       outingNudgeOn: false,
       crewDetectOn: false,
+      driveAlertOn: null,
+      drivePassengerUntil: null,
+      driveAlertedAt: null,
+      driveWarningAt: null,
       outingHabit: null,
       launchedParties: [],
       peakWarnedAt: null,
@@ -342,6 +354,9 @@ export function clearAccountHistory(): void {
     manualLevel: null,
     foodByNight: {},
     emergencyContact: null,
+    drivePassengerUntil: null,
+    driveAlertedAt: null,
+    driveWarningAt: null,
     drinkVenues: {},
     hiddenRowDrinks: [],
     // Their files go at the next launch (pruneDrinkPhotos).

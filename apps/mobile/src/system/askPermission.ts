@@ -25,7 +25,11 @@ export type PermissionUse =
   | "drinkPhoto"
   | "drinkLibrary"
   /** "Rappel quand t'es de sortie": the background location, kept on this phone. */
-  | "outing";
+  | "outing"
+  /** "Alerte si je conduis après avoir bu": the background location and its speed, kept on this phone. */
+  | "drive"
+  /** The torch blinking on the driving warning. */
+  | "torch";
 
 export interface PermissionAnswer {
   granted: boolean;
