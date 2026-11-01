@@ -2654,6 +2654,7 @@ export const pt: Messages = {
     phone: { v1: "Pousa o telemóvel. Não o uses a conduzir.", v2: "Nada de telemóvel ao volante, nem um segundo.", v3: "Os olhos na estrada, não no ecrã.", v4: "Guarda o telemóvel. Pode esperar." },
     options: { v1: "Liga a um amigo, apanha um táxi ou espera.", v2: "Encosta. Alguém pode vir buscar-te.", v3: "Um táxi custa menos do que um acidente.", v4: "Esperar é chegar a casa inteiro." },
     passenger: "Sou passageiro",
+    passengerHold: "Mantém premido para confirmar",
     close: "Fechar",
     closeIn: "Fechar em {seconds} s",
     call: "Ligar a {name}",

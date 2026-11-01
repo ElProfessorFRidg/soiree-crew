@@ -2653,6 +2653,7 @@ export const fr = {
     phone: { v1: "Pose le téléphone. Ne l'utilise pas en conduisant.", v2: "Pas de téléphone au volant, même une seconde.", v3: "Les yeux sur la route, pas sur l'écran.", v4: "Range le téléphone. Il attendra." },
     options: { v1: "Appelle un ami, prends un taxi ou attends.", v2: "Gare-toi. Quelqu'un peut venir te chercher.", v3: "Un taxi coûte moins cher qu'un accident.", v4: "Attendre, c'est rentrer entier." },
     passenger: "Je suis passager",
+    passengerHold: "Maintiens pour confirmer",
     close: "Fermer",
     closeIn: "Fermer dans {seconds} s",
     call: "Appeler {name}",

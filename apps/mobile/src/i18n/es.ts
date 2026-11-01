@@ -2654,6 +2654,7 @@ export const es: Messages = {
     phone: { v1: "Deja el móvil. No lo uses mientras conduces.", v2: "Nada de móvil al volante, ni un segundo.", v3: "Los ojos en la carretera, no en la pantalla.", v4: "Guarda el móvil. Puede esperar." },
     options: { v1: "Llama a un amigo, coge un taxi o espera.", v2: "Aparca. Alguien puede venir a buscarte.", v3: "Un taxi cuesta menos que un accidente.", v4: "Esperar es llegar a casa entero." },
     passenger: "Soy pasajero",
+    passengerHold: "Mantén pulsado para confirmar",
     close: "Cerrar",
     closeIn: "Cerrar en {seconds} s",
     call: "Llamar a {name}",

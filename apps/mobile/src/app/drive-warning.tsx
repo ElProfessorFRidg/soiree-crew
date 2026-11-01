@@ -2,10 +2,12 @@ import { CameraView } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { BackHandler, Linking, Platform, StyleSheet, View } from "react-native";
+import { BackHandler, Linking, Platform, Pressable, StyleSheet, View } from "react-native";
 import Animated, {
+  cancelAnimation,
   Easing,
-  interpolateColor,
+  FadeInDown,
+  runOnJS,
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
@@ -15,6 +17,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Svg, { Defs, LinearGradient, RadialGradient, Rect, Stop } from "react-native-svg";
 import { breathRatio, formatBacValue } from "@crew/units";
 import { fontFiles } from "@crew/design-tokens";
 import { useT } from "@/i18n";
@@ -24,19 +27,30 @@ import { driveReading, silenceAsPassenger } from "@/location/driving";
 import { useAppStore } from "@/state/store";
 import { askPermission } from "@/system/askPermission";
 import { Button } from "@/ui/Button";
+import { Icon } from "@/ui/Icon";
 import { Text } from "@/ui/Text";
 
-// The driving warning: a deep red screen, the reminders appearing one after the other over about
-// 30 s, strong vibrations and the torch blinking a few times. It closes only after the 30 s, or
-// at once with "Je suis passager". Reduce Motion: a steady red, every line at once, no torch.
+// The driving warning: a deep red screen in layers (a crimson glow breathing over a dark garnet,
+// warmer at the top), a car in a pulsing halo, the reminders appearing slowly one after the other,
+// strong vibrations and the torch blinking a few times. Nothing to tap at first: the safe ways out
+// (call, another way home) come after a while, "passenger" later and only held down, and "close"
+// only once every line has had time to sink in. Reduce Motion: steady colours, every line at once,
+// no torch, same waits.
 
-const HOLD_S = 30;
-/** One line every 5 s: six lines over the 30 s. */
-const LINE_GAP_MS = 5_000;
-const LINE_FADE_MS = 1_800;
-const RED = "#7A0010";
-const RED_BRIGHT = "#C1121F";
+/** Long enough to read every line twice; short enough not to keep a real passenger hostage. */
+const HOLD_S = 45;
+/** One line every 6 s: the six lines are all there after about 32 s. */
+const LINE_GAP_MS = 6_000;
+const LINE_FADE_MS = 2_200;
+/** When the safe ways out show up, then "passenger" (held down), in seconds. */
+const HELP_AFTER_S = 12;
+const PASSENGER_AFTER_S = 20;
+const PASSENGER_HOLD_MS = 2_000;
 const WHITE = "#FFFFFF";
+const GARNET = "#2A0006";
+const CRIMSON = "#9B0F1E";
+const SCARLET = "#E5383B";
+const EMBER = "#FF7A45";
 /** The torch: on and off this many times. */
 const BLINKS = 4;
 const BLINK_MS = 280;
@@ -45,14 +59,18 @@ const native = Platform.OS === "ios" || Platform.OS === "android";
 
 function Line({ text, index, still, big }: { text: string; index: number; still: boolean; big?: boolean }) {
   const opacity = useSharedValue(still ? 1 : 0);
+  const rise = useSharedValue(still ? 0 : 14);
   useEffect(() => {
     if (still) {
       opacity.value = 1;
+      rise.value = 0;
       return;
     }
-    opacity.value = withDelay(index * LINE_GAP_MS, withTiming(1, { duration: LINE_FADE_MS, easing: Easing.out(Easing.quad) }));
-  }, [index, still, opacity]);
-  const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
+    const easing = Easing.out(Easing.cubic);
+    opacity.value = withDelay(index * LINE_GAP_MS, withTiming(1, { duration: LINE_FADE_MS, easing }));
+    rise.value = withDelay(index * LINE_GAP_MS, withTiming(0, { duration: LINE_FADE_MS, easing }));
+  }, [index, still, opacity, rise]);
+  const style = useAnimatedStyle(() => ({ opacity: opacity.value, transform: [{ translateY: rise.value }] }));
   return (
     <Animated.View style={style}>
       <Text variant={big ? "h1" : "h2"} color={WHITE} align="center" style={big ? styles.big : styles.line} accessibilityRole="text">
@@ -62,17 +80,105 @@ function Line({ text, index, still, big }: { text: string; index: number; still:
   );
 }
 
+/** The layered red: garnet edges, a crimson to scarlet core that breathes, an ember warmth on top. */
+function Backdrop({ still }: { still: boolean }) {
+  const glow = useSharedValue(still ? 0.6 : 0.35);
+  useEffect(() => {
+    if (still) return;
+    glow.value = withRepeat(withSequence(withTiming(1, { duration: 900, easing: Easing.inOut(Easing.sin) }), withTiming(0.35, { duration: 1100, easing: Easing.inOut(Easing.sin) })), -1);
+    return () => cancelAnimation(glow);
+  }, [still, glow]);
+  const core = useAnimatedStyle(() => ({ opacity: glow.value }));
+  return (
+    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+      <Svg style={StyleSheet.absoluteFill} preserveAspectRatio="none" viewBox="0 0 100 100">
+        <Defs>
+          <LinearGradient id="base" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor={CRIMSON} />
+            <Stop offset="0.55" stopColor="#5C0410" />
+            <Stop offset="1" stopColor={GARNET} />
+          </LinearGradient>
+          <LinearGradient id="ember" x1="0" y1="0" x2="1" y2="0.6">
+            <Stop offset="0" stopColor={EMBER} stopOpacity={0.28} />
+            <Stop offset="0.6" stopColor={EMBER} stopOpacity={0} />
+          </LinearGradient>
+        </Defs>
+        <Rect x="0" y="0" width="100" height="100" fill="url(#base)" />
+        <Rect x="0" y="0" width="100" height="100" fill="url(#ember)" />
+      </Svg>
+      <Animated.View style={[StyleSheet.absoluteFill, core]}>
+        <Svg style={StyleSheet.absoluteFill} preserveAspectRatio="none" viewBox="0 0 100 100">
+          <Defs>
+            <RadialGradient id="core" cx="50" cy="38" r="62" gradientUnits="userSpaceOnUse">
+              <Stop offset="0" stopColor={SCARLET} stopOpacity={0.95} />
+              <Stop offset="0.45" stopColor={CRIMSON} stopOpacity={0.55} />
+              <Stop offset="1" stopColor={GARNET} stopOpacity={0} />
+            </RadialGradient>
+          </Defs>
+          <Rect x="0" y="0" width="100" height="100" fill="url(#core)" />
+        </Svg>
+      </Animated.View>
+    </View>
+  );
+}
+
+/** The car in a halo that pulses outwards, like a warning light. */
+function Beacon({ still }: { still: boolean }) {
+  const ring = useSharedValue(0);
+  useEffect(() => {
+    if (still) return;
+    ring.value = withRepeat(withTiming(1, { duration: 1600, easing: Easing.out(Easing.quad) }), -1, false);
+    return () => cancelAnimation(ring);
+  }, [still, ring]);
+  const halo = useAnimatedStyle(() => ({ opacity: 0.55 * (1 - ring.value), transform: [{ scale: 1 + ring.value * 0.7 }] }));
+  return (
+    <View style={styles.beacon} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      {still ? null : <Animated.View style={[styles.halo, halo]} />}
+      <View style={styles.badge}>
+        <Icon name="car" size={34} color={WHITE} />
+      </View>
+    </View>
+  );
+}
+
+/** "Je suis passager", held down: a quick tap is not enough to wave the warning away. */
+function PassengerHold({ label, hint, onConfirm }: { label: string; hint: string; onConfirm: () => void }) {
+  const fill = useSharedValue(0);
+  const start = () => {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined);
+    fill.value = withTiming(1, { duration: PASSENGER_HOLD_MS, easing: Easing.linear }, (done) => {
+      if (done) runOnJS(onConfirm)();
+    });
+  };
+  const stop = () => {
+    cancelAnimation(fill);
+    fill.value = withTiming(0, { duration: 200 });
+  };
+  const bar = useAnimatedStyle(() => ({ width: `${fill.value * 100}%` }));
+  return (
+    <Pressable onPressIn={start} onPressOut={stop} accessibilityRole="button" accessibilityLabel={label} accessibilityHint={hint} style={styles.hold}>
+      <Animated.View style={[styles.holdFill, bar]} />
+      <Text color={WHITE} align="center" style={styles.holdLabel}>
+        {label}
+      </Text>
+      <Text color={WHITE} align="center" variant="small" style={styles.holdHint}>
+        {hint}
+      </Text>
+    </Pressable>
+  );
+}
+
 export default function DriveWarningScreen() {
   const i18n = useT();
   const reduceMotion = useReducedMotion();
   const preferences = useAppStore((state) => state.preferences);
   const contact = useAppStore((state) => state.emergencyContact);
   const [openedAt] = useState(() => Date.now());
-  const [left, setLeft] = useState(HOLD_S);
+  const [elapsed, setElapsed] = useState(0);
   const [torchReady, setTorchReady] = useState(false);
   const [torchOn, setTorchOn] = useState(false);
   const [camera, setCamera] = useState(false);
-  const canClose = left <= 0;
+  const canClose = elapsed >= HOLD_S;
   const canCloseRef = useRef(false);
   canCloseRef.current = canClose;
 
@@ -103,20 +209,20 @@ export default function DriveWarningScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openedAt]);
 
-  // The countdown before "Fermer".
+  // The clock behind every wait.
   useEffect(() => {
     useAppStore.setState({ driveWarningAt: null });
-    const timer = setInterval(() => setLeft(Math.max(0, HOLD_S - Math.floor((Date.now() - openedAt) / 1000))), 500);
+    const timer = setInterval(() => setElapsed(Math.floor((Date.now() - openedAt) / 1000)), 500);
     return () => clearInterval(timer);
   }, [openedAt]);
 
-  // No way out but the buttons: Android back waits for the 30 s; the iOS swipe is off (_layout.tsx).
+  // No way out but the buttons: Android back waits for the hold; the iOS swipe is off (_layout.tsx).
   useEffect(() => {
     const back = BackHandler.addEventListener("hardwareBackPress", () => !canCloseRef.current);
     return () => back.remove();
   }, []);
 
-  // Strong vibrations: a warning, then a heavy pulse with each line.
+  // Strong vibrations: a warning, then a heavy double pulse with each line.
   useEffect(() => {
     if (!native || !useAppStore.getState().hapticsOn) return;
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => undefined);
@@ -156,24 +262,16 @@ export default function DriveWarningScreen() {
     return () => clearInterval(timer);
   }, [torchReady]);
 
-  // The pulse: deep red to bright red and back, about once a second.
-  const pulse = useSharedValue(0);
-  useEffect(() => {
-    if (reduceMotion) {
-      pulse.value = 0;
-      return;
-    }
-    pulse.value = withRepeat(withSequence(withTiming(1, { duration: 550 }), withTiming(0, { duration: 650 })), -1);
-  }, [reduceMotion, pulse]);
-  const background = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(pulse.value, [0, 1], [RED, RED_BRIGHT]) }));
-
   const close = () => {
     if (router.canGoBack()) router.back();
     else router.replace("/(tabs)");
   };
+  const appear = reduceMotion ? undefined : FadeInDown.duration(700);
+  const progress = Math.min(1, elapsed / HOLD_S);
 
   return (
-    <Animated.View style={[styles.root, background]} accessibilityViewIsModal>
+    <View style={styles.root} accessibilityViewIsModal>
+      <Backdrop still={reduceMotion} />
       {camera ? (
         <CameraView
           style={styles.camera}
@@ -187,6 +285,7 @@ export default function DriveWarningScreen() {
       ) : null}
       <SafeAreaView style={styles.safe}>
         <View style={styles.lines} accessible accessibilityRole="alert" accessibilityLabel={`${i18n.t("drive.a11y")} ${lines.map((l) => l.text).join(" ")}`}>
+          <Beacon still={reduceMotion} />
           <Text color={WHITE} align="center" style={styles.title}>
             {i18n.t("drive.notifTitle")}
           </Text>
@@ -195,47 +294,69 @@ export default function DriveWarningScreen() {
           ))}
         </View>
         <View style={styles.actions}>
-          {contact ? (
-            <Button
-              label={i18n.t("drive.call", { name: contact.name })}
-              icon="phone"
-              variant="secondary"
-              height={52}
-              onPress={() => void Linking.openURL(`tel:${contact.phone}`)}
-            />
+          {elapsed >= HELP_AFTER_S ? (
+            <Animated.View entering={appear} style={styles.actions}>
+              {contact ? (
+                <Button label={i18n.t("drive.call", { name: contact.name })} icon="phone" variant="secondary" height={52} onPress={() => void Linking.openURL(`tel:${contact.phone}`)} />
+              ) : null}
+              <Button label={i18n.t("drive.ride")} variant="secondary" height={52} onPress={() => router.replace("/home")} />
+            </Animated.View>
           ) : null}
-          <Button label={i18n.t("drive.ride")} variant="secondary" height={52} onPress={() => router.replace("/home")} />
-          <Button
-            label={i18n.t("drive.passenger")}
-            variant="outline"
-            height={52}
-            onPress={() => {
-              void silenceAsPassenger();
-              canCloseRef.current = true;
-              close();
-            }}
-          />
-          <Button
-            label={canClose ? i18n.t("drive.close") : i18n.t("drive.closeIn", { seconds: left })}
-            variant="outline"
-            height={48}
-            disabled={!canClose}
-            onPress={close}
-          />
+          {elapsed >= PASSENGER_AFTER_S && !canClose ? (
+            <Animated.View entering={appear}>
+              <PassengerHold
+                label={i18n.t("drive.passenger")}
+                hint={i18n.t("drive.passengerHold")}
+                onConfirm={() => {
+                  void silenceAsPassenger();
+                  canCloseRef.current = true;
+                  close();
+                }}
+              />
+            </Animated.View>
+          ) : null}
+          {canClose ? (
+            <Animated.View entering={appear}>
+              <Button label={i18n.t("drive.close")} variant="outline" height={48} onPress={close} />
+            </Animated.View>
+          ) : (
+            // No close button yet: only a thin line filling up says the wait has an end.
+            <View style={styles.track} accessibilityLabel={i18n.t("drive.closeIn", { seconds: HOLD_S - elapsed })}>
+              <View style={[styles.trackFill, { width: `${progress * 100}%` }]} />
+            </View>
+          )}
         </View>
       </SafeAreaView>
-    </Animated.View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1 },
+  root: { flex: 1, backgroundColor: GARNET },
   safe: { flex: 1, paddingHorizontal: 24, justifyContent: "space-between" },
   lines: { flex: 1, justifyContent: "center", gap: 18 },
   title: { fontFamily: fontFiles.title, fontSize: 40, lineHeight: 44 },
   big: { fontSize: 38, lineHeight: 42 },
   line: { fontSize: 24, lineHeight: 30 },
   actions: { gap: 10, paddingBottom: 12 },
+  beacon: { alignSelf: "center", width: 88, height: 88, alignItems: "center", justifyContent: "center", marginBottom: 6 },
+  halo: { position: "absolute", width: 88, height: 88, borderRadius: 44, backgroundColor: SCARLET },
+  badge: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(255,255,255,0.12)",
+    borderWidth: 1.5,
+    borderColor: "rgba(255,255,255,0.45)",
+  },
+  hold: { minHeight: 60, borderRadius: 16, overflow: "hidden", justifyContent: "center", borderWidth: 1.5, borderColor: "rgba(255,255,255,0.5)" },
+  holdFill: { position: "absolute", left: 0, top: 0, bottom: 0, backgroundColor: "rgba(255,255,255,0.28)" },
+  holdLabel: { fontFamily: fontFiles.title, fontSize: 17 },
+  holdHint: { opacity: 0.75 },
+  track: { height: 4, borderRadius: 2, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", marginBottom: 8 },
+  trackFill: { height: 4, backgroundColor: "rgba(255,255,255,0.7)" },
   // Out of sight: only its torch matters.
   camera: { position: "absolute", width: 1, height: 1, opacity: 0, top: 0, left: 0 },
 });

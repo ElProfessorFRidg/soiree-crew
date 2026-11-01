@@ -2653,6 +2653,7 @@ export const de: Messages = {
     phone: { v1: "Leg das Handy weg. Nie während der Fahrt benutzen.", v2: "Kein Handy am Steuer, nicht eine Sekunde.", v3: "Augen auf die Straße, nicht auf den Bildschirm.", v4: "Steck das Handy weg. Es kann warten." },
     options: { v1: "Ruf einen Freund an, nimm ein Taxi oder warte.", v2: "Fahr rechts ran. Jemand kann dich abholen.", v3: "Ein Taxi kostet weniger als ein Unfall.", v4: "Warten heißt heil nach Hause kommen." },
     passenger: "Ich bin Beifahrer",
+    passengerHold: "Gedrückt halten zum Bestätigen",
     close: "Schließen",
     closeIn: "Schließen in {seconds} s",
     call: "{name} anrufen",
