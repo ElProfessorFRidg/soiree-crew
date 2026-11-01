@@ -6,6 +6,27 @@
   "Other": [
     {
       "name": "Soirée Crew",
+      "version": "0.2.2",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.2%2Bbuild.86/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "• Allow the drink-driving warning's red gradients, asked for explicitly\n• 45 s hold with no close button until the end (a thin line fills instead), call and another way home after 12 s, passenger after 20 s and only held down 2 s; layered red backdrop (garnet, breathing crimson core, ember warmth) and a car in a pulsing halo\n• The driving time follows the curve on screen, so it never comes after back to zero and a level shown under the limit is never called over it; the margin is too close to call\n• Warn when driving after drinking\n• Capfuls and sips (under 5 g of alcohol) no longer count in the no-water streak or the fast-pace warning",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew 0.2.1",
       "version": "0.2.1",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.1%2Bbuild.83/soiree-crew-unsigned.ipa",
