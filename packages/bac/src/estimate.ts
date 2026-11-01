@@ -102,7 +102,11 @@ export function estimateDriving(
   now: number,
   limitBac: number,
 ): DrivingEstimate {
-  const sim = new BacSimulation(drinks, distributionVolume(profile), now, "safe");
+  // The same model as the level and back-to-zero on screen: the time to drive again can never come
+  // after the time back to zero, and a level shown under the limit is never called over it. The
+  // margin for error is "too close to call" (0.10 g/L or one hour around the limit), not a second,
+  // slower model that contradicts the figures next to it.
+  const sim = new BacSimulation(drinks, distributionVolume(profile), now);
   // Zero-tolerance countries: the limit is the display zero, so only back-to-zero matters.
   const limit = Math.max(limitBac, ZERO_BAC);
   const current = sim.pointAt(now);

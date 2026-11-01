@@ -98,17 +98,18 @@ describe("T2: woman 60 kg, three wines at 0, 0.5, 1 h", () => {
     expectTime(firstBelow(s, 0.2, T0 + 2 * H, T0 + 12 * H), 5.9);
     expectTime(estimateBac(drinks, woman60, T0 + 2 * H).backToZeroAt!, 8.42);
   });
-  it("T2-safe: the driving card uses the slow model", () => {
+  it("T2-drive: the driving card follows the curve on screen, never after back to zero", () => {
     const now = T0 + 2 * H;
-    expectTime(estimateDriving(drinks, woman60, now, 0.5).underLimitAt!, 5.32);
-    expectTime(estimateDriving(drinks, woman60, now, 0.2).underLimitAt!, 8.77);
+    expectTime(estimateDriving(drinks, woman60, now, 0.5).underLimitAt!, 3.59);
+    expectTime(estimateDriving(drinks, woman60, now, 0.2).underLimitAt!, 5.9);
+    expect(estimateDriving(drinks, woman60, now, 0.2).underLimitAt!).toBeLessThanOrEqual(estimateBac(drinks, woman60, now).backToZeroAt!);
   });
   it("O-87: no verdict while still rising, and a peak just under the limit is too close to call", () => {
     // Right after the third glass the curve still climbs to its 0.78 peak (84 min).
     expect(estimateDriving(drinks, woman60, T0 + 1 * H, 0.5).rising).toBe(true);
     expect(estimateDriving(drinks, woman60, T0 + 2 * H, 0.5).rising).toBe(false);
     // A limit just above the peak: neither "under the limit" nor a countdown.
-    const near = estimateDriving(drinks, woman60, T0 + 2 * H, 0.85);
+    const near = estimateDriving(drinks, woman60, T0 + 2 * H, 0.8);
     expect(near.tooCloseToCall).toBe(true);
     // Far above the peak: nothing to call.
     const far = estimateDriving(drinks, woman60, T0 + 2 * H, 1.5);
