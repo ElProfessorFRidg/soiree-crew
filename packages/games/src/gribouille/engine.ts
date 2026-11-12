@@ -45,8 +45,8 @@ export interface GribouillePlayer {
 export interface GribouilleFeedLine {
   id: number;
   userId: string;
-  kind: "guess" | "found";
-  /** Absent on "found" (the word is never in the feed) and when a guess was hidden by the text filter. */
+  kind: "guess" | "close" | "found";
+  /** Absent on "found" (the word is never in the feed), when a guess was hidden by the text filter, and on a "close" guess for everyone but the person who typed it. */
   text?: string;
 }
 
@@ -335,7 +335,8 @@ export function guessGribouille(room: GribouilleRoom, userId: string, text: stri
     return { result: "correct", points };
   }
   const shown = text.trim().slice(0, 40);
-  pushFeed(room, hide || !shown ? { userId, kind: "guess" } : { userId, kind: "guess", text: shown });
+  const kind = judgement === "close" ? "close" : "guess";
+  pushFeed(room, hide || !shown ? { userId, kind } : { userId, kind, text: shown });
   return { result: judgement };
 }
 
@@ -454,7 +455,8 @@ export function viewGribouille(room: GribouilleRoom, userId: string, now: number
       drawing: turn?.drawerId === p.id && room.phase === "drawing",
     })),
     turn: turnView,
-    feed: room.feed,
+    // A close guess is nearly the word: its text stays with the person who typed it.
+    feed: room.feed.map((line) => (line.kind === "close" && line.userId !== userId && line.text !== undefined ? { id: line.id, userId: line.userId, kind: line.kind } : line)),
     ranking: room.phase === "end" ? rankGribouille(room) : [],
   };
 }

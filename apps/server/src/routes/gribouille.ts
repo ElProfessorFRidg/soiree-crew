@@ -76,10 +76,16 @@ export function gribouilleRoutes(app: FastifyInstance, ctx: Context): void {
   const timers = new Map<string, ReturnType<typeof setTimeout>>();
   const creates = new RateLimiter(12, HOUR_MS, ctx.now);
   const strokes = new RateLimiter(900, 60_000, ctx.now);
+  const joins = new RateLimiter(20, 10 * 60_000, ctx.now);
+  const joinsByAddress = new RateLimiter(60, 10 * 60_000, ctx.now);
   const guesses = new RateLimiter(120, 60_000, ctx.now);
   const rng = mathRandom;
 
+  const sweeper = setInterval(sweep, 10 * 60_000);
+  sweeper.unref();
+
   app.addHook("onClose", async () => {
+    clearInterval(sweeper);
     for (const timer of timers.values()) clearTimeout(timer);
     timers.clear();
   });
@@ -97,8 +103,12 @@ export function gribouilleRoutes(app: FastifyInstance, ctx: Context): void {
     const deadline = room.phase === "drawing" ? turn.startedAt + turn.timeLimitMs : (turn.endedAt ?? ctx.now()) + GRIBOUILLE_REVEAL_MS;
     const timer = setTimeout(() => {
       timers.delete(room.id);
-      if (advanceGribouille(room, ctx.now(), rng)) tell(room);
-      schedule(room);
+      try {
+        if (advanceGribouille(room, ctx.now(), rng)) tell(room);
+        schedule(room);
+      } catch (error) {
+        app.log.error({ err: error, roomId: room.id }, "gribouille: advancing the room failed");
+      }
     }, Math.max(250, deadline - ctx.now()));
     timer.unref();
     timers.set(room.id, timer);
@@ -193,6 +203,8 @@ export function gribouilleRoutes(app: FastifyInstance, ctx: Context): void {
 
   app.post("/v1/gribouille/join", async (request) => {
     const user = requireUser(request);
+    joins.check(user.id);
+    joinsByAddress.check(request.ip);
     const { code } = z.object({ code: z.string().trim().min(4).max(4) }).parse(request.body);
     const id = byCode.get(code.toUpperCase());
     if (!id) throw new HttpError(404, "not_found");
@@ -264,7 +276,7 @@ export function gribouilleRoutes(app: FastifyInstance, ctx: Context): void {
     const user = requireUser(request);
     const room = rooms.get(request.params.id);
     if (!room) return reply.status(204).send();
-    leaveGribouille(room, user.id, ctx.now(), rng);
+    guarded(() => leaveGribouille(room, user.id, ctx.now(), rng));
     if (room.players.every((p) => p.left) || room.players.length === 0) forget(room);
     else {
       schedule(room);

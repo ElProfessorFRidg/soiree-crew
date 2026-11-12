@@ -134,6 +134,21 @@ describe("a game", () => {
     expect(room.feed.map((l) => l.text)).toEqual(["banana split", undefined]);
   });
 
+  it("shows a close guess's text only to the person who typed it", () => {
+    const room = started(["a", "b", "c"]);
+    const turn = room.turn!;
+    const [g1, g2] = guessersOf(room) as [string, string];
+    const near = `${turn.word}x`;
+    expect(guessGribouille(room, g1, near, T0 + 5).result).toBe("close");
+    expect(viewGribouille(room, g1, T0 + 6).feed[0]).toMatchObject({ kind: "close", text: near });
+    for (const other of [g2, turn.drawerId]) {
+      const line = viewGribouille(room, other, T0 + 6).feed[0]!;
+      expect(line.kind).toBe("close");
+      expect(line.text).toBeUndefined();
+      expect(JSON.stringify(viewGribouille(room, other, T0 + 6))).not.toContain(near);
+    }
+  });
+
   it("ends the turn at the buzzer with nobody paid, then plays everyone and finishes", () => {
     const room = started(["a", "b", "c"], 1);
     let now = T0;

@@ -1,11 +1,11 @@
 # Status
 
-Generated from FEATURES.md on 2026-11-12 by `pnpm status`. Edit FEATURES.md, not this file.
+Generated from FEATURES.md on 2026-10-31 by `pnpm status`. Edit FEATURES.md, not this file.
 
 | Status | Count |
 |---|---|
-| Built | 245 |
-| Partly built | 58 |
+| Built | 244 |
+| Partly built | 59 |
 | To do | 2 |
 | Proposed (not in the brief yet) | 4 |
 | Total | 309 |
@@ -17,6 +17,7 @@ Generated from FEATURES.md on 2026-11-12 by `pnpm status`. Edit FEATURES.md, not
 - **O-09** (P0, Account, profile, settings): 7 languages: FR, EN, ES, IT, DE, PT, RU. The whole app, not a few screens. See <localization>.
 - **O-33** (P0, Widgets): iOS and Android home-screen widget in 3 sizes: live curve that falls on its own, back-to-zero, interactive but
 - **O-42** (P0, Parties and trips): Squad mode: curves shared continuously between members.
+- **O-63** (P0, Games (15)): "Gribouille": one player draws, the others guess, 3 to 8 players online (real-time, multi-phone).
 - **O-66** (P1, The Bar (recipes)): 470+ recipes with photo and preparation: Classics, Shots, Party, Alcohol-free, Beers, Desserts, + signature co
 - **O-83** (P1, Requests from S2M users): Photo when logging a drink.
 - **O-84** (P1, Requests from S2M users): Photos and videos shared that stay inside the group.
@@ -90,7 +91,7 @@ Generated from FEATURES.md on 2026-11-12 by `pnpm status`. Edit FEATURES.md, not
 - Widgets: O-34
 - Parties and trips: O-35, O-36, O-37, O-38, O-39, O-40, O-41
 - Friends: O-43
-- Games (15): O-44, O-45, O-46, O-47, O-48, O-49, O-50, O-51, O-52, O-53, O-54, O-55, O-56, O-57, O-58, O-59, O-60, O-61, O-62, O-63, O-64, O-65, O-89, O-90, O-91
+- Games (15): O-44, O-45, O-46, O-47, O-48, O-49, O-50, O-51, O-52, O-53, O-54, O-55, O-56, O-57, O-58, O-59, O-60, O-61, O-62, O-64, O-65, O-89, O-90, O-91
 - The Bar (recipes): O-67, O-68, O-69
 - Shared expenses: O-70
 - Status, monetisation, extras: O-76, O-77, O-78
