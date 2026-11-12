@@ -102,7 +102,7 @@ Phase 0 merge (2026-10-26): proposed IDs carry their source report in the summar
 | O-60 | P0 | JeuxAction.dc.html | build | "Le Doigt": reflex game that settles the group (fingers on the screen). |
 | O-61 | P0 | JeuxAction.dc.html | build | "L'Imposteur": a secret word, one intruder, discuss, vote, unmask. |
 | O-62 | P0 | JeuxAction.dc.html | build | "Le Double Agent": two infiltrated agents with a different word, 5 players minimum. |
-| O-63 | P0 | JeuxAction.dc.html | partial | "Gribouille": one player draws, the others guess, 3 to 8 players online (real-time, multi-phone). |
+| O-63 | P0 | JeuxAction.dc.html | build | "Gribouille": one player draws, the others guess, 3 to 8 players online (real-time, multi-phone). First online version, not reviewed and never played on several real phones: rooms on the server (code or crew lobby, in memory), word, 75/60/45 s clock, guesses, scores and turn order decided by the server, live hints plus 1.5 s polling, strokes batched every 120 ms, reconnection by re-reading the room, word banks in 7 languages. Not done: results are not posted to the hall of fame or territories (penalty model differs), rooms do not survive a server restart, no anti-slop, motion or drunk-mode review yet. |
 | O-64 | P0 | JeuxAction.dc.html | build | "La Courbe" (listed on the store pages, rules not public). |
 | O-65 | P0 | Jeux.dc.html | build | More than 500 cards / questions / dares per language for FR and EN, all written by us (see <localization> and ... |
 | O-89 | P0 | Backstage (near Jeux.dc.html) | build | Penalty model shared by every game: N sips or a forfeit of the same size, per-player "no alcohol" switch, water-or-forfeit swap for a player at UI level 3, penalty counter never creates a drink. Source: games.md §2.0, §5 (proposed there as N-xx). |
@@ -646,7 +646,7 @@ Board-wide gaps:
 | O-59 | partial | Duplicate mines possible; no end; no player decision. | C §2.8 |
 | O-60 | partial | Clicks instead of multi-touch; 6 fingers max vs "2 à 8"; picks by finger order. | C §2.8 |
 | O-62 | partial | Coral card reveals the agents; second-agent vote not handled. | C §2.8 |
-| O-63 | partial | Drawer screen only; no guesser, lobby, scoring or round end. | C §5.1 |
+| O-63 | build | Was: drawer screen only. Now lobby, guesser, scoring and round end exist online; still to check on several phones. | C §5.1 |
 | O-64 | partial | Exit multiplier rewards nothing; crash uniform from x1.6 (exit at x1.5 always safe). | C §2.8; games.md §2.4 |
 | O-65 | missing | Content requirement, no screen. | B §2.7 |
 | O-66, O-68 | partial | 8 recipes, colour blocks, no ingredient search. | C §5.1 |

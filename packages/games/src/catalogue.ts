@@ -75,7 +75,7 @@ export const GAMES: readonly GameDefinition[] = [
   { id: "fingerPick", feature: "O-60", minPlayers: 2, maxPlayers: 10, playModes: ["single_device"], tags: ["luck"], roundTimer: false, colour: cream },
   { id: "impostor", feature: "O-61", minPlayers: 4, maxPlayers: 12, playModes: ["single_device"], tags: ["bluff"], roundTimer: true, colour: lavender, unlockAtFriends: 3 },
   { id: "doubleAgent", feature: "O-62", minPlayers: 5, maxPlayers: 12, playModes: ["single_device"], tags: ["bluff"], roundTimer: true, colour: coral, unlockAtFriends: 4 },
-  { id: "quickDraw", feature: "O-63", minPlayers: 3, maxPlayers: 8, playModes: ["single_device"], tags: ["drawing", "group"], roundTimer: false, colour: mint },
+  { id: "quickDraw", feature: "O-63", minPlayers: 3, maxPlayers: 8, playModes: ["single_device", "multi_device"], tags: ["drawing", "group"], roundTimer: false, colour: mint },
   { id: "crash", feature: "O-64", minPlayers: 2, maxPlayers: 8, playModes: ["single_device"], tags: ["nerve"], roundTimer: false, colour: amber },
 ];
 

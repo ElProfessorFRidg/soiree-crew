@@ -54,13 +54,13 @@ export function RuleCards({ gameId }: { gameId: GameId }) {
 }
 
 /** O-46 mid-game: the "?" sheet lists every rule. */
-export function RulesList({ gameId }: { gameId: GameId }) {
+export function RulesList({ gameId, keys }: { gameId: GameId; keys?: readonly GameMessageKey[] }) {
   const theme = useTheme();
   const g = useGameT();
   const ui = useGameUi();
   return (
     <View style={styles.list}>
-      {ruleKeys(gameId).map((key) => (
+      {(keys ?? ruleKeys(gameId)).map((key) => (
         <View key={key} style={[styles.item, { backgroundColor: theme.surface2 }]}>
           <Text style={ui.big ? styles.bigRule : null}>{g.t(key)}</Text>
         </View>

@@ -24,6 +24,7 @@ import { communityRoutes } from "./routes/community";
 import { moderationRoutes } from "./routes/moderation";
 import { referralRoutes } from "./routes/referrals";
 import { gameWinRoutes } from "./routes/gameWins";
+import { gribouilleRoutes } from "./routes/gribouille";
 import { workplaceRoutes } from "./routes/workplace";
 import { statsRoutes } from "./routes/stats";
 import { profileRoutes } from "./routes/profiles";
@@ -113,6 +114,7 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
   moderationRoutes(app, ctx);
   referralRoutes(app, ctx);
   gameWinRoutes(app, ctx);
+  gribouilleRoutes(app, ctx);
   workplaceRoutes(app, ctx);
   venueRoutes(app, ctx, ctx.hashSecret);
   venueFactRoutes(app, ctx);

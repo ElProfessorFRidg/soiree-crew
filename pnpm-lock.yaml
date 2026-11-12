@@ -195,6 +195,9 @@ importers:
       '@crew/bac':
         specifier: workspace:*
         version: link:../../packages/bac
+      '@crew/games':
+        specifier: workspace:*
+        version: link:../../packages/games
       '@crew/money':
         specifier: workspace:*
         version: link:../../packages/money

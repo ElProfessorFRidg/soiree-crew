@@ -86,7 +86,7 @@ describe("catalogue", () => {
   it("filters by play mode", () => {
     expect(filterGames("all")).toHaveLength(15);
     expect(filterGames("single_device")).toHaveLength(15);
-    expect(filterGames("multi_device")).toHaveLength(0);
+    expect(filterGames("multi_device").map((game) => game.id)).toEqual(["quickDraw"]);
   });
 
   it("shows a typical duration only after three games, as a median", () => {

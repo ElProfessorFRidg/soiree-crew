@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@crew/bac": "workspace:*",
+    "@crew/games": "workspace:*",
     "@crew/money": "workspace:*",
     "@crew/territory": "workspace:*",
     "@crew/units": "workspace:*",

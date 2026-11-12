@@ -167,6 +167,9 @@ export function SetupScreen({ gameId }: { gameId: GameId }) {
             </Text>
           </View>
         ) : null}
+        {gameId === "quickDraw" ? (
+          <Button label={g.t("games.quickDraw.online.play")} variant="secondary" icon="users" height={ui.secondary} onPress={() => router.push("/games/gribouille")} />
+        ) : null}
         <Button
           label={g.plural("setup.start", table.length)}
           height={ui.action}
