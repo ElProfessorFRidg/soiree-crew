@@ -51,7 +51,7 @@ afterEach(async () => {
 type User = { id: string; name: string; auth: { authorization: string } };
 
 async function account(name: string): Promise<User> {
-  const body = (await app.inject({ method: "POST", url: "/v1/accounts", payload: { username: name, displayName: name } })).json() as { user: { id: string }; token: string };
+  const body = (await app.inject({ method: "POST", url: "/v1/accounts", payload: { birthDate: "1990-01-01", username: name, displayName: name } })).json() as { user: { id: string }; token: string };
   return { id: body.user.id, name, auth: { authorization: `Bearer ${body.token}` } };
 }
 

@@ -1,16 +1,23 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as AppleAuthentication from "expo-apple-authentication";
 import { useEffect, useRef, useState, type ComponentRef } from "react";
-import type { TextInput } from "react-native";
+import { StyleSheet, type TextInput } from "react-native";
+import { PROFILE_BOUNDS } from "@crew/bac";
+import { themes } from "@crew/design-tokens";
 import { useT, type Translator } from "@/i18n";
 import { haptic } from "@/motion/haptics";
+import { birthDateText } from "@/onboarding/flow";
+import { appleAvailable, askApple, type AppleResult } from "@/onboarding/appleSignIn";
 import { api, ApiError } from "@/server/api";
 import { deviceName } from "@/server/device";
 import { failureMessage, serverMessage } from "@/server/errors";
 import { usePendingInvite } from "@/server/pendingInvite";
+import { usernameAvailable } from "@/server/profileData";
 import { saveSession } from "@/server/session";
 import { useTheme } from "@/theme";
 import { Button } from "@/ui/Button";
 import { Panel, Segmented } from "@/ui/controls";
+import { DateWheel, type DateParts } from "@/ui/native/DateWheel";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import type { CrewDraft } from "./AddCrew";
@@ -27,9 +34,25 @@ interface AccountResponse {
 }
 
 type Way = "password" | "code";
-type Problem = { field: "username" | "login" | "password" | "code" | "form"; message: string };
+type Problem = {
+  field: "username" | "login" | "password" | "code" | "form";
+  message: string;
+};
+type Availability = "unknown" | "checking" | "free" | "taken";
 
 const USERNAME = /^[a-z0-9_.]{3,24}$/;
+const EMAIL = /^[^s@]+@[^s@]+.[^s@]+$/;
+
+function birthParts(birthDate: string | null): DateParts {
+  const match = birthDate ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(birthDate) : null;
+  if (match)
+    return {
+      year: Number(match[1]),
+      month: Number(match[2]),
+      day: Number(match[3]),
+    };
+  return { year: new Date().getFullYear() - 25, month: 6, day: 15 };
+}
 
 /** Joins, creates or accepts on the new account, before the app switches to it. Returns the crew's name when known. */
 async function carryOn(intent: ArrivalIntent, baseUrl: string, token: string): Promise<string | null> {
@@ -40,7 +63,10 @@ async function carryOn(intent: ArrivalIntent, baseUrl: string, token: string): P
   }
   if (intent.kind === "create") {
     const { name, kind, open, category } = intent.draft;
-    await api("/v1/crews", { ...call, body: { name, kind, open, ...(category ? { category } : {}) } });
+    await api("/v1/crews", {
+      ...call,
+      body: { name, kind, open, ...(category ? { category } : {}) },
+    });
     return name;
   }
   await api(`/v1/invites/${encodeURIComponent(intent.code)}/accept`, call);
@@ -66,18 +92,26 @@ export function AccountForm({
   mode,
   onModeChange,
   autoFocus = true,
+  birthDate: askedBirthDate = null,
 }: {
   intent: ArrivalIntent | null;
   server: string | null;
   mode: AccountMode;
   onModeChange: (mode: AccountMode) => void;
   autoFocus?: boolean;
+  /** O-02: asked before the account, so it goes along and the server refuses a minor before storing anything. */
+  birthDate?: string | null;
 }) {
   const i18n = useT();
   const theme = useTheme();
   const setMode = onModeChange;
   const [way, setWay] = useState<Way>("password");
   const [username, setUsername] = useState("");
+  // O-01: the first name is what the crew sees; the username is what people type to find me.
+  const [firstName, setFirstName] = useState("");
+  const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [availability, setAvailability] = useState<Availability>("unknown");
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
@@ -85,6 +119,16 @@ export function AccountForm({
   const [linkServer, setLinkServer] = useState<string | null>(null);
   const [problem, setProblem] = useState<Problem | null>(null);
   const [busy, setBusy] = useState(false);
+  // O-01: an Apple identity waiting for its username, and whether Apple's button is offered at all
+  // (iOS only, and only where the date of birth is already known).
+  // Outside the arrival flow (the Crew tab) the date of birth has not been asked yet: it is asked here, still before the account.
+  const [ownBirth, setOwnBirth] = useState<string | null>(null);
+  const birthDate = askedBirthDate ?? ownBirth;
+  const [apple, setApple] = useState<AppleResult | null>(null);
+  const [appleOffered, setAppleOffered] = useState(false);
+  useEffect(() => {
+    if (askedBirthDate) void appleAvailable().then(setAppleOffered);
+  }, [askedBirthDate]);
   const passwordRef = useRef<ComponentRef<typeof TextInput>>(null);
 
   // Each new request clears what the last one said.
@@ -92,8 +136,69 @@ export function AccountForm({
     setProblem(null);
   }, [intent]);
 
+  // The username is checked against the server as it is typed, once it has a valid shape.
+  useEffect(() => {
+    setAvailability("unknown");
+    if (mode !== "create" || !server || !USERNAME.test(username.trim())) return;
+    setAvailability("checking");
+    let current = true;
+    const timer = setTimeout(() => {
+      void usernameAvailable(server, username.trim())
+        .then((free) => current && setAvailability(free ? "free" : "taken"))
+        .catch(() => current && setAvailability("unknown"));
+    }, 400);
+    return () => {
+      current = false;
+      clearTimeout(timer);
+    };
+  }, [username, server, mode]);
+
+  const emailValid = email.trim() === "" || (EMAIL.test(email.trim()) && newPassword.length >= 10);
   const ready =
-    mode === "create" ? USERNAME.test(username.trim()) : way === "password" ? login.trim().length >= 3 && password.length > 0 : code.trim().length === 10;
+    mode === "create" ? USERNAME.test(username.trim()) && firstName.trim().length > 0 && availability !== "taken" && birthDate !== null && (apple !== null || emailValid) : way === "password" ? login.trim().length >= 3 && password.length > 0 : code.trim().length === 10;
+
+  /** The account exists: whatever happens to the crew step, the person is signed in. */
+  const finish = async (account: AccountResponse, url: string) => {
+    if (!intent) {
+      haptic.confirmed();
+      setBusy(false);
+      // Success shows no toast: the next step sliding in says it (SYNC-07).
+      await saveSession({
+        url,
+        token: account.token,
+        userId: account.user.id,
+        username: account.user.username,
+        displayName: account.user.displayName,
+      });
+      return;
+    }
+    let message: { tone?: "danger"; text: string };
+    try {
+      const crewName = await carryOn(intent, url, account.token);
+      message = { text: doneMessage(intent, crewName, i18n) };
+      // QOL-07: the crew name typed in "Créer" was a draft until now.
+      if (intent.kind === "create") void AsyncStorage.removeItem("crew-draft:crew:name").catch(() => undefined);
+    } catch (error) {
+      message = {
+        tone: "danger",
+        text: i18n.t("arrival.afterAccountFailed", {
+          reason: crewErrorMessage(error, i18n),
+        }),
+      };
+    }
+    if (intent.kind === "code") usePendingInvite.setState({ invite: null });
+    if (message.tone) haptic.error();
+    else haptic.confirmed();
+    setBusy(false);
+    await saveSession({
+      url,
+      token: account.token,
+      userId: account.user.id,
+      username: account.user.username,
+      displayName: account.user.displayName,
+    });
+    showToast({ tone: message.tone, message: message.text });
+  };
 
   const submit = async () => {
     if (!ready || busy) return;
@@ -116,17 +221,47 @@ export function AccountForm({
     const deviceLabel = deviceName();
     try {
       account =
-        mode === "create"
-          ? await api<AccountResponse>("/v1/accounts", {
+        mode === "create" && apple && birthDate
+          ? await api<AccountResponse>("/v1/accounts/apple", {
               baseUrl: url,
               token: null,
               method: "POST",
-              // One field: the pseudo is also the name the crew sees, until it is changed in Moi.
-              body: { username: username.trim(), displayName: username.trim(), deviceLabel },
+              body: {
+                identityToken: apple.identityToken,
+                nonce: apple.nonce,
+                username: username.trim(),
+                displayName: firstName.trim(),
+                birthDate,
+                deviceLabel,
+              },
             })
-          : way === "password"
-            ? await api<AccountResponse>("/v1/sessions/password", { baseUrl: url, token: null, method: "POST", body: { login: login.trim(), password, deviceLabel } })
-            : await api<AccountResponse>("/v1/sessions/claim", { baseUrl: url, token: null, method: "POST", body: { code: code.trim().toUpperCase(), deviceLabel } });
+          : mode === "create"
+            ? await api<AccountResponse>("/v1/accounts", {
+                baseUrl: url,
+                token: null,
+                method: "POST",
+                body: {
+                  username: username.trim(),
+                  displayName: firstName.trim(),
+                  deviceLabel,
+                  ...(birthDate ? { birthDate } : {}),
+                  // Both or neither: the server refuses one without the other.
+                  ...(email.trim() ? { email: email.trim(), password: newPassword } : {}),
+                },
+              })
+            : way === "password"
+              ? await api<AccountResponse>("/v1/sessions/password", {
+                  baseUrl: url,
+                  token: null,
+                  method: "POST",
+                  body: { login: login.trim(), password, deviceLabel },
+                })
+              : await api<AccountResponse>("/v1/sessions/claim", {
+                  baseUrl: url,
+                  token: null,
+                  method: "POST",
+                  body: { code: code.trim().toUpperCase(), deviceLabel },
+                });
     } catch (err) {
       setBusy(false);
       haptic.error();
@@ -136,34 +271,67 @@ export function AccountForm({
         else if (failure.code === "credentials_invalid") setProblem({ field: "password", message: i18n.t("crew.credentialsInvalid") });
         else if (mode === "signin" && way === "code" && (failure.code === "code_invalid" || failure.status === 400))
           setProblem({ field: "code", message: i18n.t("crew.transferInvalid") });
+        else if (failure.code === "under_age") setProblem({ field: "form", message: i18n.t("journey.birthUnder", { age: 18 }) });
         else if (mode === "create" && failure.status === 400) setProblem({ field: "username", message: i18n.t("crew.usernameHint") });
         else setProblem({ field: "form", message: serverMessage(failure.code, i18n) });
       } else setProblem({ field: "form", message: failureMessage(err, i18n) });
       return;
     }
-    // The account exists: whatever happens to the crew step, the person is signed in.
-    if (!intent) {
-      haptic.confirmed();
-      setBusy(false);
-      // Success shows no toast: the next step sliding in says it (SYNC-07).
-      await saveSession({ url, token: account.token, userId: account.user.id, username: account.user.username, displayName: account.user.displayName });
+    await finish(account, url);
+  };
+
+  /** One tap: Apple opens the account it already made, or hands over the first name and only the username is asked. */
+  const continueWithApple = async () => {
+    if (busy) return;
+    if (!server) {
+      setProblem({ field: "form", message: i18n.t("arrival.pickServerFirst") });
       return;
     }
-    let message: { tone?: "danger"; text: string };
+    setBusy(true);
+    setProblem(null);
     try {
-      const crewName = await carryOn(intent, url, account.token);
-      message = { text: doneMessage(intent, crewName, i18n) };
-      // QOL-07: the crew name typed in "Créer" was a draft until now.
-      if (intent.kind === "create") void AsyncStorage.removeItem("crew-draft:crew:name").catch(() => undefined);
-    } catch (error) {
-      message = { tone: "danger", text: i18n.t("arrival.afterAccountFailed", { reason: crewErrorMessage(error, i18n) }) };
+      await api("/v1/health", { baseUrl: server, token: null });
+    } catch {
+      setBusy(false);
+      haptic.error();
+      setProblem({ field: "form", message: i18n.t("crew.serverUnreachable") });
+      return;
     }
-    if (intent.kind === "code") usePendingInvite.setState({ invite: null });
-    if (message.tone) haptic.error();
-    else haptic.confirmed();
-    setBusy(false);
-    await saveSession({ url, token: account.token, userId: account.user.id, username: account.user.username, displayName: account.user.displayName });
-    showToast({ tone: message.tone, message: message.text });
+    try {
+      const result = await askApple();
+      if (!result) {
+        setBusy(false);
+        return;
+      }
+      try {
+        const account = await api<AccountResponse>("/v1/sessions/apple", {
+          baseUrl: server,
+          token: null,
+          method: "POST",
+          body: {
+            identityToken: result.identityToken,
+            nonce: result.nonce,
+            deviceLabel: deviceName(),
+          },
+        });
+        await finish(account, server);
+      } catch (err) {
+        if (err instanceof ApiError && err.failure.kind === "http" && err.failure.code === "apple_unknown") {
+          setApple(result);
+          if (result.givenName) setFirstName(result.givenName);
+          setBusy(false);
+          return;
+        }
+        throw err;
+      }
+    } catch (err) {
+      setBusy(false);
+      haptic.error();
+      setProblem({
+        field: "form",
+        message: err instanceof ApiError && err.failure.kind === "http" ? serverMessage(err.failure.code, i18n) : failureMessage(err, i18n),
+      });
+    }
   };
 
   return (
@@ -171,22 +339,100 @@ export function AccountForm({
       {mode === "create" ? (
         <>
           <Text muted>{i18n.t("arrival.accountBody")}</Text>
+          {appleOffered && !apple ? (
+            <>
+              <AppleAuthentication.AppleAuthenticationButton
+                buttonType={AppleAuthentication.AppleAuthenticationButtonType.CONTINUE}
+                buttonStyle={theme.bg === themes.dark.bg ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                cornerRadius={14}
+                style={styles.apple}
+                onPress={() => void continueWithApple()}
+              />
+              <Text variant="small" align="center">
+                {i18n.t("arrival.orUsername")}
+              </Text>
+            </>
+          ) : null}
+          {askedBirthDate ? null : (
+            <Panel>
+              <Text variant="h3">{i18n.t("journey.birthTitle")}</Text>
+              <Text variant="small">{i18n.t("journey.birthWhy")}</Text>
+              <DateWheel
+                value={birthParts(ownBirth)}
+                minYear={new Date().getFullYear() - PROFILE_BOUNDS.ageYears.max}
+                maxYear={new Date().getFullYear()}
+                monthLabel={(m) =>
+                  new Intl.DateTimeFormat(i18n.locale, {
+                    month: "long",
+                  }).format(new Date(2000, m - 1, 1))
+                }
+                labels={{
+                  day: i18n.t("journey.birthDay"),
+                  month: i18n.t("journey.birthMonth"),
+                  year: i18n.t("journey.birthYear"),
+                }}
+                onChange={(next) => setOwnBirth(birthDateText(next.year, next.month, next.day))}
+              />
+            </Panel>
+          )}
           <Panel>
+            {apple && firstName.trim() ? null : (
+              <Field
+                label={i18n.t("journey.firstName")}
+                hint={i18n.t("journey.firstNameHint")}
+                value={firstName}
+                onChangeText={setFirstName}
+                autoFocus={autoFocus}
+                textContentType="givenName"
+                autoComplete="given-name"
+                maxLength={40}
+                returnKeyType="next"
+              />
+            )}
             <Field
               label={i18n.t("crew.username")}
-              hint={i18n.t("crew.usernameHint")}
+              hint={availability === "free" ? i18n.t("journey.usernameFree") : availability === "checking" ? i18n.t("journey.usernameChecking") : i18n.t("crew.usernameHint")}
               value={username}
               onChangeText={(text) => setUsername(text.toLowerCase())}
               autoCapitalize="none"
               autoCorrect={false}
-              autoFocus={autoFocus}
               textContentType="username"
               autoComplete="username-new"
               maxLength={24}
               returnKeyType="go"
               onSubmitEditing={() => void submit()}
-              error={problem?.field === "username" ? problem.message : null}
+              error={problem?.field === "username" ? problem.message : availability === "taken" ? i18n.t("crew.usernameTaken") : null}
             />
+            {apple ? null : (
+              <Field
+                label={i18n.t("journey.email")}
+                hint={i18n.t("journey.emailHint")}
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="email-address"
+                textContentType="emailAddress"
+                autoComplete="email"
+                maxLength={254}
+              />
+            )}
+            {email.trim() && !apple ? (
+              <Field
+                label={i18n.t("journey.password")}
+                hint={i18n.t("journey.passwordHint")}
+                value={newPassword}
+                onChangeText={setNewPassword}
+                secureTextEntry
+                autoCapitalize="none"
+                autoCorrect={false}
+                textContentType="newPassword"
+                autoComplete="new-password"
+                maxLength={200}
+                returnKeyType="go"
+                onSubmitEditing={() => void submit()}
+              />
+            ) : null}
           </Panel>
           {problem?.field === "form" ? <Text color={theme.danger}>{problem.message}</Text> : null}
           <Button label={i18n.t("arrival.accountCta")} height={56} disabled={!ready} loading={busy} onPress={() => void submit()} />
@@ -288,3 +534,7 @@ export function AccountForm({
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  apple: { height: 56, alignSelf: "stretch" },
+});

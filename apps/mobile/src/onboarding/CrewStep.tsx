@@ -2,25 +2,28 @@ import * as Clipboard from "expo-clipboard";
 import { useState } from "react";
 import { Share, StyleSheet, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
-import Animated, { FadeIn, ZoomIn } from "react-native-reanimated";
-import { duration, palette, scaled } from "@crew/design-tokens";
+import Animated, { FadeIn } from "react-native-reanimated";
+import { duration, palette } from "@crew/design-tokens";
 import { Field } from "@/crew/Field";
 import { crewErrorMessage, inviteCodeFrom } from "@/crew/invite";
 import { useT } from "@/i18n";
-import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
 import { acceptInvite, createCrew, createInvite, CREW_KINDS, type CrewKind } from "@/server/crewData";
 import { usePendingInvite } from "@/server/pendingInvite";
 import { useSession } from "@/server/session";
 import { useTheme } from "@/theme";
-import { Avatar } from "@/ui/Avatar";
 import { Button } from "@/ui/Button";
 import { Chip, Panel, Segmented } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { Text } from "@/ui/Text";
+import { CrewDrawing } from "./CrewDrawing";
 import { showToast } from "@/ui/Toast";
 
-/** O-05: create the first crew (the name updates the invite card as it is typed) or join one. */
+/**
+ * O-05: the crew, after the visibility choices: join with an invite code or link (filled in when the
+ * app was opened from an invite), create one (the name updates the invite card as it is typed), or
+ * skip from the footer. Its own line drawing sits above the question, like the visibility screens.
+ */
 export function FirstCrew({ onCreated, onDone, doneLabel }: { onCreated: () => void; onDone: () => void; doneLabel: string }) {
   const i18n = useT();
   const theme = useTheme();
@@ -42,7 +45,9 @@ export function FirstCrew({ onCreated, onDone, doneLabel }: { onCreated: () => v
 
   return (
     <>
+      <CrewDrawing />
       <Text variant="h1">{i18n.t("onboarding.crewTitle")}</Text>
+      <Text muted>{i18n.t("journey.crewWhy")}</Text>
       <Segmented
         accessibilityLabel={i18n.t("onboarding.crewTitle")}
         value={mode}
@@ -94,7 +99,20 @@ export function FirstCrew({ onCreated, onDone, doneLabel }: { onCreated: () => v
                     })
                   }
                 />
-                <Button label={i18n.t("crew.invite")} icon="share" variant="outline" height={48} onPress={() => void Share.share({ message: i18n.t("crew.inviteShare", { crew: shown, url: invite.url }) })} />
+                <Button
+                  label={i18n.t("crew.invite")}
+                  icon="share"
+                  variant="outline"
+                  height={48}
+                  onPress={() =>
+                    void Share.share({
+                      message: i18n.t("crew.inviteShare", {
+                        crew: shown,
+                        url: invite.url,
+                      }),
+                    })
+                  }
+                />
                 <Text variant="small" align="center">
                   {i18n.t("onboarding.linkHint")}
                 </Text>
@@ -170,41 +188,21 @@ export function FirstCrew({ onCreated, onDone, doneLabel }: { onCreated: () => v
   );
 }
 
-/**
- * Signed out, the crew step is a short invite: what an account adds, one button to make it.
- * Nothing is lost by waiting: the Crew tab asks again when it is opened.
- */
-export function CrewWaiting({ onCreateAccount }: { onCreateAccount: () => void }) {
-  const i18n = useT();
-  const theme = useTheme();
-  const names = i18n.t("onboarding.cardCrewNames").split(",").map((n) => n.trim());
-  return (
-    <>
-      <View style={styles.faces} accessible={false}>
-        {names.map((name, index) => (
-          <Animated.View
-            key={name}
-            entering={ZoomIn.delay(scaled(duration.enter + index * 120)).duration(duration.pop).easing(easings.out)}
-            style={index ? styles.overlap : undefined}
-          >
-            <Avatar personId={`sample-${index}`} name={name} size={52} ring={theme.bg} />
-          </Animated.View>
-        ))}
-      </View>
-      <Text variant="h1">{i18n.t("onboarding.waitingTitle")}</Text>
-      <Text>{i18n.t("onboarding.waitingBody")}</Text>
-      <Text variant="small">{i18n.t("onboarding.waitingHint")}</Text>
-      <Button label={i18n.t("onboarding.waitingCta")} height={56} onPress={onCreateAccount} />
-    </>
-  );
-}
-
 const styles = StyleSheet.create({
   step: { gap: 16 },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8, paddingVertical: 8 },
   inviteCard: { alignItems: "center", gap: 12 },
-  qr: { width: 192, height: 192, borderRadius: 16, alignItems: "center", justifyContent: "center" },
+  qr: {
+    width: 192,
+    height: 192,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   inviteActions: { alignSelf: "stretch", gap: 8 },
-  faces: { flexDirection: "row", marginTop: 24 },
-  overlap: { marginLeft: -14 },
 });
+
+/** The crew screen of the arrival flow. */
+export function CrewStep({ onDone, doneLabel }: { onDone: () => void; doneLabel: string }) {
+  return <FirstCrew onCreated={() => undefined} onDone={onDone} doneLabel={doneLabel} />;
+}

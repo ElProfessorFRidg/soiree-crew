@@ -9,11 +9,11 @@ import { Panel } from "@/ui/controls";
 import { Text } from "@/ui/Text";
 
 /**
- * O-02: the account, the way the Crew tab asks for it. The official server is already picked, a
+ * O-02: the account, the way the Crew tab asks for it, after the date of birth. "Continue with Apple" comes first where the phone offers it. The official server is already picked, a
  * pseudo is enough; "J'ai déjà un compte" signs in with a password or a code from another phone,
  * and the server line at the bottom changes the server for another public or a private one.
  */
-export function AccountStep({ mode, onModeChange }: { mode: AccountMode; onModeChange: (mode: AccountMode) => void }) {
+export function AccountStep({ mode, onModeChange, birthDate }: { mode: AccountMode; onModeChange: (mode: AccountMode) => void; birthDate: string | null }) {
   const i18n = useT();
   // QOL-05: an invite link opened before the account exists names the server to use.
   const pending = usePendingInvite((state) => state.invite);
@@ -28,7 +28,7 @@ export function AccountStep({ mode, onModeChange }: { mode: AccountMode; onModeC
           <ServerAddress onPick={setServer} />
         </Panel>
       ) : null}
-      <AccountForm intent={null} server={server} mode={mode} onModeChange={onModeChange} autoFocus={false} />
+      <AccountForm intent={null} server={server} mode={mode} onModeChange={onModeChange} autoFocus={false} birthDate={birthDate} />
       <ServerLine server={server} onChange={() => setChoosing(true)} />
       <ServerSheet visible={choosing} current={server} onPick={setServer} onClose={() => setChoosing(false)} />
     </>

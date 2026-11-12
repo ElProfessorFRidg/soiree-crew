@@ -28,7 +28,7 @@ afterEach(async () => {
 
 type User = { id: string; auth: { authorization: string } };
 async function account(username: string): Promise<User> {
-  const body = (await app.inject({ method: "POST", url: "/v1/accounts", payload: { username, displayName: username } })).json() as { user: { id: string }; token: string };
+  const body = (await app.inject({ method: "POST", url: "/v1/accounts", payload: { birthDate: "1990-01-01", username, displayName: username } })).json() as { user: { id: string }; token: string };
   return { id: body.user.id, auth: { authorization: `Bearer ${body.token}` } };
 }
 const JPEG = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), randomBytes(400), Buffer.from([0xff, 0xd9])]).toString("base64");

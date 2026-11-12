@@ -22,11 +22,11 @@ afterEach(async () => {
 
 type User = { id: string; auth: { authorization: string } };
 async function account(username: string): Promise<User> {
-  const body = (await app.inject({ method: "POST", url: "/v1/accounts", payload: { username, displayName: username } })).json() as { user: { id: string }; token: string };
+  const body = (await app.inject({ method: "POST", url: "/v1/accounts", payload: { birthDate: "1990-01-01", username, displayName: username } })).json() as { user: { id: string }; token: string };
   return { id: body.user.id, auth: { authorization: `Bearer ${body.token}` } };
 }
 
-const SECTIONS = ["identity", "crews", "titles", "venues", "reviews", "drinks", "records", "nights", "games"] as const;
+const SECTIONS = ["identity", "crews", "titles", "venues", "reviews", "drinks", "records", "nights", "games", "badges"] as const;
 const AUDIENCES = ["me", "crews", "friends", "everyone"] as const;
 
 async function setup() {

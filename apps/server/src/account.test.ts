@@ -23,7 +23,7 @@ afterEach(async () => {
 });
 
 async function signUp(username: string) {
-  const body = (await app.inject({ method: "POST", url: "/v1/accounts", payload: { username, displayName: username, deviceLabel: "iPhone" } })).json() as {
+  const body = (await app.inject({ method: "POST", url: "/v1/accounts", payload: { birthDate: "1990-01-01", username, displayName: username, deviceLabel: "iPhone" } })).json() as {
     user: { id: string };
     token: string;
   };
@@ -94,7 +94,7 @@ describe("export (N-17, SEC-08)", () => {
 
 describe("email and password (O-01)", () => {
   const signUpWith = (username: string, email: string, password: string) =>
-    app.inject({ method: "POST", url: "/v1/accounts", payload: { username, displayName: username, email, password } });
+    app.inject({ method: "POST", url: "/v1/accounts", payload: { birthDate: "1990-01-01", username, displayName: username, email, password } });
   const signIn = (login: string, password: string) => app.inject({ method: "POST", url: "/v1/sessions/password", payload: { login, password, deviceLabel: "Pixel" } });
 
   it("signs in with the email or the username, and keeps the email sealed", async () => {
@@ -116,7 +116,7 @@ describe("email and password (O-01)", () => {
 
   it("refuses a short password, an email without password and a taken email", async () => {
     expect((await signUpWith("jade", "jade@example.com", "short")).statusCode).toBe(400);
-    expect((await app.inject({ method: "POST", url: "/v1/accounts", payload: { username: "jade", displayName: "Jade", email: "jade@example.com" } })).statusCode).toBe(400);
+    expect((await app.inject({ method: "POST", url: "/v1/accounts", payload: { birthDate: "1990-01-01", username: "jade", displayName: "Jade", email: "jade@example.com" } })).statusCode).toBe(400);
     await signUpWith("jade", "jade@example.com", "long enough pass");
     const again = await signUpWith("theo", "JADE@example.com", "long enough pass");
     expect(again.statusCode).toBe(409);

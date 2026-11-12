@@ -8,6 +8,7 @@ import { connectPglite, connectPostgres, migrate } from "./db";
 import { LiveHub } from "./live";
 import { sweepLiveParties } from "./nightWatch";
 import { startNotificationSweeper } from "./notifications/producers";
+import { appleAuthFromEnv } from "./appleAuth";
 import { pushFromEnv } from "./notifications/push";
 
 // Configuration comes from the environment only.
@@ -22,6 +23,7 @@ import { pushFromEnv } from "./notifications/push";
 //   DOWNLOADS_DIR   where deploy/android drops the APK it builds, served at /download/soiree-crew.apk
 //   OPERATOR_USERNAMES   comma-separated usernames who review venue claims (COM-11)
 //   SEASON_VARIANTS   optional JSON, {"2026-12": "games"} (TER-12)
+//   APPLE_CLIENT_ID   optional, the bundle id Apple identity tokens are made for (default app.soireecrew.mobile)
 //   APNS_KEY_ID, APNS_TEAM_ID, APNS_KEY, APNS_TOPIC, APNS_PRODUCTION   optional, iOS push (O-38)
 //   FCM_SERVICE_ACCOUNT, or FCM_PROJECT_ID + FCM_CLIENT_EMAIL + FCM_PRIVATE_KEY   optional, Android push (O-38)
 
@@ -46,6 +48,7 @@ const push = pushFromEnv(process.env, (message) => console.error(message));
 const context: Context = {
   db,
   push,
+  apple: appleAuthFromEnv(process.env),
   sealer: new Sealer(dataKey),
   live: new LiveHub(),
   now: () => Date.now(),

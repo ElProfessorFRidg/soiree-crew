@@ -28,7 +28,7 @@ afterEach(async () => {
 
 type User = { id: string; auth: { authorization: string } };
 async function account(username: string, password?: string): Promise<User> {
-  const payload = password ? { username, displayName: username, email: `${username}@crew.test`, password } : { username, displayName: username };
+  const payload = password ? { username, displayName: username, birthDate: "1990-01-01", email: `${username}@crew.test`, password } : { username, displayName: username, birthDate: "1990-01-01" };
   const body = (await app.inject({ method: "POST", url: "/v1/accounts", payload })).json() as { user: { id: string }; token: string };
   return { id: body.user.id, auth: { authorization: `Bearer ${body.token}` } };
 }
@@ -204,7 +204,7 @@ describe("audit follow-up", () => {
     expect((await respond(walkIn, partyId)).statusCode).toBe(200);
     for (let i = 0; i < 35; i++) {
       // Each guest signed up on their own phone; they all join on the bar's wifi.
-      const body = (await app.inject({ method: "POST", url: "/v1/accounts", remoteAddress: `203.0.113.${i + 1}`, payload: { username: `guest${i}`, displayName: "g" } })).json() as { token: string };
+      const body = (await app.inject({ method: "POST", url: "/v1/accounts", remoteAddress: `203.0.113.${i + 1}`, payload: { birthDate: "1990-01-01", username: `guest${i}`, displayName: "g" } })).json() as { token: string };
       const guest = { auth: { authorization: `Bearer ${body.token}` } };
       expect((await app.inject({ method: "POST", url: `/v1/invites/${code}/accept`, headers: guest.auth, remoteAddress: "198.51.100.1" })).statusCode).toBe(200);
     }

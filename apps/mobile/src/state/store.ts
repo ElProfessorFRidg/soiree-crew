@@ -144,6 +144,8 @@ export interface AppState {
   onboarding: OnboardingDraft | null;
   /** When the arrival flow was finished, with or without the health consent. */
   onboardedAt: number | null;
+  /** O-04: my profile photo, a small JPEG as a data address. Kept on this phone only. */
+  profilePhoto: string | null;
   /** Cards of the first days on the Party screen, and what they wait for. */
   firstRun: FirstRun;
 }
@@ -220,6 +222,7 @@ export const useAppStore = create<AppState>()(
       learnedSpellings: {},
       onboarding: null,
       onboardedAt: null,
+      profilePhoto: null,
       firstRun: { active: false, dismissed: [], invitedAt: null, playedAt: null },
     }),
     {

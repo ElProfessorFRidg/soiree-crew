@@ -32,7 +32,7 @@ const people = [
 const now = Date.now();
 const users = [];
 for (const [username, displayName, body, weight] of people) {
-  const { user, token } = await call("/v1/accounts", { method: "POST", body: { username: `${username}${suffix}`, displayName } });
+  const { user, token } = await call("/v1/accounts", { method: "POST", body: { username: `${username}${suffix}`, displayName, birthDate: "1990-01-01" } });
   await call("/v1/mutations", {
     token,
     method: "POST",

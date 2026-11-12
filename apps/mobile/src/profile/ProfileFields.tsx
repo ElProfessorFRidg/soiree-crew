@@ -13,18 +13,20 @@ export interface ProfileDraft {
   heightCm: number | null;
 }
 
-/** The prototype bounds the weight to 35 to 250 kg (Arrivee board, screen 4). */
-export const WEIGHT_BOUNDS = { min: 35, max: PROFILE_BOUNDS.weightKg.max };
+/** O-04: 30 to 250 kg, the bounds the formula takes (the prototype stopped at 35). */
+export const WEIGHT_BOUNDS = { min: PROFILE_BOUNDS.weightKg.min, max: PROFILE_BOUNDS.weightKg.max };
 const DEFAULT_HEIGHT = 175;
 
 /** One panel, fields split by hairlines: the prototype never stacks a card per field. */
-export function ProfileFields({ draft, onChange }: { draft: ProfileDraft; onChange: (next: ProfileDraft) => void }) {
+/** `reasons`: one line under each label saying why it is asked (the arrival flow shows them). */
+export function ProfileFields({ draft, onChange, reasons }: { draft: ProfileDraft; onChange: (next: ProfileDraft) => void; reasons?: { weight: string; body: string; height: string } }) {
   const i18n = useT();
   const theme = useTheme();
   const divider = [styles.divider, { backgroundColor: theme.line }];
   return (
     <Panel>
       <Text variant="label">{i18n.t("profile.weight")}</Text>
+      {reasons ? <Text variant="small">{reasons.weight}</Text> : null}
       <Stepper
         value={draft.weightKg}
         min={WEIGHT_BOUNDS.min}
@@ -37,6 +39,7 @@ export function ProfileFields({ draft, onChange }: { draft: ProfileDraft; onChan
       />
       <View style={divider} />
       <Text variant="label">{i18n.t("profile.bodyModel")}</Text>
+      {reasons ? <Text variant="small">{reasons.body}</Text> : null}
       <Segmented
         accessibilityLabel={i18n.t("profile.bodyModel")}
         value={draft.declaredBody}
@@ -50,6 +53,7 @@ export function ProfileFields({ draft, onChange }: { draft: ProfileDraft; onChan
       {draft.declaredBody === "other" ? <Text variant="small">{i18n.t("profile.otherHint")}</Text> : null}
       <View style={divider} />
       <Text variant="label">{i18n.t("profile.height")}</Text>
+      {reasons ? <Text variant="small">{reasons.height}</Text> : null}
       {draft.heightCm === null ? (
         <View style={styles.heightOff}>
           <Text variant="small" style={styles.flex}>

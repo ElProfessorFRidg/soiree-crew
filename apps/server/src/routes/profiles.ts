@@ -323,8 +323,9 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
     // COM-08: a changed bio or country is text others read, so it goes through the filters.
     const changed = [input.bio, input.country].filter((t, i) => t !== undefined && t !== (i === 0 ? current?.bio : current?.country));
     if (changed.length) await assertPublishable(ctx, user.id, changed);
-    const audiences = {
-      ...audiencesOf(current ? (JSON.parse(current.audiences) as Record<string, unknown>) : {}),
+    // Only what was chosen is stored: a section never chosen keeps following its default (badges follow games).
+    const audiences: Record<string, string> = {
+      ...(current ? (JSON.parse(current.audiences) as Record<string, string>) : {}),
       ...(input.preset ? PRESETS[input.preset] : {}),
       ...(input.audiences ?? {}),
     };
@@ -351,7 +352,7 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
       const b = input.birthday;
       await ctx.db.query("update profiles set birth_month = $2, birth_day = $3, birth_year = $4 where user_id = $1", [user.id, b?.month ?? null, b?.day ?? null, b?.year ?? null]);
     }
-    return { audiences };
+    return { audiences: audiencesOf(audiences) };
   });
 
   /**
@@ -365,8 +366,8 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
     const q = z.string().trim().toLowerCase().min(2).max(40).parse(request.query.q ?? "");
     // LIKE wildcards typed by the user are matched literally.
     const like = `%${q.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
-    const rows = await ctx.db.query<{ id: string; username: string; display_name: string; findable: string | null; known: boolean }>(
-      `select u.id, u.username, u.display_name, p.findable,
+    const rows = await ctx.db.query<{ id: string; username: string; display_name: string; findable: string | null; audiences: string | null; known: boolean }>(
+      `select u.id, u.username, u.display_name, p.findable, p.audiences,
               (exists (select 1 from crew_members a join crew_members b on a.crew_id = b.crew_id where a.user_id = $1 and b.user_id = u.id)
                or exists (select 1 from friendships f where (f.user_a = $1 and f.user_b = u.id) or (f.user_b = $1 and f.user_a = u.id))) as known
        from users u left join profiles p on p.user_id = u.id
@@ -378,6 +379,9 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
     const visible = rows.filter((r) => {
       const findable = r.findable ?? "username";
       if (r.known) return true;
+      // Who can find me: only "Everyone" lets a stranger reach me from the search; the other audiences
+      // are people who already know me (crew mates and friends, who show above).
+      if (audiencesOf(r.audiences ? (JSON.parse(r.audiences) as Record<string, unknown>) : {}).find !== "everyone") return false;
       if (findable === "search") return true;
       return findable === "username" && r.username === q;
     });

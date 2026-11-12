@@ -5,6 +5,7 @@ import { newId } from "../crypto";
 import { assertPublishable } from "../posting";
 import { notifyOutCall, notifySos } from "../notifications/producers";
 import { crewTimeZone } from "../territory";
+import { audiencesOf, canSee } from "../profileRules";
 import { dayBoundaryOf, nightOf, userClock } from "../time";
 
 const night = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
@@ -35,6 +36,20 @@ async function crewMates(ctx: Context, userId: string): Promise<string[]> {
     [userId],
   );
   return rows.map((r) => r.user_id);
+}
+
+/** The statuses of other people that their own presence setting allows this viewer to see. Everyone here is a crew mate. */
+async function filterByPresence<T extends { user_id: string }>(ctx: Context, viewerId: string, rows: T[]): Promise<T[]> {
+  const owners = [...new Set(rows.map((r) => r.user_id).filter((id) => id !== viewerId))];
+  if (!owners.length) return rows;
+  const stored = await ctx.db.query<{ user_id: string; audiences: string }>("select user_id, audiences from profiles where user_id = any($1::uuid[])", [owners]);
+  const friends = await ctx.db.query<{ other: string }>(
+    `select case when user_a = $1 then user_b else user_a end as other from friendships where (user_a = $1 or user_b = $1) and status = 'accepted'`,
+    [viewerId],
+  );
+  const friendIds = new Set(friends.map((f) => f.other));
+  const audience = new Map(stored.map((r) => [r.user_id, audiencesOf(JSON.parse(r.audiences) as Record<string, unknown>).presence]));
+  return rows.filter((r) => r.user_id === viewerId || canSee(audience.get(r.user_id) ?? "crews", { me: false, crewMate: true, friend: friendIds.has(r.user_id) }));
 }
 
 export function radarRoutes(app: FastifyInstance, ctx: Context): void {
@@ -86,6 +101,8 @@ export function radarRoutes(app: FastifyInstance, ctx: Context): void {
        join crew_members m on m.user_id = s.user_id and m.crew_id = $1 where s.night between $2 and $3`,
       [request.params.id, tonight, last],
     );
+    // Presence: each member decides who sees their "out tonight" (crew mates, friends only, or nobody).
+    const shownStatuses = await filterByPresence(ctx, user.id, statuses);
     const calls = await ctx.db.query<{ id: string; user_id: string; night: string; note: string; party_id: string | null; created_at: number }>(
       `select id, user_id, night, note, party_id, created_at from out_calls
        where crew_id = $1 and night = $2 and user_id not in (select muted from mutes where muter = $3) order by created_at desc`,
@@ -100,7 +117,7 @@ export function radarRoutes(app: FastifyInstance, ctx: Context): void {
       tonight,
       nights: Array.from({ length: STATUS_DAYS_AHEAD + 1 }, (_, i) => addDays(tonight, i)),
       members: members.map((m) => ({ userId: m.user_id, name: m.display_name })),
-      statuses: statuses.map((s) => ({ userId: s.user_id, night: s.night, status: s.status, fromMinute: s.from_minute, toMinute: s.to_minute, place: s.place })),
+      statuses: shownStatuses.map((s) => ({ userId: s.user_id, night: s.night, status: s.status, fromMinute: s.from_minute, toMinute: s.to_minute, place: s.place })),
       calls: calls.map((c) => ({
         id: c.id,
         userId: c.user_id,

@@ -23,7 +23,7 @@ afterEach(async () => {
 
 type Auth = { authorization: string };
 async function account(username: string): Promise<Auth> {
-  const body = (await app.inject({ method: "POST", url: "/v1/accounts", payload: { username, displayName: username } })).json() as { token: string };
+  const body = (await app.inject({ method: "POST", url: "/v1/accounts", payload: { birthDate: "1990-01-01", username, displayName: username } })).json() as { token: string };
   return { authorization: `Bearer ${body.token}` };
 }
 async function send(auth: Auth, key: string, mutation: unknown) {

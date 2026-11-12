@@ -18,6 +18,11 @@ const COUNTS: Partial<Record<Base, number>> = {
   "drive.dontDrink": 4,
   "drive.phone": 4,
   "drive.options": 4,
+  "journey.unlockVenues": 3,
+  "journey.unlockTitles": 3,
+  "journey.unlockBadges": 3,
+  "journey.unlockFind": 3,
+  "journey.unlockPresence": 3,
 };
 
 type Base =
@@ -51,7 +56,12 @@ type Base =
   | "drive.drank"
   | "drive.dontDrink"
   | "drive.phone"
-  | "drive.options";
+  | "drive.options"
+  | "journey.unlockVenues"
+  | "journey.unlockTitles"
+  | "journey.unlockBadges"
+  | "journey.unlockFind"
+  | "journey.unlockPresence";
 
 /**
  * SLOP-11: the same line never shows twice in a row for this person. One pick per occasion (a day
