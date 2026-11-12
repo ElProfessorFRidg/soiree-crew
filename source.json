@@ -21,16 +21,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -43,6 +43,27 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.3",
+          "buildVersion": "87",
+          "date": "2026-11-12T21:52:47Z",
+          "localizedDescription": "• Accounts in the Gribouille and suggestions tests carry a birth date; status regenerated after the merges\n• Crew step back, Apple sign-in, date of birth before the account, server-side profile photo\n• Answer a round from its notification (\"Got it\" / \"Not mine\"), drinks linked to the round, confirmedIds in the listing\n• Background location follows eco mode as it changes during the night\n• Only a party that is live now tells the crew; partyStarted asserted explicitly in inbox tests; gathering card button 48 px\n• Leave authorises on party membership, drop locks the round and keeps a changed split, a round id reused in another party is a retry\n• Eco mode slows and simplifies loops instead of freezing every animation; location updates restart when the eco state changes\n• Close guesses stay private, rate-limit join, guard timers and leave, sweep idle rooms\n• Rebuild the arrival as one continuous flow with five visibility choices\n• Gribouille online, a drawing and guessing game on several phones (O-63)\n• Offer a party when 3+ of the crew are at one venue, push when a crew mate launches one, warn before closing (QOL-17)\n• Respect the phone, eco mode, data saver, theme choice\n• Fair rotation from the crew's history, server-side split and presence checks, drop-a-drink, summary (N-18, server)",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.3%2Bbuild.87/soiree-crew-unsigned.ipa",
+          "size": 22499405,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.2",
           "buildVersion": "86",
@@ -359,26 +380,37 @@
           ]
         }
       ],
-      "version": "0.2.2",
-      "versionDate": "2026-11-01T09:34:00Z",
-      "versionDescription": "• Allow the drink-driving warning's red gradients, asked for explicitly\n• 45 s hold with no close button until the end (a thin line fills instead), call and another way home after 12 s, passenger after 20 s and only held down 2 s; layered red backdrop (garnet, breathing crimson core, ember warmth) and a car in a pulsing halo\n• The driving time follows the curve on screen, so it never comes after back to zero and a level shown under the limit is never called over it; the margin is too close to call\n• Warn when driving after drinking\n• Capfuls and sips (under 5 g of alcohol) no longer count in the no-water streak or the fast-pace warning",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.2%2Bbuild.86/soiree-crew-unsigned.ipa",
-      "size": 22370434,
+      "version": "0.2.3",
+      "versionDate": "2026-11-12T21:52:47Z",
+      "versionDescription": "• Accounts in the Gribouille and suggestions tests carry a birth date; status regenerated after the merges\n• Crew step back, Apple sign-in, date of birth before the account, server-side profile photo\n• Answer a round from its notification (\"Got it\" / \"Not mine\"), drinks linked to the round, confirmedIds in the listing\n• Background location follows eco mode as it changes during the night\n• Only a party that is live now tells the crew; partyStarted asserted explicitly in inbox tests; gathering card button 48 px\n• Leave authorises on party membership, drop locks the round and keeps a changed split, a round id reused in another party is a retry\n• Eco mode slows and simplifies loops instead of freezing every animation; location updates restart when the eco state changes\n• Close guesses stay private, rate-limit join, guard timers and leave, sweep idle rooms\n• Rebuild the arrival as one continuous flow with five visibility choices\n• Gribouille online, a drawing and guessing game on several phones (O-63)\n• Offer a party when 3+ of the crew are at one venue, push when a crew mate launches one, warn before closing (QOL-17)\n• Respect the phone, eco mode, data saver, theme choice\n• Fair rotation from the crew's history, server-side split and presence checks, drop-a-drink, summary (N-18, server)",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.3%2Bbuild.87/soiree-crew-unsigned.ipa",
+      "size": 22499405,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "release-0.2.3",
+      "title": "Soirée Crew 0.2.3",
+      "caption": "• Accounts in the Gribouille and suggestions tests carry a birth date; status regenerated after the merges\n• Crew step back, Apple sign-in, date of birth before the account, server-side profile photo\n• Answer a round from its notification (\"Got it\" / \"Not mine\"), drinks linked to the round, confirmedIds in the listing\n• Background location follows eco mode as it changes during the night\n• Only a party that is live now tells the crew; partyStarted asserted explicitly in inbox tests; gathering card button 48 px\n• Leave authorises on party membership, drop locks the round and keeps a changed split, a round id reused in another party is a retry\n• Eco mode slows and simplifies loops instead of freezing every animation; location updates restart when the eco state changes\n• Close guesses stay private, rate-limit join, guard timers and leave, sweep idle rooms\n• Rebuild the arrival as one continuous flow with five visibility choices\n• Gribouille online, a drawing and guessing game on several phones (O-63)\n• Offer a party when 3+ of the crew are at one venue, push when a crew mate launches one, warn before closing (QOL-17)\n• Respect the phone, eco mode, data saver, theme choice\n• Fair rotation from the crew's history, server-side split and presence checks, drop-a-drink, summary (N-18, server)",
+      "date": "2026-11-12T21:52:47Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/tag/v0.2.3%2Bbuild.87",
+      "appID": "app.soireecrew.mobile",
+      "notify": false
+    },
     {
       "identifier": "release-0.2.2",
       "title": "Soirée Crew 0.2.2",

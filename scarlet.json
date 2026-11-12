@@ -6,6 +6,27 @@
   "Other": [
     {
       "name": "Soirée Crew",
+      "version": "0.2.3",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.3%2Bbuild.87/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "• Accounts in the Gribouille and suggestions tests carry a birth date; status regenerated after the merges\n• Crew step back, Apple sign-in, date of birth before the account, server-side profile photo\n• Answer a round from its notification (\"Got it\" / \"Not mine\"), drinks linked to the round, confirmedIds in the listing\n• Background location follows eco mode as it changes during the night\n• Only a party that is live now tells the crew; partyStarted asserted explicitly in inbox tests; gathering card button 48 px\n• Leave authorises on party membership, drop locks the round and keeps a changed split, a round id reused in another party is a retry\n• Eco mode slows and simplifies loops instead of freezing every animation; location updates restart when the eco state changes\n• Close guesses stay private, rate-limit join, guard timers and leave, sweep idle rooms\n• Rebuild the arrival as one continuous flow with five visibility choices\n• Gribouille online, a drawing and guessing game on several phones (O-63)\n• Offer a party when 3+ of the crew are at one venue, push when a crew mate launches one, warn before closing (QOL-17)\n• Respect the phone, eco mode, data saver, theme choice\n• Fair rotation from the crew's history, server-side split and presence checks, drop-a-drink, summary (N-18, server)",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew 0.2.2",
       "version": "0.2.2",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.2%2Bbuild.86/soiree-crew-unsigned.ipa",
