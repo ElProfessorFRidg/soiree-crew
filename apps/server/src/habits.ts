@@ -54,14 +54,16 @@ export async function sharingPeople(ctx: Context, viewerId: string, crewId?: str
 export interface OwnNight {
   /** Night key on the person's own boundary and time zone. */
   key: string;
-  /** Alcoholic drinks of the night, in time order. */
+  /** Alcoholic drinks of the night, in time order. Empty for a party spent without alcohol. */
   times: number[];
+  /** When the night happened: its last drink, or the party's start when nothing was drunk. */
+  at: number;
   withCrew: boolean;
 }
 
 /**
  * Outside a crew party we trust the person: a night is any night with an alcoholic drink of their own,
- * party or not, on their own day boundary and time zone. It is "with the crew" when one of its drinks belongs
+ * party or not, on their own day boundary and time zone, plus any party they went to, drinking or not. It is "with the crew" when one of its drinks belongs
  * to a party or they were going to a party that night; otherwise it is solo.
  */
 export async function ownNights(ctx: Context, ownerId: string): Promise<{ nights: OwnNight[]; timeZone: string }> {
@@ -79,10 +81,18 @@ export async function ownNights(ctx: Context, ownerId: string): Promise<{ nights
   const byKey = new Map<string, OwnNight>();
   for (const d of drinks) {
     const key = keyOf(Number(d.consumed_at));
-    const entry = byKey.get(key) ?? { key, times: [], withCrew: crewKeys.has(key) };
+    const entry = byKey.get(key) ?? { key, times: [], at: 0, withCrew: crewKeys.has(key) };
     entry.times.push(Number(d.consumed_at));
+    entry.at = Number(d.consumed_at);
     if (d.party_id) entry.withCrew = true;
     byKey.set(key, entry);
+  }
+  // A party spent on water or soft drinks is still a night out.
+  const now = ctx.now();
+  for (const g of going) {
+    const at = Number(g.starts_at);
+    const key = keyOf(at);
+    if (at <= now && !byKey.has(key)) byKey.set(key, { key, times: [], at, withCrew: true });
   }
   return { nights: [...byKey.values()], timeZone: clock.timeZone };
 }

@@ -145,6 +145,7 @@ async function buildSections(ctx: Context, ownerId: string, relation: Relation, 
     const firsts: number[] = [];
     const paces: number[] = [];
     for (const { times } of own.nights) {
+      if (!times.length) continue;
       const first = times[0]!;
       const local = new Date(first + offsetMinutes(first, own.timeZone) * 60_000);
       firsts.push(((local.getUTCHours() - 12 + 24) % 24) * 60 + local.getUTCMinutes());
@@ -173,7 +174,7 @@ async function buildSections(ctx: Context, ownerId: string, relation: Relation, 
     let biggestNight = 0;
     for (const night of own.nights) {
       biggestNight = Math.max(biggestNight, night.times.length);
-      if (!body) continue;
+      if (!body || !night.times.length) continue;
       const first = night.times[0]!;
       const last = night.times[night.times.length - 1]!;
       const rows = await ctx.db.query<{ id: string; sealed: string; consumed_at: number }>(
@@ -195,7 +196,7 @@ async function buildSections(ctx: Context, ownerId: string, relation: Relation, 
     const withCrew = nights.filter((n) => n.withCrew).length;
     out.nights = {
       total: nights.length,
-      last30Days: nights.filter((n) => now - n.times[n.times.length - 1]! < 30 * 24 * HOUR_MS).length,
+      last30Days: nights.filter((n) => now - n.at < 30 * 24 * HOUR_MS).length,
       withCrew,
       solo: nights.length - withCrew,
     };
