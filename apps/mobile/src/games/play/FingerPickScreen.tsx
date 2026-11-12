@@ -6,6 +6,7 @@ import { duration, palette, space, scaled } from "@crew/design-tokens";
 import { createFingerPick, fingerPickReducer, type Finger } from "@crew/games";
 import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
+import { useEcoLoop } from "@/power/eco";
 import { useTheme } from "@/theme";
 import { Button } from "@/ui/Button";
 import { Text } from "@/ui/Text";
@@ -23,11 +24,12 @@ const DISC = 86;
 function FingerDisc({ finger, settling, chosen, lost }: { finger: Finger; settling: boolean; chosen: boolean; lost: boolean }) {
   const reduceMotion = useReducedMotion();
   const ripple = useSharedValue(0);
+  const loop = useEcoLoop(false);
   const pick = useSharedValue(0);
   useEffect(() => {
-    if (settling && !reduceMotion) ripple.value = withRepeat(withTiming(1, { duration: duration.ripple, easing: Easing.out(Easing.quad) }), -1, false);
+    if (settling && !reduceMotion) ripple.value = withRepeat(withTiming(1, { duration: duration.ripple * loop.slow, easing: Easing.out(Easing.quad) }), loop.count, false);
     else ripple.value = withTiming(0, { duration: scaled(150) });
-  }, [settling, reduceMotion, ripple]);
+  }, [settling, reduceMotion, ripple, loop.count, loop.slow]);
   useEffect(() => {
     pick.value = withTiming(chosen || lost ? 1 : 0, { duration: scaled(400), easing: easings.out });
   }, [chosen, lost, pick]);

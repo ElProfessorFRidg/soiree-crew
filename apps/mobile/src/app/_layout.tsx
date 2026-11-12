@@ -18,8 +18,6 @@ import { useEffect, useState } from "react";
 import { AppState as RNAppState, Platform, Settings } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
-  ReducedMotionConfig,
-  ReduceMotion,
   useReducedMotion,
 } from "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -247,8 +245,6 @@ export default function RootLayout() {
     <GestureHandlerRootView
       style={{ flex: 1, backgroundColor: themes.dark.bg }}
     >
-      {/* ADP-08: lighter effects on a low battery. Animations jump to their end, nothing else changes. */}
-      {eco ? <ReducedMotionConfig mode={ReduceMotion.Always} /> : null}
       <SafeAreaProvider>
         <ThemeProvider>
           {/* The navigator's own colours: its default theme is white and showed through while a screen slid back. */}

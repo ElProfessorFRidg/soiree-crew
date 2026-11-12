@@ -10,6 +10,7 @@ export const palette = {
   accent: tokens.color.accent,
   semantic: tokens.color.semantic,
   tint: tokens.color.tint,
+  tintLight: tokens.color.tintLight,
   bacThreshold: {
     low: tokens.color.bacThreshold.low,
     mid: tokens.color.bacThreshold.mid,
@@ -19,6 +20,9 @@ export const palette = {
 } as const;
 
 export type ThemeName = "dark" | "light";
+
+/** A tinted block or tag: its ground and the text that reads on it, in the theme's lightness. */
+export type Tints = typeof tokens.color.tint;
 
 export interface Theme {
   name: ThemeName;
@@ -44,6 +48,11 @@ export interface Theme {
   danger: string;
   water: string;
   ok: string;
+  /** The semantic colours as text or icons on the theme's grounds (the light theme needs them darker). */
+  dangerText: string;
+  waterText: string;
+  okText: string;
+  tint: Tints;
 }
 
 const dark = tokens.color.dark;
@@ -62,6 +71,10 @@ export const themes: Record<ThemeName, Theme> = {
     amberText: accent.amber,
     onAccent: accent.onAccent,
     ...semantic,
+    dangerText: semantic.danger,
+    waterText: semantic.water,
+    okText: semantic.ok,
+    tint: tokens.color.tint,
   },
   light: {
     name: "light",
@@ -84,6 +97,11 @@ export const themes: Record<ThemeName, Theme> = {
     amberText: accent.amberOnLightText,
     onAccent: accent.onAccent,
     ...semantic,
+    // QOL-24: readable in sunlight, 4.5:1 at least on bg and surface.
+    dangerText: tokens.color.tintLight.dangerText,
+    waterText: tokens.color.tintLight.waterText,
+    okText: tokens.color.tintLight.okText,
+    tint: tokens.color.tintLight,
   },
 };
 

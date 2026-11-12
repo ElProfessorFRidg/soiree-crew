@@ -13,6 +13,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { duration, scaled } from "@crew/design-tokens";
 import { easings } from "@/motion/easing";
+import { useEcoLoop } from "@/power/eco";
 
 /**
  * 3D card flip (MOT-06): rotateY 0 to 180 in 550 ms easeFlip, backface hidden.
@@ -125,13 +126,14 @@ export function Tremble({ trigger, children, calm, style }: { trigger: unknown; 
 export function useShake(strength: number, enabled: boolean) {
   const reduceMotion = useReducedMotion();
   const phase = useSharedValue(0);
+  const loop = useEcoLoop(false);
   const amount = useSharedValue(0);
   useEffect(() => {
     const on = enabled && !reduceMotion && strength > 0;
     amount.value = withTiming(on ? strength : 0, { duration: duration.toggle });
-    if (on) phase.value = withRepeat(withTiming(1, { duration: scaled(250), easing: Easing.linear }), -1, false);
+    if (on) phase.value = withRepeat(withTiming(1, { duration: scaled(250) * loop.slow, easing: Easing.linear }), loop.count, false);
     else phase.value = 0;
-  }, [strength, enabled, reduceMotion, amount, phase]);
+  }, [strength, enabled, reduceMotion, amount, phase, loop.count, loop.slow]);
   return useAnimatedStyle(() => {
     const t = phase.value * Math.PI * 2;
     return {

@@ -9,6 +9,9 @@ import { createTranslator } from "@/i18n";
 import { variantKey } from "@/i18n/variants";
 import { api } from "@/server/api";
 import { useAppStore } from "@/state/store";
+import { useEco } from "@/power/eco";
+import { savingPowerNow } from "@/power/reading";
+import { locationPlan } from "@/power/saving";
 import { driveAlertEnabled, forgetDriving, onDriveLocations } from "./driving";
 
 // "Rappel quand t'es de sortie": with the "Always" location permission, the phone notices it has
@@ -239,7 +242,7 @@ if (supported) {
 }
 
 /** The options the updates were started with in this run: a change, or a new launch, restarts them. */
-let startedFor: boolean | null = null;
+let startedFor: string | null = null;
 
 /**
  * Turns the background updates on, once both permissions are there. Low power for the outing
@@ -251,23 +254,26 @@ export async function startOuting(): Promise<boolean> {
   const background = await Location.getBackgroundPermissionsAsync().catch(() => null);
   if (!background?.granted) return false;
   const drive = await driveAlertEnabled();
+  const saving = await savingPowerNow();
+  const key = `${drive}:${saving}`;
   if (await Location.hasStartedLocationUpdatesAsync(OUTING_TASK).catch(() => false)) {
-    if (startedFor === drive) return true;
+    if (startedFor === key) return true;
     await Location.stopLocationUpdatesAsync(OUTING_TASK).catch(() => undefined);
   }
+  const plan = locationPlan(drive, saving);
   try {
     await Location.startLocationUpdatesAsync(OUTING_TASK, {
-      // Cell and Wi-Fi level: enough to tell "still at the same bar" from "moved on".
-      accuracy: drive ? Location.Accuracy.Balanced : Location.Accuracy.Low,
-      distanceInterval: 100,
-      deferredUpdatesDistance: drive ? 0 : 200,
-      deferredUpdatesInterval: (drive ? 1 : 5) * MINUTE_MS,
-      timeInterval: (drive ? 1 : 5) * MINUTE_MS,
+      // Cell and Wi-Fi level: enough to tell "still at the same bar" from "moved on". Spaced out in eco mode (QOL-24).
+      accuracy: { balanced: Location.Accuracy.Balanced, low: Location.Accuracy.Low, lowest: Location.Accuracy.Lowest }[plan.accuracy],
+      distanceInterval: plan.distanceInterval,
+      deferredUpdatesDistance: plan.deferredUpdatesDistance,
+      deferredUpdatesInterval: plan.intervalMinutes * MINUTE_MS,
+      timeInterval: plan.intervalMinutes * MINUTE_MS,
       activityType: Location.ActivityType.Other,
       pausesUpdatesAutomatically: true,
       showsBackgroundLocationIndicator: false,
     });
-    startedFor = drive;
+    startedFor = key;
     return true;
   } catch {
     return false;
@@ -282,6 +288,11 @@ export async function stopOuting(): Promise<void> {
   await cancelNudge();
   await AsyncStorage.removeItem(STATE_KEY).catch(() => undefined);
 }
+
+// QOL-24: the updates follow eco mode as it turns on or off during the night, not only at start.
+useEco.subscribe((state, previous) => {
+  if (state.eco !== previous.eco) void syncLocationUpdates();
+});
 
 /** The updates run while the outing nudge or the driving warning wants them, and stop otherwise. */
 export async function syncLocationUpdates(): Promise<boolean> {

@@ -12,6 +12,7 @@ import type { CustomDrink, DrinkPreset } from "@/drinks/presets";
 import type { DrinkEntry, Mutation, PendingMutation, StoredProfile, SyncState, WaterEntry } from "@/sync/types";
 import type { FirstRun, OnboardingDraft } from "@/onboarding/flow";
 import { withDeadline } from "@/system/launchGuard";
+import type { ThemeChoice } from "@/theme/choice";
 
 function deviceDefaults(): UserPreferences {
   const locales = getLocales();
@@ -67,6 +68,12 @@ export interface AppState {
   soundsOn: boolean;
   /** MOT-15: vibrations, on by default, switched separately from sounds. */
   hapticsOn: boolean;
+  /** QOL-24: "Économie de batterie", on by default: eco mode in Low Power Mode or on a low battery (power/eco.ts). */
+  ecoOn: boolean;
+  /** QOL-24: "Économie de données": lighter photos sent, the crew's loaded on a tap (photos/saver.tsx). This phone only. */
+  dataSaver: boolean;
+  /** QOL-24: the theme picked in Settings; "auto" is dark at night and follows the phone by day (theme/choice.ts). */
+  themeChoice: ThemeChoice;
   /** AC-12: this install's event chain and the nonces fetched in advance for offline writes. */
   installId: string | null;
   eventSeq: number;
@@ -176,6 +183,9 @@ export const useAppStore = create<AppState>()(
       barHave: [],
       soundsOn: false,
       hapticsOn: true,
+      ecoOn: true,
+      dataSaver: false,
+      themeChoice: "auto",
       copyVariants: {},
       lockScreenNumbers: false,
       liveActivityId: null,

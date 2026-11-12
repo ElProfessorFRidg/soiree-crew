@@ -82,7 +82,7 @@ Vibrations have their own switch in Settings, on by default and separate from th
 |---|---|
 | System Reduce Motion | `useReducedMotion()`: no draw-ins, no confetti, no shakes; counters jump to their value; fades only |
 | UI level 2 and 3 (ADP-01) | stable layout: no shake, no long sequences, nothing that needs a precise swipe or long-press |
-| Eco mode on a low battery (ADP-08) | `ReducedMotionConfig` forces every animation to its end; clocks and refreshes slow down |
+| Eco mode on a low battery (ADP-08) | endless loops run a few slower cycles then rest (`useEcoLoop`); nothing jumps to its end, only the system Reduce Motion setting does that; clocks, refreshes and location updates slow down |
 | Background tab or hidden window | layout animations may not start: prefer shared-value animations (`DropIn`) over entering animations for anything that carries content |
 
 ## Living background (MOT-02)
