@@ -29,7 +29,7 @@ afterEach(async () => {
 type User = { id: string; auth: { authorization: string } };
 
 async function account(username: string): Promise<User> {
-  const body = (await app.inject({ method: "POST", url: "/v1/accounts", payload: { username, displayName: username } })).json() as { user: { id: string }; token: string };
+  const body = (await app.inject({ method: "POST", url: "/v1/accounts", payload: { birthDate: "1990-01-01", username, displayName: username } })).json() as { user: { id: string }; token: string };
   const user = { id: body.user.id, auth: { authorization: `Bearer ${body.token}` } };
   live.add(user.id, { send: (payload) => heard.push({ userId: user.id, payload }) });
   return user;

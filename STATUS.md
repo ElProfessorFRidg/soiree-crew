@@ -1,11 +1,11 @@
 # Status
 
-Generated from FEATURES.md on 2026-10-31 by `pnpm status`. Edit FEATURES.md, not this file.
+Generated from FEATURES.md on 2026-11-12 by `pnpm status`. Edit FEATURES.md, not this file.
 
 | Status | Count |
 |---|---|
-| Built | 244 |
-| Partly built | 59 |
+| Built | 246 |
+| Partly built | 57 |
 | To do | 2 |
 | Proposed (not in the brief yet) | 4 |
 | Total | 309 |
@@ -17,7 +17,6 @@ Generated from FEATURES.md on 2026-10-31 by `pnpm status`. Edit FEATURES.md, not
 - **O-09** (P0, Account, profile, settings): 7 languages: FR, EN, ES, IT, DE, PT, RU. The whole app, not a few screens. See <localization>.
 - **O-33** (P0, Widgets): iOS and Android home-screen widget in 3 sizes: live curve that falls on its own, back-to-zero, interactive but
 - **O-42** (P0, Parties and trips): Squad mode: curves shared continuously between members.
-- **O-63** (P0, Games (15)): "Gribouille": one player draws, the others guess, 3 to 8 players online (real-time, multi-phone).
 - **O-66** (P1, The Bar (recipes)): 470+ recipes with photo and preparation: Classics, Shots, Party, Alcohol-free, Beers, Desserts, + signature co
 - **O-83** (P1, Requests from S2M users): Photo when logging a drink.
 - **O-84** (P1, Requests from S2M users): Photos and videos shared that stay inside the group.
@@ -33,9 +32,8 @@ Generated from FEATURES.md on 2026-10-31 by `pnpm status`. Edit FEATURES.md, not
 - **QOL-09** (P0, Everyday polish): Photos: compressed before upload, background upload with progress and retry, HEIC accepted, location metadata 
 - **QOL-14** (P0, Everyday polish): Navigation without traps: Android back and iOS swipe-back work everywhere, sheets close with a swipe, the app 
 - **QOL-15** (P1, Everyday polish): Try before signing up: games and the Bar work without an account; sign-up is asked only when the user needs a 
-- **QOL-17** (P1, Everyday polish): Suggestions that save taps: when 3+ crew members check in at the same venue, offer to start a party; when the 
 - **QOL-22** (P2, Everyday polish): Last ride home: after midnight, the last night bus / metro departures near the venue on the Party screen, when
-- **QOL-24** (P1, Everyday polish): Respect the phone: Low Power Mode lowers refresh rates and effects, a data-saver option for photos, light and 
+- **QOL-24** (P1, Everyday polish): Respect the phone: Low Power Mode lowers refresh rates and effects, a data-saver option for photos, light and ... Done: eco mode (Low Power Mode or battery 20% 
 - **QOL-25** (P0, Everyday polish): Native fast path: every out-of-app action (widget, Live Activity / Live Update, notification action, Siri / Shortcut, Control, Quick Settings tile, launcher sho
 - **QOL-29** (P0, Everyday polish): Invite survives the install: a friend who installs from an invite link lands in the right crew or party (Play Install Referrer; invite code plus system Paste bu
 - **JOY-01** (P1, Delight): Cheers: bring two phones together (Bluetooth LE / NFC) and both screens play a clink with sound and haptic. It
@@ -91,7 +89,7 @@ Generated from FEATURES.md on 2026-10-31 by `pnpm status`. Edit FEATURES.md, not
 - Widgets: O-34
 - Parties and trips: O-35, O-36, O-37, O-38, O-39, O-40, O-41
 - Friends: O-43
-- Games (15): O-44, O-45, O-46, O-47, O-48, O-49, O-50, O-51, O-52, O-53, O-54, O-55, O-56, O-57, O-58, O-59, O-60, O-61, O-62, O-64, O-65, O-89, O-90, O-91
+- Games (15): O-44, O-45, O-46, O-47, O-48, O-49, O-50, O-51, O-52, O-53, O-54, O-55, O-56, O-57, O-58, O-59, O-60, O-61, O-62, O-63, O-64, O-65, O-89, O-90, O-91
 - The Bar (recipes): O-67, O-68, O-69
 - Shared expenses: O-70
 - Status, monetisation, extras: O-76, O-77, O-78
@@ -105,7 +103,7 @@ Generated from FEATURES.md on 2026-10-31 by `pnpm status`. Edit FEATURES.md, not
 - Crew memory: N-22, N-23, N-24, N-37, N-38, N-39, N-40
 - Crew safety: N-25, N-26, N-27, N-28, N-29, N-36
 - Crew life: N-30, N-31, N-32, N-33, N-34, N-35
-- Everyday polish: QOL-02, QOL-07, QOL-08, QOL-10, QOL-11, QOL-12, QOL-13, QOL-16, QOL-18, QOL-19, QOL-20, QOL-21, QOL-23, QOL-27, QOL-28, QOL-30, QOL-32
+- Everyday polish: QOL-02, QOL-07, QOL-08, QOL-10, QOL-11, QOL-12, QOL-13, QOL-16, QOL-17, QOL-18, QOL-19, QOL-20, QOL-21, QOL-23, QOL-27, QOL-28, QOL-30, QOL-32
 - Delight: JOY-02, JOY-03, JOY-04, JOY-05, JOY-06, JOY-07, JOY-08, JOY-09, JOY-11, JOY-12
 - Adaptive drunk mode: ADP-01, ADP-02, ADP-03, ADP-04, ADP-05, ADP-06, ADP-08, ADP-10
 - Motion: MOT-01, MOT-02, MOT-03, MOT-04, MOT-05, MOT-06, MOT-07, MOT-09, MOT-10, MOT-13, MOT-14, MOT-15
