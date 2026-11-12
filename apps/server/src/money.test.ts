@@ -101,4 +101,101 @@ describe("rounds (N-18)", () => {
     expect(rounds.rounds).toHaveLength(1);
     expect(rounds.nextPayerId).not.toBe(jade.id);
   });
+
+  type Summary = { id: string; drinksAdded: number; amount: number; currency: string; shares: Record<string, number>; nextPayerId: string };
+  type State = { nextPayerId: string; rotation: string[]; standings: { userId: string; balance: number; nightsSincePaid: number | null }[]; pool: { currency: string } | null };
+  const logRound = (party: string, by: User, payerId: string, memberIds: string[], amount: number, extra: Record<string, unknown> = {}) =>
+    app.inject({
+      method: "POST",
+      url: `/v1/parties/${party}/rounds`,
+      headers: by.auth,
+      payload: { id: randomUUID(), payerId, memberIds, drink: { presetId: "m-pint", kind: "pint", volumeMl: 500, abv: 0.05 }, amount, currency: "EUR", ...extra },
+    });
+
+  it("explains the round with the server's own numbers and splits it server-side", async () => {
+    const { users, partyId } = await crewWithParty("jade", "malik", "ines");
+    const [jade, malik, ines] = users as [User, User, User];
+    const res = await logRound(partyId, jade, jade.id, [jade.id, malik.id, ines.id, malik.id], 2000);
+    expect(res.statusCode).toBe(201);
+    const summary = res.json() as Summary;
+    // The duplicate is dropped: three drinks, three shares adding up to the total.
+    expect(summary.drinksAdded).toBe(3);
+    expect(Object.values(summary.shares).reduce((s, v) => s + v, 0)).toBe(2000);
+    expect(Object.values(summary.shares).sort()).toEqual([666, 667, 667]);
+    expect(summary.nextPayerId).not.toBe(jade.id);
+    const expense = (await db.query<{ split: string; party_id: string }>("select split, party_id from expenses"))[0]!;
+    expect((JSON.parse(expense.split) as { members: string[] }).members).toHaveLength(3);
+    expect(expense.party_id).toBe(partyId);
+  });
+
+  it("rotates fairly across the crew's nights, not just tonight", async () => {
+    const { users, crewId, partyId } = await crewWithParty("jade", "malik", "ines");
+    const [jade, malik, ines] = users as [User, User, User];
+    const all = [jade.id, malik.id, ines.id];
+    await logRound(partyId, jade, jade.id, all, 1800);
+    await logRound(partyId, malik, malik.id, all, 1800);
+    // A second night: Inès still owes the crew, so she is first.
+    const tonight = randomUUID();
+    await app.inject({ method: "POST", url: "/v1/parties", headers: jade.auth, payload: { id: tonight, crewId, name: "Vendredi", mood: "party", kind: "party", startsAt: clock - 1_800_000, endsAt: clock + 3_600_000 } });
+    for (const u of [malik, ines]) await app.inject({ method: "POST", url: `/v1/parties/${tonight}/response`, headers: u.auth, payload: { response: "going" } });
+    const state = (await app.inject({ method: "GET", url: `/v1/parties/${tonight}/rounds`, headers: malik.auth })).json() as State;
+    expect(state.nextPayerId).toBe(ines.id);
+    expect(state.rotation).toHaveLength(3);
+    expect(state.rotation[0]).toBe(ines.id);
+    expect(state.standings.find((s) => s.userId === ines.id)).toEqual({ userId: ines.id, balance: -2, nightsSincePaid: null });
+    expect(state.standings.find((s) => s.userId === jade.id)?.nightsSincePaid).toBe(1);
+  });
+
+  it("refuses a round for someone who went home or is not at the party, and a pool in another currency", async () => {
+    const { users, partyId } = await crewWithParty("jade", "malik", "ines");
+    const [jade, malik, ines] = users as [User, User, User];
+    await app.inject({ method: "POST", url: `/v1/parties/${partyId}/status`, headers: ines.auth, payload: { homeSafe: true } });
+    expect((await logRound(partyId, jade, jade.id, [jade.id, ines.id], 1200)).json()).toMatchObject({ error: "not_in_party" });
+    expect((await logRound(partyId, jade, ines.id, [jade.id], 1200)).json()).toMatchObject({ error: "not_in_party" });
+    const stranger = await account("stranger");
+    expect((await logRound(partyId, jade, jade.id, [jade.id, stranger.id], 1200)).json()).toMatchObject({ error: "not_in_party" });
+    // The party's pool is in euros: a round in pounds would break its balances.
+    expect((await logRound(partyId, jade, jade.id, [jade.id, malik.id], 1200)).statusCode).toBe(201);
+    expect((await logRound(partyId, jade, jade.id, [jade.id, malik.id], 1200, { currency: "GBP" })).json()).toMatchObject({ error: "currency_mismatch" });
+    const state = (await app.inject({ method: "GET", url: `/v1/parties/${partyId}/rounds`, headers: jade.auth })).json() as State;
+    expect(state.pool?.currency).toBe("EUR");
+  });
+
+  it("answers a retried round with the same summary and logs it once", async () => {
+    const { users, partyId } = await crewWithParty("jade", "malik");
+    const [jade, malik] = users as [User, User];
+    const payload = { id: randomUUID(), payerId: jade.id, memberIds: [jade.id, malik.id], drink: { presetId: "m-pint", kind: "pint", volumeMl: 500, abv: 0.05 }, amount: 1400, currency: "EUR" };
+    const first = await app.inject({ method: "POST", url: `/v1/parties/${partyId}/rounds`, headers: jade.auth, payload });
+    const again = await app.inject({ method: "POST", url: `/v1/parties/${partyId}/rounds`, headers: jade.auth, payload });
+    expect(again.statusCode).toBe(200);
+    expect((again.json() as Summary).drinksAdded).toBe((first.json() as Summary).drinksAdded);
+    expect(await db.query("select id from drinks")).toHaveLength(2);
+  });
+
+  it("lets a member drop a drink they did not have, with their share of the expense", async () => {
+    const { users, partyId } = await crewWithParty("jade", "malik", "ines");
+    const [jade, malik, ines] = users as [User, User, User];
+    const { id: roundId } = (await logRound(partyId, jade, jade.id, [jade.id, malik.id, ines.id], 1800)).json() as Summary;
+    expect((await app.inject({ method: "POST", url: `/v1/rounds/${roundId}/leave`, headers: ines.auth })).statusCode).toBe(200);
+    // A retry is harmless.
+    expect((await app.inject({ method: "POST", url: `/v1/rounds/${roundId}/leave`, headers: ines.auth })).statusCode).toBe(200);
+    const live = await db.query<{ user_id: string }>("select user_id from drinks where round_id = $1 and deleted_at is null", [roundId]);
+    expect(live.map((d) => d.user_id).sort()).toEqual([jade.id, malik.id].sort());
+    const split = JSON.parse((await db.query<{ split: string }>("select split from expenses"))[0]!.split) as { members: string[] };
+    expect(split.members.sort()).toEqual([jade.id, malik.id].sort());
+    // Inès gave nothing and took nothing: the rotation forgets that round for her.
+    const state = (await app.inject({ method: "GET", url: `/v1/parties/${partyId}/rounds`, headers: ines.auth })).json() as State;
+    expect(state.standings.find((s) => s.userId === ines.id)?.balance).toBe(0);
+    expect(state.standings.find((s) => s.userId === malik.id)?.balance).toBe(-1);
+
+    // Removing the drink from the history does the same; the last one out removes the round.
+    const malikDrink = (await db.query<{ id: string }>("select id from drinks where round_id = $1 and user_id = $2", [roundId, malik.id]))[0]!.id;
+    await app.inject({ method: "POST", url: "/v1/mutations", headers: malik.auth, payload: { mutations: [{ key: randomUUID(), mutation: { kind: "drink.remove", drink: { id: malikDrink } } }] } });
+    await app.inject({ method: "POST", url: `/v1/rounds/${roundId}/leave`, headers: jade.auth });
+    expect(await db.query("select 1 from rounds where id = $1", [roundId])).toHaveLength(0);
+    expect((await db.query<{ deleted_at: number | null }>("select deleted_at from expenses"))[0]!.deleted_at).not.toBeNull();
+    // Someone who was not in the round cannot touch it.
+    const { id: other } = (await logRound(partyId, jade, jade.id, [jade.id], 600)).json() as Summary;
+    expect((await app.inject({ method: "POST", url: `/v1/rounds/${other}/leave`, headers: malik.auth })).statusCode).toBe(404);
+  });
 });

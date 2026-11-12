@@ -671,7 +671,7 @@ Board-wide gaps:
 | N-12 | missing | Only popular days. | B §2.7 |
 | N-14, N-15 | partial | Heatmap only; Wrapped entry only, no monthly recap. | C §2.8 |
 | N-17 | partial | No selective deletion. | C §5.1 |
-| N-18 | partial | No choice of participants or drink; adds drinks to others' BAC without their confirmation (AC-07 question). | C §5.1 |
+| N-18 | partial | Server side done and tested: fair rotation computed from the crew's whole history, equal split and currency checks server-side, only people present, retry-safe, one-tap "not for me" (drops the drink and the share). Still missing: the phone screen (pick participants and drink, show the server's rotation and summary, "not for me" action) and the 7 locale strings. | C §5.1 |
 | N-19 | partial | Static chips; no editable amounts. | C §2.8 |
 | N-20 | partial | The 90 % alert is not shown. | C §5.1 |
 | N-22 | partial | No photos or highlights in the timeline. | B §2.7 |

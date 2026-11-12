@@ -3,10 +3,11 @@ import { readFile, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { balances, convertAmount, inPoolCurrency, nextRoundPayer, parseRate, settle, shares, SplitError, type Expense, type Split } from "@crew/money";
+import { balances, convertAmount, inPoolCurrency, parseRate, settle, shares, SplitError, type Expense, type Split } from "@crew/money";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { newId } from "../crypto";
 import { RateLimiter } from "../ratelimit";
+import { dropFromRound, presentAt, rotationFor } from "../rounds";
 import { photoDir } from "./photos";
 import { checkOvertakes, notifyRound } from "../notifications/producers";
 
@@ -378,7 +379,10 @@ export function moneyRoutes(app: FastifyInstance, ctx: Context): void {
     return { ok: true };
   });
 
-  /** N-18: rounds of a party and who should pay the next one. */
+  /**
+   * N-18: tonight's rounds, who is there, and the fair rotation computed here from the crew's whole
+   * round history. The phone only shows it: it never sends a rotation back.
+   */
   app.get<{ Params: { id: string } }>("/v1/parties/:id/rounds", async (request) => {
     const user = requireUser(request);
     const party = (
@@ -392,24 +396,63 @@ export function moneyRoutes(app: FastifyInstance, ctx: Context): void {
       "select id, payer_id, amount, currency, member_ids, created_at from rounds where party_id = $1 order by created_at desc",
       [request.params.id],
     );
-    const present = await ctx.db.query<{ user_id: string; display_name: string }>(
-      "select m.user_id, u.display_name from party_members m join users u on u.id = m.user_id where m.party_id = $1 and m.response = 'going' and m.home_safe_at is null",
-      [request.params.id],
-    );
-    const next = nextRoundPayer(
+    const present = await presentAt(ctx.db, request.params.id);
+    const rotation = await rotationFor(
+      ctx.db,
+      party.crew_id,
+      request.params.id,
       present.map((p) => p.user_id),
-      rounds.map((r) => ({ payerId: r.payer_id, amount: r.amount, at: r.created_at })),
     );
+    // The round's expense lands in this pool, so its amount has to be in the pool's currency.
+    const pool = (await ctx.db.query<{ id: string; currency: string }>("select id, currency from pools where party_id = $1 and closed_at is null limit 1", [request.params.id]))[0];
     return {
       rounds: rounds.map((r) => ({ id: r.id, payerId: r.payer_id, amount: r.amount, currency: r.currency, memberIds: JSON.parse(r.member_ids) as string[], at: r.created_at })),
       present: present.map((p) => ({ userId: p.user_id, name: p.display_name })),
-      nextPayerId: next,
+      nextPayerId: rotation.order[0] ?? null,
+      rotation: rotation.order,
+      standings: rotation.standings,
+      pool: pool ? { id: pool.id, currency: pool.currency } : null,
     };
   });
 
   /**
+   * N-18: what a logged round did, worked out here so the phone explains the server's numbers:
+   * drinks added, the total in the pool, each member's share and who pays the next one.
+   */
+  async function roundSummary(roundId: string, crewId: string, partyId: string) {
+    const round = (
+      await ctx.db.query<{ amount: number; currency: string; payer_id: string; member_ids: string; expense_id: string | null }>(
+        "select amount, currency, payer_id, member_ids, expense_id from rounds where id = $1",
+        [roundId],
+      )
+    )[0];
+    const present = await presentAt(ctx.db, partyId);
+    const rotation = await rotationFor(
+      ctx.db,
+      crewId,
+      partyId,
+      present.map((p) => p.user_id),
+    );
+    if (!round) return { id: roundId, drinksAdded: 0, amount: 0, currency: null, shares: {}, nextPayerId: rotation.order[0] ?? null };
+    const memberIds = JSON.parse(round.member_ids) as string[];
+    return {
+      id: roundId,
+      drinksAdded: memberIds.length,
+      amount: round.expense_id ? round.amount : 0,
+      currency: round.currency,
+      shares: round.expense_id ? shares({ id: roundId, payerId: round.payer_id, amount: round.amount, currency: round.currency, split: { kind: "equal", members: memberIds } }) : {},
+      nextPayerId: rotation.order[0] ?? null,
+    };
+  }
+
+  /** A round adds a drink to other people's nights: a burst of them is refused, not queued. */
+  const roundLogs = new RateLimiter(20, 3_600_000, ctx.now);
+
+  /**
    * N-18: one tap logs a drink for every member of the round AND the expense in the party pool.
-   * Drinks created for others are theirs: they see them in their history and can remove them.
+   * Everyone in it must be at the party right now. Drinks created for others are theirs: they see
+   * them in their history, they stay unverified for leaderboards (AC-07), and dropping one, here or
+   * from the history, also drops that person's share of the expense.
    */
   app.post<{ Params: { id: string } }>("/v1/parties/:id/rounds", async (request, reply) => {
     const user = requireUser(request);
@@ -425,6 +468,7 @@ export function moneyRoutes(app: FastifyInstance, ctx: Context): void {
         description: z.string().trim().min(1).max(80).optional(),
       })
       .parse(request.body);
+    const memberIds = [...new Set(input.memberIds)];
     const party = (
       await ctx.db.query<{ crew_id: string; name: string; closed_at: number | null }>(
         "select p.crew_id, p.name, p.closed_at from parties p join party_members m on m.party_id = p.id and m.user_id = $2 and m.response = 'going' where p.id = $1",
@@ -432,31 +476,30 @@ export function moneyRoutes(app: FastifyInstance, ctx: Context): void {
       )
     )[0];
     if (!party) throw new HttpError(404, "not_found");
+    // A retry of a round already logged gets the same answer, whatever changed since.
+    if ((await ctx.db.query("select 1 from rounds where id = $1 and party_id = $2", [input.id, request.params.id])).length) {
+      return reply.status(200).send(await roundSummary(input.id, party.crew_id, request.params.id));
+    }
     if (party.closed_at !== null) throw new HttpError(400, "party_closed");
     const going = new Set(
       (await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1 and response = 'going'", [request.params.id])).map((m) => m.user_id),
     );
-    if (!going.has(input.payerId) || input.memberIds.some((m) => !going.has(m))) throw new HttpError(400, "not_in_party");
-    const existing = await ctx.db.query("select 1 from rounds where id = $1", [input.id]);
-    if (existing.length) return reply.status(200).send({ id: input.id });
+    // Only people still out tonight: someone home safe does not get a drink added to their night.
+    const present = new Set((await presentAt(ctx.db, request.params.id)).map((p) => p.user_id));
+    if (!present.has(input.payerId) || memberIds.some((m) => !present.has(m))) throw new HttpError(400, "not_in_party");
+    const pool = (await ctx.db.query<{ id: string; currency: string }>("select id, currency from pools where party_id = $1 and closed_at is null limit 1", [request.params.id]))[0];
+    if (input.amount > 0 && pool && pool.currency !== input.currency) throw new HttpError(400, "currency_mismatch");
+    roundLogs.check(user.id);
 
     const now = ctx.now();
     await ctx.db.transaction(async (tx) => {
-      for (const memberId of input.memberIds) {
-        const sealed = ctx.sealer.seal({ volumeMl: input.drink.volumeMl, abv: input.drink.abv, withFood: false, name: input.drink.name ?? null });
-        await tx.query(
-          `insert into drinks (id, user_id, party_id, kind, preset_id, sealed, consumed_at, logged_at, updated_at) values ($1, $2, $3, $4, $5, $6, $7, $7, $7)`,
-          [newId(), memberId, request.params.id, input.drink.kind, input.drink.presetId, sealed, now],
-        );
-        await tx.query("update party_members set last_activity_at = $3 where party_id = $1 and user_id = $2", [request.params.id, memberId, now]);
-      }
       let expenseId: string | null = null;
       if (input.amount > 0) {
-        let pool = (await tx.query<{ id: string }>("select id from pools where party_id = $1 and closed_at is null limit 1", [request.params.id]))[0];
-        if (!pool) {
-          pool = { id: newId() };
+        let poolId = pool?.id;
+        if (!poolId) {
+          poolId = newId();
           await tx.query("insert into pools (id, crew_id, party_id, name, currency, created_by, created_at) values ($1, $2, $3, $4, $5, $6, $7)", [
-            pool.id,
+            poolId,
             party.crew_id,
             request.params.id,
             party.name || (input.description ?? input.drink.kind),
@@ -465,11 +508,23 @@ export function moneyRoutes(app: FastifyInstance, ctx: Context): void {
             now,
           ]);
         }
-        for (const memberId of new Set([...going])) await tx.query("insert into pool_members (pool_id, user_id) values ($1, $2) on conflict do nothing", [pool.id, memberId]);
+        for (const memberId of going) await tx.query("insert into pool_members (pool_id, user_id) values ($1, $2) on conflict do nothing", [poolId, memberId]);
         expenseId = newId();
+        // The split is the server's: equal between the people who got a drink, never sent by the phone.
         await tx.query(
-          `insert into expenses (id, pool_id, payer_id, amount, currency, description, split, created_by, created_at) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-          [expenseId, pool.id, input.payerId, input.amount, input.currency, input.description ?? input.drink.name ?? input.drink.kind, JSON.stringify({ kind: "equal", members: input.memberIds }), user.id, now],
+          `insert into expenses (id, pool_id, payer_id, amount, currency, description, split, created_by, created_at, party_id) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+          [
+            expenseId,
+            poolId,
+            input.payerId,
+            input.amount,
+            input.currency,
+            input.description ?? input.drink.name ?? input.drink.kind,
+            JSON.stringify({ kind: "equal", members: memberIds }),
+            user.id,
+            now,
+            request.params.id,
+          ],
         );
       }
       await tx.query("insert into rounds (id, party_id, payer_id, amount, currency, member_ids, expense_id, created_at) values ($1, $2, $3, $4, $5, $6, $7, $8)", [
@@ -478,15 +533,56 @@ export function moneyRoutes(app: FastifyInstance, ctx: Context): void {
         input.payerId,
         input.amount,
         input.currency,
-        JSON.stringify(input.memberIds),
+        JSON.stringify(memberIds),
         expenseId,
         now,
       ]);
+      for (const memberId of memberIds) {
+        const sealed = ctx.sealer.seal({ volumeMl: input.drink.volumeMl, abv: input.drink.abv, withFood: false, name: input.drink.name ?? null });
+        await tx.query(
+          `insert into drinks (id, user_id, party_id, kind, preset_id, sealed, consumed_at, logged_at, updated_at, round_id) values ($1, $2, $3, $4, $5, $6, $7, $7, $7, $8)`,
+          [newId(), memberId, request.params.id, input.drink.kind, input.drink.presetId, sealed, now, input.id],
+        );
+        await tx.query("update party_members set last_activity_at = $3 where party_id = $1 and user_id = $2", [request.params.id, memberId, now]);
+      }
     });
     ctx.live.notify(going, { type: "party.changed", partyId: request.params.id });
     ctx.live.notify(going, { type: "sync", reason: "own_write" });
-    await notifyRound(ctx, request.params.id, input.id, input.memberIds, user.id);
+    if (input.amount > 0) ctx.live.notify(going, { type: "crew.changed", crewId: party.crew_id });
+    await notifyRound(ctx, request.params.id, input.id, memberIds, user.id);
     await checkOvertakes(ctx, request.params.id);
-    return reply.status(201).send({ id: input.id });
+    return reply.status(201).send(await roundSummary(input.id, party.crew_id, request.params.id));
+  });
+
+  /**
+   * N-18: "not for me". A member of a round who did not have that drink drops it in one tap: the
+   * drink leaves their night and their share leaves the expense. Open after the party too, since
+   * people notice the next morning.
+   */
+  app.post<{ Params: { id: string } }>("/v1/rounds/:id/leave", async (request) => {
+    const user = requireUser(request);
+    uuid.parse(request.params.id);
+    const round = (
+      await ctx.db.query<{ party_id: string; crew_id: string }>(
+        "select r.party_id, p.crew_id from rounds r join parties p on p.id = r.party_id join crew_members m on m.crew_id = p.crew_id and m.user_id = $2 where r.id = $1",
+        [request.params.id, user.id],
+      )
+    )[0];
+    if (!round) {
+      // Already dropped (a retry, or the round went with its last member): same answer.
+      if ((await ctx.db.query("select 1 from drinks where round_id = $1 and user_id = $2", [request.params.id, user.id])).length) return { ok: true };
+      throw new HttpError(404, "not_found");
+    }
+    const now = ctx.now();
+    const dropped = await ctx.db.transaction((tx) => dropFromRound(tx, request.params.id, user.id, now));
+    if (!dropped) {
+      if ((await ctx.db.query("select 1 from drinks where round_id = $1 and user_id = $2", [request.params.id, user.id])).length) return { ok: true };
+      throw new HttpError(404, "not_found");
+    }
+    const going = (await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1 and response = 'going'", [round.party_id])).map((m) => m.user_id);
+    ctx.live.notify(going, { type: "party.changed", partyId: round.party_id });
+    ctx.live.notify([user.id], { type: "sync", reason: "own_write" });
+    if (dropped.poolId) ctx.live.notify(going, { type: "crew.changed", crewId: round.crew_id });
+    return { ok: true };
   });
 }

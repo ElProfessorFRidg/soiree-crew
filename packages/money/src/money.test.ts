@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { balances, convertAmount, formatMoney, inPoolCurrency, nextRoundPayer, parseAmount, parseRate, settle, shares, SplitError, type Expense } from "./index";
+import { balances, convertAmount, formatMoney, inPoolCurrency, parseAmount, parseRate, roundRotation, settle, shares, SplitError, type Expense, type RoundRecord } from "./index";
 
 const eur = (id: string, payerId: string, amount: number, split: Expense["split"]): Expense => ({ id, payerId, amount, currency: "EUR", split });
 
@@ -48,14 +48,72 @@ describe("balances and settlement (O-70)", () => {
   });
 });
 
-describe("rounds (N-18)", () => {
-  it("picks whoever has paid the fewest rounds, then the least", () => {
+describe("round rotation (N-18)", () => {
+  const round = (payerId: string, memberIds: string[], at: number, partyId = "tonight"): RoundRecord => ({ payerId, memberIds, at, partyId });
+
+  it("gives everyone one turn when nobody has paid yet, in a stable order", () => {
+    const { order, standings } = roundRotation(["malik", "jade", "ines"], [], "tonight");
+    expect(order).toEqual(["ines", "jade", "malik"]);
+    expect(standings.every((s) => s.balance === 0 && s.nightsSincePaid === null)).toBe(true);
+  });
+
+  it("sends whoever received the most drinks without paying first", () => {
+    const history = [round("jade", ["jade", "malik", "ines"], 1), round("malik", ["jade", "malik", "ines"], 2)];
+    // Jade +2 -1, Malik +2 -1, Inès -2: Inès pays.
+    expect(roundRotation(["jade", "malik", "ines"], history, "tonight").order[0]).toBe("ines");
+    // Without Inès, Jade and Malik are even; Jade paid longer ago.
+    expect(roundRotation(["jade", "malik"], history, "tonight").order[0]).toBe("jade");
+  });
+
+  it("counts drinks given, so a big round pushes its payer back several turns", () => {
+    const five = ["a", "b", "c", "d", "e"];
+    const { order, standings } = roundRotation(five, [round("a", five, 1)], "tonight");
+    expect(standings.find((s) => s.userId === "a")!.balance).toBe(4);
+    // Everyone else pays once, then the books are even and A comes back.
+    expect(order).toEqual(["b", "c", "d", "e", "a"]);
+  });
+
+  it("lets someone far behind pay twice in a row", () => {
+    const history = [round("jade", ["jade", "malik"], 1), round("jade", ["jade", "malik"], 2)];
+    expect(roundRotation(["jade", "malik"], history, "tonight").order).toEqual(["malik", "malik"]);
+  });
+
+  it("credits every member when the payer did not drink", () => {
+    const { standings } = roundRotation(["jade", "malik", "ines"], [round("jade", ["malik", "ines"], 1)], "tonight");
+    expect(standings.map((s) => s.balance)).toEqual([2, -1, -1]);
+  });
+
+  it("counts the drinks received from people who are not here tonight", () => {
+    const history = [round("theo", ["theo", "jade"], 1, "last-week")];
+    const { order, standings } = roundRotation(["jade", "malik"], history, "tonight");
+    expect(order).toEqual(["jade", "malik"]);
+    expect(standings[0]!.balance).toBe(-1);
+  });
+
+  it("counts nights since someone last paid over the crew's nights with rounds", () => {
     const history = [
-      { payerId: "jade", amount: 2400, at: 1 },
-      { payerId: "malik", amount: 1800, at: 2 },
+      round("ines", ["ines", "jade"], 1, "night-1"),
+      round("jade", ["ines", "jade"], 2, "night-2"),
+      round("ines", ["ines", "jade"], 3, "night-3"),
+      round("malik", ["malik", "jade"], 4, "tonight"),
     ];
-    expect(nextRoundPayer(["jade", "malik", "ines"], history)).toBe("ines");
-    expect(nextRoundPayer(["jade", "malik"], history)).toBe("malik");
+    const standings = roundRotation(["jade", "ines", "malik", "lea"], history, "tonight").standings;
+    expect(standings.map((s) => s.nightsSincePaid)).toEqual([2, 1, 0, null]);
+  });
+
+  it("counts tonight as the next night when no round was logged yet", () => {
+    const standings = roundRotation(["jade"], [round("jade", ["jade", "malik"], 1, "last-week")], "tonight").standings;
+    expect(standings[0]!.nightsSincePaid).toBe(1);
+  });
+
+  it("breaks a tie by who paid longest ago, never paid first", () => {
+    const history = [round("jade", ["jade", "ines"], 1), round("ines", ["jade", "ines"], 2)];
+    expect(roundRotation(["ines", "jade", "lea"], history, "tonight").order).toEqual(["lea", "jade", "ines"]);
+  });
+
+  it("ignores duplicate ids and has no one to name when nobody is there", () => {
+    expect(roundRotation(["jade", "jade"], [round("jade", ["jade", "jade", "malik"], 1)], "tonight").standings).toEqual([{ userId: "jade", balance: 1, nightsSincePaid: 0 }]);
+    expect(roundRotation([], [], "tonight")).toEqual({ order: [], standings: [] });
   });
 });
 

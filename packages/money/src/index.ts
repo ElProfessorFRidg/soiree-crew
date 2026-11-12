@@ -126,24 +126,80 @@ export function settle(balance: Readonly<Record<string, number>>): Transfer[] {
   return transfers;
 }
 
+/** N-18: one round as the rotation sees it. */
+export interface RoundRecord {
+  payerId: string;
+  /** Who got a drink, the payer included when they had one. */
+  memberIds: readonly string[];
+  /** The night it was bought on: "nights since" counts the crew's nights with at least one round. */
+  partyId: string;
+  at: number;
+}
+
+export interface RotationStanding {
+  userId: string;
+  /** Drinks bought for others minus drinks received in others' rounds, over the crew's history. */
+  balance: number;
+  /** Nights since this person last paid a round: 0 tonight, null if they never did. */
+  nightsSincePaid: number | null;
+}
+
+export interface RoundRotation {
+  /** Who pays the coming rounds, one turn per person present; someone far behind can come twice. */
+  order: string[];
+  /** One line per person present, in the order they were given. */
+  standings: RotationStanding[];
+}
+
 /**
- * N-18 fair rotation: among the people present, who pays the next round. Fewest rounds paid
- * first, then the smallest total paid, then whoever paid least recently.
+ * N-18 fair rotation, computed from the crew's whole round history. Everyone keeps a balance of
+ * drinks: a round adds one per other member to its payer and takes one from each member it served.
+ * The lowest balance pays next; ties go to whoever paid longest ago (never first), then by id so the
+ * answer is stable. The order is a simulation: each predicted turn is a round for everyone present.
+ * Drinks are counted, not money: a crew takes rounds in turns, and amounts come in several currencies.
  */
-export function nextRoundPayer(
-  present: readonly string[],
-  history: readonly { payerId: string; amount: number; at: number }[],
-): string | null {
-  if (!present.length) return null;
-  const stats = new Map(present.map((id) => [id, { rounds: 0, total: 0, last: 0 }]));
-  for (const round of history) {
-    const s = stats.get(round.payerId);
-    if (!s) continue;
-    s.rounds += 1;
-    s.total += round.amount;
-    s.last = Math.max(s.last, round.at);
+export function roundRotation(present: readonly string[], history: readonly RoundRecord[], tonightId: string): RoundRotation {
+  const people = [...new Set(present)];
+  const sorted = [...history].sort((a, b) => a.at - b.at);
+  const nights: string[] = [];
+  for (const round of sorted) if (!nights.includes(round.partyId)) nights.push(round.partyId);
+  if (!nights.includes(tonightId)) nights.push(tonightId);
+  const tonight = nights.indexOf(tonightId);
+
+  const stats = new Map<string, { balance: number; lastPaidAt: number | null; lastNight: number | null }>();
+  const stat = (id: string) => {
+    let s = stats.get(id);
+    if (!s) stats.set(id, (s = { balance: 0, lastPaidAt: null, lastNight: null }));
+    return s;
+  };
+  for (const id of people) stat(id);
+  for (const round of sorted) {
+    const served = [...new Set(round.memberIds)].filter((id) => id !== round.payerId);
+    const payer = stat(round.payerId);
+    payer.balance += served.length;
+    payer.lastPaidAt = round.at;
+    payer.lastNight = nights.indexOf(round.partyId);
+    for (const id of served) stat(id).balance -= 1;
   }
-  return [...stats.entries()].sort(([a, x], [b, y]) => x.rounds - y.rounds || x.total - y.total || x.last - y.last || a.localeCompare(b))[0]![0];
+
+  const standings = people.map((userId) => {
+    const s = stat(userId);
+    return { userId, balance: s.balance, nightsSincePaid: s.lastNight === null ? null : Math.max(0, tonight - s.lastNight) };
+  });
+
+  // Each predicted turn counts as paid after everything real, in the order it would happen.
+  const sim = new Map(people.map((id) => [id, { balance: stat(id).balance, lastPaidAt: stat(id).lastPaidAt }]));
+  const latest = sorted.length ? sorted[sorted.length - 1]!.at : 0;
+  const order: string[] = [];
+  for (let turn = 0; turn < people.length; turn++) {
+    const next = [...sim.entries()].sort(
+      ([a, x], [b, y]) => x.balance - y.balance || (x.lastPaidAt ?? -Infinity) - (y.lastPaidAt ?? -Infinity) || a.localeCompare(b),
+    )[0]![0];
+    order.push(next);
+    for (const [id, s] of sim) s.balance += id === next ? people.length - 1 : -1;
+    sim.get(next)!.lastPaidAt = latest + turn + 1;
+  }
+  return { order, standings };
 }
 
 /**
