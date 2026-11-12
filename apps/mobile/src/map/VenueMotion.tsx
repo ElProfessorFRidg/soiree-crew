@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native";
 import Animated, { cancelAnimation, Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 import { duration, scaled } from "@crew/design-tokens";
 import { easings } from "@/motion/easing";
+import { useEcoLoop } from "@/power/eco";
 
 // MOT-09, DESIGN.md §5 "Venue takeover" and "Live dot": what moves on a venue pin of the Bars map.
 // `still` covers Reduce Motion and UI levels 2 and 3: the end state shows at once, nothing loops.
@@ -67,6 +68,7 @@ export function TakeoverWash({ takeoverAt, color, size, still }: { takeoverAt: n
 export function LivePulse({ live, color, size, still }: { live: boolean; color: string; size: number; still: boolean }) {
   const reduceMotion = useReducedMotion();
   const opacity = useSharedValue(1);
+  const loop = useEcoLoop(true);
   const moving = live && !still && !reduceMotion;
   useEffect(() => {
     if (!moving) {
@@ -74,9 +76,9 @@ export function LivePulse({ live, color, size, still }: { live: boolean; color: 
       opacity.value = 1;
       return;
     }
-    opacity.value = withRepeat(withTiming(0.35, { duration: scaled(PULSE_MS) / 2, easing: Easing.inOut(Easing.quad) }), -1, true);
+    opacity.value = withRepeat(withTiming(0.35, { duration: (scaled(PULSE_MS) / 2) * loop.slow, easing: Easing.inOut(Easing.quad) }), loop.count, true);
     return () => cancelAnimation(opacity);
-  }, [moving, opacity]);
+  }, [moving, opacity, loop.count, loop.slow]);
   const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
   if (!live) return null;
   const ring = size + 12;

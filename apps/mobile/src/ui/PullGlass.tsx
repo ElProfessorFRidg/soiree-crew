@@ -17,6 +17,7 @@ import Animated, {
 import Svg, { ClipPath, Defs, Path } from "react-native-svg";
 import { duration, glassIcons, spring } from "@crew/design-tokens";
 import { useTheme } from "@/theme";
+import { useEcoLoop } from "@/power/eco";
 import { pullProgress } from "./pure/pullProgress";
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
@@ -60,6 +61,8 @@ export function PullGlass({ scrollY, refreshing, top }: Props) {
   const level = useSharedValue(1);
   const phase = useSharedValue(0);
   const tilt = useSharedValue(0);
+  const loop = useEcoLoop(false);
+  const tiltLoop = useEcoLoop(true);
 
   useEffect(() => {
     if (refreshing) {
@@ -68,12 +71,12 @@ export function PullGlass({ scrollY, refreshing, top }: Props) {
         // Poured from low to the brim, a short pause full, then drunk and poured again.
         level.value = 0.15;
         level.value = withRepeat(
-          withSequence(withTiming(1, { duration: 750, easing: Easing.out(Easing.cubic) }), withDelay(150, withTiming(0.15, { duration: 250, easing: Easing.in(Easing.quad) }))),
-          -1,
+          withSequence(withTiming(1, { duration: 750 * loop.slow, easing: Easing.out(Easing.cubic) }), withDelay(150 * loop.slow, withTiming(0.15, { duration: 250 * loop.slow, easing: Easing.in(Easing.quad) }))),
+          loop.count,
           false,
         );
-        phase.value = withRepeat(withTiming(Math.PI * 2, { duration: 900, easing: Easing.linear }), -1, false);
-        tilt.value = withRepeat(withSequence(withTiming(1, { duration: 380, easing: Easing.inOut(Easing.sin) }), withTiming(-1, { duration: 380, easing: Easing.inOut(Easing.sin) })), -1, true);
+        phase.value = withRepeat(withTiming(Math.PI * 2, { duration: 900 * loop.slow, easing: Easing.linear }), loop.count, false);
+        tilt.value = withRepeat(withSequence(withTiming(1, { duration: 380 * loop.slow, easing: Easing.inOut(Easing.sin) }), withTiming(-1, { duration: 380 * loop.slow, easing: Easing.inOut(Easing.sin) })), -1, true);
       }
       return;
     }
@@ -83,7 +86,7 @@ export function PullGlass({ scrollY, refreshing, top }: Props) {
     level.value = withTiming(1, { duration: duration.press });
     tilt.value = withSpring(0, spring.snap);
     held.value = reduceMotion ? withTiming(0, { duration: duration.toggle }) : withDelay(120, withSpring(0, spring.snap));
-  }, [refreshing, reduceMotion, held, level, phase, tilt]);
+  }, [refreshing, reduceMotion, held, level, phase, tilt, loop.count, loop.slow, tiltLoop.count]);
 
   const amountOf = () => {
     "worklet";

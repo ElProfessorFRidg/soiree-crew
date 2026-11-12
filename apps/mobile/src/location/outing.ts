@@ -241,7 +241,7 @@ if (supported) {
 }
 
 /** The options the updates were started with in this run: a change, or a new launch, restarts them. */
-let startedFor: boolean | null = null;
+let startedFor: string | null = null;
 
 /**
  * Turns the background updates on, once both permissions are there. Low power for the outing
@@ -253,11 +253,13 @@ export async function startOuting(): Promise<boolean> {
   const background = await Location.getBackgroundPermissionsAsync().catch(() => null);
   if (!background?.granted) return false;
   const drive = await driveAlertEnabled();
+  const saving = await savingPowerNow();
+  const key = `${drive}:${saving}`;
   if (await Location.hasStartedLocationUpdatesAsync(OUTING_TASK).catch(() => false)) {
-    if (startedFor === drive) return true;
+    if (startedFor === key) return true;
     await Location.stopLocationUpdatesAsync(OUTING_TASK).catch(() => undefined);
   }
-  const plan = locationPlan(drive, await savingPowerNow());
+  const plan = locationPlan(drive, saving);
   try {
     await Location.startLocationUpdatesAsync(OUTING_TASK, {
       // Cell and Wi-Fi level: enough to tell "still at the same bar" from "moved on". Spaced out in eco mode (QOL-24).
@@ -270,7 +272,7 @@ export async function startOuting(): Promise<boolean> {
       pausesUpdatesAutomatically: true,
       showsBackgroundLocationIndicator: false,
     });
-    startedFor = drive;
+    startedFor = key;
     return true;
   } catch {
     return false;
