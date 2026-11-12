@@ -9,6 +9,7 @@ import { haptic } from "@/motion/haptics";
 import { refreshBirthdays, useBirthdays, type Birthday } from "@/server/calendarData";
 import { callCrew, clearNightStatus, refreshRadar, replyToCall, setNightStatus, useRadar, type NightStatus } from "@/server/radarData";
 import { useSession } from "@/server/session";
+import { refreshVenues, useVenueData } from "@/server/venueData";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
 import { Button } from "@/ui/Button";
@@ -27,6 +28,31 @@ import { showFailure } from "@/server/errors";
 const STATUSES: readonly NightStatus[] = ["going_out", "maybe", "home", "unavailable"];
 /** QOL-21: the crew tab mentions a birthday from this many days before. */
 const BIRTHDAY_CARD_DAYS = 6;
+
+/** QOL-17: three of us at one venue and no party running: one tap to start it together. */
+function GatheringCard({ crewId }: { crewId: string }) {
+  const i18n = useT();
+  const gathering = useVenueData((state) => state.byCrew[crewId]?.gathering);
+  useEffect(() => {
+    void refreshVenues(crewId).catch(() => undefined);
+  }, [crewId]);
+  if (!gathering) return null;
+  return (
+    <Panel style={styles.birthday}>
+      <Icon name="users" />
+      <View style={styles.flex}>
+        <Text variant="h3">{i18n.t("notify.gatheringBanner.title", { count: gathering.count, venue: gathering.venueName })}</Text>
+        <Text variant="small">{i18n.t("notify.gatheringBanner.body")}</Text>
+      </View>
+      <Button
+        label={i18n.t("notify.gatheringBanner.start")}
+        variant="secondary"
+        height={40}
+        onPress={() => router.push({ pathname: "/new-party", params: { crewId, name: gathering.venueName } })}
+      />
+    </Panel>
+  );
+}
 
 /** QOL-21: "Jade's birthday on Thursday", and a party already filled in one tap away. */
 function BirthdayCard({ birthday, crewId }: { birthday: Birthday; crewId: string }) {
@@ -128,6 +154,7 @@ export function RadarSection({ crewId }: { crewId: string }) {
         </Animated.View>
       ) : null}
 
+      <GatheringCard crewId={crewId} />
       {soon.map((b) => (
         <BirthdayCard key={b.userId} birthday={b} crewId={crewId} />
       ))}

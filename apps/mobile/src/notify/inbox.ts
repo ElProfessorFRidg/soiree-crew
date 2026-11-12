@@ -6,6 +6,9 @@ import { api } from "@/server/api";
 /** QOL-30: the server's fixed taxonomy (apps/server/src/notifications/kinds.ts). */
 export const NOTIFICATION_KINDS = [
   "crewNearby",
+  "gathering",
+  "partyStarted",
+  "closingSoon",
   "outCall",
   "round",
   "recapReady",
@@ -104,7 +107,10 @@ export function itemRoute(item: Pick<InboxItem, "kind" | "partyId" | "refId">): 
     case "newDevice":
       return "/settings?section=security";
     case "outCall":
+    case "gathering":
       return "/(tabs)/crew";
+    case "partyStarted":
+      return party ? `/live?id=${party}` : "/(tabs)";
     default:
       return "/(tabs)";
   }

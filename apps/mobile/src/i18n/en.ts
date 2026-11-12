@@ -2469,6 +2469,19 @@ export const en: Messages = {
   },
   // O-38, N-35, QOL-03, QOL-30: the notification centre, push text (generic) and actions.
   notify: {
+    gathering: {
+      push: { v1: "Several of the crew are in the same place. A party together?", v2: "The crew is together. Who hits the button?", v3: "That's a crowd in one place. Start the party?", v4: "The crew is all here, or nearly. Make it official?" },
+      item: { v1: "{count} of you at {venue}. Start a party together?", v2: "{count} from the crew at {venue}, only the Start button is missing.", v3: "{venue}: {count} of the crew in one place. Make the party official?", v4: "It's filling up at {venue} ({count}). Starting it?" },
+    },
+    partyStarted: {
+      push: { v1: "The crew just started a party. Joining?", v2: "It's kicking off without you. Hurry!", v3: "A party is on, your spot is waiting.", v4: "The crew is rolling. Someone's missing..." },
+      item: { v1: "{name} just launched {party}. Joining?", v2: "{party} is starting, launched by {name}. Your spot is waiting.", v3: "{name} opened the floor with {party}. Coming?", v4: "{party} just began, {name} is waiting for you." },
+    },
+    closingSoon: {
+      push: { v1: "Closing in half an hour. Last round?", v2: "Final stretch, closing soon.", v3: "The curtain falls soon. Plan what's next!", v4: "Not much time before closing." },
+      item: { v1: "{venue} closes in {minutes} min. Last round?", v2: "Only {minutes} min until {venue} closes.", v3: "{venue} pulls the shutter in {minutes} min. What's next?", v4: "Last drink at {venue}: closing in {minutes} min." },
+    },
+    gatheringBanner: { title: "{count} of the crew at {venue}", body: "Start a party together, it takes one tap.", start: "Start the party" },
     crewNearby: {
       live: { v1: "{name} and the crew are out right next to you. Start yours?", v2: "{name} already kicked off the night nearby. You in?", v3: "Glasses are clinking next door: {name} is out. Start your night?", v4: "{name} and the crew got going close by. And you?", v5: "{name} is out a stone's throw away. Start yours!", v6: "The crew is warming up next door, {name} opened the floor. You in?", v7: "{name} is already at it, right next to you. We're waiting!", v8: "Next door, {name} and the crew have started. Start your night?" },
       pushLive: { v1: "The crew is out right next to you. Start yours?", v2: "It's started just nearby. You in?", v3: "Glasses are clinking next door. Start your night?", v4: "The crew got going close by. And you?", v5: "A night is on a stone's throw away. Start yours!", v6: "The crew is warming up next door. You in?", v7: "They're already at it, right next to you. We're waiting!", v8: "Next door, the crew has started. Start your night?" },
@@ -2497,6 +2510,9 @@ export const en: Messages = {
     },
     kinds: {
       outCall: "Who's in?",
+      gathering: "Crew together in one place",
+      partyStarted: "A party launched by the crew",
+      closingSoon: "Closing soon",
       crewNearby: "Crew together nearby",
       round: "Rounds for you",
       recapReady: "Recap ready",
@@ -2531,6 +2547,9 @@ export const en: Messages = {
     },
     push: {
       outCall: { title: "Who's in?", body: "Someone in your crew is going out tonight." },
+      gathering: { title: "You're together", body: "Crew members are in the same place. Start a party?" },
+      partyStarted: { title: "A party just started", body: "Someone in the crew just launched a party." },
+      closingSoon: { title: "Closing soon", body: "The place you're at closes in half an hour." },
       crewNearby: { title: "The crew is around", body: "People from the crew are together nearby." },
       round: { title: "A round for you", body: "Someone got you a drink. Open to confirm." },
       recapReady: { title: "Recap ready", body: "The recap of the party is waiting." },

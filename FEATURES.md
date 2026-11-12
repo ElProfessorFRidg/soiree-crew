@@ -265,7 +265,7 @@ O-71 to O-75, O-79 and O-80 are retired as-is per the `<decision>` in `PROMPT.md
 | QOL-14 | P0 | Backstage | partial | Navigation without traps: Android back and iOS swipe-back work everywhere, sheets close with a swipe, the app ... |
 | QOL-15 | P1 | Arrivee.dc.html | partial | Try before signing up: games and the Bar work without an account; sign-up is asked only when the user needs a ... |
 | QOL-16 | P1 | Soirees.dc.html | build | Defaults learned from habits: usual party end time, usual venue, usual drinks first in quick add, the friends ... |
-| QOL-17 | P1 | Soirees.dc.html | partial | Suggestions that save taps: when 3+ crew members check in at the same venue, offer to start a party; when the ... |
+| QOL-17 | P1 | Soirees.dc.html | build | Suggestions that save taps: when 3+ crew members check in at the same venue, offer to start a party; when the ... |
 | QOL-18 | P1 | Securite.dc.html | build | The user's own apps: directions in Apple Maps, Google Maps or Waze, rides in Uber, Bolt or local taxi apps, ch... |
 | QOL-19 | P1 | Argent.dc.html | build | Long-press copies what people copy (IBAN, codes, addresses), with a haptic and a short inline "Copied". |
 | QOL-20 | P1 | Recap.dc.html | build | Next-morning mode: the morning after, the app opens on a calm, dark, low-contrast screen with the recap, who o... |
@@ -684,7 +684,7 @@ Board-wide gaps:
 | QOL-01 | partial | Fixed pint, not "same as last". | A §2.7 |
 | QOL-03 | partial | Second buttons show the wrong confirmation; done state instant. | A §2.7 |
 | QOL-09 | partial | No retry, no blurred placeholder. | C §5.1 |
-| QOL-17 | partial | Only the "3 friends checked in" suggestion. | A §2.7 |
+| QOL-17 | partial | Built and tested on the server and phone side, not tried on two real phones: (1) 3+ crew at one venue with no party running get "start one together?" (push, once per 4 h, and a card on the Crew tab), counted from open check-ins and the coarse positions of "Me détecter avec mon crew", private check-ins and homes excluded; (2) a party launched now or within 30 min pushes the rest of the crew once per 2 h, without the venue; (3) a venue with hours entered closes in 30 min: the people checked in there hear it. All pushes follow the notification settings and show no name or place on the lock screen. | A §2.7 |
 | QOL-18 | partial | Map app choice not shown. | A §2.7 |
 | QOL-19 | conflict | Copy on tap, not long-press; no haptic. | C §5.2 item 6 |
 | QOL-20 | conflict | Light theme vs PROMPT "dark"; photos missing. | B G-2 |

@@ -2467,6 +2467,19 @@ export const de: Messages = {
   },
   // O-38, N-35, QOL-03, QOL-30: the notification centre, push text (generic) and actions.
   notify: {
+    gathering: {
+      push: { v1: "Mehrere aus dem Crew sind am selben Ort. Zusammen eine Party?", v2: "Das Crew ist zusammen. Wer drückt den Knopf?", v3: "Das ist schon eine Menge. Party starten?", v4: "Das Crew ist fast komplett. Machen wir es offiziell?" },
+      item: { v1: "Ihr seid {count} im {venue}. Zusammen eine Party starten?", v2: "{count} vom Crew im {venue}, es fehlt nur der Start-Knopf.", v3: "{venue}: {count} vom Crew an einem Ort. Party offiziell machen?", v4: "Im {venue} wird es voll ({count}). Startest du?" },
+    },
+    partyStarted: {
+      push: { v1: "Das Crew hat gerade eine Party gestartet. Dabei?", v2: "Es geht ohne dich los. Beeil dich!", v3: "Eine Party läuft, dein Platz wartet.", v4: "Das Crew rollt. Jemand fehlt..." },
+      item: { v1: "{name} hat gerade {party} gestartet. Dabei?", v2: "{party} beginnt, gestartet von {name}. Dein Platz wartet.", v3: "{name} hat mit {party} eröffnet. Kommst du?", v4: "{party} hat gerade begonnen, {name} wartet auf dich." },
+    },
+    closingSoon: {
+      push: { v1: "Schließt in einer halben Stunde. Letzte Runde?", v2: "Endspurt, bald ist Schluss.", v3: "Der Vorhang fällt bald. Plane das Danach!", v4: "Nicht mehr viel Zeit bis zur Schließung." },
+      item: { v1: "{venue} schließt in {minutes} Min. Letzte Runde?", v2: "Nur noch {minutes} Min bis {venue} schließt.", v3: "{venue} macht in {minutes} Min zu. Und danach?", v4: "Letzter Drink im {venue}: Schluss in {minutes} Min." },
+    },
+    gatheringBanner: { title: "{count} vom Crew im {venue}", body: "Startet zusammen eine Party, ein Tipp genügt.", start: "Party starten" },
     crewNearby: {
       live: { v1: "{name} und die Crew feiern gleich nebenan. Startest du deinen Abend?", v2: "{name} hat den Abend nebenan schon gestartet. Bist du dabei?", v3: "Nebenan wird angestoßen: {name} ist unterwegs. Startest du deinen?", v4: "{name} und die Truppe legen in der Nähe los. Und du?", v5: "{name} feiert nur ein paar Schritte weiter. Starte deinen!", v6: "Die Crew wärmt sich nebenan auf, {name} hat angefangen. Startest du?", v7: "{name} ist schon mittendrin, gleich nebenan. Wir warten!", v8: "Nebenan haben {name} und die Crew angefangen. Startest du deinen Abend?" },
       pushLive: { v1: "Die Crew feiert gleich nebenan. Startest du deinen Abend?", v2: "Gleich nebenan hat's angefangen. Bist du dabei?", v3: "Nebenan wird angestoßen. Startest du deinen Abend?", v4: "Die Truppe legt in der Nähe los. Und du?", v5: "Ein paar Schritte weiter läuft ein Abend. Starte deinen!", v6: "Die Crew wärmt sich nebenan auf. Startest du?", v7: "Sie sind schon mittendrin, gleich nebenan. Wir warten!", v8: "Nebenan hat die Crew angefangen. Startest du deinen Abend?" },
@@ -2495,6 +2508,9 @@ export const de: Messages = {
     },
     kinds: {
       outCall: "Wer kommt mit?",
+      gathering: "Crew an einem Ort",
+      partyStarted: "Vom Crew gestartete Party",
+      closingSoon: "Schließt bald",
       crewNearby: "Crew in der Nähe zusammen",
       round: "Runden für dich",
       recapReady: "Rückblick fertig",
@@ -2529,6 +2545,9 @@ export const de: Messages = {
     },
     push: {
       outCall: { title: "Wer kommt mit?", body: "Jemand aus deiner Crew geht heute Abend raus." },
+      gathering: { title: "Ihr seid zusammen", body: "Leute aus dem Crew sind am selben Ort. Party starten?" },
+      partyStarted: { title: "Eine Party hat gerade begonnen", body: "Jemand aus dem Crew hat gerade eine Party gestartet." },
+      closingSoon: { title: "Schließt bald", body: "Der Ort, an dem du bist, schließt in einer halben Stunde." },
       crewNearby: { title: "Die Crew ist in der Nähe", body: "Leute aus der Crew sind ganz in der Nähe zusammen." },
       round: { title: "Eine Runde für dich", body: "Jemand gibt dir ein Getränk aus. Zum Bestätigen öffnen." },
       recapReady: { title: "Rückblick fertig", body: "Der Rückblick der Party wartet auf dich." },

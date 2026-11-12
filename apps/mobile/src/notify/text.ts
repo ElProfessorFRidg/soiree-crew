@@ -11,9 +11,13 @@ export function itemText(i18n: Translator, item: InboxItem): string {
     const v = typeof item.params.v === "number" && item.params.v >= 1 && item.params.v <= 8 ? item.params.v : 1;
     return item.params.live && params.name ? i18n.t(`notify.crewNearby.live.v${v}` as MessageKey, params) : i18n.t(`notify.crewNearby.gathered.v${v}` as MessageKey);
   }
+  if (item.kind === "gathering" || item.kind === "partyStarted" || item.kind === "closingSoon") {
+    const v = typeof item.params.v === "number" && item.params.v >= 1 && item.params.v <= 4 ? item.params.v : 1;
+    return i18n.t(`notify.${item.kind}.item.v${v}` as MessageKey, { ...params, count: Number(item.params.count) || 0, minutes: Number(item.params.minutes) || 0 });
+  }
   if (item.kind === "takeover") return i18n.t(item.params.mine ? "notify.items.takeoverMine" : "notify.items.takeover", params);
   if (!isKind(item.kind)) return i18n.t("notify.title");
-  return i18n.t(`notify.items.${item.kind as Exclude<NotificationKind, "chatMessage" | "crewNearby">}` as MessageKey, params);
+  return i18n.t(`notify.items.${item.kind as Exclude<NotificationKind, "chatMessage" | "crewNearby" | "gathering" | "partyStarted" | "closingSoon">}` as MessageKey, params);
 }
 
 /** Lock-screen copy: the same generic text the server pushes (QOL-27, MSG-04). */

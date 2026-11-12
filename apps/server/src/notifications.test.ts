@@ -82,7 +82,9 @@ async function registerPhone(user: User, token = `a${randomBytes(32).toString("h
 
 type Inbox = { items: { id: string; kind: string; params: Record<string, unknown>; readAt: number | null; partyId: string | null; count: number }[]; unread: number };
 async function inbox(user: User): Promise<Inbox> {
-  return (await app.inject({ method: "GET", url: "/v1/notifications", headers: user.auth })).json() as Inbox;
+  const box = (await app.inject({ method: "GET", url: "/v1/notifications", headers: user.auth })).json() as Inbox;
+  // QOL-17: every party these tests launch also tells the crew; suggestions.test.ts covers that kind.
+  return { ...box, items: box.items.filter((i) => i.kind !== "partyStarted") };
 }
 
 describe("push devices (O-38)", () => {
