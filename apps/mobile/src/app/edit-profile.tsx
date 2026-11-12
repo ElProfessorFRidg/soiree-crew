@@ -5,6 +5,8 @@ import { Field } from "@/crew/Field";
 import { useT } from "@/i18n";
 import { useAppStore } from "@/state/store";
 import { haptic } from "@/motion/haptics";
+import { findableFor, isVisibilityKey, VISIBILITY_KEYS } from "@/onboarding/visibility";
+import { VisibilityPicker } from "@/profile/VisibilityPicker";
 import { fetchProfile, PROFILE_SECTIONS, PROFILE_STATS, saveProfile, type Audience, type Findable, type ProfileSection, type ProfileView, type ReviewAudience } from "@/server/profileData";
 import { setReviewAudience } from "@/server/placeData";
 import { Button } from "@/ui/Button";
@@ -94,7 +96,11 @@ export default function EditProfileScreen() {
       </View>
 
       <Text variant="label">{i18n.t("people.audiences")}</Text>
-      {PROFILE_SECTIONS.map((section: ProfileSection) => (
+      {/* The five choices of the arrival flow: the same component, so the same drawings and wording. */}
+      {VISIBILITY_KEYS.map((key) => (
+        <VisibilityPicker key={key} item={key} mode="settings" value={audiences[key]} onChange={(a) => apply({ audiences: { [key]: a }, ...(key === "find" && findableFor(a) ? { findable: findableFor(a) } : {}) })} />
+      ))}
+      {PROFILE_SECTIONS.filter((section) => !isVisibilityKey(section)).map((section: ProfileSection) => (
         <View key={section} style={styles.section}>
           <Text variant="h3">{i18n.t(`people.section.${section}`)}</Text>
           <Segmented<Audience>

@@ -1,6 +1,6 @@
 /** PROF-01, PROF-02: what each profile section is and who may see it. */
 
-export const SECTIONS = ["identity", "crews", "titles", "venues", "reviews", "drinks", "records", "nights", "games", "birthday"] as const;
+export const SECTIONS = ["identity", "crews", "titles", "venues", "reviews", "drinks", "records", "nights", "games", "birthday", "badges", "find", "presence"] as const;
 export type Section = (typeof SECTIONS)[number];
 
 export const AUDIENCES = ["me", "crews", "friends", "everyone"] as const;
@@ -29,14 +29,23 @@ export const DEFAULT_AUDIENCES: Record<Section, Audience> = {
   games: "crews",
   // QOL-21: crew mates only, so they can be reminded; the year never leaves the owner.
   birthday: "crews",
+  // Badges and the non-BAC figures beside them: crew mates see them until the owner decides.
+  badges: "crews",
+  // Who can find this person to add them: strangers can (the finer rule is `findable`), as before.
+  find: "everyone",
+  // Who sees "out tonight" on the crew board. Strangers never see a person, only venue counts (COM-06).
+  presence: "crews",
 };
+
+/** Sections that carry a setting but no block of data on the profile itself. */
+export const SETTING_ONLY: readonly Section[] = ["find", "presence"];
 
 /**
  * PROF-01 presets: one tap sets every section; sections can then be changed one by one.
  * QOL-21: no preset widens the birthday past crew mates; only a choice made for that section does.
  */
 export const PRESETS: Record<"private" | "friends" | "public", Record<Section, Audience>> = {
-  private: { identity: "crews", crews: "me", titles: "me", venues: "me", reviews: "me", drinks: "me", records: "me", nights: "me", games: "me", birthday: "crews" },
+  private: { identity: "crews", crews: "me", titles: "me", venues: "me", reviews: "me", drinks: "me", records: "me", nights: "me", games: "me", birthday: "crews", badges: "me", find: "crews", presence: "crews" },
   friends: {
     identity: "everyone",
     crews: "friends",
@@ -48,6 +57,9 @@ export const PRESETS: Record<"private" | "friends" | "public", Record<Section, A
     nights: "friends",
     games: "friends",
     birthday: "crews",
+    badges: "friends",
+    find: "friends",
+    presence: "friends",
   },
   public: {
     identity: "everyone",
@@ -60,6 +72,9 @@ export const PRESETS: Record<"private" | "friends" | "public", Record<Section, A
     nights: "everyone",
     games: "everyone",
     birthday: "crews",
+    badges: "everyone",
+    find: "everyone",
+    presence: "crews",
   },
 };
 

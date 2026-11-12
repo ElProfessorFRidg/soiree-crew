@@ -7,6 +7,7 @@ import { api, ApiError } from "@/server/api";
 import { deviceName } from "@/server/device";
 import { failureMessage, serverMessage } from "@/server/errors";
 import { usePendingInvite } from "@/server/pendingInvite";
+import { usernameAvailable } from "@/server/profileData";
 import { saveSession } from "@/server/session";
 import { useTheme } from "@/theme";
 import { Button } from "@/ui/Button";
@@ -28,8 +29,10 @@ interface AccountResponse {
 
 type Way = "password" | "code";
 type Problem = { field: "username" | "login" | "password" | "code" | "form"; message: string };
+type Availability = "unknown" | "checking" | "free" | "taken";
 
 const USERNAME = /^[a-z0-9_.]{3,24}$/;
+const EMAIL = /^[^s@]+@[^s@]+.[^s@]+$/;
 
 /** Joins, creates or accepts on the new account, before the app switches to it. Returns the crew's name when known. */
 async function carryOn(intent: ArrivalIntent, baseUrl: string, token: string): Promise<string | null> {
@@ -78,6 +81,11 @@ export function AccountForm({
   const setMode = onModeChange;
   const [way, setWay] = useState<Way>("password");
   const [username, setUsername] = useState("");
+  // O-01: the first name is what the crew sees; the username is what people type to find me.
+  const [firstName, setFirstName] = useState("");
+  const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [availability, setAvailability] = useState<Availability>("unknown");
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
@@ -92,8 +100,26 @@ export function AccountForm({
     setProblem(null);
   }, [intent]);
 
+  // The username is checked against the server as it is typed, once it has a valid shape.
+  useEffect(() => {
+    setAvailability("unknown");
+    if (mode !== "create" || !server || !USERNAME.test(username.trim())) return;
+    setAvailability("checking");
+    let current = true;
+    const timer = setTimeout(() => {
+      void usernameAvailable(server, username.trim())
+        .then((free) => current && setAvailability(free ? "free" : "taken"))
+        .catch(() => current && setAvailability("unknown"));
+    }, 400);
+    return () => {
+      current = false;
+      clearTimeout(timer);
+    };
+  }, [username, server, mode]);
+
+  const emailValid = email.trim() === "" || (EMAIL.test(email.trim()) && newPassword.length >= 10);
   const ready =
-    mode === "create" ? USERNAME.test(username.trim()) : way === "password" ? login.trim().length >= 3 && password.length > 0 : code.trim().length === 10;
+    mode === "create" ? USERNAME.test(username.trim()) && firstName.trim().length > 0 && availability !== "taken" && emailValid : way === "password" ? login.trim().length >= 3 && password.length > 0 : code.trim().length === 10;
 
   const submit = async () => {
     if (!ready || busy) return;
@@ -121,8 +147,13 @@ export function AccountForm({
               baseUrl: url,
               token: null,
               method: "POST",
-              // One field: the pseudo is also the name the crew sees, until it is changed in Moi.
-              body: { username: username.trim(), displayName: username.trim(), deviceLabel },
+              body: {
+                username: username.trim(),
+                displayName: firstName.trim(),
+                deviceLabel,
+                // Both or neither: the server refuses one without the other.
+                ...(email.trim() ? { email: email.trim(), password: newPassword } : {}),
+              },
             })
           : way === "password"
             ? await api<AccountResponse>("/v1/sessions/password", { baseUrl: url, token: null, method: "POST", body: { login: login.trim(), password, deviceLabel } })
@@ -173,20 +204,58 @@ export function AccountForm({
           <Text muted>{i18n.t("arrival.accountBody")}</Text>
           <Panel>
             <Field
+              label={i18n.t("journey.firstName")}
+              hint={i18n.t("journey.firstNameHint")}
+              value={firstName}
+              onChangeText={setFirstName}
+              autoFocus={autoFocus}
+              textContentType="givenName"
+              autoComplete="given-name"
+              maxLength={40}
+              returnKeyType="next"
+            />
+            <Field
               label={i18n.t("crew.username")}
-              hint={i18n.t("crew.usernameHint")}
+              hint={availability === "free" ? i18n.t("journey.usernameFree") : availability === "checking" ? i18n.t("journey.usernameChecking") : i18n.t("crew.usernameHint")}
               value={username}
               onChangeText={(text) => setUsername(text.toLowerCase())}
               autoCapitalize="none"
               autoCorrect={false}
-              autoFocus={autoFocus}
               textContentType="username"
               autoComplete="username-new"
               maxLength={24}
               returnKeyType="go"
               onSubmitEditing={() => void submit()}
-              error={problem?.field === "username" ? problem.message : null}
+              error={problem?.field === "username" ? problem.message : availability === "taken" ? i18n.t("crew.usernameTaken") : null}
             />
+            <Field
+              label={i18n.t("journey.email")}
+              hint={i18n.t("journey.emailHint")}
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="email-address"
+              textContentType="emailAddress"
+              autoComplete="email"
+              maxLength={254}
+            />
+            {email.trim() ? (
+              <Field
+                label={i18n.t("journey.password")}
+                hint={i18n.t("journey.passwordHint")}
+                value={newPassword}
+                onChangeText={setNewPassword}
+                secureTextEntry
+                autoCapitalize="none"
+                autoCorrect={false}
+                textContentType="newPassword"
+                autoComplete="new-password"
+                maxLength={200}
+                returnKeyType="go"
+                onSubmitEditing={() => void submit()}
+              />
+            ) : null}
           </Panel>
           {problem?.field === "form" ? <Text color={theme.danger}>{problem.message}</Text> : null}
           <Button label={i18n.t("arrival.accountCta")} height={56} disabled={!ready} loading={busy} onPress={() => void submit()} />

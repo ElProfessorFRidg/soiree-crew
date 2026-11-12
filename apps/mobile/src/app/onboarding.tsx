@@ -8,96 +8,51 @@ import { easings } from "@/motion/easing";
 import { haptic } from "@/motion/haptics";
 import { AccountStep } from "@/onboarding/AccountStep";
 import { ConsentPanel } from "@/onboarding/ConsentPanel";
-import { CrewWaiting, FirstCrew } from "@/onboarding/CrewStep";
-import { freshDraft, legalAge, nextStep, previousStep, progress, type FlowContext, type OnboardingDraft, type Step } from "@/onboarding/flow";
+import { ageFromBirthDate, freshDraft, nextStep, previousStep, progress, visibleSteps, type FlowContext, type OnboardingDraft, type Step } from "@/onboarding/flow";
+import { BacStep, BirthStep, commitBirthDate, PhotoStep } from "@/onboarding/IdentitySteps";
 import { askForReminders, NotificationsStep } from "@/onboarding/NotificationsStep";
+import { ClosingStep, LocationStep, RegionStep, VisibilityStep } from "@/onboarding/SetupSteps";
+import { isVisibilityKey } from "@/onboarding/visibility";
 import { ValueCards } from "@/onboarding/ValueCards";
-import { ProfileFields } from "@/profile/ProfileFields";
 import { draftFromProfile, saveProfile } from "@/profile/saveProfile";
 import { useSession } from "@/server/session";
 import { useAppStore } from "@/state/store";
+import { askPermission } from "@/system/askPermission";
+import { openAppSettings } from "@/system/permissions";
 import { useTheme } from "@/theme";
 import { Button, IconButton } from "@/ui/Button";
 import { Panel } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
+import { showToast } from "@/ui/Toast";
 
-// O-01 to O-05, SEC-08: the arrival flow of the Arrivee board, shortened so the app comes fast:
-// age, welcome, account (only if wanted), consent, profile (only with the consent), crew, then the
-// reminders. Consent comes before the weight is typed (SEC-08, ADR 0006). The detected settings
-// moved to a card on the first Party screen. Every step and choice is kept in the app store, so a
-// closed app reopens where it was.
+// O-01 to O-05, PREF-02, PROF-01, PROF-02, SEC-08: the arrival flow of the Arrivee board as one
+// continuous run, a question per screen: account, date of birth, photo, consent, body profile, the
+// settings read from the phone, the five visibility choices, the permissions one by one and the
+// finished card. Every answer is written to the app store (and the server when it has one) as it is
+// given, so a closed app reopens on the screen it stopped at. Consent comes before the weight is
+// typed (SEC-08, ADR 0006).
 
 const appIcon = require("../../assets/icon.png") as number;
 
 /** Shown once per launch: the banner says the draft came back, then stays closed. */
 let restoreAnnounced = false;
 
+/** A single line under the back button that fills as the screens go by. */
 function Progress({ index, total }: { index: number; total: number }) {
   const theme = useTheme();
   const i18n = useT();
+  const fill = useAnimatedStyle(() => ({ width: withTiming(`${((index + 1) / total) * 100}%`, { duration: duration.progress, easing: easings.out }) }), [index, total]);
   return (
     <View
-      style={styles.progress}
+      style={[styles.progress, { backgroundColor: theme.surfaceRaised }]}
       accessibilityRole="progressbar"
       accessibilityLabel={i18n.t("onboarding.step", { n: index + 1, total })}
       accessibilityValue={{ min: 1, max: total, now: index + 1 }}
     >
-      {Array.from({ length: total }, (_, i) => (
-        <Segment key={i} on={i <= index} track={theme.surfaceRaised} />
-      ))}
+      <Animated.View style={[styles.progressFill, fill]} />
     </View>
-  );
-}
-
-function Segment({ on, track }: { on: boolean; track: string }) {
-  const fill = useAnimatedStyle(() => ({ width: withTiming(on ? "100%" : "0%", { duration: duration.progress, easing: easings.out }) }), [on]);
-  return (
-    <View style={[styles.segment, { backgroundColor: track }]}>
-      <Animated.View style={[styles.segmentFill, fill]} />
-    </View>
-  );
-}
-
-function AgeGate({ age }: { age: number }) {
-  const i18n = useT();
-  const theme = useTheme();
-  const [refused, setRefused] = useState(false);
-  return (
-    <Screen>
-      <Animated.View entering={FadeIn.duration(duration.enter).easing(easings.out)} style={styles.age}>
-        <Image source={appIcon} style={styles.icon} accessibilityIgnoresInvertColors />
-        <Text variant="h1">{i18n.t("onboarding.ageTitle", { age })}</Text>
-        <Text muted>{i18n.t("onboarding.ageBody")}</Text>
-        {refused ? (
-          <Animated.View entering={FadeIn.duration(duration.enter)}>
-            <Panel tint="danger">
-              <Text variant="h3" color={theme.danger}>
-                {i18n.t("onboarding.ageRefused", { age })}
-              </Text>
-              <Text>{i18n.t("onboarding.ageRefusedBody")}</Text>
-            </Panel>
-          </Animated.View>
-        ) : null}
-        <Button
-          label={i18n.t("onboarding.ageYes", { age })}
-          height={64}
-          onPress={() => {
-            haptic.confirmed();
-            useAppStore.setState({ ageConfirmedAt: Date.now() });
-          }}
-        />
-        <Button
-          label={i18n.t("onboarding.ageNo")}
-          variant="secondary"
-          onPress={() => {
-            haptic.error();
-            setRefused(true);
-          }}
-        />
-      </Animated.View>
-    </Screen>
   );
 }
 
@@ -126,19 +81,20 @@ function initialDraft(): OnboardingDraft {
 export default function Onboarding() {
   const i18n = useT();
   const preferences = useAppStore((state) => state.preferences);
-  const ageConfirmed = useAppStore((state) => state.ageConfirmedAt !== null);
   const stored = useAppStore((state) => state.onboarding);
   const session = useSession((state) => state.session);
   const [forward, setForward] = useState(true);
-  const [crewMade, setCrewMade] = useState(false);
   const [finishing, setFinishing] = useState(false);
+  const [committing, setCommitting] = useState(false);
+  const [tooYoung, setTooYoung] = useState(false);
   const [restored, setRestored] = useState(() => {
     const draft = useAppStore.getState().onboarding;
     const found = !restoreAnnounced && draft !== null && draft.step !== "welcome";
     restoreAnnounced = true;
     return found;
   });
-  const draft = stored ?? initialDraft();
+  // A draft kept by an older version has no birth date, photo or choices yet.
+  const draft: OnboardingDraft = { ...freshDraft(draftFromProfile(null), false), ...(stored ?? initialDraft()) };
 
   useEffect(() => {
     // Being here means not being in the app: an earlier finish (before a consent was withdrawn) no longer counts.
@@ -146,19 +102,28 @@ export default function Onboarding() {
   }, []);
 
   const update = (patch: Partial<OnboardingDraft>) =>
-    useAppStore.setState((state) => ({ onboarding: { ...(state.onboarding ?? initialDraft()), ...patch, savedAt: Date.now() } }));
+    useAppStore.setState((state) => ({ onboarding: { ...draftOf(state.onboarding), ...patch, savedAt: Date.now() } }));
 
   const context: FlowContext = {
     signedIn: session !== null,
     accountVisited: draft.accountVisited,
     health: draft.health,
     notificationsSupported: Platform.OS !== "web",
+    locationSupported: Platform.OS !== "web",
   };
-  const step = draft.step;
+  // A draft saved on a screen this version no longer has (the old crew step) resumes at the date of birth.
+  const step: Step = visibleSteps(context).includes(draft.step) ? draft.step : "birth";
   const after = nextStep(step, context);
+  const name = session?.displayName ?? "";
+  const personId = session?.userId ?? "me";
 
   const finish = () => {
-    useAppStore.setState((state) => ({ onboardedAt: Date.now(), onboarding: null, firstRun: state.firstRun.active ? state.firstRun : { ...state.firstRun, active: true } }));
+    useAppStore.setState((state) => ({
+      onboardedAt: Date.now(),
+      onboarding: null,
+      profilePhoto: draft.photo,
+      firstRun: state.firstRun.active ? state.firstRun : { ...state.firstRun, active: true },
+    }));
     router.replace("/(tabs)");
   };
   const go = (next: Step | "done", isForward = true) => {
@@ -177,7 +142,7 @@ export default function Onboarding() {
     if (previous) go(previous, false);
   };
   const leaveAccount = () => {
-    const target = draft.accountReturn ?? "consent";
+    const target = draft.accountReturn ?? "birth";
     update({ accountReturn: null });
     go(target);
   };
@@ -190,20 +155,58 @@ export default function Onboarding() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, step]);
 
-  if (!ageConfirmed) return <AgeGate age={legalAge(preferences.legalCountry)} />;
+  const next = i18n.t("onboarding.next");
+  const askLocation = async () => {
+    setFinishing(true);
+    const answer = await askPermission("location", "checkin").finally(() => setFinishing(false));
+    update({ permissions: { ...draft.permissions, location: answer.granted ? "granted" : "skipped" } });
+    if (!answer.granted && !answer.declined) {
+      showToast({
+        message: i18n.t("journey.locDenied"),
+        durationMs: 8_000,
+        ...(answer.canAskAgain ? {} : { action: { label: i18n.t("common.openSettings"), onPress: openAppSettings } }),
+      });
+    }
+    advance();
+  };
 
-  const doneLabel = after === "done" ? i18n.t("onboarding.finish") : i18n.t("onboarding.next");
   const footer = (() => {
     switch (step) {
       case "welcome":
         return null;
       case "account":
         return <Button label={i18n.t("onboarding.guest")} variant="outline" height={48} onPress={leaveAccount} />;
+      case "birth":
+        return (
+          <Button
+            label={next}
+            height={56}
+            loading={committing}
+            disabled={draft.birthDate === null}
+            onPress={() => {
+              if (draft.birthDate === null) return;
+              setCommitting(true);
+              void commitBirthDate(draft.birthDate, preferences.legalCountry)
+                .then((result) => {
+                  if (result === "ok") {
+                    setTooYoung(false);
+                    advance();
+                  } else if (result === "under") {
+                    haptic.error();
+                    setTooYoung(true);
+                  } else showToast({ tone: "danger", message: i18n.t("crew.offline") });
+                })
+                .finally(() => setCommitting(false));
+            }}
+          />
+        );
+      case "photo":
+        return <Button label={draft.photo ? next : i18n.t("journey.photoSkip")} height={56} variant={draft.photo ? "primary" : "secondary"} onPress={advance} />;
       case "consent":
         return (
           <View style={styles.footer}>
             <Button
-              label={i18n.t("onboarding.next")}
+              label={next}
               height={56}
               disabled={!draft.health}
               accessibilityHint={draft.health ? undefined : i18n.t("onboarding.consentWithout")}
@@ -225,10 +228,10 @@ export default function Onboarding() {
             )}
           </View>
         );
-      case "profile":
+      case "bac":
         return (
           <Button
-            label={doneLabel}
+            label={next}
             height={56}
             onPress={() => {
               saveProfile(draft.profile, draft.consentAt ?? Date.now());
@@ -236,28 +239,52 @@ export default function Onboarding() {
             }}
           />
         );
-      case "crew":
-        return crewMade ? null : <Button label={i18n.t("onboarding.later")} variant="outline" height={48} onPress={advance} />;
+      case "region":
+        return <Button label={next} height={56} onPress={advance} />;
       case "notifications":
         return (
           <Button
-            label={doneLabel}
+            label={next}
             height={56}
             loading={finishing}
             onPress={() => {
               setFinishing(true);
               void askForReminders(i18n, session !== null).finally(() => {
                 setFinishing(false);
+                update({ permissions: { ...draft.permissions, notifications: "granted" } });
                 advance();
               });
             }}
           />
         );
+      case "location":
+        return (
+          <View style={styles.footer}>
+            <Button label={i18n.t("journey.locAllow")} height={56} loading={finishing} onPress={() => void askLocation()} />
+            <Button
+              label={i18n.t("journey.locSkip")}
+              variant="outline"
+              height={48}
+              onPress={() => {
+                update({ permissions: { ...draft.permissions, location: "skipped" } });
+                advance();
+              }}
+            />
+          </View>
+        );
+      case "closing":
+        return <Button label={i18n.t("journey.closingGo")} height={56} onPress={finish} />;
+      default: {
+        // The five visibility screens: nothing is pre-ticked, so Continue waits for a tap on one of the four.
+        const answered = isVisibilityKey(step) && draft.visibility[step] !== undefined;
+        return <Button label={next} height={56} disabled={!answered} accessibilityHint={answered ? undefined : i18n.t("journey.chooseOne")} onPress={advance} />;
+      }
     }
   })();
 
   const entering = (forward ? SlideInRight : SlideInLeft).duration(duration.enter).easing(easings.out);
   const { index, total } = progress(step, context);
+  const age = draft.birthDate ? ageFromBirthDate(draft.birthDate, Date.now()) : null;
 
   return (
     <Screen footer={footer} withToasts>
@@ -280,36 +307,58 @@ export default function Onboarding() {
               update({ accountMode: "signin", accountVisited: true, accountReturn: null });
               go("account");
             }}
-            onGuest={() => go("consent")}
+            onGuest={() => go("birth")}
           />
         ) : null}
         {step === "account" ? <AccountStep mode={draft.accountMode} onModeChange={(accountMode) => update({ accountMode })} /> : null}
+        {step === "birth" ? (
+          <BirthStep
+            birthDate={draft.birthDate}
+            country={preferences.legalCountry}
+            tooYoung={tooYoung}
+            onChange={(birthDate) => {
+              setTooYoung(false);
+              update({ birthDate });
+            }}
+          />
+        ) : null}
+        {step === "photo" ? <PhotoStep photo={draft.photo} onChange={(photo) => update({ photo })} personId={personId} name={name} /> : null}
         {step === "consent" ? (
           <>
             <Text variant="h1">{i18n.t("onboarding.consentTitle")}</Text>
             <ConsentPanel value={draft.health} onChange={(health) => update({ health })} />
           </>
         ) : null}
-        {step === "profile" ? (
-          <>
-            <Text variant="h1">{i18n.t("onboarding.profileTitle")}</Text>
-            <Text muted>{i18n.t("onboarding.profileBody")}</Text>
-            <ProfileFields draft={draft.profile} onChange={(profile) => update({ profile })} />
-          </>
-        ) : null}
-        {step === "crew" && session ? <FirstCrew onCreated={() => setCrewMade(true)} onDone={advance} doneLabel={doneLabel} /> : null}
-        {step === "crew" && !session ? (
-          <CrewWaiting
-            onCreateAccount={() => {
-              update({ accountMode: "create", accountVisited: true, accountReturn: "crew" });
-              go("account");
+        {step === "bac" ? <BacStep draft={draft.profile} onChange={(profile) => update({ profile })} birthDate={draft.birthDate} /> : null}
+        {step === "region" ? <RegionStep /> : null}
+        {isVisibilityKey(step) ? (
+          <VisibilityStep
+            item={step}
+            value={draft.visibility[step]}
+            name={name}
+            personId={personId}
+            note={step === "venues"}
+            onChange={(audience) => {
+              const visibility = { ...draft.visibility };
+              if (audience === undefined) delete visibility[step];
+              else visibility[step] = audience;
+              update({ visibility });
             }}
           />
         ) : null}
         {step === "notifications" ? <NotificationsStep health={draft.health} /> : null}
+        {step === "location" ? <LocationStep /> : null}
+        {step === "closing" ? (
+          <ClosingStep name={name || i18n.t("journey.previewYou")} username={session?.username ?? null} personId={personId} photo={draft.photo} age={age} visibility={draft.visibility} />
+        ) : null}
       </Animated.View>
     </Screen>
   );
+}
+
+/** The draft in the store, or a fresh one: an update never starts from nothing. */
+function draftOf(stored: OnboardingDraft | null): OnboardingDraft {
+  return { ...freshDraft(draftFromProfile(null), false), ...(stored ?? initialDraft()) };
 }
 
 function Welcome({ onCreate, onSignIn, onGuest, signedIn }: { onCreate: () => void; onSignIn: () => void; onGuest: () => void; signedIn: boolean }) {
@@ -341,16 +390,13 @@ function Welcome({ onCreate, onSignIn, onGuest, signedIn }: { onCreate: () => vo
 }
 
 const styles = StyleSheet.create({
-  age: { gap: 16, paddingTop: 48 },
   welcome: { gap: 14, paddingTop: 24 },
-  icon: { width: 72, height: 72, borderRadius: 18 },
   welcomeIcon: { width: 56, height: 56, borderRadius: 14 },
   hero: { fontSize: 34, lineHeight: 38 },
   actions: { gap: 12, marginTop: 8 },
   top: { flexDirection: "row", alignItems: "center", gap: 12 },
-  progress: { flex: 1, flexDirection: "row", gap: 6 },
-  segment: { flex: 1, height: 4, borderRadius: 2, overflow: "hidden" },
-  segmentFill: { height: 4, borderRadius: 2, backgroundColor: palette.accent.amber },
+  progress: { flex: 1, height: 3, borderRadius: 2, overflow: "hidden" },
+  progressFill: { height: 3, borderRadius: 2, backgroundColor: palette.accent.amber },
   step: { gap: 16 },
   footer: { gap: 10 },
   banner: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 6 },

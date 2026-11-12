@@ -756,3 +756,16 @@ Board-wide gaps:
 | SYNC-07 | partial | No toast queue; error toasts use "OK" and never auto-dismiss. | C §5.1, §5.2 item 12 |
 | AI-02 | partial | No editor behind "Modifier"; one "Valider" does not show crew approval; no opt-in. | B §2.7 |
 | AI-03 | partial | Duplicates on repeated taps (minor). | B §2.7 |
+
+## Arrival flow, rebuilt as one run (2026-11-12)
+
+The arrival is now one continuous flow, a question per screen with a progress line, a working back button and every answer saved as it is given (`apps/mobile/src/app/onboarding.tsx`, `apps/mobile/src/onboarding/`). Order: welcome, account, date of birth, photo, consent, body profile, region summary, five visibility screens (bars and territories, rankings and titles, badges and records without alcohol, who can find me, presence tonight), notifications, location, closing card. Statuses stay `build` or `partial`: nothing here has passed the reviews or been run on a device.
+
+| ID | Status | In the code | Still missing |
+|---|---|---|---|
+| O-01 | partial | First name and username are separate fields, the username is checked live against the server (`GET /v1/usernames/:name/available`), optional email and password at sign-up, sign-in by login or code. | Google and Sign in with Apple: no native module for them is installed, so no button was added. |
+| O-02 | build | The yes/no age gate became a date of birth on a wheel (system wheel on iOS, drawn wheel elsewhere). The server refuses under 18 at sign-up and on `PUT /v1/me/birth-date` (migration 044); the phone also refuses under 21 for a US country. Only the age is ever shown. | Android and web use the drawn wheel, not a system one. The date is not re-checked when the country changes (PREF-05). |
+| O-04 | partial | Weight 30 to 250 kg, body model, optional height 120 to 230 cm, a line on why each is asked; the age comes from the date of birth. | The profile photo stays on the phone: it is not uploaded, so other people still see initials. |
+| PREF-02 | build | The detected country, language, driving limit and currency are shown as a summary that opens the region settings to correct. | First day of week, date format and drink-size presets are still not in the summary. |
+| PROF-01 | build | Four audiences per setting, stored by the server and enforced on every read (profile, search, crew board); tests in `apps/server/src/arrival.test.ts` show a stranger cannot read a field set to Crews or Me. | |
+| PROF-02 | build | New sections `badges` (unlocked icons and game wins), `find` (who can find and add me) and `presence` (who sees "out tonight" on the crew board). Settings and the flow share one component, `VisibilityPicker`, with the same drawings. | Rankings are shown through the titles section only. Badges are the unlocked app icons and game wins, as there is no other badge system yet. |

@@ -1,6 +1,6 @@
 import { api } from "./api";
 
-export const PROFILE_SECTIONS = ["identity", "crews", "titles", "venues", "reviews", "drinks", "records", "nights", "games", "birthday"] as const;
+export const PROFILE_SECTIONS = ["identity", "crews", "titles", "venues", "reviews", "drinks", "records", "nights", "games", "birthday", "badges", "find", "presence"] as const;
 /** PROF-03: single figures that can be hidden one by one (server: STATS in profileRules.ts). */
 export const PROFILE_STATS = ["drinksTotal", "favourites", "usualFirstDrink", "usualPace", "usualLeaving", "highestBac", "biggestNight", "nightsTotal", "nightsRecent", "nightHistory", "gameWins"] as const;
 export type ProfileStat = (typeof PROFILE_STATS)[number];
@@ -52,6 +52,8 @@ export interface ProfileView {
     nights?: { total?: number; last30Days?: number; history?: { at: number; name: string | null; venues: string[] }[] };
     reviews?: ProfileReview[];
     games?: { wins?: number; byGame?: { gameId: string; wins: number }[] };
+    /** Unlocked app icons and the game wins: nothing to do with drinking. */
+    badges?: { icons: string[]; gameWins: number };
     /** QOL-21: the year only comes back to its owner. */
     birthday?: { month: number; day: number; year?: number };
   };
@@ -78,6 +80,17 @@ export function saveProfile(input: {
   birthday?: { month: number; day: number; year?: number } | null;
 }): Promise<{ audiences: Record<ProfileSection, Audience> }> {
   return api("/v1/me/profile", { method: "PUT", body: input });
+}
+
+/** O-02: the date of birth. The server refuses under 18 (403 under_age) and answers with the age only. */
+export function saveBirthDate(birthDate: string): Promise<{ age: number }> {
+  return api("/v1/me/birth-date", { method: "PUT", body: { birthDate } });
+}
+
+/** O-01: is the username free? Public, so it can be asked while the account is being made. */
+export async function usernameAvailable(baseUrl: string, name: string): Promise<boolean> {
+  const res = await api<{ available: boolean }>(`/v1/usernames/${encodeURIComponent(name)}/available`, { baseUrl, token: null });
+  return res.available;
 }
 
 export interface PersonFound {

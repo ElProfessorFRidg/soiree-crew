@@ -1,5 +1,6 @@
 import type { Context } from "./context";
 import { reviewOnProfile, seesDates, STATS, type Relation, type ReviewAudience, type Section, type Stat } from "./profileRules";
+import { appIconsOf } from "./appIcons";
 import { signedPhotoUrl } from "./routes/photos";
 
 const HOUR_MS = 3_600_000;
@@ -118,6 +119,11 @@ export async function addExtraSections(
   const hidden = await hiddenItems(ctx, ownerId);
   if (visible("reviews")) out.reviews = await reviewsSection(ctx, ownerId, relation, hidden);
   if (visible("games")) out.games = await gamesSection(ctx, ownerId);
+  // Badges and figures that have nothing to do with drinking: the unlocked icons and the game wins.
+  if (visible("badges")) {
+    const wins = (await gamesSection(ctx, ownerId)) as { wins?: number };
+    out.badges = { icons: await appIconsOf(ctx, ownerId), gameWins: wins.wins ?? 0 };
+  }
   if (out.nights && seesDates(relation)) {
     (out.nights as Record<string, unknown>).history = await nightHistory(ctx, ownerId, viewerId, relation, visible("venues"), hidden, now);
   }

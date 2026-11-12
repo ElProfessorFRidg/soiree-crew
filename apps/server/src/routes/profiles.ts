@@ -365,8 +365,8 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
     const q = z.string().trim().toLowerCase().min(2).max(40).parse(request.query.q ?? "");
     // LIKE wildcards typed by the user are matched literally.
     const like = `%${q.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
-    const rows = await ctx.db.query<{ id: string; username: string; display_name: string; findable: string | null; known: boolean }>(
-      `select u.id, u.username, u.display_name, p.findable,
+    const rows = await ctx.db.query<{ id: string; username: string; display_name: string; findable: string | null; audiences: string | null; known: boolean }>(
+      `select u.id, u.username, u.display_name, p.findable, p.audiences,
               (exists (select 1 from crew_members a join crew_members b on a.crew_id = b.crew_id where a.user_id = $1 and b.user_id = u.id)
                or exists (select 1 from friendships f where (f.user_a = $1 and f.user_b = u.id) or (f.user_b = $1 and f.user_a = u.id))) as known
        from users u left join profiles p on p.user_id = u.id
@@ -378,6 +378,9 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
     const visible = rows.filter((r) => {
       const findable = r.findable ?? "username";
       if (r.known) return true;
+      // Who can find me: only "Everyone" lets a stranger reach me from the search; the other audiences
+      // are people who already know me (crew mates and friends, who show above).
+      if (audiencesOf(r.audiences ? (JSON.parse(r.audiences) as Record<string, unknown>) : {}).find !== "everyone") return false;
       if (findable === "search") return true;
       return findable === "username" && r.username === q;
     });

@@ -7,6 +7,7 @@ import { RateLimiter } from "../ratelimit";
 import { deleteChatBackup } from "./chat";
 import { deletePhotoFiles } from "./photos";
 import { deleteReceiptFiles } from "./money";
+import { ageOn, assertOldEnough, birthDateSchema } from "../age";
 import { accountSchema, passwordSchema } from "../schemas";
 import { exportToCsv } from "../csv";
 
@@ -29,6 +30,7 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
   // 10 characters, so guessing one at 10 tries per 10 minutes goes nowhere.
   const signUps = new RateLimiter(10, 10 * 60_000, ctx.now);
   const claims = new RateLimiter(10, 10 * 60_000, ctx.now);
+  const usernameChecks = new RateLimiter(120, 60_000, ctx.now);
   // O-01: per address and per login, so spreading guesses over many addresses does not help either.
   const passwordTries = new RateLimiter(10, 10 * 60_000, ctx.now);
   // Per login and address, so a stranger cannot lock the owner out; per login overall, looser, so
@@ -52,6 +54,7 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
   app.post("/v1/accounts", async (request, reply) => {
     signUps.check(request.ip);
     const input = accountSchema.parse(request.body);
+    if (input.birthDate) assertOldEnough(input.birthDate, ctx.now());
     const taken = await ctx.db.query("select 1 from users where username = $1", [input.username]);
     if (taken.length) throw new HttpError(409, "username_taken");
     if (input.email) {
@@ -59,11 +62,12 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
       if (emailTaken.length) throw new HttpError(409, "email_taken");
     }
     const id = newId();
-    await ctx.db.query("insert into users (id, username, display_name, created_at) values ($1, $2, $3, $4)", [
+    await ctx.db.query("insert into users (id, username, display_name, created_at, birth_date) values ($1, $2, $3, $4, $5)", [
       id,
       input.username,
       input.displayName,
       ctx.now(),
+      input.birthDate ?? null,
     ]);
     if (input.email && input.password) await saveCredentials(id, input.email, input.password);
     const token = await createSession(ctx, id, input.deviceLabel ?? "");
@@ -119,9 +123,28 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
     return { hasPassword: true, email: input.email };
   });
 
+  /** O-04: the age, never the date: the date stays on the server. */
   app.get("/v1/me", async (request) => {
     const user = requireUser(request);
-    return { user };
+    const row = (await ctx.db.query<{ birth_date: string | null }>("select birth_date from users where id = $1", [user.id]))[0];
+    return { user, age: row?.birth_date ? ageOn(row.birth_date, ctx.now()) : null };
+  });
+
+  /** O-02: the date of birth. Under the minimum age is refused here too; the date is stored, only the age comes back. */
+  app.put("/v1/me/birth-date", async (request) => {
+    const user = requireUser(request);
+    const input = z.object({ birthDate: birthDateSchema }).parse(request.body);
+    const age = assertOldEnough(input.birthDate, ctx.now());
+    await ctx.db.query("update users set birth_date = $2 where id = $1", [user.id, input.birthDate]);
+    return { age };
+  });
+
+  /** O-01: is this username free? Checked live while typing, so it is rate-limited per address. */
+  app.get<{ Params: { name: string } }>("/v1/usernames/:name/available", async (request) => {
+    usernameChecks.check(request.ip);
+    const name = accountSchema.shape.username.parse(request.params.name);
+    const taken = await ctx.db.query("select 1 from users where username = $1", [name]);
+    return { available: taken.length === 0 };
   });
 
   app.patch("/v1/me", async (request) => {
