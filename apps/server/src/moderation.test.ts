@@ -295,6 +295,6 @@ describe("friends (O-43)", () => {
     // A friend outside the crew gets the dates, not the crew's party name.
     expect((await nights(malik))!.history).toEqual([{ at: clock - 60 * MIN, name: null, venues: [] }]);
     expect((await nights(jade))!.history![0]!.name).toBe("Anniv");
-    expect(await nights(stranger)).toEqual({ total: 1, last30Days: 1 });
+    expect(await nights(stranger)).toEqual({ total: 1, last30Days: 1, withCrew: 1, solo: 0 });
   });
 });
