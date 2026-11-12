@@ -2554,6 +2554,7 @@ export const de: Messages = {
       no: "Heute nicht",
       home: "Bin zu Hause",
       roundOk: "Angekommen",
+      roundNot: "Nicht ich",
       mute: "Stumm bis morgen früh",
     },
     feedCheat: "{who}: Schummelversuch in {venue}",

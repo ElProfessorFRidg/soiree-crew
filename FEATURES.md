@@ -671,7 +671,7 @@ Board-wide gaps:
 | N-12 | missing | Only popular days. | B §2.7 |
 | N-14, N-15 | partial | Heatmap only; Wrapped entry only, no monthly recap. | C §2.8 |
 | N-17 | partial | No selective deletion. | C §5.1 |
-| N-18 | partial | No choice of participants or drink; adds drinks to others' BAC without their confirmation (AC-07 question). | C §5.1 |
+| N-18 | partial | Server side done and tested: fair rotation computed from the crew's whole history, equal split and currency checks server-side, only people present, retry-safe, one-tap "not for me" (drops the drink and the share). Still missing: the phone screen (pick participants and drink, show the server's rotation and summary, "not for me" action) and the 7 locale strings. | C §5.1 |
 | N-19 | partial | Static chips; no editable amounts. | C §2.8 |
 | N-20 | partial | The 90 % alert is not shown. | C §5.1 |
 | N-22 | partial | No photos or highlights in the timeline. | B §2.7 |
@@ -682,7 +682,7 @@ Board-wide gaps:
 | N-33 | partial | No game picker; admin queue not role-gated; no refusal reason. | B §2.7 |
 | N-34 | partial | Titles only; badges for organising, hydration, driving, home safe, wins not shown. | C §5.1 |
 | QOL-01 | partial | Fixed pint, not "same as last". | A §2.7 |
-| QOL-03 | partial | Second buttons show the wrong confirmation; done state instant. | A §2.7 |
+| QOL-03 | partial | Server side done and tested: round replies ("ok" / "notMe", migration 044, drinks linked to the round, `confirmedIds` in the listing). App wires reply, home, mute and round buttons; untested on a device (action buttons, background taps). Add-a-drink and add-water buttons on reminders were already in place. | A §2.7 |
 | QOL-09 | partial | No retry, no blurred placeholder. | C §5.1 |
 | QOL-17 | partial | Only the "3 friends checked in" suggestion. | A §2.7 |
 | QOL-18 | partial | Map app choice not shown. | A §2.7 |

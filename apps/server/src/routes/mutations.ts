@@ -5,6 +5,7 @@ import { requireUser, type Context } from "../context";
 import type { Db } from "../db";
 import { checkDanger } from "../nightWatch";
 import { checkOvertakes } from "../notifications/producers";
+import { dropFromRound } from "../rounds";
 import { mutationBatchSchema, mutationSchema, type MutationInput } from "../schemas";
 
 /** Tolerance for clock skew between the phone and the server. */
@@ -162,11 +163,13 @@ async function apply(ctx: Context, db: Db, userId: string, mutation: MutationInp
       return;
     }
     case "drink.remove": {
-      const rows = await db.query<{ party_id: string | null }>(
-        "update drinks set deleted_at = $1, updated_at = $1 where id = $2 and user_id = $3 returning party_id",
+      const rows = await db.query<{ party_id: string | null; round_id: string | null }>(
+        "update drinks set deleted_at = $1, updated_at = $1 where id = $2 and user_id = $3 returning party_id, round_id",
         [now, mutation.drink.id, userId],
       );
       if (rows[0]?.party_id) changedParties.add(rows[0].party_id);
+      // N-18: a drink from someone's round goes with my share of its expense.
+      if (rows[0]?.round_id) await dropFromRound(db, rows[0].round_id, userId, now);
       return;
     }
     case "water.add": {

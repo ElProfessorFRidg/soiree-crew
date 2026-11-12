@@ -2555,6 +2555,7 @@ export const es: Messages = {
       no: "Hoy no",
       home: "En casa",
       roundOk: "Recibido",
+      roundNot: "No es mío",
       mute: "Silenciar hasta mañana",
     },
     feedCheat: "{who}: intento de trampa en {venue}",

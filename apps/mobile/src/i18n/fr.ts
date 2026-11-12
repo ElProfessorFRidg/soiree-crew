@@ -2554,6 +2554,7 @@ export const fr = {
       no: "Pas ce soir",
       home: "À la maison",
       roundOk: "Bien reçu",
+      roundNot: "Pas pour moi",
       mute: "Sourdine jusqu'au matin",
     },
     feedCheat: "{who} : tentative de triche à {venue}",

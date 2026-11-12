@@ -2555,6 +2555,7 @@ export const it: Messages = {
       no: "Stasera no",
       home: "A casa",
       roundOk: "Ricevuto",
+      roundNot: "Non è mio",
       mute: "Silenzia fino a domattina",
     },
     feedCheat: "{who}: tentativo di imbroglio a {venue}",
