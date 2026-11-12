@@ -19,10 +19,17 @@ export function pushLanguage(value: unknown): UiLanguage {
 /** Generic title and body for a kind: no name, no figure, no message (QOL-27, MSG-04). */
 export function pushCopy(language: UiLanguage, kind: NotificationKind, params: Record<string, unknown> = {}): { title: string; body: string } {
   const copy = catalogues[language].notify.push[kind];
-  if (kind !== "crewNearby") return copy;
-  // A written variant, without any name: someone's night is not for the lock screen (QOL-27).
-  const lines = catalogues[language].notify.crewNearby[params.live ? "pushLive" : "gathered"] as Record<string, string>;
-  return { title: copy.title, body: lines[`v${typeof params.v === "number" ? params.v : 1}`] ?? copy.body };
+  const v = `v${typeof params.v === "number" ? params.v : 1}`;
+  // A written variant, without any name or place: someone's night is not for the lock screen (QOL-27).
+  if (kind === "crewNearby") {
+    const lines = catalogues[language].notify.crewNearby[params.live ? "pushLive" : "gathered"] as Record<string, string>;
+    return { title: copy.title, body: lines[v] ?? copy.body };
+  }
+  if (kind === "gathering" || kind === "partyStarted" || kind === "closingSoon") {
+    const lines = catalogues[language].notify[kind].push as Record<string, string>;
+    return { title: copy.title, body: lines[v] ?? copy.body };
+  }
+  return copy;
 }
 
 /** The one push sent after quiet hours for everything that waited. */

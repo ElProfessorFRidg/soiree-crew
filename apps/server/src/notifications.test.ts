@@ -210,7 +210,8 @@ describe("settings (N-35, QOL-20, QOL-30)", () => {
     await app.inject({ method: "POST", url: `/v1/parties/${partyId}/status`, headers: lea.auth, payload: { unwell: true } });
     await push.idle();
     expect(ios.sent.map((s) => s.message.data.k)).toEqual(["unwell"]);
-    expect((await inbox(malik)).items.map((i) => i.kind).sort()).toEqual(["round", "unwell"]);
+    // Launching the party told malik before he muted it; the mute holds back everything after.
+    expect((await inbox(malik)).items.map((i) => i.kind).sort()).toEqual(["partyStarted", "round", "unwell"]);
     // Outsiders cannot mute a party they are not in.
     const stranger = await account("stranger");
     expect((await app.inject({ method: "POST", url: `/v1/parties/${partyId}/mute`, headers: stranger.auth, payload: {} })).statusCode).toBe(404);
@@ -287,7 +288,8 @@ describe("producers", () => {
     await confirm(await drink(jade), malik);
     await confirm(await drink(jade), malik);
     const box = await inbox(malik);
-    expect(box.items.map((i) => [i.kind, i.params.name, i.partyId])).toEqual([["overtaken", "jade", partyId]]);
+    expect(box.items.map((i) => i.kind).sort()).toEqual(["overtaken", "partyStarted"]);
+    expect(box.items.filter((i) => i.kind === "overtaken").map((i) => [i.params.name, i.partyId])).toEqual([["jade", partyId]]);
     // Malik takes the lead back, then jade again within the hour: malik hears nothing new.
     await confirm(await drink(malik), jade);
     await confirm(await drink(malik), jade);
@@ -313,7 +315,7 @@ describe("producers", () => {
     await app.inject({ method: "POST", url: `/v1/parties/${partyId}/status`, headers: jade.auth, payload: { homeSafe: true } });
     await app.inject({ method: "POST", url: `/v1/parties/${partyId}/close`, headers: jade.auth });
     await sweepNotifications(testCtx());
-    expect((await inbox(malik)).items.map((i) => i.kind).sort()).toEqual(["homeCheck", "recapReady"]);
+    expect((await inbox(malik)).items.map((i) => i.kind).sort()).toEqual(["homeCheck", "partyStarted", "recapReady"]);
     clock += 61 * MIN;
     await sweepNotifications(testCtx());
     await sweepNotifications(testCtx());

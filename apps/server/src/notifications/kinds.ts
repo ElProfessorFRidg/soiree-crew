@@ -18,10 +18,16 @@ export interface KindSpec {
 export const KINDS = {
   /** Crew members together at night, someone with no night going on: "launch it?" (outing.ts). */
   crewNearby: { channel: "plans", safety: false, canWait: false, category: null },
+  /** QOL-17: three or more of the crew at one venue and no party running: "start one together?" (suggestions.ts). */
+  gathering: { channel: "plans", safety: false, canWait: false, category: null },
+  /** QOL-17: a crew mate just launched a party. */
+  partyStarted: { channel: "plans", safety: false, canWait: false, category: null },
   /** N-03: "I'm going out, who's in?" */
   outCall: { channel: "plans", safety: false, canWait: false, category: "outCall" },
   /** N-18: someone logged a round that includes you. */
   round: { channel: "party", safety: false, canWait: false, category: "round" },
+  /** QOL-17: the venue someone is checked in at closes in half an hour. */
+  closingSoon: { channel: "party", safety: false, canWait: false, category: null },
   /** O-41 */
   recapReady: { channel: "party", safety: false, canWait: true, category: "party" },
   /** TER-04: a venue changed boss; `mine` when it was taken from the recipient. */

@@ -6,6 +6,7 @@ import { assertPublishable } from "../posting";
 import { intakeOf, PRE_PARTY_MS, sweepParty, tellUnwell } from "../nightWatch";
 import { notifyRecapReady } from "../notifications/producers";
 import { partySchema, responseSchema } from "../schemas";
+import { notifyPartyStarted } from "../suggestions";
 
 const HOUR_MS = 3_600_000;
 /** QOL-10: the last known position shown with a low battery stays this long. */
@@ -110,6 +111,8 @@ export function partyRoutes(app: FastifyInstance, ctx: Context): void {
     const members = await ctx.db.query<{ user_id: string }>("select user_id from crew_members where crew_id = $1", [input.crewId]);
     ctx.live.notify(members.map((m) => m.user_id), { type: "crew.changed", crewId: input.crewId });
     const rows = await ctx.db.query<PartyRow>("select * from parties where id = $1", [input.id]);
+    // QOL-17: a party launched now tells the rest of the crew. A failure never fails the creation.
+    await notifyPartyStarted(ctx, rows[0]!).catch(() => undefined);
     return reply.status(201).send({ party: partyView(rows[0]!, now) });
   });
 

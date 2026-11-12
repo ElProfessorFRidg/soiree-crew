@@ -9,6 +9,7 @@ import { dayBoundaryOf, nightOf, offsetMinutes } from "../time";
 import { samePlaceIds, venueFacts } from "../hours";
 import { canSetHq, housePints, setHq } from "./venueFacts";
 import { RateLimiter } from "../ratelimit";
+import { gatheringFor, suggestGathering } from "../suggestions";
 
 const venueSchema = z.object({
   id: z.string().uuid(),
@@ -195,9 +196,14 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
       facts.set(v.id, { openNow: f.openNow, happyNow: f.happyNow });
     }
     const pints = await housePints(ctx, venues.map((v) => v.id));
+    // QOL-17: three or more of us at one venue and no party running: the app offers to start one.
+    const gathering = await gatheringFor(ctx, request.params.id, user.id);
     return {
       season,
       variant: seasonRules(season).variant,
+      gathering: gathering
+        ? { venueId: gathering.venueId, venueName: gathering.venueName, count: gathering.count, names: gathering.checkedIn.map((id) => nameOf.get(id) ?? "").filter(Boolean) }
+        : null,
       venues: venues.map((v) => {
         const standing = standings.find((s) => s.venueId === v.id);
         const boss = standing?.bossId ?? null;
@@ -392,6 +398,8 @@ export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string):
     await notifyCrew(ctx, venue.crew_id);
     if (takeover) await notifyTakeover(ctx, venue.crew_id, takeover);
     if (evaluation.verdict === "rejected") await notifyCheatAttempt(ctx, venue.crew_id, venue.id, user.id, input.id);
+    // QOL-17: the third one in starts the "start one together?" for everyone there. A failure here never fails the check-in.
+    if (evaluation.verdict === "accepted" && !input.private) await suggestGathering(ctx, venue.crew_id).catch(() => undefined);
     return reply.status(201).send({
       id: input.id,
       verdict: evaluation.verdict,

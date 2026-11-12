@@ -50,6 +50,32 @@ export function inRanges(ranges: HourRange[], at: number, timeZone: string): boo
   );
 }
 
+/**
+ * QOL-17: when a place open at `at` closes, following a range that runs into the next one (open
+ * until midnight, then midnight to 2 am). Null when it is closed now, or never closes this week.
+ */
+export function closesAt(ranges: HourRange[], at: number, timeZone: string): number | null {
+  if (!inRanges(ranges, at, timeZone)) return null;
+  let t = at - (at % 60_000);
+  for (let hop = 0; hop < 8; hop++) {
+    const { day, minute } = localMoment(t, timeZone);
+    const yesterday = (day + 6) % 7;
+    let left = 0;
+    for (const r of ranges) {
+      if (r.to > r.from) {
+        if (r.days.includes(day) && minute >= r.from && minute < r.to) left = Math.max(left, r.to - minute);
+      } else {
+        if (r.days.includes(day) && minute >= r.from) left = Math.max(left, 24 * 60 - minute + r.to);
+        if (r.days.includes(yesterday) && minute < r.to) left = Math.max(left, r.to - minute);
+      }
+    }
+    if (left === 0) return t;
+    t += left * 60_000;
+    if (!inRanges(ranges, t, timeZone)) return t;
+  }
+  return null;
+}
+
 export type FactsSource = "owner" | "crew";
 
 export interface VenueFacts {

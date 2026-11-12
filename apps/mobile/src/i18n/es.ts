@@ -2468,6 +2468,19 @@ export const es: Messages = {
   },
   // O-38, N-35, QOL-03, QOL-30: the notification centre, push text (generic) and actions.
   notify: {
+    gathering: {
+      push: { v1: "Varios del crew están en el mismo sitio. ¿Una fiesta juntos?", v2: "El crew está junto. ¿Quién pulsa el botón?", v3: "Esto ya es multitud. ¿Lanzamos la fiesta?", v4: "El crew está casi al completo. ¿Lo hacemos oficial?" },
+      item: { v1: "Sois {count} en {venue}. ¿Lanzamos una fiesta juntos?", v2: "{count} del crew en {venue}, solo falta el botón de empezar.", v3: "{venue}: {count} del crew en un sitio. ¿Oficializamos la fiesta?", v4: "{venue} se llena ({count}). ¿La lanzas?" },
+    },
+    partyStarted: {
+      push: { v1: "El crew acaba de lanzar una fiesta. ¿Te unes?", v2: "Empieza sin ti. ¡Corre!", v3: "Hay fiesta, tu sitio te espera.", v4: "El crew ya rueda. Falta alguien..." },
+      item: { v1: "{name} acaba de lanzar {party}. ¿Te unes?", v2: "{party} arranca, la lanzó {name}. Tu sitio te espera.", v3: "{name} abrió el baile con {party}. ¿Vienes?", v4: "{party} acaba de empezar, {name} te espera." },
+    },
+    closingSoon: {
+      push: { v1: "Cierran en media hora. ¿Última ronda?", v2: "Recta final, cierran pronto.", v3: "Pronto cae el telón. ¡Piensa en lo siguiente!", v4: "Queda poco para el cierre." },
+      item: { v1: "{venue} cierra en {minutes} min. ¿Última ronda?", v2: "Solo {minutes} min para que cierre {venue}.", v3: "{venue} baja la persiana en {minutes} min. ¿Y luego?", v4: "Última copa en {venue}: cierra en {minutes} min." },
+    },
+    gatheringBanner: { title: "{count} del crew en {venue}", body: "Lanzad una fiesta juntos, basta un toque.", start: "Lanzar la fiesta" },
     crewNearby: {
       live: { v1: "{name} y el crew están de fiesta al lado. ¿Lanzas la tuya?", v2: "{name} ya lanzó la noche aquí al lado. ¿Te apuntas?", v3: "Se brinda al lado: {name} está de fiesta. ¿Lanzas la tuya?", v4: "{name} y la peña ya arrancaron cerca. ¿Y tú?", v5: "{name} está de fiesta a dos pasos. ¡Lanza la tuya!", v6: "El crew se calienta al lado, {name} abrió la pista. ¿Lanzas?", v7: "{name} ya está en ello, aquí al lado. ¡Te esperamos!", v8: "Al lado, {name} y el crew empezaron. ¿Lanzas tu noche?" },
       pushLive: { v1: "El crew está de fiesta al lado. ¿Lanzas la tuya?", v2: "Ya empezó aquí al lado. ¿Te apuntas?", v3: "Se brinda al lado. ¿Lanzas tu noche?", v4: "La peña ya arrancó cerca. ¿Y tú?", v5: "Hay fiesta a dos pasos. ¡Lanza la tuya!", v6: "El crew se calienta al lado. ¿Lanzas?", v7: "Ya están en ello, aquí al lado. ¡Te esperamos!", v8: "Al lado, el crew empezó. ¿Lanzas tu noche?" },
@@ -2496,6 +2509,9 @@ export const es: Messages = {
     },
     kinds: {
       outCall: "¿Quién se apunta?",
+      gathering: "El crew junto en un sitio",
+      partyStarted: "Una fiesta lanzada por el crew",
+      closingSoon: "Cierre cercano",
       crewNearby: "El crew junto cerca",
       round: "Rondas para ti",
       recapReady: "Resumen listo",
@@ -2530,6 +2546,9 @@ export const es: Messages = {
     },
     push: {
       outCall: { title: "¿Quién se apunta?", body: "Alguien del crew sale esta noche." },
+      gathering: { title: "Estáis juntos", body: "Gente del crew está en el mismo sitio. ¿Lanzáis una fiesta?" },
+      partyStarted: { title: "Acaba de empezar una fiesta", body: "Alguien del crew acaba de lanzar una fiesta." },
+      closingSoon: { title: "Cierran pronto", body: "El sitio donde estás cierra en media hora." },
       crewNearby: { title: "El crew anda cerca", body: "Gente del crew está junta cerca de ti." },
       round: { title: "Una ronda para ti", body: "Alguien te invita a una bebida. Abre para confirmar." },
       recapReady: { title: "Resumen listo", body: "El resumen de la fiesta te espera." },

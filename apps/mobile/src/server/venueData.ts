@@ -70,8 +70,16 @@ export interface CheckInResult {
   takeover: { bossId: string | null; takenFrom: string | null } | null;
 }
 
+/** QOL-17: three or more of the crew at one venue and no party running. */
+export interface Gathering {
+  venueId: string;
+  venueName: string;
+  count: number;
+  names: string[];
+}
+
 interface VenueState {
-  byCrew: Record<string, { season: string; venues: VenueSummary[] }>;
+  byCrew: Record<string, { season: string; venues: VenueSummary[]; gathering?: Gathering | null }>;
   /** My open check-in, so "still here" and "leaving" know what to update. */
   openCheckIn: { id: string; venueId: string; at: number } | null;
 }
@@ -79,7 +87,7 @@ interface VenueState {
 export const useVenueData = create<VenueState>(() => ({ byCrew: {}, openCheckIn: null }));
 
 export async function refreshVenues(crewId: string): Promise<void> {
-  const data = await api<{ season: string; venues: VenueSummary[] }>(`/v1/crews/${crewId}/venues`);
+  const data = await api<{ season: string; venues: VenueSummary[]; gathering?: Gathering | null }>(`/v1/crews/${crewId}/venues`);
   useVenueData.setState((state) => ({ byCrew: { ...state.byCrew, [crewId]: data } }));
 }
 

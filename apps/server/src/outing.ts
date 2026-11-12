@@ -1,5 +1,6 @@
 import type { Context } from "./context";
 import { claimMark, inQuietHours, loadRecipients, notifyUsers } from "./notifications/notify";
+import { suggestGathering } from "./suggestions";
 import { offsetMinutes } from "./time";
 
 // "Me détecter avec mon crew" and the learning behind every "go out?" nudge. The phone sends a
@@ -178,6 +179,8 @@ export async function matchCrews(ctx: Context, userId: string): Promise<void> {
   const me = (await ctx.db.query<{ lat: number; lng: number }>("select lat, lng from whereabouts where user_id = $1", [userId]))[0];
   if (!me) return;
   for (const { crew_id: crewId } of crews) {
+    // QOL-17: three or more at one venue get "start one together?" instead of this nudge.
+    const gathered = await suggestGathering(ctx, crewId).catch(() => new Set<string>());
     const around = await ctx.db.query<{ user_id: string; lat: number; lng: number; muted_until: number | null; display_name: string }>(
       `select w.user_id, w.lat, w.lng, w.muted_until, u.display_name from whereabouts w
        join crew_members m on m.user_id = w.user_id and m.crew_id = $1 join users u on u.id = w.user_id
@@ -190,6 +193,7 @@ export async function matchCrews(ctx: Context, userId: string): Promise<void> {
     const idle: typeof together = [];
     for (const w of together) ((await nightGoingOn(ctx, w.user_id, now)) ? live : idle).push(w);
     for (const w of idle) {
+      if (gathered.has(w.user_id)) continue;
       if (!(await mayNudge(ctx, w.user_id, now, w.muted_until === null ? null : Number(w.muted_until)))) continue;
       if (!(await claimMark(ctx, w.user_id, `crewNearby:${crewId}`, SAME_GATHERING_MS))) continue;
       const first = live[0];
