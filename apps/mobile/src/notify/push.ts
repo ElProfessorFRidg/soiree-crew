@@ -25,6 +25,7 @@ const ACTION = {
   no: "out-no",
   home: "home-safe",
   roundOk: "round-ok",
+  roundNot: "round-not",
   mute: "party-mute",
 } as const;
 const CATEGORY: Partial<Record<NotificationKind, string>> = {
@@ -57,7 +58,11 @@ export async function prepareNotifications(): Promise<void> {
       { identifier: ACTION.maybe, buttonTitle: i18n.t("notify.actions.maybe"), options: background },
       { identifier: ACTION.no, buttonTitle: i18n.t("notify.actions.no"), options: background },
     ]),
-    Notifications.setNotificationCategoryAsync("round", [{ identifier: ACTION.roundOk, buttonTitle: i18n.t("notify.actions.roundOk"), options: background }, mute]),
+    Notifications.setNotificationCategoryAsync("round", [
+      { identifier: ACTION.roundOk, buttonTitle: i18n.t("notify.actions.roundOk"), options: background },
+      { identifier: ACTION.roundNot, buttonTitle: i18n.t("notify.actions.roundNot"), options: background },
+      mute,
+    ]),
     Notifications.setNotificationCategoryAsync("home", [{ identifier: ACTION.home, buttonTitle: i18n.t("notify.actions.home"), options: background }, mute]),
     Notifications.setNotificationCategoryAsync("party", [mute]),
   ]).catch(() => undefined);
@@ -215,7 +220,14 @@ export function handleNotificationResponse(response: Notifications.NotificationR
       .catch(() => undefined);
     return true;
   }
-  if (action === ACTION.roundOk) {
+  if ((action === ACTION.roundOk || action === ACTION.roundNot) && data.p && data.r) {
+    const reply = action === ACTION.roundOk ? "ok" : "notMe";
+    void api(`/v1/parties/${data.p}/rounds/${data.r}/reply`, { method: "POST", body: { reply } })
+      .then(markSeen)
+      .catch(() => undefined);
+    return true;
+  }
+  if (action === ACTION.roundOk || action === ACTION.roundNot) {
     void markSeen();
     return true;
   }

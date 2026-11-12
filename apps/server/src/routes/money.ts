@@ -405,8 +405,21 @@ export function moneyRoutes(app: FastifyInstance, ctx: Context): void {
     );
     // The round's expense lands in this pool, so its amount has to be in the pool's currency.
     const pool = (await ctx.db.query<{ id: string; currency: string }>("select id, currency from pools where party_id = $1 and closed_at is null limit 1", [request.params.id]))[0];
+    const confirmed = rounds.length
+      ? await ctx.db.query<{ round_id: string; user_id: string }>("select round_id, user_id from round_replies where round_id = any($1::uuid[]) and reply = 'ok'", [
+          rounds.map((r) => r.id),
+        ])
+      : [];
     return {
-      rounds: rounds.map((r) => ({ id: r.id, payerId: r.payer_id, amount: r.amount, currency: r.currency, memberIds: JSON.parse(r.member_ids) as string[], at: r.created_at })),
+      rounds: rounds.map((r) => ({
+        id: r.id,
+        payerId: r.payer_id,
+        amount: r.amount,
+        currency: r.currency,
+        memberIds: JSON.parse(r.member_ids) as string[],
+        confirmedIds: confirmed.filter((c) => c.round_id === r.id).map((c) => c.user_id),
+        at: r.created_at,
+      })),
       present: present.map((p) => ({ userId: p.user_id, name: p.display_name })),
       nextPayerId: rotation.order[0] ?? null,
       rotation: rotation.order,
@@ -583,6 +596,62 @@ export function moneyRoutes(app: FastifyInstance, ctx: Context): void {
     ctx.live.notify(going, { type: "party.changed", partyId: round.party_id });
     ctx.live.notify([user.id], { type: "sync", reason: "own_write" });
     if (dropped.poolId) ctx.live.notify(going, { type: "crew.changed", crewId: round.crew_id });
+    return { ok: true };
+  });
+
+  /**
+   * QOL-03: a member answers a round, from its notification or the app. "ok" confirms it. "notMe"
+   * takes them out: their drink from the round is removed (the phone drops it on the next sync) and
+   * the expense is split among the others; what was paid stays what was paid. Answering twice
+   * the same way changes nothing; a drink taken out does not come back with a later "ok".
+   */
+  app.post<{ Params: { id: string; roundId: string } }>("/v1/parties/:id/rounds/:roundId/reply", async (request) => {
+    const user = requireUser(request);
+    uuid.parse(request.params.id);
+    uuid.parse(request.params.roundId);
+    const { reply } = z.object({ reply: z.enum(["ok", "notMe"]) }).parse(request.body);
+    const round = (
+      await ctx.db.query<{ member_ids: string; expense_id: string | null }>("select member_ids, expense_id from rounds where id = $1 and party_id = $2", [
+        request.params.roundId,
+        request.params.id,
+      ])
+    )[0];
+    if (!round) throw new HttpError(404, "not_found");
+    const previous = (
+      await ctx.db.query<{ reply: string }>("select reply from round_replies where round_id = $1 and user_id = $2", [request.params.roundId, user.id])
+    )[0]?.reply;
+    if (previous === "not_me") {
+      if (reply === "notMe") return { ok: true };
+      throw new HttpError(409, "conflict");
+    }
+    const members = JSON.parse(round.member_ids) as string[];
+    if (!members.includes(user.id)) throw new HttpError(404, "not_found");
+    const now = ctx.now();
+
+    if (reply === "ok") {
+      await ctx.db.query("insert into round_replies (round_id, user_id, reply, at) values ($1, $2, 'ok', $3) on conflict (round_id, user_id) do nothing", [
+        request.params.roundId,
+        user.id,
+        now,
+      ]);
+      return { ok: true };
+    }
+
+    await ctx.db.transaction(async (tx) => {
+      const dropped = await dropFromRound(tx, request.params.roundId, user.id, now);
+      // The round is gone with its last member, and its replies with it.
+      if (dropped && (await tx.query("select 1 from rounds where id = $1", [request.params.roundId])).length) {
+        await tx.query(
+          "insert into round_replies (round_id, user_id, reply, at) values ($1, $2, 'not_me', $3) on conflict (round_id, user_id) do update set reply = 'not_me', at = $3",
+          [request.params.roundId, user.id, now],
+        );
+      }
+    });
+    const going = (await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1 and response = 'going'", [request.params.id])).map(
+      (m) => m.user_id,
+    );
+    ctx.live.notify(going, { type: "party.changed", partyId: request.params.id });
+    ctx.live.notify([user.id], { type: "sync", reason: "own_write" });
     return { ok: true };
   });
 }

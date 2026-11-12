@@ -68,7 +68,7 @@ export async function notifyChatMessage(ctx: Context, conversation: { id: string
   });
 }
 
-/** N-18: someone logged a round for you; "Got it" confirms it from the notification (QOL-03). */
+/** N-18: someone logged a round for you; confirm it or say it is not yours from the notification (QOL-03). */
 export async function notifyRound(ctx: Context, partyId: string, roundId: string, memberIds: string[], actorId: string): Promise<void> {
   await notifyLater(ctx, memberIds, { kind: "round", actorId, partyId, refId: roundId, params: { name: await nameOf(ctx, actorId) } });
 }

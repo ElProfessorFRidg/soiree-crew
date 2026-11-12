@@ -238,4 +238,55 @@ describe("rounds (N-18)", () => {
     expect(again.statusCode).toBe(200);
     expect(await db.query("select 1 from rounds")).toHaveLength(1);
   });
+
+  it("takes a member out of a round from its notification, and records a confirmation (QOL-03)", async () => {
+    const { users, partyId } = await crewWithParty("jade", "malik", "ines");
+    const [jade, malik, ines] = users as [User, User, User];
+    const roundId = randomUUID();
+    await app.inject({
+      method: "POST",
+      url: `/v1/parties/${partyId}/rounds`,
+      headers: jade.auth,
+      payload: { id: roundId, payerId: jade.id, memberIds: [jade.id, malik.id, ines.id], drink: { presetId: "m-pint", kind: "pint", volumeMl: 500, abv: 0.05 }, amount: 2100, currency: "EUR" },
+    });
+    const answer = (who: User, reply: string) => app.inject({ method: "POST", url: `/v1/parties/${partyId}/rounds/${roundId}/reply`, headers: who.auth, payload: { reply } });
+
+    expect((await answer(ines, "ok")).statusCode).toBe(200);
+    expect((await answer(malik, "notMe")).statusCode).toBe(200);
+    // Twice is once.
+    expect((await answer(malik, "notMe")).statusCode).toBe(200);
+    // The drink taken out does not come back.
+    expect((await answer(malik, "ok")).statusCode).toBe(409);
+
+    const sync = (await app.inject({ method: "GET", url: "/v1/sync?since=0", headers: malik.auth })).json() as { drinks: { deleted?: boolean }[] };
+    expect(sync.drinks).toEqual([expect.objectContaining({ deleted: true })]);
+    const list = (await app.inject({ method: "GET", url: `/v1/parties/${partyId}/rounds`, headers: jade.auth })).json() as {
+      rounds: { memberIds: string[]; confirmedIds: string[] }[];
+    };
+    expect(list.rounds[0]!.memberIds.sort()).toEqual([jade.id, ines.id].sort());
+    expect(list.rounds[0]!.confirmedIds).toEqual([ines.id]);
+    const split = (await db.query<{ split: string }>("select split from expenses"))[0]!;
+    expect((JSON.parse(split.split) as { members: string[] }).members.sort()).toEqual([jade.id, ines.id].sort());
+  });
+
+  it("refuses an answer from someone the round is not for", async () => {
+    const { users, partyId } = await crewWithParty("jade", "malik", "ines");
+    const [jade, malik, ines] = users as [User, User, User];
+    const roundId = randomUUID();
+    await app.inject({
+      method: "POST",
+      url: `/v1/parties/${partyId}/rounds`,
+      headers: jade.auth,
+      payload: { id: roundId, payerId: jade.id, memberIds: [jade.id, malik.id], drink: { presetId: "m-pint", kind: "pint", volumeMl: 500, abv: 0.05 }, amount: 0, currency: "EUR" },
+    });
+    const res = await app.inject({ method: "POST", url: `/v1/parties/${partyId}/rounds/${roundId}/reply`, headers: ines.auth, payload: { reply: "notMe" } });
+    expect(res.statusCode).toBe(404);
+    expect(await db.query("select 1 from drinks where deleted_at is not null")).toHaveLength(0);
+  });
+
+  it("answers 400, not 500, to a round id that is not a UUID", async () => {
+    const { users, partyId } = await crewWithParty("jade", "malik");
+    const res = await app.inject({ method: "POST", url: `/v1/parties/${partyId}/rounds/not-a-uuid/reply`, headers: users[0]!.auth, payload: { reply: "ok" } });
+    expect(res.statusCode).toBe(400);
+  });
 });

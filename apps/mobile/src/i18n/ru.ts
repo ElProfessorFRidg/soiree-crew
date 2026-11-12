@@ -2600,6 +2600,7 @@ export const ru: Messages = {
       no: "Не сегодня",
       home: "Я дома",
       roundOk: "Принято",
+      roundNot: "Не мне",
       mute: "Без звука до утра",
     },
     feedCheat: "{who}: попытка обмана, {venue}",
