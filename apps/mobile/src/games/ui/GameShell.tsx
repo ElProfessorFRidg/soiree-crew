@@ -15,7 +15,7 @@ import { ScalePressable } from "@/ui/Pressable";
 import { Text } from "@/ui/Text";
 import { ToastHost } from "@/ui/Toast";
 import { useGameUi } from "../hooks";
-import { useGameT } from "../i18n";
+import { useGameT, type GameMessageKey } from "../i18n";
 import { addTablePlayer, useGamesStore, type TablePlayer } from "../store";
 import { DrinkFab } from "./DrinkFab";
 import { RulesList } from "./Rules";
@@ -44,11 +44,15 @@ interface Props {
   scroll?: boolean;
   /** Full-bleed games (fingers on the screen) manage their own layout. */
   bleed?: boolean;
+  /** Online games: the rules sheet lists these instead of the pass-the-phone ones. */
+  rules?: readonly GameMessageKey[];
+  /** Online games: the line under a player in the players sheet (a score), in place of the penalty count. */
+  playerNote?: (id: string) => string;
   children: ReactNode;
 }
 
 /** Frame of every game: header with back and "?", players sheet, add-drink button, toasts, and the level-3 way home. */
-export function GameShell({ gameId, status, helpHidden, fab = "bottom", players, activeIds, ledger, onRemovePlayer, onAddPlayer, onStop, footer, scroll = true, bleed = false, children }: Props) {
+export function GameShell({ gameId, status, helpHidden, fab = "bottom", players, activeIds, ledger, onRemovePlayer, onAddPlayer, onStop, footer, scroll = true, bleed = false, rules, playerNote, children }: Props) {
   useKeepAwake();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -101,7 +105,7 @@ export function GameShell({ gameId, status, helpHidden, fab = "bottom", players,
         onClose={() => setSheet(null)}
         footer={<Button label={g.t("shell.resume")} height={ui.secondary} onPress={() => setSheet(null)} />}
       >
-        <RulesList gameId={gameId} />
+        <RulesList gameId={gameId} keys={rules} />
       </Sheet>
       <PlayersSheet
         visible={sheet === "players"}
@@ -109,6 +113,7 @@ export function GameShell({ gameId, status, helpHidden, fab = "bottom", players,
         players={players}
         activeIds={activeIds}
         ledger={ledger}
+        playerNote={playerNote}
         onRemovePlayer={onRemovePlayer}
         onAddPlayer={onAddPlayer}
         onStop={() => {
@@ -126,6 +131,7 @@ function PlayersSheet({
   players,
   activeIds,
   ledger,
+  playerNote,
   onRemovePlayer,
   onAddPlayer,
   onStop,
@@ -135,6 +141,7 @@ function PlayersSheet({
   players: readonly TablePlayer[];
   activeIds: ReadonlySet<string>;
   ledger: PenaltyLedger;
+  playerNote?: (id: string) => string;
   onRemovePlayer?: (id: string) => void;
   onAddPlayer?: (player: TablePlayer) => void;
   onStop: () => void;
@@ -162,7 +169,7 @@ function PlayersSheet({
         <Row
           key={player.id}
           title={player.name}
-          subtitle={g.plural("shell.penalties", ledger[player.id] ?? 0)}
+          subtitle={playerNote ? playerNote(player.id) : g.plural("shell.penalties", ledger[player.id] ?? 0)}
           leading={<Avatar personId={player.id} name={player.name} />}
           trailing={
             onRemovePlayer ? (

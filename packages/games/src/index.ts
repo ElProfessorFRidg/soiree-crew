@@ -20,3 +20,6 @@ export * from "./games/hiddenWord";
 export * from "./games/quickDraw";
 export * from "./games/crash";
 export { contentFor, type ContentLanguage } from "./content";
+export * from "./gribouille/engine";
+export * from "./gribouille/words";
+export * from "./gribouille/transport";

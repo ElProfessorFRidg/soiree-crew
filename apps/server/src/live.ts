@@ -30,6 +30,8 @@ export type LiveEvent =
   | { type: "friends.changed" }
   /** COM-08: a moderation decision about my content or my report (statement of reasons). */
   | { type: "moderation.notice" }
+  /** O-63: a Gribouille room changed (a player, a guess, strokes, a new turn); the phone asks the room for the rest. */
+  | { type: "gribouille.changed"; roomId: string }
   /** O-38: a new inbox item; `alert` when the phone should show it (not muted, not held for the morning). */
   | { type: "notification"; id: string; kind: string; alert: boolean };
 
