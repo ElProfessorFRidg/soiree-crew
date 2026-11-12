@@ -198,4 +198,44 @@ describe("rounds (N-18)", () => {
     const { id: other } = (await logRound(partyId, jade, jade.id, [jade.id], 600)).json() as Summary;
     expect((await app.inject({ method: "POST", url: `/v1/rounds/${other}/leave`, headers: malik.auth })).statusCode).toBe(404);
   });
+
+  it("lets a party guest outside the crew leave a round, and only calls it done once the drink is really gone", async () => {
+    const { users, partyId } = await crewWithParty("jade", "malik");
+    const [jade, malik] = users as [User, User];
+    const guest = await account("guest");
+    await db.query("insert into party_members (party_id, user_id, response) values ($1, $2, 'going')", [partyId, guest.id]);
+    const { id: roundId } = (await logRound(partyId, jade, jade.id, [jade.id, malik.id, guest.id], 1800)).json() as Summary;
+    expect((await app.inject({ method: "POST", url: `/v1/rounds/${roundId}/leave`, headers: guest.auth })).statusCode).toBe(200);
+    expect(await db.query("select 1 from drinks where round_id = $1 and user_id = $2 and deleted_at is null", [roundId, guest.id])).toHaveLength(0);
+    // Not a member of the party: no.
+    const stranger = await account("stranger");
+    expect((await app.inject({ method: "POST", url: `/v1/rounds/${roundId}/leave`, headers: stranger.auth })).statusCode).toBe(404);
+    // A drink still live is not "already done": a leave that cannot drop it answers 404, not ok.
+    await db.query("update rounds set member_ids = $2 where id = $1", [roundId, JSON.stringify([jade.id, malik.id])]);
+    await db.query("update drinks set deleted_at = null where round_id = $1 and user_id = $2", [roundId, guest.id]);
+    expect((await app.inject({ method: "POST", url: `/v1/rounds/${roundId}/leave`, headers: guest.auth })).statusCode).toBe(404);
+  });
+
+  it("leaves a changed expense split alone when someone leaves the round", async () => {
+    const { users, partyId } = await crewWithParty("jade", "malik", "ines");
+    const [jade, malik, ines] = users as [User, User, User];
+    const { id: roundId } = (await logRound(partyId, jade, jade.id, [jade.id, malik.id, ines.id], 1800)).json() as Summary;
+    const custom = JSON.stringify({ kind: "shares", shares: { [jade.id]: 1, [malik.id]: 2, [ines.id]: 3 } });
+    await db.query("update expenses set split = $1", [custom]);
+    expect((await app.inject({ method: "POST", url: `/v1/rounds/${roundId}/leave`, headers: ines.auth })).statusCode).toBe(200);
+    expect((await db.query<{ split: string }>("select split from expenses"))[0]!.split).toBe(custom);
+    expect(JSON.parse((await db.query<{ member_ids: string }>("select member_ids from rounds where id = $1", [roundId]))[0]!.member_ids)).toHaveLength(2);
+  });
+
+  it("answers a round id already used in another party with that round's summary, not a 500", async () => {
+    const { users, crewId, partyId } = await crewWithParty("jade", "malik");
+    const [jade, malik] = users as [User, User];
+    const id = randomUUID();
+    expect((await logRound(partyId, jade, jade.id, [jade.id, malik.id], 1200, { id })).statusCode).toBe(201);
+    const other = randomUUID();
+    await app.inject({ method: "POST", url: "/v1/parties", headers: jade.auth, payload: { id: other, crewId, name: "Dimanche", mood: "party", kind: "party", startsAt: clock - 3_600_000, endsAt: clock + 5 * 3_600_000 } });
+    const again = await logRound(other, jade, jade.id, [jade.id], 1200, { id });
+    expect(again.statusCode).toBe(200);
+    expect(await db.query("select 1 from rounds")).toHaveLength(1);
+  });
 });

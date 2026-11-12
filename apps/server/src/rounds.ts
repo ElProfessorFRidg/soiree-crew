@@ -30,7 +30,7 @@ export async function rotationFor(db: Db, crewId: string, partyId: string, prese
  */
 export async function dropFromRound(db: Db, roundId: string, userId: string, now: number): Promise<{ partyId: string; poolId: string | null } | null> {
   const round = (
-    await db.query<{ party_id: string; member_ids: string; expense_id: string | null }>("select party_id, member_ids, expense_id from rounds where id = $1", [roundId])
+    await db.query<{ party_id: string; member_ids: string; expense_id: string | null }>("select party_id, member_ids, expense_id from rounds where id = $1 for update", [roundId])
   )[0];
   if (!round) return null;
   const members = JSON.parse(round.member_ids) as string[];
@@ -39,15 +39,17 @@ export async function dropFromRound(db: Db, roundId: string, userId: string, now
   await db.query("update drinks set deleted_at = $1, updated_at = $1 where round_id = $2 and user_id = $3 and deleted_at is null", [now, roundId, userId]);
   let poolId: string | null = null;
   if (round.expense_id) {
-    const expense = (
-      await db.query<{ pool_id: string }>(
-        left.length
-          ? "update expenses set split = $2 where id = $1 and deleted_at is null returning pool_id"
-          : "update expenses set deleted_at = $2 where id = $1 and deleted_at is null returning pool_id",
-        [round.expense_id, left.length ? JSON.stringify({ kind: "equal", members: left }) : now],
-      )
-    )[0];
-    poolId = expense?.pool_id ?? null;
+    // Only an expense still split equally among the round, with this person in it, loses their share.
+    const expense = (await db.query<{ pool_id: string; split: string }>("select pool_id, split from expenses where id = $1 and deleted_at is null for update", [round.expense_id]))[0];
+    if (expense) {
+      const split = JSON.parse(expense.split) as { kind: string; members?: string[] };
+      if (split.kind === "equal" && split.members?.includes(userId)) {
+        const rest = split.members.filter((id) => id !== userId);
+        if (rest.length) await db.query("update expenses set split = $2 where id = $1", [round.expense_id, JSON.stringify({ kind: "equal", members: rest })]);
+        else await db.query("update expenses set deleted_at = $2 where id = $1", [round.expense_id, now]);
+        poolId = expense.pool_id;
+      }
+    }
   }
   if (left.length) await db.query("update rounds set member_ids = $2 where id = $1", [roundId, JSON.stringify(left)]);
   else await db.query("delete from rounds where id = $1", [roundId]);

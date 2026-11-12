@@ -477,7 +477,7 @@ export function moneyRoutes(app: FastifyInstance, ctx: Context): void {
     )[0];
     if (!party) throw new HttpError(404, "not_found");
     // A retry of a round already logged gets the same answer, whatever changed since.
-    if ((await ctx.db.query("select 1 from rounds where id = $1 and party_id = $2", [input.id, request.params.id])).length) {
+    if ((await ctx.db.query("select 1 from rounds where id = $1", [input.id])).length) {
       return reply.status(200).send(await roundSummary(input.id, party.crew_id, request.params.id));
     }
     if (party.closed_at !== null) throw new HttpError(400, "party_closed");
@@ -564,19 +564,19 @@ export function moneyRoutes(app: FastifyInstance, ctx: Context): void {
     uuid.parse(request.params.id);
     const round = (
       await ctx.db.query<{ party_id: string; crew_id: string }>(
-        "select r.party_id, p.crew_id from rounds r join parties p on p.id = r.party_id join crew_members m on m.crew_id = p.crew_id and m.user_id = $2 where r.id = $1",
+        "select r.party_id, p.crew_id from rounds r join parties p on p.id = r.party_id join party_members m on m.party_id = r.party_id and m.user_id = $2 where r.id = $1",
         [request.params.id, user.id],
       )
     )[0];
     if (!round) {
       // Already dropped (a retry, or the round went with its last member): same answer.
-      if ((await ctx.db.query("select 1 from drinks where round_id = $1 and user_id = $2", [request.params.id, user.id])).length) return { ok: true };
+      if ((await ctx.db.query("select 1 from drinks where round_id = $1 and user_id = $2 and deleted_at is not null", [request.params.id, user.id])).length) return { ok: true };
       throw new HttpError(404, "not_found");
     }
     const now = ctx.now();
     const dropped = await ctx.db.transaction((tx) => dropFromRound(tx, request.params.id, user.id, now));
     if (!dropped) {
-      if ((await ctx.db.query("select 1 from drinks where round_id = $1 and user_id = $2", [request.params.id, user.id])).length) return { ok: true };
+      if ((await ctx.db.query("select 1 from drinks where round_id = $1 and user_id = $2 and deleted_at is not null", [request.params.id, user.id])).length) return { ok: true };
       throw new HttpError(404, "not_found");
     }
     const going = (await ctx.db.query<{ user_id: string }>("select user_id from party_members where party_id = $1 and response = 'going'", [round.party_id])).map((m) => m.user_id);
