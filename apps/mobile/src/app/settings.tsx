@@ -15,6 +15,7 @@ import { useTheme } from "@/theme";
 import { Chip, Panel, Row, Segmented, Switch } from "@/ui/controls";
 import { Icon, type AnyIconName } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
+import type { ThemeChoice } from "@/theme/choice";
 import { Stepper } from "@/ui/Stepper";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
@@ -118,6 +119,9 @@ export default function SettingsScreen() {
   const soundsOn = useAppStore((state) => state.soundsOn);
   const hapticsOn = useAppStore((state) => state.hapticsOn);
   const lockScreenNumbers = useAppStore((state) => state.lockScreenNumbers);
+  const themeChoice = useAppStore((state) => state.themeChoice);
+  const ecoOn = useAppStore((state) => state.ecoOn);
+  const dataSaver = useAppStore((state) => state.dataSaver);
   const nudgesOn = useAppStore((state) => state.nudgesOn);
   const outingNudgeOn = useAppStore((state) => state.outingNudgeOn);
   const crewDetectOn = useAppStore((state) => state.crewDetectOn);
@@ -151,6 +155,19 @@ export default function SettingsScreen() {
                 <Chip key={code} label={code} selected={code === preferences.currency} onPress={() => setPreferences({ currency: code })} />
               ))}
             </View>
+            <Text variant="label">{i18n.t("settings.themeLabel")}</Text>
+            <Segmented<ThemeChoice>
+              accessibilityLabel={i18n.t("settings.themeLabel")}
+              value={themeChoice}
+              items={[
+                { value: "auto", label: i18n.t("settings.themeAuto") },
+                { value: "dark", label: i18n.t("settings.themeDark") },
+                { value: "light", label: i18n.t("settings.themeLight") },
+              ]}
+              onChange={(choice) => useAppStore.setState({ themeChoice: choice })}
+            />
+            <SwitchRow label={i18n.t("settings.eco")} hint={i18n.t("settings.ecoHint")} value={ecoOn} onChange={(on) => useAppStore.setState({ ecoOn: on })} />
+            <SwitchRow label={i18n.t("settings.dataSaver")} hint={i18n.t("settings.dataSaverHint")} value={dataSaver} onChange={(on) => useAppStore.setState({ dataSaver: on })} />
             <Text variant="label">{i18n.t("settings.timeFormat")}</Text>
             <Segmented<"phone" | "h23" | "h12">
               accessibilityLabel={i18n.t("settings.timeFormat")}

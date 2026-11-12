@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { StyleSheet, View, type DimensionValue } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 import { duration, radius } from "@crew/design-tokens";
+import { useEcoLoop } from "@/power/eco";
 import { useTheme } from "@/theme";
 
 /** MOT-10, DESIGN.md §4: a shimmering block where content will be, replaced in place. */
@@ -9,10 +10,11 @@ export function Skeleton({ width = "100%", height = 18, round = false }: { width
   const theme = useTheme();
   const reduceMotion = useReducedMotion();
   const t = useSharedValue(0);
+  const loop = useEcoLoop(false);
   useEffect(() => {
     if (reduceMotion) return;
-    t.value = withRepeat(withTiming(1, { duration: duration.shimmer, easing: Easing.linear }), -1, false);
-  }, [reduceMotion, t]);
+    t.value = withRepeat(withTiming(1, { duration: duration.shimmer * loop.slow, easing: Easing.linear }), loop.count, false);
+  }, [reduceMotion, t, loop.count, loop.slow]);
   const style = useAnimatedStyle(() => ({ opacity: 0.45 + 0.35 * Math.sin(t.value * Math.PI) }));
   return (
     <Animated.View

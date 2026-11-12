@@ -1,3 +1,4 @@
+import { useAppStore } from "@/state/store";
 import { Directory, File, Paths } from "expo-file-system";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
@@ -12,6 +13,9 @@ import type { ChatMedia } from "./store";
 // travels inside the end-to-end encrypted message; the server stores bytes it cannot open.
 
 const MAX_SIDE = 1600;
+/** QOL-24: with the data saver on, photos go out smaller and more compressed. */
+const SAVER_SIDE = 1024;
+const SAVER_COMPRESS = 0.55;
 const THUMB_SIDE = 48;
 /** The server takes 6 MB per file: about 30 s of phone video at the picker's medium quality. */
 const MAX_VIDEO_BYTES = 6 * 1024 * 1024 - 64;
@@ -62,10 +66,12 @@ export async function sendPhoto(conversationId: string, source: "camera" | "libr
     await sendVideo(conversationId, asset, reply);
     return 1;
   }
+  const saver = useAppStore.getState().dataSaver;
+  const side = saver ? SAVER_SIDE : MAX_SIDE;
   const longest = Math.max(asset.width, asset.height);
   const context = ImageManipulator.manipulate(asset.uri);
-  if (longest > MAX_SIDE) context.resize(asset.width >= asset.height ? { width: MAX_SIDE } : { height: MAX_SIDE });
-  const image = await (await context.renderAsync()).saveAsync({ compress: 0.72, format: SaveFormat.JPEG, base64: true });
+  if (longest > side) context.resize(asset.width >= asset.height ? { width: side } : { height: side });
+  const image = await (await context.renderAsync()).saveAsync({ compress: saver ? SAVER_COMPRESS : 0.72, format: SaveFormat.JPEG, base64: true });
   // The thumbnail is made on the phone too and travels inside the encrypted message.
   const thumbContext = ImageManipulator.manipulate(image.uri);
   thumbContext.resize(image.width >= image.height ? { width: THUMB_SIDE } : { height: THUMB_SIDE });

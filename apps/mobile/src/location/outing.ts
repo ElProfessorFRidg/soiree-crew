@@ -9,6 +9,8 @@ import { createTranslator } from "@/i18n";
 import { variantKey } from "@/i18n/variants";
 import { api } from "@/server/api";
 import { useAppStore } from "@/state/store";
+import { savingPowerNow } from "@/power/reading";
+import { locationPlan } from "@/power/saving";
 import { driveAlertEnabled, forgetDriving, onDriveLocations } from "./driving";
 
 // "Rappel quand t'es de sortie": with the "Always" location permission, the phone notices it has
@@ -255,14 +257,15 @@ export async function startOuting(): Promise<boolean> {
     if (startedFor === drive) return true;
     await Location.stopLocationUpdatesAsync(OUTING_TASK).catch(() => undefined);
   }
+  const plan = locationPlan(drive, await savingPowerNow());
   try {
     await Location.startLocationUpdatesAsync(OUTING_TASK, {
-      // Cell and Wi-Fi level: enough to tell "still at the same bar" from "moved on".
-      accuracy: drive ? Location.Accuracy.Balanced : Location.Accuracy.Low,
-      distanceInterval: 100,
-      deferredUpdatesDistance: drive ? 0 : 200,
-      deferredUpdatesInterval: (drive ? 1 : 5) * MINUTE_MS,
-      timeInterval: (drive ? 1 : 5) * MINUTE_MS,
+      // Cell and Wi-Fi level: enough to tell "still at the same bar" from "moved on". Spaced out in eco mode (QOL-24).
+      accuracy: { balanced: Location.Accuracy.Balanced, low: Location.Accuracy.Low, lowest: Location.Accuracy.Lowest }[plan.accuracy],
+      distanceInterval: plan.distanceInterval,
+      deferredUpdatesDistance: plan.deferredUpdatesDistance,
+      deferredUpdatesInterval: plan.intervalMinutes * MINUTE_MS,
+      timeInterval: plan.intervalMinutes * MINUTE_MS,
       activityType: Location.ActivityType.Other,
       pausesUpdatesAutomatically: true,
       showsBackgroundLocationIndicator: false,
