@@ -49,7 +49,7 @@ export interface ProfileView {
     drinks?: { total?: number; favourites?: { kind: string; count: number }[]; usualFirstDrink?: number | null; usualPacePerHour?: number | null; usualLeaving?: number | null };
     records?: { highestBac?: number | null; biggestNight?: number };
     /** O-43: history comes to friends, crew mates and me only; a party name only inside its crew. */
-    nights?: { total?: number; last30Days?: number; history?: { at: number; name: string | null; venues: string[] }[] };
+    nights?: { total?: number; last30Days?: number; withCrew?: number; solo?: number; history?: { at: number; name: string | null; venues: string[] }[] };
     reviews?: ProfileReview[];
     games?: { wins?: number; byGame?: { gameId: string; wins: number }[] };
     /** Unlocked app icons and the game wins: nothing to do with drinking. */

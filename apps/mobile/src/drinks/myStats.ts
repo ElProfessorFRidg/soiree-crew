@@ -99,19 +99,29 @@ export function myStats(
 
 /**
  * Profil board, "Mes stats": nights out per week over the last `weeks` weeks, oldest first, for
- * the year heatmap. A night counts once, whatever was drunk.
+ * the year heatmap. A night counts once, whatever was drunk, party or not (outside a crew party we
+ * trust the person). `crewNights` are the night keys the server says were with the crew; the others
+ * are solo. Before the server has answered (null) every night counts as "crew": one neutral tint.
  */
-export function nightsByWeek(drinks: readonly DrinkEntry[], to: number, dayBoundaryHour: number, weeks = 52): number[] {
+export function nightsByWeek(
+  drinks: readonly DrinkEntry[],
+  to: number,
+  dayBoundaryHour: number,
+  crewNights: ReadonlySet<string> | null,
+  weeks = 52,
+): { crew: number[]; solo: number[] } {
   const offset = (at: number) => -new Date(at).getTimezoneOffset();
   const from = to - weeks * 7 * 86_400_000;
   const seen = new Set<string>();
-  const counts = new Array<number>(weeks).fill(0);
+  const crew = new Array<number>(weeks).fill(0);
+  const solo = new Array<number>(weeks).fill(0);
   for (const d of drinks) {
     if (d.abv <= 0 || d.consumedAt < from || d.consumedAt >= to) continue;
     const night = nightKey(d.consumedAt, offset(d.consumedAt), dayBoundaryHour);
     if (seen.has(night)) continue;
     seen.add(night);
-    counts[Math.min(weeks - 1, Math.floor((d.consumedAt - from) / (7 * 86_400_000)))]! += 1;
+    const week = Math.min(weeks - 1, Math.floor((d.consumedAt - from) / (7 * 86_400_000)));
+    (crewNights === null || crewNights.has(night) ? crew : solo)[week]! += 1;
   }
-  return counts;
+  return { crew, solo };
 }

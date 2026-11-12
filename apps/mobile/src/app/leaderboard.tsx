@@ -150,8 +150,64 @@ export default function LeaderboardScreen() {
   const displayName = (row: { userId: string; name: string }) => (row.userId === me ? `${crewName(row.userId, row.name)} (${i18n.t("crew.you")})` : crewName(row.userId, row.name));
   const shownValue = (value: number) => (metric === "grams" ? `${value} g` : String(value));
 
+  const reasons = myRow?.byReason;
+  const waitingLines = reasons
+    ? [
+        reasons.not_confirmed ? i18n.plural("ranking.waitConfirm", reasons.not_confirmed) : null,
+        reasons.outside_party ? i18n.plural("ranking.waitOutside", reasons.outside_party) : null,
+        reasons.burst + reasons.late_entry ? i18n.plural("ranking.waitSet", reasons.burst + reasons.late_entry) : null,
+      ].filter((line): line is string => line !== null)
+    : [];
+  /** Why the viewer's drinks are not counted here, under their own row. */
+  const waiting = waitingLines.length ? (
+    <View style={styles.waiting}>
+      {waitingLines.map((line) => (
+        <Text key={line} variant="small">
+          {line}
+        </Text>
+      ))}
+    </View>
+  ) : null;
+  const confirmPanel = (
+    <Panel>
+      <Text variant="h3">{i18n.t("ranking.confirmTitle")}</Text>
+      {confirmable.length === 0 ? <Text variant="small">{i18n.t("ranking.noConfirmable")}</Text> : null}
+      {confirmable.map((drink) => (
+        <View key={drink.id} style={styles.confirmRow}>
+          <Avatar personId={drink.userId} name={crewName(drink.userId, drink.name)} size={32} />
+          <Text style={styles.flex}>
+            {crewName(drink.userId, drink.name)}, {formatClock(drink.consumedAt, i18n.language, hourCycle)}
+          </Text>
+          <Button
+            label={drink.confirmedByMe ? i18n.t("ranking.confirmed") : i18n.t("ranking.confirm")}
+            variant={drink.confirmedByMe ? "secondary" : "primary"}
+            height={40}
+            disabled={drink.confirmedByMe}
+            onPress={() =>
+              void confirmDrink(drink.id)
+                .then(() => {
+                  haptic.confirmed();
+                  load();
+                })
+                .catch((error: unknown) =>
+                  showToast({
+                    tone: "danger",
+                    message:
+                      error instanceof ApiError && error.failure.kind === "http" && error.failure.code === "not_together"
+                        ? i18n.t("ranking.notTogether")
+                        : failureMessage(error, i18n),
+                  }),
+                )
+            }
+          />
+        </View>
+      ))}
+    </Panel>
+  );
+
   return (
     <Screen back title={i18n.t("ranking.title")} withToasts>
+      {live && confirmable.length > 0 ? confirmPanel : null}
       <View style={styles.chips}>
         {(["party", "week", "month", "all"] as const).map((value) => (
           <Chip key={value} label={i18n.t(`ranking.${value}`)} selected={period === value} onPress={() => setPeriod(value)} />
@@ -183,6 +239,7 @@ export default function LeaderboardScreen() {
           <Confetti replay={podiumReplay} delayMs={podiumCrownDelay()} calm={calm} />
         </View>
       ) : null}
+      {podium.some((row) => row.userId === me) ? waiting : null}
 
       <View>
         {rest.map((row) => (
@@ -211,6 +268,7 @@ export default function LeaderboardScreen() {
                 {shownValue(row.value)}
               </Numeral>
             </View>
+            {row.userId === me ? waiting : null}
           </Animated.View>
         ))}
       </View>
@@ -221,44 +279,9 @@ export default function LeaderboardScreen() {
           value: `${formatBacValue(DANGER_CAP, preferences.bacUnit, breathRatio(countryRules(preferences.legalCountry)), i18n.locale)} ${i18n.t(`units.${preferences.bacUnit}`)}`,
         })}
       </Text>
-      {myRow?.unverified ? <Text variant="small">{i18n.plural("ranking.myUnverified", myRow.unverified)}</Text> : null}
+      {myRow?.unverified && !waitingLines.length ? <Text variant="small">{i18n.plural("ranking.myUnverified", myRow.unverified)}</Text> : null}
 
-      {live ? (
-        <Panel>
-          <Text variant="h3">{i18n.t("ranking.confirmTitle")}</Text>
-          {confirmable.length === 0 ? <Text variant="small">{i18n.t("ranking.noConfirmable")}</Text> : null}
-          {confirmable.map((drink) => (
-            <View key={drink.id} style={styles.confirmRow}>
-              <Avatar personId={drink.userId} name={crewName(drink.userId, drink.name)} size={32} />
-              <Text style={styles.flex}>
-                {crewName(drink.userId, drink.name)}, {formatClock(drink.consumedAt, i18n.language, hourCycle)}
-              </Text>
-              <Button
-                label={drink.confirmedByMe ? i18n.t("ranking.confirmed") : i18n.t("ranking.confirm")}
-                variant={drink.confirmedByMe ? "secondary" : "primary"}
-                height={40}
-                disabled={drink.confirmedByMe}
-                onPress={() =>
-                  void confirmDrink(drink.id)
-                    .then(() => {
-                      haptic.confirmed();
-                      load();
-                    })
-                    .catch((error: unknown) =>
-                      showToast({
-                        tone: "danger",
-                        message:
-                          error instanceof ApiError && error.failure.kind === "http" && error.failure.code === "not_together"
-                            ? i18n.t("ranking.notTogether")
-                            : failureMessage(error, i18n),
-                      }),
-                    )
-                }
-              />
-            </View>
-          ))}
-        </Panel>
-      ) : null}
+      {live && confirmable.length === 0 ? confirmPanel : null}
 
       {crewId && !disabled ? <Honours crewId={crewId} metric={metric} /> : null}
 
@@ -327,6 +350,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 60, borderBottomWidth: 1 },
   rank: { width: 30, alignItems: "center" },
   flex: { flex: 1 },
+  waiting: { gap: 4, paddingVertical: 8 },
   confirmRow: { flexDirection: "row", alignItems: "center", gap: 10, minHeight: 48 },
   switchRow: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 48 },
 });

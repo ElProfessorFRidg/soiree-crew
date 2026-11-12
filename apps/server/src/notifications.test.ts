@@ -126,7 +126,7 @@ describe("inbox (N-35)", () => {
     expect(box.unread).toBe(1);
     expect(box.items[0]).toMatchObject({ kind: "sos", params: { name: "jade" }, readAt: null });
     // Nobody is told about their own action.
-    expect((await inbox(jade)).items).toEqual([]);
+    expect((await inbox(jade)).items.filter((i) => i.kind !== "confirmDrink")).toEqual([]);
     const read = (await app.inject({ method: "POST", url: "/v1/notifications/read", headers: malik.auth, payload: { ids: [box.items[0]!.id] } })).json() as { unread: number };
     expect(read.unread).toBe(0);
     expect((await inbox(malik)).items[0]!.readAt).not.toBeNull();
@@ -284,11 +284,11 @@ describe("producers", () => {
     const confirm = (id: string, by: User) => app.inject({ method: "POST", url: `/v1/drinks/${id}/confirm`, headers: by.auth });
     await confirm(await drink(malik), jade);
     // Passed while at zero: no news for jade.
-    expect((await inbox(jade)).items).toEqual([]);
+    expect((await inbox(jade)).items.filter((i) => i.kind !== "confirmDrink")).toEqual([]);
     await confirm(await drink(jade), malik);
     await confirm(await drink(jade), malik);
     const box = await inbox(malik);
-    expect(box.items.map((i) => i.kind).sort()).toEqual(["overtaken", "partyStarted"]);
+    expect(box.items.map((i) => i.kind).filter((k) => k !== "confirmDrink").sort()).toEqual(["overtaken", "partyStarted"]);
     expect(box.items.filter((i) => i.kind === "overtaken").map((i) => [i.params.name, i.partyId])).toEqual([["jade", partyId]]);
     // Malik takes the lead back, then jade again within the hour: malik hears nothing new.
     await confirm(await drink(malik), jade);
@@ -297,6 +297,48 @@ describe("producers", () => {
     await confirm(await drink(jade), malik);
     expect((await inbox(malik)).items.filter((i) => i.kind === "overtaken")).toHaveLength(1);
     expect((await inbox(jade)).items.filter((i) => i.kind === "overtaken")).toHaveLength(1);
+  });
+
+  it("asks the others present to confirm a drink, once per drinker every 20 minutes, never the drinker (AC-07)", async () => {
+    const [jade, malik] = [await account("jade"), await account("malik")];
+    const crewId = await crewOf(jade, malik);
+    await partyOf(crewId, [jade, malik]);
+    const asks = async (u: User) => (await inbox(u)).items.filter((i) => i.kind === "confirmDrink");
+    await drink(jade);
+    expect((await asks(malik)).map((i) => i.params.name)).toEqual(["jade"]);
+    expect(await asks(jade)).toEqual([]);
+    // 10 and 20 minutes later: still the same ask.
+    await drink(jade);
+    await drink(jade);
+    expect(await asks(malik)).toHaveLength(1);
+    // More than 20 minutes after the first ask, a new one may come.
+    await drink(jade);
+    expect(await asks(malik)).toHaveLength(2);
+  });
+
+  it("tells each member how many drinks wait and why, the reasons to the owner only (RANK-06)", async () => {
+    const [jade, malik] = [await account("jade"), await account("malik")];
+    const crewId = await crewOf(jade, malik);
+    await partyOf(crewId, [jade, malik]);
+    await drink(jade);
+    await drink(jade);
+    // A drink from three days ago belongs to no party of the crew.
+    const solo = randomUUID();
+    await app.inject({
+      method: "POST",
+      url: "/v1/mutations",
+      headers: jade.auth,
+      payload: { mutations: [{ key: `k-${solo}`, mutation: { kind: "drink.add", drink: { id: solo, presetId: "m-half", kind: "half", volumeMl: 250, abv: 0.05, consumedAt: clock - 3 * 24 * 60 * MIN, loggedAt: clock, withFood: false } } }] },
+    });
+    const board = async (u: User) =>
+      ((await app.inject({ method: "GET", url: `/v1/crews/${crewId}/leaderboard?period=all`, headers: u.auth })).json() as {
+        rows: { userId: string; value: number; pending: number; byReason?: Record<string, number> }[];
+      }).rows.find((r) => r.userId === jade.id)!;
+    const mine = await board(jade);
+    expect(mine).toMatchObject({ value: 0, pending: 2, byReason: { not_confirmed: 2, outside_party: 1, burst: 0, late_entry: 0 } });
+    const seen = await board(malik);
+    expect(seen.pending).toBe(2);
+    expect(seen.byReason).toBeUndefined();
   });
 
   it("flags a quiet member, asks who is home and tells the crew who is not (N-29, N-25)", async () => {
@@ -334,7 +376,7 @@ describe("producers", () => {
     await notifyTakeover(testCtx(), crewId, { venueId, bossId: jade.id, takenFrom: malik.id });
     expect((await inbox(malik)).items[0]).toMatchObject({ kind: "takeover", params: { name: "jade", venue: "Le Zinc", mine: true } });
     expect((await inbox(lea)).items[0]).toMatchObject({ kind: "takeover", params: { mine: false } });
-    expect((await inbox(jade)).items).toEqual([]);
+    expect((await inbox(jade)).items.filter((i) => i.kind !== "confirmDrink")).toEqual([]);
     await notifyCheatAttempt(testCtx(), crewId, venueId, lea.id, randomUUID());
     expect((await inbox(jade)).items[0]).toMatchObject({ kind: "cheatAttempt", params: { name: "lea", venue: "Le Zinc" } });
   });

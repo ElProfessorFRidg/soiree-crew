@@ -5,15 +5,23 @@ import { Text } from "./Text";
 
 const COLUMNS = 13;
 
-/** Profil board: one square per week, darker to amber with the number of nights out. */
-export function Heatmap({ values, accessibilityLabel }: { values: readonly number[]; accessibilityLabel: string }) {
+/**
+ * Profil board: one square per week. Any night out fills the square at full strength (a single night
+ * must be seen): amber for nights with the crew, water for solo ones, split by their share when a week has both.
+ */
+export function Heatmap({ crew, solo, accessibilityLabel }: { crew: readonly number[]; solo: readonly number[]; accessibilityLabel: string }) {
   const theme = useTheme();
-  const shade = (n: number) => (n <= 0 ? theme.surfaceRaised : n === 1 ? `${theme.amber}55` : n === 2 ? `${theme.amber}AA` : theme.amber);
   return (
     <View style={styles.grid} accessible accessibilityRole="image" accessibilityLabel={accessibilityLabel}>
-      {values.map((n, i) => (
-        <View key={i} style={[styles.cell, { backgroundColor: shade(n) }]} />
-      ))}
+      {crew.map((withCrew, i) => {
+        const alone = solo[i] ?? 0;
+        return (
+          <View key={i} style={[styles.cell, { backgroundColor: theme.surfaceRaised }]}>
+            {withCrew > 0 ? <View style={{ flex: withCrew, backgroundColor: theme.amber }} /> : null}
+            {alone > 0 ? <View style={{ flex: alone, backgroundColor: theme.water }} /> : null}
+          </View>
+        );
+      })}
     </View>
   );
 }
@@ -104,7 +112,7 @@ export function CalendarHeatmap({
 
 const styles = StyleSheet.create({
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 3 },
-  cell: { width: `${100 / COLUMNS - 1}%`, aspectRatio: 1, borderRadius: 3 },
+  cell: { width: `${100 / COLUMNS - 1}%`, aspectRatio: 1, borderRadius: 3, overflow: "hidden" },
   calRow: { flexDirection: "row", alignItems: "center" },
   month: { position: "absolute", left: 0, width: 40, fontSize: 10, lineHeight: 12 },
   weekday: { fontSize: 10, textAlign: "left" },

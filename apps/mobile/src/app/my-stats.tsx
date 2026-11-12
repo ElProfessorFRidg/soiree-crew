@@ -45,10 +45,11 @@ export default function MyStatsScreen() {
     return myStats(drinks, water, { from: to - Number(period) * DAY_MS, to, family, dayBoundaryHour, bucket: period === "365" ? "month" : "week" });
   }, [drinks, water, period, family, dayBoundaryHour]);
 
-  const year = useMemo(() => nightsByWeek(drinks, Date.now(), dayBoundaryHour), [drinks, dayBoundaryHour]);
+  const crewNights = useMemo(() => (mine.data?.crewNights ? new Set(mine.data.crewNights) : null), [mine.data]);
+  const year = useMemo(() => nightsByWeek(drinks, Date.now(), dayBoundaryHour, crewNights), [drinks, dayBoundaryHour, crewNights]);
   const habits = mine.data?.habits;
   const clock = (minutesAfterNoon: number) => formatClock(new Date(2026, 0, 1, 12, minutesAfterNoon).getTime(), i18n.language, hourCycle);
-  const yearNights = year.reduce((sum, n) => sum + n, 0);
+  const yearNights = year.crew.reduce((sum, n) => sum + n, 0) + year.solo.reduce((sum, n) => sum + n, 0);
 
   const weekdayLabels = Array.from({ length: 7 }, (_, i) => new Intl.DateTimeFormat(i18n.locale, { weekday: "narrow" }).format(new Date(2026, 10, 2 + i)));
   const bucketLabels = stats.buckets.map((b) =>
@@ -135,8 +136,20 @@ export default function MyStatsScreen() {
       ) : null}
       <Text variant="label">{i18n.t("myStats.yearTitle")}</Text>
       <Panel>
-        <Heatmap values={year} accessibilityLabel={i18n.plural("myStats.yearCount", yearNights)} />
+        <Heatmap crew={year.crew} solo={year.solo} accessibilityLabel={i18n.plural("myStats.yearCount", yearNights)} />
         <Text variant="small">{i18n.plural("myStats.yearCount", yearNights)}</Text>
+        {crewNights ? (
+          <View style={styles.legend}>
+            <View style={styles.legendItem}>
+              <View style={[styles.swatch, { backgroundColor: theme.amber }]} />
+              <Text variant="small">{i18n.t("myStats.legendCrew")}</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.swatch, { backgroundColor: theme.water }]} />
+              <Text variant="small">{i18n.t("myStats.legendSolo")}</Text>
+            </View>
+          </View>
+        ) : null}
       </Panel>
       <Panel>
         <Row title={i18n.t("wrapped.title")} trailing={<Icon name="chev" color={theme.textMuted} />} onPress={() => router.push("/wrapped")} last />
@@ -152,4 +165,7 @@ const styles = StyleSheet.create({
   figure: { flex: 1, gap: 2 },
   line: { flexDirection: "row", alignItems: "center", minHeight: 40, gap: 10 },
   flex: { flex: 1 },
+  legend: { flexDirection: "row", gap: 16 },
+  legendItem: { flexDirection: "row", alignItems: "center", gap: 6 },
+  swatch: { width: 12, height: 12, borderRadius: 3 },
 });

@@ -6,8 +6,7 @@ import { breathRatio, countryRules, formatBacValue } from "@crew/units";
 import { useGameT } from "@/games/i18n";
 import { CRITERIA } from "@/server/placeData";
 import { useTheme } from "@/theme";
-import { drinkLabel } from "@/drinks/display";
-import type { DrinkKind } from "@/drinks/presets";
+import { favouriteLabel } from "@/drinks/favourite";
 import { useT } from "@/i18n";
 import { HeroTarget } from "@/motion/hero";
 import { loyaltyTier } from "@/crew/loyalty";
@@ -39,6 +38,7 @@ export default function ProfileScreen() {
   const theme = useTheme();
   const me = useSession((state) => state.session?.userId);
   const preferences = useAppStore((state) => state.preferences);
+  const localDrinks = useAppStore((state) => state.drinks);
   const id = !params.id || params.id === "me" ? "me" : params.id;
   const mine = id === "me" || id === me;
   const [viewAs, setViewAs] = useState<ViewAs>(mine && params.as ? params.as : "me");
@@ -73,14 +73,18 @@ export default function ProfileScreen() {
   const date = (at: number) => new Intl.DateTimeFormat(i18n.locale, { day: "numeric", month: "long" }).format(new Date(at));
   const titleLabel = (t: NonNullable<typeof s.titles>[number]) => (t.kind === "mayor" ? i18n.t("ranking.mayor", { venue: t.venueName ?? "" }) : i18n.t(`ranking.${t.kind}`));
   const empty = Object.keys(s).length === 0;
+  // Nights split into crew and solo ones; a server without the split keeps the old line.
+  const split = s.nights && typeof s.nights.withCrew === "number" && typeof s.nights.solo === "number" ? i18n.t("people.nightsSplit", { crew: s.nights.withCrew, solo: s.nights.solo }) : null;
   const nightsLine = s.nights
     ? [
         typeof s.nights.total === "number" ? i18n.plural("people.nightsTotal", s.nights.total) : null,
-        typeof s.nights.last30Days === "number" ? i18n.plural("people.nightsRecent", s.nights.last30Days) : null,
+        split,
+        !split && typeof s.nights.last30Days === "number" ? i18n.plural("people.nightsRecent", s.nights.last30Days) : null,
       ]
         .filter(Boolean)
         .join(", ")
     : "";
+  const nightsRecentLine = split && s.nights && typeof s.nights.last30Days === "number" ? i18n.t("people.nightsLast30", { count: s.nights.last30Days }) : null;
   const gameName = (gameId: string) => (GAMES_IDS.has(gameId) ? g.t(`games.${gameId as GameId}.name`) : gameId);
   const whenLong = (at: number) => `${new Intl.DateTimeFormat(i18n.locale, { weekday: "long" }).format(new Date(at))} ${formatClock(at, i18n.language, preferences.hourCycle)}`;
 
@@ -252,7 +256,7 @@ export default function ProfileScreen() {
           {typeof s.drinks.total === "number" ? <Text>{i18n.plural("people.drinksTotal", s.drinks.total)}</Text> : null}
           {s.drinks.favourites?.length ? (
             <Text variant="small">
-              {i18n.t("people.favourites", { list: s.drinks.favourites.map((f) => drinkLabel({ kind: f.kind as DrinkKind }, i18n)).join(", ") })}
+              {i18n.t("people.favourites", { list: s.drinks.favourites.map((f) => favouriteLabel(f.kind, mine && viewAs === "me", localDrinks, i18n)).join(", ") })}
             </Text>
           ) : null}
           {typeof s.drinks.usualFirstDrink === "number" ? (
@@ -274,6 +278,7 @@ export default function ProfileScreen() {
         <Panel>
           <Text variant="label">{i18n.t("people.nights")}</Text>
           {nightsLine ? <Text>{nightsLine}</Text> : null}
+          {nightsRecentLine ? <Text variant="small">{nightsRecentLine}</Text> : null}
           {/* O-43: dated history, sent by the server only to friends, crew mates and me. */}
           {s.nights.history?.length ? (
             <>

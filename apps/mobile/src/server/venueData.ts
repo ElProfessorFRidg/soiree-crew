@@ -286,6 +286,10 @@ export interface LeaderboardRow {
   value: number;
   rank: number;
   unverified?: number;
+  /** Drinks waiting for a friend present to confirm them. */
+  pending?: number;
+  /** Only on the viewer's own row: why their drinks do not count here. */
+  byReason?: { not_confirmed: number; outside_party: number; burst: number; late_entry: number };
 }
 
 export function fetchLeaderboard(

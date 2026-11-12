@@ -51,6 +51,42 @@ export async function sharingPeople(ctx: Context, viewerId: string, crewId?: str
     .map((r) => ({ userId: r.user_id, name: r.display_name }));
 }
 
+export interface OwnNight {
+  /** Night key on the person's own boundary and time zone. */
+  key: string;
+  /** Alcoholic drinks of the night, in time order. */
+  times: number[];
+  withCrew: boolean;
+}
+
+/**
+ * Outside a crew party we trust the person: a night is any night with an alcoholic drink of their own,
+ * party or not, on their own day boundary and time zone. It is "with the crew" when one of its drinks belongs
+ * to a party or they were going to a party that night; otherwise it is solo.
+ */
+export async function ownNights(ctx: Context, ownerId: string): Promise<{ nights: OwnNight[]; timeZone: string }> {
+  const clock = await personalClock(ctx, ownerId);
+  const keyOf = (at: number) => nightOf(at, clock.timeZone, clock.dayBoundaryHour);
+  const drinks = await ctx.db.query<{ party_id: string | null; consumed_at: number }>(
+    "select party_id, consumed_at from drinks where user_id = $1 and deleted_at is null and kind <> 'soft' and consumed_at > 0 order by consumed_at",
+    [ownerId],
+  );
+  const going = await ctx.db.query<{ starts_at: number }>(
+    "select p.starts_at from party_members m join parties p on p.id = m.party_id where m.user_id = $1 and m.response = 'going'",
+    [ownerId],
+  );
+  const crewKeys = new Set(going.map((g) => keyOf(Number(g.starts_at))));
+  const byKey = new Map<string, OwnNight>();
+  for (const d of drinks) {
+    const key = keyOf(Number(d.consumed_at));
+    const entry = byKey.get(key) ?? { key, times: [], withCrew: crewKeys.has(key) };
+    entry.times.push(Number(d.consumed_at));
+    if (d.party_id) entry.withCrew = true;
+    byKey.set(key, entry);
+  }
+  return { nights: [...byKey.values()], timeZone: clock.timeZone };
+}
+
 export interface Habits {
   /** Nights with something logged that the figures come from. */
   nights: number;

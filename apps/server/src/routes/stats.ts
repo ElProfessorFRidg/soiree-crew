@@ -4,7 +4,7 @@ import { z } from "zod";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
 import { priceChange, spendPerVisit } from "../hours";
 import { anniversary, byMonth, byWeekday, calendarNights, crewStreak, milestoneMoments, milestones, nightsBetween, outings, type Moment } from "../stats";
-import { personalClock, personalHabits, sharingPeople } from "../habits";
+import { ownNights, personalClock, personalHabits, sharingPeople } from "../habits";
 import { crewTimeZone } from "../territory";
 import { GAME_WINNER_BADGE, gameWins } from "./games";
 import { lastChampions } from "./leaderboards";
@@ -311,6 +311,8 @@ export function statsRoutes(app: FastifyInstance, ctx: Context): void {
       filters: { venues, people },
       nights: only === null ? null : [...only].sort(),
       habits: await personalHabits(ctx, user.id, clock, only ?? undefined),
+      // Nights with the crew, on my own clock; every other night of mine is solo (the phone tells them apart).
+      crewNights: (await ownNights(ctx, user.id)).nights.filter((n) => n.withCrew).map((n) => n.key).sort(),
     };
   });
 

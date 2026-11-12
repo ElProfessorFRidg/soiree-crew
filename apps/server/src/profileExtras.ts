@@ -134,5 +134,10 @@ export async function addExtraSections(
     if (!value) continue;
     delete value[key];
     if (stat === "gameWins") delete value.byGame;
+    // The split of the nights is part of the total: hiding one hides the other.
+    if (stat === "nightsTotal") {
+      delete value.withCrew;
+      delete value.solo;
+    }
   }
 }
