@@ -138,6 +138,18 @@ describe("suggestions that save taps (QOL-17)", () => {
     expect((await inbox(users[1]!)).filter((i) => i.kind === "partyStarted")).toHaveLength(1);
   });
 
+  it("does not announce a party logged after the fact", async () => {
+    const { users, crewId } = await setup(2);
+    const over = await app.inject({
+      method: "POST",
+      url: "/v1/parties",
+      headers: users[0]!.auth,
+      payload: { id: randomUUID(), crewId, name: "Hier", mood: "party", kind: "party", startsAt: clock - 8 * HOUR, endsAt: clock - 2 * HOUR },
+    });
+    expect(over.statusCode).toBe(201);
+    expect((await inbox(users[1]!)).some((i) => i.kind === "partyStarted")).toBe(false);
+  });
+
   it("does not announce a party planned for tomorrow", async () => {
     const { users, crewId } = await setup(2);
     await launch(users[0]!, crewId, clock + 24 * HOUR);

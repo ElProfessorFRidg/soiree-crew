@@ -167,10 +167,11 @@ export async function gatheringFor(
  */
 export async function notifyPartyStarted(
   ctx: Context,
-  party: { id: string; crew_id: string; name: string; starts_at: number; created_by: string },
+  party: { id: string; crew_id: string; name: string; starts_at: number; ends_at: number; created_by: string },
 ): Promise<void> {
   const now = ctx.now();
-  if (party.starts_at > now + LAUNCH_WINDOW_MS) return;
+  // A party logged after the fact (already over) is not news.
+  if (party.starts_at > now + LAUNCH_WINDOW_MS || party.ends_at <= now) return;
   const members = await ctx.db.query<{ user_id: string }>("select user_id from crew_members where crew_id = $1 and user_id <> $2", [party.crew_id, party.created_by]);
   const recipients: string[] = [];
   for (const { user_id: userId } of members) {

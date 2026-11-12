@@ -47,7 +47,7 @@ function GatheringCard({ crewId }: { crewId: string }) {
       <Button
         label={i18n.t("notify.gatheringBanner.start")}
         variant="secondary"
-        height={40}
+        height={48}
         onPress={() => router.push({ pathname: "/new-party", params: { crewId, name: gathering.venueName } })}
       />
     </Panel>
