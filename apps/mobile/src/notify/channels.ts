@@ -12,6 +12,7 @@ export const CHANNEL_OF: Record<NotificationKind, Channel> = {
   recapReady: "party",
   takeover: "game",
   overtaken: "game",
+  confirmDrink: "party",
   cheatAttempt: "game",
   sos: "safety",
   quietMember: "safety",

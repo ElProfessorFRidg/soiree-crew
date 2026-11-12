@@ -3,8 +3,7 @@ import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { captureRef } from "react-native-view-shot";
 import { radius } from "@crew/design-tokens";
-import { drinkLabel } from "@/drinks/display";
-import type { DrinkKind } from "@/drinks/presets";
+import { favouriteLabel } from "@/drinks/favourite";
 import { useT } from "@/i18n";
 import { fetchProfile, type ProfileView } from "@/server/profileData";
 import { useTheme } from "@/theme";
@@ -68,7 +67,7 @@ export function MemberCard() {
         ) : null}
         {held ? <Text>{i18n.plural("people.cardBars", held)}</Text> : null}
         {s.nights?.total ? <Text>{i18n.plural("people.cardNights", s.nights.total)}</Text> : null}
-        {favourite ? <Text variant="small">{i18n.t("people.favourites", { list: drinkLabel({ kind: favourite.kind as DrinkKind }, i18n) })}</Text> : null}
+        {favourite ? <Text variant="small">{i18n.t("people.favourites", { list: favouriteLabel(favourite.kind, false, [], i18n) })}</Text> : null}
         {s.crews?.length ? <Text variant="small">{s.crews.map((c) => c.name).join(", ")}</Text> : null}
         <Text variant="label" align="center">
           {i18n.t("recap.storyFooter")}

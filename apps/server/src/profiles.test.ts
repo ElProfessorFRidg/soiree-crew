@@ -8,12 +8,14 @@ import { LiveHub } from "./live";
 
 let db: Db;
 let app: FastifyInstance;
+let sealer: Sealer;
 const clock = Date.UTC(2026, 10, 7, 21, 0);
 
 beforeEach(async () => {
   db = await connectPglite();
   await migrate(db);
-  app = await buildApp({ db, sealer: new Sealer(randomBytes(32).toString("base64")), live: new LiveHub(), now: () => clock, publicUrl: "https://crew.test", hashSecret: "s" });
+  sealer = new Sealer(randomBytes(32).toString("base64"));
+  app = await buildApp({ db, sealer, live: new LiveHub(), now: () => clock, publicUrl: "https://crew.test", hashSecret: "s" });
 });
 afterEach(async () => {
   await app.close();
@@ -179,5 +181,67 @@ describe("cheat attempt badge (AC-09)", () => {
     const overturned = await app.inject({ method: "POST", url: `/v1/checkins/${checkIn}/overturn`, headers: owner.auth });
     expect(overturned.statusCode).toBe(200);
     expect(await cheat(owner)).toBeNull();
+  });
+});
+
+describe("solo nights count on the profile (trust outside a crew party)", () => {
+  const HOUR = 3_600_000;
+  async function drinkAt(user: User, at: number, partyId: string | null = null): Promise<void> {
+    await db.query("insert into drinks (id, user_id, party_id, kind, preset_id, sealed, consumed_at, logged_at, updated_at) values ($1, $2, $3, 'pint', 'm-pint', $5, $4, $4, $4)", [
+      randomUUID(),
+      user.id,
+      partyId,
+      at,
+      sealer.seal({ volumeMl: 500, abv: 0.05, withFood: false, name: null }),
+    ]);
+  }
+  type Own = { nights: { total: number; last30Days: number; withCrew: number; solo: number }; records: { biggestNight: number }; drinks: { total: number; usualFirstDrink: number | null } };
+
+  it("makes one solo night of seven drinks logged with no party", async () => {
+    const { owner } = await setup();
+    await app.inject({ method: "PUT", url: "/v1/me/profile", headers: owner.auth, payload: { preset: "public" } });
+    for (let i = 0; i < 7; i++) await drinkAt(owner, clock - 4 * HOUR + i * 20 * 60_000);
+    const own = (await view(owner, owner.id)).sections as unknown as Own;
+    expect(own.nights).toMatchObject({ total: 1, last30Days: 1, withCrew: 0, solo: 1 });
+    expect(own.records.biggestNight).toBe(7);
+    expect(own.drinks.total).toBe(7);
+    expect(own.drinks.usualFirstDrink).not.toBeNull();
+  });
+
+  it("tells a crew night from a solo one", async () => {
+    const { owner, crewId } = await setup();
+    await app.inject({ method: "PUT", url: "/v1/me/profile", headers: owner.auth, payload: { preset: "public" } });
+    const partyId = randomUUID();
+    const day = 24 * HOUR;
+    await db.query("insert into parties (id, crew_id, name, mood, kind, starts_at, ends_at, created_by, created_at) values ($1, $2, 'Soir', 'party', 'party', $3, $4, $5, $3)", [
+      partyId,
+      crewId,
+      clock - 2 * day,
+      clock - 2 * day + 6 * HOUR,
+      owner.id,
+    ]);
+    await db.query("insert into party_members (party_id, user_id, response) values ($1, $2, 'going')", [partyId, owner.id]);
+    await drinkAt(owner, clock - 2 * day + HOUR, partyId);
+    await drinkAt(owner, clock - 2 * day + 2 * HOUR, partyId);
+    await drinkAt(owner, clock - 5 * day);
+    const own = (await view(owner, owner.id)).sections as unknown as Own;
+    expect(own.nights).toMatchObject({ total: 2, last30Days: 2, withCrew: 1, solo: 1 });
+    expect(own.records.biggestNight).toBe(2);
+    const stats = (await app.inject({ method: "GET", url: "/v1/me/stats", headers: owner.auth })).json() as { crewNights: string[] };
+    expect(stats.crewNights).toHaveLength(1);
+  });
+
+  it("leaves a stranger with only what the audience allows", async () => {
+    const { owner, stranger } = await setup();
+    for (let i = 0; i < 3; i++) await drinkAt(owner, clock - 4 * HOUR + i * 20 * 60_000);
+    await app.inject({ method: "PUT", url: "/v1/me/profile", headers: owner.auth, payload: { audiences: { nights: "me", records: "me", drinks: "me" } } });
+    const hidden = (await view(stranger, owner.id)).sections;
+    expect(hidden).not.toHaveProperty("nights");
+    expect(hidden).not.toHaveProperty("records");
+    expect(hidden).not.toHaveProperty("drinks");
+    await app.inject({ method: "PUT", url: "/v1/me/profile", headers: owner.auth, payload: { audiences: { nights: "everyone" } } });
+    const shown = (await view(stranger, owner.id)).sections as Record<string, unknown>;
+    expect(shown.nights).toMatchObject({ total: 1, last30Days: 1, withCrew: 0, solo: 1 });
+    expect(shown).not.toHaveProperty("records");
   });
 });

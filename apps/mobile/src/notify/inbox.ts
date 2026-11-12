@@ -14,6 +14,7 @@ export const NOTIFICATION_KINDS = [
   "recapReady",
   "takeover",
   "overtaken",
+  "confirmDrink",
   "cheatAttempt",
   "sos",
   "quietMember",
@@ -91,6 +92,8 @@ export function itemRoute(item: Pick<InboxItem, "kind" | "partyId" | "refId">): 
   switch (item.kind) {
     case "recapReady":
       return party ? `/recap?id=${party}` : "/recaps";
+    case "confirmDrink":
+      return "/leaderboard";
     case "round":
       return party ? `/round?partyId=${party}` : "/(tabs)";
     case "takeover":

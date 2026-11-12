@@ -28,6 +28,8 @@ export const KINDS = {
   round: { channel: "party", safety: false, canWait: false, category: "round" },
   /** QOL-17: the venue someone is checked in at closes in half an hour. */
   closingSoon: { channel: "party", safety: false, canWait: false, category: null },
+  /** AC-07: a member logged a drink in the live party; the others present can confirm it so it counts on the crew board. */
+  confirmDrink: { channel: "party", safety: false, canWait: false, category: "party" },
   /** O-41 */
   recapReady: { channel: "party", safety: false, canWait: true, category: "party" },
   /** TER-04: a venue changed boss; `mine` when it was taken from the recipient. */

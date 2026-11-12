@@ -4,7 +4,7 @@ import { z, type ZodError } from "zod";
 import { requireUser, type Context } from "../context";
 import type { Db } from "../db";
 import { checkDanger } from "../nightWatch";
-import { checkOvertakes } from "../notifications/producers";
+import { askDrinkConfirmations, checkOvertakes } from "../notifications/producers";
 import { dropFromRound } from "../rounds";
 import { mutationBatchSchema, mutationSchema, type MutationInput } from "../schemas";
 
@@ -276,6 +276,7 @@ export function mutationRoutes(app: FastifyInstance, ctx: Context): void {
     for (const partyId of dangerChecks) {
       const party = (await ctx.db.query<{ id: string; starts_at: number }>("select id, starts_at from parties where id = $1", [partyId]))[0];
       if (party) await checkDanger(ctx, party, user.id);
+      await askDrinkConfirmations(ctx, partyId, user.id);
     }
     return { results };
   });

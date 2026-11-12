@@ -160,6 +160,35 @@ export async function checkOvertakes(ctx: Context, partyId: string): Promise<voi
   }
 }
 
+/** At most one "confirm a drink" per drinker per recipient every 20 minutes. */
+const CONFIRM_ASK_GAP_MS = 20 * MINUTE_MS;
+
+/**
+ * AC-07: a member logged a drink in a live crew party. The other members who are going are asked to
+ * confirm it so it can count on the crew board. The push is generic (the name stays in the inbox,
+ * never on the lock screen, QOL-27).
+ */
+export async function askDrinkConfirmations(ctx: Context, partyId: string, drinkerId: string): Promise<void> {
+  try {
+    const party = (
+      await ctx.db.query<{ crew_id: string; starts_at: number; ends_at: number; closed_at: number | null; leaderboard_enabled: boolean }>(
+        "select p.crew_id, p.starts_at, p.ends_at, p.closed_at, c.leaderboard_enabled from parties p join crews c on c.id = p.crew_id where p.id = $1",
+        [partyId],
+      )
+    )[0];
+    const now = ctx.now();
+    if (!party || !party.leaderboard_enabled || !drinkingLeaderboardEnabled() || party.closed_at !== null || party.starts_at > now || party.ends_at < now) return;
+    const recipients: string[] = [];
+    for (const userId of await goingMembers(ctx, partyId)) {
+      if (userId !== drinkerId && (await claimMark(ctx, userId, `confirmDrink:${partyId}:${drinkerId}`, CONFIRM_ASK_GAP_MS))) recipients.push(userId);
+    }
+    if (!recipients.length) return;
+    await notifyLater(ctx, recipients, { kind: "confirmDrink", actorId: drinkerId, partyId, crewId: party.crew_id, params: { name: await nameOf(ctx, drinkerId) } });
+  } catch {
+    // Asking is a courtesy: it never touches the drink that was just logged.
+  }
+}
+
 /**
  * Events nobody's request causes: a member gone quiet (N-29), the end-of-night home check and
  * who is still not home (N-25), recaps of parties that closed on their own (O-41), and what

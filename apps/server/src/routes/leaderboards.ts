@@ -109,6 +109,7 @@ export async function computeBoard(ctx: Context, crewId: string, from: number, t
     let count = 0;
     let grams = 0;
     let unverified = 0;
+    const byReason = { not_confirmed: 0, outside_party: 0, burst: 0, late_entry: 0 };
     const byParty = new Map<string | null, typeof decoded>();
     for (const item of decoded) byParty.set(item.row.party_id, [...(byParty.get(item.row.party_id) ?? []), item]);
     for (const [partyId, list] of byParty) {
@@ -129,12 +130,18 @@ export async function computeBoard(ctx: Context, crewId: string, from: number, t
         if (verified) {
           count += 1;
           grams += ethanolGrams(d.body.volumeMl, d.body.abv);
-        } else unverified += 1;
+        } else {
+          unverified += 1;
+          const reason = verdicts.get(d.row.id)?.reason;
+          if (reason && reason in byReason) byReason[reason as keyof typeof byReason] += 1;
+        }
       }
     }
     const nights = new Set(nightsOut.filter((n) => n.user_id === member.user_id).map((n) => nightOf(n.starts_at, timeZone, boundaries.get(member.user_id)))).size;
     const value = metric === "drinks" ? count : metric === "grams" ? Math.round(grams) : metric === "games" ? (wins.get(member.user_id) ?? 0) : nights;
-    return { userId: member.user_id, name: member.display_name, value, unverified: member.user_id === viewerId ? unverified : undefined };
+    const mineRow = member.user_id === viewerId;
+    // Drinks waiting for a friend present to confirm are shown for everyone; the full breakdown only to its owner.
+    return { userId: member.user_id, name: member.display_name, value, pending: byReason.not_confirmed, unverified: mineRow ? unverified : undefined, byReason: mineRow ? byReason : undefined };
   });
 
   rows.sort((a, b) => b.value - a.value || a.name.localeCompare(b.name));

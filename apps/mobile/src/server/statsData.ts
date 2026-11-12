@@ -86,6 +86,8 @@ export interface MyStats {
   filters: StatsFilters;
   /** N-16: night keys the filter keeps, null without a filter. */
   nights: string[] | null;
+  /** Night keys (my clock) that were with the crew; every other night of mine is solo. */
+  crewNights: string[];
   /** N-13: times in minutes after noon, local. */
   habits: { nights: number; usualFirstDrink: number | null; usualPacePerHour: number | null; usualLeaving: number | null };
 }

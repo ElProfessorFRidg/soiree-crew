@@ -9,7 +9,7 @@ import { addExtraSections, hiddenItems } from "../profileExtras";
 import { AUDIENCES, audiencesOf, canSee, PRESETS, SECTIONS, seesDates, STATS, STRANGER, type Relation, type Section } from "../profileRules";
 import { assertPublishable } from "../posting";
 import { dayBoundaryOf, nightOf, offsetMinutes } from "../time";
-import { personalClock, personalHabits } from "../habits";
+import { ownNights, personalClock, personalHabits } from "../habits";
 
 const HOUR_MS = 3_600_000;
 const uuid = z.string().uuid();
@@ -141,22 +141,13 @@ async function buildSections(ctx: Context, ownerId: string, relation: Relation, 
     );
     const total = (await ctx.db.query<{ n: number }>("select count(*)::int as n from drinks where user_id = $1 and deleted_at is null", [ownerId]))[0]!.n;
     // N-13: habits as plain figures: the usual time of the first drink and the usual pace.
-    const nights = await ctx.db.query<{ party_id: string; consumed_at: number; time_zone: string }>(
-      `select d.party_id, d.consumed_at, c.time_zone from drinks d join parties p on p.id = d.party_id join crews c on c.id = p.crew_id
-       where d.user_id = $1 and d.deleted_at is null and d.kind <> 'soft' order by d.consumed_at`,
-      [ownerId],
-    );
-    const byParty = new Map<string, { times: number[]; timeZone: string }>();
-    for (const n of nights) {
-      const entry = byParty.get(n.party_id) ?? { times: [], timeZone: n.time_zone };
-      entry.times.push(n.consumed_at);
-      byParty.set(n.party_id, entry);
-    }
+    const own = await ownNights(ctx, ownerId);
     const firsts: number[] = [];
     const paces: number[] = [];
-    for (const { times, timeZone } of byParty.values()) {
+    for (const { times } of own.nights) {
+      if (!times.length) continue;
       const first = times[0]!;
-      const local = new Date(first + offsetMinutes(first, timeZone) * 60_000);
+      const local = new Date(first + offsetMinutes(first, own.timeZone) * 60_000);
       firsts.push(((local.getUTCHours() - 12 + 24) % 24) * 60 + local.getUTCMinutes());
       const span = (times[times.length - 1]! - first) / HOUR_MS;
       if (times.length >= 2 && span >= 0.5) paces.push(times.length / span);
@@ -176,38 +167,39 @@ async function buildSections(ctx: Context, ownerId: string, relation: Relation, 
 
   if (visible("records") && (relation.me || recordsPublic())) {
     // PROF-06: plain figures, nothing celebrated.
-    const parties = await ctx.db.query<{ id: string; starts_at: number; ends_at: number; closed_at: number | null }>(
-      "select p.id, p.starts_at, p.ends_at, p.closed_at from party_members m join parties p on p.id = m.party_id where m.user_id = $1 and m.response = 'going'",
-      [ownerId],
-    );
+    const own = await ownNights(ctx, ownerId);
     const sealedProfile = (await ctx.db.query<{ sealed: string }>("select sealed from body_profiles where user_id = $1", [ownerId]))[0]?.sealed;
     const body = sealedProfile ? ctx.sealer.open<BodyProfile>(sealedProfile) : null;
     let highestBac: number | null = null;
     let biggestNight = 0;
-    for (const p of parties) {
-      const end = p.closed_at ?? Math.min(now, p.ends_at);
-      const rows = await ctx.db.query<{ id: string; sealed: string; consumed_at: number; party_id: string | null }>(
-        "select id, sealed, consumed_at, party_id from drinks where user_id = $1 and deleted_at is null and consumed_at between $2 and $3",
-        [ownerId, p.starts_at - 12 * HOUR_MS, end],
+    for (const night of own.nights) {
+      biggestNight = Math.max(biggestNight, night.times.length);
+      if (!body || !night.times.length) continue;
+      const first = night.times[0]!;
+      const last = night.times[night.times.length - 1]!;
+      const rows = await ctx.db.query<{ id: string; sealed: string; consumed_at: number }>(
+        "select id, sealed, consumed_at from drinks where user_id = $1 and deleted_at is null and consumed_at between $2 and $3",
+        [ownerId, first - 12 * HOUR_MS, last],
       );
-      biggestNight = Math.max(biggestNight, rows.filter((r) => r.party_id === p.id).length);
-      if (!body || !rows.length) continue;
       const intakes: DrinkIntake[] = rows.map((r) => {
         const d = ctx.sealer.open<{ volumeMl: number; abv: number; withFood: boolean }>(r.sealed);
-        return { id: r.id, volumeMl: d.volumeMl, abv: d.abv, consumedAt: r.consumed_at, withFood: d.withFood };
+        return { id: r.id, volumeMl: d.volumeMl, abv: d.abv, consumedAt: Number(r.consumed_at), withFood: d.withFood };
       });
-      const sim = new BacSimulation(intakes, distributionVolume(body), end + 8 * HOUR_MS);
-      for (const point of sim.sample(p.starts_at, end + 8 * HOUR_MS, 5 * 60_000)) highestBac = Math.max(highestBac ?? 0, point.bac);
+      const sim = new BacSimulation(intakes, distributionVolume(body), last + 8 * HOUR_MS);
+      for (const point of sim.sample(first, last + 8 * HOUR_MS, 5 * 60_000)) highestBac = Math.max(highestBac ?? 0, point.bac);
     }
     out.records = { highestBac: highestBac === null ? null : Math.round(highestBac * 100) / 100, biggestNight };
   }
 
   if (visible("nights")) {
-    const nights = await ctx.db.query<{ starts_at: number }>(
-      "select p.starts_at from party_members m join parties p on p.id = m.party_id where m.user_id = $1 and m.response = 'going' and p.starts_at <= $2",
-      [ownerId, now],
-    );
-    out.nights = { total: nights.length, last30Days: nights.filter((n) => now - n.starts_at < 30 * 24 * HOUR_MS).length };
+    const { nights } = await ownNights(ctx, ownerId);
+    const withCrew = nights.filter((n) => n.withCrew).length;
+    out.nights = {
+      total: nights.length,
+      last30Days: nights.filter((n) => now - n.at < 30 * 24 * HOUR_MS).length,
+      withCrew,
+      solo: nights.length - withCrew,
+    };
   }
 
   if (visible("birthday")) {
