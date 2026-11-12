@@ -9,6 +9,7 @@ import { createTranslator } from "@/i18n";
 import { variantKey } from "@/i18n/variants";
 import { api } from "@/server/api";
 import { useAppStore } from "@/state/store";
+import { useEco } from "@/power/eco";
 import { savingPowerNow } from "@/power/reading";
 import { locationPlan } from "@/power/saving";
 import { driveAlertEnabled, forgetDriving, onDriveLocations } from "./driving";
@@ -287,6 +288,11 @@ export async function stopOuting(): Promise<void> {
   await cancelNudge();
   await AsyncStorage.removeItem(STATE_KEY).catch(() => undefined);
 }
+
+// QOL-24: the updates follow eco mode as it turns on or off during the night, not only at start.
+useEco.subscribe((state, previous) => {
+  if (state.eco !== previous.eco) void syncLocationUpdates();
+});
 
 /** The updates run while the outing nudge or the driving warning wants them, and stop otherwise. */
 export async function syncLocationUpdates(): Promise<boolean> {
