@@ -2268,6 +2268,8 @@ export const it: Messages = {
     step: "Passo {n} di {total}",
   },
   journey: {
+    crewWhy: "Unisciti ai tuoi amici con il loro invito, o crea il tuo crew e manda il link. Puoi farlo anche più tardi.",
+    crewSkip: "Non ora",
     selected: "scelto",
     previewYou: "Tu",
     firstName: "Nome",
@@ -2670,6 +2672,7 @@ export const it: Messages = {
     feedCheat: "{who}: tentativo di imbroglio a {venue}",
   },
   arrival: {
+    orUsername: "Oppure scegli solo un nome utente",
     tabFind: "Trova",
     tabCreate: "Crea",
     tabCode: "Ho un codice",

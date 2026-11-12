@@ -38,6 +38,11 @@ export function isVisibilityKey(value: string): value is VisibilityKey {
  */
 export const CHOICE_ORDER: readonly Audience[] = ["everyone", "friends", "crews", "me"];
 
+/** The buttons of one screen: presence tonight is only ever shown to crew mates, so it never offers "Everyone". */
+export function choicesFor(item: VisibilityKey): readonly Audience[] {
+  return item === "presence" ? CHOICE_ORDER.filter((audience) => audience !== "everyone") : CHOICE_ORDER;
+}
+
 /** Whether the profile shows the thing at all, for someone in the audience asked about. */
 export function opensTo(audience: Audience | undefined, viewer: Audience): boolean {
   if (!audience) return false;

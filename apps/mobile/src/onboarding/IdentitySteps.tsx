@@ -4,9 +4,9 @@ import { PROFILE_BOUNDS } from "@crew/bac";
 import { radius } from "@crew/design-tokens";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
-import { api, ApiError } from "@/server/api";
+import { ApiError } from "@/server/api";
 import { saveBirthDate } from "@/server/profileData";
-import { saveSession, useSession } from "@/server/session";
+import { useSession } from "@/server/session";
 import { useAppStore } from "@/state/store";
 import { openAppSettings } from "@/system/permissions";
 import { useTheme } from "@/theme";
@@ -26,7 +26,12 @@ const YEAR = () => new Date().getFullYear();
 
 function partsOf(birthDate: string | null): DateParts {
   const match = birthDate ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(birthDate) : null;
-  if (match) return { year: Number(match[1]), month: Number(match[2]), day: Number(match[3]) };
+  if (match)
+    return {
+      year: Number(match[1]),
+      month: Number(match[2]),
+      day: Number(match[3]),
+    };
   return { year: YEAR() - 25, month: 6, day: 15 };
 }
 
@@ -50,7 +55,11 @@ export function BirthStep({ birthDate, onChange, country, tooYoung }: { birthDat
         minYear={YEAR() - PROFILE_BOUNDS.ageYears.max}
         maxYear={YEAR()}
         monthLabel={monthLabel}
-        labels={{ day: i18n.t("journey.birthDay"), month: i18n.t("journey.birthMonth"), year: i18n.t("journey.birthYear") }}
+        labels={{
+          day: i18n.t("journey.birthDay"),
+          month: i18n.t("journey.birthMonth"),
+          year: i18n.t("journey.birthYear"),
+        }}
         onChange={(next) => onChange(birthDateText(next.year, next.month, next.day))}
       />
       {tooYoung ? (
@@ -67,28 +76,25 @@ export function BirthStep({ birthDate, onChange, country, tooYoung }: { birthDat
 }
 
 /**
- * Checks the date and, with an account, has the server check it too. Under the age: the account made
- * a minute ago is deleted again, so nothing about a minor stays on the server.
+ * Checks the date and, with an account, has the server check it too. In the arrival flow the date
+ * is asked before any account exists, so a minor never gets one; an account is never deleted from here.
  */
 export async function commitBirthDate(birthDate: string, country: string): Promise<"ok" | "under" | "offline"> {
   const age = ageFromBirthDate(birthDate, Date.now());
-  const refuse = async () => {
-    if (useSession.getState().session) {
-      await api("/v1/me", { method: "DELETE" }).catch(() => undefined);
-      await saveSession(null).catch(() => undefined);
-    }
-    return "under" as const;
-  };
-  if (age === null || age < legalAge(country)) return refuse();
+  if (age === null || age < legalAge(country)) return "under";
   if (useSession.getState().session) {
     try {
       await saveBirthDate(birthDate);
     } catch (error) {
-      if (error instanceof ApiError && error.failure.kind === "http" && error.failure.code === "under_age") return refuse();
+      if (error instanceof ApiError && error.failure.kind === "http" && error.failure.code === "under_age") return "under";
+      // The date is set once: an account that has one already keeps it.
+      if (error instanceof ApiError && error.failure.kind === "http" && error.failure.code === "birth_date_set") return "ok";
       return "offline";
     }
   }
-  useAppStore.setState((state) => ({ ageConfirmedAt: state.ageConfirmedAt ?? Date.now() }));
+  useAppStore.setState((state) => ({
+    ageConfirmedAt: state.ageConfirmedAt ?? Date.now(),
+  }));
   return "ok";
 }
 
@@ -108,7 +114,14 @@ export function PhotoStep({ photo, onChange, personId, name }: { photo: string |
         showToast({
           message: i18n.t("journey.photoDenied"),
           durationMs: 8_000,
-          ...(result.refused === "settings" ? { action: { label: i18n.t("common.openSettings"), onPress: openAppSettings } } : {}),
+          ...(result.refused === "settings"
+            ? {
+                action: {
+                  label: i18n.t("common.openSettings"),
+                  onPress: openAppSettings,
+                },
+              }
+            : {}),
         });
       }
     } catch {

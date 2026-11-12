@@ -2267,6 +2267,8 @@ export const de: Messages = {
     step: "Schritt {n} von {total}",
   },
   journey: {
+    crewWhy: "Tritt mit der Einladung deiner Freunde bei oder gründe deine Crew und schick den Link. Das geht auch später.",
+    crewSkip: "Nicht jetzt",
     selected: "gewählt",
     previewYou: "Du",
     firstName: "Vorname",
@@ -2669,6 +2671,7 @@ export const de: Messages = {
     feedCheat: "{who}: Schummelversuch in {venue}",
   },
   arrival: {
+    orUsername: "Oder wähle einfach einen Benutzernamen",
     tabFind: "Finden",
     tabCreate: "Gründen",
     tabCode: "Ich hab einen Code",

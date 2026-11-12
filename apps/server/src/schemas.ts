@@ -102,8 +102,8 @@ export const accountSchema = z.object({
   // O-01: both or neither; without them the account lives on this phone and moves by code.
   email: z.string().trim().toLowerCase().pipe(z.email().max(254)).optional(),
   password: z.string().min(10).max(200).optional(),
-  // O-02: when given, an account under the minimum age is refused before it exists.
-  birthDate: birthDateSchema.optional(),
+  // O-02: asked before the account, and an account under the minimum age is refused before it exists.
+  birthDate: birthDateSchema,
 }).refine((input) => (input.email === undefined) === (input.password === undefined), { message: "email_and_password" });
 
 export const passwordSchema = z.string().min(10).max(200);

@@ -4,7 +4,7 @@ import { duration } from "@crew/design-tokens";
 import { useT } from "@/i18n";
 import { variantKey } from "@/i18n/variants";
 import { easings } from "@/motion/easing";
-import { CHOICE_ORDER, opensTo, type Audience, type VisibilityKey } from "@/onboarding/visibility";
+import { choicesFor, opensTo, type Audience, type VisibilityKey } from "@/onboarding/visibility";
 import { Button } from "@/ui/Button";
 import { Text } from "@/ui/Text";
 import { ProfilePreview } from "./ProfilePreview";
@@ -47,12 +47,13 @@ export function AudienceChoices({ item, value, onChange, mode, busy }: Pick<Prop
           ? i18n.t("people.audienceFriends")
           : i18n.t("people.audienceEveryone");
   const height = mode === "flow" ? 52 : 44;
+  const choices = choicesFor(item);
   return (
     <View style={styles.choices} accessibilityRole="radiogroup" accessibilityLabel={i18n.t(`journey.title.${item}`)}>
-      {CHOICE_ORDER.map((audience) => {
+      {choices.map((audience) => {
         const selected = value === audience;
         // Before any answer the widest choice is the highlighted one; after it, the chosen one is.
-        const highlighted = value === undefined ? audience === "everyone" : selected;
+        const highlighted = value === undefined ? audience === choices[0] : selected;
         return (
           <Button
             key={audience}

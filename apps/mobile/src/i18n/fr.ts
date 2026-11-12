@@ -2267,6 +2267,8 @@ export const fr = {
     step: "Étape {n} sur {total}",
   },
   journey: {
+    crewWhy: "Rejoins tes potes avec leur invitation, ou crée ton crew et envoie le lien. Tu peux aussi le faire plus tard.",
+    crewSkip: "Pas maintenant",
     selected: "choisi",
     previewYou: "Toi",
     firstName: "Prénom",
@@ -2669,6 +2671,7 @@ export const fr = {
     feedCheat: "{who} : tentative de triche à {venue}",
   },
   arrival: {
+    orUsername: "Ou choisis simplement un pseudo",
     tabFind: "Trouver",
     tabCreate: "Créer",
     tabCode: "J'ai un code",

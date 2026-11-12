@@ -30,6 +30,7 @@ export const DEFAULT_AUDIENCES: Record<Section, Audience> = {
   // QOL-21: crew mates only, so they can be reminded; the year never leaves the owner.
   birthday: "crews",
   // Badges and the non-BAC figures beside them: crew mates see them until the owner decides.
+  // (Without a stored choice it follows the stored `games` audience, see audiencesOf.)
   badges: "crews",
   // Who can find this person to add them: strangers can (the finer rule is `findable`), as before.
   find: "everyone",
@@ -124,6 +125,9 @@ export function audiencesOf(stored: Partial<Record<string, unknown>>): Record<Se
     const value = stored[section];
     if (typeof value === "string" && (AUDIENCES as readonly string[]).includes(value)) out[section] = value as Audience;
   }
+  // Game wins used to sit under `games`; badges now carry them, so someone who never chose for badges keeps what they chose for games.
+  const badges = stored.badges;
+  if (!(typeof badges === "string" && (AUDIENCES as readonly string[]).includes(badges))) out.badges = out.games;
   return out;
 }
 

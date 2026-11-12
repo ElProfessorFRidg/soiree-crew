@@ -26,7 +26,7 @@ afterEach(async () => {
 });
 
 async function account(username: string) {
-  const res = await app.inject({ method: "POST", url: "/v1/accounts", payload: { username, displayName: username.toUpperCase() } });
+  const res = await app.inject({ method: "POST", url: "/v1/accounts", payload: { birthDate: "1990-01-01", username, displayName: username.toUpperCase() } });
   expect(res.statusCode).toBe(201);
   const body = res.json() as { user: { id: string }; token: string };
   return { id: body.user.id, auth: { authorization: `Bearer ${body.token}` } };
@@ -49,7 +49,7 @@ describe("accounts and sessions", () => {
 
   it("refuses a taken username", async () => {
     await account("jade");
-    const res = await app.inject({ method: "POST", url: "/v1/accounts", payload: { username: "jade", displayName: "Other" } });
+    const res = await app.inject({ method: "POST", url: "/v1/accounts", payload: { birthDate: "1990-01-01", username: "jade", displayName: "Other" } });
     expect(res.statusCode).toBe(409);
   });
 

@@ -2269,6 +2269,8 @@ export const en: Messages = {
     step: "Step {n} of {total}",
   },
   journey: {
+    crewWhy: "Join friends with their invite, or start your crew and send the link. You can also do this later.",
+    crewSkip: "Not now",
     selected: "selected",
     previewYou: "You",
     firstName: "First name",
@@ -2671,6 +2673,7 @@ export const en: Messages = {
     feedCheat: "{who}: cheat attempt at {venue}",
   },
   arrival: {
+    orUsername: "Or just pick a username",
     tabFind: "Find",
     tabCreate: "Create",
     tabCode: "I have a code",

@@ -9,7 +9,9 @@ import { haptic } from "@/motion/haptics";
 import { AccountStep } from "@/onboarding/AccountStep";
 import { ConsentPanel } from "@/onboarding/ConsentPanel";
 import { ageFromBirthDate, freshDraft, nextStep, previousStep, progress, visibleSteps, type FlowContext, type OnboardingDraft, type Step } from "@/onboarding/flow";
+import { CrewStep } from "@/onboarding/CrewStep";
 import { BacStep, BirthStep, commitBirthDate, PhotoStep } from "@/onboarding/IdentitySteps";
+import { removeProfilePhoto, uploadProfilePhoto } from "@/onboarding/profilePhoto";
 import { askForReminders, NotificationsStep } from "@/onboarding/NotificationsStep";
 import { ClosingStep, LocationStep, RegionStep, VisibilityStep } from "@/onboarding/SetupSteps";
 import { isVisibilityKey } from "@/onboarding/visibility";
@@ -29,7 +31,7 @@ import { showToast } from "@/ui/Toast";
 
 // O-01 to O-05, PREF-02, PROF-01, PROF-02, SEC-08: the arrival flow of the Arrivee board as one
 // continuous run, a question per screen: account, date of birth, photo, consent, body profile, the
-// settings read from the phone, the five visibility choices, the permissions one by one and the
+// settings read from the phone, the five visibility choices, the crew, the permissions one by one and the
 // finished card. Every answer is written to the app store (and the server when it has one) as it is
 // given, so a closed app reopens on the screen it stopped at. Consent comes before the weight is
 // typed (SEC-08, ADR 0006).
@@ -94,11 +96,17 @@ export default function Onboarding() {
     return found;
   });
   // A draft kept by an older version has no birth date, photo or choices yet.
-  const draft: OnboardingDraft = { ...freshDraft(draftFromProfile(null), false), ...(stored ?? initialDraft()) };
+  const draft: OnboardingDraft = {
+    ...freshDraft(draftFromProfile(null), false),
+    ...(stored ?? initialDraft()),
+  };
 
   useEffect(() => {
     // Being here means not being in the app: an earlier finish (before a consent was withdrawn) no longer counts.
-    useAppStore.setState((state) => ({ onboardedAt: null, onboarding: state.onboarding ?? initialDraft() }));
+    useAppStore.setState((state) => ({
+      onboardedAt: null,
+      onboarding: state.onboarding ?? initialDraft(),
+    }));
   }, []);
 
   const update = (patch: Partial<OnboardingDraft>) =>
@@ -107,6 +115,7 @@ export default function Onboarding() {
   const context: FlowContext = {
     signedIn: session !== null,
     accountVisited: draft.accountVisited,
+    accountFirst: draft.accountMode === "signin",
     health: draft.health,
     notificationsSupported: Platform.OS !== "web",
     locationSupported: Platform.OS !== "web",
@@ -142,7 +151,7 @@ export default function Onboarding() {
     if (previous) go(previous, false);
   };
   const leaveAccount = () => {
-    const target = draft.accountReturn ?? "birth";
+    const target = draft.accountReturn ?? nextStep("account", context);
     update({ accountReturn: null });
     go(target);
   };
@@ -155,16 +164,43 @@ export default function Onboarding() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, step]);
 
+  // O-04: the photo goes to the server as soon as there is an account: at once when it is picked
+  // signed in, right after the account is made when it was picked before.
+  useEffect(() => {
+    if (!session || !draft.photo || draft.photoSent) return;
+    let current = true;
+    uploadProfilePhoto(draft.photo)
+      .then(() => current && update({ photoSent: true }))
+      .catch(() => current && showToast({ tone: "danger", message: i18n.t("crew.offline") }));
+    return () => {
+      current = false;
+    };
+    // update only writes the draft.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session, draft.photo, draft.photoSent]);
+
   const next = i18n.t("onboarding.next");
   const askLocation = async () => {
     setFinishing(true);
     const answer = await askPermission("location", "checkin").finally(() => setFinishing(false));
-    update({ permissions: { ...draft.permissions, location: answer.granted ? "granted" : "skipped" } });
+    update({
+      permissions: {
+        ...draft.permissions,
+        location: answer.granted ? "granted" : "skipped",
+      },
+    });
     if (!answer.granted && !answer.declined) {
       showToast({
         message: i18n.t("journey.locDenied"),
         durationMs: 8_000,
-        ...(answer.canAskAgain ? {} : { action: { label: i18n.t("common.openSettings"), onPress: openAppSettings } }),
+        ...(answer.canAskAgain
+          ? {}
+          : {
+              action: {
+                label: i18n.t("common.openSettings"),
+                onPress: openAppSettings,
+              },
+            }),
       });
     }
     advance();
@@ -194,7 +230,11 @@ export default function Onboarding() {
                   } else if (result === "under") {
                     haptic.error();
                     setTooYoung(true);
-                  } else showToast({ tone: "danger", message: i18n.t("crew.offline") });
+                  } else
+                    showToast({
+                      tone: "danger",
+                      message: i18n.t("crew.offline"),
+                    });
                 })
                 .finally(() => setCommitting(false));
             }}
@@ -211,7 +251,10 @@ export default function Onboarding() {
               disabled={!draft.health}
               accessibilityHint={draft.health ? undefined : i18n.t("onboarding.consentWithout")}
               onPress={() => {
-                update({ consentAt: draft.consentAt ?? Date.now(), skippedHealth: false });
+                update({
+                  consentAt: draft.consentAt ?? Date.now(),
+                  skippedHealth: false,
+                });
                 advance();
               }}
             />
@@ -251,7 +294,12 @@ export default function Onboarding() {
               setFinishing(true);
               void askForReminders(i18n, session !== null).finally(() => {
                 setFinishing(false);
-                update({ permissions: { ...draft.permissions, notifications: "granted" } });
+                update({
+                  permissions: {
+                    ...draft.permissions,
+                    notifications: "granted",
+                  },
+                });
                 advance();
               });
             }}
@@ -266,12 +314,16 @@ export default function Onboarding() {
               variant="outline"
               height={48}
               onPress={() => {
-                update({ permissions: { ...draft.permissions, location: "skipped" } });
+                update({
+                  permissions: { ...draft.permissions, location: "skipped" },
+                });
                 advance();
               }}
             />
           </View>
         );
+      case "crew":
+        return <Button label={i18n.t("journey.crewSkip")} variant="outline" height={48} onPress={advance} />;
       case "closing":
         return <Button label={i18n.t("journey.closingGo")} height={56} onPress={finish} />;
       default: {
@@ -300,17 +352,25 @@ export default function Onboarding() {
           <Welcome
             signedIn={session !== null}
             onCreate={() => {
-              update({ accountMode: "create", accountVisited: true, accountReturn: null });
+              update({
+                accountMode: "create",
+                accountVisited: true,
+                accountReturn: null,
+              });
               go("account");
             }}
             onSignIn={() => {
-              update({ accountMode: "signin", accountVisited: true, accountReturn: null });
+              update({
+                accountMode: "signin",
+                accountVisited: true,
+                accountReturn: null,
+              });
               go("account");
             }}
             onGuest={() => go("birth")}
           />
         ) : null}
-        {step === "account" ? <AccountStep mode={draft.accountMode} onModeChange={(accountMode) => update({ accountMode })} /> : null}
+        {step === "account" ? <AccountStep mode={draft.accountMode} onModeChange={(accountMode) => update({ accountMode })} birthDate={draft.birthDate} /> : null}
         {step === "birth" ? (
           <BirthStep
             birthDate={draft.birthDate}
@@ -322,7 +382,17 @@ export default function Onboarding() {
             }}
           />
         ) : null}
-        {step === "photo" ? <PhotoStep photo={draft.photo} onChange={(photo) => update({ photo })} personId={personId} name={name} /> : null}
+        {step === "photo" ? (
+          <PhotoStep
+            photo={draft.photo}
+            onChange={(photo) => {
+              update({ photo, photoSent: false });
+              if (!photo && session) void removeProfilePhoto().catch(() => undefined);
+            }}
+            personId={personId}
+            name={name}
+          />
+        ) : null}
         {step === "consent" ? (
           <>
             <Text variant="h1">{i18n.t("onboarding.consentTitle")}</Text>
@@ -346,6 +416,7 @@ export default function Onboarding() {
             }}
           />
         ) : null}
+        {step === "crew" ? <CrewStep onDone={advance} doneLabel={next} /> : null}
         {step === "notifications" ? <NotificationsStep health={draft.health} /> : null}
         {step === "location" ? <LocationStep /> : null}
         {step === "closing" ? (
@@ -358,7 +429,10 @@ export default function Onboarding() {
 
 /** The draft in the store, or a fresh one: an update never starts from nothing. */
 function draftOf(stored: OnboardingDraft | null): OnboardingDraft {
-  return { ...freshDraft(draftFromProfile(null), false), ...(stored ?? initialDraft()) };
+  return {
+    ...freshDraft(draftFromProfile(null), false),
+    ...(stored ?? initialDraft()),
+  };
 }
 
 function Welcome({ onCreate, onSignIn, onGuest, signedIn }: { onCreate: () => void; onSignIn: () => void; onGuest: () => void; signedIn: boolean }) {
@@ -396,9 +470,18 @@ const styles = StyleSheet.create({
   actions: { gap: 12, marginTop: 8 },
   top: { flexDirection: "row", alignItems: "center", gap: 12 },
   progress: { flex: 1, height: 3, borderRadius: 2, overflow: "hidden" },
-  progressFill: { height: 3, borderRadius: 2, backgroundColor: palette.accent.amber },
+  progressFill: {
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: palette.accent.amber,
+  },
   step: { gap: 16 },
   footer: { gap: 10 },
-  banner: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 6 },
+  banner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 6,
+  },
   flex: { flex: 1 },
 });

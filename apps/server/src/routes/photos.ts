@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import { mkdirSync } from "node:fs";
 import { readFile, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -93,6 +93,31 @@ export function photoRoutes(app: FastifyInstance, ctx: Context): void {
     return reply.status(201).send({ id: input.id });
   });
 
+  /** O-04: the profile photo, one per account, replaced by sending another. Same JPEG checks and the same signed links as the album. */
+  const profilePhotos = new RateLimiter(20, 24 * 3_600_000, ctx.now);
+  app.put("/v1/me/photo", { bodyLimit: 8 * 1024 * 1024 }, async (request) => {
+    const user = requireUser(request);
+    profilePhotos.check(user.id);
+    const input = z.object({ data: z.string().min(100).max(7_000_000) }).parse(request.body);
+    const previous = (await ctx.db.query<{ id: string }>("select id from profile_photos where user_id = $1", [user.id]))[0];
+    const id = randomUUID();
+    const bytes = await storeJpeg(ctx, id, input.data);
+    await ctx.db.query(
+      `insert into profile_photos (user_id, id, bytes, updated_at) values ($1, $2, $3, $4)
+       on conflict (user_id) do update set id = excluded.id, bytes = excluded.bytes, updated_at = excluded.updated_at`,
+      [user.id, id, bytes, ctx.now()],
+    );
+    if (previous) await unlink(photoPath(ctx, previous.id)).catch(() => undefined);
+    return { photoUrl: signedPhotoUrl(ctx, id) };
+  });
+
+  app.delete("/v1/me/photo", async (request, reply) => {
+    const user = requireUser(request);
+    const rows = await ctx.db.query<{ id: string }>("delete from profile_photos where user_id = $1 returning id", [user.id]);
+    if (rows[0]) await unlink(photoPath(ctx, rows[0].id)).catch(() => undefined);
+    return reply.status(204).send();
+  });
+
   /** O-84: the album, with links that work for an hour and only for this album's members. */
   app.get<{ Params: { id: string } }>("/v1/parties/:id/photos", async (request) => {
     const user = requireUser(request);
@@ -127,7 +152,7 @@ export function photoRoutes(app: FastifyInstance, ctx: Context): void {
     const expected = signature(ctx, id, exp);
     const valid = Number.isFinite(exp) && exp > ctx.now() && sig.length === expected.length && timingSafeEqual(Buffer.from(sig), Buffer.from(expected));
     if (!valid) throw new HttpError(404, "not_found");
-    const exists = await ctx.db.query("select 1 from photos where id = $1 union all select 1 from review_photos where id = $1", [id]);
+    const exists = await ctx.db.query("select 1 from photos where id = $1 union all select 1 from review_photos where id = $1 union all select 1 from profile_photos where id = $1", [id]);
     if (!exists.length) throw new HttpError(404, "not_found");
     const file = await readFile(photoPath(ctx, id)).catch(() => null);
     if (!file) throw new HttpError(404, "not_found");
@@ -145,6 +170,6 @@ export function photoRoutes(app: FastifyInstance, ctx: Context): void {
 
 /** O-07: files of a deleted account go with it. Called before the rows are removed. */
 export async function deletePhotoFiles(ctx: Context, userId: string): Promise<void> {
-  const rows = await ctx.db.query<{ id: string }>("select id from photos where user_id = $1 union all select id from review_photos where user_id = $1", [userId]);
+  const rows = await ctx.db.query<{ id: string }>("select id from photos where user_id = $1 union all select id from review_photos where user_id = $1 union all select id from profile_photos where user_id = $1", [userId]);
   for (const r of rows) await unlink(photoPath(ctx, r.id)).catch(() => undefined);
 }

@@ -2293,6 +2293,8 @@ export const ru: Messages = {
     step: "Шаг {n} из {total}",
   },
   journey: {
+    crewWhy: "Присоединись к друзьям по их приглашению или создай свой крю и отправь ссылку. Это можно сделать и позже.",
+    crewSkip: "Не сейчас",
     selected: "выбрано",
     previewYou: "Ты",
     firstName: "Имя",
@@ -2715,6 +2717,7 @@ export const ru: Messages = {
     feedCheat: "{who}: попытка обмана, {venue}",
   },
   arrival: {
+    orUsername: "Или просто выбери имя пользователя",
     tabFind: "Найти",
     tabCreate: "Создать",
     tabCode: "У меня код",

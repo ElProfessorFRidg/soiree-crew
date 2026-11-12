@@ -29,7 +29,7 @@ describe("app icon unlocks (JOY-03)", () => {
     });
 
     async function account(username: string) {
-      const body = (await app.inject({ method: "POST", url: "/v1/accounts", payload: { username, displayName: username } })).json() as { user: { id: string }; token: string };
+      const body = (await app.inject({ method: "POST", url: "/v1/accounts", payload: { birthDate: "1990-01-01", username, displayName: username } })).json() as { user: { id: string }; token: string };
       return { id: body.user.id, auth: { authorization: `Bearer ${body.token}` } };
     }
 

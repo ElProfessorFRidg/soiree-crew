@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ageFromBirthDate, birthDateText, checklistDone, daysInMonth, legalAge, nextStep, previousStep, progress, visibleSteps, VISIBILITY_STEPS, type FlowContext } from "./flow";
-import { CHOICE_ORDER, findableFor, isVisibilityKey, opensTo, VISIBILITY_ITEMS } from "./visibility";
+import { CHOICE_ORDER, choicesFor, findableFor, isVisibilityKey, opensTo, VISIBILITY_ITEMS } from "./visibility";
 
 const base: FlowContext = { signedIn: false, accountVisited: false, health: true, notificationsSupported: true, locationSupported: true };
 const member: FlowContext = { ...base, signedIn: true, accountVisited: true };
@@ -9,8 +9,8 @@ describe("arrival steps (O-01 to O-05, PREF-02, PROF-01)", () => {
   it("goes through the whole flow with an account, one question per screen", () => {
     expect(visibleSteps(member)).toEqual([
       "welcome",
-      "account",
       "birth",
+      "account",
       "photo",
       "consent",
       "bac",
@@ -20,10 +20,25 @@ describe("arrival steps (O-01 to O-05, PREF-02, PROF-01)", () => {
       "badges",
       "find",
       "presence",
+      "crew",
       "notifications",
       "location",
       "closing",
     ]);
+  });
+
+  it("asks the date of birth before a new account, and signing in to an existing one first", () => {
+    const steps = visibleSteps(member);
+    expect(steps.indexOf("birth")).toBeLessThan(steps.indexOf("account"));
+    const signIn = visibleSteps({ ...member, accountFirst: true });
+    expect(signIn.indexOf("account")).toBeLessThan(signIn.indexOf("birth"));
+  });
+
+  it("puts the crew step after the visibility screens and before the permissions", () => {
+    const steps = visibleSteps(member);
+    expect(steps.indexOf("crew")).toBe(steps.indexOf("presence") + 1);
+    expect(steps.indexOf("crew")).toBeLessThan(steps.indexOf("notifications"));
+    expect(visibleSteps(base)).not.toContain("crew");
   });
 
   it("has no visibility screen without an account: the server keeps what was chosen", () => {
@@ -44,13 +59,14 @@ describe("arrival steps (O-01 to O-05, PREF-02, PROF-01)", () => {
   it("finishes after the closing screen", () => {
     expect(nextStep("closing", base)).toBe("done");
     expect(nextStep("region", member)).toBe("venues");
-    expect(nextStep("presence", member)).toBe("notifications");
-    expect(nextStep("crew" as never, member)).toBe("birth");
+    expect(nextStep("presence", member)).toBe("crew");
+    expect(nextStep("crew", member)).toBe("notifications");
   });
 
   it("goes back one screen at a time, past the account form once signed in", () => {
     expect(previousStep("birth", member)).toBe("welcome");
-    expect(previousStep("birth", { ...member, signedIn: false })).toBe("account");
+    expect(previousStep("photo", member)).toBe("birth");
+    expect(previousStep("photo", { ...member, signedIn: false })).toBe("account");
     expect(previousStep("presence", member)).toBe("find");
     expect(previousStep("closing", member)).toBe("location");
     expect(previousStep("welcome", base)).toBeNull();
@@ -58,7 +74,7 @@ describe("arrival steps (O-01 to O-05, PREF-02, PROF-01)", () => {
 
   it("counts only the steps shown after the welcome screen", () => {
     expect(progress("birth", base)).toEqual({ index: 0, total: 8 });
-    expect(progress("closing", member)).toEqual({ index: 13, total: 14 });
+    expect(progress("closing", member)).toEqual({ index: 14, total: 15 });
   });
 
   it("asks 21 in the United States and 18 elsewhere", () => {
@@ -100,6 +116,10 @@ describe("visibility choices (PROF-01, PROF-02)", () => {
   it("offers the four audiences with the private one last and nothing chosen", () => {
     expect(CHOICE_ORDER).toEqual(["everyone", "friends", "crews", "me"]);
     expect(opensTo(undefined, "everyone")).toBe(false);
+  });
+  it("never offers Everyone for presence tonight: only crew mates ever see it", () => {
+    expect(choicesFor("presence")).toEqual(["friends", "crews", "me"]);
+    expect(choicesFor("badges")).toEqual(CHOICE_ORDER);
   });
   it("opens to a stranger only on Everyone", () => {
     expect(opensTo("everyone", "everyone")).toBe(true);

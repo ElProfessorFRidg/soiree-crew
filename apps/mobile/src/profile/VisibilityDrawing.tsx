@@ -11,7 +11,7 @@ const AnimatedPath = Animated.createAnimatedComponent(Path);
 const DASH = 600;
 const STAGGER = 130;
 
-interface Line {
+export interface Line {
   d: string;
   /** The one accent stroke of the drawing, in amber. */
   accent?: boolean;
@@ -63,7 +63,7 @@ const DRAWINGS: Record<VisibilityKey, Line[]> = {
   ],
 };
 
-function DrawnPath({ line, index, still, stroke, accent }: { line: Line; index: number; still: boolean; stroke: string; accent: string }) {
+export function DrawnPath({ line, index, still, stroke, accent }: { line: Line; index: number; still: boolean; stroke: string; accent: string }) {
   const draw = useSharedValue(still ? 1 : 0);
   useEffect(() => {
     if (still) {

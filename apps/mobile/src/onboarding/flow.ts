@@ -13,6 +13,7 @@ export type Step =
   | "bac"
   | "region"
   | VisibilityKey
+  | "crew"
   | "notifications"
   | "location"
   | "closing";
@@ -37,6 +38,8 @@ export interface OnboardingDraft {
   birthDate: string | null;
   /** The profile photo, a small JPEG as a data address, kept on this phone. */
   photo: string | null;
+  /** The photo is on the server too; false until it was sent (it needs an account). */
+  photoSent: boolean;
   /** The audience chosen on each visibility screen; missing means not answered yet. */
   visibility: Partial<Record<VisibilityKey, Audience>>;
   permissions: Partial<Record<"notifications" | "location", PermissionAnswer>>;
@@ -58,6 +61,8 @@ export type FirstRunCard = "settings" | "checklist" | "preview" | "notifications
 export interface FlowContext {
   signedIn: boolean;
   accountVisited: boolean;
+  /** Signing in to an account that exists asks for it first; a new account comes after the date of birth, so a minor never gets one. */
+  accountFirst?: boolean;
   health: boolean;
   /** A browser tab cannot send local reminders, so the web has no notifications step. */
   notificationsSupported: boolean;
@@ -71,11 +76,13 @@ export const VISIBILITY_STEPS: readonly VisibilityKey[] = ["venues", "titles", "
 /** The steps actually shown, welcome first. */
 export function visibleSteps(context: FlowContext): Step[] {
   const steps: Step[] = ["welcome"];
-  if (context.accountVisited) steps.push("account");
-  steps.push("birth", "photo", "consent");
+  if (context.accountVisited && context.accountFirst) steps.push("account");
+  steps.push("birth");
+  if (context.accountVisited && !context.accountFirst) steps.push("account");
+  steps.push("photo", "consent");
   if (context.health) steps.push("bac");
   steps.push("region");
-  if (context.signedIn) steps.push(...VISIBILITY_STEPS);
+  if (context.signedIn) steps.push(...VISIBILITY_STEPS, "crew");
   if (context.notificationsSupported) steps.push("notifications");
   if (context.locationSupported) steps.push("location");
   steps.push("closing");
@@ -140,6 +147,7 @@ export function freshDraft(profile: ProfileDraft, health: boolean): OnboardingDr
     profile,
     birthDate: null,
     photo: null,
+    photoSent: false,
     visibility: {},
     permissions: {},
     savedAt: Date.now(),

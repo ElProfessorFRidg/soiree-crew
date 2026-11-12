@@ -25,7 +25,7 @@ afterEach(async () => {
 
 type User = { id: string; auth: { authorization: string } };
 async function account(username: string, extra: object = {}): Promise<User> {
-  const body = (await app.inject({ method: "POST", url: "/v1/accounts", payload: { username, displayName: username, ...extra } })).json() as { user: { id: string }; token: string };
+  const body = (await app.inject({ method: "POST", url: "/v1/accounts", payload: { birthDate: "1990-01-01", username, displayName: username, ...extra } })).json() as { user: { id: string }; token: string };
   return { id: body.user.id, auth: { authorization: `Bearer ${body.token}` } };
 }
 const put = (user: User, payload: object) => app.inject({ method: "PUT", url: "/v1/me/profile", headers: user.auth, payload });
@@ -54,8 +54,25 @@ describe("age (O-02)", () => {
     expect((await app.inject({ method: "POST", url: "/v1/accounts", payload: { username: "adult", displayName: "Adult", birthDate: "2008-11-07" } })).statusCode).toBe(201);
   });
 
+  it("refuses an account made without a date of birth", async () => {
+    const res = await app.inject({ method: "POST", url: "/v1/accounts", payload: { username: "nodate", displayName: "No date" } });
+    expect(res.statusCode).toBe(400);
+    expect((await db.query("select 1 from users where username = 'nodate'")).length).toBe(0);
+  });
+
+  it("lets the date be set once for an account that has none, then refuses a different one", async () => {
+    const user = await account("once");
+    await db.query("update users set birth_date = null where id = $1", [user.id]);
+    const set = (birthDate: string) => app.inject({ method: "PUT", url: "/v1/me/birth-date", headers: user.auth, payload: { birthDate } });
+    expect((await set("1995-03-04")).statusCode).toBe(200);
+    expect((await set("1990-01-01")).statusCode).toBe(409);
+    expect((await set("1995-03-04")).statusCode).toBe(200);
+    expect((await db.query<{ birth_date: string }>("select birth_date from users where id = $1", [user.id]))[0]?.birth_date).toBe("1995-03-04");
+  });
+
   it("refuses an under 18 date later on, and answers with the age, never the date", async () => {
     const user = await account("late");
+    await db.query("update users set birth_date = null where id = $1", [user.id]);
     const refused = await app.inject({ method: "PUT", url: "/v1/me/birth-date", headers: user.auth, payload: { birthDate: "2015-01-01" } });
     expect(refused.statusCode).toBe(403);
     expect((await app.inject({ method: "GET", url: "/v1/me", headers: user.auth })).json()).toMatchObject({ age: null });
@@ -101,6 +118,16 @@ describe("the five visibility choices (PROF-01, PROF-02)", () => {
         expect(section in (await profileOf(owner, owner.id)).sections).toBe(true);
       }
     }
+  });
+
+  it("lets badges follow the games audience until badges has its own choice", async () => {
+    const [owner, mate] = [await account("gamer"), await account("gmate")] as [User, User];
+    await crewWith(owner, mate);
+    expect("badges" in (await profileOf(mate, owner.id)).sections).toBe(true);
+    await put(owner, { audiences: { games: "me" } });
+    expect("badges" in (await profileOf(mate, owner.id)).sections).toBe(false);
+    await put(owner, { audiences: { badges: "crews" } });
+    expect("badges" in (await profileOf(mate, owner.id)).sections).toBe(true);
   });
 
   it("stores find and presence next to the other audiences, and shows them to the owner only", async () => {

@@ -10,6 +10,7 @@
     "backgroundColor": "#1E2624",
     "ios": {
       "bundleIdentifier": "app.soireecrew.mobile",
+      "usesAppleSignIn": true,
       "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": true,
@@ -39,6 +40,7 @@
     "plugins": [
       "expo-router",
       "expo-localization",
+      "expo-apple-authentication",
       [
         "expo-font",
         {

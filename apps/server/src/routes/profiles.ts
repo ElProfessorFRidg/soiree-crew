@@ -323,8 +323,9 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
     // COM-08: a changed bio or country is text others read, so it goes through the filters.
     const changed = [input.bio, input.country].filter((t, i) => t !== undefined && t !== (i === 0 ? current?.bio : current?.country));
     if (changed.length) await assertPublishable(ctx, user.id, changed);
-    const audiences = {
-      ...audiencesOf(current ? (JSON.parse(current.audiences) as Record<string, unknown>) : {}),
+    // Only what was chosen is stored: a section never chosen keeps following its default (badges follow games).
+    const audiences: Record<string, string> = {
+      ...(current ? (JSON.parse(current.audiences) as Record<string, string>) : {}),
       ...(input.preset ? PRESETS[input.preset] : {}),
       ...(input.audiences ?? {}),
     };
@@ -351,7 +352,7 @@ export function profileRoutes(app: FastifyInstance, ctx: Context): void {
       const b = input.birthday;
       await ctx.db.query("update profiles set birth_month = $2, birth_day = $3, birth_year = $4 where user_id = $1", [user.id, b?.month ?? null, b?.day ?? null, b?.year ?? null]);
     }
-    return { audiences };
+    return { audiences: audiencesOf(audiences) };
   });
 
   /**
