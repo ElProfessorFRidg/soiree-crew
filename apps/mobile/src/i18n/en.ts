@@ -425,7 +425,7 @@ export const en: Messages = {
     eraseAll: "Erase everything",
     eraseAllTitle: "Erase everything on this phone?",
     eraseAllBody: "Your profile, drinks and water, settings, custom drinks and photos waiting to upload are erased from this phone, reminders included. The app restarts as on its first launch.",
-    withdraw: "Withdraw consent for health data",
+    withdraw: "Withdraw health consent",
     withdrawTitle: "Withdraw your consent?",
     withdrawBody: "Your weight, body, drinks and water are erased from the server and this phone. Without consent, the app can't estimate your BAC.",
     withdrawConfirm: "Withdraw and erase",

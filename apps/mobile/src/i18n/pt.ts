@@ -424,7 +424,7 @@ export const pt: Messages = {
     eraseAll: "Apagar tudo",
     eraseAllTitle: "Apagar tudo deste telemóvel?",
     eraseAllBody: "O teu perfil, as bebidas e a água, as definições, as bebidas personalizadas e as fotos em espera são apagados deste telemóvel, lembretes incluídos. A app reinicia como na primeira vez.",
-    withdraw: "Retirar o meu acordo para os dados de saúde",
+    withdraw: "Retirar acordo de saúde",
     withdrawTitle: "Retirar o teu acordo?",
     withdrawBody: "O teu peso, a tua morfologia, as tuas bebidas e os copos de água são apagados do servidor e deste telemóvel. Sem acordo, a app deixa de calcular a tua taxa.",
     withdrawConfirm: "Retirar e apagar",

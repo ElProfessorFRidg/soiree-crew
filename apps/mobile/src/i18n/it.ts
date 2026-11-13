@@ -424,7 +424,7 @@ export const it: Messages = {
     eraseAll: "Cancella tutto",
     eraseAllTitle: "Cancellare tutto da questo telefono?",
     eraseAllBody: "Il tuo profilo, i drink e l'acqua, le impostazioni, i drink personalizzati e le foto in attesa vengono cancellati da questo telefono, promemoria compresi. L'app riparte come al primo avvio.",
-    withdraw: "Ritira il consenso per i dati sanitari",
+    withdraw: "Ritira il consenso salute",
     withdrawTitle: "Ritirare il consenso?",
     withdrawBody: "Peso, corporatura, drink e bicchieri d'acqua vengono cancellati dal server e da questo telefono. Senza consenso, l'app non calcola più il tuo tasso.",
     withdrawConfirm: "Ritira e cancella",

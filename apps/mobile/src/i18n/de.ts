@@ -423,7 +423,7 @@ export const de: Messages = {
     eraseAll: "Alles löschen",
     eraseAllTitle: "Alles auf diesem Handy löschen?",
     eraseAllBody: "Dein Profil, deine Getränke und dein Wasser, Einstellungen, eigene Getränke und wartende Fotos werden von diesem Handy gelöscht, Erinnerungen inklusive. Die App startet wie beim ersten Mal.",
-    withdraw: "Einwilligung für Gesundheitsdaten widerrufen",
+    withdraw: "Gesundheits-Einwilligung widerrufen",
     withdrawTitle: "Einwilligung widerrufen?",
     withdrawBody: "Gewicht, Körperbau, Drinks und Wasser werden vom Server und von diesem Handy gelöscht. Ohne Einwilligung schätzt die App deine Promille nicht mehr.",
     withdrawConfirm: "Widerrufen und löschen",

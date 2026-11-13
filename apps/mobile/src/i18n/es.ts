@@ -424,7 +424,7 @@ export const es: Messages = {
     eraseAll: "Borrarlo todo",
     eraseAllTitle: "¿Borrarlo todo de este teléfono?",
     eraseAllBody: "Tu perfil, tus bebidas y el agua, tus ajustes, tus bebidas personalizadas y las fotos pendientes se borran de este teléfono, recordatorios incluidos. La app se reinicia como la primera vez.",
-    withdraw: "Retirar mi permiso para los datos de salud",
+    withdraw: "Retirar permiso de salud",
     withdrawTitle: "¿Retirar tu permiso?",
     withdrawBody: "Tu peso, tu morfología, tus copas y tus vasos de agua se borran del servidor y de este teléfono. Sin permiso, la app ya no calcula tu tasa.",
     withdrawConfirm: "Retirar y borrar",

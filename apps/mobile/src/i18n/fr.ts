@@ -423,7 +423,7 @@ export const fr = {
     eraseAll: "Tout effacer",
     eraseAllTitle: "Tout effacer de ce téléphone ?",
     eraseAllBody: "Ton profil, tes verres et ton eau, tes réglages, tes boissons perso et tes photos en attente sont effacés de ce téléphone, rappels compris. L'app redémarre comme au premier lancement.",
-    withdraw: "Retirer mon accord pour les données de santé",
+    withdraw: "Retirer mon accord santé",
     withdrawTitle: "Retirer ton accord ?",
     withdrawBody: "Ton poids, ta morphologie, tes verres et tes verres d'eau sont effacés du serveur et de ce téléphone. Sans accord, l'app ne calcule plus ton taux.",
     withdrawConfirm: "Retirer et effacer",
