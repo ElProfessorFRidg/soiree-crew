@@ -1,7 +1,7 @@
 import { router, useSegments } from "expo-router";
-import { Children, isValidElement, useState, type ReactNode } from "react";
+import { Children, isValidElement, useEffect, useState, type ReactNode } from "react";
 import { KeyboardAvoidingView, Platform, RefreshControl, StyleSheet, View } from "react-native";
-import Animated, { FadeInUp, interpolate, runOnJS, useAnimatedReaction, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
+import Animated, { FadeInUp, interpolate, runOnJS, useAnimatedReaction, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withDelay, withTiming } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { duration, scaled, space } from "@crew/design-tokens";
 import { useT } from "@/i18n";
@@ -148,22 +148,12 @@ export function Screen({ title, brand, back, trailing, children, footer, withToa
         ) : null}
         {/* Blocks rise into place one after the other when the screen opens (Reduce Motion: none). */}
         {Children.toArray(children).map((child, index) => (
-          <Animated.View
+          <Block
             key={isValidElement(child) && child.key != null ? child.key : index}
-            // A child that renders a fragment (a settings page, say) keeps the gap between its blocks.
-            style={styles.block}
-            // On the web the rise-in leaves a compositing layer per block, and mobile Safari paints blank holes
-            // between them once a scroll stops: there the blocks simply appear.
-            entering={
-              Platform.OS === "web"
-                ? undefined
-                : FadeInUp.delay(scaled(Math.min(index, 8) * 45))
-                    .duration(duration.enter)
-                    .withInitialValues({ opacity: 0, transform: [{ translateY: 12 }] })
-            }
+            index={index}
           >
             {child}
-          </Animated.View>
+          </Block>
         ))}
       </Animated.ScrollView>
       {onRefresh && customPull ? <PullGlass scrollY={scrollY} refreshing={refreshing} top={insets.top + 10} /> : null}
@@ -174,6 +164,38 @@ export function Screen({ title, brand, back, trailing, children, footer, withToa
       {footer ? <View style={[styles.footer, { paddingBottom: footerBottom }]}>{footer}</View> : null}
       {withToasts ? <ToastHost bottomOffset={insets.bottom + 24 + overTabBar} /> : null}
     </KeyboardAvoidingView>
+  );
+}
+
+/**
+ * One block of a screen, rising into place when the screen opens. On the web the animation plays once
+ * and the block then goes back to a plain View: a transform left on every block made mobile Safari
+ * paint blank holes between them after a scroll.
+ */
+function Block({ index, children }: { index: number; children: ReactNode }) {
+  const [settled, setSettled] = useState(Platform.OS !== "web");
+  const progress = useSharedValue(Platform.OS === "web" ? 0 : 1);
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+    progress.value = withDelay(
+      scaled(Math.min(index, 8) * 45),
+      withTiming(1, { duration: duration.enter }, (finished) => {
+        if (finished) runOnJS(setSettled)(true);
+      }),
+    );
+  }, [index, progress]);
+  const rise = useAnimatedStyle(() => ({ opacity: progress.value, transform: [{ translateY: (1 - progress.value) * 12 }] }));
+  if (Platform.OS === "web") return settled ? <View style={styles.block}>{children}</View> : <Animated.View style={[styles.block, rise]}>{children}</Animated.View>;
+  return (
+    // A child that renders a fragment (a settings page, say) keeps the gap between its blocks.
+    <Animated.View
+      style={styles.block}
+      entering={FadeInUp.delay(scaled(Math.min(index, 8) * 45))
+        .duration(duration.enter)
+        .withInitialValues({ opacity: 0, transform: [{ translateY: 12 }] })}
+    >
+      {children}
+    </Animated.View>
   );
 }
 
