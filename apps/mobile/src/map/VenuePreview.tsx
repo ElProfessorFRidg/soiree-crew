@@ -4,6 +4,7 @@ import { Image, ScrollView, StyleSheet, View } from "react-native";
 import { useT } from "@/i18n";
 import { useSession } from "@/server/session";
 import { fetchVenuePage, fetchVenuePhotos, type VenuePage, type VenuePhoto } from "@/server/venueData";
+import { Avatar } from "@/ui/Avatar";
 import { ScalePressable } from "@/ui/Pressable";
 import { Text } from "@/ui/Text";
 
@@ -40,9 +41,18 @@ export function VenuePreview({ venueId }: { venueId: string }) {
         <View>
           <Text variant="label">{i18n.t("bars.topHere")}</Text>
           {top.map((row, index) => (
-            <Text key={row.userId} variant="small" style={row.userId === me ? styles.me : undefined}>
-              {i18n.t("bars.rankLine", { rank: index + 1, name: row.name, points: row.points })}
-            </Text>
+            <ScalePressable
+              key={row.userId}
+              accessibilityRole="button"
+              accessibilityLabel={i18n.t("bars.rankLine", { rank: index + 1, name: row.name, points: row.points })}
+              onPress={() => router.push({ pathname: "/profile", params: { id: row.userId } })}
+              style={styles.rankRow}
+            >
+              <Avatar personId={row.userId} name={row.name} size={30} />
+              <Text variant="small" style={[styles.rankText, row.userId === me ? styles.me : undefined]}>
+                {i18n.t("bars.rankLine", { rank: index + 1, name: row.name, points: row.points })}
+              </Text>
+            </ScalePressable>
           ))}
         </View>
       ) : null}
@@ -71,6 +81,8 @@ export function VenuePreview({ venueId }: { venueId: string }) {
 const styles = StyleSheet.create({
   box: { gap: 10 },
   me: { fontFamily: "Archivo-Semibold" },
+  rankRow: { flexDirection: "row", alignItems: "center", gap: 8, minHeight: 40 },
+  rankText: { flex: 1 },
   photos: { gap: 8 },
   photo: { width: 64, height: 64, borderRadius: 12 },
 });

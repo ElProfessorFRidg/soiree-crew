@@ -56,6 +56,7 @@ function VenuePin({
   const size = selected ? 40 : 30;
   return (
     <ScalePressable
+      accessibilityRole="button"
       accessibilityLabel={
         venue.bossName ? `${venue.name}, ${venue.bossName}` : venue.name
       }
@@ -180,7 +181,7 @@ export default function BarsScreen() {
 
   const locate = async () => {
     setLocating(true);
-    const result = await currentFix("checkin").finally(() => setLocating(false));
+    const result = await currentFix("nearby").finally(() => setLocating(false));
     if (!result.ok) {
       if (!result.declined) showToast({ message: i18n.t("journey.locDenied"), durationMs: 8_000 });
       return;
@@ -194,6 +195,13 @@ export default function BarsScreen() {
   useEffect(() => {
     if (!crewId && crews[0]) setCrewId(crews[0].id);
   }, [crews, crewId]);
+
+  // Each crew has its own map extent and selection. Reusing the previous crew's viewport can
+  // make the new crew's venues look missing until the map is manually moved a long way back.
+  useEffect(() => {
+    setSelectedId(null);
+    setRegion(null);
+  }, [crewId]);
 
   // MOT-09: while the map is on screen it follows the crew, so a crown changing hands shows up live.
   useFocusEffect(
@@ -241,6 +249,22 @@ export default function BarsScreen() {
     if (filter === "happy") return all.filter((v) => v.happyNow === true);
     return all;
   }, [data, filter]);
+  const filterCounts = useMemo(() => {
+    const all = data?.venues ?? [];
+    return {
+      all: all.length,
+      friends: all.filter((venue) => venue.hereNow > 0).length,
+      fog: all.filter((venue) => !venue.explored && venue.kind !== "home").length,
+      open: all.filter((venue) => venue.openNow === true).length,
+      happy: all.filter((venue) => venue.happyNow === true).length,
+    } satisfies Record<Filter, number>;
+  }, [data]);
+
+  // A selected pin must always remain one of the pins on screen. This also closes the old
+  // preview when a filter hides its venue.
+  useEffect(() => {
+    if (selectedId && !venues.some((venue) => venue.id === selectedId)) setSelectedId(null);
+  }, [selectedId, venues]);
 
   useEffect(() => {
     if (!region && data?.venues.length)
@@ -261,6 +285,14 @@ export default function BarsScreen() {
 
   const selected = venues.find((v) => v.id === selectedId) ?? null;
   const view = region ?? fitRegion([], width - 40, mapHeight);
+  const fitVisible = () => {
+    const points: LatLng[] = [
+      ...venues,
+      ...friends,
+      ...(mine ? [mine] : []),
+    ];
+    setRegion(fitRegion(points, width - 40, mapHeight));
+  };
 
   return (
     <Screen
@@ -312,7 +344,11 @@ export default function BarsScreen() {
               <VenuePin
                 venue={venue}
                 selected={venue.id === selectedId}
-                onPress={() => setSelectedId(venue.id)}
+                onPress={() => {
+                  setSelectedId(venue.id);
+                  // Bring the chosen pin away from the edge and close enough to read its context.
+                  setRegion({ center: venue, zoom: Math.max(view.zoom, 15) });
+                }}
                 takeoverAt={takeovers[venue.id] ?? 0}
                 still={still}
               />
@@ -337,25 +373,42 @@ export default function BarsScreen() {
             lat: f.lat,
             lng: f.lng,
             render: () => (
-              <Avatar
-                personId={f.userId}
-                name={f.name}
-                size={30}
-                ring={palette.accent.amber}
-              />
+              <ScalePressable
+                accessibilityRole="button"
+                accessibilityLabel={f.name}
+                onPress={() => router.push({ pathname: "/profile", params: { id: f.userId } })}
+              >
+                <Avatar
+                  personId={f.userId}
+                  name={f.name}
+                  size={34}
+                  ring={palette.accent.amber}
+                />
+              </ScalePressable>
             ),
           })),
         ]}
       />
 
-      <Button
-        label={i18n.t("bars.locateMe")}
-        icon="pin"
-        variant="secondary"
-        height={48}
-        loading={locating}
-        onPress={() => void locate()}
-      />
+      <View style={styles.mapActions}>
+        <Button
+          label={i18n.t("bars.locateMe")}
+          icon="pin"
+          variant="secondary"
+          height={48}
+          loading={locating}
+          style={styles.flex}
+          onPress={() => void locate()}
+        />
+        <Button
+          label={i18n.t("bars.fitMap")}
+          icon="filter"
+          variant="secondary"
+          height={48}
+          style={styles.flex}
+          onPress={fitVisible}
+        />
+      </View>
 
       <View style={styles.chips}>
         {(
@@ -369,7 +422,7 @@ export default function BarsScreen() {
         ).map(([value, key]) => (
           <Chip
             key={value}
-            label={i18n.t(key)}
+            label={`${i18n.t(key)} · ${filterCounts[value]}`}
             selected={filter === value}
             onPress={() => setFilter(value)}
           />
@@ -383,6 +436,7 @@ export default function BarsScreen() {
         >
           <Panel>
             <Text variant="h2">{selected.name}</Text>
+            {selected.address ? <Text variant="small">{selected.address}</Text> : null}
             <View style={styles.tags}>
               {selected.bossName ? (
                 <Tag
@@ -441,6 +495,10 @@ export default function BarsScreen() {
         <Text>{i18n.t("bars.empty")}</Text>
       ) : venues.length === 0 && (filter === "open" || filter === "happy") ? (
         <Text variant="small">{i18n.t("bars.noHours")}</Text>
+      ) : venues.length === 0 && filter === "friends" ? (
+        <Text variant="small">{i18n.t("bars.noFriendsHere")}</Text>
+      ) : venues.length === 0 && filter === "fog" ? (
+        <Text variant="small">{i18n.t("bars.noConquests")}</Text>
       ) : null}
 
       {/* N-11: "Where to?" from here too, not only during a party. */}
@@ -475,6 +533,7 @@ const styles = StyleSheet.create({
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   tags: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   actions: { flexDirection: "row", gap: 10 },
+  mapActions: { flexDirection: "row", gap: 10 },
   flex: { flex: 1 },
   meHalo: { width: 44, height: 44, borderRadius: 22, backgroundColor: "rgba(80,150,255,0.25)", alignItems: "center", justifyContent: "center" },
   meDot: { width: 18, height: 18, borderRadius: 9, borderWidth: 3 },
