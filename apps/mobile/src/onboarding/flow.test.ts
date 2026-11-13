@@ -63,7 +63,7 @@ describe("arrival steps (O-01 to O-05, PREF-02, PROF-01)", () => {
 
   it("goes back one screen at a time, past the account form once signed in", () => {
     expect(previousStep("account", member)).toBe("welcome");
-    expect(previousStep("photo", member)).toBe("account");
+    expect(previousStep("photo", member)).toBe("welcome");
     expect(previousStep("photo", { ...member, signedIn: false })).toBe("account");
     expect(previousStep("presence", member)).toBe("find");
     expect(previousStep("closing", member)).toBe("location");
