@@ -152,9 +152,15 @@ export function Screen({ title, brand, back, trailing, children, footer, withToa
             key={isValidElement(child) && child.key != null ? child.key : index}
             // A child that renders a fragment (a settings page, say) keeps the gap between its blocks.
             style={styles.block}
-            entering={FadeInUp.delay(scaled(Math.min(index, 8) * 45))
-              .duration(duration.enter)
-              .withInitialValues({ opacity: 0, transform: [{ translateY: 12 }] })}
+            // On the web the rise-in leaves a compositing layer per block, and mobile Safari paints blank holes
+            // between them once a scroll stops: there the blocks simply appear.
+            entering={
+              Platform.OS === "web"
+                ? undefined
+                : FadeInUp.delay(scaled(Math.min(index, 8) * 45))
+                    .duration(duration.enter)
+                    .withInitialValues({ opacity: 0, transform: [{ translateY: 12 }] })
+            }
           >
             {child}
           </Animated.View>
