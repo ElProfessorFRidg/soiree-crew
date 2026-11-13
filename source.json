@@ -21,16 +21,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -43,6 +43,27 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.4",
+          "buildVersion": "93",
+          "date": "2026-11-13T17:17:54Z",
+          "localizedDescription": "• Dropped-phone test polls every 5s instead of one 25s jump (order-dependent presence race)\n• Fix back-navigation test now that birth step is gone\n• Ask age only when creating an account; native selects for the web date picker\n• A stranger allowed to see nights also gets the crew and solo split\n• A party spent without alcohol still counts as a night out\n• Solo nights count on the profile, stats and records; crew board explains waiting drinks and asks friends to confirm",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.4%2Bbuild.93/soiree-crew-unsigned.ipa",
+          "size": 22503695,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.3",
           "buildVersion": "87",
@@ -380,26 +401,37 @@
           ]
         }
       ],
-      "version": "0.2.3",
-      "versionDate": "2026-11-12T21:52:47Z",
-      "versionDescription": "• Accounts in the Gribouille and suggestions tests carry a birth date; status regenerated after the merges\n• Crew step back, Apple sign-in, date of birth before the account, server-side profile photo\n• Answer a round from its notification (\"Got it\" / \"Not mine\"), drinks linked to the round, confirmedIds in the listing\n• Background location follows eco mode as it changes during the night\n• Only a party that is live now tells the crew; partyStarted asserted explicitly in inbox tests; gathering card button 48 px\n• Leave authorises on party membership, drop locks the round and keeps a changed split, a round id reused in another party is a retry\n• Eco mode slows and simplifies loops instead of freezing every animation; location updates restart when the eco state changes\n• Close guesses stay private, rate-limit join, guard timers and leave, sweep idle rooms\n• Rebuild the arrival as one continuous flow with five visibility choices\n• Gribouille online, a drawing and guessing game on several phones (O-63)\n• Offer a party when 3+ of the crew are at one venue, push when a crew mate launches one, warn before closing (QOL-17)\n• Respect the phone, eco mode, data saver, theme choice\n• Fair rotation from the crew's history, server-side split and presence checks, drop-a-drink, summary (N-18, server)",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.3%2Bbuild.87/soiree-crew-unsigned.ipa",
-      "size": 22499405,
+      "version": "0.2.4",
+      "versionDate": "2026-11-13T17:17:54Z",
+      "versionDescription": "• Dropped-phone test polls every 5s instead of one 25s jump (order-dependent presence race)\n• Fix back-navigation test now that birth step is gone\n• Ask age only when creating an account; native selects for the web date picker\n• A stranger allowed to see nights also gets the crew and solo split\n• A party spent without alcohol still counts as a night out\n• Solo nights count on the profile, stats and records; crew board explains waiting drinks and asks friends to confirm",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.4%2Bbuild.93/soiree-crew-unsigned.ipa",
+      "size": 22503695,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "release-0.2.4",
+      "title": "Soirée Crew 0.2.4",
+      "caption": "• Dropped-phone test polls every 5s instead of one 25s jump (order-dependent presence race)\n• Fix back-navigation test now that birth step is gone\n• Ask age only when creating an account; native selects for the web date picker\n• A stranger allowed to see nights also gets the crew and solo split\n• A party spent without alcohol still counts as a night out\n• Solo nights count on the profile, stats and records; crew board explains waiting drinks and asks friends to confirm",
+      "date": "2026-11-13T17:17:54Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/tag/v0.2.4%2Bbuild.93",
+      "appID": "app.soireecrew.mobile",
+      "notify": false
+    },
     {
       "identifier": "release-0.2.3",
       "title": "Soirée Crew 0.2.3",
