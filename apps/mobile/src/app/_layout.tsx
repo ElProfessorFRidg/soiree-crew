@@ -6,6 +6,7 @@ import {
   DarkTheme,
   router,
   Stack,
+  useSegments,
   ThemeProvider as NavigationThemeProvider,
 } from "expo-router";
 import * as SystemUI from "expo-system-ui";
@@ -29,7 +30,7 @@ import { refreshCalendarReminders, sendClock, watchCalendarReminders } from "@/s
 import { useSyncFeedback } from "@/sync/feedback";
 import { useDriverReminder } from "@/party/driverReminder";
 import { flush } from "@/sync/engine";
-import { followPhoneHourCycle, useAppStore } from "@/state/store";
+import { followPhoneHourCycle, isOnboarded, useAppStore } from "@/state/store";
 import { ThemeProvider } from "@/theme";
 import { useEco, watchBattery } from "@/power/eco";
 import { logWater } from "@/drinks/actions";
@@ -238,6 +239,15 @@ export default function RootLayout() {
     const route = Settings.get("ciRoute") as unknown;
     if (typeof route === "string" && route.startsWith("/")) setTimeout(() => router.push(route as never), 300);
   }, [ready]);
+
+  // Every screen sits behind the arrival flow: a pasted or bookmarked address does not skip it. An invite
+  // link is the one way in, it only keeps the code and carries on to the arrival flow itself.
+  const onboarded = useAppStore(isOnboarded);
+  const first = (useSegments() as string[])[0];
+  const open = first === "onboarding" || first === "join";
+  useEffect(() => {
+    if (ready && !onboarded && !open) router.replace("/onboarding");
+  }, [ready, onboarded, open]);
 
   if (!ready) return null;
 
