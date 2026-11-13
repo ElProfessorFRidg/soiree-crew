@@ -20,9 +20,12 @@ export function LaunchCurtain({ onShown }: { onShown: () => void }) {
 
   useEffect(() => {
     onShown();
+    // A missing Reanimated completion callback must never leave the logo over a working app.
+    const deadline = setTimeout(() => setGone(true), duration.launch + 500);
     t.value = withTiming(1, { duration: duration.launch, easing: easings.out }, (done) => {
       if (done) runOnJS(setGone)(true);
     });
+    return () => clearTimeout(deadline);
     // Only once, on the first frame: the native splash goes away behind this copy.
   }, []);
 

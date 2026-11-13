@@ -66,7 +66,7 @@ export type TransportResult =
   | { status: "accepted"; serverTime: number }
   | { status: "rejected"; reason: RejectionReason }
   | { status: "offline" }
-  | { status: "temporary" };
+  | { status: "temporary"; retryAfterMs?: number };
 
 export interface Transport {
   send(pending: PendingMutation): Promise<TransportResult>;

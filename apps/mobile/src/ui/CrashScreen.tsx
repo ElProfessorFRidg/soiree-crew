@@ -4,12 +4,15 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { radius, themes } from "@crew/design-tokens";
 import { createTranslator } from "@/i18n";
 import { useAppStore } from "@/state/store";
+import { useEffect } from "react";
+import * as SplashScreen from "expo-splash-screen";
 
 // Rendered in place of a layout that crashed, so none of its providers (theme, i18n, safe area)
 // can be assumed: plain components, the dark theme and a translator built from the stored language.
 
 /** QOL: a crash in one screen never leaves a blank app; it says so and offers a way out. */
 export function CrashScreen({ retry }: ErrorBoundaryProps) {
+  useEffect(() => { void SplashScreen.hideAsync().catch(() => undefined); }, []);
   const i18n = createTranslator(useAppStore.getState().preferences.language);
   const theme = themes.dark;
   return (

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { bearer, requireUser, HttpError, type Context } from "../context";
 import { DUMMY_PASSWORD_HASH, hashPassword, needsRehash, hashToken, newCode, newId, newToken, verifyPassword } from "../crypto";
 import { notifyNewDevice } from "../notifications/producers";
-import { RateLimiter } from "../ratelimit";
+import { RateLimiter, TokenBucket } from "../ratelimit";
 import { deleteChatBackup } from "./chat";
 import { deletePhotoFiles, signedPhotoUrl } from "./photos";
 import { deleteReceiptFiles } from "./money";
@@ -29,11 +29,12 @@ async function createSession(ctx: Context, userId: string, deviceLabel: string):
 export function accountRoutes(app: FastifyInstance, ctx: Context): void {
   // SEC-07: sign-up and sign-in are rate-limited per address. A transfer code has
   // 10 characters, so guessing one at 10 tries per 10 minutes goes nowhere.
-  const signUps = new RateLimiter(10, 10 * 60_000, ctx.now);
+  const signUps = new TokenBucket(30, 3, ctx.now);
   const claims = new RateLimiter(10, 10 * 60_000, ctx.now);
   const usernameChecks = new RateLimiter(120, 60_000, ctx.now);
   // O-01: per address and per login, so spreading guesses over many addresses does not help either.
   const passwordTries = new RateLimiter(10, 10 * 60_000, ctx.now);
+  const passwordNetwork = new TokenBucket(60, 6, ctx.now);
   // Per login and address, so a stranger cannot lock the owner out; per login overall, looser, so
   // spreading guesses over many addresses still gets nowhere.
   const loginTries = new RateLimiter(5, 10 * 60_000, ctx.now);
@@ -120,7 +121,7 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
 
   /** O-01: sign in with an email or a username and a password. Same answer for an unknown login and a wrong password. */
   app.post("/v1/sessions/password", async (request, reply) => {
-    passwordTries.check(request.ip);
+    passwordNetwork.check(request.ip);
     const input = z
       .object({ login: z.string().trim().toLowerCase().min(3).max(254), password: z.string().min(1).max(200), deviceLabel: z.string().max(60).optional() })
       .parse(request.body);

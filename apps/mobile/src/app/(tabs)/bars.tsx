@@ -284,6 +284,8 @@ export default function BarsScreen() {
           text={i18n.t("bars.needCrew")}
           action={{ label: i18n.t("bars.openCrew"), onPress: () => router.navigate("/(tabs)/crew") }}
         />
+        <Button label={i18n.t("discover.title")} icon="search" variant="secondary" onPress={() => router.push("/discover")} />
+        {!session ? <Button label={i18n.t("account.guestSignIn")} variant="outline" onPress={() => router.push({ pathname: "/settings", params: { section: "security" } })} /> : null}
       </Screen>
     );
   }

@@ -66,8 +66,10 @@ if (__DEV__)
     getScale: getMotionScale,
   };
 
-void SplashScreen.preventAutoHideAsync();
+void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 const hideSplash = () => void SplashScreen.hideAsync().catch(() => undefined);
+// This watchdog does not depend on fonts, hydration, the Keychain or the animation callback.
+const splashWatchdog = setTimeout(hideSplash, LAUNCH_STEP_MS * 3);
 
 const fonts = {
   "Archivo-Numeral": require("../../assets/fonts/Archivo-Numeral.ttf"),
@@ -113,6 +115,12 @@ export default function RootLayout() {
   const sessionReady = useSession((state) => state.ready);
   const session = useSession((state) => state.session);
   const ready = fontsLoaded && (hydrated || storeLate) && sessionReady;
+
+  useEffect(() => {
+    if (!ready) return;
+    clearTimeout(splashWatchdog);
+    hideSplash();
+  }, [ready]);
 
   useEffect(() => {
     const fontTimer = setTimeout(() => setFontsLate(true), LAUNCH_STEP_MS);
