@@ -126,9 +126,11 @@ describe("Gribouille rooms", () => {
     await call(users[0]!, "POST", `/v1/gribouille/${id}/start`);
     const first = await view(users[0]!, id);
     const guesserIndex = users.findIndex((u) => u.id !== first.turn!.drawerId);
-    clock += 25_000;
-    // The guesser's phone was off; the others went on polling.
-    await Promise.all(users.filter((_, i) => i !== guesserIndex).map((u) => view(u, id)));
+    // The guesser's phone was off; the others went on polling every 5 seconds, one after the other.
+    for (let tick = 0; tick < 5; tick++) {
+      clock += 5_000;
+      for (const u of users.filter((_, i) => i !== guesserIndex)) await view(u, id);
+    }
     const during = await view(users[(guesserIndex + 1) % 3]!, id);
     expect(during.players.find((p) => p.id === users[guesserIndex]!.id)!.connected).toBe(false);
     expect(during.phase).toBe("drawing");
