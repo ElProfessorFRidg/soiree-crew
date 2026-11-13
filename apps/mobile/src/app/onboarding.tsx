@@ -121,7 +121,7 @@ export default function Onboarding() {
     locationSupported: Platform.OS !== "web",
   };
   // A draft saved on a screen this version no longer has (the old crew step) resumes at the date of birth.
-  const step: Step = visibleSteps(context).includes(draft.step) ? draft.step : "birth";
+  const step: Step = visibleSteps(context).includes(draft.step) ? draft.step : "welcome";
   const after = nextStep(step, context);
   const name = session?.displayName ?? "";
   const personId = session?.userId ?? "me";
@@ -367,7 +367,7 @@ export default function Onboarding() {
               });
               go("account");
             }}
-            onGuest={() => go("birth")}
+            onGuest={() => go(nextStep("welcome", context))}
           />
         ) : null}
         {step === "account" ? <AccountStep mode={draft.accountMode} onModeChange={(accountMode) => update({ accountMode })} birthDate={draft.birthDate} /> : null}
