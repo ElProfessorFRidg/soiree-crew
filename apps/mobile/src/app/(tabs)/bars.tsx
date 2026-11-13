@@ -8,10 +8,12 @@ import { haptic } from "@/motion/haptics";
 import { takeoversBetween, type BossSnapshot } from "@/motion/math/takeover";
 import { CrownDrop, LivePulse, TakeoverWash } from "@/map/VenueMotion";
 import { fitRegion, TileMap, type LatLng } from "@/map/TileMap";
+import { VenuePreview } from "@/map/VenuePreview";
 import { useLevelNow } from "@/state/levelNow";
 import { useCrewData, useLiveParty } from "@/server/crewData";
 import { useSession } from "@/server/session";
 import {
+  currentFix,
   refreshVenues,
   useVenueData,
   type VenueSummary,
@@ -24,6 +26,7 @@ import { ScalePressable } from "@/ui/Pressable";
 import { EmptyState } from "@/ui/EmptyState";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
+import { showToast } from "@/ui/Toast";
 import {
   fetchFriendLocations,
   type FriendLocation,
@@ -153,6 +156,10 @@ export default function BarsScreen() {
   const livePartyId =
     live && live.party.crewId === crewId ? live.party.id : null;
   const [friends, setFriends] = useState<FriendLocation[]>([]);
+  // My own position on the map, once asked for: nothing is read until the button is pressed.
+  const [mine, setMine] = useState<LatLng | null>(null);
+  const [locating, setLocating] = useState(false);
+  const theme = useTheme();
   const me = session?.userId;
   const pollMs = useEcoInterval(60_000);
 
@@ -170,6 +177,19 @@ export default function BarsScreen() {
     const timer = setInterval(load, pollMs);
     return () => clearInterval(timer);
   }, [livePartyId, me, pollMs]);
+
+  const locate = async () => {
+    setLocating(true);
+    const result = await currentFix("checkin").finally(() => setLocating(false));
+    if (!result.ok) {
+      if (!result.declined) showToast({ message: i18n.t("journey.locDenied"), durationMs: 8_000 });
+      return;
+    }
+    haptic.confirmed();
+    const here = { lat: result.fix.lat, lng: result.fix.lng };
+    setMine(here);
+    setRegion({ center: here, zoom: 15 });
+  };
 
   useEffect(() => {
     if (!crewId && crews[0]) setCrewId(crews[0].id);
@@ -298,6 +318,20 @@ export default function BarsScreen() {
               />
             ),
           })),
+          ...(mine
+            ? [
+                {
+                  id: "me",
+                  lat: mine.lat,
+                  lng: mine.lng,
+                  render: () => (
+                    <View accessible accessibilityLabel={i18n.t("bars.myPosition")} style={styles.meHalo}>
+                      <View style={[styles.meDot, { backgroundColor: theme.water, borderColor: theme.text }]} />
+                    </View>
+                  ),
+                },
+              ]
+            : []),
           ...friends.map((f) => ({
             id: `friend-${f.userId}`,
             lat: f.lat,
@@ -312,6 +346,15 @@ export default function BarsScreen() {
             ),
           })),
         ]}
+      />
+
+      <Button
+        label={i18n.t("bars.locateMe")}
+        icon="pin"
+        variant="secondary"
+        height={48}
+        loading={locating}
+        onPress={() => void locate()}
       />
 
       <View style={styles.chips}>
@@ -365,6 +408,7 @@ export default function BarsScreen() {
             <Text variant="small">
               {i18n.plural("bars.myPoints", selected.myPoints)}
             </Text>
+            <VenuePreview venueId={selected.id} />
             <View style={styles.actions}>
               <Button
                 label={i18n.t("bars.checkIn")}
@@ -432,6 +476,8 @@ const styles = StyleSheet.create({
   tags: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   actions: { flexDirection: "row", gap: 10 },
   flex: { flex: 1 },
+  meHalo: { width: 44, height: 44, borderRadius: 22, backgroundColor: "rgba(80,150,255,0.25)", alignItems: "center", justifyContent: "center" },
+  meDot: { width: 18, height: 18, borderRadius: 9, borderWidth: 3 },
   happyBadge: {
     position: "absolute",
     left: -6,
