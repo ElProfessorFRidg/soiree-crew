@@ -1,7 +1,7 @@
 import { router, useSegments } from "expo-router";
-import { Children, isValidElement, useEffect, useState, type ReactNode } from "react";
+import { Children, isValidElement, useState, type ReactNode } from "react";
 import { KeyboardAvoidingView, Platform, RefreshControl, StyleSheet, View } from "react-native";
-import Animated, { FadeInUp, interpolate, runOnJS, useAnimatedReaction, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withDelay, withTiming } from "react-native-reanimated";
+import Animated, { FadeInUp, interpolate, runOnJS, useAnimatedReaction, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { duration, scaled, space } from "@crew/design-tokens";
 import { useT } from "@/i18n";
@@ -168,24 +168,11 @@ export function Screen({ title, brand, back, trailing, children, footer, withToa
 }
 
 /**
- * One block of a screen, rising into place when the screen opens. On the web the animation plays once
- * and the block then goes back to a plain View: a transform left on every block made mobile Safari
- * paint blank holes between them after a scroll.
+ * Native blocks rise into place. Web blocks stay in a plain View: transforms caused blank holes
+ * in Safari, and swapping an animated wrapper for a View after entry remounted forms and maps.
  */
 function Block({ index, children }: { index: number; children: ReactNode }) {
-  const [settled, setSettled] = useState(Platform.OS !== "web");
-  const progress = useSharedValue(Platform.OS === "web" ? 0 : 1);
-  useEffect(() => {
-    if (Platform.OS !== "web") return;
-    progress.value = withDelay(
-      scaled(Math.min(index, 8) * 45),
-      withTiming(1, { duration: duration.enter }, (finished) => {
-        if (finished) runOnJS(setSettled)(true);
-      }),
-    );
-  }, [index, progress]);
-  const rise = useAnimatedStyle(() => ({ opacity: progress.value, transform: [{ translateY: (1 - progress.value) * 12 }] }));
-  if (Platform.OS === "web") return settled ? <View style={styles.block}>{children}</View> : <Animated.View style={[styles.block, rise]}>{children}</Animated.View>;
+  if (Platform.OS === "web") return <View style={styles.block}>{children}</View>;
   return (
     // A child that renders a fragment (a settings page, say) keeps the gap between its blocks.
     <Animated.View

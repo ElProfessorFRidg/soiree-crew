@@ -34,6 +34,7 @@ import {
 import { useEcoInterval } from "@/power/eco";
 import { Avatar } from "@/ui/Avatar";
 import { OpenTags } from "@/venues/HoursPanel";
+import { latestRequest } from "@/ui/pure/latestRequest";
 
 type Filter = "all" | "friends" | "fog" | "open" | "happy";
 const MAP_HEIGHT_RATIO = 0.46;
@@ -166,18 +167,22 @@ export default function BarsScreen() {
 
   // N-07: friends who share their position tonight show on the map, refreshed every minute.
   useEffect(() => {
+    setFriends([]);
     if (!livePartyId) {
-      setFriends([]);
       return;
     }
-    const load = () =>
-      void fetchFriendLocations(livePartyId)
-        .then((list) => setFriends(list.filter((f) => f.userId !== me)))
-        .catch(() => undefined);
+    const request = latestRequest(
+      () => fetchFriendLocations(livePartyId),
+      (list) => setFriends(list.filter((f) => f.userId !== me)),
+    );
+    const load = () => void request.load();
     load();
     const timer = setInterval(load, pollMs);
-    return () => clearInterval(timer);
-  }, [livePartyId, me, pollMs]);
+    return () => {
+      request.dispose();
+      clearInterval(timer);
+    };
+  }, [livePartyId, session, me, pollMs]);
 
   const locate = async () => {
     setLocating(true);
@@ -193,7 +198,7 @@ export default function BarsScreen() {
   };
 
   useEffect(() => {
-    if (!crewId && crews[0]) setCrewId(crews[0].id);
+    if (!crews.some((crew) => crew.id === crewId)) setCrewId(crews[0]?.id ?? null);
   }, [crews, crewId]);
 
   // Each crew has its own map extent and selection. Reusing the previous crew's viewport can

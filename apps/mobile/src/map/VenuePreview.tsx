@@ -13,6 +13,13 @@ import { Text } from "@/ui/Text";
  * the nights I was part of. Each part shows only once it has loaded; a failure leaves the panel as it was.
  */
 export function VenuePreview({ venueId }: { venueId: string }) {
+  const session = useSession((state) => state.session);
+  // Ranking, visit counts and album URLs are scoped to both the venue and the current account.
+  if (!session) return null;
+  return <AccountVenuePreview key={JSON.stringify([session.url, session.userId, venueId])} venueId={venueId} />;
+}
+
+function AccountVenuePreview({ venueId }: { venueId: string }) {
   const i18n = useT();
   const me = useSession((state) => state.session?.userId);
   const [page, setPage] = useState<VenuePage | null>(null);
