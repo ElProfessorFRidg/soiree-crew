@@ -77,7 +77,7 @@ export const VISIBILITY_STEPS: readonly VisibilityKey[] = ["venues", "titles", "
 export function visibleSteps(context: FlowContext): Step[] {
   const steps: Step[] = ["welcome"];
   if (context.accountVisited && context.accountFirst) steps.push("account");
-  steps.push("birth");
+  // The date of birth is asked inside the account form, only when an account is created: a guest or someone signing in is never asked.
   if (context.accountVisited && !context.accountFirst) steps.push("account");
   steps.push("photo", "consent");
   if (context.health) steps.push("bac");
@@ -93,7 +93,7 @@ export function visibleSteps(context: FlowContext): Step[] {
 export function nextStep(step: Step, context: FlowContext): Step | "done" {
   const steps = visibleSteps(context);
   const index = steps.indexOf(step);
-  if (index === -1) return "birth";
+  if (index === -1) return steps[1] ?? "done";
   return steps[index + 1] ?? "done";
 }
 
