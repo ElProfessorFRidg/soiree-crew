@@ -32,8 +32,8 @@ const TAB_ICONS: Record<string, AnyIconName> = {
 };
 
 /** One tab: the icon pops when it becomes the active one (DESIGN.md §5 pop), static under Reduce Motion. */
-/** The "no account yet" dot: a cyan that nothing else in the interface uses, so it reads at a glance (amber is the accent, red the counts). */
-const NO_ACCOUNT_DOT = "#22D3EE";
+/** The "no account yet" dot: a pink that nothing else in the interface uses, so it reads at a glance (amber is the accent, red the counts). */
+const NO_ACCOUNT_DOT = "#FF4FA3";
 
 function TabItem({ label, icon, focused, onPress, badge = 0, dot = false }: { label: string; icon: AnyIconName; focused: boolean; onPress: () => void; badge?: number; dot?: boolean }) {
   const theme = useTheme();
