@@ -75,6 +75,8 @@ export function Button({
           backgroundColor: colors.bg,
           opacity: disabled ? 0.4 : 1,
           paddingHorizontal: small ? 14 : 18,
+          // A label on two lines gets room above and below it; a one-line button keeps its minimum height.
+          paddingVertical: small ? 6 : 12,
         },
         colors.border ? { borderWidth: 1.5, borderColor: colors.border } : null,
         style,
