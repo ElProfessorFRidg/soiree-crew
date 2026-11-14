@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { contentLayout, navigationWidth } from "./layout";
+import { contentLayout, navigationWidth, screenSpacing } from "./layout";
 
 describe("adaptive tablet layout", () => {
   it("switches between bottom navigation, rail and expanded sidebar as the window resizes", () => {
@@ -27,5 +27,26 @@ describe("adaptive tablet layout", () => {
     const narrow = contentLayout(390, 844, navigationWidth(390));
     expect(wide.split).toBe(true);
     expect(narrow).toMatchObject({ sidebar: 0, split: false, columns: 1, mapWidth: 350 });
+  });
+});
+
+describe("screen spacing", () => {
+  const insets = { top: 24, bottom: 34, left: 0, right: 0 };
+  const base = { gutter: 20, height: 844, sidebar: 0, tabbed: false, nativeTabs: false, insets };
+  it("reserves an overlay only for floating native tabs", () => {
+    expect(screenSpacing({ ...base, tabbed: true, nativeTabs: true }).bottom).toBe(122);
+    expect(screenSpacing({ ...base, tabbed: true }).bottom).toBe(24);
+    expect(screenSpacing({ ...base, sidebar: 88, tabbed: true }).bottom).toBe(58);
+    expect(screenSpacing(base).bottom).toBe(58);
+  });
+  it("keeps landscape controls clear of cutouts and removes duplicate safe-area space over the keyboard", () => {
+    expect(screenSpacing({ ...base, insets: { ...insets, left: 59 } }).left).toBe(59);
+    expect(screenSpacing({ ...base, footer: true, keyboard: true, nativeTabs: true, tabbed: true }).footerBottom).toBe(12);
+    expect(screenSpacing({ ...base, footer: true }).bottom).toBe(20);
+  });
+  it("uses smaller gutters on narrow phones and roomier sections on tablets", () => {
+    expect(contentLayout(320, 568).gutter).toBe(16);
+    expect(screenSpacing({ ...base, height: 568 }).top).toBe(34);
+    expect(screenSpacing({ ...base, gutter: 24 }).sectionGap).toBe(20);
   });
 });

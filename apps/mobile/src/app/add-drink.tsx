@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { FoodLevel } from "@crew/bac";
@@ -55,6 +55,8 @@ import { useLiveParty } from "@/server/crewData";
 import { showFailure } from "@/server/errors";
 import { showPermissionDenied } from "@/system/permissions";
 import { CUSTOM_ICONS } from "@/drinks/customOrder";
+import { useScreenSpacing } from "@/ui/layout";
+import { useKeyboardShown } from "@/ui/useKeyboardShown";
 
 const MINUTE_MS = 60_000;
 /** O-22: a forgotten drink goes back this far at most; older ones are edited from the history. */
@@ -86,6 +88,8 @@ function prefillFrom(params: Params): CustomDrinkDraft | undefined {
 }
 
 export default function AddDrinkSheet() {
+  const keyboard = useKeyboardShown();
+  const spacing = useScreenSpacing({ footer: true, keyboard });
   const i18n = useT();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -181,12 +185,12 @@ export default function AddDrinkSheet() {
   };
 
   return (
-    <View style={[styles.sheet, { backgroundColor: theme.surface }]}>
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={[styles.sheet, { backgroundColor: theme.surface }]}>
       <ScrollView
         ref={scroll}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
-        contentContainerStyle={[styles.content, { paddingBottom: 24 }]}
+        contentContainerStyle={[styles.content, { paddingLeft: spacing.left, paddingRight: spacing.right, paddingBottom: spacing.bottom }]}
       >
         <View style={styles.title}>
           <Text variant="h2" accessibilityRole="header">
@@ -430,7 +434,7 @@ export default function AddDrinkSheet() {
         ) : null}
       </ScrollView>
       {/* ADP-09: the main action stays pinned under the thumb, never at the end of a long scroll. It names exactly what it logs. */}
-      <View style={[styles.footer, { paddingBottom: insets.bottom + 12, borderTopColor: theme.line }]}>
+      <View style={[styles.footer, { paddingLeft: spacing.left, paddingRight: spacing.right, paddingBottom: spacing.footerBottom, borderTopColor: theme.line }]}>
         <Button
           label={i18n.t("drinkCatalogue.addExact", { drink: drinkWithArticle(preset, i18n), details: sizeAndStrength(preset, unit, i18n) })}
           height={64}
@@ -444,7 +448,7 @@ export default function AddDrinkSheet() {
         />
       </View>
       <ToastHost bottomOffset={insets.bottom + 92} />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

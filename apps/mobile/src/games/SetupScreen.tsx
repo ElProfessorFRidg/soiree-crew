@@ -1,7 +1,6 @@
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, TextInput, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from "react-native";
 import { palette, radius, size, space } from "@crew/design-tokens";
 import { GAME_LEVELS, gameById, type GameId } from "@crew/games";
 import { useGameLock } from "./unlocks";
@@ -29,13 +28,16 @@ import {
 } from "./store";
 import { RuleCards } from "./ui/Rules";
 import { inputText } from "@/ui/inputText";
+import { useScreenSpacing } from "@/ui/layout";
+import { useKeyboardShown } from "@/ui/useKeyboardShown";
 
 const TIMERS: readonly TimerSeconds[] = [0, 30, 60];
 
 /** Game sheet (Jeux board, screen 2): level, rules as cards, players in order, round timer, then Start. */
 export function SetupScreen({ gameId }: { gameId: GameId }) {
+  const keyboard = useKeyboardShown();
+  const spacing = useScreenSpacing({ footer: true, keyboard });
   const theme = useTheme();
-  const insets = useSafeAreaInsets();
   const i18n = useT();
   const g = useGameT();
   const ui = useGameUi();
@@ -64,8 +66,8 @@ export function SetupScreen({ gameId }: { gameId: GameId }) {
   };
 
   return (
-    <View style={[styles.screen, { backgroundColor: theme.bg }]}>
-      <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={[styles.content, { paddingTop: insets.top + space.screenTop, paddingBottom: 24 }]}>
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={[styles.screen, { backgroundColor: theme.bg }]}>
+      <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={[styles.content, { paddingTop: spacing.top, paddingBottom: spacing.bottom, paddingLeft: spacing.left, paddingRight: spacing.right }]}>
         <View style={styles.top}>
           <IconButton icon="back" accessibilityLabel={i18n.t("common.back")} onPress={() => (router.canGoBack() ? router.back() : router.replace("/(tabs)/games"))} />
           <Text variant="h3" accessibilityRole="header" style={styles.flex} align="center">
@@ -155,7 +157,7 @@ export function SetupScreen({ gameId }: { gameId: GameId }) {
         ) : null}
       </ScrollView>
 
-      <View style={[styles.footer, { paddingBottom: insets.bottom + 12 }]}>
+      <View style={[styles.footer, { paddingBottom: spacing.footerBottom, paddingLeft: spacing.left, paddingRight: spacing.right }]}>
         {lock ? (
           <View style={[styles.lock, { backgroundColor: palette.tint.amberBg }]} accessibilityLiveRegion="polite">
             <Text color={palette.tint.amberTextStrong}>
@@ -180,13 +182,13 @@ export function SetupScreen({ gameId }: { gameId: GameId }) {
           }}
         />
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  content: { paddingHorizontal: space.screenX, gap: space.sectionGap },
+  content: { width: "100%", maxWidth: 760, alignSelf: "center", paddingHorizontal: space.screenX, gap: space.sectionGap },
   top: { flexDirection: "row", alignItems: "center", gap: 12 },
   spacer: { width: size.iconButton },
   flex: { flex: 1 },
@@ -198,6 +200,6 @@ const styles = StyleSheet.create({
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   timerRow: { flexDirection: "row", alignItems: "center", gap: 12 },
   timer: { width: 200 },
-  footer: { paddingHorizontal: space.screenX, paddingTop: 10, gap: 10 },
+  footer: { width: "100%", maxWidth: 760, alignSelf: "center", paddingHorizontal: space.screenX, paddingTop: 10, gap: 10 },
   lock: { borderRadius: radius.tile, padding: 12 },
 });

@@ -14,7 +14,6 @@ import { HeroOverlay } from "@/motion/hero";
 import { AT_LAUNCH_MS, checkAndAnnounce, installLatest, ON_RETURN_MS } from "@/system/updates";
 import { showToast } from "@/ui/Toast";
 import * as SplashScreen from "expo-splash-screen";
-import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { AppState as RNAppState, Platform, Settings } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -268,7 +267,6 @@ export default function RootLayout() {
           {/* The navigator's own colours: its default theme is white and showed through while a screen slid back. */}
           <NavigationThemeProvider value={NAVIGATION_THEME}>
             <I18nProvider language={language}>
-              <StatusBar style="light" />
               <SyncFeedback />
               <Stack
                 screenOptions={{

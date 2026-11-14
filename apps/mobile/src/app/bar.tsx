@@ -1,7 +1,6 @@
 import { router } from "expo-router";
 import { memo, useCallback, useMemo, useState } from "react";
 import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, View, type ListRenderItem } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { space } from "@crew/design-tokens";
 import { browseRecipes, recipeCandidates } from "@/bar/browse";
 import { RECIPE_CATEGORIES, RECIPES, recipeAbv, type Recipe, type RecipeCategory } from "@/bar/recipes";
@@ -14,6 +13,7 @@ import { Chip, Row } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { Text } from "@/ui/Text";
 import { RecipeArt } from "@/bar/RecipeArt";
+import { useScreenSpacing } from "@/ui/layout";
 
 type BarText = ReturnType<typeof barText>;
 
@@ -37,7 +37,7 @@ const RecipeRow = memo(function RecipeRow({ recipe, name, meta, last, chevron }:
 export default function BarScreen() {
   const i18n = useT();
   const theme = useTheme();
-  const insets = useSafeAreaInsets();
+  const spacing = useScreenSpacing();
   const text: BarText = barText(i18n.language);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<RecipeCategory | "all">("all");
@@ -97,7 +97,7 @@ export default function BarScreen() {
         maxToRenderPerBatch={12}
         windowSize={7}
         removeClippedSubviews={Platform.OS === "android"}
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + space.screenTop, paddingBottom: insets.bottom + 110 }]}
+        contentContainerStyle={[styles.content, { paddingTop: spacing.top, paddingBottom: spacing.bottom, paddingLeft: spacing.left, paddingRight: spacing.right }]}
       />
     </KeyboardAvoidingView>
   );
@@ -105,7 +105,7 @@ export default function BarScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  content: { paddingHorizontal: space.screenX },
+  content: { width: "100%", maxWidth: 760, alignSelf: "center", paddingHorizontal: space.screenX },
   header: { gap: space.sectionGap, marginBottom: space.sectionGap },
   top: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },

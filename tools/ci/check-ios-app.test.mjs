@@ -15,6 +15,16 @@ with tempfile.TemporaryDirectory() as folder:
     (app / 'Crew').write_bytes(b'binary')
     (app / 'main.jsbundle').write_bytes(b'bundle')
     assert inspect(app)['deviceFamily'] == [1]
+    assert inspect(app, 'iphone', 'public')['channel'] == 'public'
+    try:
+        inspect(app, 'iphone', 'preview')
+        raise AssertionError('Preview accepted with public bundle ID')
+    except ValueError:
+        pass
+    info['CFBundleIdentifier'] = 'app.soireecrew.mobile.preview'
+    save()
+    assert inspect(app, 'iphone', 'preview')['channel'] == 'preview'
+    info['CFBundleIdentifier'] = 'app.soireecrew.mobile'
     info['UIDeviceFamily'] = [2]
     info['UISupportedInterfaceOrientations~ipad'] = ['UIInterfaceOrientationPortrait', 'UIInterfaceOrientationLandscapeLeft', 'UIInterfaceOrientationLandscapeRight']
     save()

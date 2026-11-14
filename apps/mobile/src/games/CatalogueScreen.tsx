@@ -2,7 +2,6 @@ import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { FlatList, StyleSheet, View, type NativeScrollEvent, type NativeSyntheticEvent, ScrollView } from "react-native";
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { palette, radius, space, scaled } from "@crew/design-tokens";
 import { filterGames, typicalMinutes, type CatalogueFilter, type GameDefinition } from "@crew/games";
 import { useGameLock } from "./unlocks";
@@ -21,7 +20,7 @@ import { useGamesStore } from "./store";
 import { refreshCrewCards } from "./crewCards";
 import { useCrewData } from "@/server/crewData";
 import { GameIcon } from "./ui/GameIcon";
-import { useContentLayout } from "@/ui/layout";
+import { useContentLayout, useScreenSpacing } from "@/ui/layout";
 
 const GAP = 12;
 const FILTERS: readonly CatalogueFilter[] = ["all", "single_device", "multi_device"];
@@ -97,6 +96,7 @@ function GameCardView({ game, width, height, compact = false }: { game: GameDefi
 /** O-44: swipeable catalogue with pagination, filter, and a Play button for the game on screen. */
 export function CatalogueScreen() {
   const layout = useContentLayout();
+  const spacing = useScreenSpacing();
   const i18n = useT();
   const firstCrew = useCrewData((state) => state.crews[0]?.id);
   useEffect(() => {
@@ -104,7 +104,6 @@ export function CatalogueScreen() {
     if (firstCrew) void refreshCrewCards(firstCrew).catch(() => undefined);
   }, [firstCrew]);
   const theme = useTheme();
-  const insets = useSafeAreaInsets();
   const g = useGameT();
   const ui = useGameUi();
   const screenHeight = layout.height;
@@ -153,11 +152,11 @@ export function CatalogueScreen() {
     // Scrolls as a whole: on a small phone Play would otherwise sit under the floating tab bar, out of reach.
     <ScrollView
       style={{ flex: 1, backgroundColor: theme.bg }}
-      contentContainerStyle={[styles.screen, { paddingTop: insets.top + space.screenTop, paddingBottom: insets.bottom + (layout.sidebar ? 32 : 96) }]}
+      contentContainerStyle={[styles.screen, { gap: spacing.sectionGap, paddingTop: spacing.top, paddingBottom: spacing.bottom }]}
       showsVerticalScrollIndicator={false}
     >
       {/* Title and position on one line, the shortcuts on their own scrolling row underneath. */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingHorizontal: layout.gutter }]}>
         <Text variant="h1" accessibilityRole="header">
           {g.t("catalogue.title")}
         </Text>
@@ -169,12 +168,12 @@ export function CatalogueScreen() {
         </Text>
       ) : null}
       {/* flexGrow 0: a horizontal row in a column otherwise stretches its chips into tall ovals. */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.noGrow} contentContainerStyle={styles.headerButtons}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.noGrow} contentContainerStyle={[styles.headerButtons, { paddingHorizontal: layout.gutter }]}>
         <Chip label={i18n.t("bar.title")} icon="wine" onPress={() => router.push("/bar")} />
         <Chip label={g.t("crewCards.open")} icon="edit" onPress={() => router.push("/games/cards")} />
         <Chip label={g.t("hall.open")} icon="trophy" onPress={() => router.push("/games/hall")} />
       </ScrollView>
-      <View style={styles.padded}>
+      <View style={[styles.padded, { paddingHorizontal: layout.gutter }]}>
         <Segmented
           accessibilityLabel={g.t("catalogue.filterLabel")}
           value={filter}
@@ -217,7 +216,7 @@ export function CatalogueScreen() {
             snapToInterval={cardWidth + GAP}
             decelerationRate="fast"
             disableIntervalMomentum
-            contentContainerStyle={styles.carousel}
+            contentContainerStyle={[styles.carousel, { paddingHorizontal: layout.gutter }]}
             ItemSeparatorComponent={() => <View style={{ width: GAP }} />}
             getItemLayout={(_, i) => ({ length: cardWidth + GAP, offset: (cardWidth + GAP) * i, index: i })}
             onScroll={(event) => {

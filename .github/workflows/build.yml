@@ -73,8 +73,9 @@ jobs:
       APP_VERSION: ${{ needs.version.outputs.version }}
       BUILD_NUMBER: ${{ github.run_number }}
       CREW_IOS_TARGET: ${{ matrix.target }}
+      CREW_RELEASE_CHANNEL: ${{ github.event_name == 'pull_request' && 'preview' || 'public' }}
       IPA_FILE: ${{ matrix.file }}
-      CREW_SERVER_URL: ${{ vars.CREW_SERVER_URL }}
+      CREW_SERVER_URL: ${{ github.event_name == 'pull_request' && vars.CREW_PREVIEW_SERVER_URL || vars.CREW_SERVER_URL }}
       CREW_PUBLIC_SERVERS: ${{ vars.CREW_PUBLIC_SERVERS }}
     steps:
       - uses: actions/checkout@v7
@@ -106,8 +107,6 @@ jobs:
         working-directory: apps/mobile
         env:
           BUILD_NUMBER: ${{ github.run_number }}
-          CREW_SERVER_URL: ${{ vars.CREW_SERVER_URL }}
-          CREW_PUBLIC_SERVERS: ${{ vars.CREW_PUBLIC_SERVERS }}
           # React Native wires ccache into every pod when this is set at pod install.
           USE_CCACHE: "1"
         run: npx expo prebuild --platform ios --clean
@@ -153,7 +152,7 @@ jobs:
           APP=$(ls -d build/Build/Products/Release-iphoneos/*.app | head -n 1)
           # An empty shell of an app must never be packed and released again.
           test -f "$APP/Info.plist" && test -f "$APP/main.jsbundle" || { echo "::error::The built app is incomplete"; exit 1; }
-          python3 ../../../tools/ci/check-ios-app.py "$APP" "$CREW_IOS_TARGET" > "../../../ios-build-info-$CREW_IOS_TARGET.json"
+          python3 ../../../tools/ci/check-ios-app.py "$APP" "$CREW_IOS_TARGET" "$CREW_RELEASE_CHANNEL" > "../../../ios-build-info-$CREW_IOS_TARGET.json"
           mkdir -p Payload
           cp -R "$APP" Payload/
           zip -qry "../../../$IPA_FILE" Payload
@@ -321,7 +320,7 @@ jobs:
           n=1
           # One launch per screen: the app reads -ciRoute from its launch arguments (custom URL schemes
           # ask "Open in ...?" on recent simulators, which no script can answer).
-          for route in / /crew /games /bars /me /settings /my-stats /add-drink /curve /limits /leaderboard /history; do
+          for route in / /crew /games /bars /me /settings /my-stats /add-drink /curve /limits /leaderboard /history /versions; do
             xcrun simctl terminate "$DEVICE" "$BUNDLE" || true
             # SIMCTL_CHILD_ variables reach the app: Paris time, as the phone above.
             if [ "$route" = "/" ]; then SIMCTL_CHILD_TZ=Europe/Paris xcrun simctl launch "$DEVICE" "$BUNDLE"; else SIMCTL_CHILD_TZ=Europe/Paris xcrun simctl launch "$DEVICE" "$BUNDLE" -ciRoute "$route"; fi
@@ -344,8 +343,11 @@ jobs:
     # https://github.com/<owner>/soiree-crew/releases/latest/download/soiree-crew.apk
     needs: [version, checks, ios, ios-launch, android]
     # The APK job is usually skipped; the release goes out with what was built.
-    if: always() && needs.checks.result == 'success' && needs.ios.result == 'success' && needs.ios-launch.result == 'success' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    # Only repository-owned PR branches may publish previews. Forks keep read-only build artifacts.
+    if: always() && needs.checks.result == 'success' && needs.ios.result == 'success' && needs.ios-launch.result == 'success' && ((github.event_name != 'pull_request' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository))
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.publish.outputs.tag }}
     permissions:
       contents: write
     steps:
@@ -356,34 +358,21 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           path: dist
+          pattern: soiree-crew-*-unsigned
           merge-multiple: true
+      - uses: actions/download-artifact@v8
+        if: needs.android.result == 'success'
+        with:
+          name: soiree-crew-android
+          path: dist
       - name: Publish the release
+        id: publish
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          VERSION="${{ needs.version.outputs.version }}"
-          # Semver build metadata after "+": older apps read the build number from the tag.
-          TAG="v${VERSION}+build.${GITHUB_RUN_NUMBER}"
-          PREVIOUS=$(git tag --list 'v*+build.*' --sort=-creatordate | head -1)
-          RANGE=${PREVIOUS:+$PREVIOUS..}HEAD
-          # What changed since the previous release, one line per commit, merges and docs left out.
-          git log "$RANGE" --no-merges --pretty=format:'- %s' | grep -v '^- docs' | head -40 > changes.md || true
-          {
-            echo "Version ${VERSION}, build ${GITHUB_RUN_NUMBER} of ${GITHUB_SHA::7}."
-            echo
-            cat changes.md
-            echo
-            echo
-            echo "- iOS: \`soiree-crew-unsigned.ipa\`, unsigned. Install it with AltStore or SideStore (source below), or sign it with your sideloading tool."
-            echo "- iPad: \`soiree-crew-ipad-unsigned.ipa\`, native tablet interface with sidebar navigation, adaptive columns and landscape support."
-            echo "- AltStore / SideStore source: https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/altstore/source.json"
-            if [ -f dist/soiree-crew.apk ]; then echo "- Android: \`soiree-crew.apk\`, signed with the debug key. Allow installs from this source."; fi
-          } > notes.md
-          echo "TAG=$TAG" >> "$GITHUB_ENV"
-          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-          FILES="dist/soiree-crew-unsigned.ipa dist/soiree-crew-ipad-unsigned.ipa dist/ios-build-info-iphone.json dist/ios-build-info-ipad.json"
-          [ -f dist/soiree-crew.apk ] && FILES="$FILES dist/soiree-crew.apk"
-          gh release create "$TAG" $FILES             --title "Soirée Crew ${VERSION}"             --notes-file notes.md             --target "$GITHUB_SHA"             --latest
+          APP_VERSION: ${{ needs.version.outputs.version }}
+          CREW_RELEASE_CHANNEL: ${{ github.event_name == 'pull_request' && 'preview' || 'public' }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: node tools/ci/publish-release.mjs
 
   altstore:
     # docs/ALTSTORE.md: the source is rewritten from the published releases, with this build's screenshots.
@@ -396,3 +385,4 @@ jobs:
     uses: ./.github/workflows/altstore.yml
     with:
       screenshots: true
+      release_tag: ${{ needs.release.outputs.tag }}

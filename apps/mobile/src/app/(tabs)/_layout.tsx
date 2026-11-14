@@ -143,7 +143,7 @@ function Sidebar({ state, descriptors, navigateToTab, width }: BottomTabBarProps
         const label = descriptors[route.key]?.options.title ?? route.name;
         const badge = route.name === "crew" ? invitations : 0;
         const dot = route.name === "me" && !signedIn;
-        const color = selected ? theme.amber : theme.textMuted;
+        const color = selected ? theme.amberText : theme.textMuted;
         return (
           <ScalePressable key={route.key} accessibilityRole="tab" accessibilityState={{ selected }} accessibilityLabel={badge ? `${label}, ${i18n.plural("crew.tabBadge", badge)}` : dot ? `${label}, ${i18n.t("account.guestCreate")}` : label}
             onPress={() => { if (!selected) { haptic.select(); navigateToTab(route.key); } }}

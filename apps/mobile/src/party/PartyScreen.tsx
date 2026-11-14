@@ -57,7 +57,7 @@ import { NightAlerts } from "./NightAlerts";
 import { PartyBoard } from "./PartyBoard";
 import { DetectedSettingsCard, FirstNightPreview, FirstRunChecklist, NoEstimateCard } from "@/onboarding/FirstRun";
 import { EstimatePreview } from "@/onboarding/ValueCards";
-import { useContentLayout } from "@/ui/layout";
+import { useContentLayout, useScreenSpacing } from "@/ui/layout";
 
 /** JOY-02: the line above the title, from the night as it goes. */
 function Greeting({ i18n, live, now, drinksTonight }: { i18n: Translator; live: LiveBac; now: number; drinksTonight: number }) {
@@ -169,9 +169,9 @@ function MoodBand() {
 
 export function PartyScreen() {
   const layout = useContentLayout();
+  const spacing = useScreenSpacing();
   const i18n = useT();
   const theme = useTheme();
-  const insets = useSafeAreaInsets();
   const preferences = useAppStore((state) => state.preferences);
   const [fastTick, setFastTick] = useState(false);
   const now = useNow(fastTick ? 5_000 : 15_000);
@@ -245,7 +245,7 @@ export function PartyScreen() {
       <LivingBackground mine={tonight.drinks.length} level={level} />
       <MoodBand />
       <ScrollView
-        contentContainerStyle={[styles.content, { maxWidth: level === 0 && layout.split ? 1280 : 760, paddingTop: insets.top + space.screenTop, paddingBottom: layout.sidebar ? 32 : 140 }]}
+        contentContainerStyle={[styles.content, { maxWidth: level === 0 && layout.split ? 1280 : 760, paddingLeft: spacing.left, paddingRight: spacing.right, paddingTop: spacing.top, paddingBottom: spacing.bottom }]}
         contentInsetAdjustmentBehavior="never"
       >
         <SosBanner />
@@ -279,10 +279,9 @@ export function PartyScreen() {
  * what the estimate needs with a button to give it, and the parts of the night that work anyway.
  */
 function NoEstimateParty() {
-  const layout = useContentLayout();
+  const spacing = useScreenSpacing();
   const i18n = useT();
   const theme = useTheme();
-  const insets = useSafeAreaInsets();
   const tiles: { label: string; icon: "dice" | "wine" | "users" | "alert"; variant?: "danger"; go: () => void }[] = [
     { label: i18n.t("party.tileGames"), icon: "dice", go: () => router.push("/(tabs)/games") },
     { label: i18n.t("bar.title"), icon: "wine", go: () => router.push("/bar") },
@@ -292,7 +291,7 @@ function NoEstimateParty() {
   return (
     <View style={[styles.screen, { backgroundColor: theme.bg }]}>
       <MoodBand />
-      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + space.screenTop, paddingBottom: layout.sidebar ? 32 : 140 }]} contentInsetAdjustmentBehavior="never">
+      <ScrollView contentContainerStyle={[styles.content, { paddingLeft: spacing.left, paddingRight: spacing.right, paddingTop: spacing.top, paddingBottom: spacing.bottom }]} contentInsetAdjustmentBehavior="never">
         <SosBanner />
         <View style={styles.header}>
           <View style={styles.flex}>
@@ -817,7 +816,6 @@ const styles = StyleSheet.create({
     maxWidth: 760,
     alignSelf: "center",
     paddingHorizontal: space.screenX,
-    paddingBottom: 140,
     gap: 14,
   },
   header: { flexDirection: "row", alignItems: "center", gap: 12 },

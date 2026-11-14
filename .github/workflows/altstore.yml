@@ -20,6 +20,10 @@ on:
         description: Give the version just released the screenshots of the calling build (its ios-launch artifact)
         type: boolean
         default: false
+      release_tag:
+        description: Exact tested release whose screenshots are attached
+        type: string
+        default: ""
 
 concurrency:
   group: altstore-source
@@ -44,9 +48,16 @@ jobs:
         with:
           name: ios-launch
           path: launch
+      - name: Native iPad screenshots of the build that just shipped
+        if: inputs.screenshots
+        uses: actions/download-artifact@v8
+        with:
+          name: ios-launch-ipad
+          path: launch-ipad
       - name: Rewrite the source
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -56,31 +67,37 @@ jobs:
           else
             git worktree add --orphan -b altstore altstore-src
           fi
-          gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100" > releases.json
-          NAMED='^v[0-9]+\.[0-9]+\.[0-9]+\+build\.[0-9]+$'
+          gh api --paginate --slurp "repos/${GITHUB_REPOSITORY}/releases?per_page=100" | jq 'add' > releases.json
+          NAMED='^v[0-9]+\.[0-9]+\.[0-9]+(-preview\.[0-9]+)?(\+build\.|-build\.)[0-9]+$'
           mkdir -p altstore-src/screens
-          # Each version keeps its own screenshots in screens/<version>/. This build's go to the
-          # version it just released, the newest named release.
+          # Exact tag + target prevents public/preview or same-version builds mixing pictures.
           if [ -d launch/screens ] && ls launch/screens/*.png > /dev/null 2>&1; then
-            TAG=$(jq -r --arg re "$NAMED" '[.[] | select(.tag_name | test($re))][0].tag_name' releases.json)
-            V=${TAG#v}; V=${V%%+*}
-            rm -rf "altstore-src/screens/$V"
-            mkdir -p "altstore-src/screens/$V"
-            cp launch/screens/*.png "altstore-src/screens/$V/"
+            [[ "$RELEASE_TAG" =~ $NAMED ]] || { echo "Missing valid release tag for screenshots"; exit 1; }
+            mkdir -p "altstore-src/screens/$RELEASE_TAG/iphone" "altstore-src/screens/$RELEASE_TAG/ipad"
+            cp launch/screens/*.png "altstore-src/screens/$RELEASE_TAG/iphone/"
+            cp launch-ipad/screens/*.png "altstore-src/screens/$RELEASE_TAG/ipad/"
           fi
           # A version without screenshots yet takes them from its own build (the tag's build number
           # is the Build run number) while GitHub still keeps that artifact.
           gh run list --workflow build.yml --limit 300 --json databaseId,number > runs.json
           for TAG in $(jq -r --arg re "$NAMED" '.[] | select(.tag_name | test($re)) | .tag_name' releases.json); do
-            V=${TAG#v}; V=${V%%+*}; N=${TAG##*.}
-            [ -d "altstore-src/screens/$V" ] && continue
+            N=${TAG##*.}
             ID=$(jq -r --argjson n "$N" '.[] | select(.number == $n) | .databaseId' runs.json)
             [ -n "$ID" ] || continue
-            if gh run download "$ID" -n ios-launch -D "old/$V" 2> /dev/null && ls "old/$V"/screens/*.png > /dev/null 2>&1; then
-              mkdir -p "altstore-src/screens/$V"
-              cp "old/$V"/screens/*.png "altstore-src/screens/$V/"
-              echo "Screenshots of $V from run $ID"
-            fi
+            for TARGET in iphone ipad; do
+              ASSET=soiree-crew-unsigned.ipa
+              [ "$TARGET" = ipad ] && ASSET=soiree-crew-ipad-unsigned.ipa
+              jq -e --arg tag "$TAG" --arg asset "$ASSET" '[.[] | select(.tag_name == $tag) | .assets[]? | select(.name == $asset)] | length > 0' releases.json > /dev/null || continue
+              DEST="altstore-src/screens/$TAG/$TARGET"
+              ls "$DEST"/*.png > /dev/null 2>&1 && continue
+              ARTIFACT=ios-launch
+              [ "$TARGET" = ipad ] && ARTIFACT=ios-launch-ipad
+              if gh run download "$ID" -n "$ARTIFACT" -D "old/$TAG/$TARGET" 2> /dev/null && ls "old/$TAG/$TARGET"/screens/*.png > /dev/null 2>&1; then
+                mkdir -p "$DEST"
+                cp "old/$TAG/$TARGET"/screens/*.png "$DEST/"
+                echo "Screenshots of $TAG/$TARGET from run $ID"
+              fi
+            done
           done
           # The first sources kept one flat set of screenshots.
           rm -f altstore-src/screens/*.png

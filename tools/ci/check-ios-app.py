@@ -5,10 +5,14 @@ import sys
 from pathlib import Path
 
 
-def inspect_app(path, target="iphone"):
+def inspect_app(path, target="iphone", channel=None):
     app = Path(path)
     with (app / "Info.plist").open("rb") as source:
         info = plistlib.load(source)
+    if channel is not None:
+        expected = "app.soireecrew.mobile" + (".preview" if channel == "preview" else "")
+        if channel not in ("public", "preview") or info.get("CFBundleIdentifier") != expected:
+            raise ValueError(f"Wrong bundle identifier for {channel}")
     families = {"iphone": [1], "ipad": [2], "universal": [1, 2]}
     if target not in families or info.get("UIDeviceFamily") != families[target]:
         raise ValueError(f"Wrong device family for {target}: {info.get('UIDeviceFamily')}")
@@ -22,10 +26,10 @@ def inspect_app(path, target="iphone"):
     if not info.get("MinimumOSVersion"):
         raise ValueError("Missing minimum iOS version")
     return {"bundleIdentifier": info["CFBundleIdentifier"], "minimumOSVersion": info["MinimumOSVersion"],
-            "deviceFamily": info["UIDeviceFamily"], "target": target,
+            "deviceFamily": info["UIDeviceFamily"], "target": target, "channel": channel,
             "ipadMode": "native tablet" if 2 in info["UIDeviceFamily"] else "iPhone",
             "orientations": orientations}
 
 
 if __name__ == "__main__":
-    print(json.dumps(inspect_app(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else "iphone"), indent=2))
+    print(json.dumps(inspect_app(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else "iphone", sys.argv[3] if len(sys.argv) > 3 else None), indent=2))

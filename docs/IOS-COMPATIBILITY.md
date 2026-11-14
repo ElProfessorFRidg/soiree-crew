@@ -1,5 +1,7 @@
 # Native iPhone, native iPad and re-signed installs
 
+Public and Preview are separate app identities (`app.soireecrew.mobile` and `app.soireecrew.mobile.preview`). The same ID is retained between iPhone/iPad variants within each channel. AltStore has device-specific sources, each with its own immutable public/Preview release downloads; see `ALTSTORE.md`.
+
 `CREW_IOS_TARGET` selects the native target at prebuild and JavaScript bundling. CI builds each target independently. The default development configuration is universal. The iPad target enables tablet support, portrait and landscape, and allows multitasking rather than requiring full screen.
 
 CI supplies two independently compiled downloads:
