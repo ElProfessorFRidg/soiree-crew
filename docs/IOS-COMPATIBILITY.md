@@ -1,13 +1,17 @@
-# iPhone, iPad compatibility and re-signed installs
+# Native iPhone, native iPad and re-signed installs
 
-`ios.supportsTablet` remains false. The device build must have `UIDeviceFamily = [1]`: this is the iPhone interface running in iPadOS compatibility mode, with the system's enlargement control where provided by iPadOS. A universal `[1, 2]` build would opt into native tablet layout and would not provide that iPhone compatibility mode.
+`CREW_IOS_TARGET` selects the native target at prebuild and JavaScript bundling. CI builds each target independently. The default development configuration is universal. The iPad target enables tablet support, portrait and landscape, and allows multitasking rather than requiring full screen.
 
-CI supplies two separately named downloads from the same validated binary:
+CI supplies two independently compiled downloads:
 
 - `soiree-crew-unsigned.ipa`: the regular iPhone download.
-- `soiree-crew-ipad-compat-unsigned.ipa`: the separately named iPad compatibility download. It intentionally has the same bundle ID and payload, so installing one replaces the other.
+- `soiree-crew-ipad-unsigned.ipa`: the native iPad download, `UIDeviceFamily = [2]`. This replaces the old `ipad-compat` artifact. It has its own tablet interface rather than the system's enlarged phone window.
 
-`ios-build-info.json` records the bundle ID, actual minimum iOS version and device family from the built app. CI rejects a missing/empty executable or JavaScript bundle before packaging. Both iPhone and iPad simulators run the launch/screen checks. Simulator execution re-marks the device binaries and is a smoke test, not a physical-device or TrollStore certification.
+Both retain the same bundle ID so an iPad installation can replace the previous compatibility build while retaining its local data. `ios-build-info-iphone.json` and `ios-build-info-ipad.json` record the bundle ID, actual minimum OS, device family and orientations. CI rejects incorrect families, iPad builds without landscape, and missing/empty executable or JavaScript payloads. Each simulator downloads its matching target. Simulator execution re-marks the device binaries and is a smoke test, not a physical-device or TrollStore certification.
+
+Layout follows the current window width, including rotation and Split View. At 768 points the bottom tabs become a compact navigation rail; at 1180 they expand into a labelled sidebar. Narrow iPad windows retain the same JavaScript navigator with bottom tabs, preserving navigation state while resizing. iPhone retains its native tabs.
+
+The party dashboard uses two columns when space permits. The map and selected bar/details occupy separate panes; map fitting uses the actual map pane width after subtracting navigation and gutters. The games catalogue uses two or three columns instead of stretching the phone carousel. Reading and form screens remain centred at a readable width. Content is capped on very large windows, with no phone compatibility frame or system zoom control.
 
 The native splash has a JavaScript watchdog independent of fonts, persisted state, Keychain promises and animation completion. A ready root or crash boundary also hides it. The launch curtain has its own timeout, so a missing Reanimated completion callback cannot leave the logo covering the app. Existing font, hydration and Keychain deadlines remain in place. These changes cover stalled JavaScript/native promises after JavaScript starts; they cannot repair an OS rejecting the executable before JavaScript runs.
 

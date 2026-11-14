@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { FlatList, StyleSheet, View, useWindowDimensions, type NativeScrollEvent, type NativeSyntheticEvent, ScrollView } from "react-native";
+import { FlatList, StyleSheet, View, type NativeScrollEvent, type NativeSyntheticEvent, ScrollView } from "react-native";
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { palette, radius, space, scaled } from "@crew/design-tokens";
@@ -21,6 +21,7 @@ import { useGamesStore } from "./store";
 import { refreshCrewCards } from "./crewCards";
 import { useCrewData } from "@/server/crewData";
 import { GameIcon } from "./ui/GameIcon";
+import { useContentLayout } from "@/ui/layout";
 
 const GAP = 12;
 const FILTERS: readonly CatalogueFilter[] = ["all", "single_device", "multi_device"];
@@ -33,7 +34,7 @@ function Dot({ active }: { active: boolean }) {
   return <Animated.View style={[styles.dot, { backgroundColor: active ? theme.amber : theme.lineStrong }, style]} />;
 }
 
-function GameCardView({ game, width, height }: { game: GameDefinition; width: number; height: number }) {
+function GameCardView({ game, width, height, compact = false }: { game: GameDefinition; width: number; height: number; compact?: boolean }) {
   const g = useGameT();
   const tablePlayers = useGamesStore((s) => s.table.length);
   const durations = useGamesStore((s) => s.durations[game.id]);
@@ -67,7 +68,7 @@ function GameCardView({ game, width, height }: { game: GameDefinition; width: nu
         <GameIcon game={game.id} size={220} color={ink} />
       </View>
       <View style={styles.middle}>
-        <Numeral size={game.id === "pointBlank" || game.id === "neverEver" || game.id === "truthDare" ? 48 : 56} color={ink}>
+        <Numeral size={compact ? 34 : game.id === "pointBlank" || game.id === "neverEver" || game.id === "truthDare" ? 48 : 56} color={ink}>
           {g.t(`games.${game.id}.name`)}
         </Numeral>
         <Text color={ink}>{g.t(`games.${game.id}.tagline`)}</Text>
@@ -95,6 +96,7 @@ function GameCardView({ game, width, height }: { game: GameDefinition; width: nu
 
 /** O-44: swipeable catalogue with pagination, filter, and a Play button for the game on screen. */
 export function CatalogueScreen() {
+  const layout = useContentLayout();
   const i18n = useT();
   const firstCrew = useCrewData((state) => state.crews[0]?.id);
   useEffect(() => {
@@ -105,12 +107,14 @@ export function CatalogueScreen() {
   const insets = useSafeAreaInsets();
   const g = useGameT();
   const ui = useGameUi();
-  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const screenHeight = layout.height;
   const [filter, setFilter] = useState<CatalogueFilter>("all");
   const [index, setIndex] = useState(0);
   const list = useRef<FlatList<GameDefinition>>(null);
   const games = filterGames(filter);
-  const cardWidth = screenWidth - space.screenX * 2;
+  const cardWidth = layout.innerWidth;
+  const grid = layout.columns > 1;
+  const gridWidth = (layout.innerWidth - 20 * (layout.columns - 1)) / layout.columns;
   // Room for the title, filters, pager and Play above the floating tab bar on a small iPhone.
   const cardHeight = Math.min(380, Math.max(260, screenHeight * 0.4));
   const current = games[Math.min(index, games.length - 1)];
@@ -119,6 +123,13 @@ export function CatalogueScreen() {
     setIndex(0);
     list.current?.scrollToOffset({ offset: 0, animated: false });
   }, [filter]);
+
+  // Split View and rotation change the paging interval; restart at a complete card.
+  useEffect(() => {
+    setIndex(0);
+    offset.current = 0;
+    list.current?.scrollToOffset({ offset: 0, animated: false });
+  }, [cardWidth]);
 
   const go = (next: number) => {
     if (games.length === 0) return;
@@ -142,7 +153,7 @@ export function CatalogueScreen() {
     // Scrolls as a whole: on a small phone Play would otherwise sit under the floating tab bar, out of reach.
     <ScrollView
       style={{ flex: 1, backgroundColor: theme.bg }}
-      contentContainerStyle={[styles.screen, { paddingTop: insets.top + space.screenTop, paddingBottom: insets.bottom + 96 }]}
+      contentContainerStyle={[styles.screen, { paddingTop: insets.top + space.screenTop, paddingBottom: insets.bottom + (layout.sidebar ? 32 : 96) }]}
       showsVerticalScrollIndicator={false}
     >
       {/* Title and position on one line, the shortcuts on their own scrolling row underneath. */}
@@ -150,7 +161,7 @@ export function CatalogueScreen() {
         <Text variant="h1" accessibilityRole="header">
           {g.t("catalogue.title")}
         </Text>
-        {games.length > 0 ? <Text variant="small">{g.t("catalogue.position", { index: Math.min(index, games.length - 1) + 1, count: games.length })}</Text> : null}
+        {!grid && games.length > 0 ? <Text variant="small">{g.t("catalogue.position", { index: Math.min(index, games.length - 1) + 1, count: games.length })}</Text> : null}
       </View>
       {g.language !== "fr" && g.language !== "en" ? (
         <Text variant="small" style={styles.padded}>
@@ -183,6 +194,17 @@ export function CatalogueScreen() {
         <View style={[styles.padded, styles.empty]}>
           <Text>{g.t("catalogue.emptySeveral")}</Text>
           <Button label={g.t("catalogue.filterAll")} variant="secondary" onPress={() => setFilter("all")} />
+        </View>
+      ) : grid ? (
+        <View style={[styles.gameGrid, { paddingHorizontal: layout.gutter }]}>
+          {games.map((game) => (
+            <View key={game.id} style={{ width: gridWidth, gap: 10 }}>
+              <GameCardView game={game} width={gridWidth} height={360} compact />
+              <Button label={g.t("catalogue.play")} icon="dice" height={ui.action}
+                accessibilityLabel={`${g.t("catalogue.play")}, ${g.t(`games.${game.id}.name`)}`}
+                onPress={() => router.push({ pathname: "/games/[gameId]", params: { gameId: game.id } })} />
+            </View>
+          ))}
         </View>
       ) : (
         <>
@@ -247,7 +269,8 @@ export function CatalogueScreen() {
 
 const styles = StyleSheet.create({
   headerButtons: { gap: 8, paddingHorizontal: space.screenX, paddingVertical: 4, alignItems: "center" },
-  screen: { gap: space.sectionGap },
+  screen: { width: "100%", maxWidth: 1280, alignSelf: "center", gap: space.sectionGap },
+  gameGrid: { flexDirection: "row", flexWrap: "wrap", gap: 20, paddingHorizontal: 20 },
   noGrow: { flexGrow: 0 },
   header: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", paddingHorizontal: space.screenX },
   padded: { paddingHorizontal: space.screenX },

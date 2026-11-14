@@ -1,7 +1,7 @@
 import { it, expect } from "vitest";
 import { spawnSync } from "node:child_process";
 
-it("validates iPad compatibility and rejects empty or tablet-only payloads", () => {
+it("validates distinct native iPad and iPhone targets, rotation and complete payloads", () => {
   const result = spawnSync("python3", ["-c", `
 import runpy, tempfile, plistlib
 from pathlib import Path
@@ -15,11 +15,28 @@ with tempfile.TemporaryDirectory() as folder:
     (app / 'Crew').write_bytes(b'binary')
     (app / 'main.jsbundle').write_bytes(b'bundle')
     assert inspect(app)['deviceFamily'] == [1]
-    info['UIDeviceFamily'] = [1, 2]
+    info['UIDeviceFamily'] = [2]
+    info['UISupportedInterfaceOrientations~ipad'] = ['UIInterfaceOrientationPortrait', 'UIInterfaceOrientationLandscapeLeft', 'UIInterfaceOrientationLandscapeRight']
+    save()
+    assert inspect(app, 'ipad')['ipadMode'] == 'native tablet'
+    try:
+        inspect(app, 'iphone')
+        raise AssertionError('Tablet accepted as phone target')
+    except ValueError:
+        pass
+    info['UIDeviceFamily'] = [1]
     save()
     try:
-        inspect(app)
-        raise AssertionError('Universal apps do not have iPhone zoom mode')
+        inspect(app, 'ipad')
+        raise AssertionError('Phone compatibility app accepted as native tablet')
+    except ValueError:
+        pass
+    info['UIDeviceFamily'] = [2]
+    info['UISupportedInterfaceOrientations~ipad'] = ['UIInterfaceOrientationPortrait']
+    save()
+    try:
+        inspect(app, 'ipad')
+        raise AssertionError('Tablet without landscape accepted')
     except ValueError:
         pass
     info['UIDeviceFamily'] = [1]

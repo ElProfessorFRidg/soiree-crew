@@ -4,6 +4,7 @@ import type { ConfigContext, ExpoConfig } from "expo/config";
 // so every installed build can be replaced by the next one.
 export default ({ config }: ConfigContext): ExpoConfig => {
   const build = Number.parseInt(process.env.BUILD_NUMBER ?? "1", 10);
+  const target = process.env.CREW_IOS_TARGET ?? "universal";
   // docs/VERSIONING.md: CI names each release 0.1.1, 0.1.2...; app.json keeps the series for local builds.
   const version = process.env.APP_VERSION || config.version;
   // O-38: remote push needs the aps-environment entitlement, which a free Apple account cannot
@@ -20,8 +21,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ...(config as ExpoConfig),
     ...(plugins ? { plugins: plugins as ExpoConfig["plugins"] } : {}),
     ...(version ? { version } : {}),
+    orientation: target === "iphone" ? "portrait" : "default",
     ios: {
       ...config.ios,
+      supportsTablet: target !== "iphone",
+      isTabletOnly: target === "ipad",
+      requireFullScreen: false,
       buildNumber: String(build),
       // Safety alerts (SOS, a friend not feeling well) may break through Focus.
       ...(push ? { entitlements: { ...config.ios?.entitlements, "com.apple.developer.usernotifications.time-sensitive": true } } : {}),

@@ -1,7 +1,7 @@
 import { Redirect, Tabs } from "expo-router";
 import { NativeTabs } from "expo-router/native-tabs";
 import { useEffect, useState } from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View, useWindowDimensions } from "react-native";
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 import { duration } from "@crew/design-tokens";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -21,6 +21,8 @@ import { Icon, type AnyIconName } from "@/ui/Icon";
 import { ScalePressable } from "@/ui/Pressable";
 import { Text } from "@/ui/Text";
 import { ToastHost } from "@/ui/Toast";
+import { SidebarWidthContext } from "@/ui/layout";
+import { navigationWidth } from "@/ui/pure/layout";
 
 // Tabs appear as their features ship: no tab leads to an empty screen.
 const TAB_ICONS: Record<string, AnyIconName> = {
@@ -126,6 +128,36 @@ function TabBar({ state, descriptors, navigateToTab }: BottomTabBarProps) {
   );
 }
 
+function Sidebar({ state, descriptors, navigateToTab, width }: BottomTabBarProps & { width: number }) {
+  const theme = useTheme();
+  const i18n = useT();
+  const insets = useSafeAreaInsets();
+  const invitations = useInvitations((s) => s.total);
+  const signedIn = useSession((s) => s.session !== null);
+  const expanded = width > 100;
+  return (
+    <View accessibilityRole="tablist" accessibilityLabel={i18n.t("tabs.navigation")} style={[styles.sidebar, { width, paddingTop: insets.top + 24, paddingLeft: Math.max(12, insets.left), backgroundColor: theme.surface, borderRightColor: theme.line }]}>
+      {expanded ? <Text variant="h3" style={{ marginBottom: 20 }}>{i18n.t("common.appName")}</Text> : null}
+      {state.routes.map((route, index) => {
+        const selected = state.index === index;
+        const label = descriptors[route.key]?.options.title ?? route.name;
+        const badge = route.name === "crew" ? invitations : 0;
+        const dot = route.name === "me" && !signedIn;
+        const color = selected ? theme.amber : theme.textMuted;
+        return (
+          <ScalePressable key={route.key} accessibilityRole="tab" accessibilityState={{ selected }} accessibilityLabel={badge ? `${label}, ${i18n.plural("crew.tabBadge", badge)}` : dot ? `${label}, ${i18n.t("account.guestCreate")}` : label}
+            onPress={() => { if (!selected) { haptic.select(); navigateToTab(route.key); } }}
+            style={[styles.sideItem, { flexDirection: expanded ? "row" : "column", backgroundColor: selected ? theme.surfaceRaised : "transparent" }]}>
+            <View><Icon name={TAB_ICONS[route.name] ?? "more"} color={color} size={24} />{dot || badge ? <View style={[styles.sideDot, { backgroundColor: badge ? theme.danger : NO_ACCOUNT_DOT }]} /> : null}</View>
+            <Text variant={expanded ? "label" : "tab"} color={color} style={expanded ? { flex: 1 } : undefined} align={expanded ? "left" : "center"}>{label}</Text>
+            {expanded && badge > 0 ? <Text variant="tag" color={theme.danger}>{badge > 99 ? "99+" : badge}</Text> : null}
+          </ScalePressable>
+        );
+      })}
+    </View>
+  );
+}
+
 /**
  * iOS: the system tab bar (Liquid Glass from iOS 26, shrinks while scrolling), SF Symbols that fill
  * when selected, the system badge and selection haptic. Same tabs, titles and amber as Android's.
@@ -176,6 +208,9 @@ function IosTabs({ toastOffset, largeToasts }: { toastOffset: number; largeToast
 }
 
 export default function TabsLayout() {
+  const { width } = useWindowDimensions();
+  const tablet = Platform.OS !== "ios" || Platform.isPad;
+  const sideWidth = tablet ? navigationWidth(width) : 0;
   const i18n = useT();
   const games = useGameT();
   const insets = useSafeAreaInsets();
@@ -185,22 +220,27 @@ export default function TabsLayout() {
   // ADP-09: at levels 2 and 3 the undo button grows like everything else.
   const level = useLevelNow((state) => state.level);
   if (!onboarded) return <Redirect href="/onboarding" />;
-  if (Platform.OS === "ios") return <IosTabs toastOffset={insets.bottom + 64} largeToasts={level >= 2} />;
+  if (Platform.OS === "ios" && !tablet) return <IosTabs toastOffset={insets.bottom + 64} largeToasts={level >= 2} />;
   return (
+    <SidebarWidthContext.Provider value={sideWidth}>
     <View style={{ flex: 1 }}>
-      <Tabs screenOptions={{ headerShown: false }} tabBar={(props) => <TabBar {...props} />}>
+      <Tabs screenOptions={{ headerShown: false, tabBarPosition: sideWidth ? "left" : "bottom" }} tabBar={(props) => sideWidth ? <Sidebar {...props} width={sideWidth} /> : <TabBar {...props} />}>
         <Tabs.Screen name="index" options={{ title: i18n.t("tabs.party") }} />
         <Tabs.Screen name="crew" options={{ title: i18n.t("crew.tab") }} />
         <Tabs.Screen name="games" options={{ title: games.t("catalogue.title") }} />
         <Tabs.Screen name="bars" options={{ title: i18n.t("bars.tab") }} />
         <Tabs.Screen name="me" options={{ title: i18n.t("tabs.me") }} />
       </Tabs>
-      <ToastHost bottomOffset={insets.bottom + 76} large={level >= 2} />
+      <ToastHost bottomOffset={insets.bottom + (sideWidth ? 24 : 76)} large={level >= 2} />
     </View>
+    </SidebarWidthContext.Provider>
   );
 }
 
 const styles = StyleSheet.create({
+  sidebar: { height: "100%", paddingRight: 12, borderRightWidth: 1, gap: 12 },
+  sideItem: { minHeight: 64, borderRadius: 14, paddingHorizontal: 10, paddingVertical: 12, alignItems: "center", gap: 10 },
+  sideDot: { position: "absolute", right: -5, top: -4, width: 9, height: 9, borderRadius: 5 },
   bar: {
     flexDirection: "row",
     paddingTop: 10,

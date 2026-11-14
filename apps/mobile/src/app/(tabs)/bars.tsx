@@ -1,6 +1,6 @@
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { StyleSheet, View, useWindowDimensions } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Animated, { FadeIn, useReducedMotion } from "react-native-reanimated";
 import { avatarColor, duration, palette } from "@crew/design-tokens";
 import { useT } from "@/i18n";
@@ -20,7 +20,7 @@ import {
 } from "@/server/venueData";
 import { useTheme } from "@/theme";
 import { Button, IconButton } from "@/ui/Button";
-import { Chip, Panel, Tag } from "@/ui/controls";
+import { Chip, Panel, Row, Tag } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { ScalePressable } from "@/ui/Pressable";
 import { EmptyState } from "@/ui/EmptyState";
@@ -35,6 +35,7 @@ import { useEcoInterval } from "@/power/eco";
 import { Avatar } from "@/ui/Avatar";
 import { OpenTags } from "@/venues/HoursPanel";
 import { latestRequest } from "@/ui/pure/latestRequest";
+import { useContentLayout } from "@/ui/layout";
 
 type Filter = "all" | "friends" | "fog" | "open" | "happy";
 const MAP_HEIGHT_RATIO = 0.46;
@@ -141,7 +142,8 @@ function VenuePin({
 
 export default function BarsScreen() {
   const i18n = useT();
-  const { width, height } = useWindowDimensions();
+  const layout = useContentLayout();
+  const { height } = layout;
   const session = useSession((state) => state.session);
   const crews = useCrewData((state) => state.crews);
   const [crewId, setCrewId] = useState<string | null>(crews[0]?.id ?? null);
@@ -153,7 +155,7 @@ export default function BarsScreen() {
   const [region, setRegion] = useState<{ center: LatLng; zoom: number } | null>(
     null,
   );
-  const mapHeight = Math.round(height * MAP_HEIGHT_RATIO);
+  const mapHeight = Math.round(layout.split ? Math.max(400, Math.min(680, height * 0.68)) : height * MAP_HEIGHT_RATIO);
   const live = useLiveParty();
   const livePartyId =
     live && live.party.crewId === crewId ? live.party.id : null;
@@ -273,8 +275,8 @@ export default function BarsScreen() {
 
   useEffect(() => {
     if (!region && data?.venues.length)
-      setRegion(fitRegion(data.venues, width - 40, mapHeight));
-  }, [data, region, width, mapHeight]);
+      setRegion(fitRegion(data.venues, layout.mapWidth, mapHeight));
+  }, [data, region, layout.mapWidth, mapHeight]);
 
   if (!session || !crews.length || !crewId) {
     return (
@@ -291,18 +293,19 @@ export default function BarsScreen() {
   }
 
   const selected = venues.find((v) => v.id === selectedId) ?? null;
-  const view = region ?? fitRegion([], width - 40, mapHeight);
+  const view = region ?? fitRegion([], layout.mapWidth, mapHeight);
   const fitVisible = () => {
     const points: LatLng[] = [
       ...venues,
       ...friends,
       ...(mine ? [mine] : []),
     ];
-    setRegion(fitRegion(points, width - 40, mapHeight));
+    setRegion(fitRegion(points, layout.mapWidth, mapHeight));
   };
 
   return (
     <Screen
+      wide
       title={i18n.t("bars.title")}
       trailing={
         <View style={styles.headerButtons}>
@@ -336,6 +339,8 @@ export default function BarsScreen() {
         </View>
       ) : null}
 
+      <View style={[styles.workspace, { flexDirection: layout.split ? "row" : "column" }]}>
+      <View style={[styles.mapColumn, layout.split ? { width: layout.mapWidth } : undefined]}>
       <TileMap
         center={view.center}
         zoom={view.zoom}
@@ -436,13 +441,15 @@ export default function BarsScreen() {
         ))}
       </View>
 
+      </View>
+      <View style={styles.detailColumn}>
       {selected ? (
         <Animated.View
           key={selected.id}
           entering={FadeIn.duration(duration.enter)}
         >
           <Panel>
-            <Text variant="h2">{selected.name}</Text>
+            <View style={styles.headerButtons}><Text variant="h2" style={styles.flex}>{selected.name}</Text><IconButton icon="x" accessibilityLabel={i18n.t("common.close")} onPress={() => setSelectedId(null)} /></View>
             {selected.address ? <Text variant="small">{selected.address}</Text> : null}
             <View style={styles.tags}>
               {selected.bossName ? (
@@ -508,6 +515,15 @@ export default function BarsScreen() {
         <Text variant="small">{i18n.t("bars.noConquests")}</Text>
       ) : null}
 
+      {!selected && venues.length > 0 ? (
+        <Panel>
+          <Text variant="h2">{i18n.t("bars.title")}</Text>
+          {venues.map((venue, index) => <Row key={venue.id} title={venue.name} subtitle={venue.address || i18n.plural("bars.myPoints", venue.myPoints)} last={index === venues.length - 1}
+            leading={<Icon name="pin" color={theme.amber} />} trailing={<Icon name="chev" color={theme.textMuted} />}
+            onPress={() => { setSelectedId(venue.id); setRegion({ center: venue, zoom: Math.max(view.zoom, 15) }); }} />)}
+        </Panel>
+      ) : null}
+
       {/* N-11: "Where to?" from here too, not only during a party. */}
       <Button
         label={i18n.t("whereTo.open")}
@@ -531,11 +547,16 @@ export default function BarsScreen() {
           router.push({ pathname: "/add-venue", params: { crewId } })
         }
       />
+      </View>
+      </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  workspace: { gap: 24, alignItems: "stretch" },
+  mapColumn: { gap: 16, minWidth: 0 },
+  detailColumn: { flex: 1, gap: 16, minWidth: 0 },
   headerButtons: { flexDirection: "row", alignItems: "center", gap: 8 },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   tags: { flexDirection: "row", flexWrap: "wrap", gap: 6 },

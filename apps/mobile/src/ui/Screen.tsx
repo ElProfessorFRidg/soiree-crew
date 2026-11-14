@@ -14,8 +14,11 @@ import { BrandMark } from "./BrandMark";
 import { haptic } from "@/motion/haptics";
 import { useKeyboardShown } from "./useKeyboardShown";
 import { PULL_DISTANCE, pullProgress } from "./pure/pullProgress";
+import { useContentLayout } from "./layout";
 
 interface Props {
+  /** Dashboards and master/detail workspaces can use the full tablet width. */
+  wide?: boolean;
   title?: string;
   /** The app's icon and name above the title, on the screens people screenshot and share. */
   brand?: boolean;
@@ -31,7 +34,8 @@ interface Props {
   scrollEnabled?: boolean;
 }
 
-export function Screen({ title, brand, back, trailing, children, footer, withToasts, onRefresh, scrollEnabled = true }: Props) {
+export function Screen({ title, brand, back, trailing, children, footer, withToasts, onRefresh, scrollEnabled = true, wide = false }: Props) {
+  const layout = useContentLayout();
   const [refreshing, setRefreshing] = useState(false);
   const theme = useTheme();
   const i18n = useT();
@@ -39,7 +43,7 @@ export function Screen({ title, brand, back, trailing, children, footer, withToa
   // iOS draws the tab bar as a floating capsule over the screen: whatever sits at the bottom of a
   // tab (a pinned button, the end of the list, a toast) goes above it, not under it.
   const segments = useSegments() as string[];
-  const overTabBar = Platform.OS === "ios" && segments[0] === "(tabs)" ? TAB_BAR : 0;
+  const overTabBar = Platform.OS === "ios" && segments[0] === "(tabs)" && !layout.sidebar ? TAB_BAR : 0;
   // With the keyboard up the footer sits right on it: no home indicator nor tab bar to clear.
   const keyboard = useKeyboardShown();
   const footerBottom = keyboard ? 12 : insets.bottom + 12 + overTabBar;
@@ -132,7 +136,7 @@ export function Screen({ title, brand, back, trailing, children, footer, withToa
             />
           ) : undefined
         }
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + space.screenTop, paddingBottom: footer ? 24 : insets.bottom + 110 }]}
+        contentContainerStyle={[styles.content, { maxWidth: wide ? 1280 : 760, paddingHorizontal: layout.gutter, paddingTop: insets.top + space.screenTop, paddingBottom: footer ? 24 : insets.bottom + (layout.sidebar ? 32 : 110) }]}
       >
         {back || trailing ? (
           <View style={styles.top}>
@@ -161,7 +165,7 @@ export function Screen({ title, brand, back, trailing, children, footer, withToa
         pointerEvents="none"
         style={[styles.band, { height: insets.top, backgroundColor: theme.bg, borderBottomColor: theme.line }, band]}
       />
-      {footer ? <View style={[styles.footer, { paddingBottom: footerBottom }]}>{footer}</View> : null}
+      {footer ? <View style={[styles.footer, { maxWidth: wide ? 1280 : 760, paddingBottom: footerBottom }]}>{footer}</View> : null}
       {withToasts ? <ToastHost bottomOffset={insets.bottom + 24 + overTabBar} /> : null}
     </KeyboardAvoidingView>
   );
@@ -194,9 +198,9 @@ const TAB_BAR = 64;
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  content: { paddingHorizontal: space.screenX, gap: space.sectionGap },
+  content: { width: "100%", alignSelf: "center", paddingHorizontal: space.screenX, gap: space.sectionGap },
   block: { gap: space.sectionGap },
   top: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
-  footer: { paddingHorizontal: space.screenX, paddingTop: 12 },
+  footer: { width: "100%", alignSelf: "center", paddingHorizontal: space.screenX, paddingTop: 12 },
   band: { position: "absolute", top: 0, left: 0, right: 0, borderBottomWidth: StyleSheet.hairlineWidth },
 });

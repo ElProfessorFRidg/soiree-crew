@@ -58,10 +58,22 @@ jobs:
     needs: version
     runs-on: macos-26
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: iphone
+            artifact: soiree-crew-ios-unsigned
+            file: soiree-crew-unsigned.ipa
+          - target: ipad
+            artifact: soiree-crew-ipad-unsigned
+            file: soiree-crew-ipad-unsigned.ipa
     # Read by app.config.ts at prebuild and again when Xcode bundles the JavaScript (expo-constants).
     env:
       APP_VERSION: ${{ needs.version.outputs.version }}
       BUILD_NUMBER: ${{ github.run_number }}
+      CREW_IOS_TARGET: ${{ matrix.target }}
+      IPA_FILE: ${{ matrix.file }}
       CREW_SERVER_URL: ${{ vars.CREW_SERVER_URL }}
       CREW_PUBLIC_SERVERS: ${{ vars.CREW_PUBLIC_SERVERS }}
     steps:
@@ -86,7 +98,7 @@ jobs:
           path: |
             ~/Library/Caches/ccache
             ~/Library/Caches/CocoaPods
-          key: ios-build-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.run_id }}
+          key: ios-build-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}-${{ matrix.target }}-${{ github.run_id }}
           restore-keys: |
             ios-build-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}-
             ios-build-xcode26.6-
@@ -132,7 +144,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: xcodebuild-device-log
+          name: xcodebuild-device-log-${{ matrix.target }}
           path: apps/mobile/ios/xcodebuild.log
           retention-days: 7
       - name: Pack the IPA
@@ -141,26 +153,16 @@ jobs:
           APP=$(ls -d build/Build/Products/Release-iphoneos/*.app | head -n 1)
           # An empty shell of an app must never be packed and released again.
           test -f "$APP/Info.plist" && test -f "$APP/main.jsbundle" || { echo "::error::The built app is incomplete"; exit 1; }
-          python3 ../../../tools/ci/check-ios-app.py "$APP" > ../../../ios-build-info.json
+          python3 ../../../tools/ci/check-ios-app.py "$APP" "$CREW_IOS_TARGET" > "../../../ios-build-info-$CREW_IOS_TARGET.json"
           mkdir -p Payload
           cp -R "$APP" Payload/
-          zip -qry ../../../soiree-crew-unsigned.ipa Payload
-          # iPad's system zoom control requires an iPhone-only device family. This separately
-          # named download intentionally contains the same compatible binary, not a tablet UI.
-          cp ../../../soiree-crew-unsigned.ipa ../../../soiree-crew-ipad-compat-unsigned.ipa
+          zip -qry "../../../$IPA_FILE" Payload
       - uses: actions/upload-artifact@v7
         with:
-          name: soiree-crew-ios-unsigned
-          path: soiree-crew-unsigned.ipa
-          if-no-files-found: error
-          retention-days: 14
-
-      - uses: actions/upload-artifact@v7
-        with:
-          name: soiree-crew-ipad-compat-unsigned
+          name: ${{ matrix.artifact }}
           path: |
-            soiree-crew-ipad-compat-unsigned.ipa
-            ios-build-info.json
+            ${{ matrix.file }}
+            ios-build-info-${{ matrix.target }}.json
           if-no-files-found: error
           retention-days: 14
 
@@ -224,9 +226,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        family: [iPhone, iPad]
+        include:
+          - family: iPhone
+            target: iphone
+            artifact: soiree-crew-ios-unsigned
+            file: soiree-crew-unsigned.ipa
+          - family: iPad
+            target: ipad
+            artifact: soiree-crew-ipad-unsigned
+            file: soiree-crew-ipad-unsigned.ipa
     env:
       DEVICE_FAMILY: ${{ matrix.family }}
+      IPA_FILE: ${{ matrix.file }}
+      CREW_IOS_TARGET: ${{ matrix.target }}
     steps:
       - uses: actions/checkout@v7
       - uses: maxim-lobanov/setup-xcode@v1
@@ -234,11 +246,12 @@ jobs:
           xcode-version: "26.6"
       - uses: actions/download-artifact@v8
         with:
-          name: soiree-crew-ios-unsigned
+          name: ${{ matrix.artifact }}
       - name: Make the IPA runnable in the simulator
         run: |
-          unzip -q soiree-crew-unsigned.ipa -d sim
+          unzip -q "$IPA_FILE" -d sim
           APP=$(ls -d sim/Payload/*.app | head -n 1)
+          python3 tools/ci/check-ios-app.py "$APP" "$CREW_IOS_TARGET"
           python3 tools/ci/ios-device-to-simulator.py "$APP"
           # Inside out: frameworks, then the app extensions (Live Activity), then the app.
           for f in "$APP"/Frameworks/*.framework "$APP"/Frameworks/*.dylib "$APP"/PlugIns/*.appex/Frameworks/*.framework; do
@@ -362,13 +375,13 @@ jobs:
             echo
             echo
             echo "- iOS: \`soiree-crew-unsigned.ipa\`, unsigned. Install it with AltStore or SideStore (source below), or sign it with your sideloading tool."
-            echo "- iPad compatibility: \`soiree-crew-ipad-compat-unsigned.ipa\`, the iPhone interface with the system zoom control. Same binary, separately named download."
+            echo "- iPad: \`soiree-crew-ipad-unsigned.ipa\`, native tablet interface with sidebar navigation, adaptive columns and landscape support."
             echo "- AltStore / SideStore source: https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/altstore/source.json"
             if [ -f dist/soiree-crew.apk ]; then echo "- Android: \`soiree-crew.apk\`, signed with the debug key. Allow installs from this source."; fi
           } > notes.md
           echo "TAG=$TAG" >> "$GITHUB_ENV"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-          FILES="dist/soiree-crew-unsigned.ipa dist/soiree-crew-ipad-compat-unsigned.ipa dist/ios-build-info.json"
+          FILES="dist/soiree-crew-unsigned.ipa dist/soiree-crew-ipad-unsigned.ipa dist/ios-build-info-iphone.json dist/ios-build-info-ipad.json"
           [ -f dist/soiree-crew.apk ] && FILES="$FILES dist/soiree-crew.apk"
           gh release create "$TAG" $FILES             --title "Soirée Crew ${VERSION}"             --notes-file notes.md             --target "$GITHUB_SHA"             --latest
 
