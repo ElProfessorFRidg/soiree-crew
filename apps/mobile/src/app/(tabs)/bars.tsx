@@ -442,7 +442,7 @@ export default function BarsScreen() {
       </View>
 
       </View>
-      <View style={styles.detailColumn}>
+      <View style={[styles.detailColumn, layout.split ? styles.flex : undefined]}>
       {selected ? (
         <Animated.View
           key={selected.id}
@@ -556,7 +556,7 @@ export default function BarsScreen() {
 const styles = StyleSheet.create({
   workspace: { gap: 24, alignItems: "stretch" },
   mapColumn: { gap: 16, minWidth: 0 },
-  detailColumn: { flex: 1, gap: 16, minWidth: 0 },
+  detailColumn: { gap: 16, minWidth: 0 },
   headerButtons: { flexDirection: "row", alignItems: "center", gap: 8 },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   tags: { flexDirection: "row", flexWrap: "wrap", gap: 6 },

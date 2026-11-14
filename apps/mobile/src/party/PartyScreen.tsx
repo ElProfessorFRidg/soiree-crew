@@ -589,7 +589,7 @@ function LevelZero(props: LevelProps) {
         <IconButton icon="clock" accessibilityLabel={i18n.t("party.history")} onPress={() => router.push("/history")} />
       </View>
       <View style={[styles.dashboard, { flexDirection: layout.split ? "row" : "column" }]}>
-      <View style={styles.dashboardColumn}>
+      <View style={[styles.dashboardColumn, layout.split ? styles.flex : undefined]}>
       <DetectedSettingsCard />
       <BacHero {...props} size={124} />
       <Text>{trendLine(props, hourCycle)}</Text>
@@ -620,7 +620,7 @@ function LevelZero(props: LevelProps) {
       <StatusRow {...props} />
       <EveningFood i18n={i18n} now={now} />
       </View>
-      <View style={styles.dashboardColumn}>
+      <View style={[styles.dashboardColumn, layout.split ? styles.flex : undefined]}>
       <FirstNightPreview />
       <FirstRunChecklist />
       <CrewStrip />
@@ -822,7 +822,7 @@ const styles = StyleSheet.create({
   },
   header: { flexDirection: "row", alignItems: "center", gap: 12 },
   dashboard: { gap: 24, alignItems: "stretch" },
-  dashboardColumn: { flex: 1, minWidth: 0, gap: 14 },
+  dashboardColumn: { minWidth: 0, gap: 14 },
   flex: { flex: 1 },
   block: { gap: space.blockGap },
   heroRow: { flexDirection: "row", alignItems: "flex-end", gap: 12, flexWrap: "wrap" },

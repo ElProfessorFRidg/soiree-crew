@@ -599,10 +599,10 @@ function QuickType({ presets, consumedAt, food, houseAbv, unit, onDone }: QuickT
 }
 
 const styles = StyleSheet.create({
-  footer: { paddingHorizontal: space.screenX, paddingTop: 12, borderTopWidth: 1 },
+  footer: { width: "100%", maxWidth: 760, alignSelf: "center", paddingHorizontal: space.screenX, paddingTop: 12, borderTopWidth: 1 },
   quick: { gap: 10 },
   sheet: { flex: 1 },
-  content: { paddingHorizontal: space.screenX, paddingTop: 20, gap: 16 },
+  content: { width: "100%", maxWidth: 760, alignSelf: "center", paddingHorizontal: space.screenX, paddingTop: 20, gap: 16 },
   title: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   tile: {
