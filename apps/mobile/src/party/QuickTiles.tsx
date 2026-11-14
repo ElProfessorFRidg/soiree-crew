@@ -76,6 +76,6 @@ export function MoreChips({ i18n }: { i18n: Translator }) {
 const styles = StyleSheet.create({
   tiles: { flexDirection: "row", gap: 8 },
   tile: { flex: 1, paddingHorizontal: 4 },
-  chipRow: { marginHorizontal: -space.screenX },
+  chipRow: { marginHorizontal: -space.screenX, flexGrow: 0 },
   chips: { gap: 8, paddingHorizontal: space.screenX, paddingVertical: 6 },
 });

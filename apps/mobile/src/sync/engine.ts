@@ -51,10 +51,10 @@ function dequeue(id: string): void {
   useAppStore.setState((state) => ({ outbox: state.outbox.filter((item) => item.id !== id) }));
 }
 
-function scheduleRetry(attempts: number): void {
+function scheduleRetry(attempts: number, minimumMs = 0): void {
   if (retryTimer) return;
   // Exponential backoff with jitter (SYNC-04).
-  const delay = Math.min(MAX_RETRY_MS, BASE_RETRY_MS * 2 ** attempts) * (0.5 + Math.random() / 2);
+  const delay = Math.max(minimumMs, Math.min(MAX_RETRY_MS, BASE_RETRY_MS * 2 ** attempts) * (0.5 + Math.random() / 2));
   retryTimer = setTimeout(() => {
     retryTimer = null;
     void flush();
@@ -96,7 +96,7 @@ export async function flush(): Promise<void> {
       } else if (attempts === SLOW_AFTER_ATTEMPTS) {
         emit({ type: "slow" });
       }
-      scheduleRetry(attempts);
+      scheduleRetry(attempts, result.status === "temporary" ? result.retryAfterMs : undefined);
       return;
     }
   } finally {

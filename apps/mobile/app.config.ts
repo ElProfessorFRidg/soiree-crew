@@ -4,6 +4,9 @@ import type { ConfigContext, ExpoConfig } from "expo/config";
 // so every installed build can be replaced by the next one.
 export default ({ config }: ConfigContext): ExpoConfig => {
   const build = Number.parseInt(process.env.BUILD_NUMBER ?? "1", 10);
+  const target = process.env.CREW_IOS_TARGET ?? "universal";
+  const preview = process.env.CREW_RELEASE_CHANNEL === "preview";
+  const bundleIdentifier = `${config.ios?.bundleIdentifier ?? "app.soireecrew.mobile"}${preview ? ".preview" : ""}`;
   // docs/VERSIONING.md: CI names each release 0.1.1, 0.1.2...; app.json keeps the series for local builds.
   const version = process.env.APP_VERSION || config.version;
   // O-38: remote push needs the aps-environment entitlement, which a free Apple account cannot
@@ -18,24 +21,33 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     : config.plugins;
   return {
     ...(config as ExpoConfig),
+    name: preview ? "Soirée Crew Preview" : config.name ?? "Soirée Crew",
+    scheme: preview ? "soireecrew-preview" : config.scheme,
     ...(plugins ? { plugins: plugins as ExpoConfig["plugins"] } : {}),
     ...(version ? { version } : {}),
+    orientation: target === "iphone" ? "portrait" : "default",
     ios: {
       ...config.ios,
+      bundleIdentifier,
+      supportsTablet: target !== "iphone",
+      isTabletOnly: target === "ipad",
+      requireFullScreen: false,
       buildNumber: String(build),
       // Safety alerts (SOS, a friend not feeling well) may break through Focus.
       ...(push ? { entitlements: { ...config.ios?.entitlements, "com.apple.developer.usernotifications.time-sensitive": true } } : {}),
     },
-    android: { ...config.android, versionCode: build, ...(push && googleServices ? { googleServicesFile: googleServices } : {}) },
+    android: { ...config.android, ...(preview ? { package: `${config.android?.package ?? "app.soireecrew.mobile"}.preview` } : {}), versionCode: build, ...(push && googleServices ? { googleServicesFile: googleServices } : {}) },
     // O-12: the app compares this with the latest GitHub release to say when a newer one exists.
     // The public server the connect screen suggests; CI passes the repository variable CREW_SERVER_URL.
     extra: {
       ...config.extra,
       buildNumber: build,
       appVersion: version ?? null,
-      releasesApi: "https://api.github.com/repos/ElProfessorFRidg/soiree-crew/releases/latest",
+      releaseChannel: preview ? "preview" : "public",
+      iosTarget: target,
+      releasesApi: `https://api.github.com/repos/ElProfessorFRidg/soiree-crew/releases${preview ? "?per_page=100" : "/latest"}`,
       // AltStore / SideStore source, rewritten by every release on the altstore branch (docs/ALTSTORE.md).
-      altstoreSource: "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/source.json",
+      altstoreSource: `https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/source${target === "ipad" ? "-ipad" : ""}.json`,
       defaultServerUrl: process.env.CREW_SERVER_URL || null,
       // Builds made by a server (deploy/android) check that server for updates instead of GitHub.
       updateServer: process.env.CREW_UPDATE_SERVER || null,

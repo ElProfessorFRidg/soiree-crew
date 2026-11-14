@@ -57,6 +57,7 @@ import { NightAlerts } from "./NightAlerts";
 import { PartyBoard } from "./PartyBoard";
 import { DetectedSettingsCard, FirstNightPreview, FirstRunChecklist, NoEstimateCard } from "@/onboarding/FirstRun";
 import { EstimatePreview } from "@/onboarding/ValueCards";
+import { useContentLayout, useScreenSpacing } from "@/ui/layout";
 
 /** JOY-02: the line above the title, from the night as it goes. */
 function Greeting({ i18n, live, now, drinksTonight }: { i18n: Translator; live: LiveBac; now: number; drinksTonight: number }) {
@@ -167,9 +168,10 @@ function MoodBand() {
 }
 
 export function PartyScreen() {
+  const layout = useContentLayout();
+  const spacing = useScreenSpacing();
   const i18n = useT();
   const theme = useTheme();
-  const insets = useSafeAreaInsets();
   const preferences = useAppStore((state) => state.preferences);
   const [fastTick, setFastTick] = useState(false);
   const now = useNow(fastTick ? 5_000 : 15_000);
@@ -243,7 +245,7 @@ export function PartyScreen() {
       <LivingBackground mine={tonight.drinks.length} level={level} />
       <MoodBand />
       <ScrollView
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + space.screenTop }]}
+        contentContainerStyle={[styles.content, { maxWidth: level === 0 && layout.split ? 1280 : 760, paddingLeft: spacing.left, paddingRight: spacing.right, paddingTop: spacing.top, paddingBottom: spacing.bottom }]}
         contentInsetAdjustmentBehavior="never"
       >
         <SosBanner />
@@ -277,9 +279,9 @@ export function PartyScreen() {
  * what the estimate needs with a button to give it, and the parts of the night that work anyway.
  */
 function NoEstimateParty() {
+  const spacing = useScreenSpacing();
   const i18n = useT();
   const theme = useTheme();
-  const insets = useSafeAreaInsets();
   const tiles: { label: string; icon: "dice" | "wine" | "users" | "alert"; variant?: "danger"; go: () => void }[] = [
     { label: i18n.t("party.tileGames"), icon: "dice", go: () => router.push("/(tabs)/games") },
     { label: i18n.t("bar.title"), icon: "wine", go: () => router.push("/bar") },
@@ -289,7 +291,7 @@ function NoEstimateParty() {
   return (
     <View style={[styles.screen, { backgroundColor: theme.bg }]}>
       <MoodBand />
-      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + space.screenTop }]} contentInsetAdjustmentBehavior="never">
+      <ScrollView contentContainerStyle={[styles.content, { paddingLeft: spacing.left, paddingRight: spacing.right, paddingTop: spacing.top, paddingBottom: spacing.bottom }]} contentInsetAdjustmentBehavior="never">
         <SosBanner />
         <View style={styles.header}>
           <View style={styles.flex}>
@@ -570,6 +572,7 @@ function PartyTitle({ i18n }: { i18n: Translator }) {
 }
 
 function LevelZero(props: LevelProps) {
+  const layout = useContentLayout();
   const { i18n, now } = props;
   const theme = useTheme();
   const hourCycle = useAppStore((state) => state.preferences.hourCycle);
@@ -584,6 +587,8 @@ function LevelZero(props: LevelProps) {
         <NotificationBell />
         <IconButton icon="clock" accessibilityLabel={i18n.t("party.history")} onPress={() => router.push("/history")} />
       </View>
+      <View style={[styles.dashboard, { flexDirection: layout.split ? "row" : "column" }]}>
+      <View style={[styles.dashboardColumn, layout.split ? styles.flex : undefined]}>
       <DetectedSettingsCard />
       <BacHero {...props} size={124} />
       <Text>{trendLine(props, hourCycle)}</Text>
@@ -612,9 +617,11 @@ function LevelZero(props: LevelProps) {
       </View>
       <MyDrinksRow now={now} exclude={props.againKey} big={false} />
       <StatusRow {...props} />
+      <EveningFood i18n={i18n} now={now} />
+      </View>
+      <View style={[styles.dashboardColumn, layout.split ? styles.flex : undefined]}>
       <FirstNightPreview />
       <FirstRunChecklist />
-      <EveningFood i18n={i18n} now={now} />
       <CrewStrip />
       <QuickTiles i18n={i18n} />
       <PartyBoard />
@@ -624,6 +631,8 @@ function LevelZero(props: LevelProps) {
       <DareOfTheNight now={props.now} />
       <MoreChips i18n={i18n} />
       <LevelPicker {...props} />
+      </View>
+      </View>
     </>
   );
 }
@@ -803,11 +812,15 @@ const styles = StyleSheet.create({
   moodBand: { position: "absolute", left: 0, right: 0, height: 4, zIndex: 2, opacity: 0.9 },
   screen: { flex: 1 },
   content: {
+    width: "100%",
+    maxWidth: 760,
+    alignSelf: "center",
     paddingHorizontal: space.screenX,
-    paddingBottom: 140,
     gap: 14,
   },
   header: { flexDirection: "row", alignItems: "center", gap: 12 },
+  dashboard: { gap: 24, alignItems: "stretch" },
+  dashboardColumn: { minWidth: 0, gap: 14 },
   flex: { flex: 1 },
   block: { gap: space.blockGap },
   heroRow: { flexDirection: "row", alignItems: "flex-end", gap: 12, flexWrap: "wrap" },

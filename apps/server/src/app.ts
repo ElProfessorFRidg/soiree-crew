@@ -36,10 +36,20 @@ import { syncRoutes } from "./routes/sync";
 import { venueRoutes } from "./routes/venues";
 import { venueFactRoutes } from "./routes/venueFacts";
 import { notificationRoutes } from "./notifications/routes";
+import { networkKey, RateLimitError, TokenBucket } from "./ratelimit";
 
 const PUBLIC_ROUTES = new Set(["POST /v1/accounts", "POST /v1/accounts/apple", "POST /v1/sessions/apple", "POST /v1/sessions/claim", "POST /v1/sessions/password", "GET /v1/usernames/:name/available", "GET /v1/health", "GET /v1/info", "GET /download/android.json", "GET /download/soiree-crew.apk", "GET /v1/invites/:code", "GET /v1/crews/open", "GET /v1/live", "GET /i/:code", "GET /f/:code","GET /v1/photos/:id", "GET /v1/receipts/:id","GET /v1/calendar/:token.ics"]);
 
 export async function buildApp(ctx: Context, options: { logger?: boolean; trustProxy?: boolean | number } = {}): Promise<FastifyInstance> {
+  // A generous network ceiling accommodates a whole bar behind one Wi-Fi relay. Once verified,
+  // each account has its own read/write budgets; rotating a token does not reset those budgets.
+  const networks = new TokenBucket(2400, 12_000, ctx.now);
+  const guests = new TokenBucket(180, 600, ctx.now);
+  const invalidTokens = new TokenBucket(60, 120, ctx.now);
+  const media = new TokenBucket(600, 1800, ctx.now);
+  const reads = new TokenBucket(180, 600, ctx.now);
+  const writes = new TokenBucket(120, 240, ctx.now);
+  const safety = new TokenBucket(20, 20, ctx.now);
   const app = Fastify({
     // Behind Coolify's proxy every request comes from the proxy: without this, rate limits would
     // count all users as one address. Only set it when the port is reachable through the proxy alone.
@@ -53,20 +63,43 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
     forceCloseConnections: true,
   });
   // Tokens travel in the Authorization header, never in cookies, so any origin may call the API.
-  await app.register(cors, { origin: true, methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], allowedHeaders: ["authorization", "content-type"] });
+  await app.register(cors, { origin: true, methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], allowedHeaders: ["authorization", "content-type"], exposedHeaders: ["retry-after"] });
   await app.register(websocket);
 
-  app.addHook("preHandler", async (request) => {
+  app.addHook("onRequest", async (request) => {
+    if (request.method !== "OPTIONS") networks.check(networkKey(request.ip));
+  });
+
+  // Authenticate and budget requests before parsing potentially large uploads.
+  app.addHook("onRequest", async (request) => {
     if (request.method === "OPTIONS") return;
     const route = `${request.method} ${request.routeOptions.url ?? ""}`;
     const user = await userFromToken(ctx, bearer(request));
-    if (user) request.user = user;
-    else if (!PUBLIC_ROUTES.has(route)) throw new HttpError(401, "unauthenticated");
+    const readCost = route === "GET /v1/places" ? 10 : route === "GET /v1/places/:id" ? 3 : 1;
+    if (user) {
+      request.user = user;
+      const urgent = route === "POST /v1/sos" || route === "POST /v1/sos/:id/resolve" || route === "POST /v1/parties/:id/status";
+      (urgent ? safety : request.method === "GET" || request.method === "HEAD" ? reads : writes).check(user.id, request.method === "GET" ? readCost : 1);
+    } else {
+      // Invalid credentials never select an account quota or silently become a guest.
+      if (request.headers.authorization) {
+        invalidTokens.check(networkKey(request.ip));
+        throw new HttpError(401, "unauthenticated");
+      }
+      // Image tags use signed capability URLs rather than Authorization. A gallery behind a
+      // shared Wi-Fi needs its own larger budget; each media handler still validates its signature.
+      const signedMedia = route === "GET /v1/photos/:id" || route === "GET /v1/receipts/:id";
+      (signedMedia ? media : guests).check(networkKey(request.ip), readCost);
+      const publicPlace = route === "GET /v1/places" || route === "GET /v1/places/:id";
+      if (!PUBLIC_ROUTES.has(route) && !(publicPlace && ctx.serverInfo?.public)) throw new HttpError(401, "unauthenticated");
+    }
   });
 
   // SEC-03: once served over HTTPS, browsers must stay on it; nothing is framed or sniffed.
   const https = ctx.publicUrl.startsWith("https://");
   app.addHook("onSend", async (_request, reply) => {
+    // Authenticated representations contain personal flags and must not enter shared HTTP caches.
+    if (!reply.hasHeader("cache-control")) reply.header("cache-control", "no-store");
     if (https) reply.header("strict-transport-security", "max-age=31536000; includeSubDomains");
     reply.header("x-content-type-options", "nosniff");
     reply.header("referrer-policy", "no-referrer");
@@ -74,6 +107,7 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
   });
 
   app.setErrorHandler((error, _request, reply) => {
+    if (error instanceof RateLimitError) reply.header("retry-after", String(error.retryAfterSeconds));
     if (error instanceof ZodError) return reply.status(400).send({ error: "invalid" });
     return sendError(reply, error);
   });

@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { AppState, useColorScheme } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { themes, type Theme } from "@crew/design-tokens";
 import { useAppStore } from "@/state/store";
 import { isDaytime, themeFor } from "./choice";
@@ -34,7 +35,7 @@ export function ThemeProvider({ force, children }: { force?: "dark" | "light" | 
   const choice = useAppStore((state) => state.themeChoice);
   const day = useDaytime(!force && choice === "auto" && system === "light");
   const name = force === "system" ? (system === "light" ? "light" : "dark") : (force ?? themeFor(choice, system, day));
-  return <ThemeContext.Provider value={themes[name]}>{children}</ThemeContext.Provider>;
+  return <ThemeContext.Provider value={themes[name]}><StatusBar style={name === "light" ? "dark" : "light"} />{children}</ThemeContext.Provider>;
 }
 
 export function useTheme(): Theme {

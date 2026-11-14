@@ -12,6 +12,8 @@ import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
 import { SkeletonRows } from "@/ui/Skeleton";
 import { Text } from "@/ui/Text";
+import { Button } from "@/ui/Button";
+import { publicReads } from "@/ui/pure/readCache";
 
 const PINT_CAPS = [500, 700] as const;
 
@@ -22,6 +24,7 @@ export default function DiscoverScreen() {
   const currency = useAppStore((state) => state.preferences.currency);
   const [places, setPlaces] = useState<NearbyPlace[] | null>(null);
   const [failed, setFailed] = useState(false);
+  const [networkFailed, setNetworkFailed] = useState(false);
   const [maxPint, setMaxPint] = useState<number | undefined>(undefined);
   const [strict, setStrict] = useState(false);
   const [tag, setTag] = useState<VibeTag | undefined>(undefined);
@@ -29,6 +32,7 @@ export default function DiscoverScreen() {
 
   const load = useCallback(async () => {
     setFailed(false);
+    setNetworkFailed(false);
     const fix = await currentFix("nearby");
     if (!fix.ok) {
       setFailed(true);
@@ -36,6 +40,7 @@ export default function DiscoverScreen() {
       return;
     }
     const res = await fetchNearby(fix.fix.lat, fix.fix.lng, { ...(maxPint ? { maxPint } : {}), strict, ...(tag ? { tag } : {}), openNow }).catch(() => null);
+    setNetworkFailed(res === null);
     setPlaces(res?.places ?? []);
   }, [maxPint, strict, tag, openNow]);
   useEffect(() => {
@@ -44,7 +49,7 @@ export default function DiscoverScreen() {
 
   const distance = (m: number) => (m < 1000 ? `${Math.round(m / 10) * 10} m` : `${i18n.number(m / 1000, 1)} km`);
   return (
-    <Screen back title={i18n.t("discover.title")} onRefresh={load}>
+    <Screen back title={i18n.t("discover.title")} onRefresh={() => { publicReads.clear(); return load(); }}>
       <View style={styles.chips}>
         <Chip label={i18n.t("discover.openNow")} selected={openNow} onPress={() => setOpenNow(!openNow)} />
         {PINT_CAPS.map((cap) => (
@@ -64,7 +69,8 @@ export default function DiscoverScreen() {
       </View>
       {places === null ? <SkeletonRows /> : null}
       {failed ? <Text>{i18n.t("discover.noLocation")}</Text> : null}
-      {places && !failed && places.length === 0 ? <Text>{i18n.t("discover.none")}</Text> : null}
+      {networkFailed ? <><Text>{i18n.t("common.waitingNetwork")}</Text><Button label={i18n.t("common.retry")} onPress={() => void load()} /></> : null}
+      {places && !failed && !networkFailed && places.length === 0 ? <Text>{i18n.t("discover.none")}</Text> : null}
       <View>
         {places?.map((p, index) => (
           <Row

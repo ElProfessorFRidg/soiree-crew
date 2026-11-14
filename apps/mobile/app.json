@@ -4,14 +4,14 @@
     "slug": "soiree-crew",
     "scheme": "soireecrew",
     "version": "0.2.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "backgroundColor": "#1E2624",
     "ios": {
       "bundleIdentifier": "app.soireecrew.mobile",
       "usesAppleSignIn": true,
-      "supportsTablet": false,
+      "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": true,
         "UIBackgroundModes": ["location"],

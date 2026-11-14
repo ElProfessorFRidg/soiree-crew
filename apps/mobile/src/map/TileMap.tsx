@@ -2,39 +2,19 @@ import { useMemo, useState, type ReactNode } from "react";
 import { Image, StyleSheet, View, type LayoutChangeEvent } from "react-native";
 import { GestureDetector, usePanGesture, usePinchGesture, useSimultaneousGestures } from "react-native-gesture-handler";
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
+import { fitRegion, MAP_TILE_SIZE as TILE, MAX_MAP_ZOOM as MAX_ZOOM, MIN_MAP_ZOOM as MIN_ZOOM, project, unproject, type LatLng } from "@/motion/math/map";
 import { useTheme } from "@/theme";
 import { Text } from "@/ui/Text";
+
+export { fitRegion, type LatLng } from "@/motion/math/map";
 
 // Raster tile map with no native map SDK and no key: Esri World Dark Gray at night, OpenStreetMap by day
 // (docs/adr/0003-maps.md). Both need their attribution on screen.
 // Gestures move a transformed layer on the UI thread; tiles are recomputed only when a gesture ends.
 
-const TILE = 256;
-const MIN_ZOOM = 3;
-// Esri's dark canvas stops at 16.
-const MAX_ZOOM = 16;
-
-export interface LatLng {
-  lat: number;
-  lng: number;
-}
-
 export interface MapMarker extends LatLng {
   id: string;
   render: () => ReactNode;
-}
-
-function project({ lat, lng }: LatLng, zoom: number): { x: number; y: number } {
-  const scale = TILE * 2 ** zoom;
-  const sin = Math.sin((Math.max(-85, Math.min(85, lat)) * Math.PI) / 180);
-  return { x: ((lng + 180) / 360) * scale, y: (0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) * scale };
-}
-
-function unproject(x: number, y: number, zoom: number): LatLng {
-  const scale = TILE * 2 ** zoom;
-  const lng = (x / scale) * 360 - 180;
-  const n = Math.PI - (2 * Math.PI * y) / scale;
-  return { lat: (180 / Math.PI) * Math.atan(Math.sinh(n)), lng };
 }
 
 interface Props {
@@ -136,10 +116,15 @@ export function TileMap({ center, zoom, markers, onRegionChange, height, accessi
           {width
             ? markers.map((marker) => {
                 const point = project(marker, z);
+                const world = TILE * 2 ** z;
+                let offsetX = point.x - origin.x;
+                // A pin just across the antimeridian is nearby, not one whole world away.
+                if (offsetX > world / 2) offsetX -= world;
+                if (offsetX < -world / 2) offsetX += world;
                 return (
                   <View
                     key={marker.id}
-                    style={[styles.marker, { left: point.x - origin.x + width / 2, top: point.y - origin.y + height / 2 }]}
+                    style={[styles.marker, { left: offsetX + width / 2, top: point.y - origin.y + height / 2 }]}
                     pointerEvents="box-none"
                   >
                     {marker.render()}
@@ -156,20 +141,6 @@ export function TileMap({ center, zoom, markers, onRegionChange, height, accessi
       </View>
     </View>
   );
-}
-
-/** Centre and zoom that fit a set of points, for the first view of the map. */
-export function fitRegion(points: LatLng[], width: number, height: number): { center: LatLng; zoom: number } {
-  if (!points.length) return { center: { lat: 48.8566, lng: 2.3522 }, zoom: 12 };
-  const lats = points.map((p) => p.lat);
-  const lngs = points.map((p) => p.lng);
-  const center = { lat: (Math.min(...lats) + Math.max(...lats)) / 2, lng: (Math.min(...lngs) + Math.max(...lngs)) / 2 };
-  for (let zoom = MAX_ZOOM; zoom > MIN_ZOOM; zoom--) {
-    const a = project({ lat: Math.max(...lats), lng: Math.min(...lngs) }, zoom);
-    const b = project({ lat: Math.min(...lats), lng: Math.max(...lngs) }, zoom);
-    if (b.x - a.x < width * 0.8 && b.y - a.y < height * 0.7) return { center, zoom };
-  }
-  return { center, zoom: MIN_ZOOM };
 }
 
 const styles = StyleSheet.create({

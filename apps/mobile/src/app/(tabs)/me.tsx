@@ -65,6 +65,16 @@ export default function MeScreen() {
       <ProfileFields draft={draft} onChange={onProfileChange} />
       <EmergencyContact />
 
+      {/* Without an account: the way to make or open one, straight from here. */}
+      {session ? null : (
+        <Row
+          title={i18n.t("account.guestCreate")}
+          subtitle={i18n.t("account.guestSignIn")}
+          leading={<Icon name="user" color={theme.amber} />}
+          trailing={<Icon name="chev" color={theme.textMuted} />}
+          onPress={() => router.push({ pathname: "/settings", params: { section: "security" } })}
+        />
+      )}
       <Row
         title={i18n.t("people.myProfile")}
         leading={<Icon name="user" color={theme.textMuted} />}

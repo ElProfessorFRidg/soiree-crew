@@ -29,6 +29,7 @@ export class HttpTransport implements Transport {
       return { status: "rejected", reason };
     } catch (error) {
       if (error instanceof ApiError) {
+        if (error.failure.kind === "http" && error.failure.status === 429) return { status: "temporary", retryAfterMs: error.failure.retryAfterMs };
         if (error.failure.kind === "offline") return { status: "offline" };
         if (error.failure.kind === "http" && error.failure.status === 400) return { status: "rejected", reason: "invalid" };
       }
