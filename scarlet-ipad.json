@@ -1,0 +1,29 @@
+{
+  "META": {
+    "repoName": "Soirée Crew · iPad",
+    "repoIcon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png"
+  },
+  "Other": [
+    {
+      "name": "Soirée Crew Preview",
+      "version": "0.2.5",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.5-preview.4%2Bbuild.115/soiree-crew-ipad-unsigned.ipa",
+      "category": "Other",
+      "description": "• Publish separate public and Preview apps in AltStore, retain downloadable history and refine screen spacing\n• Keep compact dashboard sections in normal flow and bound the drink form on iPad\n• Build a native iPad interface with adaptive navigation, dashboard, map panes and game grids\n• Keep server configuration available while bundling native apps\n• Reserve a separate network budget for signed photo galleries\n• Add guest public browsing, bounded caches, shared-network quotas and iPad IPA checks\n• Fix stale map responses, removed crew selection and web screen remounts\n• Improve the bars map and social venue discovery\n• Bars map: my position dot and locate button; tapped bar shows ranking, my nights and photos\n• Button: no vertical padding, all buttons keep the same height; short labels fit on one line\n• Revert Button vertical padding: all buttons keep the same height, short labels fit on one line\n• Button: vertical padding so a two-line label is not tight against the border\n• Shorter label for withdrawing the health consent so it stays on one line\n• No-account dot: pink instead of cyan, which the anti-slop lint (D-09) refuses\n• Moi tab: a cyan dot while there is no account\n• Every screen needs the arrival flow first: direct URLs redirect to onboarding\n• Moi: guests get a row to create or open an account\n• Web: screen blocks rise in once, then drop their animated style\n• Web: no rise-in animation on screen blocks, it left blank holes after scrolling\n• Guests can create or open an account; sign-out asks to confirm and needs a password\n• Fix onboarding progress row overlapping the step title\n• Let guests into the app after onboarding: age is optional\n• Preview deployment",
+      "bundleID": "app.soireecrew.mobile.preview",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/10-limits.png"
+      ]
+    }
+  ]
+}

@@ -13,16 +13,16 @@
       "description": "• Dropped-phone test polls every 5s instead of one 25s jump (order-dependent presence race)\n• Fix back-navigation test now that birth step is gone\n• Ask age only when creating an account; native selects for the web date picker\n• A stranger allowed to see nights also gets the crew and solo split\n• A party spent without alcohol still counts as a night out\n• Solo nights count on the profile, stats and records; crew board explains waiting drinks and asks friends to confirm",
       "bundleID": "app.soireecrew.mobile",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.4/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.4%2Bbuild.93/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.4%2Bbuild.93/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.4%2Bbuild.93/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.4%2Bbuild.93/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.4%2Bbuild.93/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.4%2Bbuild.93/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.4%2Bbuild.93/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.4%2Bbuild.93/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.4%2Bbuild.93/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.4%2Bbuild.93/iphone/10-limits.png"
       ]
     },
     {
@@ -34,16 +34,16 @@
       "description": "• Accounts in the Gribouille and suggestions tests carry a birth date; status regenerated after the merges\n• Crew step back, Apple sign-in, date of birth before the account, server-side profile photo\n• Answer a round from its notification (\"Got it\" / \"Not mine\"), drinks linked to the round, confirmedIds in the listing\n• Background location follows eco mode as it changes during the night\n• Only a party that is live now tells the crew; partyStarted asserted explicitly in inbox tests; gathering card button 48 px\n• Leave authorises on party membership, drop locks the round and keeps a changed split, a round id reused in another party is a retry\n• Eco mode slows and simplifies loops instead of freezing every animation; location updates restart when the eco state changes\n• Close guesses stay private, rate-limit join, guard timers and leave, sweep idle rooms\n• Rebuild the arrival as one continuous flow with five visibility choices\n• Gribouille online, a drawing and guessing game on several phones (O-63)\n• Offer a party when 3+ of the crew are at one venue, push when a crew mate launches one, warn before closing (QOL-17)\n• Respect the phone, eco mode, data saver, theme choice\n• Fair rotation from the crew's history, server-side split and presence checks, drop-a-drink, summary (N-18, server)",
       "bundleID": "app.soireecrew.mobile",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.3/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.3%2Bbuild.87/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.3%2Bbuild.87/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.3%2Bbuild.87/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.3%2Bbuild.87/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.3%2Bbuild.87/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.3%2Bbuild.87/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.3%2Bbuild.87/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.3%2Bbuild.87/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.3%2Bbuild.87/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.3%2Bbuild.87/iphone/10-limits.png"
       ]
     },
     {
@@ -55,16 +55,16 @@
       "description": "• Allow the drink-driving warning's red gradients, asked for explicitly\n• 45 s hold with no close button until the end (a thin line fills instead), call and another way home after 12 s, passenger after 20 s and only held down 2 s; layered red backdrop (garnet, breathing crimson core, ember warmth) and a car in a pulsing halo\n• The driving time follows the curve on screen, so it never comes after back to zero and a level shown under the limit is never called over it; the margin is too close to call\n• Warn when driving after drinking\n• Capfuls and sips (under 5 g of alcohol) no longer count in the no-water streak or the fast-pace warning",
       "bundleID": "app.soireecrew.mobile",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.2.2/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.2%2Bbuild.86/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.2%2Bbuild.86/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.2%2Bbuild.86/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.2%2Bbuild.86/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.2%2Bbuild.86/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.2%2Bbuild.86/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.2%2Bbuild.86/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.2%2Bbuild.86/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.2%2Bbuild.86/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.2%2Bbuild.86/iphone/10-limits.png"
       ]
     },
     {
@@ -359,6 +359,267 @@
         "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.1/04-bars.png",
         "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.1/05-me.png",
         "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.1/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.66/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.64/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.60/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.59/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.58/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.57/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.54/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.42/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.40/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.39/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.38/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.31/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.30/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.29/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.28/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.27/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.26/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.25/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.24/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.23/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.22/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.15/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.14/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew 0.1.0",
+      "version": "0.1.0",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.2/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": []
+    },
+    {
+      "name": "Soirée Crew Preview",
+      "version": "0.2.5",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.5-preview.4%2Bbuild.115/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "• Publish separate public and Preview apps in AltStore, retain downloadable history and refine screen spacing\n• Keep compact dashboard sections in normal flow and bound the drink form on iPad\n• Build a native iPad interface with adaptive navigation, dashboard, map panes and game grids\n• Keep server configuration available while bundling native apps\n• Reserve a separate network budget for signed photo galleries\n• Add guest public browsing, bounded caches, shared-network quotas and iPad IPA checks\n• Fix stale map responses, removed crew selection and web screen remounts\n• Improve the bars map and social venue discovery\n• Bars map: my position dot and locate button; tapped bar shows ranking, my nights and photos\n• Button: no vertical padding, all buttons keep the same height; short labels fit on one line\n• Revert Button vertical padding: all buttons keep the same height, short labels fit on one line\n• Button: vertical padding so a two-line label is not tight against the border\n• Shorter label for withdrawing the health consent so it stays on one line\n• No-account dot: pink instead of cyan, which the anti-slop lint (D-09) refuses\n• Moi tab: a cyan dot while there is no account\n• Every screen needs the arrival flow first: direct URLs redirect to onboarding\n• Moi: guests get a row to create or open an account\n• Web: screen blocks rise in once, then drop their animated style\n• Web: no rise-in animation on screen blocks, it left blank holes after scrolling\n• Guests can create or open an account; sign-out asks to confirm and needs a password\n• Fix onboarding progress row overlapping the step title\n• Let guests into the app after onboarding: age is optional\n• Preview deployment",
+      "bundleID": "app.soireecrew.mobile.preview",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/10-limits.png"
       ]
     }
   ]

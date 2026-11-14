@@ -1,0 +1,181 @@
+{
+  "name": "Soirée Crew · iPad",
+  "identifier": "app.soireecrew.source.ipad",
+  "subtitle": "Version publique et Preview",
+  "description": "Deux applications, publique et Preview, avec leurs versions téléchargeables. Dans l’app : Réglages → Versions et téléchargements.",
+  "iconURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+  "headerURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/header.png",
+  "website": "https://github.com/ElProfessorFRidg/soiree-crew",
+  "tintColor": "F4B33D",
+  "featuredApps": [
+    "app.soireecrew.mobile.preview"
+  ],
+  "apps": [
+    {
+      "name": "Soirée Crew Preview",
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "developerName": "Soirée Crew",
+      "subtitle": "Les nouveautés en cours de test.",
+      "localizedDescription": "Note tes verres et vois ton taux estimé, sa courbe et l'heure du retour à zéro. Sors avec ton crew : soirées, bars, jeux, chat, cagnottes et récap du lendemain. Estimation, pas un éthylotest : ne prends jamais le volant sur cette base.",
+      "iconURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "tintColor": "F4B33D",
+      "category": "lifestyle",
+      "screenshots": [
+        {
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/01-party.png",
+          "width": 2064,
+          "height": 2752
+        },
+        {
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/08-add-drink.png",
+          "width": 2064,
+          "height": 2752
+        },
+        {
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/09-curve.png",
+          "width": 2064,
+          "height": 2752
+        },
+        {
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/03-games.png",
+          "width": 2064,
+          "height": 2752
+        },
+        {
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/07-my-stats.png",
+          "width": 2064,
+          "height": 2752
+        },
+        {
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/12-history.png",
+          "width": 2064,
+          "height": 2752
+        },
+        {
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/11-leaderboard.png",
+          "width": 2064,
+          "height": 2752
+        },
+        {
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/04-bars.png",
+          "width": 2064,
+          "height": 2752
+        },
+        {
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/05-me.png",
+          "width": 2064,
+          "height": 2752
+        },
+        {
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/10-limits.png",
+          "width": 2064,
+          "height": 2752
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {
+          "NSLocationWhenInUseUsageDescription": "Your location is used to check in at a bar with your crew, and to share it during a party if you turn that on. It is checked, then deleted.",
+          "NSPhotoLibraryUsageDescription": "Your photos fill the party album, seen by your crew only. Their location is removed.",
+          "NSCameraUsageDescription": "The camera takes photos for the party album and your chats, and scans a friend's safety code. Photos are seen only by the people you share them with.",
+          "NSMicrophoneUsageDescription": "Voice notes in your chats use the microphone, only while you record one. They are encrypted on your phone before they are sent.",
+          "NSCalendarsUsageDescription": "The calendar gets the parties you add to it, nothing else is read."
+        }
+      },
+      "versions": [
+        {
+          "version": "0.2.5",
+          "buildVersion": "115",
+          "marketingVersion": "0.2.5 Preview (115)",
+          "date": "2026-11-14T20:55:56Z",
+          "localizedDescription": "• Publish separate public and Preview apps in AltStore, retain downloadable history and refine screen spacing\n• Keep compact dashboard sections in normal flow and bound the drink form on iPad\n• Build a native iPad interface with adaptive navigation, dashboard, map panes and game grids\n• Keep server configuration available while bundling native apps\n• Reserve a separate network budget for signed photo galleries\n• Add guest public browsing, bounded caches, shared-network quotas and iPad IPA checks\n• Fix stale map responses, removed crew selection and web screen remounts\n• Improve the bars map and social venue discovery\n• Bars map: my position dot and locate button; tapped bar shows ranking, my nights and photos\n• Button: no vertical padding, all buttons keep the same height; short labels fit on one line\n• Revert Button vertical padding: all buttons keep the same height, short labels fit on one line\n• Button: vertical padding so a two-line label is not tight against the border\n• Shorter label for withdrawing the health consent so it stays on one line\n• No-account dot: pink instead of cyan, which the anti-slop lint (D-09) refuses\n• Moi tab: a cyan dot while there is no account\n• Every screen needs the arrival flow first: direct URLs redirect to onboarding\n• Moi: guests get a row to create or open an account\n• Web: screen blocks rise in once, then drop their animated style\n• Web: no rise-in animation on screen blocks, it left blank holes after scrolling\n• Guests can create or open an account; sign-out asks to confirm and needs a password\n• Fix onboarding progress row overlapping the step title\n• Let guests into the app after onboarding: age is optional\n• Preview deployment",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.5-preview.4%2Bbuild.115/soiree-crew-ipad-unsigned.ipa",
+          "size": 22533591,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/01-party.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/08-add-drink.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/09-curve.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/03-games.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/07-my-stats.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/12-history.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/11-leaderboard.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/04-bars.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/05-me.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/10-limits.png",
+              "width": 2064,
+              "height": 2752
+            }
+          ]
+        }
+      ],
+      "version": "0.2.5",
+      "versionDate": "2026-11-14T20:55:56Z",
+      "versionDescription": "• Publish separate public and Preview apps in AltStore, retain downloadable history and refine screen spacing\n• Keep compact dashboard sections in normal flow and bound the drink form on iPad\n• Build a native iPad interface with adaptive navigation, dashboard, map panes and game grids\n• Keep server configuration available while bundling native apps\n• Reserve a separate network budget for signed photo galleries\n• Add guest public browsing, bounded caches, shared-network quotas and iPad IPA checks\n• Fix stale map responses, removed crew selection and web screen remounts\n• Improve the bars map and social venue discovery\n• Bars map: my position dot and locate button; tapped bar shows ranking, my nights and photos\n• Button: no vertical padding, all buttons keep the same height; short labels fit on one line\n• Revert Button vertical padding: all buttons keep the same height, short labels fit on one line\n• Button: vertical padding so a two-line label is not tight against the border\n• Shorter label for withdrawing the health consent so it stays on one line\n• No-account dot: pink instead of cyan, which the anti-slop lint (D-09) refuses\n• Moi tab: a cyan dot while there is no account\n• Every screen needs the arrival flow first: direct URLs redirect to onboarding\n• Moi: guests get a row to create or open an account\n• Web: screen blocks rise in once, then drop their animated style\n• Web: no rise-in animation on screen blocks, it left blank holes after scrolling\n• Guests can create or open an account; sign-out asks to confirm and needs a password\n• Fix onboarding progress row overlapping the step title\n• Let guests into the app after onboarding: age is optional\n• Preview deployment",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.5-preview.4%2Bbuild.115/soiree-crew-ipad-unsigned.ipa",
+      "size": 22533591,
+      "screenshotURLs": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/10-limits.png"
+      ]
+    }
+  ],
+  "news": [
+    {
+      "identifier": "preview-0.2.5-115",
+      "title": "Soirée Crew Preview 0.2.5 (115)",
+      "caption": "• Publish separate public and Preview apps in AltStore, retain downloadable history and refine screen spacing\n• Keep compact dashboard sections in normal flow and bound the drink form on iPad\n• Build a native iPad interface with adaptive navigation, dashboard, map panes and game grids\n• Keep server configuration available while bundling native apps\n• Reserve a separate network budget for signed photo galleries\n• Add guest public browsing, bounded caches, shared-network quotas and iPad IPA checks\n• Fix stale map responses, removed crew selection and web screen remounts\n• Improve the bars map and social venue discovery\n• Bars map: my position dot and locate button; tapped bar shows ranking, my nights and photos\n• Button: no vertical padding, all buttons keep the same height; short labels fit on one line\n• Revert Button vertical padding: all buttons keep the same height, short labels fit on one line\n• Button: vertical padding so a two-line label is not tight against the border\n• Shorter label for withdrawing the health consent so it stays on one line\n• No-account dot: pink instead of cyan, which the anti-slop lint (D-09) refuses\n• Moi tab: a cyan dot while there is no account\n• Every screen needs the arrival flow first: direct URLs redirect to onboarding\n• Moi: guests get a row to create or open an account\n• Web: screen blocks rise in once, then drop their animated style\n• Web: no rise-in animation on screen blocks, it left blank holes after scrolling\n• Guests can create or open an account; sign-out asks to confirm and needs a password\n• Fix onboarding progress row overlapping the step title\n• Let guests into the app after onboarding: age is optional\n• Preview deployment",
+      "date": "2026-11-14T20:55:56Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/ipad/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.5-preview.4%2Bbuild.115/soiree-crew-ipad-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    }
+  ]
+}
