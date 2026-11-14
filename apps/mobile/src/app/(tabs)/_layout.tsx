@@ -14,6 +14,7 @@ import { useMorningAfter } from "@/recap/morning";
 import { useHomeScreenActions } from "@/system/quickActions";
 import { useLevelNow } from "@/state/levelNow";
 import { useInvitations } from "@/server/socialData";
+import { useSession } from "@/server/session";
 import { isOnboarded, useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 import { Icon, type AnyIconName } from "@/ui/Icon";
@@ -31,7 +32,10 @@ const TAB_ICONS: Record<string, AnyIconName> = {
 };
 
 /** One tab: the icon pops when it becomes the active one (DESIGN.md §5 pop), static under Reduce Motion. */
-function TabItem({ label, icon, focused, onPress, badge = 0 }: { label: string; icon: AnyIconName; focused: boolean; onPress: () => void; badge?: number }) {
+/** The "no account yet" dot: a pink that nothing else in the interface uses, so it reads at a glance (amber is the accent, red the counts). */
+const NO_ACCOUNT_DOT = "#FF4FA3";
+
+function TabItem({ label, icon, focused, onPress, badge = 0, dot = false }: { label: string; icon: AnyIconName; focused: boolean; onPress: () => void; badge?: number; dot?: boolean }) {
   const theme = useTheme();
   const i18n = useT();
   const reduceMotion = useReducedMotion();
@@ -50,7 +54,7 @@ function TabItem({ label, icon, focused, onPress, badge = 0 }: { label: string; 
       accessibilityRole="tab"
       accessibilityState={{ selected: focused }}
       // O-36: the badge is read out with the tab, not as a separate element.
-      accessibilityLabel={badge > 0 ? `${label}, ${i18n.plural("crew.tabBadge", badge)}` : label}
+      accessibilityLabel={badge > 0 ? `${label}, ${i18n.plural("crew.tabBadge", badge)}` : dot ? `${label}, ${i18n.t("account.guestCreate")}` : label}
       pressedScale={0.94}
       onPress={onPress}
       style={styles.item}
@@ -63,6 +67,8 @@ function TabItem({ label, icon, focused, onPress, badge = 0 }: { label: string; 
               {badge > 99 ? "99+" : String(badge)}
             </Text>
           </View>
+        ) : dot ? (
+          <View style={[styles.dot, { backgroundColor: NO_ACCOUNT_DOT, borderColor: theme.bg }]} />
         ) : null}
       </Animated.View>
       {/* O-11: a long label wraps under the icon instead of being cut. */}
@@ -80,6 +86,8 @@ function TabBar({ state, descriptors, navigateToTab }: BottomTabBarProps) {
   const [width, setWidth] = useState(0);
   // O-36: the real number of invitations waiting, on the Crew tab (DESIGN.md: badge in danger colour).
   const invitations = useInvitations((s) => s.total);
+  // Without an account the Moi tab carries a dot: that is where one is made.
+  const signedIn = useSession((s) => s.session !== null);
   const slot = width / Math.max(1, state.routes.length);
   // A short amber line slides to the active tab.
   const x = useSharedValue(0);
@@ -106,6 +114,7 @@ function TabBar({ state, descriptors, navigateToTab }: BottomTabBarProps) {
           icon={TAB_ICONS[route.name] ?? "more"}
           focused={state.index === index}
           badge={route.name === "crew" ? invitations : 0}
+          dot={route.name === "me" && !signedIn}
           onPress={() => {
             if (state.index === index) return;
             haptic.select();
@@ -126,6 +135,7 @@ function IosTabs({ toastOffset, largeToasts }: { toastOffset: number; largeToast
   const games = useGameT();
   const theme = useTheme();
   const invitations = useInvitations((s) => s.total);
+  const signedIn = useSession((s) => s.session !== null);
   return (
     <View style={{ flex: 1 }}>
       <NativeTabs
@@ -156,6 +166,8 @@ function IosTabs({ toastOffset, largeToasts }: { toastOffset: number; largeToast
         <NativeTabs.Trigger name="me" contentStyle={{ backgroundColor: theme.bg }}>
           <NativeTabs.Trigger.Label>{i18n.t("tabs.me")}</NativeTabs.Trigger.Label>
           <NativeTabs.Trigger.Icon sf={{ default: "person.crop.circle", selected: "person.crop.circle.fill" }} />
+          {/* The system badge has one colour for every tab (red), so here it is a "!" rather than a dot. */}
+          {signedIn ? null : <NativeTabs.Trigger.Badge>!</NativeTabs.Trigger.Badge>}
         </NativeTabs.Trigger>
       </NativeTabs>
       <ToastHost bottomOffset={toastOffset} large={largeToasts} />
@@ -210,6 +222,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   badgeText: { fontSize: 10, lineHeight: 12 },
+  dot: { position: "absolute", top: -3, left: 15, width: 12, height: 12, borderRadius: 6, borderWidth: 2 },
   item: {
     flex: 1,
     minHeight: 44,

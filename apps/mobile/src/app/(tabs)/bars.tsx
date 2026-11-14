@@ -8,10 +8,12 @@ import { haptic } from "@/motion/haptics";
 import { takeoversBetween, type BossSnapshot } from "@/motion/math/takeover";
 import { CrownDrop, LivePulse, TakeoverWash } from "@/map/VenueMotion";
 import { fitRegion, TileMap, type LatLng } from "@/map/TileMap";
+import { VenuePreview } from "@/map/VenuePreview";
 import { useLevelNow } from "@/state/levelNow";
 import { useCrewData, useLiveParty } from "@/server/crewData";
 import { useSession } from "@/server/session";
 import {
+  currentFix,
   refreshVenues,
   useVenueData,
   type VenueSummary,
@@ -24,6 +26,7 @@ import { ScalePressable } from "@/ui/Pressable";
 import { EmptyState } from "@/ui/EmptyState";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
+import { showToast } from "@/ui/Toast";
 import {
   fetchFriendLocations,
   type FriendLocation,
@@ -31,6 +34,7 @@ import {
 import { useEcoInterval } from "@/power/eco";
 import { Avatar } from "@/ui/Avatar";
 import { OpenTags } from "@/venues/HoursPanel";
+import { latestRequest } from "@/ui/pure/latestRequest";
 
 type Filter = "all" | "friends" | "fog" | "open" | "happy";
 const MAP_HEIGHT_RATIO = 0.46;
@@ -53,6 +57,7 @@ function VenuePin({
   const size = selected ? 40 : 30;
   return (
     <ScalePressable
+      accessibilityRole="button"
       accessibilityLabel={
         venue.bossName ? `${venue.name}, ${venue.bossName}` : venue.name
       }
@@ -153,27 +158,55 @@ export default function BarsScreen() {
   const livePartyId =
     live && live.party.crewId === crewId ? live.party.id : null;
   const [friends, setFriends] = useState<FriendLocation[]>([]);
+  // My own position on the map, once asked for: nothing is read until the button is pressed.
+  const [mine, setMine] = useState<LatLng | null>(null);
+  const [locating, setLocating] = useState(false);
+  const theme = useTheme();
   const me = session?.userId;
   const pollMs = useEcoInterval(60_000);
 
   // N-07: friends who share their position tonight show on the map, refreshed every minute.
   useEffect(() => {
+    setFriends([]);
     if (!livePartyId) {
-      setFriends([]);
       return;
     }
-    const load = () =>
-      void fetchFriendLocations(livePartyId)
-        .then((list) => setFriends(list.filter((f) => f.userId !== me)))
-        .catch(() => undefined);
+    const request = latestRequest(
+      () => fetchFriendLocations(livePartyId),
+      (list) => setFriends(list.filter((f) => f.userId !== me)),
+    );
+    const load = () => void request.load();
     load();
     const timer = setInterval(load, pollMs);
-    return () => clearInterval(timer);
-  }, [livePartyId, me, pollMs]);
+    return () => {
+      request.dispose();
+      clearInterval(timer);
+    };
+  }, [livePartyId, session, me, pollMs]);
+
+  const locate = async () => {
+    setLocating(true);
+    const result = await currentFix("nearby").finally(() => setLocating(false));
+    if (!result.ok) {
+      if (!result.declined) showToast({ message: i18n.t("journey.locDenied"), durationMs: 8_000 });
+      return;
+    }
+    haptic.confirmed();
+    const here = { lat: result.fix.lat, lng: result.fix.lng };
+    setMine(here);
+    setRegion({ center: here, zoom: 15 });
+  };
 
   useEffect(() => {
-    if (!crewId && crews[0]) setCrewId(crews[0].id);
+    if (!crews.some((crew) => crew.id === crewId)) setCrewId(crews[0]?.id ?? null);
   }, [crews, crewId]);
+
+  // Each crew has its own map extent and selection. Reusing the previous crew's viewport can
+  // make the new crew's venues look missing until the map is manually moved a long way back.
+  useEffect(() => {
+    setSelectedId(null);
+    setRegion(null);
+  }, [crewId]);
 
   // MOT-09: while the map is on screen it follows the crew, so a crown changing hands shows up live.
   useFocusEffect(
@@ -221,6 +254,22 @@ export default function BarsScreen() {
     if (filter === "happy") return all.filter((v) => v.happyNow === true);
     return all;
   }, [data, filter]);
+  const filterCounts = useMemo(() => {
+    const all = data?.venues ?? [];
+    return {
+      all: all.length,
+      friends: all.filter((venue) => venue.hereNow > 0).length,
+      fog: all.filter((venue) => !venue.explored && venue.kind !== "home").length,
+      open: all.filter((venue) => venue.openNow === true).length,
+      happy: all.filter((venue) => venue.happyNow === true).length,
+    } satisfies Record<Filter, number>;
+  }, [data]);
+
+  // A selected pin must always remain one of the pins on screen. This also closes the old
+  // preview when a filter hides its venue.
+  useEffect(() => {
+    if (selectedId && !venues.some((venue) => venue.id === selectedId)) setSelectedId(null);
+  }, [selectedId, venues]);
 
   useEffect(() => {
     if (!region && data?.venues.length)
@@ -235,12 +284,22 @@ export default function BarsScreen() {
           text={i18n.t("bars.needCrew")}
           action={{ label: i18n.t("bars.openCrew"), onPress: () => router.navigate("/(tabs)/crew") }}
         />
+        <Button label={i18n.t("discover.title")} icon="search" variant="secondary" onPress={() => router.push("/discover")} />
+        {!session ? <Button label={i18n.t("account.guestSignIn")} variant="outline" onPress={() => router.push({ pathname: "/settings", params: { section: "security" } })} /> : null}
       </Screen>
     );
   }
 
   const selected = venues.find((v) => v.id === selectedId) ?? null;
   const view = region ?? fitRegion([], width - 40, mapHeight);
+  const fitVisible = () => {
+    const points: LatLng[] = [
+      ...venues,
+      ...friends,
+      ...(mine ? [mine] : []),
+    ];
+    setRegion(fitRegion(points, width - 40, mapHeight));
+  };
 
   return (
     <Screen
@@ -292,27 +351,71 @@ export default function BarsScreen() {
               <VenuePin
                 venue={venue}
                 selected={venue.id === selectedId}
-                onPress={() => setSelectedId(venue.id)}
+                onPress={() => {
+                  setSelectedId(venue.id);
+                  // Bring the chosen pin away from the edge and close enough to read its context.
+                  setRegion({ center: venue, zoom: Math.max(view.zoom, 15) });
+                }}
                 takeoverAt={takeovers[venue.id] ?? 0}
                 still={still}
               />
             ),
           })),
+          ...(mine
+            ? [
+                {
+                  id: "me",
+                  lat: mine.lat,
+                  lng: mine.lng,
+                  render: () => (
+                    <View accessible accessibilityLabel={i18n.t("bars.myPosition")} style={styles.meHalo}>
+                      <View style={[styles.meDot, { backgroundColor: theme.water, borderColor: theme.text }]} />
+                    </View>
+                  ),
+                },
+              ]
+            : []),
           ...friends.map((f) => ({
             id: `friend-${f.userId}`,
             lat: f.lat,
             lng: f.lng,
             render: () => (
-              <Avatar
-                personId={f.userId}
-                name={f.name}
-                size={30}
-                ring={palette.accent.amber}
-              />
+              <ScalePressable
+                accessibilityRole="button"
+                accessibilityLabel={f.name}
+                onPress={() => router.push({ pathname: "/profile", params: { id: f.userId } })}
+              >
+                <Avatar
+                  personId={f.userId}
+                  name={f.name}
+                  size={34}
+                  ring={palette.accent.amber}
+                />
+              </ScalePressable>
             ),
           })),
         ]}
       />
+
+      <View style={styles.mapActions}>
+        <Button
+          label={i18n.t("bars.locateMe")}
+          icon="pin"
+          variant="secondary"
+          height={48}
+          loading={locating}
+          style={styles.flex}
+          onPress={() => void locate()}
+        />
+        <Button
+          label={i18n.t("bars.fitMap")}
+          icon="filter"
+          variant="secondary"
+          height={48}
+          style={styles.flex}
+          onPress={fitVisible}
+        />
+      </View>
 
       <View style={styles.chips}>
         {(
@@ -326,7 +429,7 @@ export default function BarsScreen() {
         ).map(([value, key]) => (
           <Chip
             key={value}
-            label={i18n.t(key)}
+            label={`${i18n.t(key)} · ${filterCounts[value]}`}
             selected={filter === value}
             onPress={() => setFilter(value)}
           />
@@ -340,6 +443,7 @@ export default function BarsScreen() {
         >
           <Panel>
             <Text variant="h2">{selected.name}</Text>
+            {selected.address ? <Text variant="small">{selected.address}</Text> : null}
             <View style={styles.tags}>
               {selected.bossName ? (
                 <Tag
@@ -365,6 +469,7 @@ export default function BarsScreen() {
             <Text variant="small">
               {i18n.plural("bars.myPoints", selected.myPoints)}
             </Text>
+            <VenuePreview venueId={selected.id} />
             <View style={styles.actions}>
               <Button
                 label={i18n.t("bars.checkIn")}
@@ -397,6 +502,10 @@ export default function BarsScreen() {
         <Text>{i18n.t("bars.empty")}</Text>
       ) : venues.length === 0 && (filter === "open" || filter === "happy") ? (
         <Text variant="small">{i18n.t("bars.noHours")}</Text>
+      ) : venues.length === 0 && filter === "friends" ? (
+        <Text variant="small">{i18n.t("bars.noFriendsHere")}</Text>
+      ) : venues.length === 0 && filter === "fog" ? (
+        <Text variant="small">{i18n.t("bars.noConquests")}</Text>
       ) : null}
 
       {/* N-11: "Where to?" from here too, not only during a party. */}
@@ -431,7 +540,10 @@ const styles = StyleSheet.create({
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   tags: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   actions: { flexDirection: "row", gap: 10 },
+  mapActions: { flexDirection: "row", gap: 10 },
   flex: { flex: 1 },
+  meHalo: { width: 44, height: 44, borderRadius: 22, backgroundColor: "rgba(80,150,255,0.25)", alignItems: "center", justifyContent: "center" },
+  meDot: { width: 18, height: 18, borderRadius: 9, borderWidth: 3 },
   happyBadge: {
     position: "absolute",
     left: -6,

@@ -7,6 +7,7 @@ import { checkDanger } from "../nightWatch";
 import { askDrinkConfirmations, checkOvertakes } from "../notifications/producers";
 import { dropFromRound } from "../rounds";
 import { mutationBatchSchema, mutationSchema, type MutationInput } from "../schemas";
+import { TokenBucket } from "../ratelimit";
 
 /** Tolerance for clock skew between the phone and the server. */
 const FUTURE_TOLERANCE_MS = 60_000;
@@ -225,9 +226,11 @@ async function apply(ctx: Context, db: Db, userId: string, mutation: MutationInp
 
 /** POST /v1/mutations: the only write path of the sync engine (SYNC-01 to SYNC-04, AC-08). */
 export function mutationRoutes(app: FastifyInstance, ctx: Context): void {
+  const events = new TokenBucket(200, 600, ctx.now);
   app.post("/v1/mutations", async (request) => {
     const user = requireUser(request);
     const batch = mutationBatchSchema.parse(request.body);
+    events.check(user.id, batch.mutations.length);
     const results: MutationResult[] = [];
     const changedParties = new Set<string>();
     const dangerChecks = new Set<string>();

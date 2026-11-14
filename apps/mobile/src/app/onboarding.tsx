@@ -340,6 +340,8 @@ export default function Onboarding() {
 
   return (
     <Screen footer={footer} withToasts>
+      {/* One block for the whole arrival: the back row, the banner and the step stack in normal flow, never over each other. */}
+      <View style={styles.stack}>
       {step !== "welcome" ? (
         <View style={styles.top}>
           <IconButton icon="back" accessibilityLabel={i18n.t("common.back")} onPress={back} />
@@ -423,6 +425,7 @@ export default function Onboarding() {
           <ClosingStep name={name || i18n.t("journey.previewYou")} username={session?.username ?? null} personId={personId} photo={draft.photo} age={age} visibility={draft.visibility} />
         ) : null}
       </Animated.View>
+      </View>
     </Screen>
   );
 }
@@ -468,7 +471,8 @@ const styles = StyleSheet.create({
   welcomeIcon: { width: 56, height: 56, borderRadius: 14 },
   hero: { fontSize: 34, lineHeight: 38 },
   actions: { gap: 12, marginTop: 8 },
-  top: { flexDirection: "row", alignItems: "center", gap: 12 },
+  stack: { gap: 16 },
+  top: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 48 },
   progress: { flex: 1, height: 3, borderRadius: 2, overflow: "hidden" },
   progressFill: {
     height: 3,

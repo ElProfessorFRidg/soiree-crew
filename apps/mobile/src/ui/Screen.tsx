@@ -148,16 +148,12 @@ export function Screen({ title, brand, back, trailing, children, footer, withToa
         ) : null}
         {/* Blocks rise into place one after the other when the screen opens (Reduce Motion: none). */}
         {Children.toArray(children).map((child, index) => (
-          <Animated.View
+          <Block
             key={isValidElement(child) && child.key != null ? child.key : index}
-            // A child that renders a fragment (a settings page, say) keeps the gap between its blocks.
-            style={styles.block}
-            entering={FadeInUp.delay(scaled(Math.min(index, 8) * 45))
-              .duration(duration.enter)
-              .withInitialValues({ opacity: 0, transform: [{ translateY: 12 }] })}
+            index={index}
           >
             {child}
-          </Animated.View>
+          </Block>
         ))}
       </Animated.ScrollView>
       {onRefresh && customPull ? <PullGlass scrollY={scrollY} refreshing={refreshing} top={insets.top + 10} /> : null}
@@ -168,6 +164,25 @@ export function Screen({ title, brand, back, trailing, children, footer, withToa
       {footer ? <View style={[styles.footer, { paddingBottom: footerBottom }]}>{footer}</View> : null}
       {withToasts ? <ToastHost bottomOffset={insets.bottom + 24 + overTabBar} /> : null}
     </KeyboardAvoidingView>
+  );
+}
+
+/**
+ * Native blocks rise into place. Web blocks stay in a plain View: transforms caused blank holes
+ * in Safari, and swapping an animated wrapper for a View after entry remounted forms and maps.
+ */
+function Block({ index, children }: { index: number; children: ReactNode }) {
+  if (Platform.OS === "web") return <View style={styles.block}>{children}</View>;
+  return (
+    // A child that renders a fragment (a settings page, say) keeps the gap between its blocks.
+    <Animated.View
+      style={styles.block}
+      entering={FadeInUp.delay(scaled(Math.min(index, 8) * 45))
+        .duration(duration.enter)
+        .withInitialValues({ opacity: 0, transform: [{ translateY: 12 }] })}
+    >
+      {children}
+    </Animated.View>
   );
 }
 

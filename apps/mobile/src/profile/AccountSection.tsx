@@ -4,7 +4,10 @@ import { linkValue } from "@/crew/LinkScanner";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { View } from "react-native";
+import { AccountForm, type AccountMode } from "@/crew/AccountForm";
 import { Field } from "@/crew/Field";
+import { officialServer } from "@/crew/servers";
+import { Sheet } from "@/ui/Sheet";
 import { useT, type Translator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
 import { DataControls } from "./DataControls";
@@ -113,7 +116,7 @@ function Devices() {
 }
 
 /** O-01: an optional email and password, to sign in again without another phone. */
-function Credentials() {
+function Credentials({ openSignal = 0 }: { openSignal?: number }) {
   const i18n = useT();
   const [state, setState] = useState<{ hasPassword: boolean; email: string | null } | null>(null);
   const [open, setOpen] = useState(false);
@@ -130,6 +133,10 @@ function Credentials() {
       })
       .catch(() => undefined);
   }, []);
+  // Signing out without a password is refused and sends people here, the form already open.
+  useEffect(() => {
+    if (openSignal > 0) setOpen(true);
+  }, [openSignal]);
   if (!state) return null;
 
   const save = () => {
@@ -228,6 +235,48 @@ export function AccountSection() {
   const i18n = useT();
   const session = useSession((state) => state.session);
   const [transfer, setTransfer] = useState<string | null>(null);
+  const [passwordAsk, setPasswordAsk] = useState(0);
+  const [creating, setCreating] = useState<AccountMode | null>(null);
+
+  // A guest can make or open an account any time; once the session exists the sheet closes by itself.
+  useEffect(() => {
+    if (session) setCreating(null);
+  }, [session]);
+
+  const signOut = async () => {
+    // Without a password there is no way back in: refuse, and offer to make one.
+    const credentials = await api<{ hasPassword: boolean }>("/v1/me/credentials").catch((error) => {
+      showFailure(i18n)(error);
+      return null;
+    });
+    if (!credentials) return;
+    if (!credentials.hasPassword) {
+      const create = await confirmAction({
+        title: i18n.t("account.noPasswordTitle"),
+        body: i18n.t("account.noPasswordBody"),
+        confirmLabel: i18n.t("account.noPasswordCreate"),
+        cancelLabel: i18n.t("account.deleteKeep"),
+        destructive: false,
+      });
+      if (create) setPasswordAsk((n) => n + 1);
+      return;
+    }
+    const ok = await confirmAction({
+      title: i18n.t("account.signOutTitle"),
+      body: i18n.t("account.signOutBody"),
+      confirmLabel: i18n.t("account.signOutConfirm"),
+      cancelLabel: i18n.t("account.deleteKeep"),
+    });
+    if (!ok) return;
+    // The session ends on the server too; if it can't be reached, the token dies with the phone's copy.
+    void api("/v1/sessions/current", { method: "DELETE" }).catch(() => undefined);
+    const userId = useSession.getState().session?.userId;
+    // Chat keys and history are tied to this session's device: they go with it.
+    if (userId) void forgetChat(userId);
+    // O-13: nothing of this account stays for whoever uses the phone next.
+    wipePreviousAccount(null);
+    void saveSession(null);
+  };
 
   // Without an account there is nothing on the server: the same reset, said for this phone only.
   const onDelete = () => {
@@ -280,27 +329,26 @@ export function AccountSection() {
                 .catch(showFailure(i18n))
             }
           />
-          <Credentials />
+          <Credentials openSignal={passwordAsk} />
           <Devices />
           <DataControls />
           <Button
             label={i18n.t("account.signOut")}
             variant="outline"
             height={44}
-            onPress={() => {
-              // The session ends on the server too; if it can't be reached, the token dies with the phone's copy.
-              void api("/v1/sessions/current", { method: "DELETE" }).catch(() => undefined);
-              const userId = useSession.getState().session?.userId;
-              // Chat keys and history are tied to this session's device: they go with it.
-              if (userId) void forgetChat(userId);
-              // O-13: nothing of this account stays for whoever uses the phone next.
-              wipePreviousAccount(null);
-              void saveSession(null);
-            }}
+            onPress={() => void signOut()}
           />
         </>
       ) : (
-        <Text variant="small">{i18n.t("account.notConnected")}</Text>
+        <>
+          <Text variant="small">{i18n.t("account.notConnected")}</Text>
+          <Text variant="small">{i18n.t("account.guestHint")}</Text>
+          <Button label={i18n.t("account.guestCreate")} height={44} onPress={() => setCreating("create")} />
+          <Button label={i18n.t("account.guestSignIn")} variant="outline" height={44} onPress={() => setCreating("signin")} />
+          <Sheet visible={creating !== null} title={creating === "signin" ? i18n.t("crew.signIn") : i18n.t("account.guestCreate")} onClose={() => setCreating(null)}>
+            <AccountForm intent={null} server={officialServer()} mode={creating ?? "create"} onModeChange={setCreating} />
+          </Sheet>
+        </>
       )}
       <Button label={i18n.t("account.withdraw")} variant="outline" height={44} onPress={onWithdraw} />
       <Button label={session ? i18n.t("account.delete") : i18n.t("account.eraseAll")} variant="danger" height={44} onPress={onDelete} />

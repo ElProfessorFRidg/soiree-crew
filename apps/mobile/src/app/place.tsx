@@ -50,15 +50,23 @@ import { Copyable } from "@/ui/Copyable";
 import { DirectionsButton } from "@/venues/DirectionsButton";
 import { HoursPanel } from "@/venues/HoursPanel";
 import { useDraft } from "@/state/drafts";
+import { publicReads } from "@/ui/pure/readCache";
 
 const EVENT_KINDS: EventKind[] = ["dj", "student", "match", "concert", "quiz", "other"];
 
 /** COM-01 to COM-10: a place as all app users see it, whichever crew pinned it. */
 export default function PlaceScreen() {
+  const session = useSession((state) => state.session);
+  const { venueId } = useLocalSearchParams<{ venueId: string }>();
+  return <PlaceContent key={JSON.stringify([session?.url, session?.userId, venueId])} />;
+}
+
+function PlaceContent() {
   const { venueId } = useLocalSearchParams<{ venueId: string }>();
   const i18n = useT();
   const theme = useTheme();
   const me = useSession((state) => state.session?.userId);
+  const server = useSession((state) => state.session?.url);
   const hourCycle = useAppStore((state) => state.preferences.hourCycle);
   const crew = useCrewData((state) => state.crews[0]);
   const [page, setPage] = useState<PlacePage | null>(null);
@@ -66,7 +74,7 @@ export default function PlaceScreen() {
   const [writing, setWriting] = useState(false);
   const [ratings, setRatings] = useState<Partial<Record<Criterion, number>>>({});
   // QOL-07: a review being written survives the app being killed.
-  const [text, setText] = useDraft(`review:${venueId}`);
+  const [text, setText] = useDraft(`review:${JSON.stringify([server, me, venueId])}`);
   const [audience, setAudience] = useState<ReviewAudience>("public");
   const [reviewError, setReviewError] = useState<string | null>(null);
   const [eventTitle, setEventTitle] = useState("");
@@ -75,7 +83,7 @@ export default function PlaceScreen() {
   const offline = showFailure(i18n);
 
   const load = useCallback(() => {
-    void fetchPlace(venueId)
+    const request = fetchPlace(venueId)
       .then((data) => {
         setPage(data);
         const mine = data.reviews.find((r) => r.mine);
@@ -90,10 +98,11 @@ export default function PlaceScreen() {
       })
       .catch(offline);
     if (crew) void fetchWantToGo(crew.id).then((res) => setWanted(res.places.some((p) => p.venueId === venueId))).catch(() => undefined);
+    return request;
     // offline only shows a toast.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [venueId, crew]);
-  useEffect(load, [load]);
+  useEffect(() => { void load(); }, [load]);
 
   if (!page) {
     return (
@@ -111,7 +120,7 @@ export default function PlaceScreen() {
   };
 
   return (
-    <Screen back title={page.place.name} withToasts onRefresh={async () => load()}>
+    <Screen back title={page.place.name} withToasts onRefresh={() => { publicReads.clear(); return load(); }}>
       {page.place.address ? <Copyable value={page.place.address} /> : null}
       <DirectionsButton lat={page.place.lat} lng={page.place.lng} label={page.place.address || page.place.name} />
       {/* COM-01: the owner's hours, else the ones users entered, said as such. The owner edits theirs below. */}
@@ -184,10 +193,10 @@ export default function PlaceScreen() {
           key={e.id}
           title={e.official ? i18n.t("place.officialEvent", { title: e.title }) : e.title}
           subtitle={`${new Intl.DateTimeFormat(i18n.locale, { weekday: "short", day: "numeric", month: "short" }).format(new Date(e.startsAt))}, ${formatClock(e.startsAt, i18n.language, hourCycle)} · ${i18n.plural("place.going", e.going)}${e.friendsGoing ? `, ${i18n.plural("place.friendsGoing", e.friendsGoing)}` : ""}`}
-          trailing={<Button label={e.mine ? i18n.t("place.imGoing") : i18n.t("place.join")} variant={e.mine ? "outline" : "secondary"} height={40} onPress={() => void rsvp(e.id, !e.mine).then(load).catch(offline)} />}
+          trailing={me ? <Button label={e.mine ? i18n.t("place.imGoing") : i18n.t("place.join")} variant={e.mine ? "outline" : "secondary"} height={40} onPress={() => void rsvp(e.id, !e.mine).then(load).catch(offline)} /> : undefined}
         />
       ))}
-      <Panel>
+      {me ? <Panel>
         <Field label={i18n.t("place.newEvent")} placeholder={i18n.t("place.newEventPlaceholder")} value={eventTitle} onChangeText={setEventTitle} maxLength={60} />
         <View style={styles.chips}>
           {EVENT_KINDS.map((k) => (
@@ -218,10 +227,10 @@ export default function PlaceScreen() {
               .catch(offline);
           }}
         />
-      </Panel>
+      </Panel> : null}
 
       {/* COM-05: parties opened here by their hosts, with a join request in one tap. */}
-      <OpenPartiesSection venueId={page.place.venueId} />
+      {me ? <OpenPartiesSection venueId={page.place.venueId} /> : null}
 
       {page.regulars.length ? (
         <Panel>
@@ -233,7 +242,7 @@ export default function PlaceScreen() {
               subtitle={r.legend ? i18n.t("place.legend", { place: page.place.name }) : i18n.plural("place.nights", r.nights)}
               leading={<Avatar personId={r.userId} name={r.name} size={32} />}
               trailing={
-                r.userId !== me ? (
+                me && r.userId !== me ? (
                   <View style={styles.regularActions}>
                     {r.openToMeet && !r.friend ? (
                       <Button
@@ -252,7 +261,7 @@ export default function PlaceScreen() {
                   </View>
                 ) : undefined
               }
-              onPress={() => router.push({ pathname: "/profile", params: { id: r.userId } })}
+              onPress={me ? () => router.push({ pathname: "/profile", params: { id: r.userId } }) : undefined}
               last={index === page.regulars.length - 1}
             />
           ))}
@@ -276,7 +285,7 @@ export default function PlaceScreen() {
           {r.text ? <Text>{r.text}</Text> : null}
           <ReviewPhotos venueId={venueId} photos={r.photos ?? []} mine={r.mine} onChanged={load} />
           <ReviewReply review={r} isOwner={Boolean(page.isOwner)} onChanged={load} />
-          {!r.mine ? (
+          {me && !r.mine ? (
             <Button
               label={r.markedUseful ? i18n.plural("place.usefulMarked", r.useful) : i18n.plural("place.useful", r.useful)}
               variant="outline"
@@ -285,7 +294,7 @@ export default function PlaceScreen() {
             />
           ) : null}
           {/* COM-08, O-77: any review can be reported; public content goes to the server's moderators. */}
-          {!r.mine ? <ReportPanel targetKind="review" targetId={r.id} compact /> : null}
+          {me && !r.mine ? <ReportPanel targetKind="review" targetId={r.id} compact /> : null}
         </Panel>
       ))}
 
@@ -350,6 +359,7 @@ export default function PlaceScreen() {
       ) : (
         <Text variant="small">{i18n.t("place.reviewAfterVisit")}</Text>
       )}
+      {!me ? <Button label={i18n.t("account.guestSignIn")} onPress={() => router.push({ pathname: "/settings", params: { section: "security" } })} /> : null}
     </Screen>
   );
 }
