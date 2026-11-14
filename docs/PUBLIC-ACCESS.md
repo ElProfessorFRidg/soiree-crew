@@ -13,6 +13,7 @@ Request budgets use bounded in-memory token buckets, scoped to this server proce
 | Network ceiling, before authentication | 2400 | 12000 |
 | Guest per IP | 180 | 600 |
 | Invalid token per IP | 60 | 120 |
+| Signed media per network | 600 | 1800 |
 | Verified account reads | 180 | 600 |
 | Verified account writes | 120 | 240 |
 | Safety writes per verified account | 20 | 20 |

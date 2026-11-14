@@ -46,6 +46,7 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
   const networks = new TokenBucket(2400, 12_000, ctx.now);
   const guests = new TokenBucket(180, 600, ctx.now);
   const invalidTokens = new TokenBucket(60, 120, ctx.now);
+  const media = new TokenBucket(600, 1800, ctx.now);
   const reads = new TokenBucket(180, 600, ctx.now);
   const writes = new TokenBucket(120, 240, ctx.now);
   const safety = new TokenBucket(20, 20, ctx.now);
@@ -85,7 +86,10 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
         invalidTokens.check(networkKey(request.ip));
         throw new HttpError(401, "unauthenticated");
       }
-      guests.check(networkKey(request.ip), readCost);
+      // Image tags use signed capability URLs rather than Authorization. A gallery behind a
+      // shared Wi-Fi needs its own larger budget; each media handler still validates its signature.
+      const signedMedia = route === "GET /v1/photos/:id" || route === "GET /v1/receipts/:id";
+      (signedMedia ? media : guests).check(networkKey(request.ip), readCost);
       const publicPlace = route === "GET /v1/places" || route === "GET /v1/places/:id";
       if (!PUBLIC_ROUTES.has(route) && !(publicPlace && ctx.serverInfo?.public)) throw new HttpError(401, "unauthenticated");
     }
@@ -95,7 +99,7 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
   const https = ctx.publicUrl.startsWith("https://");
   app.addHook("onSend", async (_request, reply) => {
     // Authenticated representations contain personal flags and must not enter shared HTTP caches.
-    reply.header("cache-control", "no-store");
+    if (!reply.hasHeader("cache-control")) reply.header("cache-control", "no-store");
     if (https) reply.header("strict-transport-security", "max-age=31536000; includeSubDomains");
     reply.header("x-content-type-options", "nosniff");
     reply.header("referrer-policy", "no-referrer");

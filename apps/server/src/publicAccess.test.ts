@@ -92,4 +92,13 @@ describe("quotas on a shared Wi-Fi", () => {
     // Valid authentication on the same network bypasses the exhausted guest quota.
     expect((await app.inject({ method: "GET", url: "/v1/me", remoteAddress, headers: auth() })).statusCode).toBe(200);
   });
+
+  it("keeps gallery requests out of the guest browsing quota, without accepting invalid media signatures", async () => {
+    const remoteAddress = "203.0.113.50";
+    const id = randomUUID();
+    for (let n = 0; n < 181; n++) {
+      expect((await app.inject({ method: "GET", url: `/v1/photos/${id}?exp=9999999999999&sig=invalid`, remoteAddress })).statusCode).toBe(404);
+    }
+    expect((await app.inject({ method: "GET", url: "/v1/health", remoteAddress })).statusCode).toBe(200);
+  });
 });
