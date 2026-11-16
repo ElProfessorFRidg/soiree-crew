@@ -1,11 +1,12 @@
 import * as Sharing from "expo-sharing";
-import { useEffect, useRef, useState, type ComponentRef } from "react";
+import { useRef, useState, type ComponentRef } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { captureRef } from "react-native-view-shot";
 import { radius } from "@crew/design-tokens";
 import { favouriteLabel } from "@/drinks/favourite";
 import { useT } from "@/i18n";
-import { fetchProfile, type ProfileView } from "@/server/profileData";
+import { useProfile } from "./useProfile";
+import { ProfileLoadState } from "./ProfileLoadState";
 import { useTheme } from "@/theme";
 import { Avatar } from "@/ui/Avatar";
 import { Button } from "@/ui/Button";
@@ -21,13 +22,10 @@ import { canShareImages } from "@/system/share";
 export function MemberCard() {
   const i18n = useT();
   const theme = useTheme();
-  const [view, setView] = useState<ProfileView | null>(null);
+  const { profile: view, connected, error, loading, refresh } = useProfile("me", "stranger");
   const [busy, setBusy] = useState(false);
   const card = useRef<ComponentRef<typeof View>>(null);
-  useEffect(() => {
-    void fetchProfile("me", "stranger").then(setView).catch(() => undefined);
-  }, []);
-  if (!view) return null;
+  if (loading || error || !view) return <ProfileLoadState connected={connected} error={error} loading={loading} onRetry={refresh} />;
   if (!view.sections.identity) return <Text variant="small">{i18n.t("people.cardEmpty")}</Text>;
   const s = view.sections;
   const held = (s.titles ?? []).filter((t) => t.kind === "mayor").length;

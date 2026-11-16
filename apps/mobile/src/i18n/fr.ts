@@ -1127,6 +1127,7 @@ export const fr = {
     handled: "Traité",
     markHandled: "Marquer traité",
     myProfile: "Mon profil",
+    accountRequired: "Ton profil partagé nécessite un compte.",
     edit: "Modifier mon profil",
     viewAs: "Voir comme",
     asMe: "Moi",

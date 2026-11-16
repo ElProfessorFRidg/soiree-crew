@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Field } from "@/crew/Field";
 import { useT } from "@/i18n";
@@ -7,7 +7,10 @@ import { useAppStore } from "@/state/store";
 import { haptic } from "@/motion/haptics";
 import { findableFor, isVisibilityKey, VISIBILITY_KEYS } from "@/onboarding/visibility";
 import { VisibilityPicker } from "@/profile/VisibilityPicker";
-import { fetchProfile, PROFILE_SECTIONS, PROFILE_STATS, saveProfile, type Audience, type Findable, type ProfileSection, type ProfileView, type ReviewAudience } from "@/server/profileData";
+import { PROFILE_SECTIONS, PROFILE_STATS, saveProfile, type Audience, type Findable, type ProfileSection, type ReviewAudience } from "@/server/profileData";
+import { ApiError } from "@/server/api";
+import { ProfileLoadState } from "@/profile/ProfileLoadState";
+import { useProfile } from "@/profile/useProfile";
 import { setReviewAudience } from "@/server/placeData";
 import { Button } from "@/ui/Button";
 import { Chip, Panel, Segmented, Switch } from "@/ui/controls";
@@ -23,25 +26,18 @@ const REVIEW_AUDIENCES: ReviewAudience[] = ["public", "anonymous", "friends", "m
 /** PROF-01, PROF-03, PROF-04: presets, an audience per section, and venues, reviews and figures hidden one by one. */
 export default function EditProfileScreen() {
   const i18n = useT();
-  const [profile, setProfile] = useState<ProfileView | null>(null);
-  const [bio, setBio] = useState("");
-  const [country, setCountry] = useState("");
+  const { profile, setProfile, context, connected, loading, error, refresh } = useProfile();
+  const [draft, setDraft] = useState<{ context: object; bio: string; country: string } | null>(null);
+  const bio = draft?.context === context ? draft.bio : profile?.sections.identity?.bio ?? "";
+  const country = draft?.context === context ? draft.country : profile?.sections.identity?.country ?? "";
+  const setBio = (value: string) => setDraft({ context, bio: value, country });
+  const setCountry = (value: string) => setDraft({ context, bio, country: value });
   const [busy, setBusy] = useState(false);
   const offline = showFailure(i18n);
 
-  useEffect(() => {
-    void fetchProfile("me")
-      .then((data) => {
-        setProfile(data);
-        setBio(data.sections.identity?.bio ?? "");
-        setCountry(data.sections.identity?.country ?? "");
-      })
-      .catch(offline);
-    // offline only shows a toast.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  if (!profile?.audiences) return <Screen back title={i18n.t("people.edit")}>{null}</Screen>;
+  if (!profile?.audiences) return <Screen back title={i18n.t("people.edit")} withToasts onRefresh={connected ? refresh : undefined}>
+    <ProfileLoadState connected={connected} loading={loading} error={error ?? (profile ? new ApiError({ kind: "http", status: 502, code: "api_response_incompatible" }) : null)} onRetry={refresh} />
+  </Screen>;
   const audiences = profile.audiences;
   const venues = profile.sections.venues ?? [];
   const hidden = venues.filter((v) => v.hidden).map((v) => v.venueId);
@@ -66,7 +62,8 @@ export default function EditProfileScreen() {
     a === "me" ? i18n.t("people.audienceMe") : a === "crews" ? i18n.t("people.audienceCrews") : a === "friends" ? i18n.t("people.audienceFriends") : i18n.t("people.audienceEveryone");
 
   return (
-    <Screen back title={i18n.t("people.edit")} withToasts>
+    <Screen back title={i18n.t("people.edit")} withToasts onRefresh={refresh}>
+      {error ? <ProfileLoadState connected={connected} loading={false} error={error} onRetry={refresh} /> : null}
       <Field label={i18n.t("people.bio")} placeholder={i18n.t("people.bioPlaceholder")} value={bio} onChangeText={setBio} maxLength={160} multiline />
       <Field label={i18n.t("people.country")} placeholder={i18n.t("people.countryPlaceholder")} value={country} onChangeText={setCountry} maxLength={60} />
       <Button

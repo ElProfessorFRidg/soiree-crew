@@ -1,30 +1,26 @@
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
 import { useT } from "@/i18n";
-import { fetchProfile, PROFILE_SECTIONS, type ProfileView } from "@/server/profileData";
+import { PROFILE_SECTIONS } from "@/server/profileData";
+import { ApiError } from "@/server/api";
+import { ProfileLoadState } from "@/profile/ProfileLoadState";
+import { useProfile } from "@/profile/useProfile";
 import { useTheme } from "@/theme";
 import { Button } from "@/ui/Button";
 import { Panel, Row } from "@/ui/controls";
 import { Icon } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
-import { SkeletonRows } from "@/ui/Skeleton";
 import { Text } from "@/ui/Text";
 
 /** PROF-10: what someone outside my crews and friends can see of me, right now. */
 export default function PrivacySummaryScreen() {
   const i18n = useT();
   const theme = useTheme();
-  const [profile, setProfile] = useState<ProfileView | null>(null);
-  useEffect(() => {
-    void fetchProfile("me")
-      .then(setProfile)
-      .catch(() => setProfile(null));
-  }, []);
+  const { profile, connected, error, loading, refresh } = useProfile();
 
   if (!profile?.audiences) {
     return (
-      <Screen back title={i18n.t("privacySummary.title")}>
-        <SkeletonRows />
+      <Screen back title={i18n.t("privacySummary.title")} withToasts onRefresh={connected ? refresh : undefined}>
+        <ProfileLoadState connected={connected} loading={loading} error={error ?? (profile ? new ApiError({ kind: "http", status: 502, code: "api_response_incompatible" }) : null)} onRetry={refresh} />
       </Screen>
     );
   }
@@ -34,7 +30,8 @@ export default function PrivacySummaryScreen() {
   const findable = profile.findable ?? "username";
 
   return (
-    <Screen back title={i18n.t("privacySummary.title")}>
+    <Screen back title={i18n.t("privacySummary.title")} withToasts onRefresh={refresh}>
+      {error ? <ProfileLoadState connected={connected} loading={false} error={error} onRetry={refresh} /> : null}
       <Text>{open.length ? i18n.t("privacySummary.intro") : i18n.t("privacySummary.nothing")}</Text>
       {open.length ? (
         <Panel tint="amber">

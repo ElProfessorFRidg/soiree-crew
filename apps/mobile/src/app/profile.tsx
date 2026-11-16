@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Image, StyleSheet, View } from "react-native";
 import { GAMES, type GameId } from "@crew/games";
 import { breathRatio, countryRules, formatBacValue } from "@crew/units";
@@ -12,7 +12,7 @@ import { HeroTarget } from "@/motion/hero";
 import { loyaltyTier } from "@/crew/loyalty";
 import { haptic } from "@/motion/haptics";
 import { ReportPanel } from "@/moderation/ReportPanel";
-import { befriend, block, fetchProfile, mute, unfriend, unmute, type ProfileView } from "@/server/profileData";
+import { befriend, block, mute, unfriend, unmute } from "@/server/profileData";
 import { useSession } from "@/server/session";
 import { useAppStore } from "@/state/store";
 import { Avatar } from "@/ui/Avatar";
@@ -21,7 +21,8 @@ import { Panel, Segmented, Tag } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
-import { SkeletonRows } from "@/ui/Skeleton";
+import { ProfileLoadState } from "@/profile/ProfileLoadState";
+import { useProfile } from "@/profile/useProfile";
 import { formatClock } from "@/i18n/format";
 import { MemberCard } from "@/profile/MemberCard";
 import { showFailure } from "@/server/errors";
@@ -42,28 +43,14 @@ export default function ProfileScreen() {
   const id = !params.id || params.id === "me" ? "me" : params.id;
   const mine = id === "me" || id === me;
   const [viewAs, setViewAs] = useState<ViewAs>(mine && params.as ? params.as : "me");
-  const [profile, setProfile] = useState<ProfileView | null>(null);
-  const [gone, setGone] = useState(false);
+  const { profile, error, loading, connected, refresh: load } = useProfile(mine ? "me" : id, mine && viewAs !== "me" ? viewAs : undefined);
   const offline = showFailure(i18n);
-
-  const load = useCallback(() => {
-    void fetchProfile(mine ? "me" : id, mine && viewAs !== "me" ? viewAs : undefined)
-      .then(setProfile)
-      .catch(() => setGone(true));
-  }, [id, mine, viewAs]);
-  useEffect(load, [load]);
-
-  if (gone) {
-    return (
-      <Screen back>
-        <Text>{i18n.t("people.nothing")}</Text>
-      </Screen>
-    );
-  }
+  useEffect(() => { setViewAs(mine && params.as ? params.as : "me"); }, [id, mine, params.as]);
   if (!profile)
     return (
-      <Screen back>
-        <SkeletonRows rows={3} />
+      <Screen back title={mine ? i18n.t("people.myProfile") : undefined} withToasts onRefresh={connected ? load : undefined}>
+        <ProfileLoadState connected={connected} loading={loading} error={error} onRetry={load} />
+        {!connected && mine ? <Button label={i18n.t("myStats.title")} variant="secondary" onPress={() => router.push("/my-stats")} /> : null}
       </Screen>
     );
 
@@ -115,13 +102,14 @@ export default function ProfileScreen() {
   };
 
   return (
-    <Screen back withToasts>
+    <Screen back withToasts onRefresh={load}>
+      {error ? <ProfileLoadState connected={connected} loading={false} error={error} onRetry={load} /> : null}
       <View style={styles.head}>
         <HeroTarget heroKey={`avatar:${profile.userId}`}>
           <Avatar personId={profile.userId} name={name || "?"} size={72} />
         </HeroTarget>
         <View style={styles.flex}>
-          {name ? <Text variant="h1">{name}</Text> : null}
+          {name ? <Text variant="h1" accessibilityRole="header">{name}</Text> : null}
           {s.identity ? <Text variant="small">@{s.identity.username}</Text> : null}
           {profile.mutualFriends ? <Text variant="small">{i18n.plural("people.mutual", profile.mutualFriends)}</Text> : null}
           <View style={styles.tags}>

@@ -1129,6 +1129,7 @@ export const en: Messages = {
     handled: "Handled",
     markHandled: "Mark as handled",
     myProfile: "My profile",
+    accountRequired: "Your shared profile requires an account.",
     edit: "Edit my profile",
     viewAs: "View as",
     asMe: "Me",

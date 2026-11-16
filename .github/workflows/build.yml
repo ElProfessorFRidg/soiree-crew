@@ -320,7 +320,7 @@ jobs:
           n=1
           # One launch per screen: the app reads -ciRoute from its launch arguments (custom URL schemes
           # ask "Open in ...?" on recent simulators, which no script can answer).
-          for route in / /crew /games /bars /me /settings /my-stats /add-drink /curve /limits /leaderboard /history /versions; do
+          for route in / /crew /games /bars /me /settings /my-stats /add-drink /curve /limits /leaderboard /history /versions /profile /edit-profile /privacy-summary; do
             xcrun simctl terminate "$DEVICE" "$BUNDLE" || true
             # SIMCTL_CHILD_ variables reach the app: Paris time, as the phone above.
             if [ "$route" = "/" ]; then SIMCTL_CHILD_TZ=Europe/Paris xcrun simctl launch "$DEVICE" "$BUNDLE"; else SIMCTL_CHILD_TZ=Europe/Paris xcrun simctl launch "$DEVICE" "$BUNDLE" -ciRoute "$route"; fi
