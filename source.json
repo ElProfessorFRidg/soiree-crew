@@ -2,7 +2,7 @@
   "name": "Soirée Crew",
   "identifier": "app.soireecrew.source",
   "subtitle": "Version publique et Preview",
-  "description": "Deux applications, publique et Preview, avec leurs versions téléchargeables. Dans l’app : Réglages → Versions et téléchargements.",
+  "description": "Version publique et Preview, leurs IPA et leurs changelogs disponibles directement dans cette source.",
   "iconURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
   "headerURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/header.png",
   "website": "https://github.com/ElProfessorFRidg/soiree-crew",
@@ -687,16 +687,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -709,6 +709,28 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.5",
+          "buildVersion": "116",
+          "marketingVersion": "0.2.5 Preview (116)",
+          "date": "2026-11-16T03:53:24Z",
+          "localizedDescription": "• Keep AltStore history optional and explain API compatibility changes\n• Publish separate public and Preview apps in AltStore, retain downloadable history and refine screen spacing\n• Keep compact dashboard sections in normal flow and bound the drink form on iPad\n• Build a native iPad interface with adaptive navigation, dashboard, map panes and game grids\n• Keep server configuration available while bundling native apps\n• Reserve a separate network budget for signed photo galleries\n• Add guest public browsing, bounded caches, shared-network quotas and iPad IPA checks\n• Fix stale map responses, removed crew selection and web screen remounts\n• Improve the bars map and social venue discovery\n• Bars map: my position dot and locate button; tapped bar shows ranking, my nights and photos\n• Button: no vertical padding, all buttons keep the same height; short labels fit on one line\n• Revert Button vertical padding: all buttons keep the same height, short labels fit on one line\n• Button: vertical padding so a two-line label is not tight against the border\n• Shorter label for withdrawing the health consent so it stays on one line\n• No-account dot: pink instead of cyan, which the anti-slop lint (D-09) refuses\n• Moi tab: a cyan dot while there is no account\n• Every screen needs the arrival flow first: direct URLs redirect to onboarding\n• Moi: guests get a row to create or open an account\n• Web: screen blocks rise in once, then drop their animated style\n• Web: no rise-in animation on screen blocks, it left blank holes after scrolling\n• Guests can create or open an account; sign-out asks to confirm and needs a password\n• Fix onboarding progress row overlapping the step title\n• Let guests into the app after onboarding: age is optional\n• Preview deployment",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.5-preview.4%2Bbuild.116/soiree-crew-unsigned.ipa",
+          "size": 22541167,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.5",
           "buildVersion": "115",
@@ -733,25 +755,36 @@
         }
       ],
       "version": "0.2.5",
-      "versionDate": "2026-11-14T20:55:56Z",
-      "versionDescription": "• Publish separate public and Preview apps in AltStore, retain downloadable history and refine screen spacing\n• Keep compact dashboard sections in normal flow and bound the drink form on iPad\n• Build a native iPad interface with adaptive navigation, dashboard, map panes and game grids\n• Keep server configuration available while bundling native apps\n• Reserve a separate network budget for signed photo galleries\n• Add guest public browsing, bounded caches, shared-network quotas and iPad IPA checks\n• Fix stale map responses, removed crew selection and web screen remounts\n• Improve the bars map and social venue discovery\n• Bars map: my position dot and locate button; tapped bar shows ranking, my nights and photos\n• Button: no vertical padding, all buttons keep the same height; short labels fit on one line\n• Revert Button vertical padding: all buttons keep the same height, short labels fit on one line\n• Button: vertical padding so a two-line label is not tight against the border\n• Shorter label for withdrawing the health consent so it stays on one line\n• No-account dot: pink instead of cyan, which the anti-slop lint (D-09) refuses\n• Moi tab: a cyan dot while there is no account\n• Every screen needs the arrival flow first: direct URLs redirect to onboarding\n• Moi: guests get a row to create or open an account\n• Web: screen blocks rise in once, then drop their animated style\n• Web: no rise-in animation on screen blocks, it left blank holes after scrolling\n• Guests can create or open an account; sign-out asks to confirm and needs a password\n• Fix onboarding progress row overlapping the step title\n• Let guests into the app after onboarding: age is optional\n• Preview deployment",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.5-preview.4%2Bbuild.115/soiree-crew-unsigned.ipa",
-      "size": 22533539,
+      "versionDate": "2026-11-16T03:53:24Z",
+      "versionDescription": "• Keep AltStore history optional and explain API compatibility changes\n• Publish separate public and Preview apps in AltStore, retain downloadable history and refine screen spacing\n• Keep compact dashboard sections in normal flow and bound the drink form on iPad\n• Build a native iPad interface with adaptive navigation, dashboard, map panes and game grids\n• Keep server configuration available while bundling native apps\n• Reserve a separate network budget for signed photo galleries\n• Add guest public browsing, bounded caches, shared-network quotas and iPad IPA checks\n• Fix stale map responses, removed crew selection and web screen remounts\n• Improve the bars map and social venue discovery\n• Bars map: my position dot and locate button; tapped bar shows ranking, my nights and photos\n• Button: no vertical padding, all buttons keep the same height; short labels fit on one line\n• Revert Button vertical padding: all buttons keep the same height, short labels fit on one line\n• Button: vertical padding so a two-line label is not tight against the border\n• Shorter label for withdrawing the health consent so it stays on one line\n• No-account dot: pink instead of cyan, which the anti-slop lint (D-09) refuses\n• Moi tab: a cyan dot while there is no account\n• Every screen needs the arrival flow first: direct URLs redirect to onboarding\n• Moi: guests get a row to create or open an account\n• Web: screen blocks rise in once, then drop their animated style\n• Web: no rise-in animation on screen blocks, it left blank holes after scrolling\n• Guests can create or open an account; sign-out asks to confirm and needs a password\n• Fix onboarding progress row overlapping the step title\n• Let guests into the app after onboarding: age is optional\n• Preview deployment",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.5-preview.4%2Bbuild.116/soiree-crew-unsigned.ipa",
+      "size": 22541167,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.115/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "preview-0.2.5-116",
+      "title": "Soirée Crew Preview 0.2.5 (116)",
+      "caption": "• Keep AltStore history optional and explain API compatibility changes\n• Publish separate public and Preview apps in AltStore, retain downloadable history and refine screen spacing\n• Keep compact dashboard sections in normal flow and bound the drink form on iPad\n• Build a native iPad interface with adaptive navigation, dashboard, map panes and game grids\n• Keep server configuration available while bundling native apps\n• Reserve a separate network budget for signed photo galleries\n• Add guest public browsing, bounded caches, shared-network quotas and iPad IPA checks\n• Fix stale map responses, removed crew selection and web screen remounts\n• Improve the bars map and social venue discovery\n• Bars map: my position dot and locate button; tapped bar shows ranking, my nights and photos\n• Button: no vertical padding, all buttons keep the same height; short labels fit on one line\n• Revert Button vertical padding: all buttons keep the same height, short labels fit on one line\n• Button: vertical padding so a two-line label is not tight against the border\n• Shorter label for withdrawing the health consent so it stays on one line\n• No-account dot: pink instead of cyan, which the anti-slop lint (D-09) refuses\n• Moi tab: a cyan dot while there is no account\n• Every screen needs the arrival flow first: direct URLs redirect to onboarding\n• Moi: guests get a row to create or open an account\n• Web: screen blocks rise in once, then drop their animated style\n• Web: no rise-in animation on screen blocks, it left blank holes after scrolling\n• Guests can create or open an account; sign-out asks to confirm and needs a password\n• Fix onboarding progress row overlapping the step title\n• Let guests into the app after onboarding: age is optional\n• Preview deployment",
+      "date": "2026-11-16T03:53:24Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.5-preview.4%2Bbuild.116/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.5-preview.4%2Bbuild.116/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
     {
       "identifier": "preview-0.2.5-115",
       "title": "Soirée Crew Preview 0.2.5 (115)",
@@ -960,17 +993,310 @@
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.66/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile",
       "notify": false
+    }
+  ],
+  "allowDowngrades": true,
+  "changelog": [
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.2.4",
+      "buildVersion": "93",
+      "date": "2026-11-13T17:17:54Z",
+      "localizedDescription": "• Dropped-phone test polls every 5s instead of one 25s jump (order-dependent presence race)\n• Fix back-navigation test now that birth step is gone\n• Ask age only when creating an account; native selects for the web date picker\n• A stranger allowed to see nights also gets the crew and solo split\n• A party spent without alcohol still counts as a night out\n• Solo nights count on the profile, stats and records; crew board explains waiting drinks and asks friends to confirm"
     },
     {
-      "identifier": "release-0.1.0-64",
-      "title": "Soirée Crew 0.1.0 (64)",
-      "caption": "",
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.2.3",
+      "buildVersion": "87",
+      "date": "2026-11-12T21:52:47Z",
+      "localizedDescription": "• Accounts in the Gribouille and suggestions tests carry a birth date; status regenerated after the merges\n• Crew step back, Apple sign-in, date of birth before the account, server-side profile photo\n• Answer a round from its notification (\"Got it\" / \"Not mine\"), drinks linked to the round, confirmedIds in the listing\n• Background location follows eco mode as it changes during the night\n• Only a party that is live now tells the crew; partyStarted asserted explicitly in inbox tests; gathering card button 48 px\n• Leave authorises on party membership, drop locks the round and keeps a changed split, a round id reused in another party is a retry\n• Eco mode slows and simplifies loops instead of freezing every animation; location updates restart when the eco state changes\n• Close guesses stay private, rate-limit join, guard timers and leave, sweep idle rooms\n• Rebuild the arrival as one continuous flow with five visibility choices\n• Gribouille online, a drawing and guessing game on several phones (O-63)\n• Offer a party when 3+ of the crew are at one venue, push when a crew mate launches one, warn before closing (QOL-17)\n• Respect the phone, eco mode, data saver, theme choice\n• Fair rotation from the crew's history, server-side split and presence checks, drop-a-drink, summary (N-18, server)"
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.2.2",
+      "buildVersion": "86",
+      "date": "2026-11-01T09:34:00Z",
+      "localizedDescription": "• Allow the drink-driving warning's red gradients, asked for explicitly\n• 45 s hold with no close button until the end (a thin line fills instead), call and another way home after 12 s, passenger after 20 s and only held down 2 s; layered red backdrop (garnet, breathing crimson core, ember warmth) and a car in a pulsing halo\n• The driving time follows the curve on screen, so it never comes after back to zero and a level shown under the limit is never called over it; the margin is too close to call\n• Warn when driving after drinking\n• Capfuls and sips (under 5 g of alcohol) no longer count in the no-water streak or the fast-pace warning"
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.2.1",
+      "buildVersion": "83",
+      "date": "2026-10-31T19:08:18Z",
+      "localizedDescription": "• Colons instead of stray control characters in the 0.2.0 notes\n• Start the 0.2 series (crew nudges, background location, night notifications); fix control characters in the release notes\n• Never nudge from home, learnt from where the phone spends the night; rewrite the flat French notification lines\n• Food, pace, way home and morning after notifications; a water streak line and 20 water lines in every language\n• Spot me with my crew, and nudges that learn each person's habits\n• Opt-in background location nudge when you settle somewhere at night with no night going on\n• The refresh starts only when a full glass is let go, a firmer click when it arms, ticks on the way; while loading the pint pours again and again with sloshing beer and a head of foam, for at least one fill"
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.13",
+      "buildVersion": "81",
+      "date": "2026-10-31T18:14:04Z",
+      "localizedDescription": "• Eight or more lines for every recurring notification and greeting in all languages; a once-a-night peak warning, a nudge when a party I said yes to started without me, a weekend comeback nudge, with a settings toggle\n• Twelve casual water lines in every language, no night notification once nothing is drunk or the level is back to zero; home party, apero, dinner, game and movie night moods"
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.12",
+      "buildVersion": "80",
+      "date": "2026-10-31T15:35:25Z",
+      "localizedDescription": "• L'icône et le nom de l'app en haut de Crew et de la soirée en direct, pour tes captures.\n• Tirer pour actualiser se sent : petits crans pendant que tu tires, un clic quand ça part, et une vibration de réussite ou d'échec à la fin.\n• Corrige un plantage de l'écran Soirée avec un verre venu d'un autre téléphone, et blinde l'affichage des profils."
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.11",
+      "buildVersion": "79",
+      "date": "2026-10-31T15:00:48Z",
+      "localizedDescription": "• L'app ne reste plus bloquée sur son icône au lancement (TrollStore, iPad) : chaque étape du démarrage a un délai, et l'app continue sans celle qui ne répond pas.\n• La Live Activity tient dans son cadre, sur l'écran verrouillé comme dans la Dynamic Island."
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.10",
+      "buildVersion": "77",
+      "date": "2026-10-31T14:22:47Z",
+      "localizedDescription": "• Les boissons comme on les commande : « Flash vodka Red Bull » en entier, « Flash vodka » quand la place manque, et pareil pour les noms longs.\n• Les vrais noms de chaque pays, dans la langue de l'app : Monaco, Picon bière, Perroquet, Cubata, Calimocho, Wodka-E, Radler, Snakebite, Ёрш, Отвёртка…\n• Des dizaines de shots et de mélanges : TGV, B-52, Kamikaze, Tequila paf, Mexikaner, Baby Guinness, Jägerbomb, Rhum coca, Whisky coca…\n• « Un bouchon de vodka » ou « 2 bouchons de whisky » se tapent tels quels (1 cl le bouchon).\n• Verre mélangé : moitié whisky, moitié rhum, un soft par-dessus… Mets les doses, l'app calcule la taille et le degré du verre.\n• Prends ou choisis une photo de ta boisson perso : elle remplace l'icône partout, et reste sur ton téléphone."
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.9",
+      "buildVersion": "76",
+      "date": "2026-10-31T13:57:31Z",
+      "localizedDescription": "• Écran Soirée : le volant affiche l'heure « Pas avant », en couleur selon ta situation, et précise quand elle peut encore reculer.\n• Retour à 0 donne aussi l'heure.\n• L'icône et le nom de l'app en haut de l'écran Soirée, pour que tes captures disent d'où elles viennent.\n• Live Activity plus utile, même en mode discret : l'heure du retour à 0 en grand, le volant en couleur, tes verres, ton eau et ton dernier verre, des boutons Encore et Eau, et plus de secondes qui défilent."
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.8",
+      "buildVersion": "75",
+      "date": "2026-10-31T13:25:24Z",
+      "localizedDescription": "• « Flash vodka » : c'est maintenant le nom du flash de Poliakov avec un Red Bull, et tu peux le taper tel quel (« 2 flash vodka »).\n• Le bouton Encore montre juste le nom de ta boisson à côté du +, sur une ligne.\n• Les boutons avec une icône gardent leur texte sur une ligne, l'icône collée à côté."
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.7",
+      "buildVersion": "74",
+      "date": "2026-10-31T11:58:12Z",
+      "localizedDescription": "• Dans tous les champs de saisie, le curseur et le texte sont enfin alignés, texte d'exemple compris.\n• Avec le clavier ouvert, le bouton du bas se pose juste au-dessus, au lieu de flotter au milieu de l'écran.\n• En tapant une valeur (poids, taille …), l'unité reste alignée sur la case."
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.6",
+      "buildVersion": "73",
+      "date": "2026-10-31T02:25:43Z",
+      "localizedDescription": "• Premier lancement plus court : un compte seulement si tu le choisis, le serveur officiel déjà choisi, un pseudo suffit.\n• La localisation, l'appareil photo et les notifications sont demandés au moment où tu en as besoin, avec une phrase qui dit pourquoi.\n• Tu peux utiliser l'app sans le calcul du taux et l'activer plus tard.\n• Si tu fermes l'app pendant l'accueil, tu reprends où tu en étais.\n• Écran Soirée : le pays de ta limite en un coup d'œil et une petite liste pour bien démarrer."
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.5",
+      "buildVersion": "72",
+      "date": "2026-10-31T02:02:46Z",
+      "localizedDescription": "• Supprimer l'app ne supprime plus tes données : en la réinstallant, tu retrouves ton profil, tes réglages, tes boissons et tes 45 derniers jours.\n• Tes données font maintenant partie de la sauvegarde iCloud ou Google du téléphone.\n• Réglages, Sécurité et données : supprimer ton compte ou tout effacer remet le téléphone comme si l'app n'avait jamais été installée.\n• La politique de confidentialité explique les sauvegardes et la copie gardée sur le téléphone."
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.4",
+      "buildVersion": "70",
+      "date": "2026-10-31T01:29:33Z",
+      "localizedDescription": "• L'app regarde s'il y a une nouvelle version à chaque ouverture et te propose de l'installer, une seule fois.\n• Réglages : un bouton pour vérifier tout de suite.\n• Recherche des boissons bien plus maligne : elle retrouve « zubrikov », une première lettre ratée, une touche voisine, un mot écrit au son.\n• Elle propose « Tu voulais dire… ? » et retient ta façon d'écrire.\n• Des marques de nombreux pays avec toutes leurs tailles : pinte anglaise, caña, Maß, 12 oz."
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.3",
+      "buildVersion": "69",
+      "date": "2026-10-31T01:01:38Z",
+      "localizedDescription": "• Catalogue de marques : bières, vins, alcools forts et shots, avec la pinte maison de chaque bar.\n• Tape ta commande comme tu la dirais (« 2 pintes de Kasteel ») et elle est comprise.\n• Une rangée « Mes boissons » selon l'heure et tes habitudes.\n• Rejoindre un crew sans adresse de serveur, liste des crews publics, onglet Crew réorganisé."
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.2",
+      "buildVersion": "68",
+      "date": "2026-10-31T00:30:20Z",
+      "localizedDescription": "• L'écran Jeux défile jusqu'en bas et le bouton Jouer reste au-dessus de la barre d'onglets.\n• Champ de saisie des nombres plus calme, sans le grand curseur.\n• Boutons et messages toujours au-dessus de la barre flottante, boutons système dans la langue de l'app."
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.1",
+      "buildVersion": "67",
+      "date": "2026-10-31T00:01:59Z",
+      "localizedDescription": "• Numéros de version lisibles : 0.1.1, 0.1.2…\n• Nouvelle icône pour ton alibi du jour.\n• Live Activity et Dynamic Island : ton taux, tes verres et ta soirée sur l'écran verrouillé.\n• Barre d'onglets iOS native, en verre liquide."
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "66",
+      "date": "2026-10-30T23:29:45Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "64",
       "date": "2026-10-30T20:31:17Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/header.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.0-build.64/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile",
-      "notify": false
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "60",
+      "date": "2026-10-30T19:45:51Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "59",
+      "date": "2026-10-30T19:21:59Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "58",
+      "date": "2026-10-30T18:44:46Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "57",
+      "date": "2026-10-30T18:17:42Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "54",
+      "date": "2026-10-30T17:30:11Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "42",
+      "date": "2026-10-28T00:10:00Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "40",
+      "date": "2026-10-27T23:07:47Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "39",
+      "date": "2026-10-27T22:38:41Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "38",
+      "date": "2026-10-27T22:03:37Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "31",
+      "date": "2026-10-27T13:53:55Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "30",
+      "date": "2026-10-27T13:23:39Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "29",
+      "date": "2026-10-27T12:55:04Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "28",
+      "date": "2026-10-27T12:16:16Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "27",
+      "date": "2026-10-27T11:51:06Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "26",
+      "date": "2026-10-27T11:04:06Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "25",
+      "date": "2026-10-27T10:35:45Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "24",
+      "date": "2026-10-27T10:06:04Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "23",
+      "date": "2026-10-27T09:34:17Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "22",
+      "date": "2026-10-27T09:03:18Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "15",
+      "date": "2026-10-27T05:12:45Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "14",
+      "date": "2026-10-27T04:43:21Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.1.0",
+      "buildVersion": "2",
+      "date": "2026-10-27T00:43:05Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.5",
+      "buildVersion": "116",
+      "date": "2026-11-16T03:53:24Z",
+      "localizedDescription": "• Keep AltStore history optional and explain API compatibility changes\n• Publish separate public and Preview apps in AltStore, retain downloadable history and refine screen spacing\n• Keep compact dashboard sections in normal flow and bound the drink form on iPad\n• Build a native iPad interface with adaptive navigation, dashboard, map panes and game grids\n• Keep server configuration available while bundling native apps\n• Reserve a separate network budget for signed photo galleries\n• Add guest public browsing, bounded caches, shared-network quotas and iPad IPA checks\n• Fix stale map responses, removed crew selection and web screen remounts\n• Improve the bars map and social venue discovery\n• Bars map: my position dot and locate button; tapped bar shows ranking, my nights and photos\n• Button: no vertical padding, all buttons keep the same height; short labels fit on one line\n• Revert Button vertical padding: all buttons keep the same height, short labels fit on one line\n• Button: vertical padding so a two-line label is not tight against the border\n• Shorter label for withdrawing the health consent so it stays on one line\n• No-account dot: pink instead of cyan, which the anti-slop lint (D-09) refuses\n• Moi tab: a cyan dot while there is no account\n• Every screen needs the arrival flow first: direct URLs redirect to onboarding\n• Moi: guests get a row to create or open an account\n• Web: screen blocks rise in once, then drop their animated style\n• Web: no rise-in animation on screen blocks, it left blank holes after scrolling\n• Guests can create or open an account; sign-out asks to confirm and needs a password\n• Fix onboarding progress row overlapping the step title\n• Let guests into the app after onboarding: age is optional\n• Preview deployment"
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.5",
+      "buildVersion": "115",
+      "date": "2026-11-14T20:55:56Z",
+      "localizedDescription": "• Publish separate public and Preview apps in AltStore, retain downloadable history and refine screen spacing\n• Keep compact dashboard sections in normal flow and bound the drink form on iPad\n• Build a native iPad interface with adaptive navigation, dashboard, map panes and game grids\n• Keep server configuration available while bundling native apps\n• Reserve a separate network budget for signed photo galleries\n• Add guest public browsing, bounded caches, shared-network quotas and iPad IPA checks\n• Fix stale map responses, removed crew selection and web screen remounts\n• Improve the bars map and social venue discovery\n• Bars map: my position dot and locate button; tapped bar shows ranking, my nights and photos\n• Button: no vertical padding, all buttons keep the same height; short labels fit on one line\n• Revert Button vertical padding: all buttons keep the same height, short labels fit on one line\n• Button: vertical padding so a two-line label is not tight against the border\n• Shorter label for withdrawing the health consent so it stays on one line\n• No-account dot: pink instead of cyan, which the anti-slop lint (D-09) refuses\n• Moi tab: a cyan dot while there is no account\n• Every screen needs the arrival flow first: direct URLs redirect to onboarding\n• Moi: guests get a row to create or open an account\n• Web: screen blocks rise in once, then drop their animated style\n• Web: no rise-in animation on screen blocks, it left blank holes after scrolling\n• Guests can create or open an account; sign-out asks to confirm and needs a password\n• Fix onboarding progress row overlapping the step title\n• Let guests into the app after onboarding: age is optional\n• Preview deployment"
     }
   ]
 }
