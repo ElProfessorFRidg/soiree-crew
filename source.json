@@ -709,16 +709,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -731,6 +731,28 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.6",
+          "buildVersion": "120",
+          "marketingVersion": "0.2.6 Preview (120)",
+          "date": "2026-11-16T18:33:15Z",
+          "localizedDescription": "• Diagnose iOS startup before JavaScript and register scenes explicitly\n• Keep request timeouts active while reading profile responses\n• Fix profile loading, error recovery and guest account states",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.5%2Bbuild.120/soiree-crew-unsigned.ipa",
+          "size": 22563267,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.6",
           "buildVersion": "119",
@@ -799,25 +821,36 @@
         }
       ],
       "version": "0.2.6",
-      "versionDate": "2026-11-16T11:23:45Z",
-      "versionDescription": "• Keep request timeouts active while reading profile responses\n• Fix profile loading, error recovery and guest account states",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.5%2Bbuild.119/soiree-crew-unsigned.ipa",
-      "size": 22545224,
+      "versionDate": "2026-11-16T18:33:15Z",
+      "versionDescription": "• Diagnose iOS startup before JavaScript and register scenes explicitly\n• Keep request timeouts active while reading profile responses\n• Fix profile loading, error recovery and guest account states",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.5%2Bbuild.120/soiree-crew-unsigned.ipa",
+      "size": 22563267,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.119/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "preview-0.2.6-120",
+      "title": "Soirée Crew Preview 0.2.6 (120)",
+      "caption": "• Diagnose iOS startup before JavaScript and register scenes explicitly\n• Keep request timeouts active while reading profile responses\n• Fix profile loading, error recovery and guest account states",
+      "date": "2026-11-16T18:33:15Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.5%2Bbuild.120/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
     {
       "identifier": "preview-0.2.6-119",
       "title": "Soirée Crew Preview 0.2.6 (119)",
@@ -1024,17 +1057,6 @@
       "tintColor": "F4B33D",
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.3/banner.png",
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.3%2Bbuild.69/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile",
-      "notify": false
-    },
-    {
-      "identifier": "release-0.1.2-68",
-      "title": "Soirée Crew 0.1.2 (68)",
-      "caption": "• L'écran Jeux défile jusqu'en bas et le bouton Jouer reste au-dessus de la barre d'onglets.\n• Champ de saisie des nombres plus calme, sans le grand curseur.\n• Boutons et messages toujours au-dessus de la barre flottante, boutons système dans la langue de l'app.",
-      "date": "2026-10-31T00:30:20Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.2/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.2%2Bbuild.68/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile",
       "notify": false
     }
@@ -1334,6 +1356,13 @@
       "buildVersion": "2",
       "date": "2026-10-27T00:43:05Z",
       "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.6",
+      "buildVersion": "120",
+      "date": "2026-11-16T18:33:15Z",
+      "localizedDescription": "• Diagnose iOS startup before JavaScript and register scenes explicitly\n• Keep request timeouts active while reading profile responses\n• Fix profile loading, error recovery and guest account states"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
