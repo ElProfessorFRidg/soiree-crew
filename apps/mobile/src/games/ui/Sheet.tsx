@@ -41,8 +41,9 @@ export function Sheet({ visible, title, onClose, children, footer }: { visible: 
 const styles = StyleSheet.create({
   sheet: {
     position: "absolute",
-    left: 0,
-    right: 0,
+    width: "100%",
+    maxWidth: 760,
+    alignSelf: "center",
     bottom: 0,
     maxHeight: "86%",
     borderTopLeftRadius: radius.sheet,

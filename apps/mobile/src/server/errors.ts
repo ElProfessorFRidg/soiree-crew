@@ -2,6 +2,7 @@ import type { Translator } from "@/i18n";
 import { showToast } from "@/ui/Toast";
 import { ApiError } from "./api";
 import { fr } from "@/i18n/fr";
+import { compatibilityCode } from "@/ui/pure/apiCompatibility";
 
 type ServerCode = keyof typeof fr.serverCodes;
 const KNOWN = new Set(Object.keys(fr.serverCodes));
@@ -17,12 +18,17 @@ export function serverMessage(code: string, i18n: Translator): string {
  */
 export function failureMessage(error: unknown, i18n: Translator): string {
   if (!(error instanceof ApiError)) return i18n.t("crew.offline");
-  if (error.failure.kind === "http") return serverMessage(error.failure.code, i18n);
+  if (error.failure.kind === "http" && error.failure.status === 429 && error.failure.retryAfterMs) return i18n.t("serverCodes.rate_limited_wait", { seconds: Math.max(1, Math.ceil(error.failure.retryAfterMs / 1000)) });
+  if (error.failure.kind === "http") return serverMessage(error.failure.compatibility ? compatibilityCode(error.failure.compatibility.reason) : error.failure.code, i18n);
   if (error.failure.kind === "timeout") return i18n.t("crew.timeout");
   return i18n.t("crew.offline");
 }
 
 /** For `.catch(...)`: shows the failure as a danger toast. */
 export function showFailure(i18n: Translator): (error?: unknown) => void {
-  return (error) => showToast({ tone: "danger", message: failureMessage(error, i18n) });
+  return (error) => {
+    // api() already reports these centrally, including failures from background calls.
+    if (error instanceof ApiError && error.failure.kind === "http" && error.failure.compatibility) return;
+    showToast({ tone: "danger", message: failureMessage(error, i18n) });
+  };
 }

@@ -6,6 +6,7 @@ import type { AppleAuth } from "./appleAuth";
 import type { Db } from "./db";
 import type { LiveHub } from "./live";
 import type { PushService } from "./notifications/push";
+import type { CompatibilityNotice, CompatibilityRules } from "./apiCompatibility";
 
 export interface Context {
   db: Db;
@@ -31,12 +32,17 @@ export interface Context {
   push?: PushService | null;
   /** O-01: "Continue with Apple", when the server checks Apple identity tokens (APPLE_CLIENT_ID). */
   apple?: AppleAuth | null;
+  /** Optional per-endpoint changes; unset keeps older released apps working. */
+  apiCompatibility?: CompatibilityRules;
+  /** Explicit public web-app origin; never inferred from an API or session URL. */
+  webAppUrl?: string;
 }
 
 export class HttpError extends Error {
   constructor(
     readonly status: number,
     readonly code: string,
+    readonly details?: { message: string; compatibility: CompatibilityNotice },
   ) {
     super(code);
   }
@@ -88,7 +94,7 @@ export function requireUser(request: FastifyRequest): AuthedUser {
 }
 
 export function sendError(reply: FastifyReply, error: unknown): FastifyReply {
-  if (error instanceof HttpError) return reply.status(error.status).send({ error: error.code });
+  if (error instanceof HttpError) return reply.status(error.status).send({ error: error.code, ...error.details });
   // Fastify's own refusals (empty or oversized body, bad JSON) keep their 4xx instead of turning into a 500.
   const status = (error as { statusCode?: number }).statusCode;
   if (typeof status === "number" && status >= 400 && status < 500) return reply.status(status).send({ error: status === 413 ? "too_large" : "invalid" });

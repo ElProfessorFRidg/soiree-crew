@@ -1,6 +1,8 @@
 import { defineConfig } from "vitest/config";
+import { fileURLToPath } from "node:url";
 
 export default defineConfig({
+  resolve: { alias: { "@": fileURLToPath(new URL("./apps/mobile/src", import.meta.url)) } },
   test: {
     include: ["packages/*/src/**/*.test.ts", "apps/server/src/**/*.test.ts", "apps/mobile/src/bar/**/*.test.ts", "apps/mobile/src/drinks/customOrder.test.ts", "apps/mobile/src/drinks/myRow.test.ts", "apps/mobile/src/drinks/mixedGlass.test.ts", "apps/mobile/src/crew/celebrate.test.ts","apps/mobile/src/ui/pure/**/*.test.ts","apps/mobile/src/motion/math/**/*.test.ts","apps/mobile/src/games/results.test.ts","apps/mobile/src/party/**/*.test.ts","apps/mobile/src/onboarding/**/*.test.ts", "apps/mobile/src/location/speed.test.ts",
       "apps/mobile/src/power/saving.test.ts","tools/**/*.test.mjs"],

@@ -14,7 +14,9 @@ module.exports = function withNightActivityView(config) {
       const target = path.join(config.modRequest.platformProjectRoot, "LiveActivity");
       if (!fs.existsSync(target)) throw new Error("withNightActivityView: ios/LiveActivity is missing; expo-live-activity must come first");
       for (const file of FILES) {
-        fs.copyFileSync(path.join(config.modRequest.projectRoot, "native", "live-activity", file), path.join(target, file));
+        const source = fs.readFileSync(path.join(config.modRequest.projectRoot, "native", "live-activity", file), "utf8");
+        const scheme = config.scheme === "soireecrew-preview" ? "soireecrew-preview" : "soireecrew";
+        fs.writeFileSync(path.join(target, file), source.replaceAll("soireecrew://", `${scheme}://`));
       }
       return config;
     },

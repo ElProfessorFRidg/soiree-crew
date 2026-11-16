@@ -6,6 +6,7 @@ import {
   DarkTheme,
   router,
   Stack,
+  useSegments,
   ThemeProvider as NavigationThemeProvider,
 } from "expo-router";
 import * as SystemUI from "expo-system-ui";
@@ -13,7 +14,6 @@ import { HeroOverlay } from "@/motion/hero";
 import { AT_LAUNCH_MS, checkAndAnnounce, installLatest, ON_RETURN_MS } from "@/system/updates";
 import { showToast } from "@/ui/Toast";
 import * as SplashScreen from "expo-splash-screen";
-import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { AppState as RNAppState, Platform, Settings } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -27,9 +27,10 @@ import { connect } from "@/server/connection";
 import { loadSession, useSession } from "@/server/session";
 import { refreshCalendarReminders, sendClock, watchCalendarReminders } from "@/server/calendarData";
 import { useSyncFeedback } from "@/sync/feedback";
+import { CompatibilityToastHost, useCompatibilityFeedback } from "@/system/compatibilityFeedback";
 import { useDriverReminder } from "@/party/driverReminder";
 import { flush } from "@/sync/engine";
-import { followPhoneHourCycle, useAppStore } from "@/state/store";
+import { followPhoneHourCycle, isOnboarded, useAppStore } from "@/state/store";
 import { ThemeProvider } from "@/theme";
 import { useEco, watchBattery } from "@/power/eco";
 import { logWater } from "@/drinks/actions";
@@ -65,8 +66,10 @@ if (__DEV__)
     getScale: getMotionScale,
   };
 
-void SplashScreen.preventAutoHideAsync();
+void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 const hideSplash = () => void SplashScreen.hideAsync().catch(() => undefined);
+// This watchdog does not depend on fonts, hydration, the Keychain or the animation callback.
+const splashWatchdog = setTimeout(hideSplash, LAUNCH_STEP_MS * 3);
 
 const fonts = {
   "Archivo-Numeral": require("../../assets/fonts/Archivo-Numeral.ttf"),
@@ -81,6 +84,7 @@ const fonts = {
 
 function SyncFeedback() {
   useSyncFeedback();
+  useCompatibilityFeedback();
   useDriverReminder();
   return null;
 }
@@ -112,6 +116,12 @@ export default function RootLayout() {
   const sessionReady = useSession((state) => state.ready);
   const session = useSession((state) => state.session);
   const ready = fontsLoaded && (hydrated || storeLate) && sessionReady;
+
+  useEffect(() => {
+    if (!ready) return;
+    clearTimeout(splashWatchdog);
+    hideSplash();
+  }, [ready]);
 
   useEffect(() => {
     const fontTimer = setTimeout(() => setFontsLate(true), LAUNCH_STEP_MS);
@@ -239,6 +249,15 @@ export default function RootLayout() {
     if (typeof route === "string" && route.startsWith("/")) setTimeout(() => router.push(route as never), 300);
   }, [ready]);
 
+  // Every screen sits behind the arrival flow: a pasted or bookmarked address does not skip it. An invite
+  // link is the one way in, it only keeps the code and carries on to the arrival flow itself.
+  const onboarded = useAppStore(isOnboarded);
+  const first = (useSegments() as string[])[0];
+  const open = first === "onboarding" || first === "join";
+  useEffect(() => {
+    if (ready && !onboarded && !open) router.replace("/onboarding");
+  }, [ready, onboarded, open]);
+
   if (!ready) return null;
 
   return (
@@ -250,7 +269,6 @@ export default function RootLayout() {
           {/* The navigator's own colours: its default theme is white and showed through while a screen slid back. */}
           <NavigationThemeProvider value={NAVIGATION_THEME}>
             <I18nProvider language={language}>
-              <StatusBar style="light" />
               <SyncFeedback />
               <Stack
                 screenOptions={{
@@ -351,6 +369,7 @@ export default function RootLayout() {
                   }}
                 />
               </Stack>
+              <CompatibilityToastHost />
               <HeroOverlay />
               <PermissionPrompt />
               <PrivacyCover />
