@@ -21,7 +21,17 @@ For the native iPad app, use `source-ipad.json` instead of `source.json` (and `s
 
 Each app's `versions` array contains every published version/build with an immutable release-asset URL, including historical `v0.1.0-build.N` tags and multiple builds of the same version. Previews use tags such as `v0.2.5-preview.4+build.115`; they are GitHub prereleases and never move the public `/latest` link or consume a public patch number. Drafts and fork PRs are not published. A preview is published only after checks, both native builds and both simulator checks pass. The source is then refreshed automatically.
 
-Some sideloading readers expose only the latest install button, even with a complete `versions` array. News cards now link directly to their exact IPA. In the app, **Settings → Versions and downloads** also lists public and Preview builds, including older builds, with a download button for each. This gives people access to the archive without relying on a particular reader's history UI. AltStore, not this source, controls whether its own version-history menu is visible.
+Publication and IPA history live in the AltStore source. Some readers expose only the latest install button, even with a complete `versions` array; News cards link directly to their exact IPA while download history is enabled. AltStore, not this source, controls whether its own history menu is visible.
+
+The app opens **Settings → What's new** on a read-only changelog. Its separate Downloads tab retains the optional older-version installer. The changelog does not depend on download URLs or the presence of historical IPA entries.
+
+To turn off the downgrade feature, change one shared setting in `apps/mobile/store/distribution.json`:
+
+```json
+{ "allowDowngrades": false }
+```
+
+The default is `true`, keeping the existing feature. With `false`, AltStore/Scarlet expose only the latest Public and Preview IPA for that device, older News cards lose their direct IPA action, and the app hides its Downloads tab. The complete read-only changelog stays in the source's `changelog` field and remains available in the app. Existing release assets are retained. Setting the flag back to `true` and regenerating the source restores the download archive. The app honors both its bundled setting and the source's remote setting, so a published remote `false` also disables the tab in builds that support it when they refresh the source.
 
 How it is kept up to date:
 
@@ -30,7 +40,7 @@ How it is kept up to date:
 - **Screenshots:** new builds use `screens/<tag>/<iphone|ipad>/`, with the exact tag passed by the publishing job, so concurrent public/preview releases and repeated versions cannot mix images. Legacy `screens/<version>/` pictures remain usable. Only `SHOWCASE` screens appear. Expired screenshot artifacts do not affect IPA downloads: those are permanent release assets.
 - **Pictures:** `tools/ci/altstore-images.py` (Pillow) draws each build's card next to its screenshots and the source header.
 - It runs on its own after each release of the Build workflow, with that build's screenshots. It also runs when its script, its pictures script, the release notes, its workflow or the app icon changes on `main`, and from the Actions tab (Run workflow).
-- The Build workflow ignores pushes that only touch Markdown, `docs/`, `research/`, the release notes or the source's scripts and workflow: changing the source never rebuilds the app.
+- The Build workflow ignores pushes that only touch Markdown, `docs/`, `research/`, release notes or the source's scripts and workflow. The shared distribution setting also affects the app bundle, so changing it starts an app build as well as a source refresh on `main`.
 - The source lives on the `altstore` branch, never on `main`: updating it does not start a build either.
 - Each version links to its own release asset (`releases/download/<tag>/soiree-crew-unsigned.ipa`), so an older version stays installable.
 

@@ -14,6 +14,7 @@ import { SkeletonRows } from "@/ui/Skeleton";
 import { Text } from "@/ui/Text";
 import { Button } from "@/ui/Button";
 import { publicReads } from "@/ui/pure/readCache";
+import { failureMessage } from "@/server/errors";
 
 const PINT_CAPS = [500, 700] as const;
 
@@ -25,6 +26,7 @@ export default function DiscoverScreen() {
   const [places, setPlaces] = useState<NearbyPlace[] | null>(null);
   const [failed, setFailed] = useState(false);
   const [networkFailed, setNetworkFailed] = useState(false);
+  const [loadError, setLoadError] = useState<unknown>(null);
   const [maxPint, setMaxPint] = useState<number | undefined>(undefined);
   const [strict, setStrict] = useState(false);
   const [tag, setTag] = useState<VibeTag | undefined>(undefined);
@@ -33,13 +35,14 @@ export default function DiscoverScreen() {
   const load = useCallback(async () => {
     setFailed(false);
     setNetworkFailed(false);
+    setLoadError(null);
     const fix = await currentFix("nearby");
     if (!fix.ok) {
       setFailed(true);
       setPlaces([]);
       return;
     }
-    const res = await fetchNearby(fix.fix.lat, fix.fix.lng, { ...(maxPint ? { maxPint } : {}), strict, ...(tag ? { tag } : {}), openNow }).catch(() => null);
+    const res = await fetchNearby(fix.fix.lat, fix.fix.lng, { ...(maxPint ? { maxPint } : {}), strict, ...(tag ? { tag } : {}), openNow }).catch((error: unknown) => { setLoadError(error); return null; });
     setNetworkFailed(res === null);
     setPlaces(res?.places ?? []);
   }, [maxPint, strict, tag, openNow]);
@@ -69,7 +72,7 @@ export default function DiscoverScreen() {
       </View>
       {places === null ? <SkeletonRows /> : null}
       {failed ? <Text>{i18n.t("discover.noLocation")}</Text> : null}
-      {networkFailed ? <><Text>{i18n.t("common.waitingNetwork")}</Text><Button label={i18n.t("common.retry")} onPress={() => void load()} /></> : null}
+      {networkFailed ? <><Text>{failureMessage(loadError, i18n)}</Text><Button label={i18n.t("common.retry")} onPress={() => void load()} /></> : null}
       {places && !failed && !networkFailed && places.length === 0 ? <Text>{i18n.t("discover.none")}</Text> : null}
       <View>
         {places?.map((p, index) => (

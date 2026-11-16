@@ -1,14 +1,19 @@
 import { useSession } from "./session";
 import { RequestCooldown, retryAfterMs } from "@/ui/pure/requestCooldown";
 import { publicReads } from "@/ui/pure/readCache";
+import { Platform } from "react-native";
+import { extraNumber } from "@/system/extra";
+import { compatibilityAccept, decodeCompatibility, type CompatibilityNotice } from "@/ui/pure/apiCompatibility";
+import { reportCompatibility } from "./compatibilityEvents";
 
 const TIMEOUT_MS = 10_000;
 const cooldown = new RequestCooldown();
+const incompatible = new Map<string, { until: number; failure: Extract<ApiFailure, { kind: "http" }> }>();
 
 export type ApiFailure =
   | { kind: "offline" }
   | { kind: "timeout" }
-  | { kind: "http"; status: number; code: string; retryAfterMs?: number };
+  | { kind: "http"; status: number; code: string; retryAfterMs?: number; compatibility?: CompatibilityNotice };
 
 export class ApiError extends Error {
   constructor(readonly failure: ApiFailure) {
@@ -31,6 +36,11 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
   if (!baseUrl) throw new ApiError({ kind: "offline" });
   const token = options.token === undefined ? session?.token : options.token;
   const urgent = options.method === "POST" && (path === "/v1/sos" || /^\/v1\/sos\/[^/]+\/resolve$/.test(path) || /^\/v1\/parties\/[^/]+\/status$/.test(path));
+  const featureKey = JSON.stringify([baseUrl, token ?? "guest", options.method ?? "GET", path.split("?")[0]]);
+  const now = Date.now();
+  for (const [key, entry] of incompatible) if (entry.until <= now) incompatible.delete(key);
+  const blocked = incompatible.get(featureKey);
+  if (blocked && !urgent) throw new ApiError({ ...blocked.failure, retryAfterMs: blocked.until - now });
   const scope = urgent ? "safety" : !options.method || options.method === "GET" ? "read" : "write";
   const quota = JSON.stringify([baseUrl, token ?? "guest", scope]);
   const wait = cooldown.remaining(quota);
@@ -43,6 +53,7 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
     response = await fetch(`${baseUrl}${path}`, {
       method: options.method ?? "GET",
       headers: {
+        accept: compatibilityAccept(extraNumber("buildNumber"), Platform.OS),
         ...(options.body !== undefined ? { "content-type": "application/json" } : {}),
         ...(token ? { authorization: `Bearer ${token}` } : {}),
       },
@@ -58,13 +69,27 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
     if (options.method && options.method !== "GET") publicReads.clear();
     return undefined as T;
   }
-  const data = (await response.json().catch(() => ({}))) as { error?: string };
+  const data: unknown = await response.json().catch(() => undefined);
+  const code = data !== null && typeof data === "object" && "error" in data && typeof data.error === "string" ? data.error : "unknown";
   if (response.status === 429) {
     const delay = retryAfterMs(response.headers.get("retry-after"));
     cooldown.block(quota, delay);
-    throw new ApiError({ kind: "http", status: 429, code: data.error ?? "too_many_attempts", retryAfterMs: delay });
+    throw new ApiError({ kind: "http", status: 429, code: code === "unknown" ? "too_many_attempts" : code, retryAfterMs: delay });
   }
-  if (!response.ok) throw new ApiError({ kind: "http", status: response.status, code: data.error ?? "unknown" });
+  const compatibility = decodeCompatibility(data, response.status, path, options.method)
+    ?? (data === undefined && (response.ok || response.status === 404) ? { reason: "server_outdated" as const, apiVersion: 1 } : undefined);
+  if (compatibility) {
+    reportCompatibility(baseUrl, compatibility);
+    const delay = compatibility.reason === "feature_unavailable" ? Math.max(30_000, retryAfterMs(response.headers.get("retry-after"))) : 5 * 60_000;
+    const failure = { kind: "http" as const, status: response.status, code: data === undefined ? "api_response_incompatible" : code, compatibility, retryAfterMs: delay };
+    // Safety actions can be retried immediately if a proxy briefly returns an HTML page.
+    if (!urgent) {
+      if (incompatible.size >= 100) incompatible.delete(incompatible.keys().next().value!);
+      incompatible.set(featureKey, { until: Date.now() + delay, failure });
+    }
+    throw new ApiError(failure);
+  }
+  if (!response.ok) throw new ApiError({ kind: "http", status: response.status, code });
   if (options.method && options.method !== "GET") publicReads.clear();
   return data as T;
 }

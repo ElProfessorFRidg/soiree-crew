@@ -10,6 +10,7 @@ import { sweepLiveParties } from "./nightWatch";
 import { startNotificationSweeper } from "./notifications/producers";
 import { appleAuthFromEnv } from "./appleAuth";
 import { pushFromEnv } from "./notifications/push";
+import { compatibilityRulesFromEnv } from "./apiCompatibility";
 
 // Configuration comes from the environment only.
 //   DATABASE_URL  postgres://... (falls back to an on-disk PGlite database in ./data for local use)
@@ -20,6 +21,8 @@ import { pushFromEnv } from "./notifications/push";
 //   TRUST_PROXY   "1" (one proxy hop, e.g. Coolify's Traefik) or "true"; unset when exposed directly
 //   AI_PROVIDER, ANTHROPIC_API_KEY, AI_MODEL   optional, ADR 0004
 //   SERVER_NAME, SERVER_DESCRIPTION, PUBLIC_SERVER=true   how the server presents itself (GET /v1/info)
+//   API_COMPATIBILITY   optional per-endpoint JSON rules; no global minimum client version
+//   WEB_APP_URL   optional HTTPS frontend origin for explicitly allowed public web fallbacks
 //   DOWNLOADS_DIR   where deploy/android drops the APK it builds, served at /download/soiree-crew.apk
 //   OPERATOR_USERNAMES   comma-separated usernames who review venue claims (COM-11)
 //   SEASON_VARIANTS   optional JSON, {"2026-12": "games"} (TER-12)
@@ -49,6 +52,8 @@ const context: Context = {
   db,
   push,
   apple: appleAuthFromEnv(process.env),
+  apiCompatibility: compatibilityRulesFromEnv(process.env.API_COMPATIBILITY),
+  ...(process.env.WEB_APP_URL ? { webAppUrl: process.env.WEB_APP_URL } : {}),
   sealer: new Sealer(dataKey),
   live: new LiveHub(),
   now: () => Date.now(),

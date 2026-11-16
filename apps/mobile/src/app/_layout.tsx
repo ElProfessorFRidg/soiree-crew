@@ -27,6 +27,7 @@ import { connect } from "@/server/connection";
 import { loadSession, useSession } from "@/server/session";
 import { refreshCalendarReminders, sendClock, watchCalendarReminders } from "@/server/calendarData";
 import { useSyncFeedback } from "@/sync/feedback";
+import { CompatibilityToastHost, useCompatibilityFeedback } from "@/system/compatibilityFeedback";
 import { useDriverReminder } from "@/party/driverReminder";
 import { flush } from "@/sync/engine";
 import { followPhoneHourCycle, isOnboarded, useAppStore } from "@/state/store";
@@ -83,6 +84,7 @@ const fonts = {
 
 function SyncFeedback() {
   useSyncFeedback();
+  useCompatibilityFeedback();
   useDriverReminder();
   return null;
 }
@@ -367,6 +369,7 @@ export default function RootLayout() {
                   }}
                 />
               </Stack>
+              <CompatibilityToastHost />
               <HeroOverlay />
               <PermissionPrompt />
               <PrivacyCover />

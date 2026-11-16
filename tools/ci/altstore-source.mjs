@@ -154,7 +154,7 @@ export function addRelease(source, appJson, release) {
     name: target === "ipad" ? "Soirée Crew · iPad" : "Soirée Crew",
     identifier: `app.soireecrew.source${target === "ipad" ? ".ipad" : ""}`,
     subtitle: "Version publique et Preview",
-    description: "Deux applications, publique et Preview, avec leurs versions téléchargeables. Dans l’app : Réglages → Versions et téléchargements.",
+    description: "Version publique et Preview, leurs IPA et leurs changelogs disponibles directement dans cette source.",
     iconURL: `${RAW}/icon.png`,
     ...(release.header ? { headerURL: `${RAW}/header.png` } : {}),
     website: `https://github.com/${OWNER_REPO}`,
@@ -194,7 +194,32 @@ export function releaseOfTag(tag) {
   return old ? { version: old[1], channel: "public", build: Number(old[2]) } : null;
 }
 
-export function fromReleases(appJson, releases, media = {}, notes = {}, target = "iphone") {
+/** One shared switch removes older install actions while retaining the complete changelog. */
+export function applyDistributionPolicy(source, { allowDowngrades = true } = {}) {
+  if (typeof allowDowngrades !== "boolean") throw new Error("distribution.allowDowngrades must be a boolean");
+  if (!source) return null;
+  const changelog = source.apps.flatMap((app) => app.versions.map((version) => ({
+    bundleIdentifier: app.bundleIdentifier,
+    version: version.version,
+    buildVersion: version.buildVersion,
+    date: version.date,
+    localizedDescription: version.localizedDescription,
+  })));
+  const latestURLs = new Set(source.apps.map((app) => app.versions[0]?.downloadURL));
+  return {
+    ...source,
+    allowDowngrades,
+    changelog,
+    apps: source.apps.map((app) => ({ ...app, versions: allowDowngrades ? app.versions : app.versions.slice(0, 1) })),
+    news: source.news.map((news) => {
+      if (allowDowngrades || latestURLs.has(news.url)) return news;
+      const { url: _oldDownload, ...changes } = news;
+      return changes;
+    }),
+  };
+}
+
+export function fromReleases(appJson, releases, media = {}, notes = {}, target = "iphone", policy = {}) {
   let source = null;
   const named = releases
     .map((release) => ({ release, parsed: releaseOfTag(release.tag_name) }))
@@ -220,7 +245,7 @@ export function fromReleases(appJson, releases, media = {}, notes = {}, target =
       header: !!media.header,
     });
   }
-  return source;
+  return applyDistributionPolicy(source, policy);
 }
 
 // node tools/ci/altstore-source.mjs <altstore branch folder> <releases.json from the GitHub API>
@@ -228,6 +253,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
   const [dir, releasesPath] = process.argv.slice(2);
   const appJson = JSON.parse(readFileSync(new URL("../../apps/mobile/app.json", import.meta.url), "utf8"));
   const notes = JSON.parse(readFileSync(new URL("../../apps/mobile/store/release-notes.json", import.meta.url), "utf8"));
+  const policy = JSON.parse(readFileSync(new URL("../../apps/mobile/store/distribution.json", import.meta.url), "utf8"));
   const screensDir = join(dir, "screens");
   const versions = {};
   for (const version of existsSync(screensDir) ? readdirSync(screensDir) : []) {
@@ -251,14 +277,14 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
     versions[version] = { screenshots: files.filter((f) => f !== "banner.png"), banner: files.includes("banner.png") };
   }
   const media = { versions, header: existsSync(join(dir, "header.png")) };
-  const source = fromReleases(appJson, JSON.parse(readFileSync(releasesPath, "utf8")), media, notes);
+  const source = fromReleases(appJson, JSON.parse(readFileSync(releasesPath, "utf8")), media, notes, "iphone", policy);
   if (!source) {
     console.log("No release with an IPA yet: nothing to publish.");
     process.exit(0);
   }
   writeFileSync(join(dir, "source.json"), `${JSON.stringify(source, null, 2)}\n`);
   writeFileSync(join(dir, "scarlet.json"), `${JSON.stringify(scarletOf(source), null, 2)}\n`);
-  const ipad = fromReleases(appJson, JSON.parse(readFileSync(releasesPath, "utf8")), media, notes, "ipad");
+  const ipad = fromReleases(appJson, JSON.parse(readFileSync(releasesPath, "utf8")), media, notes, "ipad", policy);
   if (ipad) {
     writeFileSync(join(dir, "source-ipad.json"), `${JSON.stringify(ipad, null, 2)}\n`);
     writeFileSync(join(dir, "scarlet-ipad.json"), `${JSON.stringify(scarletOf(ipad), null, 2)}\n`);

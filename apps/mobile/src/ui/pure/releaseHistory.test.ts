@@ -1,8 +1,18 @@
 import { expect, it } from "vitest";
-import { updateFromReleases, versionsFromSource } from "./releaseHistory";
+import { allowsDowngrades, changelogFromSource, updateFromReleases, versionsFromSource } from "./releaseHistory";
 
 const url = (name: string) => `https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.5%2Bbuild.120/${name}`;
 const assets = ["soiree-crew-ipad-unsigned.ipa", "soiree-crew-unsigned.ipa"].map((name) => ({ name, browser_download_url: url(name) }));
+it("can disable install history remotely or in the build while retaining all notes", () => {
+  const source = { allowDowngrades: false, apps: [], changelog: [{ bundleIdentifier: "app.soireecrew.mobile", version: "0.2.5", buildVersion: "120", localizedDescription: "Newest" }, { bundleIdentifier: "app.soireecrew.mobile", version: "0.2.4", buildVersion: "93", localizedDescription: "Older notes without an IPA" }, { bundleIdentifier: "app.soireecrew.mobile.preview", version: "0.2.5", buildVersion: "121", localizedDescription: "Preview" }] };
+  expect(allowsDowngrades(source, true)).toBe(false);
+  expect(allowsDowngrades({ allowDowngrades: true }, false)).toBe(false);
+  expect(allowsDowngrades({}, true)).toBe(true);
+  expect(changelogFromSource(source, "public").map((entry) => entry.notes)).toEqual(["Newest", "Older notes without an IPA"]);
+  expect(changelogFromSource(source, "preview").map((entry) => entry.build)).toEqual([121]);
+  expect(versionsFromSource(source, "public")).toEqual([]);
+  expect(changelogFromSource({ apps: [{ bundleIdentifier: "app.soireecrew.mobile", versions: [{ version: "0.1.0", buildVersion: "2", localizedDescription: "Historical source" }, {}] }] }, "public")[0]?.notes).toBe("Historical source");
+});
 it("selects the exact native device asset even when iPad appears first", () => {
   const release = { tag_name: "v0.2.5+build.120", assets };
   expect(updateFromReleases(release, "public", "iphone")?.url).toBe(url("soiree-crew-unsigned.ipa"));

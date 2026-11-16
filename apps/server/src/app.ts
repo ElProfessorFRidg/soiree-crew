@@ -37,10 +37,12 @@ import { venueRoutes } from "./routes/venues";
 import { venueFactRoutes } from "./routes/venueFacts";
 import { notificationRoutes } from "./notifications/routes";
 import { networkKey, RateLimitError, TokenBucket } from "./ratelimit";
+import { API_VERSION, ApiCompatibility, compatibilityFailure } from "./apiCompatibility";
 
 const PUBLIC_ROUTES = new Set(["POST /v1/accounts", "POST /v1/accounts/apple", "POST /v1/sessions/apple", "POST /v1/sessions/claim", "POST /v1/sessions/password", "GET /v1/usernames/:name/available", "GET /v1/health", "GET /v1/info", "GET /download/android.json", "GET /download/soiree-crew.apk", "GET /v1/invites/:code", "GET /v1/crews/open", "GET /v1/live", "GET /i/:code", "GET /f/:code","GET /v1/photos/:id", "GET /v1/receipts/:id","GET /v1/calendar/:token.ics"]);
 
 export async function buildApp(ctx: Context, options: { logger?: boolean; trustProxy?: boolean | number } = {}): Promise<FastifyInstance> {
+  const compatibility = new ApiCompatibility(ctx.apiCompatibility, ctx.webAppUrl);
   // A generous network ceiling accommodates a whole bar behind one Wi-Fi relay. Once verified,
   // each account has its own read/write budgets; rotating a token does not reset those budgets.
   const networks = new TokenBucket(2400, 12_000, ctx.now);
@@ -96,6 +98,11 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
   });
 
   // SEC-03: once served over HTTPS, browsers must stay on it; nothing is framed or sniffed.
+  // Authentication and quotas run first. A version header never grants access to a private route.
+  app.addHook("onRequest", async (request) => {
+    if (request.method !== "OPTIONS") compatibility.check(request.method, request.routeOptions.url ?? "", request.url.split("?")[0] ?? "", request.headers.accept);
+  });
+
   const https = ctx.publicUrl.startsWith("https://");
   app.addHook("onSend", async (_request, reply) => {
     // Authenticated representations contain personal flags and must not enter shared HTTP caches.
@@ -108,8 +115,14 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
 
   app.setErrorHandler((error, _request, reply) => {
     if (error instanceof RateLimitError) reply.header("retry-after", String(error.retryAfterSeconds));
+    if (error instanceof HttpError && error.details?.compatibility.reason === "feature_unavailable") reply.header("retry-after", "30");
     if (error instanceof ZodError) return reply.status(400).send({ error: "invalid" });
     return sendError(reply, error);
+  });
+
+  app.setNotFoundHandler((request, reply) => {
+    if (request.url.startsWith("/v1/")) return sendError(reply, compatibilityFailure("server_outdated"));
+    return reply.status(404).send({ error: "not_found" });
   });
 
   app.get("/v1/health", async () => ({ ok: true }));
@@ -118,6 +131,7 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
     name: ctx.serverInfo?.name || "Soirée Crew",
     description: ctx.serverInfo?.description ?? "",
     public: ctx.serverInfo?.public ?? false,
+    api: { version: API_VERSION, compatibilityMessages: true },
     openCrews: ((await ctx.db.query<{ n: number }>("select count(*)::int as n from crews where open"))[0]?.n ?? 0),
   }));
 

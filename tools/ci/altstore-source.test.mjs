@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addRelease, fromReleases, notesOf, privacyFrom, releaseOfTag, scarletOf, showcase } from "./altstore-source.mjs";
+import { addRelease, applyDistributionPolicy, fromReleases, notesOf, privacyFrom, releaseOfTag, scarletOf, showcase } from "./altstore-source.mjs";
 
 const appJson = {
   expo: {
@@ -80,6 +80,20 @@ describe("old versions and other sideloading apps", () => {
 describe("public and preview channels", () => {
   const assets = [{ name: "soiree-crew-unsigned.ipa", size: 100 }, { name: "soiree-crew-ipad-unsigned.ipa", size: 200 }];
   const row = (tag_name, prerelease = false) => ({ tag_name, prerelease, assets, published_at: "2026-11-14T00:00:00Z" });
+  it("switches off older install actions without losing changelogs or either channel", () => {
+    const releases = [row("v0.2.3+build.80"), row("v0.2.4+build.93"), row("v0.2.5-preview.4+build.115", true), row("v0.2.5-preview.4+build.116", true)];
+    const full = fromReleases(appJson, releases);
+    expect(full.allowDowngrades).toBe(true);
+    expect(full.apps.map((app) => app.versions.length)).toEqual([2, 2]);
+    const changesOnly = fromReleases(appJson, releases, {}, {}, "iphone", { allowDowngrades: false });
+    expect(changesOnly.apps.map((app) => app.versions.map((v) => v.buildVersion))).toEqual([["93"], ["116"]]);
+    expect(changesOnly.changelog).toHaveLength(4);
+    expect(changesOnly.changelog.every((entry) => !Object.hasOwn(entry, "downloadURL"))).toBe(true);
+    expect(changesOnly.news.filter((entry) => entry.url)).toHaveLength(2);
+    expect(scarletOf(changesOnly).Other).toHaveLength(2);
+    expect(fromReleases(appJson, releases).apps.map((app) => app.versions.length)).toEqual([2, 2]);
+    expect(() => applyDistributionPolicy(full, { allowDowngrades: "false" })).toThrow();
+  });
   it("publishes two real bundle IDs without moving the public latest to a preview", () => {
     const source = fromReleases(appJson, [row("v0.2.4+build.93"), row("v0.2.5-preview.4+build.115", true), row("v0.2.5-preview.4+build.116", true)]);
     expect(source.apps.map((a) => a.bundleIdentifier)).toEqual(["app.soireecrew.mobile", "app.soireecrew.mobile.preview"]);

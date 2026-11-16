@@ -10,7 +10,7 @@ on:
       - "research/**"
       - "tools/ci/altstore-source*.mjs"
       - "tools/ci/altstore-images.py"
-      - "apps/mobile/store/**"
+      - "apps/mobile/store/release-notes.json"
       - ".github/workflows/altstore.yml"
   pull_request:
   workflow_dispatch:

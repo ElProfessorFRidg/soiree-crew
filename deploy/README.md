@@ -12,6 +12,8 @@
 | `SERVER_NAME` | no | Shown on the connect screen (default "Soirée Crew"). |
 | `SERVER_DESCRIPTION` | no | One sentence under the name. |
 | `PUBLIC_SERVER` | no | `true` lists the server as public in the apps that know it, and lets people browse its public crews (name, category, city, description, member count) before they have an account. Without it, only signed-in people see the list. |
+| `API_COMPATIBILITY` | no | Per-endpoint compatibility JSON; unset accepts historical clients. See [API compatibility](../docs/API-COMPATIBILITY.md) for minimum builds, API versions and temporary/retired features. |
+| `WEB_APP_URL` | no | Explicit HTTPS origin of a deployed web app. Enables opt-in alternatives for public read-only screens; never inferred from `PUBLIC_URL`. |
 | `OPERATOR_IDS` | no | Comma-separated account ids who review venue claims (COM-11). Get one with `select id from users where username = '<name>'`. `OPERATOR_USERNAMES` still works but is weaker: a name nobody holds can be registered by anyone. |
 | `TRUST_PROXY` | set | `1` in the compose file: one reverse proxy in front. Keep port 8787 unpublished, or a client could fake its address. |
 | `AI_PROVIDER`, `ANTHROPIC_API_KEY`, `AI_MODEL` | no | ADR 0004. Off without them. |

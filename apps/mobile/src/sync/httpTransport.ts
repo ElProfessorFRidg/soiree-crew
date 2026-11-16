@@ -29,6 +29,8 @@ export class HttpTransport implements Transport {
       return { status: "rejected", reason };
     } catch (error) {
       if (error instanceof ApiError) {
+        // Keep the outbox and the local drink intact until the feature is usable again.
+        if (error.failure.kind === "http" && error.failure.compatibility) return { status: "temporary", retryAfterMs: Math.max(5 * 60_000, error.failure.retryAfterMs ?? 0) };
         if (error.failure.kind === "http" && error.failure.status === 429) return { status: "temporary", retryAfterMs: error.failure.retryAfterMs };
         if (error.failure.kind === "offline") return { status: "offline" };
         if (error.failure.kind === "http" && error.failure.status === 400) return { status: "rejected", reason: "invalid" };
