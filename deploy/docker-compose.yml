@@ -17,6 +17,8 @@ services:
       SERVER_NAME: ${SERVER_NAME:-}
       SERVER_DESCRIPTION: ${SERVER_DESCRIPTION:-}
       PUBLIC_SERVER: ${PUBLIC_SERVER:-}
+      API_COMPATIBILITY: ${API_COMPATIBILITY:-}
+      WEB_APP_URL: ${WEB_APP_URL:-}
       # Accounts that review venue claims (COM-11), comma-separated ids.
       OPERATOR_IDS: ${OPERATOR_IDS:-}
       OPERATOR_USERNAMES: ${OPERATOR_USERNAMES:-}

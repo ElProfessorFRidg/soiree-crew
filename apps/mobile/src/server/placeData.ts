@@ -1,5 +1,16 @@
 import type { VenueFacts, WeekSchedule } from "@/venues/hours";
 import { api } from "./api";
+import { useSession } from "./session";
+import { officialServer } from "@/crew/servers";
+import { publicReads } from "@/ui/pure/readCache";
+
+function readPlace<T>(path: string, fresh = false): Promise<T> {
+  if (useSession.getState().session) return api<T>(path);
+  const baseUrl = officialServer() ?? undefined;
+  const load = () => api<T>(path, { baseUrl, token: null });
+  if (fresh) publicReads.clear();
+  return publicReads.get(JSON.stringify([baseUrl, path]), load);
+}
 
 export const VIBE_TAGS = ["dance", "terrace", "student", "live", "quiet", "sport", "karaoke", "rock", "electro", "hiphop", "cheap"] as const;
 export type VibeTag = (typeof VIBE_TAGS)[number];
@@ -71,7 +82,7 @@ export interface NearbyPlace {
   happyNow?: boolean;
 }
 
-export const fetchPlace = (venueId: string) => api<PlacePage>(`/v1/places/${venueId}`);
+export const fetchPlace = (venueId: string, fresh = false) => readPlace<PlacePage>(`/v1/places/${venueId}`, fresh);
 export const saveReview = (venueId: string, body: { ratings: Partial<Record<Criterion, number>>; text: string; audience: ReviewAudience }) =>
   api<{ ok: true; id: string; audience: ReviewAudience }>(`/v1/places/${venueId}/review`, { method: "PUT", body });
 /** PROF-04: one review's audience; the place page and the profile follow at once. */
@@ -89,7 +100,7 @@ export const fetchNearby = (lat: number, lng: number, filters: { maxPint?: numbe
   if (filters.maxPint) params.set("maxPint", String(filters.maxPint));
   if (filters.strict) params.set("strict", "1");
   if (filters.tag) params.set("tag", filters.tag);
-  return api<{ places: NearbyPlace[] }>(`/v1/places?${params.toString()}`);
+  return readPlace<{ places: NearbyPlace[] }>(`/v1/places?${params.toString()}`);
 };
 export const fetchWantToGo = (crewId: string) => api<{ places: { venueId: string; name: string; addedBy: string }[] }>(`/v1/crews/${crewId}/want-to-go`);
 export const setWantToGo = (crewId: string, venueId: string, want: boolean) => api(`/v1/crews/${crewId}/want-to-go`, { method: "PUT", body: { venueId, want } });

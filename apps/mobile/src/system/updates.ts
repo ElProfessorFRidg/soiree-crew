@@ -1,6 +1,7 @@
 import { Linking, Platform } from "react-native";
 import { useAppStore } from "@/state/store";
 import { extraNumber, extraString } from "./extra";
+import { updateFromReleases, type ReleaseChannel } from "@/ui/pure/releaseHistory";
 
 const DAY_MS = 86_400_000;
 
@@ -14,9 +15,11 @@ const extra = {
 
 /** The build running now, as numbered by CI; 0 for a local or web build, which never asks. */
 export const currentBuild = typeof extra.buildNumber === "number" ? extra.buildNumber : 0;
+export const releaseChannel: ReleaseChannel = extraString("releaseChannel") === "preview" ? "preview" : "public";
+export const downloadTarget = Platform.OS === "android" ? "android" : extraString("iosTarget") === "ipad" ? "ipad" : "iphone";
 
 /** "0.1.3" for a release built by CI (docs/VERSIONING.md); the series from app.json elsewhere. */
-export const currentVersion = extra.appVersion ?? "dev";
+export const currentVersion = `${extra.appVersion ?? "dev"}${releaseChannel === "preview" ? " Preview" : ""}`;
 
 /** "v0.1.3+build.71" -> "0.1.3"; tags from before version names give null. */
 export function versionOfTag(tag: string): string | null {
@@ -56,13 +59,9 @@ export async function checkForUpdate(force = false, minGapMs = DAY_MS): Promise<
   }
   const res = await fetch(extra.releasesApi, { headers: { accept: "application/vnd.github+json" } });
   if (!res.ok) return "unavailable";
-  const release = (await res.json()) as { tag_name?: string; html_url?: string; assets?: { name: string; browser_download_url: string }[] };
-  const build = Number(/build\.(\d+)/.exec(release.tag_name ?? "")?.[1] ?? 0);
-  const asset = release.assets?.find((a) => (Platform.OS === "android" ? a.name.endsWith(".apk") : a.name.endsWith(".ipa")));
-  const url = asset?.browser_download_url ?? release.html_url ?? "";
-  const version = versionOfTag(release.tag_name ?? "");
-  const newer = build > currentBuild && url.startsWith("https://");
-  useAppStore.setState({ updateCheckedAt: Date.now(), latestRelease: newer ? { build, version, url } : null });
+  const release = updateFromReleases(await res.json(), releaseChannel, downloadTarget);
+  const newer = release !== null && release.build > currentBuild;
+  useAppStore.setState({ updateCheckedAt: Date.now(), latestRelease: newer ? release : null });
   return newer ? "newer" : "latest";
 }
 

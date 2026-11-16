@@ -97,7 +97,9 @@ def banner(shots, version, out):
     place(canvas, phone(picks[1], side), width * 0.27, round(height * 0.12), 9)
     place(canvas, phone(picks[2], side), width * 0.73, round(height * 0.12), -9)
     place(canvas, phone(picks[0], front), width * 0.5, round(height * 0.06))
-    pill(canvas, version, width - 300, 46, 54)
+    face = font(42)
+    text_width = ImageDraw.Draw(canvas).textbbox((0, 0), version, font=face)[2]
+    pill(canvas, version, max(24, width - text_width - 100), 46, 42)
     canvas.convert("RGB").save(out, optimize=True)
 
 
@@ -137,6 +139,21 @@ def main(root):
         if not os.path.exists(out) or os.path.getmtime(out) < max(os.path.getmtime(s) for s in shots):
             banner(shots, version, out)
             print(f"card for {version}")
+    # New releases keep media per immutable tag and native device target.
+    tags = sorted((d for d in os.listdir(screens) if re.fullmatch(r"v\d+\.\d+\.\d+(?:-preview\.\d+)?(?:\+build\.|-build\.)\d+", d)), key=lambda d: int(d.rsplit('.', 1)[1])) if os.path.isdir(screens) else []
+    for tag in tags:
+        for target in ["iphone", "ipad"]:
+            folder = os.path.join(screens, tag, target)
+            shots = showcase(folder) if os.path.isdir(folder) else []
+            if not shots:
+                continue
+            if target == "iphone":
+                latest = shots
+            out = os.path.join(folder, "banner.png")
+            if not os.path.exists(out) or os.path.getmtime(out) < max(os.path.getmtime(s) for s in shots):
+                label = tag[1:].split('+')[0].replace('-preview.', ' Preview #')
+                banner(shots, label, out)
+                print(f"card for {tag}/{target}")
     if latest:
         header(latest, os.path.join(root, "icon.png"), os.path.join(root, "header.png"))
         print("header")

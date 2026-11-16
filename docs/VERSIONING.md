@@ -15,4 +15,6 @@ When to move the series:
 
 Tags read `v0.1.3+build.71`. The part after `+` is the CI run number: the iOS build number, and what the in-app update check compares (O-12), so apps built before version names still see newer releases. Releases from before this scheme are tagged `v0.1.0-build.N` and do not count towards any patch.
 
+Repository-owned PRs publish tested Preview prereleases as `v0.2.5-preview.4+build.115` (PR 4, build 115). Their numeric app version remains `0.2.5`; the app ID has a `.preview` suffix. Preview tags do not increment the next public patch and never move GitHub's public latest release. AltStore keeps individual build numbers, including several Preview builds with the same numeric version. See `ALTSTORE.md` for the two channels and native iPad source.
+
 The app shows its name in Settings ("Soirée Crew 0.1.3 (build 71)"). CI passes `APP_VERSION` and `BUILD_NUMBER` to the whole iOS and Android jobs, because Xcode reads the app config a second time when it bundles the JavaScript.

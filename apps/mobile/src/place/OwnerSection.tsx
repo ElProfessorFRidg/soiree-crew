@@ -11,9 +11,11 @@ import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { showFailure } from "@/server/errors";
 import { HoursEditor } from "@/venues/HoursEditor";
+import { useSession } from "@/server/session";
 
 /** COM-11: the "managed by the venue" label, its hours, and for the owner the editor; else the claim form. */
 export function OwnerSection({ page, onChanged }: { page: PlacePage; onChanged: () => void }) {
+  const signedIn = useSession((state) => state.session !== null);
   const i18n = useT();
   const venueId = page.place.venueId;
   const [claim, setClaim] = useState<"pending" | "approved" | "rejected" | null>(null);
@@ -25,8 +27,8 @@ export function OwnerSection({ page, onChanged }: { page: PlacePage; onChanged: 
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!page.claimed) void fetchClaim(venueId).then((c) => setClaim(c.status)).catch(() => undefined);
-  }, [venueId, page.claimed]);
+    if (signedIn && !page.claimed) void fetchClaim(venueId).then((c) => setClaim(c.status)).catch(() => undefined);
+  }, [venueId, page.claimed, signedIn]);
 
   const failed = showFailure(i18n);
 
@@ -82,7 +84,7 @@ export function OwnerSection({ page, onChanged }: { page: PlacePage; onChanged: 
       ) : null}
 
       {!page.claimed && claim === "pending" ? <Text variant="small">{i18n.t("place.claimPending")}</Text> : null}
-      {!page.claimed && claim !== "pending" ? (
+      {signedIn && !page.claimed && claim !== "pending" ? (
         claiming ? (
           <Panel>
             <Text variant="label">{i18n.t("place.claimTitle")}</Text>

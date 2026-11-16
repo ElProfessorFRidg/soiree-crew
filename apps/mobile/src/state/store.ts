@@ -152,7 +152,8 @@ export interface AppState {
 
 /** In the app: past the age gate, and through the arrival flow (older installs have a profile instead). */
 export function isOnboarded(state: Pick<AppState, "ageConfirmedAt" | "profile" | "onboardedAt">): boolean {
-  return state.ageConfirmedAt !== null && (state.profile !== null || state.onboardedAt !== null);
+  // The age is optional: a guest who finished the arrival flow, minor or not, gets into the app.
+  return state.profile !== null || state.onboardedAt !== null;
 }
 
 export const useAppStore = create<AppState>()(

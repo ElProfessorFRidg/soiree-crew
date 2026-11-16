@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Image, Modal, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
+import { Image, Modal, Pressable, StyleSheet, View } from "react-native";
 import { radius } from "@crew/design-tokens";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
@@ -17,8 +17,8 @@ import { confirmAction } from "@/ui/confirm";
 import { EmptyState } from "@/ui/EmptyState";
 import { showPermissionDenied } from "@/system/permissions";
 import { ReportPanel } from "@/moderation/ReportPanel";
+import { useContentLayout } from "@/ui/layout";
 
-const COLUMNS = 3;
 const GAP = 6;
 
 /** N-21, O-84: the party's photos, private to the people who came. */
@@ -26,13 +26,15 @@ export default function AlbumScreen() {
   const { partyId } = useLocalSearchParams<{ partyId: string }>();
   const i18n = useT();
   const theme = useTheme();
-  const { width } = useWindowDimensions();
+  const layout = useContentLayout();
   const me = useSession((state) => state.session?.userId);
   const queue = useUploads((state) => state.queue);
   const pending = queue.filter((p) => p.partyId === partyId);
   const [photos, setPhotos] = useState<AlbumPhoto[]>([]);
   const [open, setOpen] = useState<AlbumPhoto | null>(null);
-  const tile = Math.floor((Math.min(width, 560) - 40 - GAP * (COLUMNS - 1)) / COLUMNS);
+  const available = Math.min(layout.width, 760) - layout.gutter * 2;
+  const columns = available >= 620 ? 4 : 3;
+  const tile = Math.floor((available - GAP * (columns - 1)) / columns);
 
   const load = useCallback(() => {
     void fetchAlbum(partyId).then(setPhotos).catch(() => undefined);

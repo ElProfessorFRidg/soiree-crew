@@ -10,6 +10,8 @@ import { Text } from "./Text";
 
 export interface ToastSpec {
   message: string;
+  /** Compatibility notices have one root host, including screens without local action toasts. */
+  channel?: "compatibility";
   tone?: "info" | "danger";
   action?: { label: string; onPress: () => void };
   /** Undo toasts stay 5 s (ADP-04); errors stay until dismissed or replaced by the next one. */
@@ -39,9 +41,13 @@ export function dismissToast(id: number): void {
   useToastStore.setState((state) => ({ queue: state.queue.filter((toast) => toast.id !== id) }));
 }
 
-export function ToastHost({ bottomOffset, large }: { bottomOffset: number; large?: boolean }) {
+export function useToastVisible(channel: ToastSpec["channel"]): boolean {
+  return useToastStore((state) => state.queue.some((toast) => toast.channel === channel));
+}
+
+export function ToastHost({ bottomOffset, large, channel }: { bottomOffset: number; large?: boolean; channel?: "compatibility" }) {
   const theme = useTheme();
-  const current = useToastStore((state) => state.queue[0]);
+  const current = useToastStore((state) => state.queue.find((toast) => toast.channel === channel));
 
   useEffect(() => {
     if (!current) return;

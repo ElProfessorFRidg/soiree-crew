@@ -1,4 +1,5 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyRequest } from "fastify";
+import { PublicCache } from "../publicCache";
 import { z } from "zod";
 import { distanceMeters } from "../anticheat";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
@@ -75,17 +76,22 @@ const presenceCount = (n: number): number => (n < PRESENCE_MIN_USERS ? 0 : Math.
 
 export function communityRoutes(app: FastifyInstance, ctx: Context): void {
   const writes = new RateLimiter(60, 60 * 60_000, ctx.now);
+  const pages = new PublicCache<unknown>(15_000, ctx.now);
+  // Public review visibility and moderation changes invalidate cached pages at once.
+  app.addHook("onSend", async (request, reply) => {
+    if (!["GET", "HEAD", "OPTIONS"].includes(request.method) && reply.statusCode < 400) pages.clear();
+  });
 
   /**
    * COM-01: the public page of a place, for any signed-in user: crowd prices, vibe tags, busy days
    * and hours, users this month, ratings, reviews as their authors allow (PROF-04), the door
    * (COM-07), upcoming events (COM-09) and the season's regulars who opted in (COM-03).
    */
-  app.get<{ Params: { id: string } }>("/v1/places/:id", async (request) => {
-    const user = requireUser(request);
+  const placePage = async (request: FastifyRequest<{ Params: { id: string } }>) => {
+    const user = request.user ?? { id: null };
     const { venue, ids } = await placeOf(ctx, request.params.id);
     const now = ctx.now();
-    const friends = await friendIds(ctx, user.id);
+    const friends = user.id ? await friendIds(ctx, user.id) : new Set<string>();
 
     const prices = await ctx.db.query<{ kind: string; amount: number; currency: string }>(
       "select kind, amount, currency from venue_prices where venue_id = any($1::uuid[]) and at > $2",
@@ -188,7 +194,7 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
       .sort((a, b) => b.nights - a.nights || a.name.localeCompare(b.name))
       .slice(0, 5);
 
-    const lastVisit = await hasVerifiedVisit(ctx, ids, user.id);
+    const lastVisit = user.id ? await hasVerifiedVisit(ctx, ids, user.id) : null;
     // COM-11: a claimed page says so; the owner's hours and replies come with it.
     const owner = await placeOwner(ctx, ids);
     const info = (await ctx.db.query<{ hours: string; happy_hours: string }>("select hours, happy_hours from place_info where venue_id = any($1::uuid[]) order by updated_at desc limit 1", [ids]))[0];
@@ -230,7 +236,7 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
       })),
       canReview: lastVisit !== null,
       claimed: owner !== null,
-      isOwner: owner === user.id,
+      isOwner: user.id !== null && owner === user.id,
       info: info && (info.hours || info.happy_hours) ? { hours: info.hours, happyHours: info.happy_hours } : null,
       facts: {
         source: facts.source,
@@ -263,6 +269,12 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
       })),
       regulars: regulars.map((r, i) => ({ ...r, legend: i === 0 })),
     };
+  };
+  app.get<{ Params: { id: string } }>("/v1/places/:id", async (request) => {
+    if (!request.user && !ctx.serverInfo?.public) throw new HttpError(401, "unauthenticated");
+    // Validate before allocating a cache key; personalized pages never use this shared cache.
+    const id = uuid.parse(request.params.id);
+    return request.user ? placePage(request) : pages.get(id, () => placePage(request));
   });
 
   /** COM-02, PROF-04: one review per person and place, only after a verified check-in there. */
@@ -447,7 +459,7 @@ export function communityRoutes(app: FastifyInstance, ctx: Context): void {
    * filters for a pint under a price (in cents), a strict door, a vibe tag.
    */
   app.get<{ Querystring: Record<string, string | undefined> }>("/v1/places", async (request) => {
-    requireUser(request);
+    if (!request.user && !ctx.serverInfo?.public) throw new HttpError(401, "unauthenticated");
     const q = z
       .object({
         lat: z.coerce.number().min(-90).max(90),

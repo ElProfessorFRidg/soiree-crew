@@ -1,4 +1,4 @@
-import { router, useSegments } from "expo-router";
+import { router } from "expo-router";
 import { Children, isValidElement, useState, type ReactNode } from "react";
 import { KeyboardAvoidingView, Platform, RefreshControl, StyleSheet, View } from "react-native";
 import Animated, { FadeInUp, interpolate, runOnJS, useAnimatedReaction, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
@@ -14,8 +14,11 @@ import { BrandMark } from "./BrandMark";
 import { haptic } from "@/motion/haptics";
 import { useKeyboardShown } from "./useKeyboardShown";
 import { PULL_DISTANCE, pullProgress } from "./pure/pullProgress";
+import { useScreenSpacing } from "./layout";
 
 interface Props {
+  /** Dashboards and master/detail workspaces can use the full tablet width. */
+  wide?: boolean;
   title?: string;
   /** The app's icon and name above the title, on the screens people screenshot and share. */
   brand?: boolean;
@@ -31,18 +34,16 @@ interface Props {
   scrollEnabled?: boolean;
 }
 
-export function Screen({ title, brand, back, trailing, children, footer, withToasts, onRefresh, scrollEnabled = true }: Props) {
+export function Screen({ title, brand, back, trailing, children, footer, withToasts, onRefresh, scrollEnabled = true, wide = false }: Props) {
   const [refreshing, setRefreshing] = useState(false);
   const theme = useTheme();
   const i18n = useT();
   const insets = useSafeAreaInsets();
   // iOS draws the tab bar as a floating capsule over the screen: whatever sits at the bottom of a
   // tab (a pinned button, the end of the list, a toast) goes above it, not under it.
-  const segments = useSegments() as string[];
-  const overTabBar = Platform.OS === "ios" && segments[0] === "(tabs)" ? TAB_BAR : 0;
   // With the keyboard up the footer sits right on it: no home indicator nor tab bar to clear.
   const keyboard = useKeyboardShown();
-  const footerBottom = keyboard ? 12 : insets.bottom + 12 + overTabBar;
+  const spacing = useScreenSpacing({ footer: !!footer, keyboard });
   // The band under the status bar fills in once content scrolls under the clock.
   const scrollY = useSharedValue(0);
   // MOT-10, iOS: the refresh starts when the finger lets go of a full glass, never before and
@@ -132,32 +133,24 @@ export function Screen({ title, brand, back, trailing, children, footer, withToa
             />
           ) : undefined
         }
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + space.screenTop, paddingBottom: footer ? 24 : insets.bottom + 110 }]}
+        contentContainerStyle={[styles.content, { maxWidth: wide ? 1280 : 760, gap: spacing.sectionGap, paddingLeft: spacing.left, paddingRight: spacing.right, paddingTop: spacing.top, paddingBottom: spacing.bottom }]}
       >
-        {back || trailing ? (
-          <View style={styles.top}>
-            {back ? <IconButton icon="back" accessibilityLabel={i18n.t("common.back")} onPress={() => (router.canGoBack() ? router.back() : router.replace("/(tabs)"))} /> : <View />}
+        {brand || title || back || trailing ? <View style={styles.header}>
+          {brand ? <BrandMark /> : null}
+          {title || back || trailing ? <View style={styles.top}>
+            {back ? <IconButton icon="back" accessibilityLabel={i18n.t("common.back")} onPress={() => (router.canGoBack() ? router.back() : router.replace("/(tabs)"))} /> : null}
+            {title ? <Text variant="h1" accessibilityRole="header" style={styles.title}>{title}</Text> : <View style={styles.title} />}
             {trailing}
-          </View>
-        ) : null}
-        {brand ? <BrandMark /> : null}
-        {title ? (
-          <Text variant="h1" accessibilityRole="header">
-            {title}
-          </Text>
-        ) : null}
+          </View> : null}
+        </View> : null}
         {/* Blocks rise into place one after the other when the screen opens (Reduce Motion: none). */}
         {Children.toArray(children).map((child, index) => (
-          <Animated.View
+          <Block
             key={isValidElement(child) && child.key != null ? child.key : index}
-            // A child that renders a fragment (a settings page, say) keeps the gap between its blocks.
-            style={styles.block}
-            entering={FadeInUp.delay(scaled(Math.min(index, 8) * 45))
-              .duration(duration.enter)
-              .withInitialValues({ opacity: 0, transform: [{ translateY: 12 }] })}
+            index={index}
           >
             {child}
-          </Animated.View>
+          </Block>
         ))}
       </Animated.ScrollView>
       {onRefresh && customPull ? <PullGlass scrollY={scrollY} refreshing={refreshing} top={insets.top + 10} /> : null}
@@ -165,23 +158,41 @@ export function Screen({ title, brand, back, trailing, children, footer, withToa
         pointerEvents="none"
         style={[styles.band, { height: insets.top, backgroundColor: theme.bg, borderBottomColor: theme.line }, band]}
       />
-      {footer ? <View style={[styles.footer, { paddingBottom: footerBottom }]}>{footer}</View> : null}
-      {withToasts ? <ToastHost bottomOffset={insets.bottom + 24 + overTabBar} /> : null}
+      {footer ? <View style={[styles.footer, { maxWidth: wide ? 1280 : 760, paddingLeft: spacing.left, paddingRight: spacing.right, paddingBottom: spacing.footerBottom }]}>{footer}</View> : null}
+      {withToasts ? <ToastHost bottomOffset={insets.bottom + 24 + spacing.tabOverlay} /> : null}
     </KeyboardAvoidingView>
+  );
+}
+
+/**
+ * Native blocks rise into place. Web blocks stay in a plain View: transforms caused blank holes
+ * in Safari, and swapping an animated wrapper for a View after entry remounted forms and maps.
+ */
+function Block({ index, children }: { index: number; children: ReactNode }) {
+  if (Platform.OS === "web") return <View style={styles.block}>{children}</View>;
+  return (
+    // A child that renders a fragment (a settings page, say) keeps the gap between its blocks.
+    <Animated.View
+      style={styles.block}
+      entering={FadeInUp.delay(scaled(Math.min(index, 8) * 45))
+        .duration(duration.enter)
+        .withInitialValues({ opacity: 0, transform: [{ translateY: 12 }] })}
+    >
+      {children}
+    </Animated.View>
   );
 }
 
 /** Shortest time the refresh glass stays, so one fill is always seen. */
 const MIN_REFRESH_MS = 900;
 
-/** Height of iOS's floating tab bar above the home indicator. */
-const TAB_BAR = 64;
-
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  content: { paddingHorizontal: space.screenX, gap: space.sectionGap },
+  content: { width: "100%", alignSelf: "center", paddingHorizontal: space.screenX, gap: space.sectionGap },
   block: { gap: space.sectionGap },
-  top: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
-  footer: { paddingHorizontal: space.screenX, paddingTop: 12 },
+  header: { gap: 12 },
+  title: { flex: 1, minWidth: 0 },
+  top: { flexDirection: "row", alignItems: "center", gap: 12 },
+  footer: { width: "100%", alignSelf: "center", paddingHorizontal: space.screenX, paddingTop: 12 },
   band: { position: "absolute", top: 0, left: 0, right: 0, borderBottomWidth: StyleSheet.hairlineWidth },
 });

@@ -49,6 +49,6 @@ export function Sheet({ visible, title, onClose, children }: Props) {
 
 const styles = StyleSheet.create({
   fill: { flex: 1 },
-  content: { paddingHorizontal: space.screenX, gap: space.sectionGap },
+  content: { width: "100%", maxWidth: 760, alignSelf: "center", paddingHorizontal: space.screenX, gap: space.sectionGap },
   head: { flexDirection: "row", alignItems: "center", gap: 12 },
 });
