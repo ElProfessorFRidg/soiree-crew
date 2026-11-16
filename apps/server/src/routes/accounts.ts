@@ -11,6 +11,7 @@ import { ageOn, assertOldEnough, birthDateSchema } from "../age";
 import { accountSchema, passwordSchema } from "../schemas";
 import { exportToCsv } from "../csv";
 import { verifyAppleToken } from "../appleAuth";
+import { canInspectServer } from "../diagnostics";
 
 const TRANSFER_TTL_MS = 10 * 60_000;
 /** N-17: the kinds of personal data that can be erased one by one. */
@@ -173,7 +174,7 @@ export function accountRoutes(app: FastifyInstance, ctx: Context): void {
     const user = requireUser(request);
     const row = (await ctx.db.query<{ birth_date: string | null }>("select birth_date from users where id = $1", [user.id]))[0];
     const photo = (await ctx.db.query<{ id: string }>("select id from profile_photos where user_id = $1", [user.id]))[0];
-    return { user, age: row?.birth_date ? ageOn(row.birth_date, ctx.now()) : null, photoUrl: photo ? signedPhotoUrl(ctx, photo.id) : null };
+    return { user, age: row?.birth_date ? ageOn(row.birth_date, ctx.now()) : null, photoUrl: photo ? signedPhotoUrl(ctx, photo.id) : null, capabilities: { serverDiagnostics: canInspectServer(ctx, user) } };
   });
 
   /** O-02: the date of birth, set once. Under the minimum age is refused here too; the date is stored, only the age comes back. */

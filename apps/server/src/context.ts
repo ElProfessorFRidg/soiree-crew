@@ -7,6 +7,7 @@ import type { Db } from "./db";
 import type { LiveHub } from "./live";
 import type { PushService } from "./notifications/push";
 import type { CompatibilityNotice, CompatibilityRules } from "./apiCompatibility";
+import { DatabaseFailure } from "./databaseErrors";
 
 export interface Context {
   db: Db;
@@ -26,6 +27,8 @@ export interface Context {
   serverInfo?: { name: string; description: string; public: boolean };
   /** COM-11: account ids (OPERATOR_IDS, preferred) or usernames (OPERATOR_USERNAMES) of the operators, who check venue claims. */
   operators?: string[];
+  /** Optional deployed Git revision, never an environment/configuration dump. */
+  serverRevision?: string;
   /** <ai_features>: the language model, when the server is configured for one. */
   ai?: AiProvider | null;
   /** O-38: APNs and FCM senders, when the server is configured for them; the inbox works without. */
@@ -94,6 +97,12 @@ export function requireUser(request: FastifyRequest): AuthedUser {
 }
 
 export function sendError(reply: FastifyReply, error: unknown): FastifyReply {
+  if (error instanceof DatabaseFailure) {
+    const rawCode = (error.cause as { code?: unknown } | null)?.code;
+    const databaseCode = typeof rawCode === "string" && /^[A-Z0-9_]{2,40}$/.test(rawCode) ? rawCode : "unknown";
+    reply.log.error({ databaseCode, diagnosticCode: error.diagnosticCode }, "database request failed");
+    return reply.header("x-crew-diagnostic-code", error.diagnosticCode).status(503).send({ error: "database_unavailable" });
+  }
   if (error instanceof HttpError) return reply.status(error.status).send({ error: error.code, ...error.details });
   // Fastify's own refusals (empty or oversized body, bad JSON) keep their 4xx instead of turning into a 500.
   const status = (error as { statusCode?: number }).statusCode;
