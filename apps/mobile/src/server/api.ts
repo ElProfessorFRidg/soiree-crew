@@ -27,6 +27,8 @@ export interface RequestOptions {
   /** Defaults to the stored session; account creation passes the typed address instead. */
   baseUrl?: string;
   token?: string | null;
+  /** Explicit read retry: recheck a changed server, while still honoring every 429 cooldown. */
+  recheckCompatibility?: boolean;
 }
 
 /** Every call to the server goes through here: timeout, auth header, typed failures. */
@@ -40,7 +42,8 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
   const now = Date.now();
   for (const [key, entry] of incompatible) if (entry.until <= now) incompatible.delete(key);
   const blocked = incompatible.get(featureKey);
-  if (blocked && !urgent) throw new ApiError({ ...blocked.failure, retryAfterMs: blocked.until - now });
+  const recheck = options.recheckCompatibility && (!options.method || options.method === "GET");
+  if (blocked && !urgent && !recheck) throw new ApiError({ ...blocked.failure, retryAfterMs: blocked.until - now });
   const scope = urgent ? "safety" : !options.method || options.method === "GET" ? "read" : "write";
   const quota = JSON.stringify([baseUrl, token ?? "guest", scope]);
   const wait = cooldown.remaining(quota);
@@ -49,6 +52,7 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   let response: Response;
+  let data: unknown;
   try {
     response = await fetch(`${baseUrl}${path}`, {
       method: options.method ?? "GET",
@@ -60,16 +64,26 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
       body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
       signal: controller.signal,
     });
+    if (response.status === 429) {
+      // Retry-After applies immediately, even if a rate-limited server never finishes its body.
+      void response.body?.cancel().catch(() => undefined);
+    } else if (response.status !== 204) {
+      try { data = await response.json(); }
+      catch (error) {
+        // A malformed payload is a compatibility problem; a broken/aborted body is a network failure.
+        if (controller.signal.aborted || !(error instanceof SyntaxError)) throw error;
+      }
+    }
   } catch (error) {
     throw new ApiError(controller.signal.aborted ? { kind: "timeout" } : { kind: "offline" });
   } finally {
     clearTimeout(timer);
   }
   if (response.status === 204) {
+    incompatible.delete(featureKey);
     if (options.method && options.method !== "GET") publicReads.clear();
     return undefined as T;
   }
-  const data: unknown = await response.json().catch(() => undefined);
   const code = data !== null && typeof data === "object" && "error" in data && typeof data.error === "string" ? data.error : "unknown";
   if (response.status === 429) {
     const delay = retryAfterMs(response.headers.get("retry-after"));
@@ -90,6 +104,7 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
     throw new ApiError(failure);
   }
   if (!response.ok) throw new ApiError({ kind: "http", status: response.status, code });
+  incompatible.delete(featureKey);
   if (options.method && options.method !== "GET") publicReads.clear();
   return data as T;
 }

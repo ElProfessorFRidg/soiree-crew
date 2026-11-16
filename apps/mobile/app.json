@@ -74,6 +74,7 @@
       "expo-secure-store",
       "expo-live-activity",
       "./plugins/withNightActivityView",
+      "./plugins/withStartupDiagnostics",
       [
         "expo-location",
         {

@@ -1128,6 +1128,7 @@ export const pt: Messages = {
     handled: "Tratada",
     markHandled: "Marcar como tratada",
     myProfile: "O meu perfil",
+    accountRequired: "O teu perfil partilhado precisa de uma conta.",
     edit: "Editar o meu perfil",
     viewAs: "Ver como",
     asMe: "Eu",

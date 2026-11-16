@@ -1127,6 +1127,7 @@ export const de: Messages = {
     handled: "Erledigt",
     markHandled: "Als erledigt markieren",
     myProfile: "Mein Profil",
+    accountRequired: "Für dein geteiltes Profil brauchst du ein Konto.",
     edit: "Profil bearbeiten",
     viewAs: "Ansehen als",
     asMe: "Ich",

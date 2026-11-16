@@ -1,4 +1,5 @@
-import { api } from "./api";
+import { api, ApiError } from "./api";
+import { useSession } from "./session";
 
 export const PROFILE_SECTIONS = ["identity", "crews", "titles", "venues", "reviews", "drinks", "records", "nights", "games", "birthday", "badges", "find", "presence"] as const;
 /** PROF-03: single figures that can be hidden one by one (server: STATS in profileRules.ts). */
@@ -59,8 +60,19 @@ export interface ProfileView {
   };
 }
 
-export function fetchProfile(userId: string, as?: "stranger" | "friend" | "crew"): Promise<ProfileView> {
-  return api(`/v1/users/${userId}/profile${as ? `?as=${as}` : ""}`);
+export async function fetchProfile(userId: string, as?: "stranger" | "friend" | "crew", options: { recheckCompatibility?: boolean } = {}): Promise<ProfileView> {
+  const session = useSession.getState().session;
+  if (!session) throw new ApiError({ kind: "http", status: 401, code: "unauthenticated" });
+  // Use the real account ID: older servers do not necessarily support the "me" path alias.
+  const target = userId === "me" ? session.userId : userId;
+  const data = await api<ProfileView>(`/v1/users/${encodeURIComponent(target)}/profile${as ? `?as=${as}` : ""}`, { baseUrl: session.url, token: session.token, recheckCompatibility: options.recheckCompatibility });
+  const record = (value: unknown): value is Record<string, unknown> => value !== null && typeof value === "object" && !Array.isArray(value);
+  if (!record(data) || data.userId !== target || !record(data.sections) || !record(data.relation)
+    || ![data.relation.me, data.relation.friend, data.relation.crewMate].every((flag) => typeof flag === "boolean")
+    || (target === session.userId && !as && (!data.relation.me || !record(data.sections.identity)))) {
+    throw new ApiError({ kind: "http", status: 502, code: "api_response_incompatible" });
+  }
+  return data;
 }
 
 export function saveProfile(input: {

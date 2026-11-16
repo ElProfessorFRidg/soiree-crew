@@ -9,12 +9,33 @@ inspect = runpy.run_path('tools/ci/check-ios-app.py')['inspect_app']
 with tempfile.TemporaryDirectory() as folder:
     app = Path(folder)
     info = {'UIDeviceFamily': [1], 'CFBundleIdentifier': 'app.soireecrew.mobile', 'CFBundleExecutable': 'Crew', 'MinimumOSVersion': '16.4'}
+    info['CrewStartupDiagnosticsVersion'] = 1
+    info['UIApplicationSceneManifest'] = {'UISceneConfigurations': {'UIWindowSceneSessionRoleApplication': [{'UISceneDelegateClassName': 'SceneDelegate'}]}}
     def save():
         (app / 'Info.plist').write_bytes(plistlib.dumps(info))
     save()
     (app / 'Crew').write_bytes(b'binary')
     (app / 'main.jsbundle').write_bytes(b'bundle')
     assert inspect(app)['deviceFamily'] == [1]
+    assert inspect(app)['startupDiagnostics'] == 1
+    scene = info['UIApplicationSceneManifest']['UISceneConfigurations']['UIWindowSceneSessionRoleApplication'][0]
+    scene['UISceneDelegateClassName'] = 'Crew.SceneDelegate'
+    save()
+    try:
+        inspect(app)
+        raise AssertionError('Mismatched Objective-C scene delegate accepted')
+    except ValueError:
+        pass
+    scene['UISceneDelegateClassName'] = 'SceneDelegate'
+    info['CrewStartupDiagnosticsVersion'] = 0
+    save()
+    try:
+        inspect(app)
+        raise AssertionError('Missing native diagnostics accepted')
+    except ValueError:
+        pass
+    info['CrewStartupDiagnosticsVersion'] = 1
+    save()
     assert inspect(app, 'iphone', 'public')['channel'] == 'public'
     try:
         inspect(app, 'iphone', 'preview')
