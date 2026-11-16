@@ -1,6 +1,7 @@
 import cors from "@fastify/cors";
 import websocket from "@fastify/websocket";
 import Fastify, { type FastifyInstance } from "fastify";
+import { randomUUID } from "node:crypto";
 import { ZodError } from "zod";
 import { bearer, HttpError, sendError, userFromToken, type Context } from "./context";
 import { accountRoutes } from "./routes/accounts";
@@ -38,8 +39,9 @@ import { venueFactRoutes } from "./routes/venueFacts";
 import { notificationRoutes } from "./notifications/routes";
 import { networkKey, RateLimitError, TokenBucket } from "./ratelimit";
 import { API_VERSION, ApiCompatibility, compatibilityFailure } from "./apiCompatibility";
+import { diagnosticRoutes, type RegisteredApi } from "./diagnostics";
 
-const PUBLIC_ROUTES = new Set(["POST /v1/accounts", "POST /v1/accounts/apple", "POST /v1/sessions/apple", "POST /v1/sessions/claim", "POST /v1/sessions/password", "GET /v1/usernames/:name/available", "GET /v1/health", "GET /v1/info", "GET /download/android.json", "GET /download/soiree-crew.apk", "GET /v1/invites/:code", "GET /v1/crews/open", "GET /v1/live", "GET /i/:code", "GET /f/:code","GET /v1/photos/:id", "GET /v1/receipts/:id","GET /v1/calendar/:token.ics"]);
+const PUBLIC_ROUTES = new Set(["POST /v1/accounts", "POST /v1/accounts/apple", "POST /v1/sessions/apple", "POST /v1/sessions/claim", "POST /v1/sessions/password", "GET /v1/usernames/:name/available", "GET /v1/health", "GET /v1/ready", "GET /v1/info", "GET /download/android.json", "GET /download/soiree-crew.apk", "GET /v1/invites/:code", "GET /v1/crews/open", "GET /v1/live", "GET /i/:code", "GET /f/:code","GET /v1/photos/:id", "GET /v1/receipts/:id","GET /v1/calendar/:token.ics"]);
 
 export async function buildApp(ctx: Context, options: { logger?: boolean; trustProxy?: boolean | number } = {}): Promise<FastifyInstance> {
   const compatibility = new ApiCompatibility(ctx.apiCompatibility, ctx.webAppUrl);
@@ -53,6 +55,7 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
   const writes = new TokenBucket(120, 240, ctx.now);
   const safety = new TokenBucket(20, 20, ctx.now);
   const app = Fastify({
+    genReqId: () => `sc_${randomUUID()}`,
     // Behind Coolify's proxy every request comes from the proxy: without this, rate limits would
     // count all users as one address. Only set it when the port is reachable through the proxy alone.
     // (Cast: a boolean | number union confuses Fastify's server-type overloads.)
@@ -65,8 +68,16 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
     forceCloseConnections: true,
   });
   // Tokens travel in the Authorization header, never in cookies, so any origin may call the API.
-  await app.register(cors, { origin: true, methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], allowedHeaders: ["authorization", "content-type"], exposedHeaders: ["retry-after"] });
+  await app.register(cors, { origin: true, methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], allowedHeaders: ["authorization", "content-type"], exposedHeaders: ["retry-after", "x-crew-request-id", "x-crew-diagnostic-code"] });
   await app.register(websocket);
+
+  const registered = new Map<string, RegisteredApi>();
+  app.addHook("onRoute", (route) => {
+    if (!route.url.startsWith("/v1/")) return;
+    for (const method of Array.isArray(route.method) ? route.method : [route.method]) {
+      if (method !== "HEAD" && method !== "OPTIONS") registered.set(`${method} ${route.url}`, { method, path: route.url });
+    }
+  });
 
   app.addHook("onRequest", async (request) => {
     if (request.method !== "OPTIONS") networks.check(networkKey(request.ip));
@@ -104,7 +115,9 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
   });
 
   const https = ctx.publicUrl.startsWith("https://");
-  app.addHook("onSend", async (_request, reply) => {
+  app.addHook("onSend", async (request, reply) => {
+    reply.header("x-crew-request-id", request.id);
+    if (reply.statusCode >= 400 && !reply.hasHeader("x-crew-diagnostic-code")) reply.header("x-crew-diagnostic-code", `SC_HTTP_${reply.statusCode}`);
     // Authenticated representations contain personal flags and must not enter shared HTTP caches.
     if (!reply.hasHeader("cache-control")) reply.header("cache-control", "no-store");
     if (https) reply.header("strict-transport-security", "max-age=31536000; includeSubDomains");
@@ -126,6 +139,7 @@ export async function buildApp(ctx: Context, options: { logger?: boolean; trustP
   });
 
   app.get("/v1/health", async () => ({ ok: true }));
+  diagnosticRoutes(app, ctx, registered, (method, path) => PUBLIC_ROUTES.has(`${method} ${path}`) || (!!ctx.serverInfo?.public && method === "GET" && ["/v1/places", "/v1/places/:id"].includes(path)));
   /** What the connect screen shows before signing up: a public server says so, with its name. */
   app.get("/v1/info", async () => ({
     name: ctx.serverInfo?.name || "Soirée Crew",

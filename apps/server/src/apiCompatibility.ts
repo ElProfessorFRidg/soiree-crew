@@ -11,7 +11,7 @@ export interface CompatibilityNotice {
   webUrl?: string;
 }
 
-const essential = (route: string) => / \/v1\/(?:health$|info$|accounts(?:\/|$)|sessions(?:\/|$)|sos(?:\/|$)|parties\/[^/]+\/status$)/.test(route);
+const essential = (route: string) => / \/v1\/(?:health$|ready$|info$|me\/capabilities$|accounts(?:\/|$)|sessions(?:\/|$)|sos(?:\/|$)|parties\/[^/]+\/status$)/.test(route);
 // These public screens can be opened without transferring local health data or encryption keys.
 const WEB_ROUTES: Record<string, string> = {
   "GET /v1/places": "/discover",

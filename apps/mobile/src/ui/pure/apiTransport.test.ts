@@ -117,7 +117,7 @@ describe("client feature failures", () => {
     const failure: unknown = await api("/v1/limited-read").catch((error: unknown) => error);
     expect(failure).toMatchObject({ failure: { status: 429, retryAfterMs: 30_000 } });
     const translator = { t: (key: string, params?: { seconds: number }) => key === "serverCodes.rate_limited_wait" ? fr.serverCodes.rate_limited_wait.replace("{seconds}", String(params?.seconds)) : key } as unknown as Parameters<typeof failureMessage>[1];
-    expect(failureMessage(failure, translator)).toBe("Trop de demandes. Réessaie dans 30 s.");
+    expect(failureMessage(failure, translator)).toBe("Trop de demandes. Réessaie dans 30 s. (SC_HTTP_429)");
     await expect(api("/v1/other-read", { recheckCompatibility: true })).rejects.toMatchObject({ failure: { status: 429, retryAfterMs: 30_000 } });
     expect(fetcher).toHaveBeenCalledTimes(1);
     await expect(api("/v1/sos", { method: "POST", body: {} })).resolves.toEqual({ ok: true });

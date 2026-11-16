@@ -37,7 +37,7 @@ Without the variables above the server still keeps every notification in each pe
 
 ## Health
 
-`GET /v1/health` answers `{"ok":true}`; the image has a Docker `HEALTHCHECK` on it. `GET /v1/info` is public and says how the server presents itself.
+`GET /v1/health` answers `{"ok":true}` when the process is alive. Docker's `HEALTHCHECK` uses `GET /v1/ready`, which also checks database access, applied migrations and the discovery schema. A live process with an unavailable database is unhealthy. `GET /v1/info` is public and says how the server presents itself. See [server diagnostics](../docs/SERVER-DIAGNOSTICS.md) for the app's checks, error references and operator activation.
 
 ## Backups
 

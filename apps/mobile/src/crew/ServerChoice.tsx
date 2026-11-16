@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { router } from "expo-router";
 import { Pressable, StyleSheet, View } from "react-native";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
-import { api } from "@/server/api";
+import { api, ApiError } from "@/server/api";
 import { normaliseServerUrl } from "@/server/session";
 import { useTheme } from "@/theme";
 import { Button } from "@/ui/Button";
@@ -11,6 +12,7 @@ import { Icon } from "@/ui/Icon";
 import { Sheet } from "@/ui/Sheet";
 import { Text } from "@/ui/Text";
 import { Field } from "./Field";
+import { failureMessage } from "@/server/errors";
 import { hostOf, officialServer, otherPublicServers, serverInfo, useServerInfo, type ServerInfo } from "./servers";
 
 /** An address typed by hand: checked for https and for an answer before it is used. */
@@ -28,14 +30,15 @@ export function ServerAddress({ initial = "", onPick }: { initial?: string; onPi
     setBusy(true);
     setError(null);
     try {
-      await api("/v1/health", { baseUrl: url, token: null });
+      const info = await api<{ name: string; public: boolean }>("/v1/info", { baseUrl: url, token: null, recheckCompatibility: true });
+      if (!info || typeof info.name !== "string" || typeof info.public !== "boolean") throw new ApiError({ kind: "http", status: 502, code: "api_response_incompatible" });
       haptic.confirmed();
       setBusy(false);
       onPick(url);
-    } catch {
+    } catch (error) {
       haptic.error();
       setBusy(false);
-      setError(i18n.t("crew.serverUnreachable"));
+      setError(failureMessage(error, i18n));
     }
   };
   return (
@@ -54,6 +57,7 @@ export function ServerAddress({ initial = "", onPick }: { initial?: string; onPi
         error={error}
       />
       <Button label={i18n.t("arrival.serverUse")} variant="secondary" height={48} disabled={normaliseServerUrl(address) === null} loading={busy} onPress={() => void use()} />
+      {error ? <Button label={i18n.t("diagnostics.title")} variant="outline" onPress={() => router.push({ pathname: "/server-status", params: { server: normaliseServerUrl(address) ?? "" } })} /> : null}
     </View>
   );
 }

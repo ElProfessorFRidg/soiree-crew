@@ -9,6 +9,9 @@ dist/
 web-build/
 ios/
 android/
+# Local Expo module sources are maintained; only app projects are generated.
+!apps/mobile/modules/*/ios/
+!apps/mobile/modules/*/android/
 *.ipa
 coverage/
 .claude/worktrees/

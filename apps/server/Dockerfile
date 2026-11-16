@@ -16,5 +16,5 @@ EXPOSE 8787
 VOLUME ["/data"]
 USER node
 WORKDIR /app/apps/server
-HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 CMD wget -qO- http://127.0.0.1:8787/v1/health > /dev/null || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 CMD wget -qO- http://127.0.0.1:8787/v1/ready > /dev/null || exit 1
 CMD ["pnpm", "start"]

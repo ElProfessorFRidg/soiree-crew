@@ -264,7 +264,7 @@ export default function RootLayout() {
   // link is the one way in, it only keeps the code and carries on to the arrival flow itself.
   const onboarded = useAppStore(isOnboarded);
   const first = (useSegments() as string[])[0];
-  const open = first === "onboarding" || first === "join";
+  const open = first === "onboarding" || first === "join" || first === "server-status";
   useEffect(() => {
     if (ready && !onboarded && !open) router.replace("/onboarding");
   }, [ready, onboarded, open]);
@@ -335,6 +335,7 @@ export default function RootLayout() {
                 />
                 <Stack.Screen name="recaps" />
                 <Stack.Screen name="settings" />
+                <Stack.Screen name="server-status" />
                 <Stack.Screen name="notifications" />
                 <Stack.Screen name="notification-settings" />
                 <Stack.Screen name="home" />

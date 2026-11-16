@@ -22,6 +22,8 @@ services:
       # Accounts that review venue claims (COM-11), comma-separated ids.
       OPERATOR_IDS: ${OPERATOR_IDS:-}
       OPERATOR_USERNAMES: ${OPERATOR_USERNAMES:-}
+      SERVER_REVISION: ${SERVER_REVISION:-}
+      SOURCE_COMMIT: ${SOURCE_COMMIT:-}
       DRINKING_LEADERBOARD: ${DRINKING_LEADERBOARD:-}
       AI_PROVIDER: ${AI_PROVIDER:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}

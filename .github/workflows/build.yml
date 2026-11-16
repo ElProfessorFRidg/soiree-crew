@@ -84,6 +84,12 @@ jobs:
           # expo-modules-jsi 58.0.21 needs a recent Swift: Xcode 26.3 rejects it. 26.6 is the newest on
           # GitHub's macOS 26 runners (no Xcode 27 there yet).
           xcode-version: "26.6"
+      - name: Check native diagnostics against the supported iOS deployment target
+        run: |
+          SDK=$(xcrun --sdk iphoneos --show-sdk-path)
+          xcrun swiftc -typecheck -target arm64-apple-ios16.4 -sdk "$SDK" apps/mobile/native/startup/CrewStartupDiagnostics.swift apps/mobile/modules/network-diagnostics/ios/CrewNetworkProbe.swift
+          xcrun swiftc apps/mobile/modules/network-diagnostics/ios/CrewNetworkProbe.swift tools/ci/check-network-errors.swift -o /tmp/check-network-errors
+          /tmp/check-network-errors
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with:
@@ -346,6 +352,21 @@ jobs:
           xcrun simctl spawn "$DEVICE" log show --last 3m --style compact --predicate 'eventMessage CONTAINS "SC_STARTUP"' > launch/startup-diagnostic.log
           grep -q 'SC_TEST_NO_JS_DIAGNOSTIC_VISIBLE' launch/startup-diagnostic.log
           grep -q 'SC_TEST_RECOVERED' launch/startup-diagnostic.log
+      - name: Native server status distinguishes HTTP failures from a network outage
+        run: |
+          python3 tools/ci/network-diagnostic-stub.py > /tmp/network-diagnostic-stub.log 2>&1 &
+          STUB_PID=$!
+          trap 'kill "$STUB_PID" 2>/dev/null || true' EXIT
+          BUNDLE=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Info.plist")
+          DEVICE=$(xcrun simctl list devices booted -j | python3 -c 'import json,sys; d=json.load(sys.stdin)["devices"]; print(next(x["udid"] for v in d.values() for x in v))')
+          xcrun simctl terminate "$DEVICE" "$BUNDLE" || true
+          xcrun simctl launch "$DEVICE" "$BUNDLE" -ciRoute /server-status -ciDiagnosticServer http://127.0.0.1:8799
+          sleep 20
+          xcrun simctl io "$DEVICE" screenshot launch/screens/19-server-status.png
+          xcrun simctl spawn "$DEVICE" log show --last 2m --style compact --predicate 'eventMessage CONTAINS "SC_NETWORK"' > launch/network-diagnostic.log
+          grep -q 'SC_NETWORK /v1/health SC_OK HTTP200' launch/network-diagnostic.log
+          grep -q 'SC_NETWORK /v1/info SC_HTTP_500 HTTP500' launch/network-diagnostic.log
+          grep -q 'SC_NETWORK /v1/ready SC_DB_01 HTTP503' launch/network-diagnostic.log
       - uses: actions/upload-artifact@v7
         if: always()
         with:
