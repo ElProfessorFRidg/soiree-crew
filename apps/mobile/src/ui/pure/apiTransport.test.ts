@@ -35,6 +35,27 @@ beforeEach(() => { vi.useFakeTimers(); caseTime += 1_000_000; vi.setSystemTime(c
 afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); vi.unstubAllGlobals(); });
 
 describe("client feature failures", () => {
+  it("times out a response body that stalls after the server sends its headers", async () => {
+    let signal: AbortSignal | undefined;
+    vi.stubGlobal("fetch", vi.fn(async (_url: string, init: RequestInit) => {
+      signal = init.signal ?? undefined;
+      return { status: 200, ok: true, json: () => new Promise((_resolve, reject) => signal?.addEventListener("abort", () => reject(new DOMException("Aborted", "AbortError")))) } as Response;
+    }));
+    const response = api("/v1/slow-profile-body").catch((error: unknown) => error);
+    await vi.advanceTimersByTimeAsync(10_001);
+    expect(signal?.aborted).toBe(true);
+    await expect(response).resolves.toMatchObject({ failure: { kind: "timeout" } });
+  });
+  it("preserves a network failure while receiving JSON instead of reporting an incompatible API", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ status: 200, ok: true, json: async () => { throw new TypeError("Network connection interrupted"); } } as unknown as Response));
+    await expect(api("/v1/interrupted-profile-body")).rejects.toMatchObject({ failure: { kind: "offline" } });
+  });
+  it("honors Retry-After from headers without waiting for a broken refusal body", async () => {
+    const json = vi.fn(async () => { throw new TypeError("Network connection interrupted"); });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ status: 429, ok: false, headers: new Headers({ "retry-after": "25" }), json } as unknown as Response));
+    await expect(api("/v1/refused-profile-body")).rejects.toMatchObject({ failure: { status: 429, retryAfterMs: 25_000 } });
+    expect(json).not.toHaveBeenCalled();
+  });
   it("sends version information with authentication and throttles only the failing feature", async () => {
     const fetcher = vi.fn().mockResolvedValueOnce(unavailable()).mockResolvedValueOnce(new Response('{"ok":true}', { status: 200 }));
     vi.stubGlobal("fetch", fetcher);
