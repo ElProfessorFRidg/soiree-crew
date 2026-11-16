@@ -626,6 +626,27 @@
       "name": "Soirée Crew Preview",
       "version": "0.2.6",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.5%2Bbuild.121/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "• Add protected server diagnostics and actionable network errors\n• Diagnose iOS startup before JavaScript and register scenes explicitly\n• Keep request timeouts active while reading profile responses\n• Fix profile loading, error recovery and guest account states",
+      "bundleID": "app.soireecrew.mobile.preview",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.121/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.121/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.121/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.121/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.121/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.121/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.121/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.121/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.121/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.121/iphone/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew Preview 0.2.6",
+      "version": "0.2.6",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.5%2Bbuild.120/soiree-crew-unsigned.ipa",
       "category": "Other",
       "description": "• Diagnose iOS startup before JavaScript and register scenes explicitly\n• Keep request timeouts active while reading profile responses\n• Fix profile loading, error recovery and guest account states",
