@@ -97,7 +97,7 @@ describe("client feature failures", () => {
     expect(failure).toMatchObject({ failure: { status: 429, retryAfterMs: 30_000 } });
     const translator = { t: (key: string, params?: { seconds: number }) => key === "serverCodes.rate_limited_wait" ? fr.serverCodes.rate_limited_wait.replace("{seconds}", String(params?.seconds)) : key } as unknown as Parameters<typeof failureMessage>[1];
     expect(failureMessage(failure, translator)).toBe("Trop de demandes. Réessaie dans 30 s.");
-    await expect(api("/v1/other-read")).rejects.toMatchObject({ failure: { status: 429, retryAfterMs: 30_000 } });
+    await expect(api("/v1/other-read", { recheckCompatibility: true })).rejects.toMatchObject({ failure: { status: 429, retryAfterMs: 30_000 } });
     expect(fetcher).toHaveBeenCalledTimes(1);
     await expect(api("/v1/sos", { method: "POST", body: {} })).resolves.toEqual({ ok: true });
     await vi.advanceTimersByTimeAsync(30_001);

@@ -1143,6 +1143,7 @@ export const ru: Messages = {
     handled: "Разобрано",
     markHandled: "Отметить как разобранное",
     myProfile: "Мой профиль",
+    accountRequired: "Для общего профиля нужна учётная запись.",
     edit: "Изменить профиль",
     viewAs: "Смотреть как",
     asMe: "Я",

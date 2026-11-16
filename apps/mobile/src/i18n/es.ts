@@ -1128,6 +1128,7 @@ export const es: Messages = {
     handled: "Gestionada",
     markHandled: "Marcar como gestionada",
     myProfile: "Mi perfil",
+    accountRequired: "Tu perfil compartido necesita una cuenta.",
     edit: "Editar mi perfil",
     viewAs: "Ver como",
     asMe: "Yo",

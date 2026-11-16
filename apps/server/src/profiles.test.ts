@@ -48,6 +48,16 @@ const view = async (viewer: User, ownerId: string, as?: string) =>
   };
 
 describe("profile audiences (PROF-01, PROF-08)", () => {
+  it("returns my identity and private sections for a new account, by UUID or by the me alias", async () => {
+    const owner = await account("newprofile");
+    for (const id of [owner.id, "me"]) {
+      const response = await app.inject({ method: "GET", url: `/v1/users/${id}/profile`, headers: owner.auth });
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toMatchObject({ userId: owner.id, relation: { me: true }, sections: { identity: { username: "newprofile", displayName: "newprofile" }, drinks: { total: 0 } } });
+      expect(response.json().sections.records).toBeDefined();
+      expect(response.json().audiences).toBeDefined();
+    }
+  });
   it("sends each section only to the audiences allowed, for every section and every audience", async () => {
     const { owner, crewMate, friend, stranger } = await setup();
     const expected: Record<(typeof AUDIENCES)[number], { mate: boolean; friend: boolean; stranger: boolean }> = {
