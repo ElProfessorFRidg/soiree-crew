@@ -13,10 +13,12 @@ const SPLASH_WIDTH = 120;
  * hiding the native one shows no seam; then the mark grows a little and the curtain fades into
  * the first screen. Reduce Motion: a plain fade.
  */
-export function LaunchCurtain({ onShown }: { onShown: () => void }) {
+export function LaunchCurtain({ onShown, onFinished }: { onShown: () => void; onFinished?: () => void }) {
   const reduceMotion = useReducedMotion();
   const [gone, setGone] = useState(false);
   const t = useSharedValue(0);
+
+  useEffect(() => { if (gone) onFinished?.(); }, [gone, onFinished]);
 
   useEffect(() => {
     onShown();

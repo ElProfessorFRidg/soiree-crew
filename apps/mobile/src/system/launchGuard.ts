@@ -25,6 +25,7 @@ export function withDeadline<T>(step: string, work: Promise<T>, fallback: T, ms 
       },
       () => {
         clearTimeout(timer);
+        stalled.add(step);
         resolve(fallback);
       },
     );

@@ -221,7 +221,7 @@ jobs:
     # A crash at startup fails the run, with the app log and crash report as an artifact.
     needs: ios
     runs-on: macos-26
-    timeout-minutes: 20
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
@@ -329,6 +329,23 @@ jobs:
             xcrun simctl io "$DEVICE" screenshot "launch/screens/$(printf %02d $n)-$name.png" || true
             n=$((n + 1))
           done
+      - name: Startup diagnostic without JavaScript, then normal recovery
+        run: |
+          BUNDLE=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Info.plist")
+          DEVICE=$(xcrun simctl list devices booted -j | python3 -c 'import json,sys; d=json.load(sys.stdin)["devices"]; print(next(x["udid"] for v in d.values() for x in v))')
+          xcrun simctl terminate "$DEVICE" "$BUNDLE" || true
+          # Do not start React: the diagnostic must be drawn by UIKit alone.
+          xcrun simctl launch "$DEVICE" "$BUNDLE" -crewStartupTestNoJS
+          sleep 12
+          xcrun simctl io "$DEVICE" screenshot launch/screens/17-startup-diagnostic.png
+          xcrun simctl terminate "$DEVICE" "$BUNDLE"
+          # No test flag persists: a fresh launch must reach the app again.
+          xcrun simctl launch "$DEVICE" "$BUNDLE" -crewStartupTestRecovery -ciRoute /settings
+          sleep 12
+          xcrun simctl io "$DEVICE" screenshot launch/screens/18-startup-recovery.png
+          xcrun simctl spawn "$DEVICE" log show --last 3m --style compact --predicate 'eventMessage CONTAINS "SC_STARTUP"' > launch/startup-diagnostic.log
+          grep -q 'SC_TEST_NO_JS_DIAGNOSTIC_VISIBLE' launch/startup-diagnostic.log
+          grep -q 'SC_TEST_RECOVERED' launch/startup-diagnostic.log
       - uses: actions/upload-artifact@v7
         if: always()
         with:

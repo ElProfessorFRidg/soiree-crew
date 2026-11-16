@@ -25,10 +25,15 @@ def inspect_app(path, target="iphone", channel=None):
             raise ValueError(f"Missing or empty app payload: {name}")
     if not info.get("MinimumOSVersion"):
         raise ValueError("Missing minimum iOS version")
+    scenes = info.get("UIApplicationSceneManifest", {}).get("UISceneConfigurations", {}).get("UIWindowSceneSessionRoleApplication", [])
+    if not scenes or any(scene.get("UISceneDelegateClassName") != "SceneDelegate" for scene in scenes):
+        raise ValueError("Missing or incorrect Objective-C scene delegate name")
+    if info.get("CrewStartupDiagnosticsVersion") != 1:
+        raise ValueError("Missing native startup diagnostics")
     return {"bundleIdentifier": info["CFBundleIdentifier"], "minimumOSVersion": info["MinimumOSVersion"],
             "deviceFamily": info["UIDeviceFamily"], "target": target, "channel": channel,
             "ipadMode": "native tablet" if 2 in info["UIDeviceFamily"] else "iPhone",
-            "orientations": orientations}
+            "orientations": orientations, "sceneDelegate": "SceneDelegate", "startupDiagnostics": 1}
 
 
 if __name__ == "__main__":

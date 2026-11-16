@@ -54,7 +54,8 @@ import { syncOuting } from "@/location/outing";
 import { PrivacyCover } from "@/ui/PrivacyCover";
 import { PermissionPrompt } from "@/system/PermissionPrompt";
 import { handleNotificationResponse, prepareNotifications } from "@/notify/push";
-import { LAUNCH_STEP_MS } from "@/system/launchGuard";
+import { LAUNCH_STEP_MS, stalledSteps } from "@/system/launchGuard";
+import { reportStartup, reportStartupLayout, reportStartupCurtain } from "@/system/startupReport";
 
 /** Expo Router shows this instead of a crashed screen (any route below this layout). */
 export { CrashScreen as ErrorBoundary };
@@ -116,6 +117,16 @@ export default function RootLayout() {
   const sessionReady = useSession((state) => state.ready);
   const session = useSession((state) => state.session);
   const ready = fontsLoaded && (hydrated || storeLate) && sessionReady;
+
+  useEffect(() => {
+    reportStartup("root", "ready");
+  }, []);
+
+  useEffect(() => {
+    reportStartup("fonts", fontsReady ? "ready" : fontError || fontsLate ? "fallback" : "waiting");
+    reportStartup("storage", hydrated ? "ready" : storeLate ? "fallback" : "waiting");
+    reportStartup("session", sessionReady ? stalledSteps().includes("keychain") ? "fallback" : "ready" : "waiting");
+  }, [fontsReady, fontError, fontsLate, hydrated, storeLate, sessionReady]);
 
   useEffect(() => {
     if (!ready) return;
@@ -263,6 +274,7 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView
       style={{ flex: 1, backgroundColor: themes.dark.bg }}
+      onLayout={reportStartupLayout}
     >
       <SafeAreaProvider>
         <ThemeProvider>
@@ -377,7 +389,7 @@ export default function RootLayout() {
           </NavigationThemeProvider>
         </ThemeProvider>
       </SafeAreaProvider>
-      <LaunchCurtain onShown={hideSplash} />
+      <LaunchCurtain onShown={hideSplash} onFinished={reportStartupCurtain} />
     </GestureHandlerRootView>
   );
 }
