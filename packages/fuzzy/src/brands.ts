@@ -106,6 +106,11 @@ const SPIRITS = rows("spirit", [
   ["manzana", "Manzana verde", 20, 30, "shot", ["manzana"], ["FR", "ES"], BOTTLES],
   ["cognac-hennessy", "Hennessy VS", 40, 40, "shot", ["hennessy", "cognac"], ["FR", "US", "GB"], BOTTLES],
   ["calvados", "Calvados", 40, 40, "shot", ["calva"], ["FR"], BOTTLES],
+  // Mint, cream, cassis and passion fruit: strengths from the label listings and producer pages.
+  ["get-31-menthe", "Get 31 Menthe Glaciale", 24, 40, "shot", ["get31", "get 31 menthe", "menthe glaciale"], ["FR"], BOTTLES],
+  ["advocaat", "Advocaat Warninks", 17.2, 40, "shot", ["advocaat", "warninks"], ["NL", "DE", "BE"], BOTTLES],
+  ["lejay-creme-de-cassis", "Crème de cassis Lejay", 16, 40, "shot", ["lejay", "creme de cassis", "crème de cassis", "cassis"], ["FR"], BOTTLES],
+  ["passoa", "Passoã", 17, 40, "shot", ["passoa", "passoã", "passion fruit"], ["FR", "IT", "GB"], BOTTLES],
 ]);
 
 const APERITIFS = rows("wine", [
@@ -120,6 +125,9 @@ const APERITIFS = rows("wine", [
   ["cava", "Cava", 11.5, 120, "wine", [], ["ES"], [120, 750]],
   ["lambrusco", "Lambrusco", 8, 120, "wine", [], ["IT"], [120, 750]],
   ["vin-chaud", "Vin chaud", 10, 200, "wine", ["gluhwein", "glühwein", "mulled wine"], ["FR", "DE", "AT"], [200, 250]],
+  ["cynar", "Cynar", 16.5, 60, "wine", ["cynar artichaut"], ["IT", "FR"], [60, 700]],
+  ["pommeau", "Pommeau de Normandie", 17, 60, "wine", ["pommeau"], ["FR"], [60, 120, 700]],
+  ["pineau-des-charentes", "Pineau des Charentes", 17, 60, "wine", ["pineau", "pineau des charentes", "pineau blanc"], ["FR"], [60, 120, 750]],
 ]);
 
 const BEERS = rows("beer", [
@@ -150,6 +158,15 @@ const BEERS = rows("beer", [
   ["carolus", "Gouden Carolus", 8.5, 330, "bottle", ["carolus"], ["BE"]],
   ["gulden-draak", "Gulden Draak", 10.5, 330, "bottle", ["draak"], ["BE", "FR"]],
   ["brugse-zot", "Brugse Zot", 6, 330, "bottle", ["zot"], ["BE"]],
+  // Sourced from the brewers' own pages or the label listings. Strengths as printed on the label.
+  ["rince-cochon-blonde", "Rince Cochon Blonde", 8.5, 330, "bottle", ["rince cochon", "rince", "rince cochon blonde"], ["BE", "FR"], [330, 750]],
+  ["rince-cochon-triple", "Rince Cochon Triple", 9.5, 750, "bottle", ["rince cochon triple", "rince triple"], ["BE", "FR"]],
+  ["rince-cochon-rouge", "Rince Cochon Rouge", 7.5, 330, "bottle", ["rince cochon rouge", "rince rouge", "rince cerise"], ["BE", "FR"]],
+  ["filou", "Filou", 8.5, 330, "bottle", ["filou blonde", "biere filou"], ["BE", "FR"]],
+  ["chouffe-blanche", "Chouffe Blanche", 6.5, 330, "bottle", ["chouffe blanche", "blanche chouffe", "chouffe blanc"], ["BE", "FR"]],
+  ["mc-chouffe", "Mc Chouffe", 8, 330, "bottle", ["mc chouffe", "mac chouffe", "chouffe brune"], ["BE", "FR"]],
+  ["cuvee-des-trolls", "Cuvée des Trolls", 7, 330, "bottle", ["cuvee des trolls", "trolls"], ["BE", "FR"]],
+  ["bush-ambree", "Bush Ambrée", 12, 330, "bottle", ["bush", "bush ambree"], ["BE", "FR"]],
   ["kriek", "Kriek Lindemans", 3.5, 250, "bottle", ["kriek", "lindemans"], ["BE", "FR"]],
   ["mort-subite", "Mort Subite", 4, 250, "bottle", ["mort subite"], ["BE", "FR"]],
   ["la-trappe", "La Trappe Tripel", 8, 330, "bottle", ["trappe"], ["NL", "BE"]],
