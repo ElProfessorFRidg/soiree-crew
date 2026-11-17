@@ -190,6 +190,21 @@ const BEERS = rows("beer", [
   ["mc-chouffe", "Mc Chouffe", 8, 330, "bottle", ["mc chouffe", "mac chouffe", "chouffe brune"], ["BE", "FR"]],
   ["cuvee-des-trolls", "Cuvée des Trolls", 7, 330, "bottle", ["cuvee des trolls", "trolls"], ["BE", "FR"]],
   ["bush-ambree", "Bush Ambrée", 12, 330, "bottle", ["bush", "bush ambree"], ["BE", "FR"]],
+  // Brasserie de Saint-Omer, the independent brewer of the Pas-de-Calais (strengths from BeerTasting and retailers).
+  ["saint-omer-karlsquell", "Karlsquell", 4.7, 330, "bottle", ["karlsquell", "karl"], ["FR"]],
+  ["saint-omer-rambler", "Rambler's Classic Lager", 4.8, 330, "bottle", ["rambler", "ramblers"], ["FR"]],
+  ["saint-omer-argus-camaro", "Argus Camaro", 4.6, 330, "bottle", ["argus", "camaro"], ["FR"]],
+  ["saint-omer-blonde", "Saint-Omer Blonde", 5, 330, "bottle", ["saint omer", "saint-omer blonde"], ["FR"], [250, 330, 500]],
+  ["saint-omer-8-0-forte", "8.0 Bière Forte", 8, 330, "bottle", ["8.0", "huit", "8 0 forte"], ["FR"]],
+  ["saint-omer-doble-malta", "Doble Malta", 7, 330, "bottle", ["doble malta", "malta"], ["FR"]],
+  ["saint-omer-sterling", "Sterling Blonde", 4.2, 330, "bottle", ["sterling"], ["FR"]],
+  ["saint-omer-starberg", "Starberg Pilsner", 4, 330, "bottle", ["starberg"], ["FR"]],
+  ["saint-omer-walberg", "Walberg Lager", 4, 330, "bottle", ["walberg"], ["FR"]],
+  ["saint-omer-1866-blanche", "1866 Blanche", 4.5, 330, "bottle", ["1866", "1866 blanche"], ["FR"]],
+  ["saint-omer-grand-cru-1897", "Grand Cru Especialidades 1897", 7.9, 330, "bottle", ["grand cru 1897", "1897"], ["FR"]],
+  ["saint-omer-export", "Saint-Omer Export", 4.5, 250, "bottle", ["saint omer export"], ["GB", "FR"], [250, 330]],
+  // Trois Monts, from the Nord-Pas-de-Calais guide figures.
+  ["trois-monts", "Trois Monts", 8.5, 330, "bottle", ["3 monts", "trois-monts"], ["FR"]],
   // Bavaria 8.6 cans: the Gold is 6.5 %, the Extreme 10.5 % (50 cl), from the retailers' listings.
   ["bavaria-8-6-gold", "Bavaria 8.6 Gold", 6.5, 500, "can", ["8.6 gold", "bavaria gold", "86 gold"], ["NL", "FR"]],
   ["bavaria-8-6-extreme", "Bavaria 8.6 Extreme", 10.5, 500, "can", ["8.6 extreme", "bavaria extreme", "86 extreme"], ["NL", "FR"]],
