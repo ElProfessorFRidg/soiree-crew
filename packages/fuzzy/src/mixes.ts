@@ -113,6 +113,23 @@ const SHOTS = mixed([
   { id: "boyarsky", brand: "Boyarsky", group: "spirit", glass: "shot", parts: [[40, 30], [0, 15]], aliases: ["боярский", "boyarskiy", "boyarski"], countries: ["RU"], names: [{ name: "Боярский", languages: ["ru"] }] },
   // Two parts vodka, one part raspberry syrup, drops of Tabasco.
   { id: "wsciekly-pies", brand: "Wściekły pies", group: "spirit", glass: "shot", parts: [[40, 30], [0, 15]], aliases: ["wsciekly pies", "mad dog"], countries: ["PL"] },
+  // Shooters built from their recipe: each strength is the glass's, from the parts' own strengths.
+  { id: "buttery-nipple", brand: "Buttery Nipple", group: "spirit", glass: "shot", parts: [[20, 15], [17, 15]], aliases: ["buttery", "butter nipple"], countries: ["US", "GB", "FR", "DE"] },
+  { id: "sex-on-the-beach-shot", brand: "Sex on the beach shot", short: "SOTB shot", group: "spirit", glass: "shot", parts: [[40, 15], [20, 15], [0, 15]], aliases: ["sotb shot", "shot sotb", "sex on the beach shooter"], countries: ["US", "GB", "FR", "DE"] },
+  { id: "washington-apple", brand: "Washington apple", group: "spirit", glass: "shot", parts: [[40, 15], [15, 15], [0, 15]], aliases: ["washington", "washington apple shot"], countries: ["US", "GB", "FR"] },
+  { id: "fuzzy-navel-shot", brand: "Fuzzy navel shot", group: "spirit", glass: "shot", parts: [[20, 20], [0, 20]], aliases: ["fuzzy navel", "fuzzy"], countries: ["US", "GB", "FR"] },
+  { id: "mind-eraser", brand: "Mind eraser", group: "spirit", glass: "shot", parts: [[40, 30], [16, 15], [0, 15]], aliases: ["mind eraser shot"], countries: ["US", "GB", "FR"] },
+  { id: "orgasm", brand: "Orgasm", group: "spirit", glass: "shot", parts: [[16, 15], [28, 15], [17, 15]], aliases: ["orgasme", "orgasm shot"], countries: ["FR", "GB", "US"], names: [{ name: "Orgasme", languages: ["fr"] }] },
+  { id: "pickle-back", brand: "Pickle back", group: "spirit", glass: "shot", parts: [[40, 30], [0, 30]], aliases: ["pickleback", "pickle"], countries: ["US", "GB", "CA"] },
+  { id: "apple-pie-shot", brand: "Apple pie", group: "spirit", glass: "shot", parts: [[33, 30], [15, 15]], aliases: ["apple pie shot", "tarte aux pommes"], countries: ["US", "GB", "FR"] },
+  { id: "rusty-nail-shot", brand: "Rusty nail", group: "spirit", glass: "shot", parts: [[40, 30], [40, 15]], aliases: ["rusty nail shot", "rusty"], countries: ["GB", "US", "FR"] },
+  { id: "peppermint-patty", brand: "Peppermint patty", group: "spirit", glass: "shot", parts: [[24, 15], [17, 15]], aliases: ["peppermint"], countries: ["US", "GB", "FR"] },
+  { id: "tequila-sunrise-shot", brand: "Tequila sunrise shot", group: "spirit", glass: "shot", parts: [[38, 30], [0, 30]], aliases: ["tequila sunrise", "sunrise shot"], countries: ["US", "GB", "FR", "ES"] },
+  { id: "sour-apple-shot", brand: "Sour apple shot", group: "spirit", glass: "shot", parts: [[15, 30], [40, 15]], aliases: ["sour apple", "pomme sure shot"], countries: ["GB", "US", "FR", "DE"] },
+  { id: "cherry-bomb", brand: "Cherry bomb", group: "spirit", glass: "shot", parts: [[25, 30], [40, 15]], aliases: ["cherry bomb shot", "cherry bomb vodka"], countries: ["GB", "US", "FR"] },
+  { id: "mudslide-shot", brand: "Mudslide shot", group: "spirit", glass: "shot", parts: [[17, 15], [16, 15], [40, 15]], aliases: ["mudslide", "mud slide shot"], countries: ["US", "GB", "FR"] },
+  { id: "amaretto-sour-shot", brand: "Amaretto sour shot", group: "spirit", glass: "shot", parts: [[28, 30], [0, 15]], aliases: ["amaretto sour", "amaretto sour shooter"], countries: ["US", "GB", "FR", "IT"] },
+  { id: "woo-woo-shot", brand: "Woo woo shot", group: "spirit", glass: "shot", parts: [[40, 15], [20, 15], [0, 15]], aliases: ["woo woo", "woo-woo"], countries: ["US", "GB", "FR"] },
 ]);
 
 const LIQUEURS = bottled("spirit", [

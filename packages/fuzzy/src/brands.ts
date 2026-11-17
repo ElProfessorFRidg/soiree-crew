@@ -111,6 +111,19 @@ const SPIRITS = rows("spirit", [
   ["advocaat", "Advocaat Warninks", 17.2, 40, "shot", ["advocaat", "warninks"], ["NL", "DE", "BE"], BOTTLES],
   ["lejay-creme-de-cassis", "Crème de cassis Lejay", 16, 40, "shot", ["lejay", "creme de cassis", "crème de cassis", "cassis"], ["FR"], BOTTLES],
   ["passoa", "Passoã", 17, 40, "shot", ["passoa", "passoã", "passion fruit"], ["FR", "IT", "GB"], BOTTLES],
+  // Flavoured vodkas. Absolut's citrus stays at 40 %, its fruit and spice flavours went to 38 % (2022 range).
+  ["absolut-citron", "Absolut Citron", 40, 40, "shot", ["absolut citron"], ["SE", "FR", "GB", "DE"], BOTTLES],
+  ["absolut-lime", "Absolut Lime", 40, 40, "shot", ["absolut lime"], ["SE", "FR", "GB", "DE"], BOTTLES],
+  ["absolut-mandarin", "Absolut Mandarin", 40, 40, "shot", ["absolut mandarin"], ["SE", "FR", "GB", "DE"], BOTTLES],
+  ["absolut-vanilia", "Absolut Vanilia", 38, 40, "shot", ["absolut vanilia", "absolut vanilla"], ["SE", "FR", "GB", "DE"], BOTTLES],
+  ["absolut-raspberri", "Absolut Raspberri", 38, 40, "shot", ["absolut raspberri", "absolut raspberry"], ["SE", "FR", "GB", "DE"], BOTTLES],
+  ["absolut-mango", "Absolut Mango", 38, 40, "shot", ["absolut mango"], ["SE", "FR", "GB", "DE"], BOTTLES],
+  ["absolut-pears", "Absolut Pears", 38, 40, "shot", ["absolut pears", "absolut pear"], ["SE", "FR", "GB", "DE"], BOTTLES],
+  ["absolut-passionfruit", "Absolut Passionfruit", 38, 40, "shot", ["absolut passionfruit", "absolut passion"], ["SE", "FR", "GB", "DE"], BOTTLES],
+  ["absolut-watermelon", "Absolut Watermelon", 38, 40, "shot", ["absolut watermelon", "absolut pasteque"], ["SE", "FR", "GB", "DE"], BOTTLES],
+  // Eristoff fruit vodka drinks, 18 % on the label.
+  ["eristoff-red", "Eristoff Red", 18, 40, "shot", ["eristoff red", "eristoff rouge"], ["FR", "BE", "ES", "IT", "AT"], BOTTLES],
+  ["eristoff-black", "Eristoff Black", 18, 40, "shot", ["eristoff black", "eristoff noir"], ["FR", "BE", "ES", "IT", "AT"], BOTTLES],
 ]);
 
 const APERITIFS = rows("wine", [
@@ -167,6 +180,12 @@ const BEERS = rows("beer", [
   ["mc-chouffe", "Mc Chouffe", 8, 330, "bottle", ["mc chouffe", "mac chouffe", "chouffe brune"], ["BE", "FR"]],
   ["cuvee-des-trolls", "Cuvée des Trolls", 7, 330, "bottle", ["cuvee des trolls", "trolls"], ["BE", "FR"]],
   ["bush-ambree", "Bush Ambrée", 12, 330, "bottle", ["bush", "bush ambree"], ["BE", "FR"]],
+  // Bavaria 8.6 cans: the Gold is 6.5 %, the Extreme 10.5 % (50 cl), from the retailers' listings.
+  ["bavaria-8-6-gold", "Bavaria 8.6 Gold", 6.5, 500, "can", ["8.6 gold", "bavaria gold", "86 gold"], ["NL", "FR"]],
+  ["bavaria-8-6-extreme", "Bavaria 8.6 Extreme", 10.5, 500, "can", ["8.6 extreme", "bavaria extreme", "86 extreme"], ["NL", "FR"]],
+  // Spain, the bars' own beers: Voll-Damm 7.2 % (Damm's site), Ambar Especial 5.2 % (BeerTasting).
+  ["voll-damm", "Voll-Damm", 7.2, 330, "bottle", ["voll damm", "voll"], ["ES"], [250, 330, 500]],
+  ["ambar-especial", "Ambar Especial", 5.2, 330, "bottle", ["ambar", "ambar especial"], ["ES"], [250, 330, 500]],
   ["kriek", "Kriek Lindemans", 3.5, 250, "bottle", ["kriek", "lindemans"], ["BE", "FR"]],
   ["mort-subite", "Mort Subite", 4, 250, "bottle", ["mort subite"], ["BE", "FR"]],
   ["la-trappe", "La Trappe Tripel", 8, 330, "bottle", ["trappe"], ["NL", "BE"]],
