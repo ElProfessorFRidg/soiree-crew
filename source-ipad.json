@@ -238,52 +238,52 @@
       "category": "lifestyle",
       "screenshots": [
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/01-party.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/01-party.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/08-add-drink.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/08-add-drink.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/09-curve.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/09-curve.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/03-games.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/03-games.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/07-my-stats.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/07-my-stats.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/12-history.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/12-history.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/11-leaderboard.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/11-leaderboard.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/04-bars.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/04-bars.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/05-me.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/05-me.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/10-limits.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/10-limits.png",
           "width": 2064,
           "height": 2752
         }
@@ -299,6 +299,68 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.6",
+          "buildVersion": "126",
+          "marketingVersion": "0.2.6 Preview (126)",
+          "date": "2026-11-17T23:41:22Z",
+          "localizedDescription": "",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.8%2Bbuild.126/soiree-crew-ipad-unsigned.ipa",
+          "size": 22546131,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/01-party.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/08-add-drink.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/09-curve.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/03-games.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/07-my-stats.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/12-history.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/11-leaderboard.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/04-bars.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/05-me.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/10-limits.png",
+              "width": 2064,
+              "height": 2752
+            }
+          ]
+        },
         {
           "version": "0.2.6",
           "buildVersion": "124",
@@ -356,6 +418,68 @@
             },
             {
               "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/10-limits.png",
+              "width": 2064,
+              "height": 2752
+            }
+          ]
+        },
+        {
+          "version": "0.2.6",
+          "buildVersion": "122",
+          "marketingVersion": "0.2.6 Preview (122)",
+          "date": "2026-11-17T23:41:45Z",
+          "localizedDescription": "",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.6%2Bbuild.122/soiree-crew-ipad-unsigned.ipa",
+          "size": 22542259,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.6%2Bbuild.122/ipad/01-party.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.6%2Bbuild.122/ipad/08-add-drink.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.6%2Bbuild.122/ipad/09-curve.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.6%2Bbuild.122/ipad/03-games.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.6%2Bbuild.122/ipad/07-my-stats.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.6%2Bbuild.122/ipad/12-history.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.6%2Bbuild.122/ipad/11-leaderboard.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.6%2Bbuild.122/ipad/04-bars.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.6%2Bbuild.122/ipad/05-me.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.6%2Bbuild.122/ipad/10-limits.png",
               "width": 2064,
               "height": 2752
             }
@@ -673,21 +797,21 @@
         }
       ],
       "version": "0.2.6",
-      "versionDate": "2026-11-17T23:26:51Z",
-      "versionDescription": "• Add flavoured vodkas, Spanish bar beers, cans and 16 shooters\n• Add verified Belgian beers, liqueurs and aperitifs to the catalogue",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.7%2Bbuild.124/soiree-crew-ipad-unsigned.ipa",
-      "size": 22544618,
+      "versionDate": "2026-11-17T23:41:22Z",
+      "versionDescription": "",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.8%2Bbuild.126/soiree-crew-ipad-unsigned.ipa",
+      "size": 22546131,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/10-limits.png"
       ]
     }
   ],
@@ -704,6 +828,17 @@
       "notify": false
     },
     {
+      "identifier": "preview-0.2.6-126",
+      "title": "Soirée Crew Preview 0.2.6 (126)",
+      "caption": "",
+      "date": "2026-11-17T23:41:22Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.8%2Bbuild.126/ipad/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.8%2Bbuild.126/soiree-crew-ipad-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
+    {
       "identifier": "preview-0.2.6-124",
       "title": "Soirée Crew Preview 0.2.6 (124)",
       "caption": "• Add flavoured vodkas, Spanish bar beers, cans and 16 shooters\n• Add verified Belgian beers, liqueurs and aperitifs to the catalogue",
@@ -711,6 +846,17 @@
       "tintColor": "F4B33D",
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/ipad/banner.png",
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.7%2Bbuild.124/soiree-crew-ipad-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
+    {
+      "identifier": "preview-0.2.6-122",
+      "title": "Soirée Crew Preview 0.2.6 (122)",
+      "caption": "",
+      "date": "2026-11-17T23:41:45Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.6%2Bbuild.122/ipad/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.6%2Bbuild.122/soiree-crew-ipad-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
     },
@@ -800,9 +946,23 @@
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
       "version": "0.2.6",
+      "buildVersion": "126",
+      "date": "2026-11-17T23:41:22Z",
+      "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.6",
       "buildVersion": "124",
       "date": "2026-11-17T23:26:51Z",
       "localizedDescription": "• Add flavoured vodkas, Spanish bar beers, cans and 16 shooters\n• Add verified Belgian beers, liqueurs and aperitifs to the catalogue"
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.6",
+      "buildVersion": "122",
+      "date": "2026-11-17T23:41:45Z",
+      "localizedDescription": ""
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
