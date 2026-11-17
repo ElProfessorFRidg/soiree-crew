@@ -6,6 +6,27 @@
   "Other": [
     {
       "name": "Soirée Crew",
+      "version": "0.2.6",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6%2Bbuild.129/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "• Add Brasserie de Saint-Omer beers and Trois Monts with sourced strengths\n• Add national spirits and French eaux-de-vie with sourced strengths\n• Add flavoured vodkas, Spanish bar beers, cans and 16 shooters\n• Add verified Belgian beers, liqueurs and aperitifs to the catalogue",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6%2Bbuild.129/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6%2Bbuild.129/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6%2Bbuild.129/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6%2Bbuild.129/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6%2Bbuild.129/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6%2Bbuild.129/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6%2Bbuild.129/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6%2Bbuild.129/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6%2Bbuild.129/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6%2Bbuild.129/iphone/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew 0.2.5",
       "version": "0.2.5",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.5%2Bbuild.117/soiree-crew-unsigned.ipa",
