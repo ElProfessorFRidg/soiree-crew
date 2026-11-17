@@ -124,6 +124,15 @@ const SPIRITS = rows("spirit", [
   // Eristoff fruit vodka drinks, 18 % on the label.
   ["eristoff-red", "Eristoff Red", 18, 40, "shot", ["eristoff red", "eristoff rouge"], ["FR", "BE", "ES", "IT", "AT"], BOTTLES],
   ["eristoff-black", "Eristoff Black", 18, 40, "shot", ["eristoff black", "eristoff noir"], ["FR", "BE", "ES", "IT", "AT"], BOTTLES],
+  // Eaux-de-vie and spirits of other countries, strength from the appellation minimum or a retailer's label.
+  ["marc-de-bourgogne", "Marc de Bourgogne", 40, 40, "shot", ["marc de bourgogne", "marc"], ["FR"], BOTTLES],
+  ["armagnac", "Armagnac", 40, 40, "shot", ["armagnac"], ["FR"], BOTTLES],
+  ["soju", "Soju", 17, 50, "shot", ["soju", "소주"], ["KR"], [50, 360, 700]],
+  ["shochu", "Shochu", 25, 40, "shot", ["shochu", "shouchu"], ["JP"], BOTTLES],
+  ["moutai", "Kweichow Moutai", 53, 40, "shot", ["moutai", "maotai", "feitian", "茅台"], ["CN"], BOTTLES],
+  ["rakia", "Rakia", 40, 40, "shot", ["rakia", "rakija", "slivovitz", "sljivovica"], ["RS", "HR", "BA", "BG", "MK", "SI"], BOTTLES],
+  ["tsipouro", "Tsipouro", 40, 40, "shot", ["tsipouro", "tsipuro"], ["GR"], BOTTLES],
+  ["feni", "Feni", 43, 40, "shot", ["feni", "cashew feni"], ["IN"], BOTTLES],
 ]);
 
 const APERITIFS = rows("wine", [
@@ -141,6 +150,7 @@ const APERITIFS = rows("wine", [
   ["cynar", "Cynar", 16.5, 60, "wine", ["cynar artichaut"], ["IT", "FR"], [60, 700]],
   ["pommeau", "Pommeau de Normandie", 17, 60, "wine", ["pommeau"], ["FR"], [60, 120, 700]],
   ["pineau-des-charentes", "Pineau des Charentes", 17, 60, "wine", ["pineau", "pineau des charentes", "pineau blanc"], ["FR"], [60, 120, 750]],
+  ["ratafia-champenois", "Ratafia de Champagne", 18, 60, "wine", ["ratafia", "ratafia champenois"], ["FR"], [60, 120, 750]],
 ]);
 
 const BEERS = rows("beer", [
