@@ -1,5 +1,5 @@
 import { AppState, Platform } from "react-native";
-import { estimateBac, estimateDriving } from "@crew/bac";
+import { BacSimulation, distributionVolume, estimateBac, estimateDriving } from "@crew/bac";
 import { avatarColor, themes } from "@crew/design-tokens";
 import { breathRatio, countryRules, drivingLimit, formatBacValue } from "@crew/units";
 import { bacColor } from "@/drinks/display";
@@ -89,6 +89,23 @@ function driveOf(driving: ReturnType<typeof estimateDriving> | null, now: number
   return { label, value: i18n.t("liveActivity.underLimit"), short: i18n.t("liveActivity.underLimit"), tone: "ok" };
 }
 
+/** One simulation pass rather than recomputing peaks and driving thresholds for every sample. */
+function showForecast(
+  profile: Parameters<typeof distributionVolume>[0] | null,
+  intakes: ConstructorParameters<typeof BacSimulation>[0],
+  now: number,
+  zeroAt: number | null,
+  format: (bac: number) => string,
+): { at: number; value: string }[] | undefined {
+  if (!profile || !intakes.length || zeroAt === null) return undefined;
+  const sim = new BacSimulation(intakes, distributionVolume(profile), now);
+  const count = Math.min(361, Math.max(1, Math.ceil((zeroAt - now) / 120_000) + 1));
+  return Array.from({ length: count }, (_, i) => {
+    const at = Math.min(zeroAt, now + i * 120_000);
+    return { at, value: format(sim.bacAt(at)) };
+  });
+}
+
 const FACES = 4;
 
 /** The alert the crew would want first: someone very high, unwell, then gone quiet (O-88, N-36, N-29). */
@@ -131,6 +148,7 @@ export function buildNightPayload(input: {
   const estimate = profile && intakes.length ? estimateBac(intakes, profile, now) : null;
   const driving = profile && intakes.length ? estimateDriving(intakes, profile, now, limit) : null;
   const drinking = !!estimate && estimate.bac > 0 && estimate.backToZeroAt !== null;
+  const forecast = showForecast(profile, intakes, now, estimate?.backToZeroAt ?? null, value);
   if (!drinking && !party) return null;
 
   const show = lockScreenNumbers;
@@ -180,12 +198,7 @@ export function buildNightPayload(input: {
     zeroAt,
     limitFrac: under !== null && span > 0 && startAt !== null ? (under - startAt) / span : null,
     bac: show && estimate ? value(estimate.bac) : null,
-    bacForecast: show && profile && intakes.length && zeroAt !== null
-      ? Array.from({ length: Math.min(721, Math.ceil((zeroAt - now) / 60_000) + 1) }, (_, index) => {
-          const at = now + index * 60_000;
-          return { at, value: value(estimateBac(intakes, profile, at).bac) };
-        })
-      : undefined,
+    bacForecast: show ? forecast : undefined,
     unit: show ? i18n.t(`units.${preferences.bacUnit}`) : null,
     bacColor: estimate ? bacColor(estimate.bac, limit) : null,
     stamp: i18n.t("liveActivity.stamp", { time: clock(now) }),
