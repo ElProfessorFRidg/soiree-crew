@@ -164,6 +164,37 @@ export function notificationRoutes(app: FastifyInstance, ctx: Context): void {
     return reply.status(204).send();
   });
 
+  /** ActivityKit tokens are per-activity, not normal APNs device tokens. */
+  app.post("/v1/push/live-activities", async (request, reply) => {
+    const user = requireUser(request);
+    registrations.check(user.id);
+    const input = z.object({
+      activityId: z.string().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/),
+      token: z.string().regex(/^[0-9a-fA-F]{32,200}$/),
+    }).parse(request.body);
+    const session = hashToken(bearer(request) ?? "");
+    const now = ctx.now();
+    const tokenHash = hashToken(input.token.toLowerCase());
+    // A token cannot be claimed by another user or activity.
+    await ctx.db.query("delete from live_activity_devices where expires_at < $1 or (user_id = $2 and activity_id = $3)", [now, user.id, input.activityId]);
+    await ctx.db.query(
+      `insert into live_activity_devices (token_hash, token, activity_id, user_id, session_hash, created_at, last_seen_at, expires_at)
+       values ($1, $2, $3, $4, $5, $6, $6, $7)
+       on conflict (token_hash) do update set last_seen_at = excluded.last_seen_at, expires_at = excluded.expires_at
+       where live_activity_devices.user_id = excluded.user_id and live_activity_devices.session_hash = excluded.session_hash`,
+      [tokenHash, input.token.toLowerCase(), input.activityId, user.id, session, now, now + 12 * 3_600_000],
+    );
+    return reply.status(201).send({ ok: true });
+  });
+
+  app.delete<{ Params: { activityId: string } }>("/v1/push/live-activities/:activityId", async (request, reply) => {
+    const user = requireUser(request);
+    const id = z.string().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/).parse(request.params.activityId);
+    const session = hashToken(bearer(request) ?? "");
+    await ctx.db.query("delete from live_activity_devices where user_id = $1 and session_hash = $2 and activity_id = $3", [user.id, session, id]);
+    return reply.status(204).send();
+  });
+
   /** QOL-30: mute a party until the morning (or a given time, within two days). Safety still comes through. */
   app.post<{ Params: { id: string } }>("/v1/parties/:id/mute", async (request) => {
     const user = requireUser(request);
