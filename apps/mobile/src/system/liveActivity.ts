@@ -1,7 +1,7 @@
 import { AppState, Platform } from "react-native";
 import { BacSimulation, distributionVolume, estimateBac, estimateDriving } from "@crew/bac";
 import { avatarColor, themes } from "@crew/design-tokens";
-import { breathRatio, countryRules, drivingLimit, formatBacValue } from "@crew/units";
+import { bacFractionDigits, breathRatio, convertBac, countryRules, drivingLimit, formatBacValue } from "@crew/units";
 import { bacColor } from "@/drinks/display";
 import { createTranslator, type Translator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
@@ -41,7 +41,7 @@ export interface NightPayload {
   limitFrac: number | null;
   bac: string | null;
   /** Precomputed local estimates, no network or personal profile in the widget. */
-  bacForecast?: { start: number; step: number; values: number[]; scale: number };
+  bacForecast?: { start: number; step: number; values: number[]; digits: number; separator: string };
   unit: string | null;
   bacColor: string | null;
   stamp: string;
@@ -95,17 +95,25 @@ function showForecast(
   intakes: ConstructorParameters<typeof BacSimulation>[0],
   now: number,
   zeroAt: number | null,
-): { start: number; step: number; values: number[]; scale: number } | undefined {
+  unit: Parameters<typeof convertBac>[1],
+  ratio: number,
+  locale: string,
+): { start: number; step: number; values: number[]; digits: number; separator: string } | undefined {
   if (!profile || !intakes.length || zeroAt === null) return undefined;
   const step = 120_000;
+  const digits = bacFractionDigits(unit);
+  const separator = (1.1).toLocaleString(locale).replace(/\d/g, "").trim() || ".";
   const sim = new BacSimulation(intakes, distributionVolume(profile), now);
   const count = Math.min(361, Math.max(1, Math.ceil((zeroAt - now) / step) + 1));
   return {
     start: now,
     step,
-    scale: 1000,
-    values: Array.from({ length: count }, (_, i) =>
-      Math.round(Math.max(0, sim.bacAt(Math.min(zeroAt, now + i * step))) * 1000)),
+    digits,
+    separator,
+    values: Array.from({ length: count }, (_, i) => {
+      const bac = sim.bacAt(Math.min(zeroAt, now + i * step));
+      return Math.round(convertBac(bac < 0.005 ? 0 : bac, unit, ratio) * 10 ** digits);
+    }),
   };
 }
 
@@ -151,7 +159,7 @@ export function buildNightPayload(input: {
   const estimate = profile && intakes.length ? estimateBac(intakes, profile, now) : null;
   const driving = profile && intakes.length ? estimateDriving(intakes, profile, now, limit) : null;
   const drinking = !!estimate && estimate.bac > 0 && estimate.backToZeroAt !== null;
-  const forecast = showForecast(profile, intakes, now, estimate?.backToZeroAt ?? null);
+  const forecast = showForecast(profile, intakes, now, estimate?.backToZeroAt ?? null, preferences.bacUnit, ratio, i18n.locale);
   if (!drinking && !party) return null;
 
   const show = lockScreenNumbers;
