@@ -210,7 +210,7 @@ export function notificationRoutes(app: FastifyInstance, ctx: Context): void {
     const updated = await ctx.db.query<{ activity_id: string }>(
       `update live_activity_devices set state_sealed = $1, next_push_at = $2, last_seen_at = $3
        where activity_id = $4 and user_id = $5 and session_hash = $6 and expires_at > $3 returning activity_id`,
-      [ctx.sealer.seal(state), now + 10 * 60_000, now, input.activityId, user.id, session],
+      [ctx.sealer.seal(state), now + 60_000, now, input.activityId, user.id, session],
     );
     if (!updated.length) throw new HttpError(404, "activity_not_registered");
     return reply.status(204).send();
