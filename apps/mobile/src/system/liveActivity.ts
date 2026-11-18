@@ -159,10 +159,10 @@ export function buildNightPayload(input: {
   const estimate = profile && intakes.length ? estimateBac(intakes, profile, now) : null;
   const driving = profile && intakes.length ? estimateDriving(intakes, profile, now, limit) : null;
   const drinking = !!estimate && estimate.bac > 0 && estimate.backToZeroAt !== null;
-  const forecast = showForecast(profile, intakes, now, estimate?.backToZeroAt ?? null, preferences.bacUnit, ratio, i18n.locale);
   if (!drinking && !party) return null;
 
   const show = lockScreenNumbers;
+  const forecast = show ? showForecast(profile, intakes, now, estimate?.backToZeroAt ?? null, preferences.bacUnit, ratio, i18n.locale) : undefined;
   const zeroAt = drinking ? estimate!.backToZeroAt : null;
   const startAt = alcohol.length ? Math.min(...alcohol.map((d) => d.consumedAt)) : party ? party.startsAt : null;
   const under = driving && driving.underLimitAt !== null && driving.underLimitAt > now ? driving.underLimitAt : null;
@@ -249,6 +249,11 @@ function currentParty(now: number): { party: Party | null; live: LiveParty | nul
   return { party, live: party ? (live[party.id] ?? null) : null };
 }
 
+/** UTF-8 bytes, including multibyte translated strings. */
+function BufferSize(value: string): number {
+  return new TextEncoder().encode(value).length;
+}
+
 export function syncLiveActivity(): void {
   const mod = live();
   if (!mod) return;
@@ -274,6 +279,12 @@ export function syncLiveActivity(): void {
       subtitle: JSON.stringify(payload),
       ...(end !== null ? { progressBar: { date: end } } : {}),
     };
+    // ActivityKit has a strict payload budget. Never send an oversized JSON snapshot.
+    // A smaller snapshot retains the native countdown and all existing controls.
+    if (BufferSize(state.subtitle) > 3500) {
+      payload.bacForecast = undefined;
+      state.subtitle = JSON.stringify(payload);
+    }
     if (liveActivityId) mod.updateActivity(liveActivityId, state);
     else {
       const id = mod.startActivity(state, {
