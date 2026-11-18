@@ -99,9 +99,9 @@ function showForecast(
 ): { at: number; value: string }[] | undefined {
   if (!profile || !intakes.length || zeroAt === null) return undefined;
   const sim = new BacSimulation(intakes, distributionVolume(profile), now);
-  const count = Math.min(361, Math.max(1, Math.ceil((zeroAt - now) / 120_000) + 1));
+  const count = Math.min(73, Math.max(1, Math.ceil((zeroAt - now) / 600_000) + 1));
   return Array.from({ length: count }, (_, i) => {
-    const at = Math.min(zeroAt, now + i * 120_000);
+    const at = Math.min(zeroAt, now + i * 600_000);
     return { at, value: format(sim.bacAt(at)) };
   });
 }
