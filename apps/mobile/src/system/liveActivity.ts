@@ -289,7 +289,18 @@ export function syncLiveActivity(): void {
       payload.bacForecast = undefined;
       state.subtitle = JSON.stringify(payload);
     }
-    if (liveActivityId) mod.updateActivity(liveActivityId, state);
+    if (liveActivityId) {
+      mod.updateActivity(liveActivityId, state);
+      // No secrets or credentials in the payload; API authenticates the current session.
+      if (useSession.getState().session) void api("/v1/push/live-activities/state", {
+        method: "PUT",
+        body: { activityId: liveActivityId, contentState: {
+          title: state.title,
+          subtitle: state.subtitle,
+          ...(end !== null ? { timerEndDateInMilliseconds: end } : {}),
+        } },
+      }).catch(() => undefined);
+    }
     else if (!startingPushActivity) {
       startingPushActivity = true;
       // Native Activity.request(pushType: .token) is mandatory for APNs updates.
@@ -343,6 +354,7 @@ export function watchLiveActivity(): void {
     pending.add(key);
     void api("/v1/push/live-activities", { method: "POST", body: { activityId, token } })
       .then(() => {
+        syncLiveActivity(); // Send the encrypted server snapshot once token registration succeeds.
         const current = useSession.getState().session;
         if (current?.url === session.url && current.userId === session.userId && current.token === session.token) seen.set(activityId, key);
       })
