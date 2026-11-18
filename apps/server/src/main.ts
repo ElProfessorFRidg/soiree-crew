@@ -76,7 +76,7 @@ await app.listen({ port, host: "0.0.0.0" });
 app.log.info(`push: iOS ${push?.enabled("ios") ? "on" : "off"}, Android ${push?.enabled("android") ? "on" : "off"}`);
 // N-25, N-29, O-41, QOL-20: notifications nobody's request causes.
 const stopSweeper = startNotificationSweeper(context, (error) => app.log.error(error));
-const stopActivityScheduler = startActivityPushScheduler(context, (error) => app.log.error(error));
+const stopActivityScheduler = startActivityPushScheduler(context, (error) => app.log.error(error), (event, details) => app.log.info({ event, ...details }, "ActivityKit scheduler"));
 
 // N-29, N-36, O-88: once a minute the server looks over the live parties and tells the crews.
 setInterval(() => {
