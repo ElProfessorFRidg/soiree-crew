@@ -130,3 +130,29 @@ export class ApnsTransport implements PushTransport {
     this.session = null;
   }
 }
+
+/**
+ * ActivityKit remote updates use a distinct push type, topic and device token.
+ * These tokens are issued per Live Activity, NOT by expo-notifications.
+ * The caller must provide the complete ActivityKit ContentState matching the widget.
+ */
+export interface LiveActivityPush {
+  token: string;
+  event: "update" | "end";
+  contentState: Record<string, unknown>;
+  timestamp: number;
+  staleDate?: number;
+  dismissalDate?: number;
+}
+
+export function activityKitPayload(message: LiveActivityPush): Record<string, unknown> {
+  return {
+    aps: {
+      timestamp: Math.floor(message.timestamp / 1000),
+      event: message.event,
+      "content-state": message.contentState,
+      ...(message.staleDate === undefined ? {} : { "stale-date": Math.floor(message.staleDate / 1000) }),
+      ...(message.event === "end" && message.dismissalDate !== undefined ? { "dismissal-date": Math.floor(message.dismissalDate / 1000) } : {}),
+    },
+  };
+}
