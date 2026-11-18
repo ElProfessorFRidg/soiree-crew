@@ -52,6 +52,10 @@ struct LiveActivityAttributes: ActivityAttributes {
 // MARK: - What the app sends
 
 struct NightPayload: Decodable {
+  struct ForecastPoint: Decodable {
+    let at: Double
+    let value: String
+  }
   struct Person: Decodable, Hashable {
     let i: String
     let c: String
@@ -99,6 +103,7 @@ struct NightPayload: Decodable {
   let zeroAt: Double?
   let limitFrac: Double?
   let bac: String?
+  let bacForecast: [ForecastPoint]?
   let unit: String?
   let bacColor: String?
   let stamp: String
@@ -329,6 +334,21 @@ private struct Faces: View {
 
 // MARK: - Lock screen, solo night (design A)
 
+/// A best-effort offline clock-driven view. iOS owns Live Activity refresh cadence;
+/// TimelineView is not a guarantee of minute-by-minute lock-screen updates.
+private struct ForecastFigure: View {
+  let payload: NightPayload
+  let fallback: String
+  let size: CGFloat
+  var body: some View {
+    TimelineView(.periodic(from: .now, by: 60)) { timeline in
+      let now = timeline.date.timeIntervalSince1970 * 1000
+      let value = payload.bacForecast?.last(where: { $0.at <= now })?.value ?? fallback
+      Text(value).font(numeral(size)).foregroundStyle(payload.figureColor)
+    }
+  }
+}
+
 private struct SoloLockView: View {
   let p: NightPayload
   // iOS gives the lock screen about 160 pt of height: hero, bar, one line of facts, buttons.
@@ -338,7 +358,7 @@ private struct SoloLockView: View {
         if p.show, let bac = p.bac {
           VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
-              Text(bac).font(numeral(40)).foregroundStyle(p.figureColor)
+              ForecastFigure(payload: p, fallback: bac, size: 40)
               Text(p.unit ?? "").font(.system(size: 13, weight: .bold)).foregroundStyle(NightColors.text)
             }
             if let status = p.status {
@@ -421,7 +441,7 @@ private struct PartyLockView: View {
           Spacer(minLength: 4)
           if p.show, let bac = p.bac {
             HStack(alignment: .firstTextBaseline, spacing: 3) {
-              Text(bac).font(numeral(26)).foregroundStyle(p.figureColor)
+              ForecastFigure(payload: p, fallback: bac, size: 26)
               Text(p.unit ?? "").font(.system(size: 11, weight: .bold)).foregroundStyle(NightColors.text)
             }
           }
@@ -535,7 +555,7 @@ struct LiveActivityWidget: Widget {
     } else if p.show, let bac = p.bac {
       HStack(spacing: 4) {
         Glyph(systemName: "mug.fill", color: p.figureColor, size: 12)
-        Text(bac).font(numeral(17)).foregroundStyle(p.figureColor)
+        ForecastFigure(payload: p, fallback: bac, size: 17)
       }
     } else {
       HStack(spacing: 3) {
@@ -585,7 +605,7 @@ struct LiveActivityWidget: Widget {
       }
       if p.show, let bac = p.bac {
         HStack(alignment: .firstTextBaseline, spacing: 4) {
-          Text(bac).font(numeral(p.inParty ? 30 : 44)).foregroundStyle(p.figureColor)
+          ForecastFigure(payload: p, fallback: bac, size: p.inParty ? 30 : 44)
           Text(p.unit ?? "").font(.system(size: 12, weight: .bold)).foregroundStyle(NightColors.text)
         }
       } else if !p.inParty, let zero = p.zeroClock {
