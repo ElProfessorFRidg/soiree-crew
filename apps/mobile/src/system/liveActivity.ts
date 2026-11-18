@@ -1,4 +1,6 @@
 import { AppState, Platform } from "react-native";
+import { observeActivityTokens } from "../../modules/crew-activity-tokens";
+import { api } from "@/server/api";
 import { BacSimulation, distributionVolume, estimateBac, estimateDriving } from "@crew/bac";
 import { avatarColor, themes } from "@crew/design-tokens";
 import { bacFractionDigits, breathRatio, convertBac, countryRules, drivingLimit, formatBacValue } from "@crew/units";
@@ -307,6 +309,16 @@ export function syncLiveActivity(): void {
 /** Follows what is logged and the party, and refreshes the figure each minute while the app is open. */
 export function watchLiveActivity(): void {
   if (Platform.OS !== "ios") return;
+  // Replay token registrations after app upgrades, login, or network reconnection.
+  const seen = new Map<string, string>();
+  const register = ({ activityId, token }: { activityId: string; token: string }) => {
+    if (seen.get(activityId) === token) return;
+    void api("/v1/push/live-activities", { method: "POST", body: { activityId, token } })
+      .then(() => seen.set(activityId, token))
+      .catch(() => undefined); // Offline: replayed when the observer is restarted.
+  };
+  const observe = () => observeActivityTokens(register);
+  let stopObserving = observe();
   const schedule = () => {
     clearTimeout(timer);
     timer = setTimeout(syncLiveActivity, 800);
@@ -322,7 +334,11 @@ export function watchLiveActivity(): void {
     tick(active);
     // A delayed JS timer is not reliable once iOS suspends the app.
     // Publish the latest snapshot synchronously before suspension; refresh on resume.
-    if (active) schedule();
+    if (active) {
+      stopObserving();
+      stopObserving = observe();
+      schedule();
+    }
     else {
       clearTimeout(timer);
       syncLiveActivity();
