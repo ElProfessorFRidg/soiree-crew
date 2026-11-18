@@ -1,0 +1,15 @@
+{
+  "name": "crew-activity-tokens",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "expo": {
+    "autolinking": {
+      "ios": {
+        "modules": [
+          "CrewActivityTokensModule"
+        ]
+      }
+    }
+  }
+}
