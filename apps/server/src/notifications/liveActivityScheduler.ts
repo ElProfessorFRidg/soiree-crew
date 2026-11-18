@@ -19,7 +19,7 @@ export async function sweepActivityPushes(ctx: Context): Promise<void> {
        where next_push_at <= $1 and expires_at > $1 and state_sealed is not null
        order by next_push_at limit 50 for update skip locked
      ) returning token_hash, token_sealed, state_sealed, expires_at`,
-    [now, now + 10 * 60_000],
+    [now, now + 60_000],
   );
   for (const row of due) {
     try {
@@ -27,7 +27,7 @@ export async function sweepActivityPushes(ctx: Context): Promise<void> {
       const contentState = ctx.sealer.open<Record<string, unknown>>(row.state_sealed);
       const result = await ctx.push.sendLiveActivity({ token, event: "update", contentState, timestamp: now, staleDate: Math.min(row.expires_at, now + 15 * 60_000) });
       if (result === "gone") await ctx.db.query("delete from live_activity_devices where token_hash = $1", [row.token_hash]);
-      if (result === "error") await ctx.db.query("update live_activity_devices set next_push_at = $2 where token_hash = $1 and next_push_at = $3", [row.token_hash, now + 2 * 60_000, now + 10 * 60_000]);
+      if (result === "error") await ctx.db.query("update live_activity_devices set next_push_at = $2 where token_hash = $1 and next_push_at = $3", [row.token_hash, now + 30_000, now + 60_000]);
     } catch {
       // Invalid sealed data or a transient APNs failure must not crash the server loop.
       await ctx.db.query("update live_activity_devices set next_push_at = null where token_hash = $1", [row.token_hash]);
