@@ -190,6 +190,32 @@ export function notificationRoutes(app: FastifyInstance, ctx: Context): void {
     return reply.status(201).send({ ok: true });
   });
 
+  /** The device is authoritative for its display. The server only schedules encrypted snapshots. */
+  app.put("/v1/push/live-activities/state", async (request, reply) => {
+    const user = requireUser(request);
+    registrations.check(user.id);
+    const input = z.object({
+      activityId: z.string().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/),
+      contentState: z.object({
+        title: z.string().max(256),
+        subtitle: z.string().max(3500).nullable().optional(),
+        timerEndDateInMilliseconds: z.number().finite().optional(),
+      }).strict(),
+    }).parse(request.body);
+    const state = input.contentState;
+    if (Buffer.byteLength(JSON.stringify({ aps: { timestamp: Math.floor(ctx.now() / 1000), event: "update", "content-state": state } }), "utf8") > 4096)
+      throw new HttpError(413, "activity_state_too_large");
+    const session = hashToken(bearer(request) ?? "");
+    const now = ctx.now();
+    const updated = await ctx.db.query<{ activity_id: string }>(
+      `update live_activity_devices set state_sealed = $1, next_push_at = $2, last_seen_at = $3
+       where activity_id = $4 and user_id = $5 and session_hash = $6 and expires_at > $3 returning activity_id`,
+      [ctx.sealer.seal(state), now + 10 * 60_000, now, input.activityId, user.id, session],
+    );
+    if (!updated.length) throw new HttpError(404, "activity_not_registered");
+    return reply.status(204).send();
+  });
+
   app.delete<{ Params: { activityId: string } }>("/v1/push/live-activities/:activityId", async (request, reply) => {
     const user = requireUser(request);
     const id = z.string().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/).parse(request.params.activityId);
