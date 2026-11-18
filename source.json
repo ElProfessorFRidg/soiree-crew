@@ -753,16 +753,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -775,6 +775,28 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.8",
+          "buildVersion": "176",
+          "marketingVersion": "0.2.8 Preview (176)",
+          "date": "2026-11-18T23:10:30Z",
+          "localizedDescription": "• Use OnStartObserving for the onToken event\n• Restore CI on the live-activity lifecycle branch\n• Route unauthenticated deep links to onboarding\n• Execute deep-link action before navigating away\n• Surface ActivityKit outcomes in server JSON logs\n• Privacy-safe structured ActivityKit scheduler delivery logs\n• Prevent orphaned Live Activities after async creation races\n• Schedule first remote refresh after one minute\n• Refresh APNs Live Activity snapshots every minute instead of ten\n• Publish authenticated ActivityKit snapshots for automatic server updates\n• Run ActivityKit push scheduler each minute and stop on shutdown\n• Automatically dispatch due encrypted ActivityKit updates via APNs\n• Authenticated encrypted Live Activity snapshot scheduling\n• Encrypted scheduled ActivityKit state and due-time index\n• Replay registration on login changes and deduplicate concurrent token requests\n• Declare local ActivityKit Expo module for autolinking\n• Start every new Live Activity with native pushType token\n• Expose push-enabled ActivityKit creation to JavaScript\n• Request Live Activities with pushType token natively\n• Preserve automatic token replay behavior\n• Register native ActivityKit push tokens on launch and resume\n• Observe existing and rotating ActivityKit push tokens natively\n• Scaffold local Expo ActivityKit token observer module\n• Scaffold local Expo ActivityKit token observer module\n• Scaffold local Expo ActivityKit token observer module\n• Explain legacy token re-registration requirement\n• Use keyed token lookup to avoid offline token correlation\n• Retain stable token lookup hashes across encryption upgrade\n• Remove legacy plaintext ActivityKit tokens safely\n• AES-256-GCM seal ActivityKit tokens with server DATA_KEY\n• Store encrypted ActivityKit tokens instead of plaintext\n• Reject ActivityKit token ownership conflicts explicitly\n• Expose ActivityKit sender through existing push lifecycle\n• Authenticated rate-limited ActivityKit token registration and revocation\n• Session-scoped expiring ActivityKit token registration\n• Avoid TextEncoder dependency in React Native runtime\n• Authenticated bounded HTTP2 ActivityKit push transport\n• Resolve temporal-dead-zone error and bound forecast payload\n• Decode compact 2-minute BAC samples with correct localized precision\n• Preserve selected BAC unit and decimal precision in offline forecast",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.10%2Bbuild.176/soiree-crew-unsigned.ipa",
+          "size": 22678817,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.6",
           "buildVersion": "128",
@@ -974,26 +996,37 @@
           ]
         }
       ],
-      "version": "0.2.6",
-      "versionDate": "2026-11-17T23:55:00Z",
-      "versionDescription": "",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.9%2Bbuild.128/soiree-crew-unsigned.ipa",
-      "size": 22546115,
+      "version": "0.2.8",
+      "versionDate": "2026-11-18T23:10:30Z",
+      "versionDescription": "• Use OnStartObserving for the onToken event\n• Restore CI on the live-activity lifecycle branch\n• Route unauthenticated deep links to onboarding\n• Execute deep-link action before navigating away\n• Surface ActivityKit outcomes in server JSON logs\n• Privacy-safe structured ActivityKit scheduler delivery logs\n• Prevent orphaned Live Activities after async creation races\n• Schedule first remote refresh after one minute\n• Refresh APNs Live Activity snapshots every minute instead of ten\n• Publish authenticated ActivityKit snapshots for automatic server updates\n• Run ActivityKit push scheduler each minute and stop on shutdown\n• Automatically dispatch due encrypted ActivityKit updates via APNs\n• Authenticated encrypted Live Activity snapshot scheduling\n• Encrypted scheduled ActivityKit state and due-time index\n• Replay registration on login changes and deduplicate concurrent token requests\n• Declare local ActivityKit Expo module for autolinking\n• Start every new Live Activity with native pushType token\n• Expose push-enabled ActivityKit creation to JavaScript\n• Request Live Activities with pushType token natively\n• Preserve automatic token replay behavior\n• Register native ActivityKit push tokens on launch and resume\n• Observe existing and rotating ActivityKit push tokens natively\n• Scaffold local Expo ActivityKit token observer module\n• Scaffold local Expo ActivityKit token observer module\n• Scaffold local Expo ActivityKit token observer module\n• Explain legacy token re-registration requirement\n• Use keyed token lookup to avoid offline token correlation\n• Retain stable token lookup hashes across encryption upgrade\n• Remove legacy plaintext ActivityKit tokens safely\n• AES-256-GCM seal ActivityKit tokens with server DATA_KEY\n• Store encrypted ActivityKit tokens instead of plaintext\n• Reject ActivityKit token ownership conflicts explicitly\n• Expose ActivityKit sender through existing push lifecycle\n• Authenticated rate-limited ActivityKit token registration and revocation\n• Session-scoped expiring ActivityKit token registration\n• Avoid TextEncoder dependency in React Native runtime\n• Authenticated bounded HTTP2 ActivityKit push transport\n• Resolve temporal-dead-zone error and bound forecast payload\n• Decode compact 2-minute BAC samples with correct localized precision\n• Preserve selected BAC unit and decimal precision in offline forecast",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.10%2Bbuild.176/soiree-crew-unsigned.ipa",
+      "size": 22678817,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "preview-0.2.8-176",
+      "title": "Soirée Crew Preview 0.2.8 (176)",
+      "caption": "• Use OnStartObserving for the onToken event\n• Restore CI on the live-activity lifecycle branch\n• Route unauthenticated deep links to onboarding\n• Execute deep-link action before navigating away\n• Surface ActivityKit outcomes in server JSON logs\n• Privacy-safe structured ActivityKit scheduler delivery logs\n• Prevent orphaned Live Activities after async creation races\n• Schedule first remote refresh after one minute\n• Refresh APNs Live Activity snapshots every minute instead of ten\n• Publish authenticated ActivityKit snapshots for automatic server updates\n• Run ActivityKit push scheduler each minute and stop on shutdown\n• Automatically dispatch due encrypted ActivityKit updates via APNs\n• Authenticated encrypted Live Activity snapshot scheduling\n• Encrypted scheduled ActivityKit state and due-time index\n• Replay registration on login changes and deduplicate concurrent token requests\n• Declare local ActivityKit Expo module for autolinking\n• Start every new Live Activity with native pushType token\n• Expose push-enabled ActivityKit creation to JavaScript\n• Request Live Activities with pushType token natively\n• Preserve automatic token replay behavior\n• Register native ActivityKit push tokens on launch and resume\n• Observe existing and rotating ActivityKit push tokens natively\n• Scaffold local Expo ActivityKit token observer module\n• Scaffold local Expo ActivityKit token observer module\n• Scaffold local Expo ActivityKit token observer module\n• Explain legacy token re-registration requirement\n• Use keyed token lookup to avoid offline token correlation\n• Retain stable token lookup hashes across encryption upgrade\n• Remove legacy plaintext ActivityKit tokens safely\n• AES-256-GCM seal ActivityKit tokens with server DATA_KEY\n• Store encrypted ActivityKit tokens instead of plaintext\n• Reject ActivityKit token ownership conflicts explicitly\n• Expose ActivityKit sender through existing push lifecycle\n• Authenticated rate-limited ActivityKit token registration and revocation\n• Session-scoped expiring ActivityKit token registration\n• Avoid TextEncoder dependency in React Native runtime\n• Authenticated bounded HTTP2 ActivityKit push transport\n• Resolve temporal-dead-zone error and bound forecast payload\n• Decode compact 2-minute BAC samples with correct localized precision\n• Preserve selected BAC unit and decimal precision in offline forecast",
+      "date": "2026-11-18T23:10:30Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.10%2Bbuild.176/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
     {
       "identifier": "release-0.2.7-174",
       "title": "Soirée Crew 0.2.7 (174)",
@@ -1200,17 +1233,6 @@
       "tintColor": "F4B33D",
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.11/banner.png",
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.11%2Bbuild.79/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile",
-      "notify": false
-    },
-    {
-      "identifier": "release-0.1.10-77",
-      "title": "Soirée Crew 0.1.10 (77)",
-      "caption": "• Les boissons comme on les commande : « Flash vodka Red Bull » en entier, « Flash vodka » quand la place manque, et pareil pour les noms longs.\n• Les vrais noms de chaque pays, dans la langue de l'app : Monaco, Picon bière, Perroquet, Cubata, Calimocho, Wodka-E, Radler, Snakebite, Ёрш, Отвёртка…\n• Des dizaines de shots et de mélanges : TGV, B-52, Kamikaze, Tequila paf, Mexikaner, Baby Guinness, Jägerbomb, Rhum coca, Whisky coca…\n• « Un bouchon de vodka » ou « 2 bouchons de whisky » se tapent tels quels (1 cl le bouchon).\n• Verre mélangé : moitié whisky, moitié rhum, un soft par-dessus… Mets les doses, l'app calcule la taille et le degré du verre.\n• Prends ou choisis une photo de ta boisson perso : elle remplace l'icône partout, et reste sur ton téléphone.",
-      "date": "2026-10-31T14:22:47Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.10/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.10%2Bbuild.77/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile",
       "notify": false
     }
@@ -1524,6 +1546,13 @@
       "buildVersion": "2",
       "date": "2026-10-27T00:43:05Z",
       "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.8",
+      "buildVersion": "176",
+      "date": "2026-11-18T23:10:30Z",
+      "localizedDescription": "• Use OnStartObserving for the onToken event\n• Restore CI on the live-activity lifecycle branch\n• Route unauthenticated deep links to onboarding\n• Execute deep-link action before navigating away\n• Surface ActivityKit outcomes in server JSON logs\n• Privacy-safe structured ActivityKit scheduler delivery logs\n• Prevent orphaned Live Activities after async creation races\n• Schedule first remote refresh after one minute\n• Refresh APNs Live Activity snapshots every minute instead of ten\n• Publish authenticated ActivityKit snapshots for automatic server updates\n• Run ActivityKit push scheduler each minute and stop on shutdown\n• Automatically dispatch due encrypted ActivityKit updates via APNs\n• Authenticated encrypted Live Activity snapshot scheduling\n• Encrypted scheduled ActivityKit state and due-time index\n• Replay registration on login changes and deduplicate concurrent token requests\n• Declare local ActivityKit Expo module for autolinking\n• Start every new Live Activity with native pushType token\n• Expose push-enabled ActivityKit creation to JavaScript\n• Request Live Activities with pushType token natively\n• Preserve automatic token replay behavior\n• Register native ActivityKit push tokens on launch and resume\n• Observe existing and rotating ActivityKit push tokens natively\n• Scaffold local Expo ActivityKit token observer module\n• Scaffold local Expo ActivityKit token observer module\n• Scaffold local Expo ActivityKit token observer module\n• Explain legacy token re-registration requirement\n• Use keyed token lookup to avoid offline token correlation\n• Retain stable token lookup hashes across encryption upgrade\n• Remove legacy plaintext ActivityKit tokens safely\n• AES-256-GCM seal ActivityKit tokens with server DATA_KEY\n• Store encrypted ActivityKit tokens instead of plaintext\n• Reject ActivityKit token ownership conflicts explicitly\n• Expose ActivityKit sender through existing push lifecycle\n• Authenticated rate-limited ActivityKit token registration and revocation\n• Session-scoped expiring ActivityKit token registration\n• Avoid TextEncoder dependency in React Native runtime\n• Authenticated bounded HTTP2 ActivityKit push transport\n• Resolve temporal-dead-zone error and bound forecast payload\n• Decode compact 2-minute BAC samples with correct localized precision\n• Preserve selected BAC unit and decimal precision in offline forecast"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",

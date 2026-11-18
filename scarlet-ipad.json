@@ -69,6 +69,27 @@
     },
     {
       "name": "Soirée Crew Preview",
+      "version": "0.2.8",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.10%2Bbuild.176/soiree-crew-ipad-unsigned.ipa",
+      "category": "Other",
+      "description": "• Use OnStartObserving for the onToken event\n• Restore CI on the live-activity lifecycle branch\n• Route unauthenticated deep links to onboarding\n• Execute deep-link action before navigating away\n• Surface ActivityKit outcomes in server JSON logs\n• Privacy-safe structured ActivityKit scheduler delivery logs\n• Prevent orphaned Live Activities after async creation races\n• Schedule first remote refresh after one minute\n• Refresh APNs Live Activity snapshots every minute instead of ten\n• Publish authenticated ActivityKit snapshots for automatic server updates\n• Run ActivityKit push scheduler each minute and stop on shutdown\n• Automatically dispatch due encrypted ActivityKit updates via APNs\n• Authenticated encrypted Live Activity snapshot scheduling\n• Encrypted scheduled ActivityKit state and due-time index\n• Replay registration on login changes and deduplicate concurrent token requests\n• Declare local ActivityKit Expo module for autolinking\n• Start every new Live Activity with native pushType token\n• Expose push-enabled ActivityKit creation to JavaScript\n• Request Live Activities with pushType token natively\n• Preserve automatic token replay behavior\n• Register native ActivityKit push tokens on launch and resume\n• Observe existing and rotating ActivityKit push tokens natively\n• Scaffold local Expo ActivityKit token observer module\n• Scaffold local Expo ActivityKit token observer module\n• Scaffold local Expo ActivityKit token observer module\n• Explain legacy token re-registration requirement\n• Use keyed token lookup to avoid offline token correlation\n• Retain stable token lookup hashes across encryption upgrade\n• Remove legacy plaintext ActivityKit tokens safely\n• AES-256-GCM seal ActivityKit tokens with server DATA_KEY\n• Store encrypted ActivityKit tokens instead of plaintext\n• Reject ActivityKit token ownership conflicts explicitly\n• Expose ActivityKit sender through existing push lifecycle\n• Authenticated rate-limited ActivityKit token registration and revocation\n• Session-scoped expiring ActivityKit token registration\n• Avoid TextEncoder dependency in React Native runtime\n• Authenticated bounded HTTP2 ActivityKit push transport\n• Resolve temporal-dead-zone error and bound forecast payload\n• Decode compact 2-minute BAC samples with correct localized precision\n• Preserve selected BAC unit and decimal precision in offline forecast",
+      "bundleID": "app.soireecrew.mobile.preview",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/ipad/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/ipad/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/ipad/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/ipad/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/ipad/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/ipad/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/ipad/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/ipad/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/ipad/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/ipad/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew Preview 0.2.6",
       "version": "0.2.6",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.9%2Bbuild.128/soiree-crew-ipad-unsigned.ipa",
