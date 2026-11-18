@@ -52,9 +52,22 @@ struct LiveActivityAttributes: ActivityAttributes {
 // MARK: - What the app sends
 
 struct NightPayload: Decodable {
-  struct ForecastPoint: Decodable {
-    let at: Double
-    let value: String
+  struct Forecast: Decodable {
+    let start: Double
+    let step: Double
+    let values: [Int]
+    let digits: Int
+    let separator: String
+
+    func value(at date: Date) -> String? {
+      guard !values.isEmpty, step > 0, digits >= 0, digits <= 3 else { return nil }
+      let index = max(0, min(values.count - 1, Int(floor((date.timeIntervalSince1970 * 1000 - start) / step))))
+      let divisor = Int(pow(10.0, Double(digits)))
+      let raw = max(0, values[index])
+      if digits == 0 { return String(raw) }
+      let fraction = String(raw % divisor)
+      return "\(raw / divisor)\(separator)\(String(repeating: "0", count: max(0, digits - fraction.count)))\(fraction)"
+    }
   }
   struct Person: Decodable, Hashable {
     let i: String
@@ -103,7 +116,7 @@ struct NightPayload: Decodable {
   let zeroAt: Double?
   let limitFrac: Double?
   let bac: String?
-  let bacForecast: [ForecastPoint]?
+  let bacForecast: Forecast?
   let unit: String?
   let bacColor: String?
   let stamp: String
@@ -342,8 +355,7 @@ private struct ForecastFigure: View {
   let size: CGFloat
   var body: some View {
     TimelineView(.periodic(from: .now, by: 60)) { timeline in
-      let now = timeline.date.timeIntervalSince1970 * 1000
-      let value = payload.bacForecast?.last(where: { $0.at <= now })?.value ?? fallback
+      let value = payload.bacForecast?.value(at: timeline.date) ?? fallback
       Text(value).font(numeral(size)).foregroundStyle(payload.figureColor)
     }
   }
