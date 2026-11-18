@@ -324,7 +324,10 @@ export function syncLiveActivity(): void {
         .then((id) => {
           if (!id) return;
           const current = useAppStore.getState().liveActivityId;
-          if (current && current !== id) {
+          const now = Date.now();
+          const { party: activeParty, live: activePartyLive } = currentParty(now);
+          const stillNeeded = buildNightPayload({ now, party: activeParty, live: activePartyLive, me: useSession.getState().session?.userId ?? null });
+          if (!stillNeeded || (current && current !== id)) {
             mod.stopActivity(id, { title: i18n.t("liveActivity.ended") });
             return;
           }
