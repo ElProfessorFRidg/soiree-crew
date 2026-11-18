@@ -2,7 +2,7 @@
 -- No APNs private keys or BAC data are persisted here.
 create table live_activity_devices (
   token_hash text primary key,
-  token text not null,
+  token_sealed text not null,
   activity_id text not null,
   user_id uuid not null references users(id) on delete cascade,
   session_hash text not null references sessions(token_hash) on delete cascade,
