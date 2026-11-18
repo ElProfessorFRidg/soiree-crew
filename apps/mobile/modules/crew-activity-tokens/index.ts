@@ -3,7 +3,6 @@ import { Platform } from "react-native";
 
 type TokenEvent = { activityId: string; token: string };
 type TokenModule = {
-  startObserving(): void;
   startPushActivity(attributesJson: string, stateJson: string): Promise<string | null>;
   addListener(event: "onToken", callback: (event: TokenEvent) => void): { remove(): void };
 };
@@ -14,8 +13,9 @@ export function observeActivityTokens(onToken: (event: TokenEvent) => void): () 
   let native: TokenModule;
   try { native = requireNativeModule<TokenModule>("CrewActivityTokens"); }
   catch { return () => undefined; }
+  // Expo's EventEmitter calls startObserving("onToken") natively when the first
+  // listener is attached, which triggers the module's OnStartObserving handler.
   const listener = native.addListener("onToken", onToken);
-  native.startObserving();
   return () => listener.remove();
 }
 

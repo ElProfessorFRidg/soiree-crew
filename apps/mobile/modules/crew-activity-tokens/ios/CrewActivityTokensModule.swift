@@ -72,7 +72,7 @@ public class CrewActivityTokensModule: Module {
       )
       return activity.id
     }
-    Function("startObserving") { [weak self] in
+    OnStartObserving("onToken") { [weak self] in
       guard let self = self else { return }
       if #available(iOS 16.2, *) {
         self.observer?.cancel()
