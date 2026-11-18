@@ -174,7 +174,7 @@ export function notificationRoutes(app: FastifyInstance, ctx: Context): void {
     }).parse(request.body);
     const session = hashToken(bearer(request) ?? "");
     const now = ctx.now();
-    const tokenHash = ctx.sealer.lookup(`activitykit:${input.token.toLowerCase()}`);
+    const tokenHash = hashToken(input.token.toLowerCase());
     const tokenSealed = ctx.sealer.seal(input.token.toLowerCase());
     // A token cannot be claimed by another user or activity.
     await ctx.db.query("delete from live_activity_devices where expires_at < $1 or (user_id = $2 and activity_id = $3)", [now, user.id, input.activityId]);
