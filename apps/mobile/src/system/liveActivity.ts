@@ -256,6 +256,8 @@ function utf8Size(value: string): number {
   return encodeURIComponent(value).replace(/%[0-9A-F]{2}/g, "x").length;
 }
 
+let startingPushActivity = false;
+
 export function syncLiveActivity(): void {
   const mod = live();
   if (!mod) return;
@@ -288,8 +290,12 @@ export function syncLiveActivity(): void {
       state.subtitle = JSON.stringify(payload);
     }
     if (liveActivityId) mod.updateActivity(liveActivityId, state);
-    else {
-      const id = mod.startActivity(state, {
+    else if (!startingPushActivity) {
+      startingPushActivity = true;
+      // Native Activity.request(pushType: .token) is mandatory for APNs updates.
+      // Preserve the exact widget attributes and ContentState used by expo-live-activity.
+      const attributes = {
+        name: "Soirée Crew",
         backgroundColor: themes.dark.bg,
         titleColor: themes.dark.text,
         subtitleColor: themes.dark.textMuted,
@@ -297,8 +303,25 @@ export function syncLiveActivity(): void {
         progressViewLabelColor: themes.dark.text,
         deepLinkUrl: "/",
         timerType: "digital",
-      });
-      if (id) useAppStore.setState({ liveActivityId: id });
+      };
+      const contentState = {
+        title: state.title,
+        subtitle: state.subtitle,
+        ...(end !== null ? { timerEndDateInMilliseconds: end } : {}),
+      };
+      void startPushActivity(attributes, contentState)
+        .then((id) => {
+          if (!id) return;
+          const current = useAppStore.getState().liveActivityId;
+          if (current && current !== id) {
+            mod.stopActivity(id, { title: i18n.t("liveActivity.ended") });
+            return;
+          }
+          useAppStore.setState({ liveActivityId: id });
+          syncLiveActivity();
+        })
+        .catch(() => undefined)
+        .finally(() => { startingPushActivity = false; });
     }
   } catch {
     // Live Activities turned off for the app, or an iOS older than 16.2: the app works without.
