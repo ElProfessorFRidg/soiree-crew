@@ -1,7 +1,9 @@
 import { AppState, Platform } from "react-native";
-import { estimateBac, estimateDriving } from "@crew/bac";
+import { observeActivityTokens, startPushActivity } from "../../modules/crew-activity-tokens";
+import { api } from "@/server/api";
+import { BacSimulation, distributionVolume, estimateBac, estimateDriving } from "@crew/bac";
 import { avatarColor, themes } from "@crew/design-tokens";
-import { breathRatio, countryRules, drivingLimit, formatBacValue } from "@crew/units";
+import { bacFractionDigits, breathRatio, convertBac, countryRules, drivingLimit, formatBacValue } from "@crew/units";
 import { bacColor } from "@/drinks/display";
 import { createTranslator, type Translator } from "@/i18n";
 import { formatClock } from "@/i18n/format";
@@ -40,6 +42,8 @@ export interface NightPayload {
   zeroAt: number | null;
   limitFrac: number | null;
   bac: string | null;
+  /** Precomputed local estimates, no network or personal profile in the widget. */
+  bacForecast?: { start: number; step: number; values: number[]; digits: number; separator: string };
   unit: string | null;
   bacColor: string | null;
   stamp: string;
@@ -87,6 +91,34 @@ function driveOf(driving: ReturnType<typeof estimateDriving> | null, now: number
   return { label, value: i18n.t("liveActivity.underLimit"), short: i18n.t("liveActivity.underLimit"), tone: "ok" };
 }
 
+/** Compact offline forecast: 2-minute samples, integer milli-g/L, no repeated timestamps. */
+function showForecast(
+  profile: Parameters<typeof distributionVolume>[0] | null,
+  intakes: ConstructorParameters<typeof BacSimulation>[0],
+  now: number,
+  zeroAt: number | null,
+  unit: Parameters<typeof convertBac>[1],
+  ratio: number,
+  locale: string,
+): { start: number; step: number; values: number[]; digits: number; separator: string } | undefined {
+  if (!profile || !intakes.length || zeroAt === null) return undefined;
+  const step = 120_000;
+  const digits = bacFractionDigits(unit);
+  const separator = (1.1).toLocaleString(locale).replace(/\d/g, "").trim() || ".";
+  const sim = new BacSimulation(intakes, distributionVolume(profile), now);
+  const count = Math.min(361, Math.max(1, Math.ceil((zeroAt - now) / step) + 1));
+  return {
+    start: now,
+    step,
+    digits,
+    separator,
+    values: Array.from({ length: count }, (_, i) => {
+      const bac = sim.bacAt(Math.min(zeroAt, now + i * step));
+      return Math.round(convertBac(bac < 0.005 ? 0 : bac, unit, ratio) * 10 ** digits);
+    }),
+  };
+}
+
 const FACES = 4;
 
 /** The alert the crew would want first: someone very high, unwell, then gone quiet (O-88, N-36, N-29). */
@@ -132,6 +164,7 @@ export function buildNightPayload(input: {
   if (!drinking && !party) return null;
 
   const show = lockScreenNumbers;
+  const forecast = show ? showForecast(profile, intakes, now, estimate?.backToZeroAt ?? null, preferences.bacUnit, ratio, i18n.locale) : undefined;
   const zeroAt = drinking ? estimate!.backToZeroAt : null;
   const startAt = alcohol.length ? Math.min(...alcohol.map((d) => d.consumedAt)) : party ? party.startsAt : null;
   const under = driving && driving.underLimitAt !== null && driving.underLimitAt > now ? driving.underLimitAt : null;
@@ -178,6 +211,7 @@ export function buildNightPayload(input: {
     zeroAt,
     limitFrac: under !== null && span > 0 && startAt !== null ? (under - startAt) / span : null,
     bac: show && estimate ? value(estimate.bac) : null,
+    bacForecast: show ? forecast : undefined,
     unit: show ? i18n.t(`units.${preferences.bacUnit}`) : null,
     bacColor: estimate ? bacColor(estimate.bac, limit) : null,
     stamp: i18n.t("liveActivity.stamp", { time: clock(now) }),
@@ -217,6 +251,13 @@ function currentParty(now: number): { party: Party | null; live: LiveParty | nul
   return { party, live: party ? (live[party.id] ?? null) : null };
 }
 
+/** UTF-8 bytes, including multibyte translated strings. */
+function utf8Size(value: string): number {
+  return encodeURIComponent(value).replace(/%[0-9A-F]{2}/g, "x").length;
+}
+
+let startingPushActivity = false;
+
 export function syncLiveActivity(): void {
   const mod = live();
   if (!mod) return;
@@ -242,9 +283,30 @@ export function syncLiveActivity(): void {
       subtitle: JSON.stringify(payload),
       ...(end !== null ? { progressBar: { date: end } } : {}),
     };
-    if (liveActivityId) mod.updateActivity(liveActivityId, state);
-    else {
-      const id = mod.startActivity(state, {
+    // ActivityKit has a strict payload budget. Never send an oversized JSON snapshot.
+    // A smaller snapshot retains the native countdown and all existing controls.
+    if (utf8Size(state.subtitle) > 3500) {
+      payload.bacForecast = undefined;
+      state.subtitle = JSON.stringify(payload);
+    }
+    if (liveActivityId) {
+      mod.updateActivity(liveActivityId, state);
+      // No secrets or credentials in the payload; API authenticates the current session.
+      if (useSession.getState().session) void api("/v1/push/live-activities/state", {
+        method: "PUT",
+        body: { activityId: liveActivityId, contentState: {
+          title: state.title,
+          subtitle: state.subtitle,
+          ...(end !== null ? { timerEndDateInMilliseconds: end } : {}),
+        } },
+      }).catch(() => undefined);
+    }
+    else if (!startingPushActivity) {
+      startingPushActivity = true;
+      // Native Activity.request(pushType: .token) is mandatory for APNs updates.
+      // Preserve the exact widget attributes and ContentState used by expo-live-activity.
+      const attributes = {
+        name: "Soirée Crew",
         backgroundColor: themes.dark.bg,
         titleColor: themes.dark.text,
         subtitleColor: themes.dark.textMuted,
@@ -252,8 +314,28 @@ export function syncLiveActivity(): void {
         progressViewLabelColor: themes.dark.text,
         deepLinkUrl: "/",
         timerType: "digital",
-      });
-      if (id) useAppStore.setState({ liveActivityId: id });
+      };
+      const contentState = {
+        title: state.title,
+        subtitle: state.subtitle,
+        ...(end !== null ? { timerEndDateInMilliseconds: end } : {}),
+      };
+      void startPushActivity(attributes, contentState)
+        .then((id) => {
+          if (!id) return;
+          const current = useAppStore.getState().liveActivityId;
+          const now = Date.now();
+          const { party: activeParty, live: activePartyLive } = currentParty(now);
+          const stillNeeded = buildNightPayload({ now, party: activeParty, live: activePartyLive, me: useSession.getState().session?.userId ?? null });
+          if (!stillNeeded || (current && current !== id)) {
+            mod.stopActivity(id, { title: i18n.t("liveActivity.ended") });
+            return;
+          }
+          useAppStore.setState({ liveActivityId: id });
+          syncLiveActivity();
+        })
+        .catch(() => undefined)
+        .finally(() => { startingPushActivity = false; });
     }
   } catch {
     // Live Activities turned off for the app, or an iOS older than 16.2: the app works without.
@@ -264,6 +346,32 @@ export function syncLiveActivity(): void {
 /** Follows what is logged and the party, and refreshes the figure each minute while the app is open. */
 export function watchLiveActivity(): void {
   if (Platform.OS !== "ios") return;
+  // Registration is session-scoped: a new login must always re-register its own tokens.
+  const seen = new Map<string, string>();
+  const pending = new Set<string>();
+  const register = ({ activityId, token }: { activityId: string; token: string }) => {
+    const session = useSession.getState().session;
+    if (!session) return;
+    const key = `${session.url}:${session.userId}:${activityId}:${token}`;
+    if (seen.get(activityId) === key || pending.has(key)) return;
+    pending.add(key);
+    void api("/v1/push/live-activities", { method: "POST", body: { activityId, token } })
+      .then(() => {
+        syncLiveActivity(); // Send the encrypted server snapshot once token registration succeeds.
+        const current = useSession.getState().session;
+        if (current?.url === session.url && current.userId === session.userId && current.token === session.token) seen.set(activityId, key);
+      })
+      .catch(() => undefined)
+      .finally(() => pending.delete(key));
+  };
+  const observe = () => observeActivityTokens(register);
+  let stopObserving = observe();
+  useSession.subscribe((state, previous) => {
+    if (state.session?.token === previous.session?.token && state.session?.url === previous.session?.url) return;
+    seen.clear();
+    stopObserving();
+    stopObserving = observe();
+  });
   const schedule = () => {
     clearTimeout(timer);
     timer = setTimeout(syncLiveActivity, 800);
@@ -275,9 +383,19 @@ export function watchLiveActivity(): void {
   schedule();
   tick(true);
   AppState.addEventListener("change", (status) => {
-    tick(status === "active");
-    // Leaving the app: one last update so the figure on the lock screen is as fresh as it gets.
-    schedule();
+    const active = status === "active";
+    tick(active);
+    // A delayed JS timer is not reliable once iOS suspends the app.
+    // Publish the latest snapshot synchronously before suspension; refresh on resume.
+    if (active) {
+      stopObserving();
+      stopObserving = observe();
+      schedule();
+    }
+    else {
+      clearTimeout(timer);
+      syncLiveActivity();
+    }
   });
   useAppStore.subscribe((state, previous) => {
     if (

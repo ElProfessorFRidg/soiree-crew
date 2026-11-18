@@ -164,6 +164,66 @@ export function notificationRoutes(app: FastifyInstance, ctx: Context): void {
     return reply.status(204).send();
   });
 
+  /** ActivityKit tokens are per-activity, not normal APNs device tokens. */
+  app.post("/v1/push/live-activities", async (request, reply) => {
+    const user = requireUser(request);
+    registrations.check(user.id);
+    const input = z.object({
+      activityId: z.string().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/),
+      token: z.string().regex(/^[0-9a-fA-F]{32,200}$/),
+    }).parse(request.body);
+    const session = hashToken(bearer(request) ?? "");
+    const now = ctx.now();
+    const tokenHash = ctx.sealer.lookup(`activitykit:${input.token.toLowerCase()}`);
+    const tokenSealed = ctx.sealer.seal(input.token.toLowerCase());
+    // A token cannot be claimed by another user or activity.
+    await ctx.db.query("delete from live_activity_devices where expires_at < $1 or (user_id = $2 and activity_id = $3)", [now, user.id, input.activityId]);
+    const registered = await ctx.db.query<{ token_hash: string }>(
+      `insert into live_activity_devices (token_hash, token_sealed, activity_id, user_id, session_hash, created_at, last_seen_at, expires_at)
+       values ($1, $2, $3, $4, $5, $6, $6, $7)
+       on conflict (token_hash) do update set last_seen_at = excluded.last_seen_at, expires_at = excluded.expires_at
+       where live_activity_devices.user_id = excluded.user_id and live_activity_devices.session_hash = excluded.session_hash
+       returning token_hash`,
+      [tokenHash, tokenSealed, input.activityId, user.id, session, now, now + 12 * 3_600_000],
+    );
+    if (!registered.length) throw new HttpError(409, "token_conflict");
+    return reply.status(201).send({ ok: true });
+  });
+
+  /** The device is authoritative for its display. The server only schedules encrypted snapshots. */
+  app.put("/v1/push/live-activities/state", async (request, reply) => {
+    const user = requireUser(request);
+    registrations.check(user.id);
+    const input = z.object({
+      activityId: z.string().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/),
+      contentState: z.object({
+        title: z.string().max(256),
+        subtitle: z.string().max(3500).nullable().optional(),
+        timerEndDateInMilliseconds: z.number().finite().optional(),
+      }).strict(),
+    }).parse(request.body);
+    const state = input.contentState;
+    if (Buffer.byteLength(JSON.stringify({ aps: { timestamp: Math.floor(ctx.now() / 1000), event: "update", "content-state": state } }), "utf8") > 4096)
+      throw new HttpError(413, "activity_state_too_large");
+    const session = hashToken(bearer(request) ?? "");
+    const now = ctx.now();
+    const updated = await ctx.db.query<{ activity_id: string }>(
+      `update live_activity_devices set state_sealed = $1, next_push_at = $2, last_seen_at = $3
+       where activity_id = $4 and user_id = $5 and session_hash = $6 and expires_at > $3 returning activity_id`,
+      [ctx.sealer.seal(state), now + 60_000, now, input.activityId, user.id, session],
+    );
+    if (!updated.length) throw new HttpError(404, "activity_not_registered");
+    return reply.status(204).send();
+  });
+
+  app.delete<{ Params: { activityId: string } }>("/v1/push/live-activities/:activityId", async (request, reply) => {
+    const user = requireUser(request);
+    const id = z.string().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/).parse(request.params.activityId);
+    const session = hashToken(bearer(request) ?? "");
+    await ctx.db.query("delete from live_activity_devices where user_id = $1 and session_hash = $2 and activity_id = $3", [user.id, session, id]);
+    return reply.status(204).send();
+  });
+
   /** QOL-30: mute a party until the morning (or a given time, within two days). Safety still comes through. */
   app.post<{ Params: { id: string } }>("/v1/parties/:id/mute", async (request) => {
     const user = requireUser(request);

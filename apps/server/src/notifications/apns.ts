@@ -125,8 +125,73 @@ export class ApnsTransport implements PushTransport {
     return "error";
   }
 
+
+  /** ActivityKit uses a separate token, topic and push type from ordinary alerts. */
+  async sendLiveActivity(message: LiveActivityPush): Promise<PushResult> {
+    if (!/^[0-9a-fA-F]{32,200}$/.test(message.token)) return "gone";
+    if (!Number.isFinite(message.timestamp) || message.timestamp <= 0) return "error";
+    const body = JSON.stringify(activityKitPayload(message));
+    if (Buffer.byteLength(body, "utf8") > 4096) return "error";
+    const headers: Record<string, string> = {
+      [constants.HTTP2_HEADER_METHOD]: "POST",
+      [constants.HTTP2_HEADER_PATH]: `/3/device/${message.token}`,
+      authorization: `bearer ${this.providerToken()}`,
+      "apns-topic": `${this.config.topic}.push-type.liveactivity`,
+      "apns-push-type": "liveactivity",
+      "apns-priority": "10",
+      "apns-expiration": String(Math.floor((this.now() + 3600_000) / 1000)),
+      "content-type": "application/json",
+    };
+    const result = await new Promise<{ status: number; reason: string }>((resolve, reject) => {
+      const request = this.connection().request(headers);
+      let status = 0;
+      let response = "";
+      request.setEncoding("utf8");
+      request.setTimeout(10_000, () => request.close(constants.NGHTTP2_CANCEL));
+      request.on("response", (h) => (status = Number(h[constants.HTTP2_HEADER_STATUS] ?? 0)));
+      request.on("data", (chunk: string) => { if (response.length < 2048) response += chunk; });
+      request.on("end", () => {
+        let reason = "";
+        try { reason = (JSON.parse(response) as { reason?: string }).reason ?? ""; } catch { /* no body */ }
+        resolve({ status, reason });
+      });
+      request.on("error", reject);
+      request.end(body);
+    }).catch(() => ({ status: 0, reason: "" }));
+    if (result.status === 200) return "ok";
+    if (result.status === 410 || GONE_REASONS.has(result.reason)) return "gone";
+    if (result.status === 403) this.token = null;
+    return "error";
+  }
+
   close(): void {
     this.session?.close();
     this.session = null;
   }
+}
+
+/**
+ * ActivityKit remote updates use a distinct push type, topic and device token.
+ * These tokens are issued per Live Activity, NOT by expo-notifications.
+ * The caller must provide the complete ActivityKit ContentState matching the widget.
+ */
+export interface LiveActivityPush {
+  token: string;
+  event: "update" | "end";
+  contentState: Record<string, unknown>;
+  timestamp: number;
+  staleDate?: number;
+  dismissalDate?: number;
+}
+
+export function activityKitPayload(message: LiveActivityPush): Record<string, unknown> {
+  return {
+    aps: {
+      timestamp: Math.floor(message.timestamp / 1000),
+      event: message.event,
+      "content-state": message.contentState,
+      ...(message.staleDate === undefined ? {} : { "stale-date": Math.floor(message.staleDate / 1000) }),
+      ...(message.event === "end" && message.dismissalDate !== undefined ? { "dismissal-date": Math.floor(message.dismissalDate / 1000) } : {}),
+    },
+  };
 }
