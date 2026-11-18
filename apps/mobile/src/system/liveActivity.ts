@@ -40,6 +40,8 @@ export interface NightPayload {
   zeroAt: number | null;
   limitFrac: number | null;
   bac: string | null;
+  /** Precomputed local estimates, no network or personal profile in the widget. */
+  bacForecast?: { at: number; value: string }[];
   unit: string | null;
   bacColor: string | null;
   stamp: string;
@@ -178,6 +180,12 @@ export function buildNightPayload(input: {
     zeroAt,
     limitFrac: under !== null && span > 0 && startAt !== null ? (under - startAt) / span : null,
     bac: show && estimate ? value(estimate.bac) : null,
+    bacForecast: show && profile && intakes.length && zeroAt !== null
+      ? Array.from({ length: Math.min(721, Math.ceil((zeroAt - now) / 60_000) + 1) }, (_, index) => {
+          const at = now + index * 60_000;
+          return { at, value: value(estimateBac(intakes, profile, at).bac) };
+        })
+      : undefined,
     unit: show ? i18n.t(`units.${preferences.bacUnit}`) : null,
     bacColor: estimate ? bacColor(estimate.bac, limit) : null,
     stamp: i18n.t("liveActivity.stamp", { time: clock(now) }),
