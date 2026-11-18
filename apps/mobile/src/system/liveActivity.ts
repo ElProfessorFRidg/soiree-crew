@@ -332,16 +332,31 @@ export function syncLiveActivity(): void {
 /** Follows what is logged and the party, and refreshes the figure each minute while the app is open. */
 export function watchLiveActivity(): void {
   if (Platform.OS !== "ios") return;
-  // Replay token registrations after app upgrades, login, or network reconnection.
+  // Registration is session-scoped: a new login must always re-register its own tokens.
   const seen = new Map<string, string>();
+  const pending = new Set<string>();
   const register = ({ activityId, token }: { activityId: string; token: string }) => {
-    if (seen.get(activityId) === token) return;
+    const session = useSession.getState().session;
+    if (!session) return;
+    const key = `${session.url}:${session.userId}:${activityId}:${token}`;
+    if (seen.get(activityId) === key || pending.has(key)) return;
+    pending.add(key);
     void api("/v1/push/live-activities", { method: "POST", body: { activityId, token } })
-      .then(() => seen.set(activityId, token))
-      .catch(() => undefined); // Offline: replayed when the observer is restarted.
+      .then(() => {
+        const current = useSession.getState().session;
+        if (current?.url === session.url && current.userId === session.userId && current.token === session.token) seen.set(activityId, key);
+      })
+      .catch(() => undefined)
+      .finally(() => pending.delete(key));
   };
   const observe = () => observeActivityTokens(register);
   let stopObserving = observe();
+  useSession.subscribe((state, previous) => {
+    if (state.session?.token === previous.session?.token && state.session?.url === previous.session?.url) return;
+    seen.clear();
+    stopObserving();
+    stopObserving = observe();
+  });
   const schedule = () => {
     clearTimeout(timer);
     timer = setTimeout(syncLiveActivity, 800);
