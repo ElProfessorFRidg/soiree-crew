@@ -14,8 +14,9 @@ export default function QuickActionRoute() {
   const canLog = useAppStore((state) => state.profile !== null);
   const done = useRef(false);
   useEffect(() => {
-    if (done.current || !onboarded) return;
+    if (done.current) return;
     done.current = true;
+    if (!onboarded) { router.replace("/onboarding"); return; }
     if (action === "home" || (canLog && (action === "again" || action === "water"))) runQuickAction(action, i18n);
     router.replace("/");
   }, [action, i18n, onboarded, canLog, router]);
