@@ -177,13 +177,15 @@ export function notificationRoutes(app: FastifyInstance, ctx: Context): void {
     const tokenHash = hashToken(input.token.toLowerCase());
     // A token cannot be claimed by another user or activity.
     await ctx.db.query("delete from live_activity_devices where expires_at < $1 or (user_id = $2 and activity_id = $3)", [now, user.id, input.activityId]);
-    await ctx.db.query(
+    const registered = await ctx.db.query<{ token_hash: string }>(
       `insert into live_activity_devices (token_hash, token, activity_id, user_id, session_hash, created_at, last_seen_at, expires_at)
        values ($1, $2, $3, $4, $5, $6, $6, $7)
        on conflict (token_hash) do update set last_seen_at = excluded.last_seen_at, expires_at = excluded.expires_at
-       where live_activity_devices.user_id = excluded.user_id and live_activity_devices.session_hash = excluded.session_hash`,
+       where live_activity_devices.user_id = excluded.user_id and live_activity_devices.session_hash = excluded.session_hash
+       returning token_hash`,
       [tokenHash, input.token.toLowerCase(), input.activityId, user.id, session, now, now + 12 * 3_600_000],
     );
+    if (!registered.length) throw new HttpError(409, "token_conflict");
     return reply.status(201).send({ ok: true });
   });
 
