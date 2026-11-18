@@ -275,9 +275,15 @@ export function watchLiveActivity(): void {
   schedule();
   tick(true);
   AppState.addEventListener("change", (status) => {
-    tick(status === "active");
-    // Leaving the app: one last update so the figure on the lock screen is as fresh as it gets.
-    schedule();
+    const active = status === "active";
+    tick(active);
+    // A delayed JS timer is not reliable once iOS suspends the app.
+    // Publish the latest snapshot synchronously before suspension; refresh on resume.
+    if (active) schedule();
+    else {
+      clearTimeout(timer);
+      syncLiveActivity();
+    }
   });
   useAppStore.subscribe((state, previous) => {
     if (
