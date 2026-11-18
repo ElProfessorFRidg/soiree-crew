@@ -41,7 +41,7 @@ export interface NightPayload {
   limitFrac: number | null;
   bac: string | null;
   /** Precomputed local estimates, no network or personal profile in the widget. */
-  bacForecast?: { at: number; value: string }[];
+  bacForecast?: { start: number; step: number; values: number[]; scale: number };
   unit: string | null;
   bacColor: string | null;
   stamp: string;
@@ -89,21 +89,24 @@ function driveOf(driving: ReturnType<typeof estimateDriving> | null, now: number
   return { label, value: i18n.t("liveActivity.underLimit"), short: i18n.t("liveActivity.underLimit"), tone: "ok" };
 }
 
-/** One simulation pass rather than recomputing peaks and driving thresholds for every sample. */
+/** Compact offline forecast: 2-minute samples, integer milli-g/L, no repeated timestamps. */
 function showForecast(
   profile: Parameters<typeof distributionVolume>[0] | null,
   intakes: ConstructorParameters<typeof BacSimulation>[0],
   now: number,
   zeroAt: number | null,
-  format: (bac: number) => string,
-): { at: number; value: string }[] | undefined {
+): { start: number; step: number; values: number[]; scale: number } | undefined {
   if (!profile || !intakes.length || zeroAt === null) return undefined;
+  const step = 120_000;
   const sim = new BacSimulation(intakes, distributionVolume(profile), now);
-  const count = Math.min(73, Math.max(1, Math.ceil((zeroAt - now) / 600_000) + 1));
-  return Array.from({ length: count }, (_, i) => {
-    const at = Math.min(zeroAt, now + i * 600_000);
-    return { at, value: format(sim.bacAt(at)) };
-  });
+  const count = Math.min(361, Math.max(1, Math.ceil((zeroAt - now) / step) + 1));
+  return {
+    start: now,
+    step,
+    scale: 1000,
+    values: Array.from({ length: count }, (_, i) =>
+      Math.round(Math.max(0, sim.bacAt(Math.min(zeroAt, now + i * step))) * 1000)),
+  };
 }
 
 const FACES = 4;
@@ -148,7 +151,7 @@ export function buildNightPayload(input: {
   const estimate = profile && intakes.length ? estimateBac(intakes, profile, now) : null;
   const driving = profile && intakes.length ? estimateDriving(intakes, profile, now, limit) : null;
   const drinking = !!estimate && estimate.bac > 0 && estimate.backToZeroAt !== null;
-  const forecast = showForecast(profile, intakes, now, estimate?.backToZeroAt ?? null, value);
+  const forecast = showForecast(profile, intakes, now, estimate?.backToZeroAt ?? null);
   if (!drinking && !party) return null;
 
   const show = lockScreenNumbers;
