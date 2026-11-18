@@ -250,8 +250,8 @@ function currentParty(now: number): { party: Party | null; live: LiveParty | nul
 }
 
 /** UTF-8 bytes, including multibyte translated strings. */
-function BufferSize(value: string): number {
-  return new TextEncoder().encode(value).length;
+function utf8Size(value: string): number {
+  return encodeURIComponent(value).replace(/%[0-9A-F]{2}/g, "x").length;
 }
 
 export function syncLiveActivity(): void {
@@ -281,7 +281,7 @@ export function syncLiveActivity(): void {
     };
     // ActivityKit has a strict payload budget. Never send an oversized JSON snapshot.
     // A smaller snapshot retains the native countdown and all existing controls.
-    if (BufferSize(state.subtitle) > 3500) {
+    if (utf8Size(state.subtitle) > 3500) {
       payload.bacForecast = undefined;
       state.subtitle = JSON.stringify(payload);
     }
