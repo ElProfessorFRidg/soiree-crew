@@ -59,6 +59,19 @@ public class CrewActivityTokensModule: Module {
       self?.children.values.forEach { $0.cancel() }
       self?.children.removeAll()
     }
+    AsyncFunction("startPushActivity") { (attributesJson: String, stateJson: String) -> String? in
+      guard #available(iOS 16.2, *) else { return nil }
+      guard ActivityAuthorizationInfo().areActivitiesEnabled else { return nil }
+      let decoder = JSONDecoder()
+      let attributes = try decoder.decode(LiveActivityAttributes.self, from: Data(attributesJson.utf8))
+      let state = try decoder.decode(LiveActivityAttributes.ContentState.self, from: Data(stateJson.utf8))
+      let activity = try Activity<LiveActivityAttributes>.request(
+        attributes: attributes,
+        content: ActivityContent(state: state, staleDate: nil),
+        pushType: .token
+      )
+      return activity.id
+    }
     Function("startObserving") { [weak self] in
       guard let self = self else { return }
       if #available(iOS 16.2, *) {
