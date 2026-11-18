@@ -8,6 +8,7 @@ import { connectPglite, connectPostgres, migrate } from "./db";
 import { LiveHub } from "./live";
 import { sweepLiveParties } from "./nightWatch";
 import { startNotificationSweeper } from "./notifications/producers";
+import { startActivityPushScheduler } from "./notifications/liveActivityScheduler";
 import { appleAuthFromEnv } from "./appleAuth";
 import { pushFromEnv } from "./notifications/push";
 import { compatibilityRulesFromEnv } from "./apiCompatibility";
@@ -75,6 +76,7 @@ await app.listen({ port, host: "0.0.0.0" });
 app.log.info(`push: iOS ${push?.enabled("ios") ? "on" : "off"}, Android ${push?.enabled("android") ? "on" : "off"}`);
 // N-25, N-29, O-41, QOL-20: notifications nobody's request causes.
 const stopSweeper = startNotificationSweeper(context, (error) => app.log.error(error));
+const stopActivityScheduler = startActivityPushScheduler(context, (error) => app.log.error(error));
 
 // N-29, N-36, O-88: once a minute the server looks over the live parties and tells the crews.
 setInterval(() => {
@@ -86,6 +88,7 @@ const shutdown = () => {
   if (closing) return;
   closing = true;
   stopSweeper();
+  stopActivityScheduler();
   push?.close();
   // Open sockets (the live channel) can hold app.close() forever: give it 3 s, then close the database anyway.
   const grace = new Promise((resolve) => setTimeout(resolve, 3_000).unref());
