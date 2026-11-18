@@ -1,8 +1,17 @@
-// App entry: Expo Router, plus the Android home-screen widget's headless task (O-33).
-import "expo-router/entry";
-import { Platform } from "react-native";
-// The background location task must be defined when the bundle starts, even in a headless launch.
-import "./src/location/outing";
+// Keep this before Router and its imports: a native UIKit watchdog can then locate a startup hang.
+const { reportStartup } = require("./src/system/startupReport");
+reportStartup("entry", "ready");
+try {
+  require("expo-router/entry");
+  reportStartup("router", "ready");
+  // The background task must be defined even in a headless launch.
+  require("./src/location/outing");
+} catch (error) {
+  reportStartup("entry", "failed");
+  throw error;
+}
+
+const { Platform } = require("react-native");
 
 if (Platform.OS === "android") {
   const { registerWidgetTaskHandler } = require("react-native-android-widget");

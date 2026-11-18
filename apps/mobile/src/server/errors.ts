@@ -17,11 +17,15 @@ export function serverMessage(code: string, i18n: Translator): string {
  * a real network loss says "no network". Unknown errors (no ApiError) keep the network wording.
  */
 export function failureMessage(error: unknown, i18n: Translator): string {
-  if (!(error instanceof ApiError)) return i18n.t("crew.offline");
-  if (error.failure.kind === "http" && error.failure.status === 429 && error.failure.retryAfterMs) return i18n.t("serverCodes.rate_limited_wait", { seconds: Math.max(1, Math.ceil(error.failure.retryAfterMs / 1000)) });
-  if (error.failure.kind === "http") return serverMessage(error.failure.compatibility ? compatibilityCode(error.failure.compatibility.reason) : error.failure.code, i18n);
-  if (error.failure.kind === "timeout") return i18n.t("crew.timeout");
-  return i18n.t("crew.offline");
+  if (!(error instanceof ApiError)) return `${i18n.t("diagnostics.unexpected")} (SC_UNKNOWN)`;
+  let message: string;
+  if (error.failure.kind === "configuration") message = i18n.t("diagnostics.noServer");
+  else if (error.failure.kind === "http" && error.failure.status === 429 && error.failure.retryAfterMs) message = i18n.t("serverCodes.rate_limited_wait", { seconds: Math.max(1, Math.ceil(error.failure.retryAfterMs / 1000)) });
+  else if (error.failure.kind === "http" && error.failure.status >= 500 && !error.failure.compatibility && ["internal", "unknown"].includes(error.failure.code)) message = i18n.t("diagnostics.serverFailure");
+  else if (error.failure.kind === "http") message = error.failure.code === "database_unavailable" ? i18n.t("diagnostics.database") : serverMessage(error.failure.compatibility ? compatibilityCode(error.failure.compatibility.reason) : error.failure.code, i18n);
+  else if (error.failure.kind === "timeout") message = i18n.t("crew.timeout");
+  else message = i18n.t("diagnostics.transport");
+  return `${message} (${error.diagnostic.code})`;
 }
 
 /** For `.catch(...)`: shows the failure as a danger toast. */

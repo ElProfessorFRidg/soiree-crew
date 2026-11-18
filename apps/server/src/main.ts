@@ -68,6 +68,7 @@ const context: Context = {
     .split(",")
     .map((u) => u.trim().toLowerCase())
     .filter(Boolean),
+  ...((process.env.SERVER_REVISION || process.env.SOURCE_COMMIT) ? { serverRevision: process.env.SERVER_REVISION || process.env.SOURCE_COMMIT! } : {}),
 };
 const app = await buildApp(context, { logger: true, trustProxy: trustProxy(process.env.TRUST_PROXY) });
 

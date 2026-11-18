@@ -104,6 +104,7 @@ function SettingsRoot() {
       <Text variant="small" align="center">
         {i18n.t("settings.version", { version: currentVersion, build: currentBuild || "dev" })}
       </Text>
+      <Button variant="secondary" label={i18n.t("diagnostics.title")} onPress={() => router.push("/server-status")} />
     </>
   );
 }

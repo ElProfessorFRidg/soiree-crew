@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { databaseCall, classifyDatabaseFailure } from "./databaseErrors";
 
 /** The one database surface the server uses: parameterised SQL with $1 placeholders. */
 export interface Db {
@@ -12,12 +13,12 @@ export interface Db {
 
 const MIGRATIONS_DIR = join(dirname(fileURLToPath(import.meta.url)), "..", "migrations");
 
+export const migrationNames = () => readdirSync(MIGRATIONS_DIR).filter((file) => file.endsWith(".sql")).sort();
+
 export async function migrate(db: Db): Promise<void> {
   await db.query("create table if not exists schema_migrations (name text primary key, applied_at bigint not null)");
   const applied = new Set((await db.query<{ name: string }>("select name from schema_migrations")).map((row) => row.name));
-  const files = readdirSync(MIGRATIONS_DIR)
-    .filter((file) => file.endsWith(".sql"))
-    .sort();
+  const files = migrationNames();
   for (const file of files) {
     if (applied.has(file)) continue;
     const sql = readFileSync(join(MIGRATIONS_DIR, file), "utf8");
@@ -44,7 +45,7 @@ export async function connectPostgres(url: string): Promise<Db> {
 
   const wrap = (run: (sql: string, params?: readonly unknown[]) => Promise<{ rows: unknown[] }>): Db => ({
     async query<T>(sql: string, params?: readonly unknown[]) {
-      return (await run(sql, params)).rows as T[];
+      return (await databaseCall(() => run(sql, params))).rows as T[];
     },
     transaction: async () => {
       throw new Error("Nested transactions are not supported");
@@ -54,18 +55,18 @@ export async function connectPostgres(url: string): Promise<Db> {
 
   return {
     async query<T>(sql: string, params?: readonly unknown[]) {
-      return (await pool.query(sql, params as unknown[])).rows as T[];
+      return (await databaseCall(() => pool.query(sql, params as unknown[]))).rows as T[];
     },
     async transaction<T>(work: (tx: Db) => Promise<T>) {
-      const client = await pool.connect();
+      const client = await databaseCall(() => pool.connect());
       try {
         await client.query("begin");
         const result = await work(wrap((sql, params) => client.query(sql, params as unknown[])));
         await client.query("commit");
         return result;
       } catch (error) {
-        await client.query("rollback");
-        throw error;
+        await client.query("rollback").catch(() => undefined);
+        throw classifyDatabaseFailure(error);
       } finally {
         client.release();
       }
@@ -86,7 +87,7 @@ export async function connectPglite(dataDir?: string): Promise<Db> {
   let inTransaction = false;
   const db: Db = {
     async query<T>(sql: string, params?: readonly unknown[]) {
-      const result = await pglite.query<Record<string, unknown>>(sql, params as unknown[]);
+      const result = await databaseCall(() => pglite.query<Record<string, unknown>>(sql, params as unknown[]));
       return normalise(result.rows) as T[];
     },
     async transaction<T>(work: (tx: Db) => Promise<T>) {
@@ -96,7 +97,7 @@ export async function connectPglite(dataDir?: string): Promise<Db> {
         return await pglite.transaction(async (tx) => {
           const scoped: Db = {
             async query<R>(sql: string, params?: readonly unknown[]) {
-              const result = await tx.query<Record<string, unknown>>(sql, params as unknown[]);
+              const result = await databaseCall(() => tx.query<Record<string, unknown>>(sql, params as unknown[]));
               return normalise(result.rows) as R[];
             },
             transaction: (inner) => inner(scoped),
@@ -104,6 +105,8 @@ export async function connectPglite(dataDir?: string): Promise<Db> {
           };
           return work(scoped);
         });
+      } catch (error) {
+        throw classifyDatabaseFailure(error);
       } finally {
         inTransaction = false;
       }

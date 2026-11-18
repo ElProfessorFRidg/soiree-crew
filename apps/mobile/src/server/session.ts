@@ -87,6 +87,7 @@ export function normaliseServerUrl(input: string): string | null {
   const withScheme = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
   try {
     const url = new URL(withScheme);
+    if (!["https:", "http:"].includes(url.protocol) || url.username || url.password || url.search || url.hash || url.pathname !== "/") return null;
     if (url.protocol === "http:" && !isLocalHost(url.hostname)) return null;
     return url.origin;
   } catch {
