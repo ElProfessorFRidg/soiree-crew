@@ -421,6 +421,7 @@ export const de: Messages = {
   },
   account: {
     eraseAll: "Alles löschen",
+    erased: "Deine Daten wurden gelöscht. Du kannst neu anfangen.",
     eraseAllTitle: "Alles auf diesem Handy löschen?",
     eraseAllBody: "Dein Profil, deine Getränke und dein Wasser, Einstellungen, eigene Getränke und wartende Fotos werden von diesem Handy gelöscht, Erinnerungen inklusive. Die App startet wie beim ersten Mal.",
     withdraw: "Gesundheits-Einwilligung widerrufen",
