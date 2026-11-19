@@ -481,7 +481,7 @@ export const it: Messages = {
     eraseConfirmTitle: "Cancellare: {what}?",
     eraseConfirmBody: "Cancellato sul server e su questo telefono. Nient'altro cambia.",
     eraseConfirm: "Cancella",
-    erased: "Cancellato: {what}.",
+    categoryErased: "Cancellato: {what}.",
     eraseCategory: {
       drinks: "Drink",
       water: "Bicchieri d'acqua",
