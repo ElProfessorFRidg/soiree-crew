@@ -8,6 +8,8 @@ import { CHANNELS, isKind, KIND_NAMES, KINDS } from "./kinds";
 
 const PAGE = 50;
 const MORNING_HOUR = 9;
+const LIVE_ACTIVITY_MAX_ACTIVE_MS = 8 * 3_600_000;
+const LIVE_ACTIVITY_PUSH_INTERVAL_MS = 5 * 60_000;
 
 const timeZone = z
   .string()
@@ -176,15 +178,18 @@ export function notificationRoutes(app: FastifyInstance, ctx: Context): void {
     const now = ctx.now();
     const tokenHash = ctx.sealer.lookup(`activitykit:${input.token.toLowerCase()}`);
     const tokenSealed = ctx.sealer.seal(input.token.toLowerCase());
-    // A token cannot be claimed by another user or activity.
-    await ctx.db.query("delete from live_activity_devices where expires_at < $1 or (user_id = $2 and activity_id = $3)", [now, user.id, input.activityId]);
+    // Atomic upsert: preserve the existing registration on failure, never steal a token
+    // from another user/activity, and never extend the original ActivityKit lifetime.
+    // The unique token_hash constraint also prevents cross-activity token reuse.
     const registered = await ctx.db.query<{ token_hash: string }>(
       `insert into live_activity_devices (token_hash, token_sealed, activity_id, user_id, session_hash, created_at, last_seen_at, expires_at)
-       values ($1, $2, $3, $4, $5, $6, $6, $7)
-       on conflict (token_hash) do update set last_seen_at = excluded.last_seen_at, expires_at = excluded.expires_at
-       where live_activity_devices.user_id = excluded.user_id and live_activity_devices.session_hash = excluded.session_hash
+       values ($1, $2, $3, $4, $5, $6, $6, $6 + $7)
+       on conflict (user_id, activity_id) do update
+       set token_hash = excluded.token_hash, token_sealed = excluded.token_sealed,
+           last_seen_at = excluded.last_seen_at
+       where live_activity_devices.session_hash = excluded.session_hash
        returning token_hash`,
-      [tokenHash, tokenSealed, input.activityId, user.id, session, now, now + 12 * 3_600_000],
+      [tokenHash, tokenSealed, input.activityId, user.id, session, now, LIVE_ACTIVITY_MAX_ACTIVE_MS],
     );
     if (!registered.length) throw new HttpError(409, "token_conflict");
     return reply.status(201).send({ ok: true });
@@ -208,9 +213,10 @@ export function notificationRoutes(app: FastifyInstance, ctx: Context): void {
     const session = hashToken(bearer(request) ?? "");
     const now = ctx.now();
     const updated = await ctx.db.query<{ activity_id: string }>(
-      `update live_activity_devices set state_sealed = $1, next_push_at = $2, last_seen_at = $3
+      `update live_activity_devices set state_sealed = $1,
+         next_push_at = greatest($2, coalesce(last_push_at + $7, $2)), last_seen_at = $3
        where activity_id = $4 and user_id = $5 and session_hash = $6 and expires_at > $3 returning activity_id`,
-      [ctx.sealer.seal(state), now + 60_000, now, input.activityId, user.id, session],
+      [ctx.sealer.seal(state), now + 60_000, now, input.activityId, user.id, session, LIVE_ACTIVITY_PUSH_INTERVAL_MS],
     );
     if (!updated.length) throw new HttpError(404, "activity_not_registered");
     return reply.status(204).send();

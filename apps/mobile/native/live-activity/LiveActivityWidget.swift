@@ -61,6 +61,9 @@ struct NightPayload: Decodable {
 
     func value(at date: Date) -> String? {
       guard !values.isEmpty, step > 0, digits >= 0, digits <= 3 else { return nil }
+      // Once the horizon ends, do not keep showing the last sample as a live estimate.
+      let nowMs = date.timeIntervalSince1970 * 1000
+      guard nowMs >= start, nowMs <= start + step * Double(values.count - 1) else { return nil }
       let index = max(0, min(values.count - 1, Int(floor((date.timeIntervalSince1970 * 1000 - start) / step))))
       let divisor = Int(pow(10.0, Double(digits)))
       let raw = max(0, values[index])
@@ -117,6 +120,7 @@ struct NightPayload: Decodable {
   let limitFrac: Double?
   let bac: String?
   let bacForecast: Forecast?
+  let generatedAt: Double?
   let unit: String?
   let bacColor: String?
   let stamp: String
@@ -355,7 +359,9 @@ private struct ForecastFigure: View {
   let size: CGFloat
   var body: some View {
     TimelineView(.periodic(from: .now, by: 60)) { timeline in
-      let value = payload.bacForecast?.value(at: timeline.date) ?? fallback
+      let nowMs = timeline.date.timeIntervalSince1970 * 1000
+      let recent = payload.generatedAt.map { nowMs >= $0 && nowMs - $0 <= 5 * 60_000 } ?? false
+      let value = payload.bacForecast?.value(at: timeline.date) ?? (recent ? fallback : "—")
       Text(value).font(numeral(size)).foregroundStyle(payload.figureColor)
     }
   }

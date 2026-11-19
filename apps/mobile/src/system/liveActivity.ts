@@ -44,6 +44,8 @@ export interface NightPayload {
   bac: string | null;
   /** Precomputed local estimates, no network or personal profile in the widget. */
   bacForecast?: { start: number; step: number; values: number[]; digits: number; separator: string };
+  /** When this snapshot was computed; never mistake a cached number for a fresh reading. */
+  generatedAt?: number;
   unit: string | null;
   bacColor: string | null;
   stamp: string;
@@ -212,6 +214,7 @@ export function buildNightPayload(input: {
     limitFrac: under !== null && span > 0 && startAt !== null ? (under - startAt) / span : null,
     bac: show && estimate ? value(estimate.bac) : null,
     bacForecast: show ? forecast : undefined,
+    generatedAt: now,
     unit: show ? i18n.t(`units.${preferences.bacUnit}`) : null,
     bacColor: estimate ? bacColor(estimate.bac, limit) : null,
     stamp: i18n.t("liveActivity.stamp", { time: clock(now) }),
