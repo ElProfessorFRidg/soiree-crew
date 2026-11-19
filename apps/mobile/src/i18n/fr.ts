@@ -421,6 +421,7 @@ export const fr = {
   },
   account: {
     eraseAll: "Tout effacer",
+    erased: "Tes données ont été effacées. Tu peux recommencer.",
     eraseAllTitle: "Tout effacer de ce téléphone ?",
     eraseAllBody: "Ton profil, tes verres et ton eau, tes réglages, tes boissons perso et tes photos en attente sont effacés de ce téléphone, rappels compris. L'app redémarre comme au premier lancement.",
     withdraw: "Retirer mon accord santé",
