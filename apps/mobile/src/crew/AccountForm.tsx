@@ -41,7 +41,7 @@ type Problem = {
 type Availability = "unknown" | "checking" | "free" | "taken";
 
 const USERNAME = /^[a-z0-9_.]{3,24}$/;
-const EMAIL = /^[^s@]+@[^s@]+.[^s@]+$/;
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function birthParts(birthDate: string | null): DateParts {
   const match = birthDate ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(birthDate) : null;
@@ -226,10 +226,10 @@ export function AccountForm({
     setProblem(null);
     try {
       await api("/v1/health", { baseUrl: url, token: null });
-    } catch {
+    } catch (error) {
       setBusy(false);
       haptic.error();
-      setProblem({ field: "form", message: i18n.t("crew.serverUnreachable") });
+      setProblem({ field: "form", message: failureMessage(error, i18n) });
       return;
     }
     let account: AccountResponse;
@@ -287,7 +287,7 @@ export function AccountForm({
         else if (mode === "signin" && way === "code" && (failure.code === "code_invalid" || failure.status === 400))
           setProblem({ field: "code", message: i18n.t("crew.transferInvalid") });
         else if (failure.code === "under_age") setProblem({ field: "form", message: i18n.t("journey.birthUnder", { age: 18 }) });
-        else if (mode === "create" && failure.status === 400) setProblem({ field: "username", message: i18n.t("crew.usernameHint") });
+        else if (mode === "create" && failure.status === 400 && failure.code === "username_invalid") setProblem({ field: "username", message: i18n.t("crew.usernameHint") });
         else setProblem({ field: "form", message: serverMessage(failure.code, i18n) });
       } else setProblem({ field: "form", message: failureMessage(err, i18n) });
       return;
@@ -306,10 +306,10 @@ export function AccountForm({
     setProblem(null);
     try {
       await api("/v1/health", { baseUrl: server, token: null });
-    } catch {
+    } catch (error) {
       setBusy(false);
       haptic.error();
-      setProblem({ field: "form", message: i18n.t("crew.serverUnreachable") });
+      setProblem({ field: "form", message: failureMessage(error, i18n) });
       return;
     }
     try {
