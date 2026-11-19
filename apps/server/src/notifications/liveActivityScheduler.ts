@@ -5,6 +5,22 @@ import { activityKitPayload, type LiveActivityPush } from "./apns";
 const PUSH_INTERVAL_MS = 5 * 60_000;
 const RETRY_INTERVAL_MS = 30_000;
 const ROLLOVER_WINDOW_MS = 10 * 60_000;
+const SNAPSHOT_FRESH_MS = 15 * 60_000;
+
+/** A remote restart must never present a cached reading or alert as newly observed. */
+export function sanitizeRolloverSnapshot(snapshot: Record<string, unknown>, now: number): Record<string, unknown> {
+  const copy = { ...snapshot };
+  const sampledAt = copy.generatedAt;
+  if (typeof sampledAt !== "number" || !Number.isFinite(sampledAt) || sampledAt > now + 60_000 || now - sampledAt > SNAPSHOT_FRESH_MS) {
+    for (const key of ["bac", "bacForecast", "status", "drive", "under", "bacColor", "limitFrac"]) delete copy[key];
+    if (copy.party && typeof copy.party === "object" && !Array.isArray(copy.party)) {
+      const party = { ...(copy.party as Record<string, unknown>) };
+      delete party.alert;
+      copy.party = party;
+    }
+  }
+  return copy;
+}
 
 interface DueActivity {
   token_hash: string;
@@ -42,18 +58,20 @@ export async function sweepActivityPushes(ctx: Context, log: (event: string, det
       const attributes=ctx.sealer.open<Record<string,unknown>>(item.attributes_sealed);
       attributes.startedAt=now;
       // Do not restart an already ended night from a cached snapshot.
-      const snapshot = JSON.parse(String(contentState.subtitle ?? "{}")) as {zeroAt?:number|null;party?:{endsAt?:number}|null;bacForecast?:unknown};
+      const snapshot = JSON.parse(String(contentState.subtitle ?? "{}")) as {zeroAt?:number|null;party?:{endsAt?:number}|null;bacForecast?:unknown;generatedAt?:number};
       if (!(typeof snapshot.zeroAt === "number" && snapshot.zeroAt > now) &&
           !(typeof snapshot.party?.endsAt === "number" && snapshot.party.endsAt > now)) {
         log("activitykit.rollover",{outcome:"night_ended"});
         continue;
       }
+      contentState.subtitle = JSON.stringify(sanitizeRolloverSnapshot(snapshot as Record<string, unknown>, now));
       const token=ctx.sealer.open<string>(item.token_sealed);
       const message: LiveActivityPush={token,event:"start",contentState,attributes,timestamp:now};
       // Shrink BEFORE sending: retrying a timeout with a different payload could start two activities.
       if (Buffer.byteLength(JSON.stringify(activityKitPayload(message)),"utf8") > 4096) {
-        delete snapshot.bacForecast;
-        contentState.subtitle=JSON.stringify(snapshot);
+        const slim = JSON.parse(String(contentState.subtitle)) as Record<string, unknown>;
+        delete slim.bacForecast;
+        contentState.subtitle=JSON.stringify(slim);
       }
       if (Buffer.byteLength(JSON.stringify(activityKitPayload(message)),"utf8") > 4096) {
         log("activitykit.rollover",{outcome:"oversized"});
