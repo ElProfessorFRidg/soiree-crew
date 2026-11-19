@@ -481,7 +481,7 @@ export const ru: Messages = {
     eraseConfirmTitle: "Удалить: {what}?",
     eraseConfirmBody: "Удаляется на сервере и на этом телефоне. Больше ничего не меняется.",
     eraseConfirm: "Удалить",
-    erased: "Удалено: {what}.",
+    categoryErased: "Удалено: {what}.",
     eraseCategory: {
       drinks: "Напитки",
       water: "Стаканы воды",
