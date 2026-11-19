@@ -1,4 +1,5 @@
 import type { Context } from "../context";
+import { activityKitPayload, type LiveActivityPush } from "./apns";
 
 // A standard Live Activity is active for at most eight hours on iOS.
 const PUSH_INTERVAL_MS = 5 * 60_000;
@@ -37,20 +38,28 @@ export async function sweepActivityPushes(ctx: Context, log: (event: string, det
       const contentState=ctx.sealer.open<Record<string,unknown>>(item.state_sealed);
       const attributes=ctx.sealer.open<Record<string,unknown>>(item.attributes_sealed);
       attributes.startedAt=now;
-      // APNs start has more metadata than update: remove optional forecast if too large.
-      const token=ctx.sealer.open<string>(item.token_sealed);
-      const send=async () => ctx.push!.sendLiveActivity({token,event:"start",contentState,attributes,timestamp:now});
-      let result=await send();
-      if (result==="error" && typeof contentState.subtitle==="string") {
-        try {
-          const payload=JSON.parse(contentState.subtitle) as Record<string,unknown>;
-          delete payload.bacForecast;
-          contentState.subtitle=JSON.stringify(payload);
-          result=await send();
-        } catch { /* malformed old snapshot: leave the current activity intact */ }
+      // Do not restart an already ended night from a cached snapshot.
+      const snapshot = JSON.parse(String(contentState.subtitle ?? "{}")) as {zeroAt?:number|null;party?:{endsAt?:number}|null;bacForecast?:unknown};
+      if (!(typeof snapshot.zeroAt === "number" && snapshot.zeroAt > now) &&
+          !(typeof snapshot.party?.endsAt === "number" && snapshot.party.endsAt > now)) {
+        log("activitykit.rollover",{outcome:"night_ended"});
+        continue;
       }
+      const token=ctx.sealer.open<string>(item.token_sealed);
+      const message: LiveActivityPush={token,event:"start",contentState,attributes,timestamp:now};
+      // Shrink BEFORE sending: retrying a timeout with a different payload could start two activities.
+      if (Buffer.byteLength(JSON.stringify(activityKitPayload(message)),"utf8") > 4096) {
+        delete snapshot.bacForecast;
+        contentState.subtitle=JSON.stringify(snapshot);
+      }
+      if (Buffer.byteLength(JSON.stringify(activityKitPayload(message)),"utf8") > 4096) {
+        log("activitykit.rollover",{outcome:"oversized"});
+        continue;
+      }
+      const result=await ctx.push.sendLiveActivity(message);
       log("activitykit.rollover",{outcome:result});
-      if (result!=="ok") await ctx.db.query("update live_activity_start_devices set rotation_pending_at=null where session_hash=$1 and rotation_pending_at=$2",[item.session_hash,now]);
+      if (result==="gone") await ctx.db.query("delete from live_activity_start_devices where session_hash=$1",[item.session_hash]);
+      else if (result==="error") await ctx.db.query("update live_activity_start_devices set rotation_pending_at=null where session_hash=$1 and rotation_pending_at=$2",[item.session_hash,now]);
     } catch {
       log("activitykit.rollover",{outcome:"exception"});
       await ctx.db.query("update live_activity_start_devices set rotation_pending_at=null where session_hash=$1 and rotation_pending_at=$2",[item.session_hash,now]);
