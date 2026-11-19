@@ -422,6 +422,7 @@ export const it: Messages = {
   },
   account: {
     eraseAll: "Cancella tutto",
+    erased: "I tuoi dati sono stati cancellati. Puoi ricominciare.",
     eraseAllTitle: "Cancellare tutto da questo telefono?",
     eraseAllBody: "Il tuo profilo, i drink e l'acqua, le impostazioni, i drink personalizzati e le foto in attesa vengono cancellati da questo telefono, promemoria compresi. L'app riparte come al primo avvio.",
     withdraw: "Ritira il consenso salute",
