@@ -482,7 +482,7 @@ export const en: Messages = {
     eraseConfirmTitle: "Erase: {what}?",
     eraseConfirmBody: "Erased on the server and on this phone. Nothing else changes.",
     eraseConfirm: "Erase",
-    erased: "Erased: {what}.",
+    categoryErased: "Erased: {what}.",
     eraseCategory: {
       drinks: "Drinks",
       water: "Glasses of water",
