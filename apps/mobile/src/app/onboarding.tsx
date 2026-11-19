@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Image, Platform, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut, SlideInLeft, SlideInRight, useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { duration, palette } from "@crew/design-tokens";
@@ -87,6 +87,8 @@ export default function Onboarding() {
   const session = useSession((state) => state.session);
   const [forward, setForward] = useState(true);
   const [finishing, setFinishing] = useState(false);
+  const leavingAccount = useRef(false);
+  const completed = useRef(false);
   const [committing, setCommitting] = useState(false);
   const [tooYoung, setTooYoung] = useState(false);
   const [restored, setRestored] = useState(() => {
@@ -134,6 +136,8 @@ export default function Onboarding() {
   const personId = session?.userId ?? "me";
 
   const finish = () => {
+    if (completed.current || useAppStore.getState().onboardedAt !== null) return;
+    completed.current = true;
     useAppStore.setState((state) => ({
       onboardedAt: Date.now(),
       onboarding: null,
@@ -158,14 +162,25 @@ export default function Onboarding() {
     if (previous) go(previous, false);
   };
   const leaveAccount = () => {
-    const target = draft.accountReturn ?? nextStep("account", context);
-    update({ accountReturn: null });
-    go(target);
+    // AccountForm and the session observer may both report success on the same frame.
+    // Advance exactly once, without writing an intermediate draft that can be rehydrated.
+    if (leavingAccount.current || useAppStore.getState().onboardedAt !== null) return;
+    const stored = useAppStore.getState().onboarding;
+    if (stored?.step !== "account") return;
+    leavingAccount.current = true;
+    const target = stored.accountReturn && stored.accountReturn !== "account"
+      ? stored.accountReturn : "photo";
+    useAppStore.setState((state) => ({
+      onboarding: { ...draftOf(state.onboarding), step: target, accountReturn: null, savedAt: Date.now() },
+    }));
+    setForward(true);
+    setRestored(false);
   };
 
   // Making or opening the account moves on by itself, to where the account was asked from. A
   // draft restored on the account step of an account made since moves on too.
   useEffect(() => {
+    if (step !== "account") leavingAccount.current = false;
     if (session && step === "account") leaveAccount();
     // leaveAccount only changes the draft.
     // eslint-disable-next-line react-hooks/exhaustive-deps
