@@ -60,7 +60,7 @@ export function DataControls() {
         .then(() => {
           forgetLocally(category);
           haptic.confirmed();
-          showToast({ message: i18n.t("account.erased", { what: i18n.t(`account.eraseCategory.${category}`) }) });
+          showToast({ message: i18n.t("account.categoryErased", { what: i18n.t(`account.eraseCategory.${category}`) }) });
         })
         .catch(showFailure(i18n));
     });
