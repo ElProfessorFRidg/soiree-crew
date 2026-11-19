@@ -480,7 +480,7 @@ export const de: Messages = {
     eraseConfirmTitle: "Löschen: {what}?",
     eraseConfirmBody: "Auf dem Server und auf diesem Handy gelöscht. Sonst ändert sich nichts.",
     eraseConfirm: "Löschen",
-    erased: "Gelöscht: {what}.",
+    categoryErased: "Gelöscht: {what}.",
     eraseCategory: {
       drinks: "Drinks",
       water: "Gläser Wasser",
