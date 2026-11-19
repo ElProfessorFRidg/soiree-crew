@@ -4,6 +4,8 @@ import { Paths } from "expo-file-system";
 import * as Notifications from "expo-notifications";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
+import { router } from "expo-router";
+import { useSession } from "@/server/session";
 import { CHAT_KEY_NAME } from "@/chat/secure";
 import { SESSION_KEYS } from "@/server/session";
 import { stopOuting } from "@/location/outing";
@@ -48,13 +50,19 @@ function emptyAppFolders(): void {
  */
 export async function eraseEverything(): Promise<void> {
   if (Platform.OS === "web") {
+    // Browser previews can block window.confirm and reload inside an iframe. Reset in memory
+    // and on disk, then explicitly navigate to the first-run flow instead of relying on reload.
+    stopKeptCopy();
+    useSession.setState({ session: null, ready: true });
+    // Reset before clearing storage: Zustand persist writes on every state change.
+    useAppStore.setState({ ...useAppStore.getInitialState(), hydrated: true });
+    await AsyncStorage.clear();
     try {
-      globalThis.localStorage?.clear();
       globalThis.sessionStorage?.clear();
     } catch {
-      // Blocked storage: the reload below still starts from what the browser allows.
+      // Storage access can be restricted in embedded previews.
     }
-    globalThis.location?.reload();
+    router.replace("/onboarding");
     return;
   }
   stopKeptCopy();
