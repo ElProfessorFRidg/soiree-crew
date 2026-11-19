@@ -422,6 +422,7 @@ export const es: Messages = {
   },
   account: {
     eraseAll: "Borrarlo todo",
+    erased: "Tus datos se han borrado. Puedes empezar de nuevo.",
     eraseAllTitle: "¿Borrarlo todo de este teléfono?",
     eraseAllBody: "Tu perfil, tus bebidas y el agua, tus ajustes, tus bebidas personalizadas y las fotos pendientes se borran de este teléfono, recordatorios incluidos. La app se reinicia como la primera vez.",
     withdraw: "Retirar permiso de salud",
