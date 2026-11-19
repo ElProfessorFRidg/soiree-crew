@@ -480,7 +480,7 @@ export const fr = {
     eraseConfirmTitle: "Effacer : {what} ?",
     eraseConfirmBody: "Tout est effacé sur le serveur et sur ce téléphone. Rien d'autre ne change.",
     eraseConfirm: "Effacer",
-    erased: "C'est effacé : {what}.",
+    categoryErased: "C'est effacé : {what}.",
     eraseCategory: {
       drinks: "Verres",
       water: "Verres d'eau",
