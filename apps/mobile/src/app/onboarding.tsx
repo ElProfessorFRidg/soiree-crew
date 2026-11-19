@@ -102,11 +102,13 @@ export default function Onboarding() {
   };
 
   useEffect(() => {
-    // Being here means not being in the app: an earlier finish (before a consent was withdrawn) no longer counts.
-    useAppStore.setState((state) => ({
-      onboardedAt: null,
-      onboarding: state.onboarding ?? initialDraft(),
-    }));
+    // Opening the route (including a remount during navigation) must never revoke
+    // a completed onboarding. Only create a draft when the flow is actually unfinished.
+    useAppStore.setState((state) =>
+      state.onboardedAt !== null || state.onboarding !== null
+        ? {}
+        : { onboarding: initialDraft() },
+    );
   }, []);
 
   const update = (patch: Partial<OnboardingDraft>) =>
@@ -120,8 +122,13 @@ export default function Onboarding() {
     notificationsSupported: Platform.OS !== "web",
     locationSupported: Platform.OS !== "web",
   };
-  // A draft saved on a screen this version no longer has (the old crew step) resumes at the date of birth.
-  const step: Step = visibleSteps(context).includes(draft.step) ? draft.step : "welcome";
+  // Older builds saved a separate "birth" step that is now part of account creation.
+  // Never throw an in-progress user back to the welcome page after an update.
+  const step: Step = visibleSteps(context).includes(draft.step)
+    ? draft.step
+    : draft.step === "birth"
+      ? (session ? "photo" : draft.accountVisited ? "account" : "welcome")
+      : "welcome";
   const after = nextStep(step, context);
   const name = session?.displayName ?? "";
   const personId = session?.userId ?? "me";
@@ -374,7 +381,7 @@ export default function Onboarding() {
             onGuest={() => go(nextStep("welcome", context))}
           />
         ) : null}
-        {step === "account" ? <AccountStep mode={draft.accountMode} onModeChange={(accountMode) => update({ accountMode })} birthDate={draft.birthDate} /> : null}
+        {step === "account" ? <AccountStep mode={draft.accountMode} onModeChange={(accountMode) => update({ accountMode })} birthDate={draft.birthDate} onAuthenticated={leaveAccount} /> : null}
         {step === "birth" ? (
           <BirthStep
             birthDate={draft.birthDate}
