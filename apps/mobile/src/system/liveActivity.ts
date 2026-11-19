@@ -277,6 +277,7 @@ async function adoptLatestActivity(): Promise<void> {
     return;
   }
   const latest=activities[0];
+  if (!latest) return;
   const current=useAppStore.getState().liveActivityId;
   knownStartAt=latest.startedAt;
   if (current !== latest.activityId) {
@@ -329,7 +330,10 @@ export function syncLiveActivity(): void {
         knownStartAt = now;
         useAppStore.setState({liveActivityId:id});
         syncLiveActivity();
-        if (old && old !== id) void endPushActivity(old);
+        if (old && old !== id) {
+          void endPushActivity(old);
+          if (useSession.getState().session) void api(`/v1/push/live-activities/${encodeURIComponent(old)}`,{method:"DELETE"}).catch(() => undefined);
+        }
       }).catch(() => undefined).finally(() => { startingPushActivity = false; });
     }
     if (liveActivityId) {
@@ -387,6 +391,7 @@ export function watchLiveActivity(): void {
   const register = ({ activityId, token, startedAt }: {activityId:string;token:string;startedAt:number}) => {
     const old=useAppStore.getState().liveActivityId;
     if (startedAt > knownStartAt) {
+      if (old && old !== activityId && useSession.getState().session) void api(`/v1/push/live-activities/${encodeURIComponent(old)}`,{method:"DELETE"}).catch(() => undefined);
       knownStartAt=startedAt;
       useAppStore.setState({liveActivityId:activityId});
       syncLiveActivity();
@@ -397,7 +402,7 @@ export function watchLiveActivity(): void {
     const key = `${session.url}:${session.userId}:${activityId}:${token}`;
     if (seen.get(activityId) === key || pending.has(key)) return;
     pending.add(key);
-    void api("/v1/push/live-activities", { method: "POST", body: { activityId, token } })
+    void api("/v1/push/live-activities", { method: "POST", body: { activityId, token, startedAt } })
       .then(() => {
         syncLiveActivity(); // Send the encrypted server snapshot once token registration succeeds.
         const current = useSession.getState().session;

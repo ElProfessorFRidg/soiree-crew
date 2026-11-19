@@ -173,11 +173,16 @@ export function notificationRoutes(app: FastifyInstance, ctx: Context): void {
     const input = z.object({
       activityId: z.string().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/),
       token: z.string().regex(/^[0-9a-fA-F]{32,200}$/),
+      startedAt: z.number().finite().nonnegative().optional(),
     }).parse(request.body);
     const session = hashToken(bearer(request) ?? "");
     const now = ctx.now();
     const tokenHash = ctx.sealer.lookup(`activitykit:${input.token.toLowerCase()}`);
     const tokenSealed = ctx.sealer.seal(input.token.toLowerCase());
+    // Clock tolerance: never reset Apple\'s original eight-hour timer on re-registration.
+    const startedAt = input.startedAt && input.startedAt <= now + 60_000 ? input.startedAt : now;
+    if (startedAt <= now - LIVE_ACTIVITY_MAX_ACTIVE_MS) throw new HttpError(410,"activity_expired");
+    const lifetime = Math.min(LIVE_ACTIVITY_MAX_ACTIVE_MS, startedAt + LIVE_ACTIVITY_MAX_ACTIVE_MS - now);
     // Atomic upsert: preserve the existing registration on failure, never steal a token
     // from another user/activity, and never extend the original ActivityKit lifetime.
     // The unique token_hash constraint also prevents cross-activity token reuse.
@@ -189,7 +194,7 @@ export function notificationRoutes(app: FastifyInstance, ctx: Context): void {
            last_seen_at = excluded.last_seen_at
        where live_activity_devices.session_hash = excluded.session_hash
        returning token_hash`,
-      [tokenHash, tokenSealed, input.activityId, user.id, session, now, LIVE_ACTIVITY_MAX_ACTIVE_MS],
+      [tokenHash, tokenSealed, input.activityId, user.id, session, now, lifetime],
     );
     if (!registered.length) throw new HttpError(409, "token_conflict");
     return reply.status(201).send({ ok: true });
