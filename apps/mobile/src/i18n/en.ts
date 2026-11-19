@@ -423,6 +423,7 @@ export const en: Messages = {
   },
   account: {
     eraseAll: "Erase everything",
+    erased: "Your data has been erased. You can start again.",
     eraseAllTitle: "Erase everything on this phone?",
     eraseAllBody: "Your profile, drinks and water, settings, custom drinks and photos waiting to upload are erased from this phone, reminders included. The app restarts as on its first launch.",
     withdraw: "Withdraw health consent",
