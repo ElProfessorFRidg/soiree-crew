@@ -13,6 +13,7 @@ struct LiveActivityAttributes: ActivityAttributes {
   }
 
   var name: String
+  var startedAt: Double?
   var backgroundColor: String?
   var titleColor: String?
   var subtitleColor: String?
@@ -49,6 +50,7 @@ struct LiveActivityAttributes: ActivityAttributes {
 
 public class CrewActivityTokensModule: Module {
   private var observer: Task<Void, Never>?
+  private var startObserver: Task<Void, Never>?
   private var children: [String: Task<Void, Never>] = [:]
 
   public func definition() -> ModuleDefinition {
@@ -56,6 +58,7 @@ public class CrewActivityTokensModule: Module {
     Events("onToken")
     OnDestroy { [weak self] in
       self?.observer?.cancel()
+      self?.startObserver?.cancel()
       self?.children.values.forEach { $0.cancel() }
       self?.children.removeAll()
     }
@@ -71,6 +74,35 @@ public class CrewActivityTokensModule: Module {
         pushType: .token
       )
       return activity.id
+    }
+    AsyncFunction("listPushActivities") { () -> [[String: Any]] in
+      guard #available(iOS 16.2, *) else { return [] }
+      return Activity<LiveActivityAttributes>.activities.map { ["activityId": $0.id, "startedAt": $0.attributes.startedAt ?? 0] }
+    }
+    AsyncFunction("updatePushActivity") { (id: String, stateJson: String) async throws -> Bool in
+      guard #available(iOS 16.2, *), let activity = Activity<LiveActivityAttributes>.activities.first(where: { $0.id == id }) else { return false }
+      let state = try JSONDecoder().decode(LiveActivityAttributes.ContentState.self, from: Data(stateJson.utf8))
+      await activity.update(ActivityContent(state: state, staleDate: nil))
+      return true
+    }
+    AsyncFunction("endPushActivity") { (id: String) async -> Bool in
+      guard #available(iOS 16.2, *), let activity = Activity<LiveActivityAttributes>.activities.first(where: { $0.id == id }) else { return false }
+      await activity.end(nil, dismissalPolicy: .immediate)
+      return true
+    }
+    OnStartObserving("onStartToken") { [weak self] in
+      guard let self = self else { return }
+      if #available(iOS 17.2, *) {
+        self.startObserver?.cancel()
+        self.startObserver = Task { [weak self] in
+          guard let self = self else { return }
+          if let token = Activity<LiveActivityAttributes>.pushToStartToken { self.sendEvent("onStartToken", ["token": token.map { String(format: "%02x", $0) }.joined()]) }
+          for await token in Activity<LiveActivityAttributes>.pushToStartTokenUpdates {
+            if Task.isCancelled { break }
+            self.sendEvent("onStartToken", ["token": token.map { String(format: "%02x", $0) }.joined()])
+          }
+        }
+      }
     }
     OnStartObserving("onToken") { [weak self] in
       guard let self = self else { return }
@@ -97,11 +129,11 @@ public class CrewActivityTokensModule: Module {
     children[id] = Task { [weak self] in
       guard let self = self else { return }
       if let token = activity.pushToken {
-        self.sendEvent("onToken", ["activityId": id, "token": token.map { String(format: "%02x", $0) }.joined()])
+        self.sendEvent("onToken", ["activityId": id, "startedAt": activity.attributes.startedAt ?? 0, "token": token.map { String(format: "%02x", $0) }.joined()])
       }
       for await token in activity.pushTokenUpdates {
         if Task.isCancelled { break }
-        self.sendEvent("onToken", ["activityId": id, "token": token.map { String(format: "%02x", $0) }.joined()])
+        self.sendEvent("onToken", ["activityId": id, "startedAt": activity.attributes.startedAt ?? 0, "token": token.map { String(format: "%02x", $0) }.joined()])
       }
     }
   }

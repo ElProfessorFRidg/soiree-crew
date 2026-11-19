@@ -17,6 +17,7 @@ struct LiveActivityAttributes: ActivityAttributes {
   }
 
   var name: String
+  var startedAt: Double?
   var backgroundColor: String?
   var titleColor: String?
   var subtitleColor: String?

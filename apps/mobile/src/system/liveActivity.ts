@@ -1,5 +1,5 @@
 import { AppState, Platform } from "react-native";
-import { observeActivityTokens, startPushActivity } from "../../modules/crew-activity-tokens";
+import { endPushActivity, listPushActivities, observeActivityTokens, observeStartTokens, startPushActivity, updatePushActivity } from "../../modules/crew-activity-tokens";
 import { api } from "@/server/api";
 import { BacSimulation, distributionVolume, estimateBac, estimateDriving } from "@crew/bac";
 import { avatarColor, themes } from "@crew/design-tokens";
@@ -260,6 +260,32 @@ function utf8Size(value: string): number {
 }
 
 let startingPushActivity = false;
+let knownStartAt = 0;
+const RENEW_AFTER_MS = 7 * 3_600_000 + 45 * 60_000;
+const attributesFor = (startedAt: number) => ({
+  name: "Soirée Crew", startedAt, backgroundColor: themes.dark.bg,
+  titleColor: themes.dark.text, subtitleColor: themes.dark.textMuted,
+  progressViewTint: themes.dark.amber, progressViewLabelColor: themes.dark.text,
+  deepLinkUrl: "/", timerType: "digital",
+});
+async function adoptLatestActivity(): Promise<void> {
+  const activities = (await listPushActivities()).sort((a,b) => b.startedAt-a.startedAt);
+  if (!activities.length) {
+    knownStartAt=0;
+    if (useAppStore.getState().liveActivityId) useAppStore.setState({liveActivityId:null});
+    syncLiveActivity();
+    return;
+  }
+  const latest=activities[0];
+  const current=useAppStore.getState().liveActivityId;
+  knownStartAt=latest.startedAt;
+  if (current !== latest.activityId) {
+    useAppStore.setState({liveActivityId:latest.activityId});
+    syncLiveActivity();
+  }
+  for (const old of activities.slice(1)) void endPushActivity(old.activityId);
+}
+
 
 export function syncLiveActivity(): void {
   const mod = live();
@@ -274,7 +300,8 @@ export function syncLiveActivity(): void {
     const payload = buildNightPayload({ now, party, live: partyLive, me });
     if (!payload) {
       if (liveActivityId) {
-        mod.stopActivity(liveActivityId, { title: i18n.t("liveActivity.ended") });
+        void endPushActivity(liveActivityId);
+        if (useSession.getState().session) void api(`/v1/push/live-activities/${encodeURIComponent(liveActivityId)}`, { method: "DELETE" }).catch(() => undefined);
         useAppStore.setState({ liveActivityId: null });
       }
       return;
@@ -292,12 +319,25 @@ export function syncLiveActivity(): void {
       payload.bacForecast = undefined;
       state.subtitle = JSON.stringify(payload);
     }
+    if (liveActivityId && knownStartAt > 0 && now - knownStartAt >= RENEW_AFTER_MS && !startingPushActivity) {
+      // A new ActivityKit generation can survive another eight-hour window.
+      startingPushActivity = true;
+      const content = { title: state.title, subtitle: state.subtitle, ...(end !== null ? { timerEndDateInMilliseconds: end } : {}) };
+      void startPushActivity(attributesFor(now), content).then((id) => {
+        if (!id) return;
+        const old = useAppStore.getState().liveActivityId;
+        knownStartAt = now;
+        useAppStore.setState({liveActivityId:id});
+        syncLiveActivity();
+        if (old && old !== id) void endPushActivity(old);
+      }).catch(() => undefined).finally(() => { startingPushActivity = false; });
+    }
     if (liveActivityId) {
-      mod.updateActivity(liveActivityId, state);
+      void updatePushActivity(liveActivityId, {title:state.title,subtitle:state.subtitle,...(end !== null ? {timerEndDateInMilliseconds:end} : {})});
       // No secrets or credentials in the payload; API authenticates the current session.
       if (useSession.getState().session) void api("/v1/push/live-activities/state", {
         method: "PUT",
-        body: { activityId: liveActivityId, contentState: {
+        body: { activityId: liveActivityId, attributes: attributesFor(knownStartAt || now), contentState: {
           title: state.title,
           subtitle: state.subtitle,
           ...(end !== null ? { timerEndDateInMilliseconds: end } : {}),
@@ -308,16 +348,7 @@ export function syncLiveActivity(): void {
       startingPushActivity = true;
       // Native Activity.request(pushType: .token) is mandatory for APNs updates.
       // Preserve the exact widget attributes and ContentState used by expo-live-activity.
-      const attributes = {
-        name: "Soirée Crew",
-        backgroundColor: themes.dark.bg,
-        titleColor: themes.dark.text,
-        subtitleColor: themes.dark.textMuted,
-        progressViewTint: themes.dark.amber,
-        progressViewLabelColor: themes.dark.text,
-        deepLinkUrl: "/",
-        timerType: "digital",
-      };
+      const attributes = attributesFor(now);
       const contentState = {
         title: state.title,
         subtitle: state.subtitle,
@@ -331,9 +362,10 @@ export function syncLiveActivity(): void {
           const { party: activeParty, live: activePartyLive } = currentParty(now);
           const stillNeeded = buildNightPayload({ now, party: activeParty, live: activePartyLive, me: useSession.getState().session?.userId ?? null });
           if (!stillNeeded || (current && current !== id)) {
-            mod.stopActivity(id, { title: i18n.t("liveActivity.ended") });
+            void endPushActivity(id);
             return;
           }
+          knownStartAt=now;
           useAppStore.setState({ liveActivityId: id });
           syncLiveActivity();
         })
@@ -352,7 +384,14 @@ export function watchLiveActivity(): void {
   // Registration is session-scoped: a new login must always re-register its own tokens.
   const seen = new Map<string, string>();
   const pending = new Set<string>();
-  const register = ({ activityId, token }: { activityId: string; token: string }) => {
+  const register = ({ activityId, token, startedAt }: {activityId:string;token:string;startedAt:number}) => {
+    const old=useAppStore.getState().liveActivityId;
+    if (startedAt > knownStartAt) {
+      knownStartAt=startedAt;
+      useAppStore.setState({liveActivityId:activityId});
+      syncLiveActivity();
+      if (old && old!==activityId) void endPushActivity(old);
+    }
     const session = useSession.getState().session;
     if (!session) return;
     const key = `${session.url}:${session.userId}:${activityId}:${token}`;
@@ -369,9 +408,22 @@ export function watchLiveActivity(): void {
   };
   const observe = () => observeActivityTokens(register);
   let stopObserving = observe();
+  const startTokens = new Map<string,string>();
+  const registerStart = (token:string) => {
+    const session=useSession.getState().session;
+    if (!session || startTokens.get(session.token)===token) return;
+    void api("/v1/push/live-activities/start-token",{method:"POST",body:{token}})
+      .then(() => { if (useSession.getState().session?.token===session.token) startTokens.set(session.token,token); })
+      .catch(() => undefined);
+  };
+  let stopStartObserving=observeStartTokens(registerStart);
+  void adoptLatestActivity();
   useSession.subscribe((state, previous) => {
     if (state.session?.token === previous.session?.token && state.session?.url === previous.session?.url) return;
     seen.clear();
+    startTokens.clear();
+    stopStartObserving();
+    stopStartObserving=observeStartTokens(registerStart);
     stopObserving();
     stopObserving = observe();
   });
@@ -393,6 +445,9 @@ export function watchLiveActivity(): void {
     if (active) {
       stopObserving();
       stopObserving = observe();
+      stopStartObserving();
+      stopStartObserving=observeStartTokens(registerStart);
+      void adoptLatestActivity();
       schedule();
     }
     else {
