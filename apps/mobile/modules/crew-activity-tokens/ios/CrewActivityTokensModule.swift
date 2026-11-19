@@ -55,7 +55,7 @@ public class CrewActivityTokensModule: Module {
 
   public func definition() -> ModuleDefinition {
     Name("CrewActivityTokens")
-    Events("onToken")
+    Events("onToken", "onStartToken")
     OnDestroy { [weak self] in
       self?.observer?.cancel()
       self?.startObserver?.cancel()
