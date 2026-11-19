@@ -237,6 +237,8 @@ export function AccountSection() {
   const [transfer, setTransfer] = useState<string | null>(null);
   const [passwordAsk, setPasswordAsk] = useState(0);
   const [creating, setCreating] = useState<AccountMode | null>(null);
+  const [confirmErase, setConfirmErase] = useState(false);
+  const [erasing, setErasing] = useState(false);
 
   // A guest can make or open an account any time; once the session exists the sheet closes by itself.
   useEffect(() => {
@@ -280,6 +282,10 @@ export function AccountSection() {
 
   // Without an account there is nothing on the server: the same reset, said for this phone only.
   const onDelete = () => {
+    if (!session) {
+      setConfirmErase(true);
+      return;
+    }
     void confirmAction({
       title: session ? i18n.t("account.deleteTitle") : i18n.t("account.eraseAllTitle"),
       body: session ? i18n.t("account.deleteBody") : i18n.t("account.eraseAllBody"),
@@ -288,6 +294,21 @@ export function AccountSection() {
     }).then((ok) => {
       if (ok && !guarded({ kind: "deleteAccount" }, () => void deleteAccount(i18n))) showToast({ message: i18n.t("vault.queued") });
     });
+  };
+
+  const eraseGuest = async () => {
+    if (erasing) return;
+    setErasing(true);
+    try {
+      // A guest has no server account to delete and must never be delayed by the vault.
+      await eraseEverything();
+      setConfirmErase(false);
+      showToast({ message: i18n.t("account.erased") });
+    } catch (error) {
+      showToast({ tone: "danger", message: failureMessage(error, i18n) });
+    } finally {
+      setErasing(false);
+    }
   };
 
   const onWithdraw = () => {
@@ -350,6 +371,11 @@ export function AccountSection() {
           </Sheet>
         </>
       )}
+      <Sheet visible={confirmErase} title={i18n.t("account.eraseAllTitle")} onClose={() => { if (!erasing) setConfirmErase(false); }}>
+        <Text>{i18n.t("account.eraseAllBody")}</Text>
+        <Button label={i18n.t("account.eraseAll")} variant="danger" height={48} loading={erasing} disabled={erasing} onPress={() => void eraseGuest()} />
+        <Button label={i18n.t("account.deleteKeep")} variant="outline" height={44} disabled={erasing} onPress={() => setConfirmErase(false)} />
+      </Sheet>
       <Button label={i18n.t("account.withdraw")} variant="outline" height={44} onPress={onWithdraw} />
       <Button label={session ? i18n.t("account.delete") : i18n.t("account.eraseAll")} variant="danger" height={44} onPress={onDelete} />
     </Panel>
