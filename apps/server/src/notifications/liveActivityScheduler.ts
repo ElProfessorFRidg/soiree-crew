@@ -27,6 +27,9 @@ export async function sweepActivityPushes(ctx: Context, log: (event: string, det
         join live_activity_devices a on a.session_hash=s2.session_hash
         where a.state_sealed is not null and a.attributes_sealed is not null
           and a.expires_at > $1 and a.expires_at <= $1 + $2
+          -- Only the newest registered generation may trigger a rollover. Old generations
+          -- must never restart another activity after a newer one is already running.
+          and a.created_at = (select max(latest.created_at) from live_activity_devices latest where latest.session_hash=s2.session_hash)
           and (s2.rotation_pending_at is null or s2.rotation_pending_at < a.created_at)
         order by a.expires_at limit 20 for update of s2 skip locked
       ) returning s.session_hash,s.token_sealed,
@@ -59,10 +62,12 @@ export async function sweepActivityPushes(ctx: Context, log: (event: string, det
       const result=await ctx.push.sendLiveActivity(message);
       log("activitykit.rollover",{outcome:result});
       if (result==="gone") await ctx.db.query("delete from live_activity_start_devices where session_hash=$1",[item.session_hash]);
-      else if (result==="error") await ctx.db.query("update live_activity_start_devices set rotation_pending_at=null where session_hash=$1 and rotation_pending_at=$2",[item.session_hash,now]);
+      // An APNs timeout may still have delivered a remote start. Never retry the same
+      // generation blindly: it can create two activities on the lock screen.
+      // A subsequent device registration (new created_at) re-arms the next generation.
     } catch {
       log("activitykit.rollover",{outcome:"exception"});
-      await ctx.db.query("update live_activity_start_devices set rotation_pending_at=null where session_hash=$1 and rotation_pending_at=$2",[item.session_hash,now]);
+      // Keep the claim on uncertain delivery for the same deduplication reason.
     }
   }
   await ctx.db.query("delete from live_activity_devices where expires_at <= $1", [now]);
