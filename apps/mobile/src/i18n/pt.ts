@@ -481,7 +481,7 @@ export const pt: Messages = {
     eraseConfirmTitle: "Apagar: {what}?",
     eraseConfirmBody: "Apagado no servidor e neste telemóvel. Mais nada muda.",
     eraseConfirm: "Apagar",
-    erased: "Apagado: {what}.",
+    categoryErased: "Apagado: {what}.",
     eraseCategory: {
       drinks: "Bebidas",
       water: "Copos de água",
