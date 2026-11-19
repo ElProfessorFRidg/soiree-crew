@@ -422,6 +422,7 @@ export const pt: Messages = {
   },
   account: {
     eraseAll: "Apagar tudo",
+    erased: "Os teus dados foram apagados. Podes começar de novo.",
     eraseAllTitle: "Apagar tudo deste telemóvel?",
     eraseAllBody: "O teu perfil, as bebidas e a água, as definições, as bebidas personalizadas e as fotos em espera são apagados deste telemóvel, lembretes incluídos. A app reinicia como na primeira vez.",
     withdraw: "Retirar acordo de saúde",
