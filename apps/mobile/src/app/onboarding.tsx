@@ -343,10 +343,12 @@ export default function Onboarding() {
       {/* Navigation and progress occupy separate rows, so the bar can never overlap the heading. */}
       <View style={styles.stack}>
       {step !== "welcome" ? (
-        <View style={styles.top}>
-          <IconButton icon="back" accessibilityLabel={i18n.t("common.back")} onPress={back} />
-        </View>
-        <Progress index={index} total={total} />
+        <>
+          <View style={styles.top}>
+            <IconButton icon="back" accessibilityLabel={i18n.t("common.back")} onPress={back} />
+          </View>
+          <Progress index={index} total={total} />
+        </>
       ) : null}
       {restored ? <DraftBanner onClose={() => setRestored(false)} /> : null}
       <Animated.View key={step} entering={Platform.OS === "web" ? undefined : entering} style={styles.step}>
