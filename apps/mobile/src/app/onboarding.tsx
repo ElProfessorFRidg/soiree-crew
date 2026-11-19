@@ -340,13 +340,13 @@ export default function Onboarding() {
 
   return (
     <Screen footer={footer} withToasts>
-      {/* One block for the whole arrival: the back row, the banner and the step stack in normal flow, never over each other. */}
+      {/* Navigation and progress occupy separate rows, so the bar can never overlap the heading. */}
       <View style={styles.stack}>
       {step !== "welcome" ? (
         <View style={styles.top}>
           <IconButton icon="back" accessibilityLabel={i18n.t("common.back")} onPress={back} />
-          <Progress index={index} total={total} />
         </View>
+        <Progress index={index} total={total} />
       ) : null}
       {restored ? <DraftBanner onClose={() => setRestored(false)} /> : null}
       <Animated.View key={step} entering={Platform.OS === "web" ? undefined : entering} style={styles.step}>
@@ -472,8 +472,8 @@ const styles = StyleSheet.create({
   hero: { fontSize: 34, lineHeight: 38 },
   actions: { gap: 12, marginTop: 8 },
   stack: { gap: 16 },
-  top: { flexDirection: "row", alignItems: "center", gap: 12, height: 48, marginBottom: 8 },
-  progress: { flex: 1, height: 3, borderRadius: 2, overflow: "hidden" },
+  top: { flexDirection: "row", alignItems: "center", minHeight: 48 },
+  progress: { width: "100%", height: 3, borderRadius: 2, overflow: "hidden", marginBottom: 8 },
   progressFill: {
     height: 3,
     borderRadius: 2,
