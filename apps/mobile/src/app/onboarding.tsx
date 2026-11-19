@@ -349,7 +349,7 @@ export default function Onboarding() {
         </View>
       ) : null}
       {restored ? <DraftBanner onClose={() => setRestored(false)} /> : null}
-      <Animated.View key={step} entering={entering} style={styles.step}>
+      <Animated.View key={step} entering={Platform.OS === "web" ? undefined : entering} style={styles.step}>
         {step === "welcome" ? (
           <Welcome
             signedIn={session !== null}
@@ -472,7 +472,7 @@ const styles = StyleSheet.create({
   hero: { fontSize: 34, lineHeight: 38 },
   actions: { gap: 12, marginTop: 8 },
   stack: { gap: 16 },
-  top: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 48 },
+  top: { flexDirection: "row", alignItems: "center", gap: 12, height: 48, marginBottom: 8 },
   progress: { flex: 1, height: 3, borderRadius: 2, overflow: "hidden" },
   progressFill: {
     height: 3,
