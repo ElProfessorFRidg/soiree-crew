@@ -93,6 +93,7 @@ export function AccountForm({
   onModeChange,
   autoFocus = true,
   birthDate: askedBirthDate = null,
+  onAuthenticated,
 }: {
   intent: ArrivalIntent | null;
   server: string | null;
@@ -101,6 +102,8 @@ export function AccountForm({
   autoFocus?: boolean;
   /** O-02: asked before the account, so it goes along and the server refuses a minor before storing anything. */
   birthDate?: string | null;
+  /** Called only after the account token has been persisted successfully. */
+  onAuthenticated?: () => void;
 }) {
   const i18n = useT();
   const theme = useTheme();
@@ -157,12 +160,9 @@ export function AccountForm({
   const ready =
     mode === "create" ? USERNAME.test(username.trim()) && firstName.trim().length > 0 && availability !== "taken" && birthDate !== null && (apple !== null || emailValid) : way === "password" ? login.trim().length >= 3 && password.length > 0 : code.trim().length === 10;
 
-  /** The account exists: whatever happens to the crew step, the person is signed in. */
-  const finish = async (account: AccountResponse, url: string) => {
-    if (!intent) {
-      haptic.confirmed();
-      setBusy(false);
-      // Success shows no toast: the next step sliding in says it (SYNC-07).
+  /** Keep users on the form and show an error if the device cannot persist a token. */
+  const persistAccount = async (account: AccountResponse, url: string): Promise<boolean> => {
+    try {
       await saveSession({
         url,
         token: account.token,
@@ -170,13 +170,34 @@ export function AccountForm({
         username: account.user.username,
         displayName: account.user.displayName,
       });
+      return true;
+    } catch {
+      haptic.error();
+      setProblem({
+        field: "form",
+        message: i18n.locale.startsWith("fr")
+          ? "Le compte a été créé, mais la connexion n’a pas pu être enregistrée sur cet appareil. Réessaie de te connecter."
+          : "The account was created, but sign-in could not be saved on this device. Please sign in again.",
+      });
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  /** The account exists: onboarding continues only after the session is saved. */
+  const finish = async (account: AccountResponse, url: string) => {
+    if (!intent) {
+      if (await persistAccount(account, url)) {
+        haptic.confirmed();
+        onAuthenticated?.();
+      }
       return;
     }
     let message: { tone?: "danger"; text: string };
     try {
       const crewName = await carryOn(intent, url, account.token);
       message = { text: doneMessage(intent, crewName, i18n) };
-      // QOL-07: the crew name typed in "Créer" was a draft until now.
       if (intent.kind === "create") void AsyncStorage.removeItem("crew-draft:crew:name").catch(() => undefined);
     } catch (error) {
       message = {
@@ -186,18 +207,12 @@ export function AccountForm({
         }),
       };
     }
+    if (!(await persistAccount(account, url))) return;
     if (intent.kind === "code") usePendingInvite.setState({ invite: null });
     if (message.tone) haptic.error();
     else haptic.confirmed();
-    setBusy(false);
-    await saveSession({
-      url,
-      token: account.token,
-      userId: account.user.id,
-      username: account.user.username,
-      displayName: account.user.displayName,
-    });
     showToast({ tone: message.tone, message: message.text });
+    onAuthenticated?.();
   };
 
   const submit = async () => {
