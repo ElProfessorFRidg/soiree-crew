@@ -481,7 +481,7 @@ export const es: Messages = {
     eraseConfirmTitle: "¿Borrar: {what}?",
     eraseConfirmBody: "Se borra en el servidor y en este móvil. Nada más cambia.",
     eraseConfirm: "Borrar",
-    erased: "Borrado: {what}.",
+    categoryErased: "Borrado: {what}.",
     eraseCategory: {
       drinks: "Copas",
       water: "Vasos de agua",
