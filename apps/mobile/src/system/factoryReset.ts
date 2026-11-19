@@ -6,6 +6,7 @@ import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 import { router } from "expo-router";
 import { useSession } from "@/server/session";
+import { wipePreviousAccount } from "@/server/connection";
 import { CHAT_KEY_NAME } from "@/chat/secure";
 import { SESSION_KEYS } from "@/server/session";
 import { stopOuting } from "@/location/outing";
@@ -53,6 +54,9 @@ export async function eraseEverything(): Promise<void> {
     // Browser previews can block window.confirm and reload inside an iframe. Reset in memory
     // and on disk, then explicitly navigate to the first-run flow instead of relying on reload.
     stopKeptCopy();
+    // In-memory crew, radar, invitations and account-bound caches are not part of AsyncStorage.
+    // Clear them too so a web preview cannot show the previous user after a guest reset.
+    wipePreviousAccount(null);
     useSession.setState({ session: null, ready: true });
     // Reset before clearing storage: Zustand persist writes on every state change.
     useAppStore.setState({ ...useAppStore.getInitialState(), hydrated: true });
