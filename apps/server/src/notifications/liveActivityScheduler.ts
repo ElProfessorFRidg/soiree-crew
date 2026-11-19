@@ -3,6 +3,7 @@ import type { Context } from "../context";
 // A standard Live Activity is active for at most eight hours on iOS.
 const PUSH_INTERVAL_MS = 5 * 60_000;
 const RETRY_INTERVAL_MS = 30_000;
+const ROLLOVER_WINDOW_MS = 10 * 60_000;
 
 interface DueActivity {
   token_hash: string;
@@ -14,8 +15,48 @@ interface DueActivity {
 /** One-at-a-time scheduler. DB claims avoid duplicate sends across multiple server replicas. */
 export async function sweepActivityPushes(ctx: Context, log: (event: string, details: Record<string, unknown>) => void = () => undefined): Promise<void> {
   const now = ctx.now();
-  await ctx.db.query("delete from live_activity_devices where expires_at <= $1", [now]);
   if (!ctx.push?.enabled("ios")) return;
+  // Rotate at most once per old generation, even with multiple workers.
+  // The remote start does not guarantee delivery: keep the old generation until its Apple limit.
+  const rotations = await ctx.db.query<{
+    session_hash:string; token_sealed:string; state_sealed:string; attributes_sealed:string;
+  }>(`update live_activity_start_devices s set rotation_pending_at=$1
+      where session_hash in (
+        select s2.session_hash from live_activity_start_devices s2
+        join live_activity_devices a on a.session_hash=s2.session_hash
+        where a.state_sealed is not null and a.attributes_sealed is not null
+          and a.expires_at > $1 and a.expires_at <= $1 + $2
+          and (s2.rotation_pending_at is null or s2.rotation_pending_at < a.created_at)
+        order by a.expires_at limit 20 for update of s2 skip locked
+      ) returning s.session_hash,s.token_sealed,
+        (select a.state_sealed from live_activity_devices a where a.session_hash=s.session_hash order by a.created_at desc limit 1) as state_sealed,
+        (select a.attributes_sealed from live_activity_devices a where a.session_hash=s.session_hash order by a.created_at desc limit 1) as attributes_sealed`,
+    [now,ROLLOVER_WINDOW_MS]);
+  for (const item of rotations) {
+    try {
+      const contentState=ctx.sealer.open<Record<string,unknown>>(item.state_sealed);
+      const attributes=ctx.sealer.open<Record<string,unknown>>(item.attributes_sealed);
+      attributes.startedAt=now;
+      // APNs start has more metadata than update: remove optional forecast if too large.
+      const token=ctx.sealer.open<string>(item.token_sealed);
+      const send=async () => ctx.push!.sendLiveActivity({token,event:"start",contentState,attributes,timestamp:now});
+      let result=await send();
+      if (result==="error" && typeof contentState.subtitle==="string") {
+        try {
+          const payload=JSON.parse(contentState.subtitle) as Record<string,unknown>;
+          delete payload.bacForecast;
+          contentState.subtitle=JSON.stringify(payload);
+          result=await send();
+        } catch { /* malformed old snapshot: leave the current activity intact */ }
+      }
+      log("activitykit.rollover",{outcome:result});
+      if (result!=="ok") await ctx.db.query("update live_activity_start_devices set rotation_pending_at=null where session_hash=$1 and rotation_pending_at=$2",[item.session_hash,now]);
+    } catch {
+      log("activitykit.rollover",{outcome:"exception"});
+      await ctx.db.query("update live_activity_start_devices set rotation_pending_at=null where session_hash=$1 and rotation_pending_at=$2",[item.session_hash,now]);
+    }
+  }
+  await ctx.db.query("delete from live_activity_devices where expires_at <= $1", [now]);
   const due = await ctx.db.query<DueActivity>(
     `update live_activity_devices set next_push_at = $2, last_push_at = $1
      where token_hash in (

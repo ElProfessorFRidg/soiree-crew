@@ -130,6 +130,7 @@ export class ApnsTransport implements PushTransport {
   async sendLiveActivity(message: LiveActivityPush): Promise<PushResult> {
     if (!/^[0-9a-fA-F]{32,200}$/.test(message.token)) return "gone";
     if (!Number.isFinite(message.timestamp) || message.timestamp <= 0) return "error";
+    if (message.event === "start" && !message.attributes) return "error";
     const body = JSON.stringify(activityKitPayload(message));
     if (Buffer.byteLength(body, "utf8") > 4096) return "error";
     const headers: Record<string, string> = {
@@ -138,7 +139,7 @@ export class ApnsTransport implements PushTransport {
       authorization: `bearer ${this.providerToken()}`,
       "apns-topic": `${this.config.topic}.push-type.liveactivity`,
       "apns-push-type": "liveactivity",
-      "apns-priority": "10",
+      "apns-priority": message.event === "update" ? "5" : "10",
       "apns-expiration": String(Math.floor((this.now() + 3600_000) / 1000)),
       "content-type": "application/json",
     };
@@ -177,7 +178,9 @@ export class ApnsTransport implements PushTransport {
  */
 export interface LiveActivityPush {
   token: string;
-  event: "update" | "end";
+  event: "start" | "update" | "end";
+  attributes?: Record<string,unknown>;
+  attributesType?: string;
   contentState: Record<string, unknown>;
   timestamp: number;
   staleDate?: number;
@@ -190,6 +193,8 @@ export function activityKitPayload(message: LiveActivityPush): Record<string, un
       timestamp: Math.floor(message.timestamp / 1000),
       event: message.event,
       "content-state": message.contentState,
+      ...(message.event === "start" ? { "attributes-type": message.attributesType ?? "LiveActivityAttributes", attributes: message.attributes, "input-push-token": 1,
+        alert: { title: "Soirée Crew", body: "Suivi de soirée prolongé" }, "relevance-score": 100 } : {}),
       ...(message.staleDate === undefined ? {} : { "stale-date": Math.floor(message.staleDate / 1000) }),
       ...(message.event === "end" && message.dismissalDate !== undefined ? { "dismissal-date": Math.floor(message.dismissalDate / 1000) } : {}),
     },

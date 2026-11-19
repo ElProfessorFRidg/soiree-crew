@@ -195,6 +195,23 @@ export function notificationRoutes(app: FastifyInstance, ctx: Context): void {
     return reply.status(201).send({ ok: true });
   });
 
+  /** iOS 17.2+: register the device-scoped token that permits a new activity while suspended. */
+  app.post("/v1/push/live-activities/start-token", async (request, reply) => {
+    const user = requireUser(request);
+    registrations.check(user.id);
+    const input = z.object({token:z.string().regex(/^[0-9a-fA-F]{32,200}$/)}).parse(request.body);
+    const session = hashToken(bearer(request) ?? "");
+    const token = input.token.toLowerCase();
+    const rows = await ctx.db.query<{session_hash:string}>(`insert into live_activity_start_devices
+      (session_hash,user_id,token_hash,token_sealed,last_seen_at) values ($1,$2,$3,$4,$5)
+      on conflict (session_hash) do update set token_hash=excluded.token_hash,
+        token_sealed=excluded.token_sealed,last_seen_at=excluded.last_seen_at
+      where live_activity_start_devices.user_id=excluded.user_id returning session_hash`,
+      [session,user.id,ctx.sealer.lookup(`activitykit:start:${token}`),ctx.sealer.seal(token),ctx.now()]);
+    if (!rows.length) throw new HttpError(409,"token_conflict");
+    return reply.status(201).send({ok:true});
+  });
+
   /** The device is authoritative for its display. The server only schedules encrypted snapshots. */
   app.put("/v1/push/live-activities/state", async (request, reply) => {
     const user = requireUser(request);
@@ -206,6 +223,13 @@ export function notificationRoutes(app: FastifyInstance, ctx: Context): void {
         subtitle: z.string().max(3500).nullable().optional(),
         timerEndDateInMilliseconds: z.number().finite().optional(),
       }).strict(),
+      attributes: z.object({
+        name:z.string().max(128),startedAt:z.number().finite().nonnegative(),
+        backgroundColor:z.string().max(32).optional(),titleColor:z.string().max(32).optional(),
+        subtitleColor:z.string().max(32).optional(),progressViewTint:z.string().max(32).optional(),
+        progressViewLabelColor:z.string().max(32).optional(),deepLinkUrl:z.string().max(128).optional(),
+        timerType:z.enum(["digital","circular"]).optional(),
+      }).strict(),
     }).parse(request.body);
     const state = input.contentState;
     if (Buffer.byteLength(JSON.stringify({ aps: { timestamp: Math.floor(ctx.now() / 1000), event: "update", "content-state": state } }), "utf8") > 4096)
@@ -213,10 +237,10 @@ export function notificationRoutes(app: FastifyInstance, ctx: Context): void {
     const session = hashToken(bearer(request) ?? "");
     const now = ctx.now();
     const updated = await ctx.db.query<{ activity_id: string }>(
-      `update live_activity_devices set state_sealed = $1,
+      `update live_activity_devices set state_sealed = $1, attributes_sealed = $8,
          next_push_at = greatest($2, coalesce(last_push_at + $7, $2)), last_seen_at = $3
        where activity_id = $4 and user_id = $5 and session_hash = $6 and expires_at > $3 returning activity_id`,
-      [ctx.sealer.seal(state), now + 60_000, now, input.activityId, user.id, session, LIVE_ACTIVITY_PUSH_INTERVAL_MS],
+      [ctx.sealer.seal(state), now + 60_000, now, input.activityId, user.id, session, LIVE_ACTIVITY_PUSH_INTERVAL_MS,ctx.sealer.seal(input.attributes)],
     );
     if (!updated.length) throw new HttpError(404, "activity_not_registered");
     return reply.status(204).send();
