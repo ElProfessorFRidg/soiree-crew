@@ -6,6 +6,7 @@ import { create } from "zustand";
 import { newId } from "@/state/store";
 import type { VenueFacts, WeekSchedule } from "@/venues/hours";
 import { api } from "./api";
+import { sessionStillCurrent, useSession } from "./session";
 import { useCrewData } from "./crewData";
 import { checkLocationIntegrity } from "../../modules/location-integrity";
 
@@ -87,7 +88,9 @@ interface VenueState {
 export const useVenueData = create<VenueState>(() => ({ byCrew: {}, openCheckIn: null }));
 
 export async function refreshVenues(crewId: string): Promise<void> {
+  const requestSession = useSession.getState().session;
   const data = await api<{ season: string; venues: VenueSummary[]; gathering?: Gathering | null }>(`/v1/crews/${crewId}/venues`);
+  if (!sessionStillCurrent(requestSession)) return;
   useVenueData.setState((state) => ({ byCrew: { ...state.byCrew, [crewId]: data } }));
 }
 
