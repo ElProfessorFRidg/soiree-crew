@@ -753,16 +753,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -775,6 +775,28 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.8",
+          "buildVersion": "222",
+          "marketingVersion": "0.2.8 Preview (222)",
+          "date": "2026-11-20T17:30:23Z",
+          "localizedDescription": "• Surface icon errors and avoid false empty-state messages\n• Surface icon errors and avoid false empty-state messages\n• Use localized save-retry message in every language\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• Revoke captured server token after successful local sign-out\n• Guard against browser and unsupported native alert regressions\n• Replace remaining browser-incompatible native alert flows\n• Replace remaining browser-incompatible native alert flows\n• Clear queued photos and check-in caches after data erasure\n• Keep stacked phone buttons at full natural height\n• Use approved bottom-sheet design on phones and modal on iPad/web\n• Stop old-account Live Activity when local account changes\n• Cancellation, queued prompts and duplicate taps\n• Expose pending request for deterministic queue tests\n• Isolate async screens by party and account context\n• Isolate async screens by party and account context\n• Isolate state quotas and suppress stale APNs readings\n• Isolate state quotas and suppress stale APNs readings\n• Isolate state quotas and suppress stale APNs readings\n• Recover failed session persistence and consent reset\n• Recover failed session persistence and consent reset\n• Centralize app-owned responsive confirmations\n• Centralize app-owned responsive confirmations\n• Centralize app-owned responsive confirmations\n• Guard stale data and duplicate rollover regressions\n• Strip stale BAC, driving advice and alerts during remote rollover\n• Keep route guard active until arrival flow is complete\n• Invalidate native session and surface secure-storage wipe failures\n• Use distinct translation for category deletion\n• Separate full reset and category erasure messages (ru)\n• Separate full reset and category erasure messages (pt)\n• Separate full reset and category erasure messages (it)\n• Separate full reset and category erasure messages (es)\n• Separate full reset and category erasure messages (de)",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.11%2Bbuild.222/soiree-crew-unsigned.ipa",
+          "size": 22627642,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.8",
           "buildVersion": "176",
@@ -997,25 +1019,36 @@
         }
       ],
       "version": "0.2.8",
-      "versionDate": "2026-11-18T23:10:30Z",
-      "versionDescription": "• Use OnStartObserving for the onToken event\n• Restore CI on the live-activity lifecycle branch\n• Route unauthenticated deep links to onboarding\n• Execute deep-link action before navigating away\n• Surface ActivityKit outcomes in server JSON logs\n• Privacy-safe structured ActivityKit scheduler delivery logs\n• Prevent orphaned Live Activities after async creation races\n• Schedule first remote refresh after one minute\n• Refresh APNs Live Activity snapshots every minute instead of ten\n• Publish authenticated ActivityKit snapshots for automatic server updates\n• Run ActivityKit push scheduler each minute and stop on shutdown\n• Automatically dispatch due encrypted ActivityKit updates via APNs\n• Authenticated encrypted Live Activity snapshot scheduling\n• Encrypted scheduled ActivityKit state and due-time index\n• Replay registration on login changes and deduplicate concurrent token requests\n• Declare local ActivityKit Expo module for autolinking\n• Start every new Live Activity with native pushType token\n• Expose push-enabled ActivityKit creation to JavaScript\n• Request Live Activities with pushType token natively\n• Preserve automatic token replay behavior\n• Register native ActivityKit push tokens on launch and resume\n• Observe existing and rotating ActivityKit push tokens natively\n• Scaffold local Expo ActivityKit token observer module\n• Scaffold local Expo ActivityKit token observer module\n• Scaffold local Expo ActivityKit token observer module\n• Explain legacy token re-registration requirement\n• Use keyed token lookup to avoid offline token correlation\n• Retain stable token lookup hashes across encryption upgrade\n• Remove legacy plaintext ActivityKit tokens safely\n• AES-256-GCM seal ActivityKit tokens with server DATA_KEY\n• Store encrypted ActivityKit tokens instead of plaintext\n• Reject ActivityKit token ownership conflicts explicitly\n• Expose ActivityKit sender through existing push lifecycle\n• Authenticated rate-limited ActivityKit token registration and revocation\n• Session-scoped expiring ActivityKit token registration\n• Avoid TextEncoder dependency in React Native runtime\n• Authenticated bounded HTTP2 ActivityKit push transport\n• Resolve temporal-dead-zone error and bound forecast payload\n• Decode compact 2-minute BAC samples with correct localized precision\n• Preserve selected BAC unit and decimal precision in offline forecast",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.10%2Bbuild.176/soiree-crew-unsigned.ipa",
-      "size": 22678817,
+      "versionDate": "2026-11-20T17:30:23Z",
+      "versionDescription": "• Surface icon errors and avoid false empty-state messages\n• Surface icon errors and avoid false empty-state messages\n• Use localized save-retry message in every language\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• Revoke captured server token after successful local sign-out\n• Guard against browser and unsupported native alert regressions\n• Replace remaining browser-incompatible native alert flows\n• Replace remaining browser-incompatible native alert flows\n• Clear queued photos and check-in caches after data erasure\n• Keep stacked phone buttons at full natural height\n• Use approved bottom-sheet design on phones and modal on iPad/web\n• Stop old-account Live Activity when local account changes\n• Cancellation, queued prompts and duplicate taps\n• Expose pending request for deterministic queue tests\n• Isolate async screens by party and account context\n• Isolate async screens by party and account context\n• Isolate state quotas and suppress stale APNs readings\n• Isolate state quotas and suppress stale APNs readings\n• Isolate state quotas and suppress stale APNs readings\n• Recover failed session persistence and consent reset\n• Recover failed session persistence and consent reset\n• Centralize app-owned responsive confirmations\n• Centralize app-owned responsive confirmations\n• Centralize app-owned responsive confirmations\n• Guard stale data and duplicate rollover regressions\n• Strip stale BAC, driving advice and alerts during remote rollover\n• Keep route guard active until arrival flow is complete\n• Invalidate native session and surface secure-storage wipe failures\n• Use distinct translation for category deletion\n• Separate full reset and category erasure messages (ru)\n• Separate full reset and category erasure messages (pt)\n• Separate full reset and category erasure messages (it)\n• Separate full reset and category erasure messages (es)\n• Separate full reset and category erasure messages (de)",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.11%2Bbuild.222/soiree-crew-unsigned.ipa",
+      "size": 22627642,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "preview-0.2.8-222",
+      "title": "Soirée Crew Preview 0.2.8 (222)",
+      "caption": "• Surface icon errors and avoid false empty-state messages\n• Surface icon errors and avoid false empty-state messages\n• Use localized save-retry message in every language\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• Revoke captured server token after successful local sign-out\n• Guard against browser and unsupported native alert regressions\n• Replace remaining browser-incompatible native alert flows\n• Replace remaining browser-incompatible native alert flows\n• Clear queued photos and check-in caches after data erasure\n• Keep stacked phone buttons at full natural height\n• Use approved bottom-sheet design on phones and modal on iPad/web\n• Stop old-account Live Activity when local account changes\n• Cancellation, queued prompts and duplicate taps\n• Expose pending request for deterministic queue tests\n• Isolate async screens by party and account context\n• Isolate async screens by party and account context\n• Isolate state quotas and suppress stale APNs readings\n• Isolate state quotas and suppress stale APNs readings\n• Isolate state quotas and suppress stale APNs readings\n• Recover failed session persistence and consent reset\n• Recover failed session persistence and consent reset\n• Centralize app-owned responsive confirmations\n• Centralize app-owned responsive confirmations\n• Centralize app-owned responsive confirmations\n• Guard stale data and duplicate rollover regressions\n• Strip stale BAC, driving advice and alerts during remote rollover\n• Keep route guard active until arrival flow is complete\n• Invalidate native session and surface secure-storage wipe failures\n• Use distinct translation for category deletion\n• Separate full reset and category erasure messages (ru)\n• Separate full reset and category erasure messages (pt)\n• Separate full reset and category erasure messages (it)\n• Separate full reset and category erasure messages (es)\n• Separate full reset and category erasure messages (de)",
+      "date": "2026-11-20T17:30:23Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.11%2Bbuild.222/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.11%2Bbuild.222/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
     {
       "identifier": "preview-0.2.8-176",
       "title": "Soirée Crew Preview 0.2.8 (176)",
@@ -1222,17 +1255,6 @@
       "tintColor": "F4B33D",
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.12/banner.png",
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.12%2Bbuild.80/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile",
-      "notify": false
-    },
-    {
-      "identifier": "release-0.1.11-79",
-      "title": "Soirée Crew 0.1.11 (79)",
-      "caption": "• L'app ne reste plus bloquée sur son icône au lancement (TrollStore, iPad) : chaque étape du démarrage a un délai, et l'app continue sans celle qui ne répond pas.\n• La Live Activity tient dans son cadre, sur l'écran verrouillé comme dans la Dynamic Island.",
-      "date": "2026-10-31T15:00:48Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/0.1.11/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.1.11%2Bbuild.79/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile",
       "notify": false
     }
@@ -1546,6 +1568,13 @@
       "buildVersion": "2",
       "date": "2026-10-27T00:43:05Z",
       "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.8",
+      "buildVersion": "222",
+      "date": "2026-11-20T17:30:23Z",
+      "localizedDescription": "• Surface icon errors and avoid false empty-state messages\n• Surface icon errors and avoid false empty-state messages\n• Use localized save-retry message in every language\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• Revoke captured server token after successful local sign-out\n• Guard against browser and unsupported native alert regressions\n• Replace remaining browser-incompatible native alert flows\n• Replace remaining browser-incompatible native alert flows\n• Clear queued photos and check-in caches after data erasure\n• Keep stacked phone buttons at full natural height\n• Use approved bottom-sheet design on phones and modal on iPad/web\n• Stop old-account Live Activity when local account changes\n• Cancellation, queued prompts and duplicate taps\n• Expose pending request for deterministic queue tests\n• Isolate async screens by party and account context\n• Isolate async screens by party and account context\n• Isolate state quotas and suppress stale APNs readings\n• Isolate state quotas and suppress stale APNs readings\n• Isolate state quotas and suppress stale APNs readings\n• Recover failed session persistence and consent reset\n• Recover failed session persistence and consent reset\n• Centralize app-owned responsive confirmations\n• Centralize app-owned responsive confirmations\n• Centralize app-owned responsive confirmations\n• Guard stale data and duplicate rollover regressions\n• Strip stale BAC, driving advice and alerts during remote rollover\n• Keep route guard active until arrival flow is complete\n• Invalidate native session and surface secure-storage wipe failures\n• Use distinct translation for category deletion\n• Separate full reset and category erasure messages (ru)\n• Separate full reset and category erasure messages (pt)\n• Separate full reset and category erasure messages (it)\n• Separate full reset and category erasure messages (es)\n• Separate full reset and category erasure messages (de)"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
