@@ -1,5 +1,5 @@
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { formatMoney, parseAmount } from "@crew/money";
 import { Field } from "@/crew/Field";
@@ -30,11 +30,17 @@ import { showFailure } from "@/server/errors";
 function useTonightSpent(partyId: string | undefined, currency: string, refresh: number): number | null {
   const [spent, setSpent] = useState<number | null>(null);
   useEffect(() => {
-    if (!partyId) return;
-    void fetchPartySpend(partyId)
-      .then((data) => setSpent(data.spent.find((s) => s.currency === currency)?.amount ?? 0))
-      .catch(() => undefined);
-    void checkBudget();
+    let current = true;
+    setSpent(null);
+    if (partyId) {
+      void fetchPartySpend(partyId)
+        .then((data) => {
+          if (current) setSpent(data.spent.find((s) => s.currency === currency)?.amount ?? 0);
+        })
+        .catch(() => { if (current) setSpent(null); });
+      void checkBudget();
+    }
+    return () => { current = false; };
   }, [partyId, currency, refresh]);
   return spent;
 }
@@ -55,16 +61,35 @@ export default function MoneyScreen() {
   // O-70: who the new pool is for. Everyone by default; unticking leaves someone out.
   const [leftOut, setLeftOut] = useState<Set<string>>(new Set());
   const [refresh, setRefresh] = useState(0);
+  const [loadError, setLoadError] = useState(false);
+  const requestGeneration = useRef(0);
+  const previousContext = useRef("");
 
   // Keyed on ids: useLiveParty builds a new object on every render.
   const crewKey = crew?.id;
   const partyKey = live?.party.id;
-  const load = useCallback(() => {
-    if (crewKey) void fetchPools(crewKey).then((data) => setPools(data.pools)).catch(() => undefined);
-    if (partyKey) void fetchRounds(partyKey).then(setRounds).catch(() => undefined);
+  const load = useCallback(async () => {
+    const request = ++requestGeneration.current;
+    const context = `${crewKey ?? ""}:${partyKey ?? ""}:${me ?? ""}`;
+    if (previousContext.current !== context) {
+      previousContext.current = context;
+      setPools([]);
+      setRounds(null);
+    }
+    const [poolResult, roundResult] = await Promise.allSettled([
+      crewKey ? fetchPools(crewKey) : Promise.resolve({ pools: [] as PoolSummary[] }),
+      partyKey ? fetchRounds(partyKey) : Promise.resolve(null),
+    ]);
+    if (request !== requestGeneration.current) return;
+    if (poolResult.status === "fulfilled") setPools(poolResult.value.pools);
+    if (roundResult.status === "fulfilled") setRounds(roundResult.value);
+    setLoadError(poolResult.status === "rejected" || roundResult.status === "rejected");
     setRefresh((n) => n + 1);
-  }, [crewKey, partyKey]);
-  useFocusEffect(load);
+  }, [crewKey, partyKey, me]);
+  useFocusEffect(useCallback(() => {
+    void load();
+    return () => { requestGeneration.current += 1; };
+  }, [load]));
 
   const spent = useTonightSpent(partyKey, preferences.currency, refresh);
   const money = (amount: number, currency = preferences.currency) => formatMoney(amount, currency, i18n.locale);
@@ -75,7 +100,13 @@ export default function MoneyScreen() {
   const nextName = nextPayer ? crewName(nextPayer.userId, nextPayer.name) : undefined;
 
   return (
-    <Screen back title={i18n.t("money.title")} withToasts onRefresh={async () => load()}>
+    <Screen back title={i18n.t("money.title")} withToasts onRefresh={load}>
+      {loadError ? (
+        <Panel>
+          <Text color={theme.danger}>{i18n.t("crew.offline")}</Text>
+          <Button label={i18n.t("common.retry")} variant="secondary" height={44} onPress={() => void load()} />
+        </Panel>
+      ) : null}
       <Panel>
         <Text variant="h3">{i18n.t("money.round")}</Text>
         {live && rounds ? (
@@ -92,9 +123,9 @@ export default function MoneyScreen() {
         <Text variant="h3">{i18n.t("money.budget")}</Text>
         {budget ? (
           <>
-            <Text>{i18n.t("money.budgetSpent", { spent: money(spent ?? 0), budget: money(budget) })}</Text>
+            <Text>{spent === null ? i18n.t("common.waitingNetwork") : i18n.t("money.budgetSpent", { spent: money(spent), budget: money(budget) })}</Text>
             {/* Budget bar colours from DESIGN.md §4: ok under 70 %, amber to 90 %, danger beyond. */}
-            <View style={[styles.bar, { backgroundColor: theme.surfaceRaised }]}>
+            {spent !== null ? <View style={[styles.bar, { backgroundColor: theme.surfaceRaised }]}>
               <View
                 style={{
                   width: `${Math.min(100, ratio * 100)}%`,
@@ -102,8 +133,8 @@ export default function MoneyScreen() {
                   backgroundColor: ratio >= 0.9 ? theme.danger : ratio >= 0.7 ? theme.amber : theme.ok,
                 }}
               />
-            </View>
-            {ratio >= 1 ? (
+            </View> : null}
+            {spent === null ? null : ratio >= 1 ? (
               <Text color={theme.danger}>{i18n.t("money.budgetOver")}</Text>
             ) : ratio >= 0.9 ? (
               <Text color={theme.amberText}>{i18n.t("money.budgetNear")}</Text>
