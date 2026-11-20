@@ -13,7 +13,7 @@ import { Text } from "@/ui/Text";
  * pseudo is enough; "J'ai déjà un compte" signs in with a password or a code from another phone,
  * and the server line at the bottom changes the server for another public or a private one.
  */
-export function AccountStep({ mode, onModeChange, birthDate }: { mode: AccountMode; onModeChange: (mode: AccountMode) => void; birthDate: string | null }) {
+export function AccountStep({ mode, onModeChange, birthDate, onAuthenticated }: { mode: AccountMode; onModeChange: (mode: AccountMode) => void; birthDate: string | null; onAuthenticated?: () => void }) {
   const i18n = useT();
   // QOL-05: an invite link opened before the account exists names the server to use.
   const pending = usePendingInvite((state) => state.invite);
@@ -28,7 +28,7 @@ export function AccountStep({ mode, onModeChange, birthDate }: { mode: AccountMo
           <ServerAddress onPick={setServer} />
         </Panel>
       ) : null}
-      <AccountForm intent={null} server={server} mode={mode} onModeChange={onModeChange} autoFocus={false} birthDate={birthDate} />
+      <AccountForm intent={null} server={server} mode={mode} onModeChange={onModeChange} autoFocus={false} birthDate={birthDate} onAuthenticated={onAuthenticated} />
       <ServerLine server={server} onChange={() => setChoosing(true)} />
       <ServerSheet visible={choosing} current={server} onPick={setServer} onClose={() => setChoosing(false)} />
     </>

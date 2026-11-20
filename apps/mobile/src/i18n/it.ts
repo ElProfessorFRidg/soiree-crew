@@ -466,7 +466,9 @@ export const it: Messages = {
     notifBody: { v1: "Fine di {party}. Un gesto per dire al crew che sei a casa.", v2: "{party} è finita. Rientrato bene? Dillo al crew.", v3: "Un tocco per rassicurare il crew dopo {party}.", v4: "Tornato da {party}? Il crew vuole saperlo.", v5: "{party} è finita. Pigiama? Avvisa il crew.", v6: "Il crew dorme meglio quando dici che sei a casa.", v7: "{party} è finita. Sei al caldo?", v8: "Un segnale al crew: rientrato bene?" },
   },
   account: {
+    sessionSaveFailed: "L'account esiste, ma non è stato possibile salvare l'accesso su questo dispositivo. Riprova qui senza creare un altro account.",
     eraseAll: "Cancella tutto",
+    erased: "I tuoi dati sono stati cancellati. Puoi ricominciare.",
     eraseAllTitle: "Cancellare tutto da questo telefono?",
     eraseAllBody: "Il tuo profilo, i drink e l'acqua, le impostazioni, i drink personalizzati e le foto in attesa vengono cancellati da questo telefono, promemoria compresi. L'app riparte come al primo avvio.",
     withdraw: "Ritira il consenso salute",
@@ -525,7 +527,7 @@ export const it: Messages = {
     eraseConfirmTitle: "Cancellare: {what}?",
     eraseConfirmBody: "Cancellato sul server e su questo telefono. Nient'altro cambia.",
     eraseConfirm: "Cancella",
-    erased: "Cancellato: {what}.",
+    categoryErased: "Cancellato: {what}.",
     eraseCategory: {
       drinks: "Drink",
       water: "Bicchieri d'acqua",

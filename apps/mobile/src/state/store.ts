@@ -151,9 +151,11 @@ export interface AppState {
 }
 
 /** In the app: past the age gate, and through the arrival flow (older installs have a profile instead). */
-export function isOnboarded(state: Pick<AppState, "ageConfirmedAt" | "profile" | "onboardedAt">): boolean {
-  // The age is optional: a guest who finished the arrival flow, minor or not, gets into the app.
-  return state.profile !== null || state.onboardedAt !== null;
+export function isOnboarded(state: Pick<AppState, "ageConfirmedAt" | "profile" | "onboardedAt" | "onboarding">): boolean {
+  // A saved profile is only a legacy-completion marker when no onboarding draft is active.
+  // Saving the profile midway through onboarding must not unlock every app route.
+  if (state.onboardedAt !== null) return true;
+  return state.onboarding === null && state.profile !== null;
 }
 
 export const useAppStore = create<AppState>()(

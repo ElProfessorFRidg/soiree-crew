@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Image, Platform, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut, SlideInLeft, SlideInRight, useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { duration, palette } from "@crew/design-tokens";
@@ -87,6 +87,8 @@ export default function Onboarding() {
   const session = useSession((state) => state.session);
   const [forward, setForward] = useState(true);
   const [finishing, setFinishing] = useState(false);
+  const leavingAccount = useRef(false);
+  const completed = useRef(false);
   const [committing, setCommitting] = useState(false);
   const [tooYoung, setTooYoung] = useState(false);
   const [restored, setRestored] = useState(() => {
@@ -102,11 +104,13 @@ export default function Onboarding() {
   };
 
   useEffect(() => {
-    // Being here means not being in the app: an earlier finish (before a consent was withdrawn) no longer counts.
-    useAppStore.setState((state) => ({
-      onboardedAt: null,
-      onboarding: state.onboarding ?? initialDraft(),
-    }));
+    // Opening the route (including a remount during navigation) must never revoke
+    // a completed onboarding. Only create a draft when the flow is actually unfinished.
+    useAppStore.setState((state) =>
+      state.onboardedAt !== null || state.onboarding !== null
+        ? {}
+        : { onboarding: initialDraft() },
+    );
   }, []);
 
   const update = (patch: Partial<OnboardingDraft>) =>
@@ -120,13 +124,20 @@ export default function Onboarding() {
     notificationsSupported: Platform.OS !== "web",
     locationSupported: Platform.OS !== "web",
   };
-  // A draft saved on a screen this version no longer has (the old crew step) resumes at the date of birth.
-  const step: Step = visibleSteps(context).includes(draft.step) ? draft.step : "welcome";
+  // Older builds saved a separate "birth" step that is now part of account creation.
+  // Never throw an in-progress user back to the welcome page after an update.
+  const step: Step = visibleSteps(context).includes(draft.step)
+    ? draft.step
+    : draft.step === "birth"
+      ? (session ? "photo" : draft.accountVisited ? "account" : "welcome")
+      : "welcome";
   const after = nextStep(step, context);
   const name = session?.displayName ?? "";
   const personId = session?.userId ?? "me";
 
   const finish = () => {
+    if (completed.current || useAppStore.getState().onboardedAt !== null) return;
+    completed.current = true;
     useAppStore.setState((state) => ({
       onboardedAt: Date.now(),
       onboarding: null,
@@ -151,14 +162,25 @@ export default function Onboarding() {
     if (previous) go(previous, false);
   };
   const leaveAccount = () => {
-    const target = draft.accountReturn ?? nextStep("account", context);
-    update({ accountReturn: null });
-    go(target);
+    // AccountForm and the session observer may both report success on the same frame.
+    // Advance exactly once, without writing an intermediate draft that can be rehydrated.
+    if (leavingAccount.current || useAppStore.getState().onboardedAt !== null) return;
+    const stored = useAppStore.getState().onboarding;
+    if (stored?.step !== "account") return;
+    leavingAccount.current = true;
+    const target = stored.accountReturn && stored.accountReturn !== "account"
+      ? stored.accountReturn : "photo";
+    useAppStore.setState((state) => ({
+      onboarding: { ...draftOf(state.onboarding), step: target, accountReturn: null, savedAt: Date.now() },
+    }));
+    setForward(true);
+    setRestored(false);
   };
 
   // Making or opening the account moves on by itself, to where the account was asked from. A
   // draft restored on the account step of an account made since moves on too.
   useEffect(() => {
+    if (step !== "account") leavingAccount.current = false;
     if (session && step === "account") leaveAccount();
     // leaveAccount only changes the draft.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -340,16 +362,18 @@ export default function Onboarding() {
 
   return (
     <Screen footer={footer} withToasts>
-      {/* One block for the whole arrival: the back row, the banner and the step stack in normal flow, never over each other. */}
+      {/* Navigation and progress occupy separate rows, so the bar can never overlap the heading. */}
       <View style={styles.stack}>
       {step !== "welcome" ? (
-        <View style={styles.top}>
-          <IconButton icon="back" accessibilityLabel={i18n.t("common.back")} onPress={back} />
+        <>
+          <View style={styles.top}>
+            <IconButton icon="back" accessibilityLabel={i18n.t("common.back")} onPress={back} />
+          </View>
           <Progress index={index} total={total} />
-        </View>
+        </>
       ) : null}
       {restored ? <DraftBanner onClose={() => setRestored(false)} /> : null}
-      <Animated.View key={step} entering={entering} style={styles.step}>
+      <Animated.View key={step} entering={Platform.OS === "web" ? undefined : entering} style={styles.step}>
         {step === "welcome" ? (
           <Welcome
             signedIn={session !== null}
@@ -372,7 +396,7 @@ export default function Onboarding() {
             onGuest={() => go(nextStep("welcome", context))}
           />
         ) : null}
-        {step === "account" ? <AccountStep mode={draft.accountMode} onModeChange={(accountMode) => update({ accountMode })} birthDate={draft.birthDate} /> : null}
+        {step === "account" ? <AccountStep mode={draft.accountMode} onModeChange={(accountMode) => update({ accountMode })} birthDate={draft.birthDate} onAuthenticated={leaveAccount} /> : null}
         {step === "birth" ? (
           <BirthStep
             birthDate={draft.birthDate}
@@ -472,8 +496,8 @@ const styles = StyleSheet.create({
   hero: { fontSize: 34, lineHeight: 38 },
   actions: { gap: 12, marginTop: 8 },
   stack: { gap: 16 },
-  top: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 48 },
-  progress: { flex: 1, height: 3, borderRadius: 2, overflow: "hidden" },
+  top: { flexDirection: "row", alignItems: "center", minHeight: 48 },
+  progress: { width: "100%", height: 3, borderRadius: 2, overflow: "hidden", marginBottom: 8 },
   progressFill: {
     height: 3,
     borderRadius: 2,

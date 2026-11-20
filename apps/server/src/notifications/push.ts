@@ -1,4 +1,4 @@
-import { ApnsTransport } from "./apns";
+import { ApnsTransport, type LiveActivityPush } from "./apns";
 import { FcmTransport, fcmConfigFromEnv } from "./fcm";
 
 export type Platform = "ios" | "android";
@@ -43,6 +43,15 @@ export class PushService {
 
   enabled(platform: Platform): boolean {
     return Boolean(this.transports[platform]);
+  }
+
+  sendLiveActivity(message: LiveActivityPush): Promise<PushResult> {
+    const ios = this.transports.ios;
+    if (!(ios instanceof ApnsTransport)) return Promise.resolve("error");
+    const sending = ios.sendLiveActivity(message);
+    this.pending.add(sending);
+    void sending.finally(() => this.pending.delete(sending)).catch(() => undefined);
+    return sending;
   }
 
   send(platform: Platform, token: string, message: PushMessage): Promise<PushResult> {

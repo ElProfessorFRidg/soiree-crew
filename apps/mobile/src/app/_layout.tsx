@@ -46,6 +46,7 @@ import { flushGameResults } from "@/server/gameData";
 import { watchWidget } from "@/widgets/sync";
 import { CrashScreen } from "@/ui/CrashScreen";
 import { LaunchCurtain } from "@/ui/LaunchCurtain";
+import { ConfirmDialogHost } from "@/ui/ConfirmDialogHost";
 import { purgePlainFiles } from "@/chat/media";
 import { pruneDrinkPhotos } from "@/drinks/drinkPhotos";
 import { watchLiveActivity } from "@/system/liveActivity";
@@ -382,6 +383,7 @@ export default function RootLayout() {
                   }}
                 />
               </Stack>
+              <ConfirmDialogHost />
               <CompatibilityToastHost />
               <HeroOverlay />
               <PermissionPrompt />

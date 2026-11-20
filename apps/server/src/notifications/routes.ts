@@ -8,6 +8,8 @@ import { CHANNELS, isKind, KIND_NAMES, KINDS } from "./kinds";
 
 const PAGE = 50;
 const MORNING_HOUR = 9;
+const LIVE_ACTIVITY_MAX_ACTIVE_MS = 8 * 3_600_000;
+const LIVE_ACTIVITY_PUSH_INTERVAL_MS = 5 * 60_000;
 
 const timeZone = z
   .string()
@@ -68,6 +70,9 @@ export function nextMorning(now: number, zone: string): number {
 
 export function notificationRoutes(app: FastifyInstance, ctx: Context): void {
   const registrations = new RateLimiter(30, 3_600_000, ctx.now);
+  // Periodic Live Activity snapshots must not consume the much smaller
+  // registration budget; the mobile app refreshes them every minute.
+  const activityStateUpdates = new RateLimiter(180, 3_600_000, ctx.now);
 
   /** N-35: the inbox, newest first, with the unread count for the badge. */
   app.get("/v1/notifications", async (request) => {
@@ -161,6 +166,99 @@ export function notificationRoutes(app: FastifyInstance, ctx: Context): void {
   app.delete<{ Params: { token: string } }>("/v1/push/devices/:token", async (request, reply) => {
     const user = requireUser(request);
     await ctx.db.query("delete from push_devices where token = $1 and user_id = $2", [request.params.token, user.id]);
+    return reply.status(204).send();
+  });
+
+  /** ActivityKit tokens are per-activity, not normal APNs device tokens. */
+  app.post("/v1/push/live-activities", async (request, reply) => {
+    const user = requireUser(request);
+    registrations.check(user.id);
+    const input = z.object({
+      activityId: z.string().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/),
+      token: z.string().regex(/^[0-9a-fA-F]{32,200}$/),
+      startedAt: z.number().finite().nonnegative().optional(),
+    }).parse(request.body);
+    const session = hashToken(bearer(request) ?? "");
+    const now = ctx.now();
+    const tokenHash = ctx.sealer.lookup(`activitykit:${input.token.toLowerCase()}`);
+    const tokenSealed = ctx.sealer.seal(input.token.toLowerCase());
+    // Clock tolerance: never reset Apple\'s original eight-hour timer on re-registration.
+    const startedAt = input.startedAt && input.startedAt <= now + 60_000 ? input.startedAt : now;
+    if (startedAt <= now - LIVE_ACTIVITY_MAX_ACTIVE_MS) throw new HttpError(410,"activity_expired");
+    const lifetime = Math.min(LIVE_ACTIVITY_MAX_ACTIVE_MS, startedAt + LIVE_ACTIVITY_MAX_ACTIVE_MS - now);
+    // Atomic upsert: preserve the existing registration on failure, never steal a token
+    // from another user/activity, and never extend the original ActivityKit lifetime.
+    // The unique token_hash constraint also prevents cross-activity token reuse.
+    const registered = await ctx.db.query<{ token_hash: string }>(
+      `insert into live_activity_devices (token_hash, token_sealed, activity_id, user_id, session_hash, created_at, last_seen_at, expires_at)
+       values ($1, $2, $3, $4, $5, $6, $6, $6 + $7)
+       on conflict (user_id, activity_id) do update
+       set token_hash = excluded.token_hash, token_sealed = excluded.token_sealed,
+           last_seen_at = excluded.last_seen_at
+       where live_activity_devices.session_hash = excluded.session_hash
+       returning token_hash`,
+      [tokenHash, tokenSealed, input.activityId, user.id, session, now, lifetime],
+    );
+    if (!registered.length) throw new HttpError(409, "token_conflict");
+    return reply.status(201).send({ ok: true });
+  });
+
+  /** iOS 17.2+: register the device-scoped token that permits a new activity while suspended. */
+  app.post("/v1/push/live-activities/start-token", async (request, reply) => {
+    const user = requireUser(request);
+    registrations.check(user.id);
+    const input = z.object({token:z.string().regex(/^[0-9a-fA-F]{32,200}$/)}).parse(request.body);
+    const session = hashToken(bearer(request) ?? "");
+    const token = input.token.toLowerCase();
+    const rows = await ctx.db.query<{session_hash:string}>(`insert into live_activity_start_devices
+      (session_hash,user_id,token_hash,token_sealed,last_seen_at) values ($1,$2,$3,$4,$5)
+      on conflict (session_hash) do update set token_hash=excluded.token_hash,
+        token_sealed=excluded.token_sealed,last_seen_at=excluded.last_seen_at
+      where live_activity_start_devices.user_id=excluded.user_id returning session_hash`,
+      [session,user.id,ctx.sealer.lookup(`activitykit:start:${token}`),ctx.sealer.seal(token),ctx.now()]);
+    if (!rows.length) throw new HttpError(409,"token_conflict");
+    return reply.status(201).send({ok:true});
+  });
+
+  /** The device is authoritative for its display. The server only schedules encrypted snapshots. */
+  app.put("/v1/push/live-activities/state", async (request, reply) => {
+    const user = requireUser(request);
+    activityStateUpdates.check(user.id);
+    const input = z.object({
+      activityId: z.string().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/),
+      contentState: z.object({
+        title: z.string().max(256),
+        subtitle: z.string().max(3500).nullable().optional(),
+        timerEndDateInMilliseconds: z.number().finite().optional(),
+      }).strict(),
+      attributes: z.object({
+        name:z.string().max(128),startedAt:z.number().finite().nonnegative(),
+        backgroundColor:z.string().max(32).optional(),titleColor:z.string().max(32).optional(),
+        subtitleColor:z.string().max(32).optional(),progressViewTint:z.string().max(32).optional(),
+        progressViewLabelColor:z.string().max(32).optional(),deepLinkUrl:z.string().max(128).optional(),
+        timerType:z.enum(["digital","circular"]).optional(),
+      }).strict(),
+    }).parse(request.body);
+    const state = input.contentState;
+    if (Buffer.byteLength(JSON.stringify({ aps: { timestamp: Math.floor(ctx.now() / 1000), event: "update", "content-state": state } }), "utf8") > 4096)
+      throw new HttpError(413, "activity_state_too_large");
+    const session = hashToken(bearer(request) ?? "");
+    const now = ctx.now();
+    const updated = await ctx.db.query<{ activity_id: string }>(
+      `update live_activity_devices set state_sealed = $1, attributes_sealed = $8,
+         next_push_at = greatest($2, coalesce(last_push_at + $7, $2)), last_seen_at = $3
+       where activity_id = $4 and user_id = $5 and session_hash = $6 and expires_at > $3 returning activity_id`,
+      [ctx.sealer.seal(state), now + 60_000, now, input.activityId, user.id, session, LIVE_ACTIVITY_PUSH_INTERVAL_MS,ctx.sealer.seal(input.attributes)],
+    );
+    if (!updated.length) throw new HttpError(404, "activity_not_registered");
+    return reply.status(204).send();
+  });
+
+  app.delete<{ Params: { activityId: string } }>("/v1/push/live-activities/:activityId", async (request, reply) => {
+    const user = requireUser(request);
+    const id = z.string().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/).parse(request.params.activityId);
+    const session = hashToken(bearer(request) ?? "");
+    await ctx.db.query("delete from live_activity_devices where user_id = $1 and session_hash = $2 and activity_id = $3", [user.id, session, id]);
     return reply.status(204).send();
   });
 
