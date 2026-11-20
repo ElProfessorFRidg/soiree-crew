@@ -7,6 +7,7 @@ import { fetchAppIcons, type AppIconId } from "@/server/profileData";
 import { useSession } from "@/server/session";
 import { useTheme } from "@/theme";
 import { Text } from "@/ui/Text";
+import { showFailure } from "@/server/errors";
 import { confirmAction } from "@/ui/confirm";
 
 type IconId = "default" | AppIconId;
@@ -54,7 +55,7 @@ export function AppIconPicker() {
           haptic.confirmed();
           setCurrent(id);
         })
-        .catch(() => undefined);
+        .catch(showFailure(i18n));
     // Android restarts the app to switch icons: say so before it happens.
     if (Platform.OS === "android") {
       void confirmAction({
