@@ -1,18 +1,27 @@
 import { useEffect } from "react";
-import { Modal, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
+import { AccessibilityInfo, Modal, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { radius, space } from "@crew/design-tokens";
 import { useTheme } from "@/theme";
 import { Button } from "./Button";
 import { answerConfirmation, cancelConfirmations, useCurrentConfirmation } from "./confirm";
 import { Text } from "./Text";
 
-/** One modal for the whole app: no browser confirm/alert, even inside an embedded preview. */
+/**
+ * A native-feeling bottom sheet on phones and a restrained dialog on desktop/iPad.
+ * Uses the approved slate-and-amber tokens and replaces every browser confirmation.
+ */
 export function ConfirmDialogHost() {
   const theme = useTheme();
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const active = useCurrentConfirmation();
+  const phone = width < 700;
 
   useEffect(() => () => cancelConfirmations(), []);
+  useEffect(() => {
+    if (active) AccessibilityInfo.announceForAccessibility(active.title);
+  }, [active?.id]);
 
   const answer = (accepted: boolean) => {
     if (active) answerConfirmation(active.id, accepted);
@@ -27,26 +36,24 @@ export function ConfirmDialogHost() {
       onRequestClose={() => answer(false)}
     >
       {active ? (
-        <View style={styles.overlay}>
-          <Pressable
-            style={StyleSheet.absoluteFill}
-            accessible={false}
-            onPress={() => answer(false)}
-          />
+        <View style={[styles.overlay, phone ? styles.phoneOverlay : styles.wideOverlay, { backgroundColor: theme.scrim }]}>
+          <Pressable style={StyleSheet.absoluteFill} accessible={false} onPress={() => answer(false)} />
           <View
             accessibilityViewIsModal
             style={[
               styles.dialog,
+              phone ? styles.sheet : styles.centered,
               {
-                width: Math.min(480, Math.max(280, width - 32)),
                 backgroundColor: theme.surface,
                 borderColor: theme.line,
+                paddingBottom: phone ? Math.max(24, insets.bottom + 16) : space.cardPadding,
               },
             ]}
           >
+            {phone ? <View style={[styles.handle, { backgroundColor: theme.handle }]} /> : null}
             <Text variant="h2" accessibilityRole="header">{active.title}</Text>
             {active.body ? <Text variant="body">{active.body}</Text> : null}
-            <View style={[styles.actions, width < 420 && styles.stacked]}>
+            <View style={[styles.actions, width < 380 && styles.stacked]}>
               <Button
                 label={active.cancelLabel}
                 variant="outline"
@@ -70,24 +77,33 @@ export function ConfirmDialogHost() {
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 16,
-    backgroundColor: "rgba(10,14,13,.65)",
-  },
+  overlay: { flex: 1, alignItems: "center" },
+  phoneOverlay: { justifyContent: "flex-end" },
+  wideOverlay: { justifyContent: "center", padding: 24 },
   dialog: {
-    borderRadius: radius.card,
     borderWidth: StyleSheet.hairlineWidth,
     padding: space.cardPadding,
     gap: space.sectionGap,
     maxHeight: "90%",
   },
-  actions: {
-    flexDirection: "row",
-    gap: space.blockGap,
+  sheet: {
+    width: "100%",
+    borderTopLeftRadius: radius.sheet,
+    borderTopRightRadius: radius.sheet,
   },
+  centered: {
+    width: "100%",
+    maxWidth: 480,
+    borderRadius: radius.card,
+  },
+  handle: {
+    width: 40,
+    height: 5,
+    borderRadius: 3,
+    alignSelf: "center",
+    marginBottom: 4,
+  },
+  actions: { flexDirection: "row", gap: space.blockGap },
   stacked: { flexDirection: "column" },
   action: { flex: 1 },
 });
