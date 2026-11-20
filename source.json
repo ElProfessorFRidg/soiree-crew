@@ -821,6 +821,28 @@
         },
         {
           "version": "0.2.8",
+          "buildVersion": "244",
+          "marketingVersion": "0.2.8 Preview (244)",
+          "date": "2026-11-20T19:19:39Z",
+          "localizedDescription": "• Bump the expo-sdk group with 23 updates",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.14%2Bbuild.244/soiree-crew-unsigned.ipa",
+          "size": 22743504,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.14%2Bbuild.244/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.14%2Bbuild.244/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.14%2Bbuild.244/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.14%2Bbuild.244/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.14%2Bbuild.244/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.14%2Bbuild.244/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.14%2Bbuild.244/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.14%2Bbuild.244/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.14%2Bbuild.244/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.14%2Bbuild.244/iphone/10-limits.png"
+          ]
+        },
+        {
+          "version": "0.2.8",
           "buildVersion": "226",
           "marketingVersion": "0.2.8 Preview (226)",
           "date": "2026-11-20T19:17:08Z",
@@ -1138,6 +1160,17 @@
       "notify": false
     },
     {
+      "identifier": "preview-0.2.8-244",
+      "title": "Soirée Crew Preview 0.2.8 (244)",
+      "caption": "• Bump the expo-sdk group with 23 updates",
+      "date": "2026-11-20T19:19:39Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.14%2Bbuild.244/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.14%2Bbuild.244/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
+    {
       "identifier": "release-0.2.8-228",
       "title": "Soirée Crew 0.2.8 (228)",
       "caption": "• Scope Expo CLI findings and track blocked upstream fixes\n• Enable daily dependency updates for Expo workspace\n• Surface icon errors and avoid false empty-state messages\n• Surface icon errors and avoid false empty-state messages\n• Use localized save-retry message in every language\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• Revoke captured server token after successful local sign-out\n• Guard against browser and unsupported native alert regressions\n• Replace remaining browser-incompatible native alert flows\n• Replace remaining browser-incompatible native alert flows\n• Clear queued photos and check-in caches after data erasure\n• Keep stacked phone buttons at full natural height\n• Use approved bottom-sheet design on phones and modal on iPad/web\n• Stop old-account Live Activity when local account changes\n• Cancellation, queued prompts and duplicate taps\n• Expose pending request for deterministic queue tests\n• Isolate async screens by party and account context\n• Isolate async screens by party and account context\n• Isolate state quotas and suppress stale APNs readings\n• Isolate state quotas and suppress stale APNs readings\n• Isolate state quotas and suppress stale APNs readings\n• Recover failed session persistence and consent reset\n• Recover failed session persistence and consent reset\n• Centralize app-owned responsive confirmations\n• Centralize app-owned responsive confirmations\n• Centralize app-owned responsive confirmations\n• Guard stale data and duplicate rollover regressions\n• Strip stale BAC, driving advice and alerts during remote rollover\n• Keep route guard active until arrival flow is complete\n• Invalidate native session and surface secure-storage wipe failures\n• Use distinct translation for category deletion\n• Separate full reset and category erasure messages (ru)\n• Separate full reset and category erasure messages (pt)\n• Separate full reset and category erasure messages (it)",
@@ -1332,17 +1365,6 @@
       "tintColor": "F4B33D",
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.4%2Bbuild.93/iphone/banner.png",
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.4%2Bbuild.93/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile",
-      "notify": false
-    },
-    {
-      "identifier": "release-0.2.3-87",
-      "title": "Soirée Crew 0.2.3 (87)",
-      "caption": "• Accounts in the Gribouille and suggestions tests carry a birth date; status regenerated after the merges\n• Crew step back, Apple sign-in, date of birth before the account, server-side profile photo\n• Answer a round from its notification (\"Got it\" / \"Not mine\"), drinks linked to the round, confirmedIds in the listing\n• Background location follows eco mode as it changes during the night\n• Only a party that is live now tells the crew; partyStarted asserted explicitly in inbox tests; gathering card button 48 px\n• Leave authorises on party membership, drop locks the round and keeps a changed split, a round id reused in another party is a retry\n• Eco mode slows and simplifies loops instead of freezing every animation; location updates restart when the eco state changes\n• Close guesses stay private, rate-limit join, guard timers and leave, sweep idle rooms\n• Rebuild the arrival as one continuous flow with five visibility choices\n• Gribouille online, a drawing and guessing game on several phones (O-63)\n• Offer a party when 3+ of the crew are at one venue, push when a crew mate launches one, warn before closing (QOL-17)\n• Respect the phone, eco mode, data saver, theme choice\n• Fair rotation from the crew's history, server-side split and presence checks, drop-a-drink, summary (N-18, server)",
-      "date": "2026-11-12T21:52:47Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.3%2Bbuild.87/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.3%2Bbuild.87/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile",
       "notify": false
     }
@@ -1670,6 +1692,13 @@
       "buildVersion": "252",
       "date": "2026-11-20T19:02:57Z",
       "localizedDescription": "• Bump typescript from 6.0.3 to 7.0.2"
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.8",
+      "buildVersion": "244",
+      "date": "2026-11-20T19:19:39Z",
+      "localizedDescription": "• Bump the expo-sdk group with 23 updates"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
