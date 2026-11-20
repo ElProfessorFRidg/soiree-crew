@@ -184,9 +184,7 @@ export function AccountForm({
       haptic.error();
       setProblem({
         field: "form",
-        message: i18n.locale.startsWith("fr")
-          ? "Le compte existe, mais sa session n’a pas été enregistrée sur cet appareil. Réessaie ici sans créer un autre compte."
-          : "The account exists, but its session was not saved on this device. Retry here without creating another account.",
+        message: i18n.t("account.sessionSaveFailed"),
       });
       return false;
     } finally {
