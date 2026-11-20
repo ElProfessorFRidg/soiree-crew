@@ -93,7 +93,7 @@ export function FaceOffScreen({ session, content, onAgain }: GameScreenProps) {
   );
 
   return (
-    <GameShell {...shellProps} status={g.t("shell.round", { round: state.round, rounds: state.rounds })} footer={footer} fab="bottom">
+    <GameShell {...shellProps} currentPlayerId={top?.id} secondPlayerId={bottom?.id} status={g.t("shell.round", { round: state.round, rounds: state.rounds })} footer={footer} fab="bottom">
       {/* The top player sits across the table: their half is upside down. */}
       <View style={styles.flipped}>
         <Text variant="h3" align="center">
