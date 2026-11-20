@@ -31,6 +31,10 @@ export function confirmAction(spec: ConfirmSpec): Promise<boolean> {
   });
 }
 
+export function currentConfirmation(): QueuedConfirm | undefined {
+  return useConfirmStore.getState().queue[0];
+}
+
 export function useCurrentConfirmation(): QueuedConfirm | undefined {
   return useConfirmStore((state) => state.queue[0]);
 }
