@@ -67,6 +67,8 @@ export function VerdictScreen({ session, content, onAgain }: GameScreenProps) {
   return (
     <GameShell
       {...shellProps}
+      currentPlayerId={a}
+      secondPlayerId={b}
       footer={
         voting ? (
           <Button label={g.t("games.verdict.close")} height={ui.action} onPress={() => dispatch({ type: "close" })} />

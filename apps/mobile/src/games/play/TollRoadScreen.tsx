@@ -77,7 +77,7 @@ export function TollRoadScreen({ session, content, onAgain }: GameScreenProps) {
   );
 
   return (
-    <GameShell {...shellProps} status={g.t("games.tollRoad.onTheRoad", { name: driver?.name ?? "" })} footer={footer} fab="top">
+    <GameShell {...shellProps} currentPlayerId={driver?.id} status={g.t("games.tollRoad.onTheRoad", { name: driver?.name ?? "" })} footer={footer} fab="top">
       <Animated.View style={[styles.booths, checkpointPop]}>
         {Array.from({ length: CHECKPOINTS }, (_, i) => {
           const passed = i < state.checkpoint && !result;

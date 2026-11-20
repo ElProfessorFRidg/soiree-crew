@@ -24,6 +24,11 @@ interface SessionState {
 
 export const useSession = create<SessionState>(() => ({ ready: false, session: null }));
 
+/** An in-flight authenticated request must never publish data after an account or server switch. */
+export function sessionStillCurrent(atStart: ServerSession | null): boolean {
+  return atStart !== null && useSession.getState().session === atStart;
+}
+
 // expo-secure-store has no web implementation: the web preview keeps the session for the tab only.
 function tabStorage(): Storage | null {
   try {

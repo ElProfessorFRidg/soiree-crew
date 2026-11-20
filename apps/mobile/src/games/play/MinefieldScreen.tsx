@@ -76,7 +76,7 @@ export function MinefieldScreen({ session, content, onAgain }: GameScreenProps) 
   const status = state.grids !== null ? g.t("games.minefield.grid", { number: state.gridNumber, total: state.grids }) : undefined;
 
   return (
-    <GameShell {...shellProps} status={status} footer={footer} fab="top">
+    <GameShell {...shellProps} currentPlayerId={player?.id} status={status} footer={footer} fab="top">
       <View style={styles.head}>
         <Text variant="h2">{g.t("games.minefield.turnOf", { name: player?.name ?? "" })}</Text>
         <Text variant="small" accessibilityLiveRegion="polite">

@@ -83,7 +83,7 @@ export function BigDeckScreen({ session, content, onAgain }: GameScreenProps) {
   );
 
   return (
-    <GameShell {...shellProps} status={`${g.t("games.bigDeck.turnOf", { name: table.nameOf(drawer) })}, ${g.plural("games.bigDeck.cardsLeft", cardsLeft(state))}`} fab="top" footer={footer}>
+    <GameShell {...shellProps} currentPlayerId={drawer} status={`${g.t("games.bigDeck.turnOf", { name: table.nameOf(drawer) })}, ${g.plural("games.bigDeck.cardsLeft", cardsLeft(state))}`} fab="top" footer={footer}>
       <RoundTimer seconds={session.timerSeconds} roundKey={state.deck.length} paused={!current} />
       {state.activeRule ? (
         <Panel tint="water">

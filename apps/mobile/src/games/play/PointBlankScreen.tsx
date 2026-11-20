@@ -9,7 +9,7 @@ import { useTheme } from "@/theme";
 import { Button } from "@/ui/Button";
 import { ScalePressable } from "@/ui/Pressable";
 import { Numeral, Text } from "@/ui/Text";
-import { useEngine, useGameUi, useWastedIds } from "../hooks";
+import { useEngine, useGameUi, useOnBackground, useWastedIds } from "../hooks";
 import { useGameT } from "../i18n";
 import { toEnginePlayer } from "../store";
 import { EndScreen, topOf } from "../ui/EndScreen";
@@ -39,7 +39,25 @@ export function PointBlankScreen({ session, content, onAgain }: GameScreenProps)
   // A secret card stays secret unless the named player paid to hear it.
   const [heard, setHeard] = useState(false);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+  const countdownPending = useRef(false);
+  useEffect(() => () => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    countdownPending.current = false;
+  }, []);
+  useEffect(() => {
+    if (state.phase !== "end") return;
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    countdownPending.current = false;
+    setBeat(null);
+  }, [state.phase]);
+  useOnBackground(() => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    countdownPending.current = false;
+    setBeat(null);
+  });
   useEffect(() => {
     setSecretVisible(false);
     setQuick(new Set());
@@ -65,6 +83,8 @@ export function PointBlankScreen({ session, content, onAgain }: GameScreenProps)
   }
 
   const countdown = () => {
+    if (countdownPending.current || state.phase !== "read") return;
+    countdownPending.current = true;
     // Three firm beats, a stronger one on "Point!" (research/games.md §2.1), sound-free.
     [3, 2, 1, 0].forEach((n, i) => {
       timers.current.push(
@@ -77,7 +97,11 @@ export function PointBlankScreen({ session, content, onAgain }: GameScreenProps)
         }, scaled(i * BEAT_MS)),
       );
     });
-    timers.current.push(setTimeout(() => setBeat(null), scaled(4 * BEAT_MS)));
+    timers.current.push(setTimeout(() => {
+      setBeat(null);
+      countdownPending.current = false;
+      timers.current = [];
+    }, scaled(4 * BEAT_MS)));
   };
 
   const card = state.card;
@@ -111,6 +135,7 @@ export function PointBlankScreen({ session, content, onAgain }: GameScreenProps)
   return (
     <GameShell
       {...shellProps}
+      currentPlayerId={state.readerId ?? state.order.players[state.order.turn]?.id}
       status={`${g.t("games.pointBlank.reader", { name: reader || (state.order.players[state.order.turn]?.name ?? "") })}, ${g.plural("games.pointBlank.cardsLeft", state.deck.length)}`}
       footer={footer}
       fab={state.phase === "record" ? "top" : "bottom"}

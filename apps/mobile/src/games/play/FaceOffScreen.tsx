@@ -25,8 +25,10 @@ export function FaceOffScreen({ session, content, onAgain }: GameScreenProps) {
   const [faceUp, setFaceUp] = useState(false);
   const [turning, setTurning] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const transitioning = useRef(false);
   useEffect(() => () => {
     if (timer.current) clearTimeout(timer.current);
+    transitioning.current = false;
   }, []);
 
   const shellProps = {
@@ -53,11 +55,15 @@ export function FaceOffScreen({ session, content, onAgain }: GameScreenProps) {
     setFaceUp(true);
   };
   const next = () => {
+    if (transitioning.current || state.phase === "hidden" || state.phase === "end") return;
+    transitioning.current = true;
     // Cards turn face down first; new hands are dealt only once they are hidden.
     setFaceUp(false);
     setTurning(true);
     timer.current = setTimeout(() => {
+      timer.current = null;
       dispatch({ type: "next" });
+      transitioning.current = false;
       setTurning(false);
     }, duration.flip + 30);
   };
@@ -93,7 +99,7 @@ export function FaceOffScreen({ session, content, onAgain }: GameScreenProps) {
   );
 
   return (
-    <GameShell {...shellProps} status={g.t("shell.round", { round: state.round, rounds: state.rounds })} footer={footer} fab="bottom">
+    <GameShell {...shellProps} currentPlayerId={top?.id} secondPlayerId={bottom?.id} status={g.t("shell.round", { round: state.round, rounds: state.rounds })} footer={footer} fab="bottom">
       {/* The top player sits across the table: their half is upside down. */}
       <View style={styles.flipped}>
         <Text variant="h3" align="center">
