@@ -487,6 +487,68 @@
         },
         {
           "version": "0.2.8",
+          "buildVersion": "226",
+          "marketingVersion": "0.2.8 Preview (226)",
+          "date": "2026-11-20T19:17:08Z",
+          "localizedDescription": "",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.12%2Bbuild.226/soiree-crew-ipad-unsigned.ipa",
+          "size": 22696819,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.12%2Bbuild.226/ipad/01-party.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.12%2Bbuild.226/ipad/08-add-drink.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.12%2Bbuild.226/ipad/09-curve.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.12%2Bbuild.226/ipad/03-games.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.12%2Bbuild.226/ipad/07-my-stats.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.12%2Bbuild.226/ipad/12-history.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.12%2Bbuild.226/ipad/11-leaderboard.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.12%2Bbuild.226/ipad/04-bars.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.12%2Bbuild.226/ipad/05-me.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.12%2Bbuild.226/ipad/10-limits.png",
+              "width": 2064,
+              "height": 2752
+            }
+          ]
+        },
+        {
+          "version": "0.2.8",
           "buildVersion": "223",
           "marketingVersion": "0.2.8 Preview (223)",
           "date": "2026-11-20T18:36:16Z",
@@ -1273,6 +1335,17 @@
       "notify": false
     },
     {
+      "identifier": "preview-0.2.8-226",
+      "title": "Soirée Crew Preview 0.2.8 (226)",
+      "caption": "",
+      "date": "2026-11-20T19:17:08Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.12%2Bbuild.226/ipad/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.12%2Bbuild.226/soiree-crew-ipad-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
+    {
       "identifier": "preview-0.2.8-223",
       "title": "Soirée Crew Preview 0.2.8 (223)",
       "caption": "• Surface icon errors and avoid false empty-state messages\n• Surface icon errors and avoid false empty-state messages\n• Use localized save-retry message in every language\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• Revoke captured server token after successful local sign-out\n• Guard against browser and unsupported native alert regressions\n• Replace remaining browser-incompatible native alert flows\n• Replace remaining browser-incompatible native alert flows\n• Clear queued photos and check-in caches after data erasure\n• Keep stacked phone buttons at full natural height\n• Use approved bottom-sheet design on phones and modal on iPad/web\n• Stop old-account Live Activity when local account changes\n• Cancellation, queued prompts and duplicate taps\n• Expose pending request for deterministic queue tests\n• Isolate async screens by party and account context\n• Isolate async screens by party and account context\n• Isolate state quotas and suppress stale APNs readings\n• Isolate state quotas and suppress stale APNs readings\n• Isolate state quotas and suppress stale APNs readings\n• Recover failed session persistence and consent reset\n• Recover failed session persistence and consent reset\n• Centralize app-owned responsive confirmations\n• Centralize app-owned responsive confirmations\n• Centralize app-owned responsive confirmations\n• Guard stale data and duplicate rollover regressions\n• Strip stale BAC, driving advice and alerts during remote rollover\n• Keep route guard active until arrival flow is complete\n• Invalidate native session and surface secure-storage wipe failures\n• Use distinct translation for category deletion\n• Separate full reset and category erasure messages (ru)\n• Separate full reset and category erasure messages (pt)\n• Separate full reset and category erasure messages (it)\n• Separate full reset and category erasure messages (es)\n• Separate full reset and category erasure messages (de)",
@@ -1474,6 +1547,13 @@
       "buildVersion": "252",
       "date": "2026-11-20T19:02:57Z",
       "localizedDescription": "• Bump typescript from 6.0.3 to 7.0.2"
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.8",
+      "buildVersion": "226",
+      "date": "2026-11-20T19:17:08Z",
+      "localizedDescription": ""
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
