@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { api } from "./api";
+import { sessionStillCurrent, useSession } from "./session";
 
 export type NightStatus = "going_out" | "maybe" | "home" | "unavailable";
 
@@ -29,7 +30,9 @@ interface RadarState {
 export const useRadar = create<RadarState>(() => ({ byCrew: {}, sos: [], mine: [] }));
 
 export async function refreshRadar(crewId: string): Promise<void> {
+  const requestSession = useSession.getState().session;
   const radar = await api<Radar>(`/v1/crews/${crewId}/radar`);
+  if (!sessionStillCurrent(requestSession)) return;
   useRadar.setState((state) => ({ byCrew: { ...state.byCrew, [crewId]: radar } }));
 }
 
@@ -47,6 +50,7 @@ const NO_DETAILS: StatusDetails = { fromMinute: null, toMinute: null, place: "" 
 
 /** Optimistic status change, for tonight or another night of the week: the tile flips at once and comes back if the server refuses. */
 export async function setNightStatus(crewId: string, night: string, status: NightStatus, me: string, details: StatusDetails = NO_DETAILS): Promise<void> {
+  const requestSession = useSession.getState().session;
   const out = status === "going_out" || status === "maybe";
   const kept = out ? details : NO_DETAILS;
   // A status is the same for every crew: each board shows it at once.
@@ -61,14 +65,15 @@ export async function setNightStatus(crewId: string, night: string, status: Nigh
   try {
     await api("/v1/status", { method: "PUT", body: { night, status, ...kept, place: kept.place.trim() || undefined } });
   } catch (error) {
-    useRadar.setState({ byCrew: before });
+    if (sessionStillCurrent(requestSession)) useRadar.setState({ byCrew: before });
     throw error;
   } finally {
-    void refreshRadar(crewId).catch(() => undefined);
+    if (sessionStillCurrent(requestSession)) void refreshRadar(crewId).catch(() => undefined);
   }
 }
 
 export async function clearNightStatus(crewId: string, night: string, me: string): Promise<void> {
+  const requestSession = useSession.getState().session;
   const before = useRadar.getState().byCrew;
   useRadar.setState({
     byCrew: Object.fromEntries(Object.entries(before).map(([id, radar]) => [id, { ...radar, statuses: radar.statuses.filter((s) => !(s.userId === me && s.night === night)) }])),
@@ -76,7 +81,7 @@ export async function clearNightStatus(crewId: string, night: string, me: string
   try {
     await api(`/v1/status/${night}`, { method: "DELETE" });
   } catch (error) {
-    useRadar.setState({ byCrew: before });
+    if (sessionStillCurrent(requestSession)) useRadar.setState({ byCrew: before });
     throw error;
   }
 }
@@ -97,12 +102,16 @@ export function linkCallToParty(callId: string, partyId: string): Promise<unknow
 }
 
 export async function refreshSos(): Promise<void> {
+  const requestSession = useSession.getState().session;
   const { alerts, mine } = await api<{ alerts: SosAlert[]; mine?: { id: string; at: number }[] }>("/v1/sos");
+  if (!sessionStillCurrent(requestSession)) return;
   useRadar.setState({ sos: alerts, mine: mine ?? [] });
 }
 
 export async function sendSos(input: { partyId?: string; location?: { lat: number; lng: number; accuracy: number } }): Promise<string[]> {
+  const requestSession = useSession.getState().session;
   const { ids } = await api<{ ids: string[] }>("/v1/sos", { method: "POST", body: input });
+  if (!sessionStillCurrent(requestSession)) return ids;
   const at = Date.now();
   useRadar.setState((state) => ({ mine: [...ids.map((id) => ({ id, at })), ...state.mine] }));
   return ids;
@@ -110,8 +119,10 @@ export async function sendSos(input: { partyId?: string; location?: { lat: numbe
 
 /** N-28: the sender calls off every alert they sent; the crew's banners go at once. */
 export async function cancelMySos(): Promise<void> {
+  const requestSession = useSession.getState().session;
   const { mine } = useRadar.getState();
   await Promise.all(mine.map((alert) => api(`/v1/sos/${alert.id}/resolve`, { method: "POST" })));
+  if (!sessionStillCurrent(requestSession)) return;
   useRadar.setState({ mine: [] });
   await refreshSos().catch(() => undefined);
 }

@@ -1,7 +1,9 @@
+import { useRef } from "react";
 import { View } from "react-native";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
 import { api } from "@/server/api";
+import { sessionStillCurrent, useSession } from "@/server/session";
 import { showFailure } from "@/server/errors";
 import { useVenueData } from "@/server/venueData";
 import { pruneDrinkPhotos } from "@/drinks/drinkPhotos";
@@ -51,28 +53,37 @@ function forgetLocally(category: DataCategory): void {
 export function DataControls() {
   const i18n = useT();
   const theme = useTheme();
+  const erasing = useRef(new Set<DataCategory>());
 
   const exportAs = (format: "json" | "csv") =>
     void exportMyData(format)
       .then(() => showToast({ message: i18n.t("account.exportReady") }))
       .catch(showFailure(i18n));
 
-  const erase = (category: DataCategory) =>
+  const erase = (category: DataCategory) => {
+    if (erasing.current.has(category)) return;
+    const requestSession = useSession.getState().session;
+    if (!requestSession) return;
+    erasing.current.add(category);
     void confirmAction({
       title: i18n.t("account.eraseConfirmTitle", { what: i18n.t(`account.eraseCategory.${category}`) }),
       body: i18n.t("account.eraseConfirmBody"),
       confirmLabel: i18n.t("account.eraseConfirm"),
       cancelLabel: i18n.t("account.deleteKeep"),
-    }).then((ok) => {
-      if (!ok) return;
-      void api(`/v1/me/data/${category}`, { method: "DELETE" })
-        .then(() => {
-          forgetLocally(category);
-          haptic.confirmed();
-          showToast({ message: i18n.t("account.categoryErased", { what: i18n.t(`account.eraseCategory.${category}`) }) });
-        })
-        .catch(showFailure(i18n));
-    });
+    }).then(async (ok) => {
+      if (!ok || !sessionStillCurrent(requestSession)) return;
+      try {
+        await api(`/v1/me/data/${category}`, { method: "DELETE" });
+        // An old server's successful deletion must not erase the replacement account's local data.
+        if (!sessionStillCurrent(requestSession)) return;
+        forgetLocally(category);
+        haptic.confirmed();
+        showToast({ message: i18n.t("account.categoryErased", { what: i18n.t(`account.eraseCategory.${category}`) }) });
+      } catch (error) {
+        if (sessionStillCurrent(requestSession)) showFailure(i18n)(error);
+      }
+    }).finally(() => erasing.current.delete(category));
+  };
 
   return (
     <View style={{ gap: 8 }}>

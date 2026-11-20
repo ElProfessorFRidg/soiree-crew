@@ -44,12 +44,30 @@ export function CrashScreen({ session, content, onAgain }: GameScreenProps) {
   const area = useRef<ComponentRef<typeof View>>(null);
   const areaOffset = useRef({ x: 0, y: 0 });
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+  const startPending = useRef(false);
+  useEffect(() => () => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    startPending.current = false;
+  }, []);
+  useEffect(() => {
+    if (state.phase !== "end") return;
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    startPending.current = false;
+    setBeat(null);
+  }, [state.phase]);
 
   const running = state.phase === "running";
   useTicker(running, (delta) => dispatch({ type: "tick", deltaMs: delta }), 33);
-  // No pausing a live curve: leaving the app calls the round off, nobody pays.
-  useOnBackground(() => dispatch({ type: "cancel" }));
+  // The curve and any pending start countdown stop when the app leaves foreground.
+  useOnBackground(() => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    startPending.current = false;
+    setBeat(null);
+    dispatch({ type: "cancel" });
+  });
 
   const stake = stakeAt(state.level, state.multiplier);
   const lastStake = useRef(stake);
@@ -85,6 +103,8 @@ export function CrashScreen({ session, content, onAgain }: GameScreenProps) {
   }
 
   const start = () => {
+    if (startPending.current || state.phase !== "idle") return;
+    startPending.current = true;
     [3, 2, 1].forEach((n, i) =>
       timers.current.push(
         setTimeout(() => {
@@ -96,6 +116,8 @@ export function CrashScreen({ session, content, onAgain }: GameScreenProps) {
     timers.current.push(
       setTimeout(() => {
         setBeat(null);
+        startPending.current = false;
+        timers.current = [];
         dispatch({ type: "start" });
       }, scaled(3 * BEAT_MS)),
     );
@@ -133,7 +155,7 @@ export function CrashScreen({ session, content, onAgain }: GameScreenProps) {
   const status = state.rounds !== null ? g.t("shell.round", { round: state.round, rounds: state.rounds }) : g.t("shell.roundOpen", { round: state.round });
 
   return (
-    <GameShell {...shellProps} status={status} helpHidden={running} fab={running ? "none" : "top"} footer={footer} scroll={!running}>
+    <GameShell {...shellProps} currentPlayerId={state.phase === "award" ? state.award?.playerId : null} status={status} helpHidden={running} fab={running ? "none" : "top"} footer={footer} scroll={!running}>
       <View style={[styles.chart, { backgroundColor: theme.surface }]} accessible accessibilityLabel={g.t("games.crash.curve", { stake })}>
         <Animated.View style={[StyleSheet.absoluteFill, shake]}>
           <Svg width="100%" height="100%" viewBox={`0 0 ${CHART_W} ${CHART_H}`} preserveAspectRatio="none">

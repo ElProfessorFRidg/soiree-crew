@@ -103,7 +103,7 @@ export function WheelScreen({ session, content, onAgain }: GameScreenProps) {
   const footer = <Button label={g.t("games.wheel.spin")} height={ui.action} disabled={spinning} onPress={() => dispatch({ type: "spin" })} />;
 
   return (
-    <GameShell {...shellProps} status={g.t("shell.roundOpen", { round: state.round })} helpHidden={spinning} footer={footer} fab="top">
+    <GameShell {...shellProps} currentPlayerId={state.phase === "result" ? state.resultId : null} status={g.t("shell.roundOpen", { round: state.round })} helpHidden={spinning} footer={footer} fab="top">
       <View style={styles.stage}>
         <Animated.View style={[styles.wheel, wheelStyle]} accessible accessibilityLabel={g.t("games.wheel.wheel", { count })}>
           <Svg width={SIZE} height={SIZE}>
