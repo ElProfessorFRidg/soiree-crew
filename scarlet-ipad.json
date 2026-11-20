@@ -131,6 +131,27 @@
       ]
     },
     {
+      "name": "Soirée Crew Preview 0.2.9",
+      "version": "0.2.9",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.9-preview.18%2Bbuild.267/soiree-crew-ipad-unsigned.ipa",
+      "category": "Other",
+      "description": "• Bump @noble/ciphers from 2.1.1 to 2.4.0",
+      "bundleID": "app.soireecrew.mobile.preview",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.18%2Bbuild.267/ipad/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.18%2Bbuild.267/ipad/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.18%2Bbuild.267/ipad/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.18%2Bbuild.267/ipad/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.18%2Bbuild.267/ipad/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.18%2Bbuild.267/ipad/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.18%2Bbuild.267/ipad/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.18%2Bbuild.267/ipad/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.18%2Bbuild.267/ipad/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.18%2Bbuild.267/ipad/10-limits.png"
+      ]
+    },
+    {
       "name": "Soirée Crew Preview 0.2.8",
       "version": "0.2.8",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
