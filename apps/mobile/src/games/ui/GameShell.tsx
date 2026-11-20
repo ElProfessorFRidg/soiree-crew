@@ -29,6 +29,8 @@ interface Props {
   status?: string;
   /** The player holding the turn; shown prominently above the game area. */
   currentPlayerId?: string | null;
+  /** The other participant when the game is a head-to-head round. */
+  secondPlayerId?: string | null;
   /** Live timed phases (fuse, curve): the "?" is hidden so nobody stalls (research/games.md §2.0). */
   helpHidden?: boolean;
   /** Where the add-drink button sits, away from the main tap zone of the game. */
@@ -55,7 +57,7 @@ interface Props {
 }
 
 /** Frame of every game: header with back and "?", players sheet, add-drink button, toasts, and the level-3 way home. */
-export function GameShell({ gameId, status, currentPlayerId, helpHidden, fab = "bottom", players, activeIds, ledger, onRemovePlayer, onAddPlayer, onStop, footer, scroll = true, bleed = false, rules, playerNote, children }: Props) {
+export function GameShell({ gameId, status, currentPlayerId, secondPlayerId, helpHidden, fab = "bottom", players, activeIds, ledger, onRemovePlayer, onAddPlayer, onStop, footer, scroll = true, bleed = false, rules, playerNote, children }: Props) {
   useKeepAwake();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -64,6 +66,7 @@ export function GameShell({ gameId, status, currentPlayerId, helpHidden, fab = "
   const ui = useGameUi();
   const [sheet, setSheet] = useState<"rules" | "players" | null>(null);
   const currentPlayer = currentPlayerId && activeIds.has(currentPlayerId) ? players.find((p) => p.id === currentPlayerId) : null;
+  const secondPlayer = secondPlayerId && secondPlayerId !== currentPlayerId && activeIds.has(secondPlayerId) ? players.find((p) => p.id === secondPlayerId) : null;
 
   const header = (
     <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
@@ -99,19 +102,32 @@ export function GameShell({ gameId, status, currentPlayerId, helpHidden, fab = "
       {header}
       {currentPlayer ? (
         <Animated.View
-          key={currentPlayer.id}
+          key={`${currentPlayer.id}-${secondPlayer?.id ?? ""}`}
           entering={ui.calmMotion ? undefined : FadeIn.duration(duration.toggle)}
           style={[styles.turnBanner, { backgroundColor: theme.surfaceRaised, borderColor: theme.amber }]}
           accessible
           accessibilityLiveRegion="polite"
-          accessibilityLabel={`${status ?? g.t(`games.${gameId}.name`)}: ${currentPlayer.name}`}
+          accessibilityLabel={`${status ?? g.t(`games.${gameId}.name`)}: ${currentPlayer.name}${secondPlayer ? `, ${secondPlayer.name}` : ""}`}
         >
           <View style={[styles.turnAccent, { backgroundColor: theme.amber }]} />
-          <Avatar personId={currentPlayer.id} name={currentPlayer.name} size={ui.big ? 52 : 44} />
-          <View style={styles.turnText}>
-            {status ? <Text variant="small" numberOfLines={1} color={theme.textSoft}>{status}</Text> : null}
-            <Text variant="h2" numberOfLines={2}>{currentPlayer.name}</Text>
-          </View>
+          {secondPlayer ? (
+            <View style={styles.pairRow}>
+              {[currentPlayer, secondPlayer].map((player) => (
+                <View key={player.id} style={styles.pairPlayer}>
+                  <Avatar personId={player.id} name={player.name} size={ui.big ? 48 : 38} />
+                  <Text variant="h3" numberOfLines={2} style={styles.pairName}>{player.name}</Text>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <>
+              <Avatar personId={currentPlayer.id} name={currentPlayer.name} size={ui.big ? 52 : 44} />
+              <View style={styles.turnText}>
+                {status ? <Text variant="small" numberOfLines={1} color={theme.textSoft}>{status}</Text> : null}
+                <Text variant="h2" numberOfLines={2}>{currentPlayer.name}</Text>
+              </View>
+            </>
+          )}
         </Animated.View>
       ) : null}
       {body}
@@ -247,6 +263,9 @@ const styles = StyleSheet.create({
   turnBanner: { width: "100%", maxWidth: 940, alignSelf: "center", flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1.5, borderRadius: radius.card, paddingVertical: 12, paddingHorizontal: 14, marginBottom: 8, overflow: "hidden" },
   turnAccent: { position: "absolute", left: 0, top: 0, bottom: 0, width: 5 },
   turnText: { flex: 1, minWidth: 0, gap: 2 },
+  pairRow: { flex: 1, flexDirection: "row", alignItems: "center", gap: 12 },
+  pairPlayer: { flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: 8 },
+  pairName: { flex: 1, minWidth: 0 },
   content: { width: "100%", maxWidth: 980, alignSelf: "center", paddingHorizontal: space.screenX, paddingTop: 8, gap: space.sectionGap },
   footer: { width: "100%", maxWidth: 980, alignSelf: "center", paddingHorizontal: space.screenX, paddingTop: 10, gap: 10 },
   fabBottom: { position: "absolute", right: 16 },
