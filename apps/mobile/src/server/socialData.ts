@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { api } from "./api";
+import { sessionStillCurrent, useSession } from "./session";
 import { refreshCrews, refreshParties, useCrewData, type PartyMood } from "./crewData";
 
 export interface JoinRequest {
@@ -26,7 +27,9 @@ const EMPTY: Invitations = { partyInvites: 0, friendRequests: 0, joinRequests: [
 export const useInvitations = create<Invitations>()(() => EMPTY);
 
 export async function refreshInvitations(): Promise<void> {
+  const requestSession = useSession.getState().session;
   const data = await api<Invitations>("/v1/invitations");
+  if (!sessionStillCurrent(requestSession)) return;
   useInvitations.setState(data);
 }
 
