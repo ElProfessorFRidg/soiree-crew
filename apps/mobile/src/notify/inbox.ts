@@ -2,6 +2,7 @@ import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 import { create } from "zustand";
 import { api } from "@/server/api";
+import { sessionStillCurrent, useSession } from "@/server/session";
 
 /** QOL-30: the server's fixed taxonomy (apps/server/src/notifications/kinds.ts). */
 export const NOTIFICATION_KINDS = [
@@ -61,7 +62,9 @@ function syncBadge(unread: number): void {
 }
 
 export async function refreshInbox(): Promise<InboxItem[]> {
+  const requestSession = useSession.getState().session;
   const data = await api<{ items: InboxItem[]; unread: number }>("/v1/notifications");
+  if (!sessionStillCurrent(requestSession)) return [];
   useInbox.setState({ items: data.items, unread: data.unread, loaded: true });
   syncBadge(data.unread);
   return data.items;
@@ -69,6 +72,7 @@ export async function refreshInbox(): Promise<InboxItem[]> {
 
 /** Optimistic: the dot goes at once; the server count wins when it answers. */
 export async function markRead(ids: string[] | "all"): Promise<void> {
+  const requestSession = useSession.getState().session;
   const now = Date.now();
   useInbox.setState((state) => {
     const items = state.items.map((item) => (item.readAt === null && (ids === "all" || ids.includes(item.id)) ? { ...item, readAt: now } : item));
@@ -76,6 +80,7 @@ export async function markRead(ids: string[] | "all"): Promise<void> {
   });
   syncBadge(useInbox.getState().unread);
   const { unread } = await api<{ unread: number }>("/v1/notifications/read", { method: "POST", body: ids === "all" ? { all: true } : { ids } });
+  if (!sessionStillCurrent(requestSession)) return;
   useInbox.setState({ unread });
   syncBadge(unread);
 }

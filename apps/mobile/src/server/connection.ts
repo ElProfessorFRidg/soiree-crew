@@ -17,7 +17,7 @@ import { refreshCrews, refreshLiveParty, refreshParties, useCrewData } from "./c
 import { refreshRadar, refreshSos, useRadar } from "./radarData";
 import { emitLiveHint } from "./liveHints";
 import { clearInvitations, pulseFeed, refreshInvitations } from "./socialData";
-import { useSession, type ServerSession } from "./session";
+import { sessionStillCurrent, useSession, type ServerSession } from "./session";
 import { showToast } from "@/ui/Toast";
 import { backupIfDue } from "@/chat/backup";
 import { onChatHint, onTyping, startChat } from "@/chat/engine";
@@ -50,9 +50,13 @@ function pendingIds(): Set<string> {
 
 /** Delta sync (SYNC-05): the server copy wins for everything not waiting in the queue. */
 export async function pull(): Promise<void> {
+  const requestSession = useSession.getState().session;
+  if (!requestSession) return;
   const state = useAppStore.getState();
   const since = state.syncCursor ?? 0;
   const data = await api<SyncResponse>(`/v1/sync?since=${since}`);
+  // Authentication may have changed while fetch was pending: do not resurrect old account data.
+  if (!sessionStillCurrent(requestSession)) return;
   const pending = pendingIds();
 
   useAppStore.setState((current) => {
@@ -133,6 +137,7 @@ function openSocket(session: ServerSession): void {
   const ws = new WebSocket(url);
   socket = ws;
   ws.onopen = () => {
+    if (socket !== ws || stopped || !sessionStillCurrent(session)) return;
     retry = 0;
     // Anything that arrived while the socket was down is picked up now.
     void startChat().then(() => backupIfDue());
@@ -140,6 +145,7 @@ function openSocket(session: ServerSession): void {
     emitLiveHint("open");
   };
   ws.onmessage = (event) => {
+    if (socket !== ws || stopped || !sessionStillCurrent(session)) return;
     try {
       const message = JSON.parse(String(event.data)) as {
         type: string;
@@ -189,6 +195,8 @@ function openSocket(session: ServerSession): void {
     }
   };
   ws.onclose = () => {
+    // A late close from the previous account must not clear a newer socket.
+    if (socket !== ws) return;
     socket = null;
     if (stopped) return;
     // Backoff with jitter, capped at 30 s.
@@ -205,13 +213,19 @@ function openSocket(session: ServerSession): void {
 let hasInbox = false;
 
 async function refreshAll(): Promise<void> {
+  const requestSession = useSession.getState().session;
+  if (!requestSession) return;
   await flush();
+  if (!sessionStillCurrent(requestSession)) return;
   // N-35: the inbox is fetched on every return to the foreground, which also covers builds without push.
   const inbox = refreshInbox().then(
-    () => (hasInbox = true),
+    () => {
+      if (sessionStillCurrent(requestSession)) hasInbox = true;
+    },
     () => undefined,
   );
   await Promise.allSettled([pull(), refreshCrews(), refreshParties(), refreshSos(), refreshInvitations(), inbox]);
+  if (!sessionStillCurrent(requestSession)) return;
   await Promise.allSettled(useCrewData.getState().crews.map((crew) => refreshRadar(crew.id)));
 }
 

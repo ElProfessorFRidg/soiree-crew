@@ -90,7 +90,7 @@ export function HiddenWordScreen({ session, content, onAgain }: GameScreenProps)
   }
 
   return (
-    <GameShell {...shellProps} status={g.t("shell.roundOpen", { round: state.round })} footer={footer} fab={state.phase === "reveal" ? "none" : "bottom"}>
+    <GameShell {...shellProps} currentPlayerId={state.phase === "reveal" ? holder?.id : null} status={g.t("shell.roundOpen", { round: state.round })} footer={footer} fab={state.phase === "reveal" ? "none" : "bottom"}>
       {state.phase === "reveal" && holder ? (
         <>
           <Text variant="h2">{g.t("games.hiddenWord.passTo", { name: holder.name })}</Text>
