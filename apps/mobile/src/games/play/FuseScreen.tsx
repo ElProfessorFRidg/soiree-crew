@@ -44,6 +44,14 @@ export function FuseScreen({ session, content, onAgain }: GameScreenProps) {
     if (resumeTimer.current) clearTimeout(resumeTimer.current);
     resumePending.current = false;
   }, []);
+  useEffect(() => {
+    // A stopped or otherwise advanced round cannot be resumed by an old countdown.
+    if (state.phase === "paused") return;
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    resumeTimer.current = null;
+    resumePending.current = false;
+    setResuming(false);
+  }, [state.phase]);
   const burning = state.phase === "burning";
   const escalation = fuseEscalation(state);
 
