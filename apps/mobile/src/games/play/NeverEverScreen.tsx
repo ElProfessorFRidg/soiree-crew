@@ -45,6 +45,7 @@ export function NeverEverScreen({ session, content, onAgain }: GameScreenProps) 
   return (
     <GameShell
       {...shellProps}
+      currentPlayerId={reader?.id}
       status={`${g.t("games.neverEver.reader", { name: reader?.name ?? "" })}, ${g.plural("games.neverEver.cardsLeft", state.deck.length)}`}
       footer={<Button label={g.t("games.neverEver.next")} height={ui.action} onPress={() => dispatch({ type: "next" })} />}
     >
