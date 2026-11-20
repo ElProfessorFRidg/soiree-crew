@@ -2,8 +2,9 @@ import { useKeepAwake } from "expo-keep-awake";
 import { router } from "expo-router";
 import { useState, type ReactNode } from "react";
 import { ScrollView, StyleSheet, TextInput, View } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { radius, size, space } from "@crew/design-tokens";
+import { duration, radius, size, space } from "@crew/design-tokens";
 import type { GameId, PenaltyLedger } from "@crew/games";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
@@ -26,6 +27,8 @@ interface Props {
   gameId: GameId;
   /** Round or turn line under the title. */
   status?: string;
+  /** The player holding the turn; shown prominently above the game area. */
+  currentPlayerId?: string | null;
   /** Live timed phases (fuse, curve): the "?" is hidden so nobody stalls (research/games.md §2.0). */
   helpHidden?: boolean;
   /** Where the add-drink button sits, away from the main tap zone of the game. */
@@ -52,7 +55,7 @@ interface Props {
 }
 
 /** Frame of every game: header with back and "?", players sheet, add-drink button, toasts, and the level-3 way home. */
-export function GameShell({ gameId, status, helpHidden, fab = "bottom", players, activeIds, ledger, onRemovePlayer, onAddPlayer, onStop, footer, scroll = true, bleed = false, rules, playerNote, children }: Props) {
+export function GameShell({ gameId, status, currentPlayerId, helpHidden, fab = "bottom", players, activeIds, ledger, onRemovePlayer, onAddPlayer, onStop, footer, scroll = true, bleed = false, rules, playerNote, children }: Props) {
   useKeepAwake();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -60,6 +63,7 @@ export function GameShell({ gameId, status, helpHidden, fab = "bottom", players,
   const g = useGameT();
   const ui = useGameUi();
   const [sheet, setSheet] = useState<"rules" | "players" | null>(null);
+  const currentPlayer = currentPlayerId && activeIds.has(currentPlayerId) ? players.find((p) => p.id === currentPlayerId) : null;
 
   const header = (
     <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
@@ -93,6 +97,23 @@ export function GameShell({ gameId, status, helpHidden, fab = "bottom", players,
   return (
     <View style={[styles.screen, { backgroundColor: theme.bg }]}>
       {header}
+      {currentPlayer ? (
+        <Animated.View
+          key={currentPlayer.id}
+          entering={ui.calmMotion ? undefined : FadeIn.duration(duration.toggle)}
+          style={[styles.turnBanner, { backgroundColor: theme.surfaceRaised, borderColor: theme.amber }]}
+          accessible
+          accessibilityLiveRegion="polite"
+          accessibilityLabel={`${status ?? g.t(`games.${gameId}.name`)}: ${currentPlayer.name}`}
+        >
+          <View style={[styles.turnAccent, { backgroundColor: theme.amber }]} />
+          <Avatar personId={currentPlayer.id} name={currentPlayer.name} size={ui.big ? 52 : 44} />
+          <View style={styles.turnText}>
+            {status ? <Text variant="small" numberOfLines={1} color={theme.textSoft}>{status}</Text> : null}
+            <Text variant="h2" numberOfLines={2}>{currentPlayer.name}</Text>
+          </View>
+        </Animated.View>
+      ) : null}
       {body}
       {footer ? <View style={[styles.footer, { paddingBottom: insets.bottom + 12 }]}>{footer}</View> : null}
       {fab === "none" ? null : (
@@ -223,6 +244,9 @@ const styles = StyleSheet.create({
   header: { width: "100%", maxWidth: 980, alignSelf: "center", flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: space.screenX, paddingBottom: 8 },
   title: { flex: 1, minWidth: 0 },
   help: { width: size.iconButton, height: size.iconButton, borderRadius: radius.iconButton, alignItems: "center", justifyContent: "center" },
+  turnBanner: { width: "100%", maxWidth: 940, alignSelf: "center", flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1.5, borderRadius: radius.card, paddingVertical: 12, paddingHorizontal: 14, marginBottom: 8, overflow: "hidden" },
+  turnAccent: { position: "absolute", left: 0, top: 0, bottom: 0, width: 5 },
+  turnText: { flex: 1, minWidth: 0, gap: 2 },
   content: { width: "100%", maxWidth: 980, alignSelf: "center", paddingHorizontal: space.screenX, paddingTop: 8, gap: space.sectionGap },
   footer: { width: "100%", maxWidth: 980, alignSelf: "center", paddingHorizontal: space.screenX, paddingTop: 10, gap: 10 },
   fabBottom: { position: "absolute", right: 16 },
