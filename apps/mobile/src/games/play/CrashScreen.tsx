@@ -44,7 +44,19 @@ export function CrashScreen({ session, content, onAgain }: GameScreenProps) {
   const area = useRef<ComponentRef<typeof View>>(null);
   const areaOffset = useRef({ x: 0, y: 0 });
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+  const startPending = useRef(false);
+  useEffect(() => () => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    startPending.current = false;
+  }, []);
+  useEffect(() => {
+    if (state.phase !== "end") return;
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    startPending.current = false;
+    setBeat(null);
+  }, [state.phase]);
 
   const running = state.phase === "running";
   useTicker(running, (delta) => dispatch({ type: "tick", deltaMs: delta }), 33);
@@ -85,6 +97,8 @@ export function CrashScreen({ session, content, onAgain }: GameScreenProps) {
   }
 
   const start = () => {
+    if (startPending.current || state.phase !== "idle") return;
+    startPending.current = true;
     [3, 2, 1].forEach((n, i) =>
       timers.current.push(
         setTimeout(() => {
@@ -96,6 +110,8 @@ export function CrashScreen({ session, content, onAgain }: GameScreenProps) {
     timers.current.push(
       setTimeout(() => {
         setBeat(null);
+        startPending.current = false;
+        timers.current = [];
         dispatch({ type: "start" });
       }, scaled(3 * BEAT_MS)),
     );
