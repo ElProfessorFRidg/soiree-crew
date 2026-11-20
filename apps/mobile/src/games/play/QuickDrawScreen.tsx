@@ -78,7 +78,7 @@ export function QuickDrawScreen({ session, content, onAgain }: GameScreenProps) 
   else if (state.phase === "found" || state.phase === "timeUp") footer = <Button label={g.t("games.quickDraw.next")} height={ui.action} onPress={() => dispatch({ type: "next" })} />;
 
   return (
-    <GameShell {...shellProps} currentPlayerId={drawer?.id} status={g.t("games.quickDraw.drawerTurn", { name: drawer?.name ?? "" })} footer={footer} fab="top" scroll={!drawing}>
+    <GameShell {...shellProps} currentPlayerId={drawing ? null : drawer?.id} status={g.t("games.quickDraw.drawerTurn", { name: drawer?.name ?? "" })} footer={footer} fab="top" scroll={!drawing}>
       {state.phase === "ready" ? (
         <>
           <ScalePressable
