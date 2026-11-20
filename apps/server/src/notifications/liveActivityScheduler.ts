@@ -22,6 +22,25 @@ export function sanitizeRolloverSnapshot(snapshot: Record<string, unknown>, now:
   return copy;
 }
 
+/** Remove safety-sensitive readings from periodic APNs pushes when the device
+ * has stopped providing snapshots; resending the same payload is not a new
+ * measurement. The countdown can continue independently. */
+export function sanitizeScheduledState(state: Record<string, unknown>, now: number): Record<string, unknown> {
+  const copy = { ...state };
+  if (typeof copy.subtitle !== "string") return copy;
+  try {
+    const decoded: unknown = JSON.parse(copy.subtitle);
+    if (!decoded || typeof decoded !== "object" || Array.isArray(decoded)) {
+      copy.subtitle = null;
+      return copy;
+    }
+    copy.subtitle = JSON.stringify(sanitizeRolloverSnapshot(decoded as Record<string, unknown>, now));
+  } catch {
+    copy.subtitle = null;
+  }
+  return copy;
+}
+
 interface DueActivity {
   token_hash: string;
   token_sealed: string;
@@ -102,7 +121,7 @@ export async function sweepActivityPushes(ctx: Context, log: (event: string, det
   for (const row of due) {
     try {
       const token = ctx.sealer.open<string>(row.token_sealed);
-      const contentState = ctx.sealer.open<Record<string, unknown>>(row.state_sealed);
+      const contentState = sanitizeScheduledState(ctx.sealer.open<Record<string, unknown>>(row.state_sealed), now);
       const result = await ctx.push.sendLiveActivity({ token, event: "update", contentState, timestamp: now, staleDate: Math.min(row.expires_at, now + 15 * 60_000) });
       log("activitykit.delivery", { outcome: result }); // Never log tokens, state, BAC or user identifiers.
       if (result === "gone") await ctx.db.query("delete from live_activity_devices where token_hash = $1", [row.token_hash]);
