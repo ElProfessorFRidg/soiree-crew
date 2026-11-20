@@ -1,0 +1,30 @@
+# Keep Expo's transitive tooling updated as upstream releases patched versions.
+# Security advisories in @expo/cli (including node-forge and zod) cannot be
+# safely resolved by blindly overriding their major versions.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 10
+    groups:
+      expo-sdk:
+        applies-to: version-updates
+        patterns:
+          - "expo"
+          - "expo-*"
+          - "@expo/*"
+        update-types:
+          - patch
+          - minor
+      other-patches:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "expo"
+          - "expo-*"
+          - "@expo/*"
+        update-types:
+          - patch
