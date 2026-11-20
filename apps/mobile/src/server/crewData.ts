@@ -6,7 +6,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { newId } from "@/state/store";
 import { cancelHomeCheck, notifyRecapReady, scheduleHomeCheck } from "@/reminders/reminders";
 import { api } from "./api";
-import { useSession } from "./session";
+import { sessionStillCurrent, useSession } from "./session";
 
 export interface CrewMember {
   id: string;
@@ -138,12 +138,16 @@ export const useCrewData = create<CrewState>()(
 );
 
 export async function refreshCrews(): Promise<void> {
+  const requestSession = useSession.getState().session;
   const { crews } = await api<{ crews: Crew[] }>("/v1/crews");
+  if (!sessionStillCurrent(requestSession)) return;
   useCrewData.setState({ crews });
 }
 
 export async function refreshParties(): Promise<void> {
+  const requestSession = useSession.getState().session;
   const { parties } = await api<{ parties: Party[] }>("/v1/parties");
+  if (!sessionStillCurrent(requestSession)) return;
   useCrewData.setState({ parties });
   // O-41: a party I went to closed in the last day, its recap is ready.
   const dayAgo = Date.now() - 24 * 3_600_000;
@@ -161,7 +165,9 @@ export async function refreshParties(): Promise<void> {
 }
 
 export async function refreshLiveParty(partyId: string): Promise<void> {
+  const requestSession = useSession.getState().session;
   const data = await api<Omit<LiveParty, "fetchedAt">>(`/v1/parties/${partyId}/live`);
+  if (!sessionStillCurrent(requestSession)) return;
   useCrewData.setState((state) => ({ live: { ...state.live, [partyId]: { ...data, fetchedAt: Date.now() } } }));
 }
 
