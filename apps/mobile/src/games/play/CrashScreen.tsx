@@ -133,7 +133,7 @@ export function CrashScreen({ session, content, onAgain }: GameScreenProps) {
   const status = state.rounds !== null ? g.t("shell.round", { round: state.round, rounds: state.rounds }) : g.t("shell.roundOpen", { round: state.round });
 
   return (
-    <GameShell {...shellProps} status={status} helpHidden={running} fab={running ? "none" : "top"} footer={footer} scroll={!running}>
+    <GameShell {...shellProps} currentPlayerId={state.phase === "award" ? state.award?.playerId : null} status={status} helpHidden={running} fab={running ? "none" : "top"} footer={footer} scroll={!running}>
       <View style={[styles.chart, { backgroundColor: theme.surface }]} accessible accessibilityLabel={g.t("games.crash.curve", { stake })}>
         <Animated.View style={[StyleSheet.absoluteFill, shake]}>
           <Svg width="100%" height="100%" viewBox={`0 0 ${CHART_W} ${CHART_H}`} preserveAspectRatio="none">
