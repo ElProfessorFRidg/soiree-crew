@@ -689,6 +689,27 @@
       "name": "Soirée Crew Preview",
       "version": "0.2.8",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.17%2Bbuild.252/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "• Bump typescript from 6.0.3 to 7.0.2",
+      "bundleID": "app.soireecrew.mobile.preview",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.17%2Bbuild.252/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.17%2Bbuild.252/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.17%2Bbuild.252/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.17%2Bbuild.252/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.17%2Bbuild.252/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.17%2Bbuild.252/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.17%2Bbuild.252/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.17%2Bbuild.252/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.17%2Bbuild.252/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.17%2Bbuild.252/iphone/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew Preview 0.2.8",
+      "version": "0.2.8",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.10%2Bbuild.223/soiree-crew-unsigned.ipa",
       "category": "Other",
       "description": "• Surface icon errors and avoid false empty-state messages\n• Surface icon errors and avoid false empty-state messages\n• Use localized save-retry message in every language\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• Revoke captured server token after successful local sign-out\n• Guard against browser and unsupported native alert regressions\n• Replace remaining browser-incompatible native alert flows\n• Replace remaining browser-incompatible native alert flows\n• Clear queued photos and check-in caches after data erasure\n• Keep stacked phone buttons at full natural height\n• Use approved bottom-sheet design on phones and modal on iPad/web\n• Stop old-account Live Activity when local account changes\n• Cancellation, queued prompts and duplicate taps\n• Expose pending request for deterministic queue tests\n• Isolate async screens by party and account context\n• Isolate async screens by party and account context\n• Isolate state quotas and suppress stale APNs readings\n• Isolate state quotas and suppress stale APNs readings\n• Isolate state quotas and suppress stale APNs readings\n• Recover failed session persistence and consent reset\n• Recover failed session persistence and consent reset\n• Centralize app-owned responsive confirmations\n• Centralize app-owned responsive confirmations\n• Centralize app-owned responsive confirmations\n• Guard stale data and duplicate rollover regressions\n• Strip stale BAC, driving advice and alerts during remote rollover\n• Keep route guard active until arrival flow is complete\n• Invalidate native session and surface secure-storage wipe failures\n• Use distinct translation for category deletion\n• Separate full reset and category erasure messages (ru)\n• Separate full reset and category erasure messages (pt)\n• Separate full reset and category erasure messages (it)\n• Separate full reset and category erasure messages (es)\n• Separate full reset and category erasure messages (de)",
