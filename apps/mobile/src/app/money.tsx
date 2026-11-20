@@ -173,7 +173,7 @@ export default function MoneyScreen() {
       </Panel>
 
       <Text variant="label">{i18n.t("money.pools")}</Text>
-      {pools.length === 0 ? <Text>{i18n.t("money.noPool")}</Text> : null}
+      {!loadError && pools.length === 0 ? <Text>{i18n.t("money.noPool")}</Text> : null}
       <View>
         {pools.map((pool, index) => (
           <Row
