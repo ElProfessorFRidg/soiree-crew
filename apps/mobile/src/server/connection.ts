@@ -213,13 +213,19 @@ function openSocket(session: ServerSession): void {
 let hasInbox = false;
 
 async function refreshAll(): Promise<void> {
+  const requestSession = useSession.getState().session;
+  if (!requestSession) return;
   await flush();
+  if (!sessionStillCurrent(requestSession)) return;
   // N-35: the inbox is fetched on every return to the foreground, which also covers builds without push.
   const inbox = refreshInbox().then(
-    () => (hasInbox = true),
+    () => {
+      if (sessionStillCurrent(requestSession)) hasInbox = true;
+    },
     () => undefined,
   );
   await Promise.allSettled([pull(), refreshCrews(), refreshParties(), refreshSos(), refreshInvitations(), inbox]);
+  if (!sessionStillCurrent(requestSession)) return;
   await Promise.allSettled(useCrewData.getState().crews.map((crew) => refreshRadar(crew.id)));
 }
 
