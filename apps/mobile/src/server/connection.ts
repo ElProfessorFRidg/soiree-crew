@@ -137,6 +137,7 @@ function openSocket(session: ServerSession): void {
   const ws = new WebSocket(url);
   socket = ws;
   ws.onopen = () => {
+    if (socket !== ws || stopped || !sessionStillCurrent(session)) return;
     retry = 0;
     // Anything that arrived while the socket was down is picked up now.
     void startChat().then(() => backupIfDue());
@@ -144,6 +145,7 @@ function openSocket(session: ServerSession): void {
     emitLiveHint("open");
   };
   ws.onmessage = (event) => {
+    if (socket !== ws || stopped || !sessionStillCurrent(session)) return;
     try {
       const message = JSON.parse(String(event.data)) as {
         type: string;
@@ -193,6 +195,8 @@ function openSocket(session: ServerSession): void {
     }
   };
   ws.onclose = () => {
+    // A late close from the previous account must not clear a newer socket.
+    if (socket !== ws) return;
     socket = null;
     if (stopped) return;
     // Backoff with jitter, capped at 30 s.
