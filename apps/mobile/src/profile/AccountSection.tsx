@@ -276,15 +276,21 @@ export function AccountSection() {
       cancelLabel: i18n.t("account.deleteKeep"),
     });
     if (!ok) return;
-    // The session ends on the server too; if it can't be reached, the token dies with the phone's copy.
-    void api("/v1/sessions/current", { method: "DELETE" }).catch(() => undefined);
-    const userId = useSession.getState().session?.userId;
+    const signingOut = useSession.getState().session;
     try {
-      // Do not erase the in-memory account before checking that persistent
-      // credentials could actually be cleared from Keychain / browser storage.
+      // Revoke remotely only after the device successfully forgets its own
+      // credentials. Otherwise a failed Keychain write would leave a visibly
+      // signed-in account holding an already-invalid server token.
       await saveSession(null);
       wipePreviousAccount(null);
-      if (userId) await forgetChat(userId).catch(() => undefined);
+      if (signingOut) {
+        void api("/v1/sessions/current", {
+          baseUrl: signingOut.url,
+          token: signingOut.token,
+          method: "DELETE",
+        }).catch(() => undefined);
+        await forgetChat(signingOut.userId).catch(() => undefined);
+      }
     } catch (error) {
       showToast({ tone: "danger", message: failureMessage(error, i18n) });
     }
