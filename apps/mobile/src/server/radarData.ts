@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { api } from "./api";
+import { sessionStillCurrent, useSession } from "./session";
 
 export type NightStatus = "going_out" | "maybe" | "home" | "unavailable";
 
@@ -29,7 +30,9 @@ interface RadarState {
 export const useRadar = create<RadarState>(() => ({ byCrew: {}, sos: [], mine: [] }));
 
 export async function refreshRadar(crewId: string): Promise<void> {
+  const requestSession = useSession.getState().session;
   const radar = await api<Radar>(`/v1/crews/${crewId}/radar`);
+  if (!sessionStillCurrent(requestSession)) return;
   useRadar.setState((state) => ({ byCrew: { ...state.byCrew, [crewId]: radar } }));
 }
 
@@ -97,12 +100,16 @@ export function linkCallToParty(callId: string, partyId: string): Promise<unknow
 }
 
 export async function refreshSos(): Promise<void> {
+  const requestSession = useSession.getState().session;
   const { alerts, mine } = await api<{ alerts: SosAlert[]; mine?: { id: string; at: number }[] }>("/v1/sos");
+  if (!sessionStillCurrent(requestSession)) return;
   useRadar.setState({ sos: alerts, mine: mine ?? [] });
 }
 
 export async function sendSos(input: { partyId?: string; location?: { lat: number; lng: number; accuracy: number } }): Promise<string[]> {
+  const requestSession = useSession.getState().session;
   const { ids } = await api<{ ids: string[] }>("/v1/sos", { method: "POST", body: input });
+  if (!sessionStillCurrent(requestSession)) return ids;
   const at = Date.now();
   useRadar.setState((state) => ({ mine: [...ids.map((id) => ({ id, at })), ...state.mine] }));
   return ids;
