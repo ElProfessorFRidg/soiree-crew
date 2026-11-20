@@ -60,8 +60,14 @@ export function CrashScreen({ session, content, onAgain }: GameScreenProps) {
 
   const running = state.phase === "running";
   useTicker(running, (delta) => dispatch({ type: "tick", deltaMs: delta }), 33);
-  // No pausing a live curve: leaving the app calls the round off, nobody pays.
-  useOnBackground(() => dispatch({ type: "cancel" }));
+  // The curve and any pending start countdown stop when the app leaves foreground.
+  useOnBackground(() => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    startPending.current = false;
+    setBeat(null);
+    dispatch({ type: "cancel" });
+  });
 
   const stake = stakeAt(state.level, state.multiplier);
   const lastStake = useRef(stake);
