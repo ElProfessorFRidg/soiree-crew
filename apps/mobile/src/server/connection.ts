@@ -17,7 +17,7 @@ import { refreshCrews, refreshLiveParty, refreshParties, useCrewData } from "./c
 import { refreshRadar, refreshSos, useRadar } from "./radarData";
 import { emitLiveHint } from "./liveHints";
 import { clearInvitations, pulseFeed, refreshInvitations } from "./socialData";
-import { useSession, type ServerSession } from "./session";
+import { sessionStillCurrent, useSession, type ServerSession } from "./session";
 import { showToast } from "@/ui/Toast";
 import { backupIfDue } from "@/chat/backup";
 import { onChatHint, onTyping, startChat } from "@/chat/engine";
@@ -50,9 +50,13 @@ function pendingIds(): Set<string> {
 
 /** Delta sync (SYNC-05): the server copy wins for everything not waiting in the queue. */
 export async function pull(): Promise<void> {
+  const requestSession = useSession.getState().session;
+  if (!requestSession) return;
   const state = useAppStore.getState();
   const since = state.syncCursor ?? 0;
   const data = await api<SyncResponse>(`/v1/sync?since=${since}`);
+  // Authentication may have changed while fetch was pending: do not resurrect old account data.
+  if (!sessionStillCurrent(requestSession)) return;
   const pending = pendingIds();
 
   useAppStore.setState((current) => {
