@@ -38,6 +38,12 @@ export function FuseScreen({ session, content, onAgain }: GameScreenProps) {
   const [tableStyle, setTableStyle] = useState(ui.big);
   const [picking, setPicking] = useState(false);
   const [resuming, setResuming] = useState(false);
+  const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resumePending = useRef(false);
+  useEffect(() => () => {
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    resumePending.current = false;
+  }, []);
   const burning = state.phase === "burning";
   const escalation = fuseEscalation(state);
 
@@ -100,8 +106,13 @@ export function FuseScreen({ session, content, onAgain }: GameScreenProps) {
     setPicking(false);
   };
   const resume = () => {
+    // The countdown must be single-flight, including taps before React commits loading state.
+    if (resumePending.current || state.phase !== "paused") return;
+    resumePending.current = true;
     setResuming(true);
-    setTimeout(() => {
+    resumeTimer.current = setTimeout(() => {
+      resumeTimer.current = null;
+      resumePending.current = false;
       setResuming(false);
       dispatch({ type: "resume" });
     }, scaled(RESUME_COUNT_MS));
