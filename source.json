@@ -865,6 +865,28 @@
         },
         {
           "version": "0.2.8",
+          "buildVersion": "257",
+          "marketingVersion": "0.2.8 Preview (257)",
+          "date": "2026-11-20T20:10:42Z",
+          "localizedDescription": "• Bump @fastify/cors from 11.3.1 to 11.4.3",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.20%2Bbuild.257/soiree-crew-unsigned.ipa",
+          "size": 22696768,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/iphone/10-limits.png"
+          ]
+        },
+        {
+          "version": "0.2.8",
           "buildVersion": "256",
           "marketingVersion": "0.2.8 Preview (256)",
           "date": "2026-11-20T19:53:11Z",
@@ -1292,6 +1314,17 @@
       "notify": false
     },
     {
+      "identifier": "preview-0.2.8-257",
+      "title": "Soirée Crew Preview 0.2.8 (257)",
+      "caption": "• Bump @fastify/cors from 11.3.1 to 11.4.3",
+      "date": "2026-11-20T20:10:42Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.20%2Bbuild.257/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
+    {
       "identifier": "preview-0.2.8-256",
       "title": "Soirée Crew Preview 0.2.8 (256)",
       "caption": "• Bump react-native-gesture-handler from 3.3.0 to 3.5.0",
@@ -1464,17 +1497,6 @@
       "tintColor": "F4B33D",
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.121/iphone/banner.png",
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.5%2Bbuild.121/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
-      "notify": false
-    },
-    {
-      "identifier": "preview-0.2.6-120",
-      "title": "Soirée Crew Preview 0.2.6 (120)",
-      "caption": "• Diagnose iOS startup before JavaScript and register scenes explicitly\n• Keep request timeouts active while reading profile responses\n• Fix profile loading, error recovery and guest account states",
-      "date": "2026-11-16T18:33:15Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.5%2Bbuild.120/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
     }
@@ -1816,6 +1838,13 @@
       "buildVersion": "258",
       "date": "2026-11-20T19:56:44Z",
       "localizedDescription": "• Bump zustand from 5.0.16 to 5.1.0"
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.8",
+      "buildVersion": "257",
+      "date": "2026-11-20T20:10:42Z",
+      "localizedDescription": "• Bump @fastify/cors from 11.3.1 to 11.4.3"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",

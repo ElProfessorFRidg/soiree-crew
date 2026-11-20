@@ -611,6 +611,68 @@
         },
         {
           "version": "0.2.8",
+          "buildVersion": "257",
+          "marketingVersion": "0.2.8 Preview (257)",
+          "date": "2026-11-20T20:10:42Z",
+          "localizedDescription": "• Bump @fastify/cors from 11.3.1 to 11.4.3",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.20%2Bbuild.257/soiree-crew-ipad-unsigned.ipa",
+          "size": 22696820,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/ipad/01-party.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/ipad/08-add-drink.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/ipad/09-curve.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/ipad/03-games.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/ipad/07-my-stats.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/ipad/12-history.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/ipad/11-leaderboard.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/ipad/04-bars.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/ipad/05-me.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/ipad/10-limits.png",
+              "width": 2064,
+              "height": 2752
+            }
+          ]
+        },
+        {
+          "version": "0.2.8",
           "buildVersion": "256",
           "marketingVersion": "0.2.8 Preview (256)",
           "date": "2026-11-20T19:53:11Z",
@@ -1718,6 +1780,17 @@
       "notify": false
     },
     {
+      "identifier": "preview-0.2.8-257",
+      "title": "Soirée Crew Preview 0.2.8 (257)",
+      "caption": "• Bump @fastify/cors from 11.3.1 to 11.4.3",
+      "date": "2026-11-20T20:10:42Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/ipad/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.20%2Bbuild.257/soiree-crew-ipad-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
+    {
       "identifier": "preview-0.2.8-256",
       "title": "Soirée Crew Preview 0.2.8 (256)",
       "caption": "• Bump react-native-gesture-handler from 3.3.0 to 3.5.0",
@@ -1892,17 +1965,6 @@
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.5%2Bbuild.121/soiree-crew-ipad-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
-    },
-    {
-      "identifier": "preview-0.2.6-120",
-      "title": "Soirée Crew Preview 0.2.6 (120)",
-      "caption": "• Diagnose iOS startup before JavaScript and register scenes explicitly\n• Keep request timeouts active while reading profile responses\n• Fix profile loading, error recovery and guest account states",
-      "date": "2026-11-16T18:33:15Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.5%2Bbuild.120/ipad/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.5%2Bbuild.120/soiree-crew-ipad-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
-      "notify": false
     }
   ],
   "allowDowngrades": true,
@@ -1955,6 +2017,13 @@
       "buildVersion": "258",
       "date": "2026-11-20T19:56:44Z",
       "localizedDescription": "• Bump zustand from 5.0.16 to 5.1.0"
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.8",
+      "buildVersion": "257",
+      "date": "2026-11-20T20:10:42Z",
+      "localizedDescription": "• Bump @fastify/cors from 11.3.1 to 11.4.3"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
