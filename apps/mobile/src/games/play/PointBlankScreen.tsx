@@ -111,6 +111,7 @@ export function PointBlankScreen({ session, content, onAgain }: GameScreenProps)
   return (
     <GameShell
       {...shellProps}
+      currentPlayerId={state.readerId ?? state.order.players[state.order.turn]?.id}
       status={`${g.t("games.pointBlank.reader", { name: reader || (state.order.players[state.order.turn]?.name ?? "") })}, ${g.plural("games.pointBlank.cardsLeft", state.deck.length)}`}
       footer={footer}
       fab={state.phase === "record" ? "top" : "bottom"}
