@@ -25,6 +25,8 @@ import { guarded } from "@/vault/vault";
 import { confirmAction } from "@/ui/confirm";
 import { eraseEverything } from "@/system/factoryReset";
 import { refreshReminders } from "@/reminders/reminders";
+import { freshDraft } from "@/onboarding/flow";
+import { draftFromProfile } from "@/profile/saveProfile";
 
 /**
  * O-07: deletes the account on the server first (nothing is erased here if that fails), then this
@@ -52,6 +54,10 @@ export async function withdrawHealthConsent(i18n: Translator): Promise<void> {
       drinks: [],
       water: [],
       levelState: null,
+      // Re-open the consent flow without trapping an already-completed account
+      // behind an onboarding marker that would prevent finish().
+      onboardedAt: null,
+      onboarding: { ...freshDraft(draftFromProfile(null), false), step: "consent", skippedHealth: true },
       outbox: state.outbox.filter((item) => !health.has(item.mutation.kind)),
     }));
     void refreshReminders();
@@ -273,11 +279,15 @@ export function AccountSection() {
     // The session ends on the server too; if it can't be reached, the token dies with the phone's copy.
     void api("/v1/sessions/current", { method: "DELETE" }).catch(() => undefined);
     const userId = useSession.getState().session?.userId;
-    // Chat keys and history are tied to this session's device: they go with it.
-    if (userId) void forgetChat(userId);
-    // O-13: nothing of this account stays for whoever uses the phone next.
-    wipePreviousAccount(null);
-    void saveSession(null);
+    try {
+      // Do not erase the in-memory account before checking that persistent
+      // credentials could actually be cleared from Keychain / browser storage.
+      await saveSession(null);
+      wipePreviousAccount(null);
+      if (userId) await forgetChat(userId).catch(() => undefined);
+    } catch (error) {
+      showToast({ tone: "danger", message: failureMessage(error, i18n) });
+    }
   };
 
   // Without an account there is nothing on the server: the same reset, said for this phone only.
