@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, Image, Platform, Pressable, StyleSheet, View } from "react-native";
+import { Image, Platform, Pressable, StyleSheet, View } from "react-native";
 import * as AppIcon from "expo-quick-actions/icon";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
@@ -7,6 +7,8 @@ import { fetchAppIcons, type AppIconId } from "@/server/profileData";
 import { useSession } from "@/server/session";
 import { useTheme } from "@/theme";
 import { Text } from "@/ui/Text";
+import { showFailure } from "@/server/errors";
+import { confirmAction } from "@/ui/confirm";
 
 type IconId = "default" | AppIconId;
 
@@ -53,13 +55,16 @@ export function AppIconPicker() {
           haptic.confirmed();
           setCurrent(id);
         })
-        .catch(() => undefined);
+        .catch(showFailure(i18n));
     // Android restarts the app to switch icons: say so before it happens.
     if (Platform.OS === "android") {
-      Alert.alert(i18n.t("appIcon.restartTitle"), i18n.t("appIcon.restartBody"), [
-        { text: i18n.t("common.back"), style: "cancel" },
-        { text: i18n.t("appIcon.apply"), onPress: apply },
-      ]);
+      void confirmAction({
+        title: i18n.t("appIcon.restartTitle"),
+        body: i18n.t("appIcon.restartBody"),
+        confirmLabel: i18n.t("appIcon.apply"),
+        cancelLabel: i18n.t("common.back"),
+        destructive: false,
+      }).then((approved) => { if (approved) apply(); });
     } else apply();
   };
 

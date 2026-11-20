@@ -421,6 +421,7 @@ export const es: Messages = {
     notifBody: { v1: "Fin de {party}. Un toque para decirle al crew que estás en casa.", v2: "{party} terminó. ¿Llegaste bien? Díselo al crew.", v3: "Un toque para tranquilizar al crew después de {party}.", v4: "¿Volviste de {party}? El crew quiere saberlo.", v5: "{party} terminó. ¿Pijama? Avisa al crew.", v6: "El crew duerme mejor cuando dices que llegaste.", v7: "{party} acabó. ¿Estás en casa?", v8: "Una señal al crew: ¿llegaste bien?" },
   },
   account: {
+    sessionSaveFailed: "La cuenta existe, pero no se pudo guardar la sesión en este dispositivo. Vuelve a intentarlo aquí sin crear otra cuenta.",
     eraseAll: "Borrarlo todo",
     erased: "Tus datos se han borrado. Puedes empezar de nuevo.",
     eraseAllTitle: "¿Borrarlo todo de este teléfono?",

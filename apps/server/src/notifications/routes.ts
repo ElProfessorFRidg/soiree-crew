@@ -70,6 +70,9 @@ export function nextMorning(now: number, zone: string): number {
 
 export function notificationRoutes(app: FastifyInstance, ctx: Context): void {
   const registrations = new RateLimiter(30, 3_600_000, ctx.now);
+  // Periodic Live Activity snapshots must not consume the much smaller
+  // registration budget; the mobile app refreshes them every minute.
+  const activityStateUpdates = new RateLimiter(180, 3_600_000, ctx.now);
 
   /** N-35: the inbox, newest first, with the unread count for the badge. */
   app.get("/v1/notifications", async (request) => {
@@ -220,7 +223,7 @@ export function notificationRoutes(app: FastifyInstance, ctx: Context): void {
   /** The device is authoritative for its display. The server only schedules encrypted snapshots. */
   app.put("/v1/push/live-activities/state", async (request, reply) => {
     const user = requireUser(request);
-    registrations.check(user.id);
+    activityStateUpdates.check(user.id);
     const input = z.object({
       activityId: z.string().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/),
       contentState: z.object({

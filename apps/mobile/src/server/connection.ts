@@ -3,6 +3,7 @@ import { AppState as RNAppState } from "react-native";
 import type { CustomDrink } from "@/drinks/presets";
 import { createTranslator } from "@/i18n";
 import { clearAccountHistory, useAppStore } from "@/state/store";
+import { endPushActivity } from "../../modules/crew-activity-tokens";
 import { useCrewCards } from "@/games/crewCards";
 import { dropForeignUploads } from "@/photos/uploads";
 import { usePendingInvite } from "./pendingInvite";
@@ -107,7 +108,12 @@ function uploadLocalHistory(): void {
  * it queued.
  */
 export function wipePreviousAccount(userId: string | null): void {
+  // Clearing account-bound stores must also remove the old account's lock
+  // screen activity; resetting its JS id alone would leave it visible on iOS.
+  const activityId = useAppStore.getState().liveActivityId;
+  if (activityId) void endPushActivity(activityId);
   clearAccountHistory();
+  useAppStore.setState({ liveActivityId: null });
   useCrewData.setState({ crews: [], parties: [], live: {} });
   useCrewCards.setState({ byCrew: {} });
   useRadar.setState({ byCrew: {}, sos: [], mine: [] });

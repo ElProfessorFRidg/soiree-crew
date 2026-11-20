@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sanitizeRolloverSnapshot } from "./liveActivityScheduler";
+import { sanitizeRolloverSnapshot, sanitizeScheduledState } from "./liveActivityScheduler";
 
 describe("ActivityKit rollover snapshot safety", () => {
   const now = Date.UTC(2026, 10, 19, 12);
@@ -30,5 +30,26 @@ describe("ActivityKit rollover snapshot safety", () => {
   it("treats missing and future timestamps as untrusted", () => {
     expect(sanitizeRolloverSnapshot({ bac: "0.20" }, now)).not.toHaveProperty("bac");
     expect(sanitizeRolloverSnapshot({ generatedAt: now + 5 * 60_000, bac: "0.20" }, now)).not.toHaveProperty("bac");
+  });
+});
+
+describe("periodic ActivityKit update safety", () => {
+  const now = Date.UTC(2026, 10, 20, 12);
+  it("does not send stale BAC or driving labels as a fresh APNs update", () => {
+    const data = { generatedAt: now - 20 * 60_000, zeroAt: now + 60_000,
+      bac: "0.24", status: "Under limit", drive: { value: "Safe" }, bacForecast: { values: [24] } };
+    const state = { title: "Night", subtitle: JSON.stringify(data) };
+    const result = sanitizeScheduledState(state, now);
+    const snapshot = JSON.parse(String(result.subtitle));
+    expect(snapshot.zeroAt).toBe(data.zeroAt);
+    expect(snapshot).not.toHaveProperty("bac");
+    expect(snapshot).not.toHaveProperty("drive");
+    expect(snapshot).not.toHaveProperty("status");
+    expect(state.subtitle).toContain("0.24");
+  });
+  it("keeps fresh information and discards invalid JSON safely", () => {
+    const fresh = { title: "Night", subtitle: JSON.stringify({ generatedAt: now, bac: "0.10" }) };
+    expect(sanitizeScheduledState(fresh, now)).toEqual(fresh);
+    expect(sanitizeScheduledState({ title: "Night", subtitle: "not json" }, now)).toEqual({ title: "Night", subtitle: null });
   });
 });
