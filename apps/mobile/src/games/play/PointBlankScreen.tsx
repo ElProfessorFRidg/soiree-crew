@@ -9,7 +9,7 @@ import { useTheme } from "@/theme";
 import { Button } from "@/ui/Button";
 import { ScalePressable } from "@/ui/Pressable";
 import { Numeral, Text } from "@/ui/Text";
-import { useEngine, useGameUi, useWastedIds } from "../hooks";
+import { useEngine, useGameUi, useOnBackground, useWastedIds } from "../hooks";
 import { useGameT } from "../i18n";
 import { toEnginePlayer } from "../store";
 import { EndScreen, topOf } from "../ui/EndScreen";
@@ -52,6 +52,12 @@ export function PointBlankScreen({ session, content, onAgain }: GameScreenProps)
     countdownPending.current = false;
     setBeat(null);
   }, [state.phase]);
+  useOnBackground(() => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    countdownPending.current = false;
+    setBeat(null);
+  });
   useEffect(() => {
     setSecretVisible(false);
     setQuick(new Set());
