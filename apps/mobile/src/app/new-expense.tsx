@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
-import { Alert, Image, StyleSheet, TextInput, View } from "react-native";
+import { Image, StyleSheet, TextInput, View } from "react-native";
 import { radius } from "@crew/design-tokens";
 import { convertAmount, formatMoney, parseAmount, parseRate, type Split } from "@crew/money";
 import { Field } from "@/crew/Field";
@@ -18,6 +18,7 @@ import { useTheme } from "@/theme";
 import { Button } from "@/ui/Button";
 import { Chip, Segmented } from "@/ui/controls";
 import { Screen } from "@/ui/Screen";
+import { Sheet } from "@/ui/Sheet";
 import { Text } from "@/ui/Text";
 import { showToast } from "@/ui/Toast";
 import { BIG_EXPENSE, guarded } from "@/vault/vault";
@@ -51,6 +52,7 @@ export default function NewExpenseScreen() {
   const [partyId, setPartyId] = useState<string | null | undefined>(undefined);
   const [venueId, setVenueId] = useState<string | null | undefined>(undefined);
   const [receipt, setReceipt] = useState<{ uri: string; data: string } | null>(null);
+  const [chooseReceiptSource, setChooseReceiptSource] = useState(false);
   const amountRef = useRef<ComponentRef<typeof TextInput>>(null);
 
   useEffect(() => {
@@ -180,12 +182,11 @@ export default function NewExpenseScreen() {
         }
       })
       .catch(showFailure(i18n));
-  const askReceipt = () =>
-    Alert.alert(i18n.t("money.receipt"), undefined, [
-      { text: i18n.t("money.receiptCamera"), onPress: () => attach("camera") },
-      { text: i18n.t("money.receiptLibrary"), onPress: () => attach("library") },
-      { text: i18n.t("money.cancel"), style: "cancel" },
-    ]);
+  const askReceipt = () => setChooseReceiptSource(true);
+  const chooseSource = (source: "camera" | "library") => {
+    setChooseReceiptSource(false);
+    attach(source);
+  };
 
   return (
     <Screen
@@ -291,6 +292,12 @@ export default function NewExpenseScreen() {
           <Chip label={i18n.t("money.receiptAdd")} icon="camera" onPress={askReceipt} />
         </View>
       )}
+
+      <Sheet visible={chooseReceiptSource} title={i18n.t("money.receipt")} onClose={() => setChooseReceiptSource(false)}>
+        <Button label={i18n.t("money.receiptCamera")} icon="camera" height={52} onPress={() => chooseSource("camera")} />
+        <Button label={i18n.t("money.receiptLibrary")} icon="image" variant="secondary" height={52} onPress={() => chooseSource("library")} />
+        <Button label={i18n.t("money.cancel")} variant="outline" height={44} onPress={() => setChooseReceiptSource(false)} />
+      </Sheet>
 
       <Text variant="label">{i18n.t("money.split")}</Text>
       <Segmented<Mode>

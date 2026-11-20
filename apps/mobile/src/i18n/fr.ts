@@ -420,6 +420,7 @@ export const fr = {
     notifBody: { v1: "Fin de {party}. Un geste pour dire au crew que tu es chez toi.", v2: "{party} est fini. Bien rentré·e ? Dis-le au crew.", v3: "Un tap pour rassurer le crew après {party}.", v4: "Rentré·e de {party} ? Le crew veut savoir.", v5: "Fin de {party}. Pyjama ? Préviens le crew.", v6: "Le crew dort mieux quand tu dis que tu es rentré·e.", v7: "{party} terminé. T'es au chaud ?", v8: "Petit signe au crew : t'es bien rentré·e ?" },
   },
   account: {
+    sessionSaveFailed: "Le compte existe, mais la connexion n’a pas été enregistrée sur cet appareil. Réessaie ici, sans créer un autre compte.",
     eraseAll: "Tout effacer",
     erased: "Tes données ont été effacées. Tu peux recommencer.",
     eraseAllTitle: "Tout effacer de ce téléphone ?",

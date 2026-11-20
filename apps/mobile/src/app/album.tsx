@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Image, Modal, Pressable, StyleSheet, View } from "react-native";
 import { radius } from "@crew/design-tokens";
 import { useT } from "@/i18n";
@@ -32,17 +32,37 @@ export default function AlbumScreen() {
   const pending = queue.filter((p) => p.partyId === partyId);
   const [photos, setPhotos] = useState<AlbumPhoto[]>([]);
   const [open, setOpen] = useState<AlbumPhoto | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const generation = useRef(0);
+  const previousPending = useRef(pending.length);
   const available = Math.min(layout.width, 760) - layout.gutter * 2;
   const columns = available >= 620 ? 4 : 3;
   const tile = Math.floor((available - GAP * (columns - 1)) / columns);
 
-  const load = useCallback(() => {
-    void fetchAlbum(partyId).then(setPhotos).catch(() => undefined);
-  }, [partyId]);
-  useEffect(load, [load]);
-  // Reload when the queue empties: the server now has the photos.
+  const load = useCallback(async () => {
+    if (!partyId) return;
+    const request = ++generation.current;
+    try {
+      const fresh = await fetchAlbum(partyId);
+      if (generation.current === request) {
+        setPhotos(fresh);
+        setLoadError(false);
+      }
+    } catch {
+      if (generation.current === request) setLoadError(true);
+    }
+  }, [partyId, me]);
   useEffect(() => {
-    if (pending.length === 0) load();
+    setPhotos([]);
+    setOpen(null);
+    setLoadError(false);
+    void load();
+    return () => { generation.current += 1; };
+  }, [load]);
+  // Avoid a duplicate initial request: reload only when an upload actually completes.
+  useEffect(() => {
+    if (previousPending.current > 0 && pending.length === 0) void load();
+    previousPending.current = pending.length;
   }, [pending.length, load]);
 
   const add = (source: "camera" | "library") =>
@@ -65,8 +85,14 @@ export default function AlbumScreen() {
       {photos.length >= 2 ? (
         <Button label={i18n.t("strip.open")} icon="x:film" variant="outline" height={48} onPress={() => router.push({ pathname: "/photo-strip", params: { partyId } })} />
       ) : null}
+      {loadError ? (
+        <View style={styles.recovery}>
+          <Text color={theme.danger}>{i18n.t("crew.offline")}</Text>
+          <Button label={i18n.t("common.retry")} variant="secondary" height={44} onPress={() => void load()} />
+        </View>
+      ) : null}
       {photos.length ? <Text variant="label">{i18n.plural("album.count", photos.length)}</Text> : null}
-      {!photos.length && !pending.length ? <EmptyState icon="camera" text={i18n.t("album.empty")} /> : null}
+      {!loadError && !photos.length && !pending.length ? <EmptyState icon="camera" text={i18n.t("album.empty")} /> : null}
 
       <View style={styles.grid}>
         {pending.map((p) => (
@@ -130,6 +156,7 @@ export default function AlbumScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
+  recovery: { gap: 8 },
   actions: { flexDirection: "row", gap: 10 },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: GAP },
   image: { width: "100%", height: "100%", borderRadius: radius.tile },

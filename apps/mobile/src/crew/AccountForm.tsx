@@ -122,6 +122,13 @@ export function AccountForm({
   const [linkServer, setLinkServer] = useState<string | null>(null);
   const [problem, setProblem] = useState<Problem | null>(null);
   const [busy, setBusy] = useState(false);
+  // A server-created account must never be created a second time merely because
+  // saving its session to this device failed.
+  const [pendingSave, setPendingSave] = useState<{
+    account: AccountResponse;
+    url: string;
+    message?: { tone?: "danger"; text: string };
+  } | null>(null);
   // O-01: an Apple identity waiting for its username, and whether Apple's button is offered at all
   // (iOS only, and only where the date of birth is already known).
   // Outside the arrival flow (the Crew tab) the date of birth has not been asked yet: it is asked here, still before the account.
@@ -161,7 +168,7 @@ export function AccountForm({
     mode === "create" ? USERNAME.test(username.trim()) && firstName.trim().length > 0 && availability !== "taken" && birthDate !== null && (apple !== null || emailValid) : way === "password" ? login.trim().length >= 3 && password.length > 0 : code.trim().length === 10;
 
   /** Keep users on the form and show an error if the device cannot persist a token. */
-  const persistAccount = async (account: AccountResponse, url: string): Promise<boolean> => {
+  const persistAccount = async (account: AccountResponse, url: string, message?: { tone?: "danger"; text: string }): Promise<boolean> => {
     try {
       await saveSession({
         url,
@@ -170,14 +177,14 @@ export function AccountForm({
         username: account.user.username,
         displayName: account.user.displayName,
       });
+      setPendingSave(null);
       return true;
     } catch {
+      setPendingSave({ account, url, message });
       haptic.error();
       setProblem({
         field: "form",
-        message: i18n.locale.startsWith("fr")
-          ? "Le compte a été créé, mais la connexion n’a pas pu être enregistrée sur cet appareil. Réessaie de te connecter."
-          : "The account was created, but sign-in could not be saved on this device. Please sign in again.",
+        message: i18n.t("account.sessionSaveFailed"),
       });
       return false;
     } finally {
@@ -207,11 +214,23 @@ export function AccountForm({
         }),
       };
     }
-    if (!(await persistAccount(account, url))) return;
+    if (!(await persistAccount(account, url, message))) return;
     if (intent.kind === "code") usePendingInvite.setState({ invite: null });
     if (message.tone) haptic.error();
     else haptic.confirmed();
     showToast({ tone: message.tone, message: message.text });
+    onAuthenticated?.();
+  };
+
+  const retryPersist = async () => {
+    if (!pendingSave || busy) return;
+    setBusy(true);
+    setProblem(null);
+    const { account, url, message } = pendingSave;
+    if (!(await persistAccount(account, url, message))) return;
+    if (intent?.kind === "code") usePendingInvite.setState({ invite: null });
+    if (message) showToast({ tone: message.tone, message: message.text });
+    haptic.confirmed();
     onAuthenticated?.();
   };
 
@@ -348,6 +367,15 @@ export function AccountForm({
       });
     }
   };
+
+  if (pendingSave) {
+    return (
+      <Panel>
+        <Text color={theme.danger}>{problem?.message}</Text>
+        <Button label={i18n.t("common.retry")} height={52} loading={busy} disabled={busy} onPress={() => void retryPersist()} />
+      </Panel>
+    );
+  }
 
   return (
     <>
