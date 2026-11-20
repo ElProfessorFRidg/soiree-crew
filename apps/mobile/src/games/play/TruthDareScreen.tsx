@@ -32,8 +32,10 @@ export function TruthDareScreen({ session, content, onAgain }: GameScreenProps) 
   if (state.current) shown.current = state.current;
   const [turning, setTurning] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const finishing = useRef(false);
   useEffect(() => () => {
     if (timer.current) clearTimeout(timer.current);
+    finishing.current = false;
   }, []);
 
   const shellProps = {
@@ -55,11 +57,18 @@ export function TruthDareScreen({ session, content, onAgain }: GameScreenProps) 
   }
 
   const finish = (action: { type: "done" } | { type: "refuse" }) => {
+    if (finishing.current || state.phase !== "card") return;
+    finishing.current = true;
     dispatch(action);
     setTurning(true);
-    timer.current = setTimeout(() => setTurning(false), duration.flip);
+    timer.current = setTimeout(() => {
+      timer.current = null;
+      finishing.current = false;
+      setTurning(false);
+    }, duration.flip);
   };
   const choose = (kind: "truth" | "dare") => {
+    if (turning || state.phase === "card") return;
     haptic.select();
     dispatch({ type: "choose", kind });
   };
