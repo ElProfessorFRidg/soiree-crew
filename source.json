@@ -797,16 +797,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -819,6 +819,28 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.9",
+          "buildVersion": "269",
+          "marketingVersion": "0.2.9 Preview (269)",
+          "date": "2026-11-20T20:56:13Z",
+          "localizedDescription": "• Bump @noble/hashes from 2.0.1 to 2.4.0",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.9-preview.23%2Bbuild.269/soiree-crew-unsigned.ipa",
+          "size": 22748998,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.8",
           "buildVersion": "263",
@@ -1282,26 +1304,37 @@
           ]
         }
       ],
-      "version": "0.2.8",
-      "versionDate": "2026-11-20T19:44:24Z",
-      "versionDescription": "• Stop previous-account refresh chains and inbox flags after logout\n• Stop countdowns when the app loses foreground\n• Stop countdowns when the app loses foreground\n• Keep drawing arena usable on compact screens\n• Prevent duplicate head-to-head round advancement\n• Prevent simultaneous curve starts and cancel stale countdowns\n• Verify delayed invitations and inbox responses cannot cross accounts\n• Reject stale invitations, notification and venue responses\n• Reject stale invitations, notification and venue responses\n• Reject stale invitations, notification and venue responses\n• Identify both opponents during head-to-head rounds\n• Identify both opponents during head-to-head rounds\n• Support accessible two-player highlight banners\n• Serialize category erasure and guard against session changes\n• Cover session guards for sign-out and account/server switching\n• Prevent stale optimistic rollbacks and SOS clears after sign-out\n• Ignore obsolete websocket events and preserve new socket on reconnect\n• Prevent stale radar and SOS responses crossing accounts\n• Isolate crew, party and live responses across session changes\n• Discard stale sync payloads after account changes\n• Add identity guard for in-flight authenticated responses\n• Cancel stale fuse resume when round state changes\n• Surface selected player on wheel and curve result\n• Surface selected player on wheel and curve result\n• Prevent concurrent Point Blank countdowns and stale callbacks\n• Make truth-or-dare resolution single-flight across taps and swipes\n• Prevent overlapping fuse resume timers and clear on unmount\n• Show active player in more game states\n• Show active player in more game states\n• Show active player in more game states\n• Identify active reader and driver across more mini-games\n• Identify active reader and driver across more mini-games\n• Identify active reader and driver across more mini-games\n• Highlight current player during gameplay\n• Highlight current player during gameplay\n• Highlight current player during gameplay\n• Add accessible animated active-turn banner to shared shell",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.13%2Bbuild.263/soiree-crew-unsigned.ipa",
-      "size": 22701392,
+      "version": "0.2.9",
+      "versionDate": "2026-11-20T20:56:13Z",
+      "versionDescription": "• Bump @noble/hashes from 2.0.1 to 2.4.0",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.9-preview.23%2Bbuild.269/soiree-crew-unsigned.ipa",
+      "size": 22748998,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "preview-0.2.9-269",
+      "title": "Soirée Crew Preview 0.2.9 (269)",
+      "caption": "• Bump @noble/hashes from 2.0.1 to 2.4.0",
+      "date": "2026-11-20T20:56:13Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.9-preview.23%2Bbuild.269/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
     {
       "identifier": "release-0.2.9-265",
       "title": "Soirée Crew 0.2.9 (265)",
@@ -1508,17 +1541,6 @@
       "tintColor": "F4B33D",
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.7%2Bbuild.124/iphone/banner.png",
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.7%2Bbuild.124/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
-      "notify": false
-    },
-    {
-      "identifier": "preview-0.2.6-122",
-      "title": "Soirée Crew Preview 0.2.6 (122)",
-      "caption": "",
-      "date": "2026-11-17T23:41:45Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.6%2Bbuild.122/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.6%2Bbuild.122/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
     }
@@ -1846,6 +1868,13 @@
       "buildVersion": "2",
       "date": "2026-10-27T00:43:05Z",
       "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.9",
+      "buildVersion": "269",
+      "date": "2026-11-20T20:56:13Z",
+      "localizedDescription": "• Bump @noble/hashes from 2.0.1 to 2.4.0"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
