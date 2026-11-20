@@ -467,7 +467,9 @@ export const en: Messages = {
     notifBody: { v1: "{party} is over. One tap to tell the crew you're home.", v2: "{party} is done. Home safe? Tell the crew.", v3: "One tap to reassure the crew after {party}.", v4: "Back from {party}? The crew wants to know.", v5: "{party} is over. Pyjamas on? Tell the crew.", v6: "The crew sleeps better when you say you're home.", v7: "{party} wrapped up. Are you home?", v8: "Quick sign to the crew: home safe?" },
   },
   account: {
+    sessionSaveFailed: "The account exists, but sign-in couldn't be saved on this device. Retry here without creating another account.",
     eraseAll: "Erase everything",
+    erased: "Your data has been erased. You can start again.",
     eraseAllTitle: "Erase everything on this phone?",
     eraseAllBody: "Your profile, drinks and water, settings, custom drinks and photos waiting to upload are erased from this phone, reminders included. The app restarts as on its first launch.",
     withdraw: "Withdraw health consent",
@@ -526,7 +528,7 @@ export const en: Messages = {
     eraseConfirmTitle: "Erase: {what}?",
     eraseConfirmBody: "Erased on the server and on this phone. Nothing else changes.",
     eraseConfirm: "Erase",
-    erased: "Erased: {what}.",
+    categoryErased: "Erased: {what}.",
     eraseCategory: {
       drinks: "Drinks",
       water: "Glasses of water",

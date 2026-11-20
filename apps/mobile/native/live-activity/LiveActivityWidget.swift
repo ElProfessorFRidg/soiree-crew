@@ -17,6 +17,7 @@ struct LiveActivityAttributes: ActivityAttributes {
   }
 
   var name: String
+  var startedAt: Double?
   var backgroundColor: String?
   var titleColor: String?
   var subtitleColor: String?
@@ -52,6 +53,26 @@ struct LiveActivityAttributes: ActivityAttributes {
 // MARK: - What the app sends
 
 struct NightPayload: Decodable {
+  struct Forecast: Decodable {
+    let start: Double
+    let step: Double
+    let values: [Int]
+    let digits: Int
+    let separator: String
+
+    func value(at date: Date) -> String? {
+      guard !values.isEmpty, step > 0, digits >= 0, digits <= 3 else { return nil }
+      // Once the horizon ends, do not keep showing the last sample as a live estimate.
+      let nowMs = date.timeIntervalSince1970 * 1000
+      guard nowMs >= start, nowMs <= start + step * Double(values.count - 1) else { return nil }
+      let index = max(0, min(values.count - 1, Int(floor((date.timeIntervalSince1970 * 1000 - start) / step))))
+      let divisor = Int(pow(10.0, Double(digits)))
+      let raw = max(0, values[index])
+      if digits == 0 { return String(raw) }
+      let fraction = String(raw % divisor)
+      return "\(raw / divisor)\(separator)\(String(repeating: "0", count: max(0, digits - fraction.count)))\(fraction)"
+    }
+  }
   struct Person: Decodable, Hashable {
     let i: String
     let c: String
@@ -99,6 +120,8 @@ struct NightPayload: Decodable {
   let zeroAt: Double?
   let limitFrac: Double?
   let bac: String?
+  let bacForecast: Forecast?
+  let generatedAt: Double?
   let unit: String?
   let bacColor: String?
   let stamp: String
@@ -329,6 +352,22 @@ private struct Faces: View {
 
 // MARK: - Lock screen, solo night (design A)
 
+/// A best-effort offline clock-driven view. iOS owns Live Activity refresh cadence;
+/// TimelineView is not a guarantee of minute-by-minute lock-screen updates.
+private struct ForecastFigure: View {
+  let payload: NightPayload
+  let fallback: String
+  let size: CGFloat
+  var body: some View {
+    TimelineView(.periodic(from: .now, by: 60)) { timeline in
+      let nowMs = timeline.date.timeIntervalSince1970 * 1000
+      let recent = payload.generatedAt.map { nowMs >= $0 && nowMs - $0 <= 5 * 60_000 } ?? false
+      let value = payload.bacForecast?.value(at: timeline.date) ?? (recent ? fallback : "—")
+      Text(value).font(numeral(size)).foregroundStyle(payload.figureColor)
+    }
+  }
+}
+
 private struct SoloLockView: View {
   let p: NightPayload
   // iOS gives the lock screen about 160 pt of height: hero, bar, one line of facts, buttons.
@@ -338,7 +377,7 @@ private struct SoloLockView: View {
         if p.show, let bac = p.bac {
           VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
-              Text(bac).font(numeral(40)).foregroundStyle(p.figureColor)
+              ForecastFigure(payload: p, fallback: bac, size: 40)
               Text(p.unit ?? "").font(.system(size: 13, weight: .bold)).foregroundStyle(NightColors.text)
             }
             if let status = p.status {
@@ -421,7 +460,7 @@ private struct PartyLockView: View {
           Spacer(minLength: 4)
           if p.show, let bac = p.bac {
             HStack(alignment: .firstTextBaseline, spacing: 3) {
-              Text(bac).font(numeral(26)).foregroundStyle(p.figureColor)
+              ForecastFigure(payload: p, fallback: bac, size: 26)
               Text(p.unit ?? "").font(.system(size: 11, weight: .bold)).foregroundStyle(NightColors.text)
             }
           }
@@ -535,7 +574,7 @@ struct LiveActivityWidget: Widget {
     } else if p.show, let bac = p.bac {
       HStack(spacing: 4) {
         Glyph(systemName: "mug.fill", color: p.figureColor, size: 12)
-        Text(bac).font(numeral(17)).foregroundStyle(p.figureColor)
+        ForecastFigure(payload: p, fallback: bac, size: 17)
       }
     } else {
       HStack(spacing: 3) {
@@ -585,7 +624,7 @@ struct LiveActivityWidget: Widget {
       }
       if p.show, let bac = p.bac {
         HStack(alignment: .firstTextBaseline, spacing: 4) {
-          Text(bac).font(numeral(p.inParty ? 30 : 44)).foregroundStyle(p.figureColor)
+          ForecastFigure(payload: p, fallback: bac, size: p.inParty ? 30 : 44)
           Text(p.unit ?? "").font(.system(size: 12, weight: .bold)).foregroundStyle(NightColors.text)
         }
       } else if !p.inParty, let zero = p.zeroClock {

@@ -465,7 +465,9 @@ export const de: Messages = {
     notifBody: { v1: "{party} ist vorbei. Ein Tipp, damit die Crew weiß, dass du zu Hause bist.", v2: "{party} ist aus. Gut angekommen? Sag's der Crew.", v3: "Ein Tipp, um die Crew nach {party} zu beruhigen.", v4: "Zurück von {party}? Die Crew will's wissen.", v5: "{party} ist vorbei. Schlafanzug an? Sag der Crew Bescheid.", v6: "Die Crew schläft besser, wenn du sagst, dass du daheim bist.", v7: "{party} ist durch. Bist du im Warmen?", v8: "Kurzes Zeichen an die Crew: gut angekommen?" },
   },
   account: {
+    sessionSaveFailed: "Das Konto wurde erstellt, aber die Anmeldung konnte auf diesem Gerät nicht gespeichert werden. Versuche es hier erneut, ohne ein weiteres Konto zu erstellen.",
     eraseAll: "Alles löschen",
+    erased: "Deine Daten wurden gelöscht. Du kannst neu anfangen.",
     eraseAllTitle: "Alles auf diesem Handy löschen?",
     eraseAllBody: "Dein Profil, deine Getränke und dein Wasser, Einstellungen, eigene Getränke und wartende Fotos werden von diesem Handy gelöscht, Erinnerungen inklusive. Die App startet wie beim ersten Mal.",
     withdraw: "Gesundheits-Einwilligung widerrufen",
@@ -524,7 +526,7 @@ export const de: Messages = {
     eraseConfirmTitle: "Löschen: {what}?",
     eraseConfirmBody: "Auf dem Server und auf diesem Handy gelöscht. Sonst ändert sich nichts.",
     eraseConfirm: "Löschen",
-    erased: "Gelöscht: {what}.",
+    categoryErased: "Gelöscht: {what}.",
     eraseCategory: {
       drinks: "Drinks",
       water: "Gläser Wasser",

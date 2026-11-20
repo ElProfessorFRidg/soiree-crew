@@ -5,6 +5,7 @@ import { api } from "@/server/api";
 import { showFailure } from "@/server/errors";
 import { useVenueData } from "@/server/venueData";
 import { pruneDrinkPhotos } from "@/drinks/drinkPhotos";
+import { dropUploads, useUploads } from "@/photos/uploads";
 import { refreshReminders } from "@/reminders/reminders";
 import { useAppStore } from "@/state/store";
 import { Button } from "@/ui/Button";
@@ -32,9 +33,17 @@ function forgetLocally(category: DataCategory): void {
     pruneDrinkPhotos();
   }
   if (category === "checkIns") {
-    useVenueData.setState({ openCheckIn: null });
+    useVenueData.setState({ openCheckIn: null, byCrew: {} });
     // Which bar each drink was logged at is check-in history too.
     useAppStore.setState({ drinkVenues: {} });
+  }
+  if (category === "photos" || category === "reviews") {
+    // A queued upload is another local copy of data the user just requested
+    // to erase; it must not be replayed after the server deletion.
+    const ids = useUploads.getState().queue
+      .filter((photo) => category === "photos" || !!photo.reviewVenueId)
+      .map((photo) => photo.id);
+    dropUploads(ids);
   }
 }
 
@@ -60,7 +69,7 @@ export function DataControls() {
         .then(() => {
           forgetLocally(category);
           haptic.confirmed();
-          showToast({ message: i18n.t("account.erased", { what: i18n.t(`account.eraseCategory.${category}`) }) });
+          showToast({ message: i18n.t("account.categoryErased", { what: i18n.t(`account.eraseCategory.${category}`) }) });
         })
         .catch(showFailure(i18n));
     });

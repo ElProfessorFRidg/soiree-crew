@@ -466,7 +466,9 @@ export const pt: Messages = {
     notifBody: { v1: "Fim de {party}. Um toque para dizer ao crew que estás em casa.", v2: "{party} acabou. Chegaste bem? Diz ao crew.", v3: "Um toque para tranquilizar o crew depois de {party}.", v4: "Voltaste de {party}? O crew quer saber.", v5: "{party} acabou. Pijama? Avisa o crew.", v6: "O crew dorme melhor quando dizes que chegaste.", v7: "{party} terminou. Estás em casa?", v8: "Um sinal ao crew: chegaste bem?" },
   },
   account: {
+    sessionSaveFailed: "A conta existe, mas não foi possível guardar a sessão neste dispositivo. Tenta novamente aqui sem criar outra conta.",
     eraseAll: "Apagar tudo",
+    erased: "Os teus dados foram apagados. Podes começar de novo.",
     eraseAllTitle: "Apagar tudo deste telemóvel?",
     eraseAllBody: "O teu perfil, as bebidas e a água, as definições, as bebidas personalizadas e as fotos em espera são apagados deste telemóvel, lembretes incluídos. A app reinicia como na primeira vez.",
     withdraw: "Retirar acordo de saúde",
@@ -525,7 +527,7 @@ export const pt: Messages = {
     eraseConfirmTitle: "Apagar: {what}?",
     eraseConfirmBody: "Apagado no servidor e neste telemóvel. Mais nada muda.",
     eraseConfirm: "Apagar",
-    erased: "Apagado: {what}.",
+    categoryErased: "Apagado: {what}.",
     eraseCategory: {
       drinks: "Bebidas",
       water: "Copos de água",

@@ -41,7 +41,7 @@ type Problem = {
 type Availability = "unknown" | "checking" | "free" | "taken";
 
 const USERNAME = /^[a-z0-9_.]{3,24}$/;
-const EMAIL = /^[^s@]+@[^s@]+.[^s@]+$/;
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function birthParts(birthDate: string | null): DateParts {
   const match = birthDate ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(birthDate) : null;
@@ -93,6 +93,7 @@ export function AccountForm({
   onModeChange,
   autoFocus = true,
   birthDate: askedBirthDate = null,
+  onAuthenticated,
 }: {
   intent: ArrivalIntent | null;
   server: string | null;
@@ -101,6 +102,8 @@ export function AccountForm({
   autoFocus?: boolean;
   /** O-02: asked before the account, so it goes along and the server refuses a minor before storing anything. */
   birthDate?: string | null;
+  /** Called only after the account token has been persisted successfully. */
+  onAuthenticated?: () => void;
 }) {
   const i18n = useT();
   const theme = useTheme();
@@ -119,6 +122,13 @@ export function AccountForm({
   const [linkServer, setLinkServer] = useState<string | null>(null);
   const [problem, setProblem] = useState<Problem | null>(null);
   const [busy, setBusy] = useState(false);
+  // A server-created account must never be created a second time merely because
+  // saving its session to this device failed.
+  const [pendingSave, setPendingSave] = useState<{
+    account: AccountResponse;
+    url: string;
+    message?: { tone?: "danger"; text: string };
+  } | null>(null);
   // O-01: an Apple identity waiting for its username, and whether Apple's button is offered at all
   // (iOS only, and only where the date of birth is already known).
   // Outside the arrival flow (the Crew tab) the date of birth has not been asked yet: it is asked here, still before the account.
@@ -157,12 +167,9 @@ export function AccountForm({
   const ready =
     mode === "create" ? USERNAME.test(username.trim()) && firstName.trim().length > 0 && availability !== "taken" && birthDate !== null && (apple !== null || emailValid) : way === "password" ? login.trim().length >= 3 && password.length > 0 : code.trim().length === 10;
 
-  /** The account exists: whatever happens to the crew step, the person is signed in. */
-  const finish = async (account: AccountResponse, url: string) => {
-    if (!intent) {
-      haptic.confirmed();
-      setBusy(false);
-      // Success shows no toast: the next step sliding in says it (SYNC-07).
+  /** Keep users on the form and show an error if the device cannot persist a token. */
+  const persistAccount = async (account: AccountResponse, url: string, message?: { tone?: "danger"; text: string }): Promise<boolean> => {
+    try {
       await saveSession({
         url,
         token: account.token,
@@ -170,13 +177,34 @@ export function AccountForm({
         username: account.user.username,
         displayName: account.user.displayName,
       });
+      setPendingSave(null);
+      return true;
+    } catch {
+      setPendingSave({ account, url, message });
+      haptic.error();
+      setProblem({
+        field: "form",
+        message: i18n.t("account.sessionSaveFailed"),
+      });
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  /** The account exists: onboarding continues only after the session is saved. */
+  const finish = async (account: AccountResponse, url: string) => {
+    if (!intent) {
+      if (await persistAccount(account, url)) {
+        haptic.confirmed();
+        onAuthenticated?.();
+      }
       return;
     }
     let message: { tone?: "danger"; text: string };
     try {
       const crewName = await carryOn(intent, url, account.token);
       message = { text: doneMessage(intent, crewName, i18n) };
-      // QOL-07: the crew name typed in "Créer" was a draft until now.
       if (intent.kind === "create") void AsyncStorage.removeItem("crew-draft:crew:name").catch(() => undefined);
     } catch (error) {
       message = {
@@ -186,18 +214,24 @@ export function AccountForm({
         }),
       };
     }
+    if (!(await persistAccount(account, url, message))) return;
     if (intent.kind === "code") usePendingInvite.setState({ invite: null });
     if (message.tone) haptic.error();
     else haptic.confirmed();
-    setBusy(false);
-    await saveSession({
-      url,
-      token: account.token,
-      userId: account.user.id,
-      username: account.user.username,
-      displayName: account.user.displayName,
-    });
     showToast({ tone: message.tone, message: message.text });
+    onAuthenticated?.();
+  };
+
+  const retryPersist = async () => {
+    if (!pendingSave || busy) return;
+    setBusy(true);
+    setProblem(null);
+    const { account, url, message } = pendingSave;
+    if (!(await persistAccount(account, url, message))) return;
+    if (intent?.kind === "code") usePendingInvite.setState({ invite: null });
+    if (message) showToast({ tone: message.tone, message: message.text });
+    haptic.confirmed();
+    onAuthenticated?.();
   };
 
   const submit = async () => {
@@ -211,10 +245,10 @@ export function AccountForm({
     setProblem(null);
     try {
       await api("/v1/health", { baseUrl: url, token: null });
-    } catch {
+    } catch (error) {
       setBusy(false);
       haptic.error();
-      setProblem({ field: "form", message: i18n.t("crew.serverUnreachable") });
+      setProblem({ field: "form", message: failureMessage(error, i18n) });
       return;
     }
     let account: AccountResponse;
@@ -272,7 +306,7 @@ export function AccountForm({
         else if (mode === "signin" && way === "code" && (failure.code === "code_invalid" || failure.status === 400))
           setProblem({ field: "code", message: i18n.t("crew.transferInvalid") });
         else if (failure.code === "under_age") setProblem({ field: "form", message: i18n.t("journey.birthUnder", { age: 18 }) });
-        else if (mode === "create" && failure.status === 400) setProblem({ field: "username", message: i18n.t("crew.usernameHint") });
+        else if (mode === "create" && failure.status === 400 && failure.code === "username_invalid") setProblem({ field: "username", message: i18n.t("crew.usernameHint") });
         else setProblem({ field: "form", message: serverMessage(failure.code, i18n) });
       } else setProblem({ field: "form", message: failureMessage(err, i18n) });
       return;
@@ -291,10 +325,10 @@ export function AccountForm({
     setProblem(null);
     try {
       await api("/v1/health", { baseUrl: server, token: null });
-    } catch {
+    } catch (error) {
       setBusy(false);
       haptic.error();
-      setProblem({ field: "form", message: i18n.t("crew.serverUnreachable") });
+      setProblem({ field: "form", message: failureMessage(error, i18n) });
       return;
     }
     try {
@@ -333,6 +367,15 @@ export function AccountForm({
       });
     }
   };
+
+  if (pendingSave) {
+    return (
+      <Panel>
+        <Text color={theme.danger}>{problem?.message}</Text>
+        <Button label={i18n.t("common.retry")} height={52} loading={busy} disabled={busy} onPress={() => void retryPersist()} />
+      </Panel>
+    );
+  }
 
   return (
     <>

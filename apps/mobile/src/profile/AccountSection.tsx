@@ -25,6 +25,8 @@ import { guarded } from "@/vault/vault";
 import { confirmAction } from "@/ui/confirm";
 import { eraseEverything } from "@/system/factoryReset";
 import { refreshReminders } from "@/reminders/reminders";
+import { freshDraft } from "@/onboarding/flow";
+import { draftFromProfile } from "@/profile/saveProfile";
 
 /**
  * O-07: deletes the account on the server first (nothing is erased here if that fails), then this
@@ -52,6 +54,10 @@ export async function withdrawHealthConsent(i18n: Translator): Promise<void> {
       drinks: [],
       water: [],
       levelState: null,
+      // Re-open the consent flow without trapping an already-completed account
+      // behind an onboarding marker that would prevent finish().
+      onboardedAt: null,
+      onboarding: { ...freshDraft(draftFromProfile(null), false), step: "consent", skippedHealth: true },
       outbox: state.outbox.filter((item) => !health.has(item.mutation.kind)),
     }));
     void refreshReminders();
@@ -237,6 +243,8 @@ export function AccountSection() {
   const [transfer, setTransfer] = useState<string | null>(null);
   const [passwordAsk, setPasswordAsk] = useState(0);
   const [creating, setCreating] = useState<AccountMode | null>(null);
+  const [confirmErase, setConfirmErase] = useState(false);
+  const [erasing, setErasing] = useState(false);
 
   // A guest can make or open an account any time; once the session exists the sheet closes by itself.
   useEffect(() => {
@@ -268,18 +276,32 @@ export function AccountSection() {
       cancelLabel: i18n.t("account.deleteKeep"),
     });
     if (!ok) return;
-    // The session ends on the server too; if it can't be reached, the token dies with the phone's copy.
-    void api("/v1/sessions/current", { method: "DELETE" }).catch(() => undefined);
-    const userId = useSession.getState().session?.userId;
-    // Chat keys and history are tied to this session's device: they go with it.
-    if (userId) void forgetChat(userId);
-    // O-13: nothing of this account stays for whoever uses the phone next.
-    wipePreviousAccount(null);
-    void saveSession(null);
+    const signingOut = useSession.getState().session;
+    try {
+      // Revoke remotely only after the device successfully forgets its own
+      // credentials. Otherwise a failed Keychain write would leave a visibly
+      // signed-in account holding an already-invalid server token.
+      await saveSession(null);
+      wipePreviousAccount(null);
+      if (signingOut) {
+        void api("/v1/sessions/current", {
+          baseUrl: signingOut.url,
+          token: signingOut.token,
+          method: "DELETE",
+        }).catch(() => undefined);
+        await forgetChat(signingOut.userId).catch(() => undefined);
+      }
+    } catch (error) {
+      showToast({ tone: "danger", message: failureMessage(error, i18n) });
+    }
   };
 
   // Without an account there is nothing on the server: the same reset, said for this phone only.
   const onDelete = () => {
+    if (!session) {
+      setConfirmErase(true);
+      return;
+    }
     void confirmAction({
       title: session ? i18n.t("account.deleteTitle") : i18n.t("account.eraseAllTitle"),
       body: session ? i18n.t("account.deleteBody") : i18n.t("account.eraseAllBody"),
@@ -288,6 +310,21 @@ export function AccountSection() {
     }).then((ok) => {
       if (ok && !guarded({ kind: "deleteAccount" }, () => void deleteAccount(i18n))) showToast({ message: i18n.t("vault.queued") });
     });
+  };
+
+  const eraseGuest = async () => {
+    if (erasing) return;
+    setErasing(true);
+    try {
+      // A guest has no server account to delete and must never be delayed by the vault.
+      await eraseEverything();
+      setConfirmErase(false);
+      showToast({ message: i18n.t("account.erased") });
+    } catch (error) {
+      showToast({ tone: "danger", message: failureMessage(error, i18n) });
+    } finally {
+      setErasing(false);
+    }
   };
 
   const onWithdraw = () => {
@@ -350,6 +387,11 @@ export function AccountSection() {
           </Sheet>
         </>
       )}
+      <Sheet visible={confirmErase} title={i18n.t("account.eraseAllTitle")} onClose={() => { if (!erasing) setConfirmErase(false); }}>
+        <Text>{i18n.t("account.eraseAllBody")}</Text>
+        <Button label={i18n.t("account.eraseAll")} variant="danger" height={48} loading={erasing} disabled={erasing} onPress={() => void eraseGuest()} />
+        <Button label={i18n.t("account.deleteKeep")} variant="outline" height={44} disabled={erasing} onPress={() => setConfirmErase(false)} />
+      </Sheet>
       <Button label={i18n.t("account.withdraw")} variant="outline" height={44} onPress={onWithdraw} />
       <Button label={session ? i18n.t("account.delete") : i18n.t("account.eraseAll")} variant="danger" height={44} onPress={onDelete} />
     </Panel>
