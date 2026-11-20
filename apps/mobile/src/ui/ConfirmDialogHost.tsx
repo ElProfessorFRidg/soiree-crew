@@ -58,14 +58,14 @@ export function ConfirmDialogHost() {
                 label={active.cancelLabel}
                 variant="outline"
                 height={48}
-                style={styles.action}
+                style={width < 380 ? undefined : styles.action}
                 onPress={() => answer(false)}
               />
               <Button
                 label={active.confirmLabel}
                 variant={active.destructive === false ? "primary" : "danger"}
                 height={48}
-                style={styles.action}
+                style={width < 380 ? undefined : styles.action}
                 onPress={() => answer(true)}
               />
             </View>
