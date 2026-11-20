@@ -122,7 +122,7 @@ export function FuseScreen({ session, content, onAgain }: GameScreenProps) {
   const status = state.rounds !== null ? g.t("shell.round", { round: state.round, rounds: state.rounds }) : g.t("shell.roundOpen", { round: state.round });
 
   return (
-    <GameShell {...shellProps} status={status} helpHidden={burning} footer={footer} fab="top">
+    <GameShell {...shellProps} currentPlayerId={holder?.id} status={status} helpHidden={burning} footer={footer} fab="top">
       <View style={[styles.prompt, { backgroundColor: palette.dark.text }]}>
         <Text variant="small" color={cardColours.muted}>
           {g.t("games.fuse.prompt")}
