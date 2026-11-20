@@ -80,7 +80,7 @@ export function TruthDareScreen({ session, content, onAgain }: GameScreenProps) 
     );
 
   return (
-    <GameShell {...shellProps} status={g.t("games.truthDare.turnOf", { name: table.nameOf(player) })} footer={footer} fab="top">
+    <GameShell {...shellProps} currentPlayerId={player} status={g.t("games.truthDare.turnOf", { name: table.nameOf(player) })} footer={footer} fab="top">
       <RoundTimer seconds={session.timerSeconds} roundKey={state.turns} paused={state.phase !== "card"} />
       {/* MOT-06: a drawn card goes right when done, left when refused; the buttons do the same. */}
       <SwipeCard
