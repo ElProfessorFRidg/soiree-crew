@@ -213,7 +213,7 @@ export function FuseScreen({ session, content, onAgain }: GameScreenProps) {
         <Animated.View entering={ui.calmMotion || reduceMotion ? undefined : FadeIn.duration(duration.enter)} style={styles.penalties}>
           <View style={[styles.penaltyHeading, { borderColor: theme.danger }]}>
             <Text variant="h2" color={theme.danger}>
-              {g.t("games.fuse.boom", { name: holder?.name ?? "" })}
+              {g.plural("shell.penalties", state.lastPenalties.length)}
             </Text>
           </View>
           <PenaltyList lines={state.lastPenalties} players={table.all} wasted={wasted} forfeits={content.forfeits} />
