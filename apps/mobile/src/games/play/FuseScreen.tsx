@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import Animated, { FadeIn, interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { FadeIn, cancelAnimation, interpolateColor, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
 import { duration, palette, scaled } from "@crew/design-tokens";
 import { createFuse, fuseEscalation, fuseHolder, fuseReducer, fuseTickInterval, mathRandom } from "@crew/games";
 import { haptic } from "@/motion/haptics";
@@ -28,6 +28,7 @@ export function FuseScreen({ session, content, onAgain }: GameScreenProps) {
   const g = useGameT();
   const ui = useGameUi();
   const theme = useTheme();
+  const reduceMotion = useReducedMotion();
   const table = useTable(session);
   const [state, dispatch] = useEngine(
     () => createFuse({ players: session.players.map(toEnginePlayer), level: session.level, content: content.fusePrompts, rng: mathRandom }),
@@ -86,6 +87,28 @@ export function FuseScreen({ session, content, onAgain }: GameScreenProps) {
     backgroundColor: interpolateColor(step.value, [0, 1, 2, 3], [palette.dark.text, palette.accent.amber, cardColours.coral, palette.semantic.danger]),
   }));
   const shake = useShake(Math.max(0, (escalation - 0.5) * 2), burning && !ui.calmMotion);
+
+  // Keep the suspense alive with a steady decorative heartbeat. It deliberately
+  // never tracks fuseMs or escalation, so nobody can predict when it will explode.
+  const pulse = useSharedValue(0);
+  useEffect(() => {
+    cancelAnimation(pulse);
+    if (burning && !ui.calmMotion && !reduceMotion) {
+      pulse.value = withRepeat(
+        withSequence(withTiming(1, { duration: scaled(450) }), withTiming(0, { duration: scaled(450) })),
+        -1,
+        false,
+      );
+    } else pulse.value = withTiming(0, { duration: scaled(180) });
+    return () => cancelAnimation(pulse);
+  }, [burning, ui.calmMotion, reduceMotion, pulse]);
+  const bombPulse = useAnimatedStyle(() => ({
+    transform: [{ scale: 1 + pulse.value * 0.055 }],
+  }));
+  const glowPulse = useAnimatedStyle(() => ({
+    opacity: 0.08 + pulse.value * 0.16,
+    transform: [{ scale: 0.93 + pulse.value * 0.15 }],
+  }));
 
   const shellProps = {
     gameId: session.gameId,
@@ -152,7 +175,10 @@ export function FuseScreen({ session, content, onAgain }: GameScreenProps) {
       </View>
 
       <View style={styles.arena}>
-        <Animated.View style={[styles.bomb, discColour, shake]} accessible accessibilityLabel={g.t("games.fuse.bomb")}>
+        {burning && !ui.calmMotion && !reduceMotion ? (
+          <Animated.View pointerEvents="none" style={[styles.bombGlow, { backgroundColor: theme.amber }, glowPulse]} />
+        ) : null}
+        <Animated.View style={[styles.bomb, discColour, shake, bombPulse]} accessible accessibilityLabel={g.t("games.fuse.bomb")}>
           <GameIcon game="fuse" size={84} color={palette.accent.onAccent} />
         </Animated.View>
         {state.phase === "exploded" ? <Burst size={BOMB} calm={ui.calmMotion} /> : null}
@@ -183,7 +209,16 @@ export function FuseScreen({ session, content, onAgain }: GameScreenProps) {
 
       {burning && picking ? <PlayerGrid players={state.order.players.filter((p) => p.id !== holder?.id)} onPress={(id) => pass(id)} /> : null}
 
-      {state.phase === "exploded" ? <PenaltyList lines={state.lastPenalties} players={table.all} wasted={wasted} forfeits={content.forfeits} /> : null}
+      {state.phase === "exploded" ? (
+        <Animated.View entering={ui.calmMotion || reduceMotion ? undefined : FadeIn.duration(duration.enter)} style={styles.penalties}>
+          <View style={[styles.penaltyHeading, { borderColor: theme.danger }]}>
+            <Text variant="h2" color={theme.danger}>
+              {g.t("games.fuse.boom", { name: holder?.name ?? "" })}
+            </Text>
+          </View>
+          <PenaltyList lines={state.lastPenalties} players={table.all} wasted={wasted} forfeits={content.forfeits} />
+        </Animated.View>
+      ) : null}
 
       {state.phase === "idle" ? (
         <View style={styles.switchRow}>
@@ -199,6 +234,9 @@ const styles = StyleSheet.create({
   prompt: { borderRadius: 18, padding: 16, gap: 4 },
   arena: { height: 260, alignItems: "center", justifyContent: "center" },
   bomb: { width: BOMB, height: BOMB, borderRadius: BOMB / 2, alignItems: "center", justifyContent: "center" },
+  bombGlow: { position: "absolute", width: BOMB + 32, height: BOMB + 32, borderRadius: (BOMB + 32) / 2 },
+  penalties: { gap: 12 },
+  penaltyHeading: { borderLeftWidth: 4, paddingLeft: 12, paddingVertical: 4 },
   huge: { fontSize: 40, lineHeight: 44 },
   passZone: { minHeight: 180, borderRadius: 24, alignItems: "center", justifyContent: "center", padding: 20 },
   switchRow: { flexDirection: "row", alignItems: "center", gap: 12 },
