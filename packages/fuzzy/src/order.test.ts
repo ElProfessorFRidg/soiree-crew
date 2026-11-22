@@ -57,6 +57,12 @@ describe("drink catalogue", () => {
 });
 
 describe("order parser with brands", () => {
+  it("resolves Ruby to Leffe Ruby and recognises an explicit pint", () => {
+    expect(catalogueDrink("leffe-ruby")).toMatchObject({ volumeMl: 330, abv: 0.05 });
+    expect(parse("2 ruby")[0]).toMatchObject({ quantity: 2, drink: "leffe-ruby" });
+    expect(parse("pinte de ruby")[0]).toMatchObject({ drink: "leffe-ruby", volumeMl: 500 });
+  });
+
   it("keeps tokens a person types as one: decimals, units, percent", () => {
     expect(tokenize("Pinte 8,5% et 50cl de Kro")).toEqual(["pinte", "8.5", "%", "et", "50", "cl", "de", "kro"]);
     expect(tokenize("Jäger 35°")).toEqual(["jager", "35", "%"]);
