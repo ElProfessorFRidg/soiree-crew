@@ -797,16 +797,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -819,6 +819,28 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.10",
+          "buildVersion": "272",
+          "marketingVersion": "0.2.10 Preview (272)",
+          "date": "2026-11-22T21:00:04Z",
+          "localizedDescription": "• Expand drink selection and recognise sips and capfuls\n• Add Leffe Ruby and 111 more drinks to the catalogue",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.10-preview.24%2Bbuild.272/soiree-crew-unsigned.ipa",
+          "size": 22764385,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.9",
           "buildVersion": "270",
@@ -1348,26 +1370,37 @@
           ]
         }
       ],
-      "version": "0.2.9",
-      "versionDate": "2026-11-20T21:05:15Z",
-      "versionDescription": "• Bump the other-patches group across 1 directory with 11 updates",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.9-preview.15%2Bbuild.270/soiree-crew-unsigned.ipa",
-      "size": 22764999,
+      "version": "0.2.10",
+      "versionDate": "2026-11-22T21:00:04Z",
+      "versionDescription": "• Expand drink selection and recognise sips and capfuls\n• Add Leffe Ruby and 111 more drinks to the catalogue",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.10-preview.24%2Bbuild.272/soiree-crew-unsigned.ipa",
+      "size": 22764385,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "preview-0.2.10-272",
+      "title": "Soirée Crew Preview 0.2.10 (272)",
+      "caption": "• Expand drink selection and recognise sips and capfuls\n• Add Leffe Ruby and 111 more drinks to the catalogue",
+      "date": "2026-11-22T21:00:04Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10-preview.24%2Bbuild.272/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.10-preview.24%2Bbuild.272/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
     {
       "identifier": "preview-0.2.9-270",
       "title": "Soirée Crew Preview 0.2.9 (270)",
@@ -1575,17 +1608,6 @@
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6%2Bbuild.129/iphone/banner.png",
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6%2Bbuild.129/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile",
-      "notify": false
-    },
-    {
-      "identifier": "preview-0.2.6-128",
-      "title": "Soirée Crew Preview 0.2.6 (128)",
-      "caption": "",
-      "date": "2026-11-17T23:55:00Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.6-preview.9%2Bbuild.128/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.6-preview.9%2Bbuild.128/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
       "notify": false
     }
   ],
@@ -1912,6 +1934,13 @@
       "buildVersion": "2",
       "date": "2026-10-27T00:43:05Z",
       "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.10",
+      "buildVersion": "272",
+      "date": "2026-11-22T21:00:04Z",
+      "localizedDescription": "• Expand drink selection and recognise sips and capfuls\n• Add Leffe Ruby and 111 more drinks to the catalogue"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
