@@ -61,10 +61,11 @@ const MAX_QUANTITY = 12;
 const MAX_VOLUME_ML = 3000;
 
 interface ServingWord {
-  /** A capful is read from text only: no size chip carries it. */
-  serving: ServingId | "capful";
+  /** Capfuls and sips are read from text only. */
+  serving: ServingId | "capful" | "sip";
   names: readonly string[];
   volumeMl: Partial<Record<DrinkGroup, number>>;
+  measureMl?: number;
 }
 
 /** Container words: they size the drink said with them, and mean nothing alone. */
@@ -84,10 +85,13 @@ const SERVING_WORDS: readonly ServingWord[] = [
   { serving: "pint", names: ["pinte", "pint", "halbe"], volumeMl: { beer: 500, cider: 500 } },
   { serving: "bottle", names: ["tercio"], volumeMl: { beer: 330, cider: 330 } },
   { serving: "shot", names: ["shot", "shooter", "chupito", "shottino", "cicchetto"], volumeMl: { spirit: 30 } },
-  // "Un bouchon de vodka": the bottle's cap used as a measure. Assumed to hold 10 ml, what the screw
-  // cap of a 70 cl spirit bottle holds filled to the brim. Said this way in French and English only.
-  { serving: "capful", names: ["bouchon", "capful"], volumeMl: { spirit: 10 } },
 ];
+
+// Approximate volumes per mouthful or filled bottle cap. Users can give an explicit size in ml.
+const SMALL_SERVINGS = [
+  { serving: "capful", names: ["bouchon", "bouchons", "capful", "capfuls"], ml: 10 },
+  { serving: "sip", names: ["gorgee", "gorgees", "gorge", "gorges", "sip", "sips"], ml: 15 },
+] as const;
 
 /** Words kept as typed except accents and case; "8,5" stays one number, "50cl" becomes "50 cl". */
 export function tokenize(text: string): string[] {
@@ -142,10 +146,15 @@ const emptyDraft = <P>(): Draft<P> => ({ quantity: null, preset: null, drink: nu
 export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[], options: OrderOptions<P> = {}): OrderLine<P>[] {
   const catalogue = options.catalogue ?? DRINK_CATALOGUE;
   // On a tie, a brand beats a generic preset, which beats a container word: "cidre" is the 4.5 % cider.
+  const measures = SMALL_SERVINGS.map(({ serving, names, ml }) =>
+    entry<P>({ kind: "serving", serving: { serving, names, volumeMl: {}, measureMl: ml } }, names),
+  );
+  const measureByName = new Map(measures.flatMap((candidate) => candidate.scored.map((name) => [name, candidate] as const)));
   const vocabulary: Entry<P>[] = [
     ...catalogue.map((drink) => entry<P>({ kind: "drink", drink }, catalogueNames(drink, options.names?.(drink) ?? []))),
     ...presets.map((c) => entry<P>({ kind: "preset", preset: c.value }, c.names)),
     ...SERVING_WORDS.map((serving) => entry<P>({ kind: "serving", serving }, serving.names)),
+    ...measures,
   ];
   const exactNames = new Set(vocabulary.flatMap((candidate) => candidate.scored));
   const words = tokenize(text);
@@ -155,6 +164,10 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
 
   // Longest phrase first: "grand verre de vin" before "verre", "castel rouge" before "rouge".
   const matchAt = (start: number): { entry: Entry<P>; span: number; guess: boolean; phrase: string } | null => {
+    const word = words[start]!;
+    const measure = measureByName.get(word);
+    // An exact measure starts a serving, even when the following drink is misspelled.
+    if (measure) return { entry: measure, span: 1, guess: false, phrase: word };
     for (let span = Math.min(4, words.length - start); span >= 1; span--) {
       const slice = words.slice(start, start + span);
       const phrase = slice.join(" ");
@@ -162,6 +175,8 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
       if ((boundary(slice[0]!) || boundary(slice[span - 1]!)) && !(span > 1 && exactNames.has(normalise(phrase)))) continue;
       const numericOnly = slice.every((w) => isNumber(w));
       const query = normalise(phrase);
+      // Everyday words can start an exact name, but "mal" alone does not mean Malibu.
+      if (isEverydayWord(slice[0]!) && !exactNames.has(query)) continue;
       let best: Entry<P> | null = null;
       let bestScore = Number.POSITIVE_INFINITY;
       let bestExact = false;
@@ -190,8 +205,6 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
           bestExact = exact;
         }
       }
-      // A phrase opened by an everyday word must be a name written exactly: "on se voit" is no Sex on the beach.
-      if (best && span > 1 && isEverydayWord(slice[0]!) && !bestExact) continue;
       if (best && bestScore <= span) {
         // Exact or the start of a name is sure; anything reached through a misspelling is a guess.
         const guess = !bestExact && bestScore > 0 && !best.scored.some((name) => name.startsWith(query));
@@ -213,13 +226,19 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
   const finish = (draft: Draft<P>): OrderLine<P> | null => {
     if (!draft.preset && !draft.drink) return null;
     const group = draft.drink?.group ?? groupOfPreset(draft.preset);
-    let volumeMl = draft.volumeMl;
+    const measureMl = draft.serving?.measureMl;
+    let volumeMl = draft.volumeMl ?? measureMl ?? null;
     if (volumeMl === null && draft.serving && group) {
       volumeMl = draft.serving.serving === "can" && draft.drink?.can ? draft.drink.volumeMl : (draft.serving.volumeMl[group] ?? null);
     }
     if (volumeMl === null && draft.drink && draft.preset && options.presetVolume) volumeMl = options.presetVolume(draft.preset.value);
     if (volumeMl !== null && (volumeMl <= 0 || volumeMl > MAX_VOLUME_ML)) volumeMl = null;
     let abv = draft.abv;
+    // A sip of a mix includes both liquid parts, even though the usual preset logs the spirit only.
+    if (abv === null && measureMl !== undefined && draft.drink?.combo) {
+      const { abv: spiritAbv, volumeMl: spiritMl, combo } = draft.drink;
+      abv = spiritAbv * spiritMl / (spiritMl + combo.mixerMl);
+    }
     if (abv !== null && (group ? !strengthFits(group, abv) : abv > 0.8)) abv = null;
     return {
       quantity: Math.min(MAX_QUANTITY, Math.max(1, draft.quantity ?? 1)),
@@ -269,8 +288,13 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
   while (i < words.length) {
     const word = words[i]!;
     const next = words[i + 1];
+    // "Malibu 2 bouchons" attaches the count to the drink when no other drink follows the measure.
+    const afterMeasure = words[i + 2];
+    const trailingMeasure = hasItem() && !line.serving && line.volumeMl === null
+      && next !== undefined && measureByName.has(next)
+      && (afterMeasure === undefined || SEPARATORS.has(afterMeasure));
     if (SEPARATORS.has(word)) {
-      if (hasItem()) flush();
+      flush();
       i += 1;
       continue;
     }
@@ -282,7 +306,7 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
     if (spelled !== undefined) {
       // "pinte à 8": the French "à" folds to "a", which is not "a pint" here.
       if (!(hasItem() && isNumber(next)) && next !== undefined) {
-        if (hasItem()) flush();
+        if ((!trailingMeasure && hasItem()) || line.serving?.measureMl !== undefined) flush();
         line.quantity = spelled;
       }
       i += 1;
@@ -316,7 +340,7 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
       const beforeItem = next !== undefined && matchAt(i + 1) !== null;
       if (whole && value >= 1 && value <= MAX_QUANTITY && beforeItem) {
         // "2 castel"; after a drink, "pinte 2 shots" starts the next one.
-        if (hasItem()) flush();
+        if ((!trailingMeasure && hasItem()) || line.serving?.measureMl !== undefined) flush();
         line.quantity = value;
       } else if (whole && CENTILITRE_SIZES.has(value) && (beforeItem || (hasItem() && line.volumeMl === null && !line.serving))) {
         line.volumeMl = value * 10;

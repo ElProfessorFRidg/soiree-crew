@@ -57,10 +57,36 @@ describe("drink catalogue", () => {
 });
 
 describe("order parser with brands", () => {
-  it("resolves Ruby to Leffe Ruby and recognises an explicit pint", () => {
+  it("resolves common mishearings of Leffe Ruby and Malibu", () => {
     expect(catalogueDrink("leffe-ruby")).toMatchObject({ volumeMl: 330, abv: 0.05 });
-    expect(parse("2 ruby")[0]).toMatchObject({ quantity: 2, drink: "leffe-ruby" });
-    expect(parse("pinte de ruby")[0]).toMatchObject({ drink: "leffe-ruby", volumeMl: 500 });
+    for (const name of ["ruby", "rubis", "lèvre rubis", "levre ruby", "Leffe Rüby"]) {
+      expect(parse(`2 ${name}`)).toEqual([{ quantity: 2, preset: null, drink: "leffe-ruby", volumeMl: null, abv: null }]);
+    }
+    expect(parse("pinte de rubis")[0]).toMatchObject({ drink: "leffe-ruby", volumeMl: 500 });
+    expect(parse("deux malibous")[0]).toMatchObject({ quantity: 2, drink: "malibu" });
+  });
+
+  it("keeps small measures attached to their drink despite missing accents and mistakes", () => {
+    expect(parse("deux bouchons de malibous et 3 gorgees de levre rubis")).toEqual([
+      { quantity: 2, preset: null, drink: "malibu", volumeMl: 10, abv: null },
+      { quantity: 3, preset: null, drink: "leffe-ruby", volumeMl: 15, abv: null },
+    ]);
+    expect(parse("un bouchom de malibou")[0]).toMatchObject({ drink: "malibu", volumeMl: 10 });
+    expect(parse("une gorge de rubis")[0]).toMatchObject({ drink: "leffe-ruby", volumeMl: 15 });
+    expect(parse("j’ai bu un bouchon de malibou")[0]).toMatchObject({ quantity: 1, drink: "malibu", volumeMl: 10 });
+    expect(parse("malibu deux bouchons")[0]).toMatchObject({ quantity: 2, drink: "malibu", volumeMl: 10 });
+    expect(parse("malibu 1 bouchon")[0]).toMatchObject({ drink: "malibu", volumeMl: 10 });
+    expect(parse("une gorgee de rubis 20 ml")[0]).toMatchObject({ drink: "leffe-ruby", volumeMl: 20 });
+    expect(parse("j’ai mal à la gorge, un whisky")).toEqual([{ quantity: 1, preset: null, drink: "whisky", volumeMl: null, abv: null }]);
+    expect(parse("gorgee et whisky")).toEqual([{ quantity: 1, preset: null, drink: "whisky", volumeMl: null, abv: null }]);
+    expect(parse("bouchon et gorgee")).toEqual([]);
+  });
+
+  it("accounts for the mixer in a sip of a named combo", () => {
+    const sip = parse("une gorgée de vodka red bull")[0]!;
+    expect(sip).toMatchObject({ drink: "vodka-red-bull", volumeMl: 15 });
+    expect(sip.abv).toBeCloseTo(0.4 * 40 / 290, 5);
+    expect(parse("gorgée de vodka red bull 20 ml")[0]).toMatchObject({ volumeMl: 20, abv: sip.abv });
   });
 
   it("keeps tokens a person types as one: decimals, units, percent", () => {
