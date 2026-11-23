@@ -2987,6 +2987,15 @@
   ],
   "news": [
     {
+      "identifier": "ota-v0.2.17-preview.28+build.311-ipad-45238650796.1",
+      "title": "Soirée Crew Preview 0.2.17 · OTA",
+      "caption": "• Gate merges on the route the build took, not on the ios jobs",
+      "date": "2026-11-23T18:35:38Z",
+      "appID": "app.soireecrew.mobile.preview",
+      "tintColor": "F4B33D",
+      "notify": false
+    },
+    {
       "identifier": "ota-v0.2.17-preview.28+build.311-ipad-45234232160.1",
       "title": "Soirée Crew Preview 0.2.17 · OTA",
       "caption": "• Do not count server deployment files as app changes",
@@ -3192,20 +3201,17 @@
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.9-preview.18%2Bbuild.267/soiree-crew-ipad-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
-    },
-    {
-      "identifier": "preview-0.2.9-269",
-      "title": "Soirée Crew Preview 0.2.9 (269)",
-      "caption": "• Bump @noble/hashes from 2.0.1 to 2.4.0",
-      "date": "2026-11-20T20:56:13Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/ipad/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.9-preview.23%2Bbuild.269/soiree-crew-ipad-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
-      "notify": false
     }
   ],
   "otaChangelog": [
+    {
+      "id": "ota-v0.2.17-preview.28+build.311-ipad-45238650796.1",
+      "channel": "preview",
+      "version": "0.2.17",
+      "build": 311,
+      "date": "2026-11-23T18:35:38Z",
+      "notes": "• Gate merges on the route the build took, not on the ios jobs"
+    },
     {
       "id": "ota-v0.2.17-preview.28+build.311-ipad-45234232160.1",
       "channel": "preview",
