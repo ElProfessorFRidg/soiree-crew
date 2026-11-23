@@ -841,16 +841,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -863,6 +863,28 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.12",
+          "buildVersion": "298",
+          "marketingVersion": "0.2.12 Preview (298)",
+          "date": "2026-11-23T15:33:20Z",
+          "localizedDescription": "• Expand indexed drink catalogue beyond 5,000 references\n• Add IBA cocktails and parse spoken centilitre measures\n• Import 2,861 beers and build an offline catalogue name index\n• Add 96 more catalogue references across six drink groups\n• Expand all six drink catalogue groups\n• Add 64 whiskies, vodkas, liqueurs and beers\n• Add 44 Belgian beers including Mouscron breweries",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.12-preview.29%2Bbuild.298/soiree-crew-unsigned.ipa",
+          "size": 23169053,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.12",
           "buildVersion": "291",
@@ -1569,25 +1591,36 @@
         }
       ],
       "version": "0.2.12",
-      "versionDate": "2026-11-23T13:47:02Z",
-      "versionDescription": "• Reserve short IPA versions without collisions\n• Automate OTA and IPA routing, versioning and release news\n• Add opt-in Expo OTA updates for iOS releases",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.12-preview.28%2Bbuild.291/soiree-crew-unsigned.ipa",
-      "size": 23530872,
+      "versionDate": "2026-11-23T15:33:20Z",
+      "versionDescription": "• Expand indexed drink catalogue beyond 5,000 references\n• Add IBA cocktails and parse spoken centilitre measures\n• Import 2,861 beers and build an offline catalogue name index\n• Add 96 more catalogue references across six drink groups\n• Expand all six drink catalogue groups\n• Add 64 whiskies, vodkas, liqueurs and beers\n• Add 44 Belgian beers including Mouscron breweries",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.12-preview.29%2Bbuild.298/soiree-crew-unsigned.ipa",
+      "size": 23169053,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.28%2Bbuild.291/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "preview-0.2.12-298",
+      "title": "Soirée Crew Preview 0.2.12 (298)",
+      "caption": "• Expand indexed drink catalogue beyond 5,000 references\n• Add IBA cocktails and parse spoken centilitre measures\n• Import 2,861 beers and build an offline catalogue name index\n• Add 96 more catalogue references across six drink groups\n• Expand all six drink catalogue groups\n• Add 64 whiskies, vodkas, liqueurs and beers\n• Add 44 Belgian beers including Mouscron breweries",
+      "date": "2026-11-23T15:33:20Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.12-preview.29%2Bbuild.298/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
     {
       "identifier": "preview-0.2.12-291",
       "title": "Soirée Crew Preview 0.2.12 (291)",
@@ -1710,17 +1743,6 @@
       "notify": false
     },
     {
-      "identifier": "preview-0.2.9-267",
-      "title": "Soirée Crew Preview 0.2.9 (267)",
-      "caption": "• Bump @noble/ciphers from 2.1.1 to 2.4.0",
-      "date": "2026-11-20T20:58:44Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.18%2Bbuild.267/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.9-preview.18%2Bbuild.267/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
-      "notify": false
-    },
-    {
       "identifier": "preview-0.2.9-269",
       "title": "Soirée Crew Preview 0.2.9 (269)",
       "caption": "• Bump @noble/hashes from 2.0.1 to 2.4.0",
@@ -1728,6 +1750,17 @@
       "tintColor": "F4B33D",
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.23%2Bbuild.269/iphone/banner.png",
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.9-preview.23%2Bbuild.269/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
+    {
+      "identifier": "preview-0.2.9-267",
+      "title": "Soirée Crew Preview 0.2.9 (267)",
+      "caption": "• Bump @noble/ciphers from 2.1.1 to 2.4.0",
+      "date": "2026-11-20T20:58:44Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.18%2Bbuild.267/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.9-preview.18%2Bbuild.267/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
     },
@@ -1743,35 +1776,13 @@
       "notify": false
     },
     {
-      "identifier": "preview-0.2.8-257",
-      "title": "Soirée Crew Preview 0.2.8 (257)",
-      "caption": "• Bump @fastify/cors from 11.3.1 to 11.4.3",
-      "date": "2026-11-20T20:10:42Z",
+      "identifier": "preview-0.2.8-263",
+      "title": "Soirée Crew Preview 0.2.8 (263)",
+      "caption": "• Stop previous-account refresh chains and inbox flags after logout\n• Stop countdowns when the app loses foreground\n• Stop countdowns when the app loses foreground\n• Keep drawing arena usable on compact screens\n• Prevent duplicate head-to-head round advancement\n• Prevent simultaneous curve starts and cancel stale countdowns\n• Verify delayed invitations and inbox responses cannot cross accounts\n• Reject stale invitations, notification and venue responses\n• Reject stale invitations, notification and venue responses\n• Reject stale invitations, notification and venue responses\n• Identify both opponents during head-to-head rounds\n• Identify both opponents during head-to-head rounds\n• Support accessible two-player highlight banners\n• Serialize category erasure and guard against session changes\n• Cover session guards for sign-out and account/server switching\n• Prevent stale optimistic rollbacks and SOS clears after sign-out\n• Ignore obsolete websocket events and preserve new socket on reconnect\n• Prevent stale radar and SOS responses crossing accounts\n• Isolate crew, party and live responses across session changes\n• Discard stale sync payloads after account changes\n• Add identity guard for in-flight authenticated responses\n• Cancel stale fuse resume when round state changes\n• Surface selected player on wheel and curve result\n• Surface selected player on wheel and curve result\n• Prevent concurrent Point Blank countdowns and stale callbacks\n• Make truth-or-dare resolution single-flight across taps and swipes\n• Prevent overlapping fuse resume timers and clear on unmount\n• Show active player in more game states\n• Show active player in more game states\n• Show active player in more game states\n• Identify active reader and driver across more mini-games\n• Identify active reader and driver across more mini-games\n• Identify active reader and driver across more mini-games\n• Highlight current player during gameplay\n• Highlight current player during gameplay\n• Highlight current player during gameplay\n• Add accessible animated active-turn banner to shared shell",
+      "date": "2026-11-20T19:44:24Z",
       "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.20%2Bbuild.257/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
-      "notify": false
-    },
-    {
-      "identifier": "preview-0.2.8-258",
-      "title": "Soirée Crew Preview 0.2.8 (258)",
-      "caption": "• Bump zustand from 5.0.16 to 5.1.0",
-      "date": "2026-11-20T19:56:44Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.21%2Bbuild.258/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.21%2Bbuild.258/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
-      "notify": false
-    },
-    {
-      "identifier": "preview-0.2.8-256",
-      "title": "Soirée Crew Preview 0.2.8 (256)",
-      "caption": "• Bump react-native-gesture-handler from 3.3.0 to 3.5.0",
-      "date": "2026-11-20T19:53:11Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.19%2Bbuild.256/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.19%2Bbuild.256/soiree-crew-unsigned.ipa",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.13%2Bbuild.263/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
     },
@@ -1787,29 +1798,39 @@
       "notify": false
     },
     {
-      "identifier": "preview-0.2.8-263",
-      "title": "Soirée Crew Preview 0.2.8 (263)",
-      "caption": "• Stop previous-account refresh chains and inbox flags after logout\n• Stop countdowns when the app loses foreground\n• Stop countdowns when the app loses foreground\n• Keep drawing arena usable on compact screens\n• Prevent duplicate head-to-head round advancement\n• Prevent simultaneous curve starts and cancel stale countdowns\n• Verify delayed invitations and inbox responses cannot cross accounts\n• Reject stale invitations, notification and venue responses\n• Reject stale invitations, notification and venue responses\n• Reject stale invitations, notification and venue responses\n• Identify both opponents during head-to-head rounds\n• Identify both opponents during head-to-head rounds\n• Support accessible two-player highlight banners\n• Serialize category erasure and guard against session changes\n• Cover session guards for sign-out and account/server switching\n• Prevent stale optimistic rollbacks and SOS clears after sign-out\n• Ignore obsolete websocket events and preserve new socket on reconnect\n• Prevent stale radar and SOS responses crossing accounts\n• Isolate crew, party and live responses across session changes\n• Discard stale sync payloads after account changes\n• Add identity guard for in-flight authenticated responses\n• Cancel stale fuse resume when round state changes\n• Surface selected player on wheel and curve result\n• Surface selected player on wheel and curve result\n• Prevent concurrent Point Blank countdowns and stale callbacks\n• Make truth-or-dare resolution single-flight across taps and swipes\n• Prevent overlapping fuse resume timers and clear on unmount\n• Show active player in more game states\n• Show active player in more game states\n• Show active player in more game states\n• Identify active reader and driver across more mini-games\n• Identify active reader and driver across more mini-games\n• Identify active reader and driver across more mini-games\n• Highlight current player during gameplay\n• Highlight current player during gameplay\n• Highlight current player during gameplay\n• Add accessible animated active-turn banner to shared shell",
-      "date": "2026-11-20T19:44:24Z",
+      "identifier": "preview-0.2.8-258",
+      "title": "Soirée Crew Preview 0.2.8 (258)",
+      "caption": "• Bump zustand from 5.0.16 to 5.1.0",
+      "date": "2026-11-20T19:56:44Z",
       "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.13%2Bbuild.263/soiree-crew-unsigned.ipa",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.21%2Bbuild.258/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.21%2Bbuild.258/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
     },
     {
-      "identifier": "preview-0.2.8-254",
-      "title": "Soirée Crew Preview 0.2.8 (254)",
-      "caption": "• Bump @noble/ciphers from 2.1.1 to 2.4.0",
-      "date": "2026-11-20T19:30:27Z",
+      "identifier": "preview-0.2.8-257",
+      "title": "Soirée Crew Preview 0.2.8 (257)",
+      "caption": "• Bump @fastify/cors from 11.3.1 to 11.4.3",
+      "date": "2026-11-20T20:10:42Z",
       "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.18%2Bbuild.254/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.18%2Bbuild.254/soiree-crew-unsigned.ipa",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.20%2Bbuild.257/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.20%2Bbuild.257/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
+    {
+      "identifier": "preview-0.2.8-256",
+      "title": "Soirée Crew Preview 0.2.8 (256)",
+      "caption": "• Bump react-native-gesture-handler from 3.3.0 to 3.5.0",
+      "date": "2026-11-20T19:53:11Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.19%2Bbuild.256/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.19%2Bbuild.256/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
     }
   ],
-  "otaChangelog": [],
   "allowDowngrades": true,
   "changelog": [
     {
@@ -2147,6 +2168,13 @@
       "buildVersion": "2",
       "date": "2026-10-27T00:43:05Z",
       "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.12",
+      "buildVersion": "298",
+      "date": "2026-11-23T15:33:20Z",
+      "localizedDescription": "• Expand indexed drink catalogue beyond 5,000 references\n• Add IBA cocktails and parse spoken centilitre measures\n• Import 2,861 beers and build an offline catalogue name index\n• Add 96 more catalogue references across six drink groups\n• Expand all six drink catalogue groups\n• Add 64 whiskies, vodkas, liqueurs and beers\n• Add 44 Belgian beers including Mouscron breweries"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
