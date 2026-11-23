@@ -24,7 +24,7 @@ export const en: GameMessages = {
     title: "Crew cards",
     open: "Crew cards",
     needCrew: "Join a crew to write your own cards.",
-    intro: "Your jokes, your stories, your questions. The admin approves them before they turn up in a game.",
+    intro: "The admin approves cards before they appear in a game.",
     game: "For which game",
     level: "Level",
     text: "The card",
@@ -104,7 +104,6 @@ export const en: GameMessages = {
   setup: {
     rulesPosition: "Rule {index} of {count}",
     nextRule: "Next",
-    rulesHint: "Tap ? to see them again mid-game.",
     playersLabel: "Players, in order",
     addPlaceholder: "Name",
     addPlayer: "Add player",

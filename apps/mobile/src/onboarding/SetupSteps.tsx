@@ -30,7 +30,6 @@ export function RegionStep() {
   return (
     <>
       <Text variant="h1">{i18n.t("journey.regionTitle")}</Text>
-      <Text muted>{i18n.t("journey.regionWhy")}</Text>
       <Panel>
         <Row title={i18n.t("journey.regionCountry")} subtitle={i18n.t(`countries.${preferences.legalCountry}` as "countries.FR")} leading={<Icon name="flag" color={theme.textMuted} />} />
         <Row title={i18n.t("journey.regionLanguage")} subtitle={i18n.t(`languages.${preferences.language}`)} leading={<Icon name="chat" color={theme.textMuted} />} />
@@ -136,7 +135,6 @@ export function ClosingStep({
   return (
     <>
       <Text variant="h1">{i18n.t("journey.closingTitle", { name })}</Text>
-      <Text muted>{i18n.t("journey.closingBody")}</Text>
       <View style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.line }]}>
         <View style={styles.head}>
           {photo ? <Image source={{ uri: photo }} style={[styles.photo, { borderColor: theme.amber }]} accessibilityIgnoresInvertColors /> : <Avatar personId={personId} name={name} size={64} ring={theme.amber} />}

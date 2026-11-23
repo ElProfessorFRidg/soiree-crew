@@ -98,7 +98,7 @@ function CrewCard({ delay }: { delay: number }) {
   const names = i18n.t("onboarding.cardCrewNames").split(",").map((n) => n.trim());
   return (
     <Panel>
-      <View style={styles.crew} accessible accessibilityLabel={`${i18n.t("onboarding.cardCrew")}. ${i18n.t("onboarding.cardCrewBody")}`}>
+      <View style={styles.crew} accessible accessibilityLabel={i18n.t("onboarding.cardCrew")}>
         <View style={styles.faces}>
           {names.map((name, index) => (
             <Animated.View
@@ -112,7 +112,6 @@ function CrewCard({ delay }: { delay: number }) {
         </View>
         <View style={styles.flex}>
           <Text variant="h3">{i18n.t("onboarding.cardCrew")}</Text>
-          <Text variant="small">{i18n.t("onboarding.cardCrewBody")}</Text>
         </View>
       </View>
     </Panel>
@@ -130,10 +129,9 @@ function GamesCard({ delay }: { delay: number }) {
   const roll = useAnimatedStyle(() => ({ transform: [{ rotate: `${turn.value * 360}deg` }] }));
   return (
     <Panel>
-      <View style={styles.games} accessible accessibilityLabel={`${i18n.t("onboarding.cardGames")}. ${i18n.t("onboarding.cardGamesBody")}`}>
+      <View style={styles.games} accessible accessibilityLabel={i18n.t("onboarding.cardGames")}>
         <View style={styles.flex}>
           <Text variant="h3">{i18n.t("onboarding.cardGames")}</Text>
-          <Text variant="small">{i18n.t("onboarding.cardGamesBody")}</Text>
         </View>
         <View style={styles.icons}>
           <Animated.View style={roll}>

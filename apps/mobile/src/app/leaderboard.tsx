@@ -319,7 +319,6 @@ function BarTitles({ crewId }: { crewId: string }) {
   return (
     <>
       <Text variant="label">{i18n.t("ranking.bars")}</Text>
-      <Text variant="small">{i18n.t("ranking.barsHint")}</Text>
       <View>
         {rows.map((row, index) => (
           <View key={row.userId} style={[styles.row, { borderBottomColor: theme.line, borderBottomWidth: index === rows.length - 1 ? 0 : 1 }]}>

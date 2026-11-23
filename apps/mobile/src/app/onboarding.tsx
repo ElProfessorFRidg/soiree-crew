@@ -470,7 +470,6 @@ function Welcome({ onCreate, onSignIn, onGuest, signedIn }: { onCreate: () => vo
       <Text variant="h1" style={styles.hero}>
         {i18n.t("onboarding.welcomeTitle")}
       </Text>
-      <Text muted>{i18n.t("onboarding.welcomeBody")}</Text>
       <ValueCards />
       <View style={styles.actions}>
         {signedIn ? (

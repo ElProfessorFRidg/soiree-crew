@@ -99,9 +99,7 @@ export default function HistoryScreen() {
           ))}
         </ScrollView>
       ) : null}
-      <Text variant="small">
-        {i18n.t("history.boundaryNote", { time: boundary })} {i18n.t("history.swipeEditHint")}
-      </Text>
+      {groups.length > 0 ? <Text variant="small">{i18n.t("history.swipeEditHint")}</Text> : null}
       {groups.length === 0 && tonightWater.length === 0 ? <EmptyState icon="glass" text={i18n.t("history.empty")} /> : null}
       {groups.map((group) => {
         const first = group.drinks[0]!;
