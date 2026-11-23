@@ -5,6 +5,7 @@ import {
   localName,
   normalise,
   DRINK_CATALOGUE,
+  catalogueSearchCandidates,
   SHELF_ORDER,
   GROUP_SPECS,
   sizesFor,
@@ -71,7 +72,9 @@ export function brandsOf(group: DrinkGroup, country?: string | null): CatalogueD
 /** Brands of the group whose name or nickname is close to what was typed, typos forgiven. */
 export function filterBrands(brands: readonly CatalogueDrink[], query: string, i18n: Translator): CatalogueDrink[] {
   if (!query.trim()) return [...brands];
+  const candidates = new Set(catalogueSearchCandidates(query));
   return brands
+    .filter((drink) => candidates.has(drink))
     .map((drink) => ({ drink, score: bestScore(query, searchNames(drink, i18n)) }))
     .filter((hit) => Number.isFinite(hit.score) && hit.score <= MAX_SCORE)
     .sort((a, b) => a.score - b.score)
@@ -165,7 +168,8 @@ export function readOrder(text: string, presets: readonly DrinkPreset[], i18n: T
   }));
   const byId = new Map(presets.map((p) => [p.id, p]));
   return parseDrinkOrder(text, candidates, {
-    names: (drink) => [...(drink.generic ? [catalogueLabel(drink, i18n), catalogueLabel(drink, FR), catalogueLabel(drink, EN)] : []), ...(learned.get(drink.id) ?? [])],
+    names: (drink) => drink.generic ? [catalogueLabel(drink, i18n), catalogueLabel(drink, FR), catalogueLabel(drink, EN)] : [],
+    learnedNames: learned,
     bonus: habitBonus(),
     presetVolume: (id) => byId.get(id)?.volumeMl ?? 0,
     presetGroup: (id) => {
@@ -181,7 +185,7 @@ export function readOrder(text: string, presets: readonly DrinkPreset[], i18n: T
  */
 export function searchCatalogue(query: string, i18n: Translator, limit = 6, country?: string | null): CatalogueDrink[] {
   if (!query.trim()) return [];
-  return DRINK_CATALOGUE.map((drink) => ({ drink, score: bestScore(query, searchNames(drink, i18n)) + countryRank(drink, country) * 0.3 }))
+  return catalogueSearchCandidates(query).map((drink) => ({ drink, score: bestScore(query, searchNames(drink, i18n)) + countryRank(drink, country) * 0.3 }))
     .filter((hit) => Number.isFinite(hit.score) && hit.score <= MAX_SCORE)
     .sort((a, b) => a.score - b.score)
     .slice(0, limit)

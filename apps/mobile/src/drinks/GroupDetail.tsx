@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, TextInput, View } from "react-native";
+import { FlatList, ScrollView, StyleSheet, TextInput, View } from "react-native";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 import { duration, radius, space } from "@crew/design-tokens";
 import { catalogueDrink, type CatalogueDrink, type DrinkGroup } from "@crew/fuzzy";
@@ -83,14 +83,21 @@ export function GroupDetail({ group, choice, unit, houseAbv, onChange }: Props) 
               style={[styles.filter, { color: theme.text, backgroundColor: theme.surface, borderColor: theme.line }]}
             />
           ) : null}
-          {/* One scrolling row: twenty brands of beer must not push the Add button off screen. */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" style={styles.bleed} contentContainerStyle={styles.scrollRow}>
-            <Chip label={i18n.t("drinkCatalogue.noBrand")} selected={!brand} onPress={() => pickBrand(null)} />
-            {brands.length === 0 ? <Text variant="small" style={styles.none}>{i18n.t("drinkCatalogue.brandNone")}</Text> : null}
-            {brands.map((b) => (
-              <Chip key={b.id} label={catalogueLabel(b, i18n)} selected={brand?.id === b.id} onPress={() => pickBrand(b)} />
-            ))}
-          </ScrollView>
+          <FlatList
+            horizontal
+            data={brands}
+            keyExtractor={item => item.id}
+            extraData={brand?.id}
+            showsHorizontalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            style={styles.bleed}
+            contentContainerStyle={styles.scrollRow}
+            ListHeaderComponent={<Chip label={i18n.t("drinkCatalogue.noBrand")} selected={!brand} onPress={() => pickBrand(null)} />}
+            ListEmptyComponent={<Text variant="small" style={styles.none}>{i18n.t("drinkCatalogue.brandNone")}</Text>}
+            renderItem={({ item }) => (
+              <Chip label={catalogueLabel(item, i18n)} selected={brand?.id === item.id} onPress={() => pickBrand(item)} />
+            )}
+          />
         </View>
       ) : null}
 

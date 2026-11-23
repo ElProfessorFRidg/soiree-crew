@@ -7,6 +7,10 @@
 
 import { FIRST_LIST_COUNTRIES, MORE_DRINKS, SHORT_NAMES } from "./brands";
 import { MIXES_AND_SHOTS } from "./mixes";
+import barAssistantRows from "./data/bar-assistant.json";
+import trackCaffeineRows from "./data/trackcaffeine-drinks.json";
+import openFoodFactsRows from "./data/openfoodfacts-drinks.json";
+import openBeerRows from "./data/openbeerdb.json";
 
 export type DrinkGroup = "beer" | "wine" | "spirit" | "cocktail" | "cider" | "soft";
 
@@ -199,7 +203,7 @@ const FIRST_LIST: readonly CatalogueDrink[] = [
  * then the mixes and shots ordered by name (mixes.ts). A misspelling as close to a brand as to a
  * mix named after it ("zubrikov") goes to the brand: the earlier drink wins a tie.
  */
-export const DRINK_CATALOGUE: readonly CatalogueDrink[] = [
+export const CORE_DRINK_CATALOGUE: readonly CatalogueDrink[] = [
   ...FIRST_LIST.map((drink) => {
     const countries = FIRST_LIST_COUNTRIES[drink.id] ?? ["FR"];
     return countries.length ? { ...drink, countries } : drink;
@@ -211,12 +215,70 @@ export const DRINK_CATALOGUE: readonly CatalogueDrink[] = [
   return short && !drink.short ? { ...drink, short } : drink;
 });
 
+/** Imported labels have a serving default; their source has no package size. */
+export const OPEN_BEER_CATALOGUE: readonly CatalogueDrink[] = (
+  openBeerRows as unknown as readonly (readonly [number, string, string, number, string])[]
+).map(([id, brand, alias, abv, country]) => ({
+  id: `openbeerdb-${id}`,
+  brand,
+  group: "beer",
+  abv: abv / 100,
+  volumeMl: 330,
+  glass: "bottle",
+  aliases: alias ? [alias] : [],
+  ...(country ? { countries: [country] } : {}),
+}));
+
+export const BAR_ASSISTANT_CATALOGUE: readonly CatalogueDrink[] = (
+  barAssistantRows as unknown as readonly (readonly [string, string, number, number])[]
+).map(([id, brand, volumeMl, abv]) => ({
+  id: `bar-assistant-${id}`,
+  brand,
+  group: "cocktail",
+  volumeMl,
+  abv: abv / 100,
+  glass: "cocktail",
+  aliases: [],
+}));
+
+type SoftDrinkRow = readonly [sourceId: string, name: string, volumeMl: number];
+
+function importedSoftDrinks(source: string, rows: readonly SoftDrinkRow[]): CatalogueDrink[] {
+  return rows.map(([id, brand, volumeMl]) => ({
+    id: `${source}-${id}`,
+    brand,
+    group: "soft",
+    volumeMl,
+    abv: 0,
+    glass: "soft",
+    aliases: [],
+  }));
+}
+
+export const OPEN_FOOD_FACTS_CATALOGUE = importedSoftDrinks(
+  "openfoodfacts", openFoodFactsRows as unknown as readonly SoftDrinkRow[],
+);
+export const TRACK_CAFFEINE_CATALOGUE = importedSoftDrinks(
+  "trackcaffeine", trackCaffeineRows as unknown as readonly SoftDrinkRow[],
+);
+
+const importedCatalogue = [...OPEN_BEER_CATALOGUE, ...BAR_ASSISTANT_CATALOGUE, ...OPEN_FOOD_FACTS_CATALOGUE, ...TRACK_CAFFEINE_CATALOGUE];
+const importedIds = new Set(importedCatalogue.map(drink => drink.id));
+
+export function isImportedDrink(id: string): boolean {
+  return importedIds.has(id);
+}
+
+export const DRINK_CATALOGUE: readonly CatalogueDrink[] = [...CORE_DRINK_CATALOGUE, ...importedCatalogue];
+
+const catalogueById = new Map(DRINK_CATALOGUE.map((drink) => [drink.id, drink]));
+
 /**
  * The order of the add sheet's brand chips: the French list, then the mixes and shots (the shot
  * glass shows TGV and B-52 before the seventy bottles), then the other brands.
  */
 export const SHELF_ORDER: ReadonlyMap<string, number> = new Map(
-  [...FIRST_LIST.map((d) => d.id), ...MIXES_AND_SHOTS.map((d) => d.id), ...MORE_DRINKS.map((d) => d.id)].map((id, index) => [id, index]),
+  [...FIRST_LIST.map((d) => d.id), ...MIXES_AND_SHOTS.map((d) => d.id), ...MORE_DRINKS.map((d) => d.id), ...importedCatalogue.map((d) => d.id)].map((id, index) => [id, index]),
 );
 
 /** Names a size chip or a typed word can carry. The app translates them. */
@@ -353,7 +415,7 @@ export function shownNames(drink: CatalogueDrink): ShownName[] {
 }
 
 export function catalogueDrink(id: string, catalogue: readonly CatalogueDrink[] = DRINK_CATALOGUE): CatalogueDrink | undefined {
-  return catalogue.find((drink) => drink.id === id);
+  return catalogue === DRINK_CATALOGUE ? catalogueById.get(id) : catalogue.find((drink) => drink.id === id);
 }
 
 /** The combo made of these two drinks, in either order: Poliakov and Red Bull make one drink. */
