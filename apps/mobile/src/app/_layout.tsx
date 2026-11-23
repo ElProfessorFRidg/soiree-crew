@@ -28,6 +28,7 @@ import { loadSession, useSession } from "@/server/session";
 import { refreshCalendarReminders, sendClock, watchCalendarReminders } from "@/server/calendarData";
 import { useSyncFeedback } from "@/sync/feedback";
 import { CompatibilityToastHost, useCompatibilityFeedback } from "@/system/compatibilityFeedback";
+import { OtaNotices } from "@/system/OtaNotices";
 import { useDriverReminder } from "@/party/driverReminder";
 import { flush } from "@/sync/engine";
 import { followPhoneHourCycle, isOnboarded, useAppStore } from "@/state/store";
@@ -385,6 +386,7 @@ export default function RootLayout() {
               </Stack>
               <ConfirmDialogHost />
               <CompatibilityToastHost />
+      <OtaNotices />
               <HeroOverlay />
               <PermissionPrompt />
               <PrivacyCover />

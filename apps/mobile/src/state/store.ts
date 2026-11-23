@@ -58,6 +58,8 @@ export interface AppState {
   updateCheckedAt: number | null;
   /** O-12: `version` is null for releases named before version names (build number only). */
   latestRelease: { build: number; version?: string | null; url: string } | null;
+  /** Last OTA update the person was told about, so "updated" shows once per update (system/OtaNotices). */
+  seenOtaUpdateId: string | null;
   /** QOL-23: the last few searches, newest first, on this phone only. */
   recentSearches: string[];
   /** PROF-10: the privacy summary opened once, the first time something went public. */
@@ -183,6 +185,7 @@ export const useAppStore = create<AppState>()(
       updateAnnounced: null,
       updateCheckedAt: null,
       latestRelease: null,
+      seenOtaUpdateId: null,
       recentSearches: [],
       privacySummarySeen: false,
       barHave: [],
