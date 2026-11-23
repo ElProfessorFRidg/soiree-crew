@@ -7,6 +7,7 @@
 
 import { FIRST_LIST_COUNTRIES, MORE_DRINKS, SHORT_NAMES } from "./brands";
 import { MIXES_AND_SHOTS } from "./mixes";
+import openBeerRows from "./data/openbeerdb.json";
 
 export type DrinkGroup = "beer" | "wine" | "spirit" | "cocktail" | "cider" | "soft";
 
@@ -199,7 +200,7 @@ const FIRST_LIST: readonly CatalogueDrink[] = [
  * then the mixes and shots ordered by name (mixes.ts). A misspelling as close to a brand as to a
  * mix named after it ("zubrikov") goes to the brand: the earlier drink wins a tie.
  */
-export const DRINK_CATALOGUE: readonly CatalogueDrink[] = [
+export const CORE_DRINK_CATALOGUE: readonly CatalogueDrink[] = [
   ...FIRST_LIST.map((drink) => {
     const countries = FIRST_LIST_COUNTRIES[drink.id] ?? ["FR"];
     return countries.length ? { ...drink, countries } : drink;
@@ -211,12 +212,30 @@ export const DRINK_CATALOGUE: readonly CatalogueDrink[] = [
   return short && !drink.short ? { ...drink, short } : drink;
 });
 
+/** Imported labels have a serving default; their source has no package size. */
+export const OPEN_BEER_CATALOGUE: readonly CatalogueDrink[] = (
+  openBeerRows as unknown as readonly (readonly [number, string, string, number, string])[]
+).map(([id, brand, alias, abv, country]) => ({
+  id: `openbeerdb-${id}`,
+  brand,
+  group: "beer",
+  abv: abv / 100,
+  volumeMl: 330,
+  glass: "bottle",
+  aliases: alias ? [alias] : [],
+  ...(country ? { countries: [country] } : {}),
+}));
+
+export const DRINK_CATALOGUE: readonly CatalogueDrink[] = [...CORE_DRINK_CATALOGUE, ...OPEN_BEER_CATALOGUE];
+
+const catalogueById = new Map(DRINK_CATALOGUE.map((drink) => [drink.id, drink]));
+
 /**
  * The order of the add sheet's brand chips: the French list, then the mixes and shots (the shot
  * glass shows TGV and B-52 before the seventy bottles), then the other brands.
  */
 export const SHELF_ORDER: ReadonlyMap<string, number> = new Map(
-  [...FIRST_LIST.map((d) => d.id), ...MIXES_AND_SHOTS.map((d) => d.id), ...MORE_DRINKS.map((d) => d.id)].map((id, index) => [id, index]),
+  [...FIRST_LIST.map((d) => d.id), ...MIXES_AND_SHOTS.map((d) => d.id), ...MORE_DRINKS.map((d) => d.id), ...OPEN_BEER_CATALOGUE.map((d) => d.id)].map((id, index) => [id, index]),
 );
 
 /** Names a size chip or a typed word can carry. The app translates them. */
@@ -353,7 +372,7 @@ export function shownNames(drink: CatalogueDrink): ShownName[] {
 }
 
 export function catalogueDrink(id: string, catalogue: readonly CatalogueDrink[] = DRINK_CATALOGUE): CatalogueDrink | undefined {
-  return catalogue.find((drink) => drink.id === id);
+  return catalogue === DRINK_CATALOGUE ? catalogueById.get(id) : catalogue.find((drink) => drink.id === id);
 }
 
 /** The combo made of these two drinks, in either order: Poliakov and Red Bull make one drink. */
