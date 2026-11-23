@@ -1536,6 +1536,8 @@ export const de: Messages = {
     preview: "Preview",
     channel: "Kanal",
     otaRevision: "OTA-Update {revision}",
+    otaIdle: "OTA aktiv · noch keine Korrektur erhalten ({channel})",
+    otaOff: "OTA nicht in dieser IPA aktiviert",
     otaDownloading: "Update wird heruntergeladen…",
     otaApply: "Zum Anwenden neu starten",
     otaRestart: "Neu starten",
