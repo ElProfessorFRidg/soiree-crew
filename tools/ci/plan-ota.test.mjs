@@ -32,10 +32,14 @@ it.each([
   "apps/mobile/app.config.ts",
   "apps/mobile/package.json",
   "pnpm-lock.yaml",
-  ".github/workflows/build.yml",
+  "apps/mobile/certs/ota-certificate.pem",
   "apps/mobile/src/module.swift",
 ])("requires a new IPA when %s changes", (path) => {
   expect(() => planUpdate({ ...preview, paths: [path] })).toThrow("require a new IPA");
+});
+
+it("lets CI-only changes ride along with an OTA update", () => {
+  expect(() => planUpdate({ ...preview, paths: [".github/workflows/build.yml", "tools/ci/report-route.mjs", "apps/mobile/src/i18n/fr.ts"] })).not.toThrow();
 });
 
 it("rejects another device, build, channel, update server or server configuration", () => {
