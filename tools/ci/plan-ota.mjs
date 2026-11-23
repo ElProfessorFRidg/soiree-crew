@@ -20,10 +20,10 @@ export function planUpdate({ tag, target, info, otaUrl, serverUrl = "", publicSe
       info.updates.build !== build || info.updates.serverConfig !== serverConfig) {
     throw new Error("Expo Updates and the current configuration must match the selected IPA");
   }
-  // CI orchestration does not ship in the app: the checks above already compare the update
+  // CI orchestration and server deployment files do not ship in the app: the checks above already compare the update
   // configuration with the IPA, so workflow and CI tool changes alone do not need a new binary.
   const changed = paths.filter((path) => !path.startsWith("docs/") && !path.startsWith("apps/server/") && !/^[\w-]+\.md$/i.test(path)
-    && !path.startsWith(".github/") && !path.startsWith("tools/ci/"));
+    && !path.startsWith(".github/") && !path.startsWith("tools/ci/") && !path.startsWith("deploy/"));
   const native = changed.filter((path) => !sourcePattern.test(path));
   if (native.length) {
     const list = native.slice(0, 15).map((path) => `\n- ${path}`).join("") + (native.length > 15 ? `\n- … ${native.length - 15} more` : "");

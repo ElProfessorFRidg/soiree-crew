@@ -38,8 +38,8 @@ it.each([
   expect(() => planUpdate({ ...preview, paths: [path] })).toThrow("require a new IPA");
 });
 
-it("lets CI-only changes ride along with an OTA update", () => {
-  expect(() => planUpdate({ ...preview, paths: [".github/workflows/build.yml", "tools/ci/report-route.mjs", "apps/mobile/src/i18n/fr.ts"] })).not.toThrow();
+it("lets CI and server deployment changes ride along with an OTA update", () => {
+  expect(() => planUpdate({ ...preview, paths: [".github/workflows/build.yml", "tools/ci/report-route.mjs", "deploy/ota/server.mjs", "apps/mobile/src/i18n/fr.ts"] })).not.toThrow();
 });
 
 it("rejects another device, build, channel, update server or server configuration", () => {
