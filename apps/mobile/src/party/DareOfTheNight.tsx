@@ -42,7 +42,7 @@ export function DareOfTheNight({ now }: { now: number }) {
     <Panel>
       <Text variant="label">{i18n.t("party.dareTitle")}</Text>
       <Text variant="h3">{dare}</Text>
-      <Text variant="small">{own.length ? i18n.t("party.dareCrewHint") : i18n.t("party.dareHint")}</Text>
+      <Text variant="small">{own.length ? `${i18n.t("party.dareHint")} ${i18n.t("party.dareCrewHint")}` : i18n.t("party.dareHint")}</Text>
     </Panel>
   );
 }

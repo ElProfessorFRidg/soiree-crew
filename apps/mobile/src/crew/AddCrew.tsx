@@ -55,7 +55,7 @@ export function JoinByCode({
         onSubmitEditing={() => (found ? onSubmit(found.code, found.server) : setProblem(i18n.t("arrival.codeInvalid")))}
         error={problem}
       />
-      <QrScanner label={i18n.t("crew.scanQr")} hint={i18n.t("crew.scanQrHint")} parse={parseInviteQr} onScan={(scanned) => onSubmit(scanned.code, scanned.server)} />
+      <QrScanner label={i18n.t("crew.scanQr")} parse={parseInviteQr} onScan={(scanned) => onSubmit(scanned.code, scanned.server)} />
       <Button
         label={i18n.t("crew.pasteInvite")}
         variant="outline"

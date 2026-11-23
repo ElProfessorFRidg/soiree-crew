@@ -1,9 +1,5 @@
 import { StyleSheet, View } from "react-native";
-import Animated, { FadeIn } from "react-native-reanimated";
-import { duration } from "@crew/design-tokens";
 import { useT } from "@/i18n";
-import { variantKey } from "@/i18n/variants";
-import { easings } from "@/motion/easing";
 import { choicesFor, opensTo, type Audience, type VisibilityKey } from "@/onboarding/visibility";
 import { Button } from "@/ui/Button";
 import { Text } from "@/ui/Text";
@@ -13,20 +9,12 @@ import { VisibilityDrawing } from "./VisibilityDrawing";
 // PROF-01, PROF-02: one choice of who sees one part of a profile. The arrival flow and Settings both
 // draw it from here, so the drawing, the wording and the four buttons are the same in both.
 
-const UNLOCK = {
-  venues: "journey.unlockVenues",
-  titles: "journey.unlockTitles",
-  badges: "journey.unlockBadges",
-  find: "journey.unlockFind",
-  presence: "journey.unlockPresence",
-} as const;
-
 interface Props {
   item: VisibilityKey;
   /** Undefined until answered: nothing is pre-ticked. */
   value: Audience | undefined;
   onChange: (audience: Audience) => void;
-  /** "flow" adds the push (what going public unlocks) and the two previews; "settings" is the compact row. */
+  /** "flow" shows two previews; "settings" is the compact row. */
   mode: "flow" | "settings";
   name?: string;
   personId?: string;
@@ -97,9 +85,6 @@ export function VisibilityPicker({ item, value, onChange, mode, name = "", perso
       </View>
       <Text variant="h1">{i18n.t(`journey.title.${item}`)}</Text>
       <Text muted>{i18n.t(`journey.see.${item}`)}</Text>
-      <Animated.View entering={FadeIn.duration(duration.enter).delay(duration.enter).easing(easings.out)}>
-        <Text>{i18n.t(variantKey(UNLOCK[item], item))}</Text>
-      </Animated.View>
       <View style={styles.previews}>
         <ProfilePreview focus={item} open={false} name={shownName} personId={personId} caption={i18n.t("journey.previewOff")} selected={value !== undefined && !opensTo(value, "everyone")} />
         <ProfilePreview focus={item} open name={shownName} personId={personId} caption={i18n.t("journey.previewOn")} selected={opensTo(value, "everyone")} />

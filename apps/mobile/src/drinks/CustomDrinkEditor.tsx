@@ -128,9 +128,7 @@ export function CustomDrinkEditor({ unitSystem, initial, prefill, onSave, onCanc
                   />
                 ))}
               </Animated.View>
-            ) : (
-              <Text variant="small">{i18n.t("drinkCatalogue.brandSearchHint")}</Text>
-            )}
+            ) : null}
           </>
         )}
         <Text variant="label">{i18n.t("addDrink.name")}</Text>

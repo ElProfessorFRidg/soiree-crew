@@ -61,7 +61,6 @@ export default function InviteToPartyScreen() {
         <View style={styles.switchRow}>
           <View style={styles.flex}>
             <Text>{i18n.t("people.inviteWithCrew")}</Text>
-            <Text variant="small">{i18n.t("people.inviteWithCrewHint")}</Text>
           </View>
           <Switch value={withCrew} onValueChange={setWithCrew} accessibilityLabel={i18n.t("people.inviteWithCrew")} />
         </View>

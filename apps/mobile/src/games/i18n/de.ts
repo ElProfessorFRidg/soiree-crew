@@ -22,7 +22,7 @@ export const de: GameMessages = {
     title: "Crew-Karten",
     open: "Crew-Karten",
     needCrew: "Tritt einer Crew bei, um eure Karten zu schreiben.",
-    intro: "Eure Witze, Geschichten und Fragen. Der Admin gibt sie frei, bevor sie im Spiel auftauchen.",
+    intro: "Der Admin prüft die Karten, bevor sie im Spiel auftauchen.",
     game: "Für welches Spiel",
     level: "Stufe",
     text: "Die Karte",
@@ -102,7 +102,6 @@ export const de: GameMessages = {
   setup: {
     rulesPosition: "Regel {index} von {count}",
     nextRule: "Nächste",
-    rulesHint: "Über das Fragezeichen siehst du sie mitten im Spiel wieder.",
     playersLabel: "Wer spielt, der Reihe nach",
     addPlaceholder: "Vorname",
     addPlayer: "Person hinzufügen",

@@ -1,6 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import {  } from "react-native";
 import { View } from "react-native";
 import { CIPHERSUITE } from "@crew/mls";
 import { setDisappearing, updateMeta } from "@/chat/engine";
@@ -30,6 +29,7 @@ export default function ConversationInfoScreen() {
   const me = useSession((s) => s.session?.userId ?? "");
   const conversation = useChat((s) => s.conversations.find((c) => c.id === id));
   const meta = useChat((s) => s.meta);
+  const [showKeyDetails, setShowKeyDetails] = useState(false);
   const [devices, setDevices] = useState<{ expected: number; inGroup: number } | null>(null);
 
   useEffect(() => {
@@ -106,9 +106,19 @@ export default function ConversationInfoScreen() {
       </View>
 
       <Panel>
-        <Text variant="label">{i18n.t("chat.keyState")}</Text>
-        <Text variant="small">{i18n.t("chat.keyStateBody", { suite: CIPHERSUITE, epoch: conversation.epoch ?? 0 })}</Text>
-        {devices ? <Text variant="small">{i18n.t("chat.keyStateDevices", { inGroup: devices.inGroup, expected: devices.expected })}</Text> : null}
+        <Text variant="label">{i18n.t("chat.encrypted")}</Text>
+        <Button
+          label={i18n.t(showKeyDetails ? "chat.hideKeyDetails" : "chat.keyState")}
+          variant="outline"
+          height={44}
+          onPress={() => setShowKeyDetails((visible) => !visible)}
+        />
+        {showKeyDetails ? (
+          <>
+            <Text variant="small">{i18n.t("chat.keyStateBody", { suite: CIPHERSUITE, epoch: conversation.epoch ?? 0 })}</Text>
+            {devices ? <Text variant="small">{i18n.t("chat.keyStateDevices", { inGroup: devices.inGroup, expected: devices.expected })}</Text> : null}
+          </>
+        ) : null}
       </Panel>
 
       <Panel>
