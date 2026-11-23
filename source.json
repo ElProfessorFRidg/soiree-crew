@@ -22,16 +22,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -44,6 +44,28 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.11",
+          "buildVersion": "290",
+          "marketingVersion": "0.2.11 (290)",
+          "date": "2026-11-23T13:18:15Z",
+          "localizedDescription": "• Retirer les derniers sous-textes superflus\n• Renouveler les autres phrases d’accueil en français\n• Fill gaps in 1664 and other French-market beer ranges\n• Add Spanish and international beers and expand Chouffe selection\n• Add 80 beers and recognise plural can measures\n• Add Trois Rivières, Saint James and other rum variants\n• Réécrire les huit vannes du matin en français\n• Expand regional drinks, champagne and alcohol-free choices\n• Rendre les phrases du matin plus drôles\n• Add 100 drinks to the bar catalogue\n• Alléger les textes de l’interface Soirée Crew",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.11%2Bbuild.290/soiree-crew-unsigned.ipa",
+          "size": 22832629,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.10",
           "buildVersion": "276",
@@ -791,22 +813,22 @@
           "minOSVersion": "16.4"
         }
       ],
-      "version": "0.2.10",
-      "versionDate": "2026-11-23T08:00:20Z",
-      "versionDescription": "• Expand drink selection and recognise sips and capfuls\n• Add Leffe Ruby and 111 more drinks to the catalogue\n• Regenerate lockfile after merge\n• Bump the expo-sdk group with 23 updates",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.10%2Bbuild.276/soiree-crew-unsigned.ipa",
-      "size": 22819388,
+      "version": "0.2.11",
+      "versionDate": "2026-11-23T13:18:15Z",
+      "versionDescription": "• Retirer les derniers sous-textes superflus\n• Renouveler les autres phrases d’accueil en français\n• Fill gaps in 1664 and other French-market beer ranges\n• Add Spanish and international beers and expand Chouffe selection\n• Add 80 beers and recognise plural can measures\n• Add Trois Rivières, Saint James and other rum variants\n• Réécrire les huit vannes du matin en français\n• Expand regional drinks, champagne and alcohol-free choices\n• Rendre les phrases du matin plus drôles\n• Add 100 drinks to the bar catalogue\n• Alléger les textes de l’interface Soirée Crew",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.11%2Bbuild.290/soiree-crew-unsigned.ipa",
+      "size": 22832629,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/10-limits.png"
       ]
     },
     {
@@ -1545,6 +1567,17 @@
   ],
   "news": [
     {
+      "identifier": "release-0.2.11-290",
+      "title": "Soirée Crew 0.2.11 (290)",
+      "caption": "• Retirer les derniers sous-textes superflus\n• Renouveler les autres phrases d’accueil en français\n• Fill gaps in 1664 and other French-market beer ranges\n• Add Spanish and international beers and expand Chouffe selection\n• Add 80 beers and recognise plural can measures\n• Add Trois Rivières, Saint James and other rum variants\n• Réécrire les huit vannes du matin en français\n• Expand regional drinks, champagne and alcohol-free choices\n• Rendre les phrases du matin plus drôles\n• Add 100 drinks to the bar catalogue\n• Alléger les textes de l’interface Soirée Crew",
+      "date": "2026-11-23T13:18:15Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.11%2Bbuild.290/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile",
+      "notify": false
+    },
+    {
       "identifier": "preview-0.2.11-286",
       "title": "Soirée Crew Preview 0.2.11 (286)",
       "caption": "• Retirer les derniers sous-textes superflus\n• Renouveler les autres phrases d’accueil en français\n• Réécrire les huit vannes du matin en français\n• Rendre les phrases du matin plus drôles\n• Alléger les textes de l’interface Soirée Crew",
@@ -1752,21 +1785,17 @@
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.17%2Bbuild.252/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
-    },
-    {
-      "identifier": "preview-0.2.8-244",
-      "title": "Soirée Crew Preview 0.2.8 (244)",
-      "caption": "• Bump the expo-sdk group with 23 updates",
-      "date": "2026-11-20T19:19:39Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.14%2Bbuild.244/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.14%2Bbuild.244/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
-      "notify": false
     }
   ],
   "allowDowngrades": true,
   "changelog": [
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.2.11",
+      "buildVersion": "290",
+      "date": "2026-11-23T13:18:15Z",
+      "localizedDescription": "• Retirer les derniers sous-textes superflus\n• Renouveler les autres phrases d’accueil en français\n• Fill gaps in 1664 and other French-market beer ranges\n• Add Spanish and international beers and expand Chouffe selection\n• Add 80 beers and recognise plural can measures\n• Add Trois Rivières, Saint James and other rum variants\n• Réécrire les huit vannes du matin en français\n• Expand regional drinks, champagne and alcohol-free choices\n• Rendre les phrases du matin plus drôles\n• Add 100 drinks to the bar catalogue\n• Alléger les textes de l’interface Soirée Crew"
+    },
     {
       "bundleIdentifier": "app.soireecrew.mobile",
       "version": "0.2.10",
