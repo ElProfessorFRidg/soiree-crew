@@ -17,11 +17,14 @@ registerHooks({
   },
 });
 
-const { CORE_DRINK_CATALOGUE, OPEN_BEER_CATALOGUE } = await import("./src/catalogue.ts");
+const { CORE_DRINK_CATALOGUE, OPEN_BEER_CATALOGUE, BAR_ASSISTANT_CATALOGUE, OPEN_FOOD_FACTS_CATALOGUE, TRACK_CAFFEINE_CATALOGUE } = await import("./src/catalogue.ts");
 const { buildNameIndex } = await import("./src/nameIndex.ts");
 for (const [filename, catalogue] of [
   ["core-index.json", CORE_DRINK_CATALOGUE],
   ["openbeerdb-index.json", OPEN_BEER_CATALOGUE],
+  ["bar-assistant-index.json", BAR_ASSISTANT_CATALOGUE],
+  ["openfoodfacts-index.json", OPEN_FOOD_FACTS_CATALOGUE],
+  ["trackcaffeine-index.json", TRACK_CAFFEINE_CATALOGUE],
 ]) {
   const url = new URL(`./src/data/${filename}`, import.meta.url);
   const content = "[\n" + buildNameIndex(catalogue).map(row => JSON.stringify(row)).join(",\n") + "\n]\n";

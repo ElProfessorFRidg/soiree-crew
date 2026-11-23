@@ -7,6 +7,9 @@
 
 import { FIRST_LIST_COUNTRIES, MORE_DRINKS, SHORT_NAMES } from "./brands";
 import { MIXES_AND_SHOTS } from "./mixes";
+import barAssistantRows from "./data/bar-assistant.json";
+import trackCaffeineRows from "./data/trackcaffeine-drinks.json";
+import openFoodFactsRows from "./data/openfoodfacts-drinks.json";
 import openBeerRows from "./data/openbeerdb.json";
 
 export type DrinkGroup = "beer" | "wine" | "spirit" | "cocktail" | "cider" | "soft";
@@ -226,7 +229,47 @@ export const OPEN_BEER_CATALOGUE: readonly CatalogueDrink[] = (
   ...(country ? { countries: [country] } : {}),
 }));
 
-export const DRINK_CATALOGUE: readonly CatalogueDrink[] = [...CORE_DRINK_CATALOGUE, ...OPEN_BEER_CATALOGUE];
+export const BAR_ASSISTANT_CATALOGUE: readonly CatalogueDrink[] = (
+  barAssistantRows as unknown as readonly (readonly [string, string, number, number])[]
+).map(([id, brand, volumeMl, abv]) => ({
+  id: `bar-assistant-${id}`,
+  brand,
+  group: "cocktail",
+  volumeMl,
+  abv: abv / 100,
+  glass: "cocktail",
+  aliases: [],
+}));
+
+type SoftDrinkRow = readonly [sourceId: string, name: string, volumeMl: number];
+
+function importedSoftDrinks(source: string, rows: readonly SoftDrinkRow[]): CatalogueDrink[] {
+  return rows.map(([id, brand, volumeMl]) => ({
+    id: `${source}-${id}`,
+    brand,
+    group: "soft",
+    volumeMl,
+    abv: 0,
+    glass: "soft",
+    aliases: [],
+  }));
+}
+
+export const OPEN_FOOD_FACTS_CATALOGUE = importedSoftDrinks(
+  "openfoodfacts", openFoodFactsRows as unknown as readonly SoftDrinkRow[],
+);
+export const TRACK_CAFFEINE_CATALOGUE = importedSoftDrinks(
+  "trackcaffeine", trackCaffeineRows as unknown as readonly SoftDrinkRow[],
+);
+
+const importedCatalogue = [...OPEN_BEER_CATALOGUE, ...BAR_ASSISTANT_CATALOGUE, ...OPEN_FOOD_FACTS_CATALOGUE, ...TRACK_CAFFEINE_CATALOGUE];
+const importedIds = new Set(importedCatalogue.map(drink => drink.id));
+
+export function isImportedDrink(id: string): boolean {
+  return importedIds.has(id);
+}
+
+export const DRINK_CATALOGUE: readonly CatalogueDrink[] = [...CORE_DRINK_CATALOGUE, ...importedCatalogue];
 
 const catalogueById = new Map(DRINK_CATALOGUE.map((drink) => [drink.id, drink]));
 
@@ -235,7 +278,7 @@ const catalogueById = new Map(DRINK_CATALOGUE.map((drink) => [drink.id, drink]))
  * glass shows TGV and B-52 before the seventy bottles), then the other brands.
  */
 export const SHELF_ORDER: ReadonlyMap<string, number> = new Map(
-  [...FIRST_LIST.map((d) => d.id), ...MIXES_AND_SHOTS.map((d) => d.id), ...MORE_DRINKS.map((d) => d.id), ...OPEN_BEER_CATALOGUE.map((d) => d.id)].map((id, index) => [id, index]),
+  [...FIRST_LIST.map((d) => d.id), ...MIXES_AND_SHOTS.map((d) => d.id), ...MORE_DRINKS.map((d) => d.id), ...importedCatalogue.map((d) => d.id)].map((id, index) => [id, index]),
 );
 
 /** Names a size chip or a typed word can carry. The app translates them. */

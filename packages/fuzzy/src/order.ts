@@ -1,5 +1,5 @@
 import { exactCatalogueNames, indexedNameWordLimit } from "./catalogueSearch";
-import { catalogueDrink, catalogueNames, comboOf, CORE_DRINK_CATALOGUE, strengthFits, type CatalogueDrink, type DrinkGroup, type ServingId } from "./catalogue";
+import { catalogueDrink, catalogueNames, comboOf, CORE_DRINK_CATALOGUE, isImportedDrink, strengthFits, type CatalogueDrink, type DrinkGroup, type ServingId } from "./catalogue";
 import { isEverydayWord, normalise, scoreNormalised, type Candidate } from "./match";
 
 /**
@@ -160,7 +160,7 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
   const catalogue = options.catalogue ?? CORE_DRINK_CATALOGUE;
   const learnedImports = useIndex
     ? Array.from(options.learnedNames?.keys() ?? [])
-      .filter(id => id.startsWith("openbeerdb-"))
+      .filter(isImportedDrink)
       .map(id => catalogueDrink(id))
       .filter((drink): drink is CatalogueDrink => drink !== undefined)
     : [];
@@ -219,9 +219,9 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
         const indexed = exactCatalogueNames(query)
           .map(drink => entry<P>({ kind: "drink", drink }, catalogueNames(drink)));
         const candidates = [
-          ...indexed.filter(match => match.kind === "drink" && !match.drink.id.startsWith("openbeerdb-")),
+          ...indexed.filter(match => match.kind === "drink" && !isImportedDrink(match.drink.id)),
           ...(exactNames.get(query) ?? []),
-          ...indexed.filter(match => match.kind === "drink" && match.drink.id.startsWith("openbeerdb-")),
+          ...indexed.filter(match => match.kind === "drink" && isImportedDrink(match.drink.id)),
         ];
         for (const match of candidates) {
           const validNumbers = slice.every(token => isNumber(token))
