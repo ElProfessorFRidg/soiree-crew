@@ -80,7 +80,7 @@ export const fr = {
   },
   greeting: {
     lateNight: { v1: "Encore debout ?", v2: "La nuit est encore jeune ?", v3: "Pas encore au lit ?", v4: "Les vrais sont encore là.", v5: "Il est tard, ou tôt, ça dépend.", v6: "Même la lune bâille.", v7: "Toujours dans le game ?", v8: "La nuit te dit merci, le lit t'attend." },
-    morning: { v1: "Bien dormi ?", v2: "Le réveil pique ?", v3: "Café d'abord, le reste ensuite.", v4: "On se réveille doucement.", v5: "Un grand verre d'eau pour commencer ?", v6: "Le soleil est levé, toi presque.", v7: "Mode reprise activé.", v8: "Douche, café, et ça ira." },
+    morning: { v1: "Bien dormi ?", v2: "Le réveil a gagné. De peu.", v3: "On parle après le café.", v4: "Combien de « cinq minutes » ce matin ?", v5: "Un œil ouvert, l'autre en RTT.", v6: "Le soleil est levé, toi presque.", v7: "Le lit a demandé une prolongation.", v8: "Debout, mais à quel prix ?" },
     afternoon: { v1: "Rien de prévu ce soir ?", v2: "Ce soir, ça bouge ?", v3: "Un plan pour ce soir ?", v4: "Le crew est chaud ce soir ?", v5: "Il fait soif, non ?", v6: "Un petit plan se prépare ?", v7: "L'après-midi, c'est pour comploter.", v8: "Ce soir, on sort ou on sort ?" },
     apero: { v1: "L'apéro commence.", v2: "C'est l'heure de l'apéro.", v3: "Premier verre en vue.", v4: "Les glaçons sont prêts.", v5: "Chips, verres, crew : go.", v6: "L'heure dorée de la soirée.", v7: "On trinque à quoi ce soir ?", v8: "Ça sent l'apéro à plein nez." },
     evening: { v1: "Ça commence à chauffer.", v2: "La soirée prend forme.", v3: "Ça s'anime.", v4: "La soirée décolle.", v5: "Le crew est lancé.", v6: "Ambiance qui monte.", v7: "C'est parti pour de bon.", v8: "La nuit commence à peine." },
