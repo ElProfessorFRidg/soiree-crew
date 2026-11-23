@@ -1,21 +1,16 @@
-import { describe, expect, it } from "vitest";
-import { nextVersion, seriesOf } from "./next-version.mjs";
+import { expect, it } from "vitest";
+import { versionAllocation } from "./next-version.mjs";
 
-describe("next version", () => {
-  it("starts a series at .1 and ignores the old build tags", () => {
-    expect(nextVersion("0.1", ["abc\trefs/tags/v0.1.0-build.64", "def\trefs/tags/v0.1.0-build.60"])).toBe("0.1.1");
-  });
+it("continues after existing public and preview versions, independently of the build number", () => {
+  const tags = ["v0.2.10+build.276", "v0.2.11-preview.25+build.286", "v0.1.50+build.200", "v0.2.80-build.250"];
+  expect(versionAllocation("0.2.0", "289", tags, [])).toEqual({ version: "0.2.12", reserved: false });
+  expect(versionAllocation("1.0.0", "289", tags, [])).toEqual({ version: "1.0.1", reserved: false });
+});
 
-  it("takes the patch after the highest of the same series, whatever the order", () => {
-    const tags = ["refs/tags/v0.1.2+build.70", "refs/tags/v0.1.10+build.80", "refs/tags/v0.1.9+build.79", "refs/tags/v0.2.3+build.90", "refs/tags/v0.1.10+build.80^{}"];
-    expect(nextVersion("0.1", tags)).toBe("0.1.11");
-    expect(nextVersion("0.2", tags)).toBe("0.2.4");
-    expect(nextVersion("1.0", tags)).toBe("1.0.1");
-  });
-
-  it("reads the series from app.json's version", () => {
-    expect(seriesOf("0.1.0")).toBe("0.1");
-    expect(seriesOf("1.0.0")).toBe("1.0");
-    expect(() => seriesOf("one")).toThrow();
-  });
+it("moves past another run's reservation and reuses its own on retry", () => {
+  const tag = "crew-version/v0.2.12";
+  const reservations = [{ tag, owner: "build-289" }];
+  expect(versionAllocation("0.2.0", "290", [tag], reservations)).toEqual({ version: "0.2.13", reserved: false });
+  expect(versionAllocation("0.2.0", "289", [tag, "v0.2.13+build.290"], reservations)).toEqual({ version: "0.2.12", reserved: true });
+  expect(() => versionAllocation("0.2.0", "", [], [])).toThrow();
 });

@@ -6,6 +6,14 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const build = Number.parseInt(process.env.BUILD_NUMBER ?? "1", 10);
   const target = process.env.CREW_IOS_TARGET ?? "universal";
   const preview = process.env.CREW_RELEASE_CHANNEL === "preview";
+  const channel = preview ? "preview" : "public";
+  // Self-hosted Expo Updates server (deploy/ota, docs/OTA.md). Updates are signed in CI and the
+  // app only accepts those that match certs/ota-certificate.pem.
+  const otaUrl = process.env.CREW_OTA_URL?.trim().replace(/\/+$/, "");
+  const ota = Boolean(otaUrl && (target === "iphone" || target === "ipad"));
+  if (ota && !/^https:\/\/[^/\s]+$/.test(otaUrl!)) {
+    throw new Error("CREW_OTA_URL must be an https origin, for example https://ota.example.com");
+  }
   const bundleIdentifier = `${config.ios?.bundleIdentifier ?? "app.soireecrew.mobile"}${preview ? ".preview" : ""}`;
   // docs/VERSIONING.md: CI names each release 0.1.1, 0.1.2...; app.json keeps the series for local builds.
   const version = process.env.APP_VERSION || config.version;
@@ -25,6 +33,19 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     scheme: preview ? "soireecrew-preview" : config.scheme,
     ...(plugins ? { plugins: plugins as ExpoConfig["plugins"] } : {}),
     ...(version ? { version } : {}),
+    ...(ota ? {
+      runtimeVersion: `crew-${channel}-${target}-${build}`,
+      updates: {
+        ...config.updates,
+        enabled: true,
+        url: `${otaUrl}/manifest`,
+        requestHeaders: { "expo-channel-name": `${channel}-${target}` },
+        codeSigningCertificate: "./certs/ota-certificate.pem",
+        codeSigningMetadata: { keyid: "main", alg: "rsa-v1_5-sha256" },
+        checkAutomatically: "ON_LOAD",
+        fallbackToCacheTimeout: 0,
+      },
+    } : { updates: { ...config.updates, enabled: false } }),
     orientation: target === "iphone" ? "portrait" : "default",
     ios: {
       ...config.ios,
@@ -43,7 +64,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ...config.extra,
       buildNumber: build,
       appVersion: version ?? null,
-      releaseChannel: preview ? "preview" : "public",
+      releaseChannel: channel,
       iosTarget: target,
       releasesApi: `https://api.github.com/repos/ElProfessorFRidg/soiree-crew/releases${preview ? "?per_page=100" : "/latest"}`,
       // AltStore / SideStore source, rewritten by every release on the altstore branch (docs/ALTSTORE.md).
