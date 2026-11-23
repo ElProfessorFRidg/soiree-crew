@@ -95,7 +95,6 @@ export default function AddVenueScreen() {
       <Field
         label={i18n.t("addVenue.address")}
         placeholder={i18n.t("addVenue.addressPlaceholder")}
-        hint={i18n.t("addVenue.addressHint")}
         value={address}
         onChangeText={setAddress}
         maxLength={120}

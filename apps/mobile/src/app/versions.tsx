@@ -46,7 +46,7 @@ export default function VersionsScreen() {
         { value: "downloads", label: i18n.t("updates.downloads") },
       ]} onChange={(value) => { setMode(value); setShown(10); }} /> : null}
       <Segmented accessibilityLabel={i18n.t("updates.channel")} value={channel} items={(["public", "preview"] as const).map((value) => ({ value, label: i18n.t(`updates.${value}`) }))} onChange={(value) => { setChannel(value); setShown(10); }} />
-      <Text variant="small">{i18n.t(showDownloads ? "updates.historyHint" : "updates.changelogHint")}</Text>
+      {showDownloads ? <Text variant="small">{i18n.t("updates.historyHint")}</Text> : null}
       {loading ? <ActivityIndicator color={theme.amber} /> : null}
       {failed ? <Panel><Text>{i18n.t("updates.historyFailed")}</Text><Button variant="secondary" label={i18n.t("common.retry")} onPress={() => void load()} /></Panel> : null}
       {!loading && !failed && versions.length === 0 ? <Text>{i18n.t("updates.historyEmpty")}</Text> : null}
