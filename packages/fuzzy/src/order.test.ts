@@ -57,6 +57,22 @@ describe("drink catalogue", () => {
 });
 
 describe("order parser with brands", () => {
+  it("recognises Spanish cañas with or without accents and respects the named beer", () => {
+    for (const input of ["dos cañas de Mahou Clásica", "dos canas de Mahou Clasica"]) {
+      expect(parse(input)).toEqual([
+        { quantity: 2, preset: null, drink: "mahou-clasica", volumeMl: 200, abv: null },
+      ]);
+    }
+    expect(parse("un tercio de Moritz")[0]).toMatchObject({ drink: "moritz-original", volumeMl: 330 });
+    const spanishPresets = [{ value: "demi", names: ["Caña"] }];
+    const lines = parseDrinkOrder("dos cañas de Mahou Clásica", spanishPresets, {
+      presetGroup: () => "beer",
+      presetVolume: () => 250,
+    });
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toMatchObject({ quantity: 2, drink: { id: "mahou-clasica" }, volumeMl: 200 });
+  });
+
   it("keeps plural can measures attached to the requested beer", () => {
     expect(parse("2 canettes de 8,6 black")).toEqual([
       { quantity: 2, preset: null, drink: "bavaria-8-6-black", volumeMl: 500, abv: null },

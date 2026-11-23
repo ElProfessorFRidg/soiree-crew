@@ -68,6 +68,8 @@ interface ServingWord {
   measureMl?: number;
 }
 
+const CANA: ServingWord = { serving: "demi", names: ["caña"], volumeMl: { beer: 200 } };
+
 /** Container words: they size the drink said with them, and mean nothing alone. */
 const SERVING_WORDS: readonly ServingWord[] = [
   { serving: "flash", names: ["flash"], volumeMl: { spirit: 200 } },
@@ -86,6 +88,7 @@ const SERVING_WORDS: readonly ServingWord[] = [
   // A Bavarian "Halbe" is the half litre; a Spanish "tercio" the 33 cl bottle.
   { serving: "pint", names: ["pinte", "pint", "halbe"], volumeMl: { beer: 500, cider: 500 } },
   { serving: "bottle", names: ["tercio"], volumeMl: { beer: 330, cider: 330 } },
+  CANA,
   { serving: "shot", names: ["shot", "shooter", "chupito", "shottino", "cicchetto"], volumeMl: { spirit: 30 } },
 ];
 
@@ -322,6 +325,10 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
     }
     if (found) {
       place(found.entry);
+      // In Spanish the generic demi preset is also named caña. Keep its label and use the local pour.
+      if (found.entry.kind === "preset" && !line.serving && (found.phrase === "cana" || found.phrase === "canas")) {
+        line.serving = CANA;
+      }
       if (found.entry.kind !== "serving") {
         // The line now names this drink: remember how it was typed and whether it was a guess.
         if (found.entry.kind === "drink") line.typed = found.phrase;
