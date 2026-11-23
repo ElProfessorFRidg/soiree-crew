@@ -10,7 +10,7 @@
     "typecheck": "tsc -p ."
   },
   "devDependencies": {
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "@types/pg": "^8.23.1",
     "@crew/mls": "workspace:*"
   },
@@ -20,10 +20,10 @@
     "@crew/money": "workspace:*",
     "@crew/territory": "workspace:*",
     "@crew/units": "workspace:*",
-    "@electric-sql/pglite": "^0.5.12",
+    "@electric-sql/pglite": "^0.5.17",
     "@fastify/cors": "^11.3.1",
-    "@fastify/websocket": "^11.3.4",
-    "fastify": "^5.12.7",
+    "@fastify/websocket": "^11.3.7",
+    "fastify": "^5.12.8",
     "pg": "^8.23.1",
     "tsx": "^4.23.15",
     "zod": "^4.6.7"
