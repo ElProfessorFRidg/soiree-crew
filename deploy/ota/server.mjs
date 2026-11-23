@@ -20,6 +20,7 @@ const PORT = Number(process.env.PORT ?? 3000);
 const TOKEN_HASH = Buffer.from(process.env.OTA_PUBLISH_TOKEN_SHA256 ?? "", "hex");
 const MAX_ASSET = 64 * 1024 * 1024;
 const MAX_JSON = 4 * 1024 * 1024;
+const MAX_BATCH = 48 * 1024 * 1024;
 const HISTORY = 30;
 
 const NAME = /^[a-z0-9][a-z0-9._-]{0,99}$/i;
@@ -140,6 +141,25 @@ async function uploadAsset(req, res, hex) {
   return send(res, 201, { stored: hex });
 }
 
+// One question for the whole export instead of a HEAD per file: a burst of 404s looks like a scan to CrowdSec.
+async function missingAssets(req, res) {
+  const { hashes } = JSON.parse((await body(req, MAX_JSON)).toString("utf8"));
+  if (!Array.isArray(hashes) || hashes.length > 10_000 || !hashes.every((hex) => SHA256.test(hex))) return send(res, 400, "Bad hashes");
+  return send(res, 200, { missing: [...new Set(hashes)].filter((hex) => !existsSync(assetPath(hex))) });
+}
+
+// Several files per request ({ files: [{ hex, data (base64) }] }), each checked against its SHA-256:
+// a few requests per publish instead of one per file.
+async function uploadBatch(req, res) {
+  const { files } = JSON.parse((await body(req, MAX_BATCH)).toString("utf8"));
+  if (!Array.isArray(files) || !files.every((f) => SHA256.test(f?.hex ?? "") && typeof f.data === "string")) return send(res, 400, "Bad files");
+  const decoded = files.map((f) => ({ hex: f.hex, data: Buffer.from(f.data, "base64") }));
+  const wrong = decoded.filter((f) => createHash("sha256").update(f.data).digest("hex") !== f.hex).map((f) => f.hex);
+  if (wrong.length) return send(res, 422, { error: "Content does not match its SHA-256", wrong });
+  for (const f of decoded) if (!existsSync(assetPath(f.hex))) await writeAtomic(assetPath(f.hex), f.data);
+  return send(res, 201, { stored: decoded.length });
+}
+
 // CI posts what it signed: { platform, channel, runtimeVersion, kind, body, signature, assets, message, commit }.
 async function publish(req, res) {
   const p = JSON.parse((await body(req, MAX_JSON)).toString("utf8"));
@@ -183,6 +203,12 @@ const server = createServer(async (req, res) => {
     if (parts[0] === "assets" && parts.length === 2) {
       if (req.method === "GET" || req.method === "HEAD") return await asset(req, res, parts[1]);
       if (req.method === "PUT") return authorized(req) ? await uploadAsset(req, res, parts[1]) : send(res, 401, "Unauthorized");
+    }
+    if (req.method === "POST" && url.pathname === "/assets/batch") {
+      return authorized(req) ? await uploadBatch(req, res) : send(res, 401, "Unauthorized");
+    }
+    if (req.method === "POST" && url.pathname === "/assets/missing") {
+      return authorized(req) ? await missingAssets(req, res) : send(res, 401, "Unauthorized");
     }
     if (req.method === "POST" && url.pathname === "/publish") {
       return authorized(req) ? await publish(req, res) : send(res, 401, "Unauthorized");

@@ -76,11 +76,25 @@ async function main() {
   const expoConfig = JSON.parse(read("expoConfig.json"));
   const { manifest, uploads } = buildManifest({ metadata, read, platform, runtimeVersion, expoConfig, baseUrl });
 
-  for (const { hex, path } of uploads) {
-    const head = await fetch(`${baseUrl}/assets/${hex}`, { method: "HEAD" });
-    if (head.ok) continue;
-    await call("PUT", `${baseUrl}/assets/${hex}`, token, read(path), "application/octet-stream");
+  // Ask once which files the server lacks: a HEAD per file means a burst of 404s that CrowdSec bans.
+  const asked = await call("POST", `${baseUrl}/assets/missing`, token, JSON.stringify({ hashes: uploads.map((u) => u.hex) }));
+  const missing = new Set((await asked.json()).missing);
+  // Batches of up to 24 MB: a handful of requests rather than one per file.
+  let batch = [];
+  let size = 0;
+  const flush = async () => {
+    if (!batch.length) return;
+    await call("POST", `${baseUrl}/assets/batch`, token, JSON.stringify({ files: batch }));
+    batch = [];
+    size = 0;
+  };
+  for (const { hex, path } of uploads.filter((u) => missing.has(u.hex))) {
+    const data = read(path);
+    if (size + data.length > 24 * 1024 * 1024) await flush();
+    batch.push({ hex, data: data.toString("base64") });
+    size += data.length;
   }
+  await flush();
   const body = JSON.stringify(manifest);
   await call("POST", `${baseUrl}/publish`, token, JSON.stringify({ ...common, kind: "manifest", body, signature: sign(body, key), assets: uploads.map((u) => u.hex) }));
   console.log(`Published update ${manifest.id} to ${channel} (${runtimeVersion}), ${uploads.length} files`);

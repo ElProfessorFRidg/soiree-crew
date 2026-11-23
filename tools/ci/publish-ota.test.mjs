@@ -92,12 +92,22 @@ it("serves a signed manifest the app can verify, with downloadable assets", asyn
   const bundle = Buffer.from(await (await fetch(body.launchAsset.url)).arrayBuffer());
   expect(createHash("sha256").update(bundle).digest("base64url")).toBe(body.launchAsset.hash);
   expect((await fetch(`${base}/manifest`, { headers: { ...headers, "expo-runtime-version": "crew-preview-iphone-311" } })).status).toBe(404);
+  // Uploaded files are known: a second publish uploads nothing, and the question needs the token.
+  const hashes = JSON.stringify({ hashes: [body.launchAsset.url.split("/").pop(), "f".repeat(64)] });
+  const missing = await fetch(`${base}/assets/missing`, { method: "POST", headers: { authorization: `Bearer ${token}` }, body: hashes });
+  expect((await missing.json()).missing).toEqual(["f".repeat(64)]);
+  expect((await fetch(`${base}/assets/missing`, { method: "POST", body: hashes })).status).toBe(401);
 });
 
 it("rejects a tampered upload and can roll back to the embedded bundle", async () => {
   const hex = createHash("sha256").update("real").digest("hex");
   const put = await fetch(`${base}/assets/${hex}`, { method: "PUT", headers: { authorization: `Bearer ${token}` }, body: "fake" });
   expect(put.status).toBe(422);
+  const batch = await fetch(`${base}/assets/batch`, {
+    method: "POST", headers: { authorization: `Bearer ${token}` },
+    body: JSON.stringify({ files: [{ hex, data: Buffer.from("fake").toString("base64") }] }),
+  });
+  expect(batch.status).toBe(422);
   expect(publish({ OTA_ROLLBACK: "true" }).status).toBe(0);
   const res = await fetch(`${base}/manifest`, { headers: { ...headers, accept: "multipart/mixed" } });
   const { directive } = parts(await res.text(), res.headers.get("content-type"));
