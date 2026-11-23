@@ -57,6 +57,19 @@ describe("drink catalogue", () => {
 });
 
 describe("order parser with brands", () => {
+  it("recognises Belgian blue beers and Mouscron beers by their spoken names", () => {
+    for (const [input, id] of [
+      ["biere bleue belge", "bleue-de-soignies"],
+      ["biere bleue", "brasserie-du-mont-blanc-bleue"],
+      ["chimay bleu", "chimay-bleue"],
+      ["omer bleue", "omer-blauw"],
+      ["une mouscronnoise", "bequin-mouscronnoise"],
+      ["une ipa 7700", "bequin-ipa-7700"],
+    ]) {
+      expect(parse(input!).map((line) => line.drink), input).toEqual([id]);
+    }
+  });
+
   it("distinguishes the blue 1664 bottle, the blueberry beer and 1664 variants", () => {
     expect(parse("une 1664 bleue").map((line) => line.drink)).toEqual(["1664-blanc"]);
     expect(parse("une biere bleu").map((line) => line.drink)).toEqual(["brasserie-du-mont-blanc-bleue"]);
