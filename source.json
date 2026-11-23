@@ -819,16 +819,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -841,6 +841,28 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.11",
+          "buildVersion": "286",
+          "marketingVersion": "0.2.11 Preview (286)",
+          "date": "2026-11-23T12:38:29Z",
+          "localizedDescription": "• Retirer les derniers sous-textes superflus\n• Renouveler les autres phrases d’accueil en français\n• Réécrire les huit vannes du matin en français\n• Rendre les phrases du matin plus drôles\n• Alléger les textes de l’interface Soirée Crew",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.11-preview.25%2Bbuild.286/soiree-crew-unsigned.ipa",
+          "size": 22812587,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.11",
           "buildVersion": "285",
@@ -1503,25 +1525,36 @@
         }
       ],
       "version": "0.2.11",
-      "versionDate": "2026-11-23T09:29:46Z",
-      "versionDescription": "• Renouveler les autres phrases d’accueil en français\n• Réécrire les huit vannes du matin en français\n• Rendre les phrases du matin plus drôles\n• Alléger les textes de l’interface Soirée Crew",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.11-preview.25%2Bbuild.285/soiree-crew-unsigned.ipa",
-      "size": 22812857,
+      "versionDate": "2026-11-23T12:38:29Z",
+      "versionDescription": "• Retirer les derniers sous-textes superflus\n• Renouveler les autres phrases d’accueil en français\n• Réécrire les huit vannes du matin en français\n• Rendre les phrases du matin plus drôles\n• Alléger les textes de l’interface Soirée Crew",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.11-preview.25%2Bbuild.286/soiree-crew-unsigned.ipa",
+      "size": 22812587,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "preview-0.2.11-286",
+      "title": "Soirée Crew Preview 0.2.11 (286)",
+      "caption": "• Retirer les derniers sous-textes superflus\n• Renouveler les autres phrases d’accueil en français\n• Réécrire les huit vannes du matin en français\n• Rendre les phrases du matin plus drôles\n• Alléger les textes de l’interface Soirée Crew",
+      "date": "2026-11-23T12:38:29Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.286/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.11-preview.25%2Bbuild.286/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
     {
       "identifier": "preview-0.2.11-285",
       "title": "Soirée Crew Preview 0.2.11 (285)",
@@ -1729,17 +1762,6 @@
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.14%2Bbuild.244/iphone/banner.png",
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.14%2Bbuild.244/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
-      "notify": false
-    },
-    {
-      "identifier": "release-0.2.8-228",
-      "title": "Soirée Crew 0.2.8 (228)",
-      "caption": "• Scope Expo CLI findings and track blocked upstream fixes\n• Enable daily dependency updates for Expo workspace\n• Surface icon errors and avoid false empty-state messages\n• Surface icon errors and avoid false empty-state messages\n• Use localized save-retry message in every language\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• I18n(account): translate recovery from failed session persistence\n• Revoke captured server token after successful local sign-out\n• Guard against browser and unsupported native alert regressions\n• Replace remaining browser-incompatible native alert flows\n• Replace remaining browser-incompatible native alert flows\n• Clear queued photos and check-in caches after data erasure\n• Keep stacked phone buttons at full natural height\n• Use approved bottom-sheet design on phones and modal on iPad/web\n• Stop old-account Live Activity when local account changes\n• Cancellation, queued prompts and duplicate taps\n• Expose pending request for deterministic queue tests\n• Isolate async screens by party and account context\n• Isolate async screens by party and account context\n• Isolate state quotas and suppress stale APNs readings\n• Isolate state quotas and suppress stale APNs readings\n• Isolate state quotas and suppress stale APNs readings\n• Recover failed session persistence and consent reset\n• Recover failed session persistence and consent reset\n• Centralize app-owned responsive confirmations\n• Centralize app-owned responsive confirmations\n• Centralize app-owned responsive confirmations\n• Guard stale data and duplicate rollover regressions\n• Strip stale BAC, driving advice and alerts during remote rollover\n• Keep route guard active until arrival flow is complete\n• Invalidate native session and surface secure-storage wipe failures\n• Use distinct translation for category deletion\n• Separate full reset and category erasure messages (ru)\n• Separate full reset and category erasure messages (pt)\n• Separate full reset and category erasure messages (it)",
-      "date": "2026-11-20T18:43:42Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8%2Bbuild.228/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8%2Bbuild.228/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile",
       "notify": false
     }
   ],
@@ -2073,6 +2095,13 @@
       "buildVersion": "2",
       "date": "2026-10-27T00:43:05Z",
       "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.11",
+      "buildVersion": "286",
+      "date": "2026-11-23T12:38:29Z",
+      "localizedDescription": "• Retirer les derniers sous-textes superflus\n• Renouveler les autres phrases d’accueil en français\n• Réécrire les huit vannes du matin en français\n• Rendre les phrases du matin plus drôles\n• Alléger les textes de l’interface Soirée Crew"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
