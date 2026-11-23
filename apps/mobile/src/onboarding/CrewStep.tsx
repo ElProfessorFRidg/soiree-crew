@@ -83,9 +83,6 @@ export function FirstCrew({ onCreated, onDone, doneLabel }: { onCreated: () => v
             </View>
             {invite ? (
               <View style={styles.inviteActions}>
-                <Text variant="small" align="center">
-                  {i18n.t("onboarding.crewShare")}
-                </Text>
                 <Button
                   label={i18n.t("onboarding.copyLink")}
                   icon="link"

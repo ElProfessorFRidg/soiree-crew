@@ -135,7 +135,6 @@ export function ClosingStep({
   return (
     <>
       <Text variant="h1">{i18n.t("journey.closingTitle", { name })}</Text>
-      <Text muted>{i18n.t("journey.closingBody")}</Text>
       <View style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.line }]}>
         <View style={styles.head}>
           {photo ? <Image source={{ uri: photo }} style={[styles.photo, { borderColor: theme.amber }]} accessibilityIgnoresInvertColors /> : <Avatar personId={personId} name={name} size={64} ring={theme.amber} />}
