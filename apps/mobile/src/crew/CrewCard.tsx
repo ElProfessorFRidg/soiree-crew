@@ -280,9 +280,6 @@ export function CrewCard({ crew }: { crew: Crew }) {
           <View style={[styles.qr, { backgroundColor: palette.dark.text }]}>
             <QRCode value={invite.url} size={168} backgroundColor={palette.dark.text} color={palette.accent.onAccent} />
           </View>
-          <Text variant="small" align="center">
-            {i18n.t("crew.inviteQrHint")}
-          </Text>
           <View style={styles.inviteRow}>
             {/* QOL-19: the code copies on a long press too, with the same haptic and "Copied". */}
             <Text style={styles.flex} selectable onLongPress={() => copyCode.copy(invite.code)} accessibilityHint={i18n.t("common.copyHint")}>

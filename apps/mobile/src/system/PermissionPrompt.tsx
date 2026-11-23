@@ -125,7 +125,6 @@ function PromptSheet({ use, onAnswer }: { use: PermissionUse; onAnswer: (go: boo
       {lines.map((line) => (
         <Text key={line}>{line}</Text>
       ))}
-      <Text variant="small">{i18n.t("permissions.systemNext")}</Text>
       <View style={styles.actions}>
         <Button label={i18n.t("permissions.continue")} height={56} onPress={() => onAnswer(true)} />
         <Button label={i18n.t("permissions.notNow")} variant="outline" height={48} onPress={() => onAnswer(false)} />

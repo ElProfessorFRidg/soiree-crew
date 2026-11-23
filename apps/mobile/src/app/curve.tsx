@@ -103,7 +103,6 @@ export default function CurveScreen() {
       <Text variant="small">
         {i18n.t("curve.profileNote", { weight: storedProfile.weightKg, body })}
         {period === "average" ? ` ${i18n.t("curve.averageNote")}` : ""}
-        {nights ? ` ${i18n.t("myStats.filteredNote")}` : ""}
       </Text>
       <View style={styles.stats}>
         {(

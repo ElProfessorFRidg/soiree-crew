@@ -54,7 +54,6 @@ export function NotificationsStep({ health }: { health: boolean }) {
         onPress={() => router.push({ pathname: "/settings", params: { section: "notifications" } })}
         last
       />
-      <Text variant="small">{i18n.t("onboarding.notifAsk")}</Text>
     </>
   );
 }

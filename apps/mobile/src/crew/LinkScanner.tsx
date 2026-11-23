@@ -6,7 +6,6 @@ import { radius } from "@crew/design-tokens";
 import { useT } from "@/i18n";
 import { haptic } from "@/motion/haptics";
 import { Button } from "@/ui/Button";
-import { Text } from "@/ui/Text";
 import { OpenSettingsButton } from "@/system/OpenSettingsButton";
 
 /** MSG-11: what the signed-in phone shows and the new one scans: the server and a one-time code. */
@@ -21,7 +20,7 @@ export function parseLink(data: string): { url: string; code: string } | null {
  * A button that opens the camera and reads QR codes until `parse` accepts one. Used to link a phone
  * (MSG-11) and to join a crew from its invite QR (O-36).
  */
-export function QrScanner<T>({ label, hint, parse, onScan }: { label: string; hint?: string; parse: (data: string) => T | null; onScan: (value: T) => void }) {
+export function QrScanner<T>({ label, parse, onScan }: { label: string; parse: (data: string) => T | null; onScan: (value: T) => void }) {
   const i18n = useT();
   const [open, setOpen] = useState(false);
   const [permission, , readPermission] = useCameraPermissions();
@@ -65,11 +64,6 @@ export function QrScanner<T>({ label, hint, parse, onScan }: { label: string; hi
         </View>
       ) : permission && !permission.canAskAgain ? (
         <OpenSettingsButton />
-      ) : null}
-      {hint ? (
-        <Text variant="small" align="center">
-          {hint}
-        </Text>
       ) : null}
       <Button label={i18n.t("chat.cancel")} variant="outline" height={44} onPress={() => setOpen(false)} />
     </View>

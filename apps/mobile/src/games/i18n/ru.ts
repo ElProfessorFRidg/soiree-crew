@@ -23,7 +23,7 @@ export const ru: GameMessages = {
     title: "Карты тусовки",
     open: "Карты тусовки",
     needCrew: "Вступи в тусовку, чтобы писать свои карты.",
-    intro: "Ваши шутки, истории и вопросы. Админ одобряет их, прежде чем они попадут в игру.",
+    intro: "Администратор одобряет карты перед тем, как они появятся в игре.",
     game: "Для какой игры",
     level: "Уровень",
     text: "Карта",
@@ -108,7 +108,6 @@ export const ru: GameMessages = {
   setup: {
     rulesPosition: "Правило {index} из {count}",
     nextRule: "Дальше",
-    rulesHint: "Кнопка «?» покажет их снова во время партии.",
     playersLabel: "Игроки по порядку",
     addPlaceholder: "Имя",
     addPlayer: "Добавить игрока",

@@ -134,7 +134,6 @@ export function ServerSheet({ visible, current, onPick, onClose }: { visible: bo
 
   return (
     <Sheet visible={visible} title={i18n.t("arrival.serverSheetTitle")} onClose={onClose}>
-      <Text muted>{i18n.t("arrival.serverSheetBody")}</Text>
       {official ? (
         <Panel>
           <Row

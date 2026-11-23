@@ -47,7 +47,6 @@ export function FirstCrew({ onCreated, onDone, doneLabel }: { onCreated: () => v
     <>
       <CrewDrawing />
       <Text variant="h1">{i18n.t("onboarding.crewTitle")}</Text>
-      <Text muted>{i18n.t("journey.crewWhy")}</Text>
       <Segmented
         accessibilityLabel={i18n.t("onboarding.crewTitle")}
         value={mode}
@@ -82,9 +81,6 @@ export function FirstCrew({ onCreated, onDone, doneLabel }: { onCreated: () => v
                 <Icon name="x:scan" size={56} color={palette.accent.onAccent} />
               )}
             </View>
-            <Text variant="small" align="center">
-              {i18n.t("onboarding.crewShare")}
-            </Text>
             {invite ? (
               <View style={styles.inviteActions}>
                 <Button
@@ -113,9 +109,6 @@ export function FirstCrew({ onCreated, onDone, doneLabel }: { onCreated: () => v
                     })
                   }
                 />
-                <Text variant="small" align="center">
-                  {i18n.t("onboarding.linkHint")}
-                </Text>
               </View>
             ) : null}
           </Panel>

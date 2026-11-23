@@ -22,7 +22,7 @@ export const fr = {
     title: "Cartes du crew",
     open: "Cartes du crew",
     needCrew: "Rejoins un crew pour écrire les cartes du crew.",
-    intro: "Les blagues, les histoires et les questions du crew. L'admin valide avant qu'elles tombent en partie.",
+    intro: "L'admin valide les cartes avant qu'elles tombent en partie.",
     game: "Pour quel jeu",
     level: "Difficulté",
     text: "La carte",
@@ -102,7 +102,6 @@ export const fr = {
   setup: {
     rulesPosition: "Règle {index} sur {count}",
     nextRule: "Suivante",
-    rulesHint: "Le bouton ? les remontre en pleine partie.",
     playersLabel: "Joueurs, dans l'ordre",
     addPlaceholder: "Prénom",
     addPlayer: "Ajouter",
