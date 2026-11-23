@@ -5,13 +5,13 @@ import { planUpdate } from "./plan-ota.mjs";
 const preview = {
   tag: "v0.2.12-preview.29+build.310",
   target: "iphone",
-  projectId: "expo-project",
+  otaUrl: "https://ota.example.com",
   paths: ["apps/mobile/src/i18n/fr.ts", "apps/mobile/src/ui/images/icon.png", "docs/OTA.md"],
   info: {
     target: "iphone",
     channel: "preview",
     updates: {
-      projectId: "expo-project",
+      otaUrl: "https://ota.example.com",
       version: "0.2.12",
       build: "310",
       stream: "preview-iphone",
@@ -38,12 +38,12 @@ it.each([
   expect(() => planUpdate({ ...preview, paths: [path] })).toThrow("require a new IPA");
 });
 
-it("rejects another device, build, channel, project or server configuration", () => {
+it("rejects another device, build, channel, update server or server configuration", () => {
   for (const changes of [
     { tag: "v0.2.12+build.310" },
     { tag: "v0.2.12-preview.29+build.311" },
     { target: "ipad" },
-    { projectId: "other" },
+    { otaUrl: "https://other.example.com" },
     { serverUrl: "https://example.com" },
     { info: { target: "iphone", channel: "preview", updates: null } },
   ]) {

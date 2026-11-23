@@ -6,7 +6,7 @@ import { pathToFileURL } from "node:url";
 const tagPattern = /^v(\d+\.\d+\.\d+)(?:-preview\.\d+)?\+build\.(\d+)$/;
 const sourcePattern = /^(?:apps\/mobile|packages\/(?:bac|design-tokens|fuzzy|games|money|territory|units))\/src\/.+\.(?:[jt]sx?|json|png|jpe?g|webp|svg|gif|avif|ttf|otf|mp3|wav)$/i;
 
-export function planUpdate({ tag, target, info, projectId, serverUrl = "", publicServers = "", paths }) {
+export function planUpdate({ tag, target, info, otaUrl, serverUrl = "", publicServers = "", paths }) {
   const match = tagPattern.exec(tag);
   if (!match || !["iphone", "ipad"].includes(target)) throw new Error("Invalid IPA release tag or device target");
   const [, version, build] = match;
@@ -14,8 +14,8 @@ export function planUpdate({ tag, target, info, projectId, serverUrl = "", publi
   const stream = `${channel}-${target}`;
   const runtime = `crew-${stream}-${build}`;
   const serverConfig = createHash("sha256").update(`${serverUrl}\0${publicServers}`).digest("hex");
-  if (!projectId || info.target !== target || info.channel !== channel ||
-      info.updates?.projectId !== projectId || info.updates.runtime !== runtime ||
+  if (!otaUrl || info.target !== target || info.channel !== channel ||
+      info.updates?.otaUrl !== otaUrl || info.updates.runtime !== runtime ||
       info.updates.stream !== stream || info.updates.version !== version ||
       info.updates.build !== build || info.updates.serverConfig !== serverConfig) {
     throw new Error("Expo Updates and the current configuration must match the selected IPA");
@@ -34,7 +34,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const paths = execFileSync("git", ["diff", "--name-only", "--no-renames", "-z", baseline, "HEAD"], { encoding: "utf8" }).split("\0").filter(Boolean);
   const plan = planUpdate({
     tag, target, paths, info: JSON.parse(readFileSync(metadata, "utf8")),
-    projectId: process.env.CREW_EXPO_PROJECT_ID?.trim(), serverUrl: process.env.CREW_SERVER_URL,
+    otaUrl: process.env.CREW_OTA_URL?.trim().replace(/\/+$/, ""), serverUrl: process.env.CREW_SERVER_URL,
     publicServers: process.env.CREW_PUBLIC_SERVERS,
   });
   for (const [key, value] of Object.entries(plan)) console.log(`${key}=${value}`);

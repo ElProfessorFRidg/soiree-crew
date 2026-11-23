@@ -1,23 +1,51 @@
-# Corrections à distance sur iOS
+# Over-the-air fixes on iOS
 
-GitHub Actions continue à produire les IPA iPhone et iPad. Après avoir installé un IPA équipé d’Expo Updates, l’app récupère les corrections disponibles au lancement. Sans connexion, elle démarre avec le code déjà présent sur l’appareil. Un téléchargement terminé peut être appliqué à la prochaine ouverture à froid.
+GitHub Actions keeps producing the iPhone and iPad IPAs. Once an IPA that ships Expo Updates is installed, the app fetches available fixes at launch. Offline, it starts with the code already on the device. A finished download is applied at the next cold start.
 
-## Activer Preview
+Updates come from our own server, not from Expo: no Expo account and no EAS. The server speaks the Expo Updates protocol (version 1) and lives in `deploy/ota/server.mjs`.
 
-1. Lier un projet Expo dont le slug correspond à celui dans `apps/mobile/app.json`. Créer les canaux `preview-iphone` et `preview-ipad`, chacun associé à sa branche Expo du même nom.
-2. Renseigner `CREW_EXPO_PREVIEW_PROJECT_ID` (UUID du projet) dans les variables GitHub et `EXPO_TOKEN` dans les secrets GitHub. Le compte du jeton doit pouvoir publier sur le projet Expo.
-3. Construire et installer le nouvel IPA Preview. Dans sa release, le fichier `ios-build-info-iphone.json` ou `ios-build-info-ipad.json` identifie le canal et le runtime intégrés.
-4. Pousser une correction JavaScript ou d’interface sur la branche de cette PR. Le workflow **Build** réutilise le dernier IPA compatible de cette PR. Depuis `main`, il utilise la dernière release publique. Le workflow **Expo OTA** permet aussi une publication manuelle à partir du tag exact d’un IPA.
-5. Si un nouveau binaire est nécessaire, **Build** lance les compilations comme d’habitude. L’option **Force IPA** permet de demander un nouveau binaire explicitement.
-6. Ouvrir l’app connectée, la relancer après le téléchargement, puis vérifier le correctif et l’identifiant OTA dans Réglages. Vérifier aussi le démarrage hors ligne.
+## How it fits together
 
-Une fois la Preview validée, renseigner `CREW_EXPO_PUBLIC_PROJECT_ID`, créer les canaux `public-iphone` et `public-ipad` de la même façon, puis sortir un IPA public. La publication OTA publique se lance depuis `main`. Les anciens IPA continuent à recevoir les nouvelles releases via GitHub.
+- **Server**: `https://ota.crew.57.128.183.60.sslip.io`, a Coolify service (`crew-ota`) running `deploy/ota/server.mjs` on `node:22-alpine`. Updates and assets are stored in `/srv/crew-ota/data` on the VPS. The server only stores the SHA-256 of the publish token.
+- **Signing**: CI builds and signs every manifest with the code signing key. The IPA embeds `apps/mobile/certs/ota-certificate.pem` and rejects anything not signed with the matching key. The server never sees the key, so a compromised server cannot push code to the app.
+- **Publishing**: the **Expo OTA** workflow runs `expo export`, uploads the files the server does not have yet (`PUT /assets/<sha256>`, checked against their hash), then posts the signed manifest (`POST /publish`). `tools/ci/publish-ota.mjs` does this; `tools/ci/publish-ota.test.mjs` covers it end to end.
+- **Channels**: one server for everything. The app sends `expo-channel-name` (`preview-iphone`, `preview-ipad`, `public-iphone`, `public-ipad`) and its runtime version (`crew-<channel>-<target>-<build>`), so an update only reaches the exact IPA it was built for.
 
-## Compatibilité et retour arrière
+## Settings
 
-Le workflow reprend la version, le numéro de build et le canal validés dans l’IPA. Il compare la correction au commit exact de cette release. Les fichiers JS, TS et ressources prévus dans l’app et ses bibliothèques partagées sont éligibles. Les changements côté serveur et la documentation peuvent accompagner la publication. Un changement de dépendances, de code natif ou de configuration serveur impose un nouvel IPA. Chaque modèle et chaque build ont leur propre runtime.
+| Where | Name | Value |
+|---|---|---|
+| GitHub variable | `CREW_OTA_URL` | `https://ota.crew.57.128.183.60.sslip.io` |
+| GitHub secret | `OTA_PUBLISH_TOKEN` | Publish token. The server holds its SHA-256 in `OTA_PUBLISH_TOKEN_SHA256`. |
+| GitHub secret | `OTA_SIGNING_KEY` | PEM private key matching `apps/mobile/certs/ota-certificate.pem`. Keep an offline copy: a lost key means a new certificate, so a new IPA for everyone. |
 
-Depuis Expo, republier une version OTA précédente sur le canal compatible, ou utiliser le retour au bundle embarqué pour ce runtime. Conserver le tag GitHub du build lorsqu’un correctif est publié permet de retrouver la version de l’IPA installée.
+Without `CREW_OTA_URL`, IPAs are built with updates turned off, as before. Forks never get the server URL or the secrets.
 
+## Enable Preview
 
-Les nouveautés OTA sont publiées dans GitHub, AltStore et l’écran Nouveautés. Elles ne changent ni le numéro ni le lien de téléchargement de l’IPA. Les deux variantes iOS ont chacune leur entrée. Les changements réservés au serveur et à la documentation n’entraînent pas de publication mobile.
+1. Set the three settings above.
+2. Build and install a new Preview IPA. In its release, `ios-build-info-iphone.json` or `ios-build-info-ipad.json` names the embedded channel, runtime and update server.
+3. Push a JavaScript or UI fix to this PR's branch. **Build** reuses the latest compatible IPA of this PR. From `main`, it uses the latest public release. The **Expo OTA** workflow can also publish by hand from the exact tag of an IPA.
+4. When a new binary is needed, **Build** compiles as usual. **Force IPA** asks for a new binary explicitly.
+5. Open the connected app, relaunch it after the download, then check the fix and the OTA identifier in Settings. Check an offline start too.
+
+Once Preview is validated, ship a public IPA. Public OTA publishing runs from `main`. Older IPAs keep receiving new releases through GitHub.
+
+## Compatibility and rollback
+
+The workflow reuses the version, build number and channel validated in the IPA. It compares the fix with the exact commit of that release. The app's JS, TS and asset files, and those of its shared packages, are eligible. Server and documentation changes may ride along. A change to dependencies, native code, the certificate or the server configuration requires a new IPA. Each model and each build has its own runtime.
+
+To roll back, run **Expo OTA** by hand on the IPA tag:
+
+- with **rollback** ticked, the installed IPAs go back to their embedded bundle (signed `rollBackToEmbedded` directive);
+- without it, from an older commit, it publishes that older code as a new update.
+
+The server keeps the last 30 updates of each channel and runtime in `/srv/crew-ota/data/updates`. Keeping the GitHub tag of the build when a fix ships lets you find the installed IPA version.
+
+OTA release notes are published on GitHub, AltStore and the What's new screen. They change neither the IPA number nor its download link. Both iOS variants get their own entry. Server-only and documentation-only changes do not publish anything to the phones.
+
+## Rotating the signing key
+
+1. Generate a new pair: `openssl req -x509 -newkey rsa:2048 -nodes -keyout key.pem -out apps/mobile/certs/ota-certificate.pem -days 3650 -subj "/CN=Soiree Crew OTA" -addext "keyUsage=critical,digitalSignature" -addext "extendedKeyUsage=critical,codeSigning"`.
+2. Store `key.pem` in the `OTA_SIGNING_KEY` secret, then delete the local file.
+3. Ship new IPAs. Installed IPAs only trust the certificate they were built with.

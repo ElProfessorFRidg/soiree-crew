@@ -47,16 +47,25 @@ with tempfile.TemporaryDirectory() as folder:
     assert inspect(app, 'iphone', 'preview')['channel'] == 'preview'
     info.update(CFBundleShortVersionString='0.2.12', CFBundleVersion='310')
     save()
-    project = '12345678-1234-1234-1234-123456789012'
-    os.environ['CREW_EXPO_PROJECT_ID'] = project
+    os.environ['CREW_OTA_URL'] = 'https://ota.example.com'
+    certificate = Path('apps/mobile/certs/ota-certificate.pem').read_text()
     expo = {
-        'EXUpdatesEnabled': True, 'EXUpdatesURL': f'https://u.expo.dev/{project}',
+        'EXUpdatesEnabled': True, 'EXUpdatesURL': 'https://ota.example.com/manifest',
         'EXUpdatesRequestHeaders': {'expo-channel-name': 'preview-iphone'},
         'EXUpdatesRuntimeVersion': 'crew-preview-iphone-310',
         'EXUpdatesCheckOnLaunch': 'ALWAYS', 'EXUpdatesLaunchWaitMs': 0,
+        'EXUpdatesCodeSigningCertificate': certificate,
+        'EXUpdatesCodeSigningMetadata': {'keyid': 'main', 'alg': 'rsa-v1_5-sha256'},
     }
     (app / 'Expo.plist').write_bytes(plistlib.dumps(expo))
     assert inspect(app, 'iphone', 'preview')['updates']['runtime'] == 'crew-preview-iphone-310'
+    unsigned = {k: v for k, v in expo.items() if not k.startswith('EXUpdatesCodeSigning')}
+    (app / 'Expo.plist').write_bytes(plistlib.dumps(unsigned))
+    try:
+        inspect(app, 'iphone', 'preview')
+        raise AssertionError('IPA without the update signing certificate accepted')
+    except ValueError:
+        pass
     expo['EXUpdatesRequestHeaders']['expo-channel-name'] = 'public-iphone'
     (app / 'Expo.plist').write_bytes(plistlib.dumps(expo))
     try:
@@ -64,7 +73,7 @@ with tempfile.TemporaryDirectory() as folder:
         raise AssertionError('Public OTA channel accepted in Preview')
     except ValueError:
         pass
-    del os.environ['CREW_EXPO_PROJECT_ID']
+    del os.environ['CREW_OTA_URL']
     info['CFBundleIdentifier'] = 'app.soireecrew.mobile'
     info['UIDeviceFamily'] = [2]
     info['UISupportedInterfaceOrientations~ipad'] = ['UIInterfaceOrientationPortrait', 'UIInterfaceOrientationLandscapeLeft', 'UIInterfaceOrientationLandscapeRight']

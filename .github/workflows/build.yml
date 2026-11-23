@@ -26,7 +26,7 @@ on:
 
 concurrency:
   group: build-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' && vars.CREW_EXPO_PREVIEW_PROJECT_ID == '' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' && vars.CREW_OTA_URL == '' }}
 
 jobs:
   checks:
@@ -63,11 +63,11 @@ jobs:
         if: ${{ !inputs.force_ipa && !inputs.android }}
         env:
           GH_TOKEN: ${{ github.token }}
-          OTA_AUTHORIZED: ${{ secrets.EXPO_TOKEN != '' }}
+          OTA_AUTHORIZED: ${{ secrets.OTA_PUBLISH_TOKEN != '' && secrets.OTA_SIGNING_KEY != '' }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           CHANGE_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
           OTA_ALLOWED: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
-          CREW_EXPO_PROJECT_ID: ${{ github.event_name == 'pull_request' && vars.CREW_EXPO_PREVIEW_PROJECT_ID || github.event_name != 'pull_request' && vars.CREW_EXPO_PUBLIC_PROJECT_ID || '' }}
+          CREW_OTA_URL: ${{ vars.CREW_OTA_URL }}
           CREW_SERVER_URL: ${{ github.event_name == 'pull_request' && vars.CREW_PREVIEW_SERVER_URL || vars.CREW_SERVER_URL }}
           CREW_PUBLIC_SERVERS: ${{ vars.CREW_PUBLIC_SERVERS }}
         run: |
@@ -78,7 +78,7 @@ jobs:
               exit 0
             fi
           fi
-          if [[ "$OTA_ALLOWED" != true || "$OTA_AUTHORIZED" != true || -z "$CREW_EXPO_PROJECT_ID" ]]; then exit 0; fi
+          if [[ "$OTA_ALLOWED" != true || "$OTA_AUTHORIZED" != true || -z "$CREW_OTA_URL" ]]; then exit 0; fi
           TAG=$(gh api --paginate --slurp "repos/${GITHUB_REPOSITORY}/releases?per_page=100" | jq 'add // []' | node tools/ci/select-ota-base.mjs) || exit 0
           if [[ -z "$TAG" ]]; then exit 0; fi
           for TARGET in iphone ipad; do
@@ -106,7 +106,8 @@ jobs:
       release: ${{ needs.version.outputs.ota_base }}
       target: both
     secrets:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      OTA_PUBLISH_TOKEN: ${{ secrets.OTA_PUBLISH_TOKEN }}
+      OTA_SIGNING_KEY: ${{ secrets.OTA_SIGNING_KEY }}
 
   ios:
     # Unsigned IPA: sign it on your side with your sideloading tool (ADR 0001).
@@ -131,7 +132,8 @@ jobs:
       CREW_IOS_TARGET: ${{ matrix.target }}
       CREW_RELEASE_CHANNEL: ${{ github.event_name == 'pull_request' && 'preview' || 'public' }}
       IPA_FILE: ${{ matrix.file }}
-      CREW_EXPO_PROJECT_ID: ${{ github.event_name != 'pull_request' && vars.CREW_EXPO_PUBLIC_PROJECT_ID || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && vars.CREW_EXPO_PREVIEW_PROJECT_ID || '' }}
+      # Forks get no update server: their IPA keeps its embedded bundle.
+      CREW_OTA_URL: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && vars.CREW_OTA_URL || '' }}
       CREW_SERVER_URL: ${{ github.event_name == 'pull_request' && vars.CREW_PREVIEW_SERVER_URL || vars.CREW_SERVER_URL }}
       CREW_PUBLIC_SERVERS: ${{ vars.CREW_PUBLIC_SERVERS }}
     steps:

@@ -7,10 +7,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const target = process.env.CREW_IOS_TARGET ?? "universal";
   const preview = process.env.CREW_RELEASE_CHANNEL === "preview";
   const channel = preview ? "preview" : "public";
-  const projectId = process.env.CREW_EXPO_PROJECT_ID?.trim();
-  const ota = Boolean(projectId && (target === "iphone" || target === "ipad"));
-  if (ota && !/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(projectId!)) {
-    throw new Error("CREW_EXPO_PROJECT_ID must be an Expo project UUID");
+  // Self-hosted Expo Updates server (deploy/ota, docs/OTA.md). Updates are signed in CI and the
+  // app only accepts those that match certs/ota-certificate.pem.
+  const otaUrl = process.env.CREW_OTA_URL?.trim().replace(/\/+$/, "");
+  const ota = Boolean(otaUrl && (target === "iphone" || target === "ipad"));
+  if (ota && !/^https:\/\/[^/\s]+$/.test(otaUrl!)) {
+    throw new Error("CREW_OTA_URL must be an https origin, for example https://ota.example.com");
   }
   const bundleIdentifier = `${config.ios?.bundleIdentifier ?? "app.soireecrew.mobile"}${preview ? ".preview" : ""}`;
   // docs/VERSIONING.md: CI names each release 0.1.1, 0.1.2...; app.json keeps the series for local builds.
@@ -36,8 +38,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       updates: {
         ...config.updates,
         enabled: true,
-        url: `https://u.expo.dev/${projectId}`,
+        url: `${otaUrl}/manifest`,
         requestHeaders: { "expo-channel-name": `${channel}-${target}` },
+        codeSigningCertificate: "./certs/ota-certificate.pem",
+        codeSigningMetadata: { keyid: "main", alg: "rsa-v1_5-sha256" },
         checkAutomatically: "ON_LOAD",
         fallbackToCacheTimeout: 0,
       },
@@ -58,7 +62,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     // The public server the connect screen suggests; CI passes the repository variable CREW_SERVER_URL.
     extra: {
       ...config.extra,
-      ...(ota ? { eas: { projectId } } : {}),
       buildNumber: build,
       appVersion: version ?? null,
       releaseChannel: channel,
