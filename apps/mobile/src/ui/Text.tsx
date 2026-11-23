@@ -1,5 +1,6 @@
 import { Text as RNText, type TextProps, type TextStyle } from "react-native";
 import { numeral, type } from "@crew/design-tokens";
+import { useAppStore } from "@/state/store";
 import { useTheme } from "@/theme";
 
 type Variant = keyof typeof type;
@@ -13,13 +14,15 @@ interface Props extends TextProps {
 
 export function Text({ variant = "body", color, muted, align, style, ...rest }: Props) {
   const theme = useTheme();
+  const textScale = useAppStore((state) => state.textScale);
   const base = type[variant];
+  const scaled = textScale === 1 ? base : { ...base, fontSize: base.fontSize * textScale, lineHeight: (base.lineHeight ?? base.fontSize * 1.3) * textScale };
   const mutedByDefault = variant === "small" || variant === "label" || variant === "disclaimer";
   const resolved = color ?? (muted || mutedByDefault ? theme.textMuted : theme.text);
   return (
     <RNText
       {...rest}
-      style={[base, { color: resolved, textAlign: align }, style]}
+      style={[scaled, { color: resolved, textAlign: align }, style]}
       // Key information wraps instead of being truncated (O-11).
       numberOfLines={rest.numberOfLines}
     />

@@ -14,7 +14,12 @@ import { play } from "./sounds";
 const oldAndroid = Platform.OS === "android" && typeof Platform.Version === "number" && Platform.Version < 29;
 
 function run(effect: () => Promise<void>, fallback?: () => Promise<void>): void {
-  if (Platform.OS === "web" || !useAppStore.getState().hapticsOn) return;
+  const { hapticsOn, hapticsSoft } = useAppStore.getState();
+  if (Platform.OS === "web" || !hapticsOn) return;
+  if (hapticsSoft) {
+    light().catch(() => undefined);
+    return;
+  }
   (oldAndroid && fallback ? fallback : effect)().catch(() => {
     // A device without a vibration motor is not an error worth surfacing.
   });

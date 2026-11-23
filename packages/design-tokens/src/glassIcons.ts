@@ -44,6 +44,28 @@ export const extraIcons = {
   refresh: "M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7",
   /** The photo strip. */
   film: "M7 3h10a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM6 9h12M6 15h12",
+  /** Language and region. */
+  globe: "M12 3a9 9 0 1 1 0 18a9 9 0 1 1 0-18zM3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-5.5-3.5-9s1-6.5 3.5-9z",
+  /** Theme and look. */
+  palette: "M12 3a9 9 0 1 0 0 18c1.2 0 1.8-.8 1.8-1.7 0-1.3-1-1.5-1-2.6 0-.9.7-1.5 1.6-1.5H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3zM7.5 11h.01M10 7.5h.01M14 7.5h.01",
+  /** Text size. */
+  textsize: "M3.5 19l5-14 5 14M5.3 14h6.4M15.5 19l3-8 3 8M16.5 16.5h4",
+  /** Vibration. */
+  vibrate: "M8 4h8a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zM3.5 9v6M20.5 9v6M10.5 17h3",
+  /** Sound. */
+  volume: "M4 9.5h3.5L12 5.5v13l-4.5-4H4zM15.5 9a4 4 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11",
+  /** Maps. */
+  map: "M9 4L3.5 6v14L9 18l6 2 5.5-2V4L15 6zM9 4v14M15 6v14",
+  /** About. */
+  info: "M12 3a9 9 0 1 1 0 18a9 9 0 1 1 0-18zM12 11v5.5M12 7.8h.01",
+  /** A fix downloaded over the air. */
+  cloudDown: "M7 18a4.5 4.5 0 0 1-.5-9A6 6 0 0 1 18 9.5a4 4 0 0 1-.5 8.5M12 11v8M9 16l3 3 3-3",
+  /** Stored data. */
+  database: "M12 3c4.4 0 8 1.1 8 2.5S16.4 8 12 8 4 6.9 4 5.5 7.6 3 12 3zM4 5.5v13C4 19.9 7.6 21 12 21s8-1.1 8-2.5v-13M4 12c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5",
+  /** Adjustments. */
+  sliders: "M4 7h9M17 7h3M4 17h3M11 17h9M15 4.5v5M9 14.5v5",
+  /** Accessibility. */
+  access: "M12 3a9 9 0 1 1 0 18a9 9 0 1 1 0-18zM7.5 9.5l4.5 1 4.5-1M12 10.5v3.5M9.5 18l2.5-4 2.5 4",
 } as const;
 
 export type ExtraIconName = keyof typeof extraIcons;
