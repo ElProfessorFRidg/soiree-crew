@@ -4,19 +4,22 @@
 import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 
-const HEADLINES = {
-  ota: "🔁 **OTA update.** Installed apps get this change at their next launch, no new IPA needed.",
-  ipa: "⚠️ **New IPA needed.** This change cannot reach the installed apps over the air.",
-  checks: "✅ **Checks only.** Nothing changes on the phones.",
-};
-
+// One short line, the reason folded underneath.
 export function deliveryComment({ route, reason, version, channel, sha, runUrl }) {
   const [title, ...details] = String(reason ?? "").trim().split("\n");
   const marker = `<!-- crew-delivery-${channel} -->`;
-  const lines = [marker, `### 📱 ${channel === "preview" ? "Preview" : "Public"}: delivery to phones`, "", HEADLINES[route] ?? HEADLINES.ipa, "", title];
-  if (details.length) lines.push("", ...details);
-  if (route === "ipa" && version) lines.push("", `The new IPA is \`${version}\`. Install it from AltStore or the Versions screen once the build is done.`);
-  lines.push("", `<sub>\`${sha.slice(0, 7)}\` · [workflow run](${runUrl})</sub>`);
+  const asked = title.includes("/ipa");
+  const headline = {
+    ota: `🔁 **OTA update**, no new IPA.${channel === "preview" ? " Comment \`/ipa\` for a full IPA anyway." : ""}`,
+    checks: "✅ **Checks only**, nothing changes on the phones.",
+    ipa: asked ? `📦 **IPA ${version ? `\`${version}\` ` : ""}building**, asked with \`/ipa\`.`
+      : `⚠️ **New IPA needed**${version ? ` (\`${version}\`, building)` : ""}: this change cannot ship over the air.`,
+  }[route] ?? title;
+  const lines = [marker, `**📱 ${channel === "preview" ? "Preview" : "Public"}** · ${headline}`];
+  if (!asked && route !== "checks") {
+    lines.push("", `<details><summary>Why</summary>`, "", title, ...(details.length ? ["", ...details] : []), "", "</details>");
+  }
+  lines.push("", `<sub>\`${sha.slice(0, 7)}\` · [run](${runUrl})</sub>`);
   return { marker, body: lines.join("\n") };
 }
 

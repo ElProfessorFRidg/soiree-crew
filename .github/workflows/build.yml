@@ -23,6 +23,10 @@ on:
         description: Also build the Android APK
         type: boolean
         default: false
+      pr:
+        description: Build the Preview IPA of this PR (set by the /ipa comment, ipa-command.yml)
+        type: string
+        default: ''
 
 concurrency:
   group: build-${{ github.ref }}
@@ -133,13 +137,13 @@ jobs:
           RESERVE_VERSION: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
         run: node tools/ci/next-version.mjs >> "$GITHUB_OUTPUT"
       - name: Tell the PR how this change reaches the phones
-        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository || inputs.pr != ''
         env:
           GH_TOKEN: ${{ github.token }}
           ROUTE: ${{ steps.route.outputs.route || 'ipa' }}
-          REASON: "${{ steps.route.outputs.reason || 'New IPA: asked for by hand (Force IPA or Android).' }}"
+          REASON: "${{ steps.route.outputs.reason || (inputs.pr != '' && 'New IPA: asked for with /ipa.' || 'New IPA: asked for by hand (Force IPA or Android).') }}"
           VERSION: ${{ steps.next.outputs.version }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr }}
         run: node tools/ci/report-route.mjs
 
   ota:
@@ -177,11 +181,11 @@ jobs:
       APP_VERSION: ${{ needs.version.outputs.version }}
       BUILD_NUMBER: ${{ github.run_number }}
       CREW_IOS_TARGET: ${{ matrix.target }}
-      CREW_RELEASE_CHANNEL: ${{ github.event_name == 'pull_request' && 'preview' || 'public' }}
+      CREW_RELEASE_CHANNEL: ${{ (github.event_name == 'pull_request' || inputs.pr != '') && 'preview' || 'public' }}
       IPA_FILE: ${{ matrix.file }}
       # Forks get no update server: their IPA keeps its embedded bundle.
       CREW_OTA_URL: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && vars.CREW_OTA_URL || '' }}
-      CREW_SERVER_URL: ${{ github.event_name == 'pull_request' && vars.CREW_PREVIEW_SERVER_URL || vars.CREW_SERVER_URL }}
+      CREW_SERVER_URL: ${{ (github.event_name == 'pull_request' || inputs.pr != '') && vars.CREW_PREVIEW_SERVER_URL || vars.CREW_SERVER_URL }}
       CREW_PUBLIC_SERVERS: ${{ vars.CREW_PUBLIC_SERVERS }}
     steps:
       - uses: actions/checkout@v7
@@ -488,7 +492,7 @@ jobs:
     needs: [version, checks, ios, ios-launch, android]
     # The APK job is usually skipped; the release goes out with what was built.
     # Only repository-owned PR branches may publish previews. Forks keep read-only build artifacts.
-    if: always() && needs.checks.result == 'success' && needs.ios.result == 'success' && needs.ios-launch.result == 'success' && ((github.event_name != 'pull_request' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository))
+    if: always() && needs.checks.result == 'success' && needs.ios.result == 'success' && needs.ios-launch.result == 'success' && ((github.event_name != 'pull_request' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || inputs.pr != '')
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.publish.outputs.tag }}
@@ -514,8 +518,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           APP_VERSION: ${{ needs.version.outputs.version }}
-          CREW_RELEASE_CHANNEL: ${{ github.event_name == 'pull_request' && 'preview' || 'public' }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          CREW_RELEASE_CHANNEL: ${{ (github.event_name == 'pull_request' || inputs.pr != '') && 'preview' || 'public' }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr }}
         run: node tools/ci/publish-release.mjs
 
   altstore:

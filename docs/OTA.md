@@ -21,7 +21,9 @@ On every push to a PR or to `main`, the **Build** workflow picks the route and r
    - public: the newest public IPA.
 3. **New IPA** otherwise, with the reason: native code, dependencies, configuration, the certificate, or no IPA with OTA yet.
 
-The decision and its reason appear in the run summary and in a comment on the PR (`tools/ci/report-route.mjs`). One comment tracks Preview and is updated on each push. After a merge, a second comment gives the public decision. A **New IPA needed** comment lists the files that rule out an OTA update.
+A needed IPA builds on its own. An OTA update publishes on its own. To get a full Preview IPA when an OTA update would do, comment `/ipa` on the PR. `ipa-command.yml` checks the author has write access, starts **Build** for that PR and reacts with 🚀.
+
+The decision and its reason appear in the run summary and in a one-line comment on the PR (`tools/ci/report-route.mjs`), with the reason folded underneath. One comment tracks Preview and is updated on each push. After a merge, a second comment gives the public decision. A **New IPA needed** comment lists the files that rule out an OTA update.
 
 A change goes to Preview first, on its PR, then to the public app when it merges. Each OTA update adds an entry to What's new, GitHub and AltStore.
 
