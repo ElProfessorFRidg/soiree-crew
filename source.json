@@ -863,16 +863,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -885,6 +885,28 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.17",
+          "buildVersion": "311",
+          "marketingVersion": "0.2.17 Preview (311)",
+          "date": "2026-11-23T18:01:38Z",
+          "localizedDescription": "• Upload OTA assets in a few batches instead of one request per file\n• Let CI-only changes ride along with an OTA update\n• Add a /ipa PR command for a full Preview IPA on demand\n• Read releases from a file when picking the IPA to patch\n• Route each change to OTA or a new IPA and say why\n• Self-host Expo OTA updates instead of EAS\n• Bump the other-patches group with 3 updates (#32)\n• Document Dependabot auto-merge safeguards and settings\n• Reserve short IPA versions without collisions\n• Automate OTA and IPA routing, versioning and release news\n• Add opt-in Expo OTA updates for iOS releases",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.17-preview.28%2Bbuild.311/soiree-crew-unsigned.ipa",
+          "size": 23533200,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.15",
           "buildVersion": "308",
@@ -1678,26 +1700,37 @@
           ]
         }
       ],
-      "version": "0.2.15",
-      "versionDate": "2026-11-23T16:37:45Z",
-      "versionDescription": "• Read releases from a file when picking the IPA to patch\n• Route each change to OTA or a new IPA and say why\n• Self-host Expo OTA updates instead of EAS\n• Bump the other-patches group with 3 updates (#32)\n• Document Dependabot auto-merge safeguards and settings\n• Reserve short IPA versions without collisions\n• Automate OTA and IPA routing, versioning and release news\n• Add opt-in Expo OTA updates for iOS releases",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.15-preview.28%2Bbuild.308/soiree-crew-unsigned.ipa",
-      "size": 23533201,
+      "version": "0.2.17",
+      "versionDate": "2026-11-23T18:01:38Z",
+      "versionDescription": "• Upload OTA assets in a few batches instead of one request per file\n• Let CI-only changes ride along with an OTA update\n• Add a /ipa PR command for a full Preview IPA on demand\n• Read releases from a file when picking the IPA to patch\n• Route each change to OTA or a new IPA and say why\n• Self-host Expo OTA updates instead of EAS\n• Bump the other-patches group with 3 updates (#32)\n• Document Dependabot auto-merge safeguards and settings\n• Reserve short IPA versions without collisions\n• Automate OTA and IPA routing, versioning and release news\n• Add opt-in Expo OTA updates for iOS releases",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.17-preview.28%2Bbuild.311/soiree-crew-unsigned.ipa",
+      "size": 23533200,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.15-preview.28%2Bbuild.308/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "preview-0.2.17-311",
+      "title": "Soirée Crew Preview 0.2.17 (311)",
+      "caption": "• Upload OTA assets in a few batches instead of one request per file\n• Let CI-only changes ride along with an OTA update\n• Add a /ipa PR command for a full Preview IPA on demand\n• Read releases from a file when picking the IPA to patch\n• Route each change to OTA or a new IPA and say why\n• Self-host Expo OTA updates instead of EAS\n• Bump the other-patches group with 3 updates (#32)\n• Document Dependabot auto-merge safeguards and settings\n• Reserve short IPA versions without collisions\n• Automate OTA and IPA routing, versioning and release news\n• Add opt-in Expo OTA updates for iOS releases",
+      "date": "2026-11-23T18:01:38Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.17-preview.28%2Bbuild.311/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
     {
       "identifier": "preview-0.2.15-308",
       "title": "Soirée Crew Preview 0.2.15 (308)",
@@ -1905,17 +1938,6 @@
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/iphone/banner.png",
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.9%2Bbuild.265/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile",
-      "notify": false
-    },
-    {
-      "identifier": "preview-0.2.8-263",
-      "title": "Soirée Crew Preview 0.2.8 (263)",
-      "caption": "• Stop previous-account refresh chains and inbox flags after logout\n• Stop countdowns when the app loses foreground\n• Stop countdowns when the app loses foreground\n• Keep drawing arena usable on compact screens\n• Prevent duplicate head-to-head round advancement\n• Prevent simultaneous curve starts and cancel stale countdowns\n• Verify delayed invitations and inbox responses cannot cross accounts\n• Reject stale invitations, notification and venue responses\n• Reject stale invitations, notification and venue responses\n• Reject stale invitations, notification and venue responses\n• Identify both opponents during head-to-head rounds\n• Identify both opponents during head-to-head rounds\n• Support accessible two-player highlight banners\n• Serialize category erasure and guard against session changes\n• Cover session guards for sign-out and account/server switching\n• Prevent stale optimistic rollbacks and SOS clears after sign-out\n• Ignore obsolete websocket events and preserve new socket on reconnect\n• Prevent stale radar and SOS responses crossing accounts\n• Isolate crew, party and live responses across session changes\n• Discard stale sync payloads after account changes\n• Add identity guard for in-flight authenticated responses\n• Cancel stale fuse resume when round state changes\n• Surface selected player on wheel and curve result\n• Surface selected player on wheel and curve result\n• Prevent concurrent Point Blank countdowns and stale callbacks\n• Make truth-or-dare resolution single-flight across taps and swipes\n• Prevent overlapping fuse resume timers and clear on unmount\n• Show active player in more game states\n• Show active player in more game states\n• Show active player in more game states\n• Identify active reader and driver across more mini-games\n• Identify active reader and driver across more mini-games\n• Identify active reader and driver across more mini-games\n• Highlight current player during gameplay\n• Highlight current player during gameplay\n• Highlight current player during gameplay\n• Add accessible animated active-turn banner to shared shell",
-      "date": "2026-11-20T19:44:24Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.13%2Bbuild.263/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.13%2Bbuild.263/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
       "notify": false
     }
   ],
@@ -2264,6 +2286,13 @@
       "buildVersion": "2",
       "date": "2026-10-27T00:43:05Z",
       "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.17",
+      "buildVersion": "311",
+      "date": "2026-11-23T18:01:38Z",
+      "localizedDescription": "• Upload OTA assets in a few batches instead of one request per file\n• Let CI-only changes ride along with an OTA update\n• Add a /ipa PR command for a full Preview IPA on demand\n• Read releases from a file when picking the IPA to patch\n• Route each change to OTA or a new IPA and say why\n• Self-host Expo OTA updates instead of EAS\n• Bump the other-patches group with 3 updates (#32)\n• Document Dependabot auto-merge safeguards and settings\n• Reserve short IPA versions without collisions\n• Automate OTA and IPA routing, versioning and release news\n• Add opt-in Expo OTA updates for iOS releases"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",

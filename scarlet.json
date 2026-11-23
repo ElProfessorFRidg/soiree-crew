@@ -771,6 +771,27 @@
     },
     {
       "name": "Soirée Crew Preview",
+      "version": "0.2.17",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.17-preview.28%2Bbuild.311/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "• Upload OTA assets in a few batches instead of one request per file\n• Let CI-only changes ride along with an OTA update\n• Add a /ipa PR command for a full Preview IPA on demand\n• Read releases from a file when picking the IPA to patch\n• Route each change to OTA or a new IPA and say why\n• Self-host Expo OTA updates instead of EAS\n• Bump the other-patches group with 3 updates (#32)\n• Document Dependabot auto-merge safeguards and settings\n• Reserve short IPA versions without collisions\n• Automate OTA and IPA routing, versioning and release news\n• Add opt-in Expo OTA updates for iOS releases",
+      "bundleID": "app.soireecrew.mobile.preview",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew Preview 0.2.15",
       "version": "0.2.15",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.15-preview.28%2Bbuild.308/soiree-crew-unsigned.ipa",
