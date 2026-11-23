@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
 const tagPattern = /^v(\d+\.\d+\.\d+)(?:-preview\.\d+)?\+build\.(\d+)$/;
-const sourcePattern = /^apps\/mobile\/src\/.+\.(?:[jt]sx?|json|png|jpe?g|webp|svg|gif|avif|ttf|otf|mp3|wav)$/i;
+const sourcePattern = /^(?:apps\/mobile|packages\/(?:bac|design-tokens|fuzzy|games|money|territory|units))\/src\/.+\.(?:[jt]sx?|json|png|jpe?g|webp|svg|gif|avif|ttf|otf|mp3|wav)$/i;
 
 export function planUpdate({ tag, target, info, projectId, serverUrl = "", publicServers = "", paths }) {
   const match = tagPattern.exec(tag);
@@ -20,7 +20,7 @@ export function planUpdate({ tag, target, info, projectId, serverUrl = "", publi
       info.updates.build !== build || info.updates.serverConfig !== serverConfig) {
     throw new Error("Expo Updates and the current configuration must match the selected IPA");
   }
-  const changed = paths.filter((path) => !path.startsWith("docs/") && !/^[\w-]+\.md$/i.test(path));
+  const changed = paths.filter((path) => !path.startsWith("docs/") && !path.startsWith("apps/server/") && !/^[\w-]+\.md$/i.test(path));
   if (changed.some((path) => !sourcePattern.test(path))) {
     throw new Error("Changes outside the mobile JS and assets require a new IPA");
   }

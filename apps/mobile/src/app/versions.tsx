@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Linking, StyleSheet, View } from "react-native";
 import { useT } from "@/i18n";
-import { altstoreSource, currentBuild, currentVersion, releaseChannel } from "@/system/updates";
+import { altstoreSource, releaseChannel } from "@/system/updates";
+import { UpdateStatus } from "@/system/UpdateStatus";
 import { useTheme } from "@/theme";
 import { Button } from "@/ui/Button";
 import { Panel, Segmented, Tag } from "@/ui/controls";
@@ -40,7 +41,7 @@ export default function VersionsScreen() {
     : changelogFromSource(source, channel).map((version) => ({ ...version, kind: "changes" as const }));
   return (
     <Screen back title={i18n.t("updates.changelog")} withToasts onRefresh={load}>
-      <Text variant="small">{i18n.t("updates.installed", { version: currentVersion, build: currentBuild })}</Text>
+      <UpdateStatus />
       {canDownload ? <Segmented accessibilityLabel={i18n.t("updates.changelog")} value={mode} items={[
         { value: "changes", label: i18n.t("updates.changelog") },
         { value: "downloads", label: i18n.t("updates.downloads") },
@@ -51,10 +52,10 @@ export default function VersionsScreen() {
       {failed ? <Panel><Text>{i18n.t("updates.historyFailed")}</Text><Button variant="secondary" label={i18n.t("common.retry")} onPress={() => void load()} /></Panel> : null}
       {!loading && !failed && versions.length === 0 ? <Text>{i18n.t("updates.historyEmpty")}</Text> : null}
       {versions.slice(0, shown).map((version) => (
-        <Panel key={`${version.version}-${version.build}`}>
+        <Panel key={version.kind === "changes" && version.otaId ? version.otaId : `${version.version}-${version.build}`}>
           <View style={styles.heading}>
             <Text variant="h2" style={styles.title}>{version.version}</Text>
-            <Tag label={`#${version.build}`} />
+            <Tag label={version.kind === "changes" && version.otaId ? "OTA" : `IPA #${version.build}`} />
           </View>
           <Text variant="small">{[version.date && new Date(version.date).toLocaleDateString(i18n.locale), version.kind === "download" && version.size > 0 && `${(version.size / 1048576).toLocaleString(i18n.locale, { maximumFractionDigits: 1 })} MB`, version.kind === "download" && version.minOS && i18n.t("updates.minimumOS", { version: version.minOS })].filter(Boolean).join(" · ")}</Text>
           {version.notes ? <Text>{version.notes}</Text> : null}

@@ -1,4 +1,5 @@
-import { isEmbeddedLaunch, isEnabled, updateId } from "expo-updates";
+import { checkForUpdateAsync, fetchUpdateAsync, isEnabled } from "expo-updates";
+import { UpdateStatus } from "@/system/UpdateStatus";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { StyleSheet, View, Platform } from "react-native";
@@ -23,7 +24,7 @@ import { showToast } from "@/ui/Toast";
 import { startOuting, stopCrewDetect, stopOuting, syncLocationUpdates } from "@/location/outing";
 import { askPermission, permissionStatus } from "@/system/askPermission";
 import { Button } from "@/ui/Button";
-import { checkForUpdate, currentBuild, currentVersion } from "@/system/updates";
+import { checkForUpdate, currentVersion } from "@/system/updates";
 import { AppIconPicker } from "@/profile/AppIconPicker";
 import { refreshReminders } from "@/reminders/reminders";
 import { refreshCalendarReminders } from "@/server/calendarData";
@@ -102,10 +103,7 @@ function SettingsRoot() {
         {link(i18n.t("settings.drinks"), "glass", () => router.push("/add-drink"))}
         {link(i18n.t("privacy.open"), "shield", () => router.push("/privacy"), undefined, true)}
       </Panel>
-      <Text variant="small" align="center">
-        {i18n.t("settings.version", { version: currentVersion, build: currentBuild || "dev" })}
-        {isEnabled && !isEmbeddedLaunch && updateId ? ` · OTA ${updateId.slice(0, 8)}` : null}
-      </Text>
+      <UpdateStatus />
       <Button variant="secondary" label={i18n.t("diagnostics.title")} onPress={() => router.push("/server-status")} />
     </>
   );
@@ -514,12 +512,20 @@ function CheckNow() {
       loading={busy}
       onPress={() => {
         setBusy(true);
-        void checkForUpdate(true)
-          .catch(() => "unavailable" as const)
-          .then((result) => {
+        const ota = isEnabled
+          ? checkForUpdateAsync().then(async (available) => {
+              if (!available.isAvailable && !available.isRollBackToEmbedded) return false;
+              const fetched = await fetchUpdateAsync();
+              return fetched.isNew || fetched.isRollBackToEmbedded;
+            })
+          : Promise.resolve(false);
+        void Promise.allSettled([checkForUpdate(true), ota])
+          .then(([ipaResult, otaResult]) => {
+            const result = ipaResult.status === "fulfilled" ? ipaResult.value : "unavailable";
             const latest = useAppStore.getState().latestRelease;
             if (result === "newer" && latest) showToast({ message: i18n.t("updates.available", { version: latest.version ?? String(latest.build) }) });
-            else if (result === "latest") showToast({ message: i18n.t("updates.upToDate", { version: currentVersion }) });
+            else if (otaResult.status === "fulfilled" && otaResult.value) showToast({ message: i18n.t("updates.otaReady") });
+            else if (result === "latest" && otaResult.status === "fulfilled") showToast({ message: i18n.t("updates.upToDate", { version: currentVersion }) });
             else showToast({ tone: "danger", message: i18n.t("updates.unavailable") });
           })
           .finally(() => setBusy(false));
