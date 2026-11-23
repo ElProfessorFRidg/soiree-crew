@@ -1538,6 +1538,8 @@ export const de: Messages = {
     otaRevision: "OTA-Update {revision}",
     otaDownloading: "Update wird heruntergeladen…",
     otaApply: "Zum Anwenden neu starten",
+    otaRestart: "Neu starten",
+    otaApplied: "Update installiert (Korrektur {revision}).",
     otaReady: "Update heruntergeladen.",
     installed: "Installiert: {version} (Build {build}).",
     historyHint: "Wähle eine Version, um ihre IPA zu laden. Preview wird neben der öffentlichen App installiert.",

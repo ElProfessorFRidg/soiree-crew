@@ -1564,6 +1564,8 @@ export const ru: Messages = {
     otaRevision: "Обновление OTA {revision}",
     otaDownloading: "Загрузка обновления…",
     otaApply: "Перезапустить для установки",
+    otaRestart: "Перезапустить",
+    otaApplied: "Обновление установлено (исправление {revision}).",
     otaReady: "Обновление загружено.",
     installed: "Установлена: {version} (сборка {build}).",
     historyHint: "Выбери версию для загрузки IPA. Preview устанавливается рядом с публичным приложением.",

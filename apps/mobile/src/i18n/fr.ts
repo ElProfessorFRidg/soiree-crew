@@ -1538,6 +1538,8 @@ export const fr = {
     otaRevision: "Correctif OTA {revision}",
     otaDownloading: "Téléchargement du correctif…",
     otaApply: "Redémarrer pour appliquer",
+    otaRestart: "Redémarrer",
+    otaApplied: "Mise à jour installée (correctif {revision}).",
     otaReady: "Correctif téléchargé.",
     installed: "Installée : {version} (build {build}).",
     historyHint: "Choisis une version pour télécharger son IPA. Preview s’installe à côté de l’app publique.",

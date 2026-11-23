@@ -50,6 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     outputs:
       version: ${{ steps.next.outputs.version }}
       ota_base: ${{ steps.route.outputs.release }}
@@ -70,30 +71,64 @@ jobs:
           CREW_OTA_URL: ${{ vars.CREW_OTA_URL }}
           CREW_SERVER_URL: ${{ github.event_name == 'pull_request' && vars.CREW_PREVIEW_SERVER_URL || vars.CREW_SERVER_URL }}
           CREW_PUBLIC_SERVERS: ${{ vars.CREW_PUBLIC_SERVERS }}
+        # Every outcome records why (route + reason): the summary and the PR comment show it.
         run: |
+          decide() {
+            printf 'route=%s\n' "$1" >> "$GITHUB_OUTPUT"
+            { echo 'reason<<CREW_REASON'; printf '%s\n' "$2"; if [[ -n "${3:-}" ]]; then printf '%s\n' "$3"; fi; echo 'CREW_REASON'; } >> "$GITHUB_OUTPUT"
+            { printf '### %s\n\n' "$2"; if [[ -n "${3:-}" ]]; then printf '%s\n' "$3"; fi; } >> "$GITHUB_STEP_SUMMARY"
+          }
           if [[ "$CHANGE_BASE" =~ ^[a-f0-9]{40}$ ]] && git cat-file -e "$CHANGE_BASE^{commit}"; then
             if git diff --quiet --no-renames "$CHANGE_BASE" HEAD -- . ':!apps/server/**' ':!docs/**' ':!research/**' ':!*.md' ':!apps/mobile/store/release-notes.json'; then
               echo 'skip_ipa=true' >> "$GITHUB_OUTPUT"
-              echo 'No mobile changes; checks only.' >> "$GITHUB_STEP_SUMMARY"
+              decide checks 'No mobile changes: checks only.'
               exit 0
             fi
           fi
-          if [[ "$OTA_ALLOWED" != true || "$OTA_AUTHORIZED" != true || -z "$CREW_OTA_URL" ]]; then exit 0; fi
-          TAG=$(gh api --paginate --slurp "repos/${GITHUB_REPOSITORY}/releases?per_page=100" | jq 'add // []' | node tools/ci/select-ota-base.mjs) || exit 0
-          if [[ -z "$TAG" ]]; then exit 0; fi
+          if [[ "$OTA_ALLOWED" != true ]]; then decide ipa 'New IPA: OTA updates are off for pull requests from forks.'; exit 0; fi
+          if [[ "$OTA_AUTHORIZED" != true || -z "$CREW_OTA_URL" ]]; then
+            decide ipa 'New IPA: OTA updates are not configured (CREW_OTA_URL, OTA_PUBLISH_TOKEN, OTA_SIGNING_KEY).'
+            exit 0
+          fi
+          # Preview: the Preview app runs the newest preview IPA of any open PR, so that is the one to patch.
+          if [[ -n "$PR_NUMBER" ]]; then
+            OPEN_PRS=$(gh pr list --state open --limit 200 --json number --jq 'map(.number) | join(",")') || OPEN_PRS=""
+            export OPEN_PRS
+          fi
+          TAG=$(gh api --paginate --slurp "repos/${GITHUB_REPOSITORY}/releases?per_page=100" | jq 'add // []' | node tools/ci/select-ota-base.mjs) || TAG=""
+          if [[ -z "$TAG" ]]; then
+            if [[ -n "$PR_NUMBER" ]]; then KIND='preview IPA of an open PR'; else KIND='public IPA'; fi
+            decide ipa "New IPA: no $KIND with OTA updates to patch yet."
+            exit 0
+          fi
           for TARGET in iphone ipad; do
             INFO="ios-build-info-$TARGET.json"
-            gh release download "$TAG" --pattern "$INFO" --dir "$RUNNER_TEMP" || exit 0
-            if ! node tools/ci/plan-ota.mjs "$TAG" "$TARGET" "$RUNNER_TEMP/$INFO"; then exit 0; fi
+            if ! gh release download "$TAG" --pattern "$INFO" --dir "$RUNNER_TEMP" --clobber; then
+              decide ipa "New IPA: \`$TAG\` has no $INFO."
+              exit 0
+            fi
+            if ! WHY=$(node tools/ci/plan-ota.mjs "$TAG" "$TARGET" "$RUNNER_TEMP/$INFO" 2>&1 >/dev/null); then
+              decide ipa "New IPA: this change cannot patch \`$TAG\` ($TARGET) over the air." "$WHY"
+              exit 0
+            fi
           done
           printf 'release=%s\n' "$TAG" >> "$GITHUB_OUTPUT"
-          printf 'Compatible OTA update for `%s`.\n' "$TAG" >> "$GITHUB_STEP_SUMMARY"
+          decide ota "OTA update on top of \`$TAG\` (iPhone and iPad)."
       - name: Reserve the native version
         id: next
         if: steps.route.outputs.release == '' && steps.route.outputs.skip_ipa != 'true'
         env:
           RESERVE_VERSION: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
         run: node tools/ci/next-version.mjs >> "$GITHUB_OUTPUT"
+      - name: Tell the PR how this change reaches the phones
+        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ROUTE: ${{ steps.route.outputs.route || 'ipa' }}
+          REASON: "${{ steps.route.outputs.reason || 'New IPA: asked for by hand (Force IPA or Android).' }}"
+          VERSION: ${{ steps.next.outputs.version }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: node tools/ci/report-route.mjs
 
   ota:
     needs: [checks, version]

@@ -11,6 +11,27 @@ Updates come from our own server, not from Expo: no Expo account and no EAS. The
 - **Publishing**: the **Expo OTA** workflow runs `expo export`, uploads the files the server does not have yet (`PUT /assets/<sha256>`, checked against their hash), then posts the signed manifest (`POST /publish`). `tools/ci/publish-ota.mjs` does this; `tools/ci/publish-ota.test.mjs` covers it end to end.
 - **Channels**: one server for everything. The app sends `expo-channel-name` (`preview-iphone`, `preview-ipad`, `public-iphone`, `public-ipad`) and its runtime version (`crew-<channel>-<target>-<build>`), so an update only reaches the exact IPA it was built for.
 
+## OTA or new IPA
+
+On every push to a PR or to `main`, the **Build** workflow picks the route and records why:
+
+1. **Checks only** when nothing that ships in the app changed (server, docs).
+2. **OTA update** when the change only touches the app's JS and assets compared with the IPA the phones run:
+   - Preview: the newest preview IPA among the PRs still open, since the Preview app holds whichever one was installed last;
+   - public: the newest public IPA.
+3. **New IPA** otherwise, with the reason: native code, dependencies, configuration, the certificate, or no IPA with OTA yet.
+
+The decision and its reason appear in the run summary and in a comment on the PR (`tools/ci/report-route.mjs`). One comment tracks Preview and is updated on each push. After a merge, a second comment gives the public decision. A **New IPA needed** comment lists the files that rule out an OTA update.
+
+A change goes to Preview first, on its PR, then to the public app when it merges. Each OTA update adds an entry to What's new, GitHub and AltStore.
+
+## In the app
+
+- Settings and What's new show the installed IPA and the active OTA fix.
+- When a fix has downloaded, a toast offers to restart now (`system/OtaNotices.tsx`). Otherwise it applies at the next cold start.
+- On the first launch that runs a new fix, a toast says the app was updated and opens What's new.
+- The channel switch on the Versions screen chooses which releases and notes to show. The OTA channel itself belongs to the installed app: the Preview app gets Preview fixes, the public app gets public fixes.
+
 ## Settings
 
 | Where | Name | Value |

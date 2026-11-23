@@ -1540,6 +1540,8 @@ export const en: Messages = {
     otaRevision: "OTA update {revision}",
     otaDownloading: "Downloading the update…",
     otaApply: "Restart to apply",
+    otaRestart: "Restart",
+    otaApplied: "Update installed (fix {revision}).",
     otaReady: "Update downloaded.",
     installed: "Installed: {version} (build {build}).",
     historyHint: "Choose a version to download its IPA. Preview installs alongside the public app.",
