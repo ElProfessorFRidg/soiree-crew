@@ -1,4 +1,5 @@
-import { catalogueNames, comboOf, DRINK_CATALOGUE, strengthFits, type CatalogueDrink, type DrinkGroup, type ServingId } from "./catalogue";
+import { exactCatalogueNames, indexedNameWordLimit } from "./catalogueSearch";
+import { catalogueDrink, catalogueNames, comboOf, CORE_DRINK_CATALOGUE, isImportedDrink, strengthFits, type CatalogueDrink, type DrinkGroup, type ServingId } from "./catalogue";
 import { isEverydayWord, normalise, scoreNormalised, type Candidate } from "./match";
 
 /**
@@ -27,6 +28,7 @@ export interface OrderOptions<P> {
   catalogue?: readonly CatalogueDrink[];
   /** Translated names of a generic catalogue drink ("Виски" for whisky). */
   names?: (drink: CatalogueDrink) => readonly string[];
+  learnedNames?: ReadonlyMap<string, readonly string[]>;
   /** The size a preset gives a brand said with it: "demi kro" is a Kronenbourg of the demi's size. */
   presetVolume?: (preset: P) => number;
   /** What kind of drink a preset is, so "pinte jager" stays two drinks and "pinte 40" no strength. */
@@ -56,6 +58,8 @@ const UNITS = new Map<string, number>(Object.entries({ cl: 10, ml: 1, l: 1000, c
 const PERCENT = new Set(["%", "pourcent", "percent", "degre", "degres", "deg", "grad", "градус", "градуса", "градусов"]);
 /** Sizes said as a bare number of centilitres: "33 despe", "kro 50". */
 const CENTILITRE_SIZES = new Set([20, 25, 33, 35, 44, 50, 75, 100]);
+const VOLUME_LINKS = new Set(["de", "d", "du", "des", "of"]);
+const VOLUME_ARTICLES = new Set(["un", "une", "la", "le", "l", "a", "an", "the"]);
 const MAX_QUANTITY = 12;
 /** The server refuses more in one drink. */
 const MAX_VOLUME_ML = 3000;
@@ -106,7 +110,8 @@ export function tokenize(text: string): string[] {
     .replace(/[̀-ͯ]/g, "")
     .replace(/(\d)[.,](\d)/g, "$1.$2")
     .replace(/[%°]/g, " % ")
-    .replace(/(\d)(cl|ml|l)(?!\p{L})/gu, "$1 $2")
+    .replace(/(\d)\s*([cm])\s*\.\s*l\b/gu, "$1 $2l")
+    .replace(/(\d)(centilitres?|millilitres?|cl|ml|l)(?!\p{L})/gu, "$1 $2")
     .replace(/[^\p{L}\p{N}.% ]+/gu, " ")
     .split(" ")
     .map((word) => word.replace(/^\.+|\.+$/g, ""))
@@ -135,6 +140,8 @@ function entry<P>(base: EntryBase<P>, names: readonly string[]): Entry<P> {
   };
 }
 
+const coreOrderEntries = CORE_DRINK_CATALOGUE.map(drink => entry<never>({ kind: "drink", drink }, catalogueNames(drink)));
+
 interface Draft<P> {
   quantity: number | null;
   preset: { value: P } | null;
@@ -149,20 +156,46 @@ interface Draft<P> {
 const emptyDraft = <P>(): Draft<P> => ({ quantity: null, preset: null, drink: null, serving: null, volumeMl: null, abv: null, guess: false, typed: null });
 
 export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[], options: OrderOptions<P> = {}): OrderLine<P>[] {
-  const catalogue = options.catalogue ?? DRINK_CATALOGUE;
+  const useIndex = options.catalogue === undefined;
+  const catalogue = options.catalogue ?? CORE_DRINK_CATALOGUE;
+  const learnedImports = useIndex
+    ? Array.from(options.learnedNames?.keys() ?? [])
+      .filter(isImportedDrink)
+      .map(id => catalogueDrink(id))
+      .filter((drink): drink is CatalogueDrink => drink !== undefined)
+    : [];
+  const namesFor = (drink: CatalogueDrink) => [
+    ...(options.names?.(drink) ?? []),
+    ...(options.learnedNames?.get(drink.id) ?? []),
+  ];
   // On a tie, a brand beats a generic preset, which beats a container word: "cidre" is the 4.5 % cider.
   const measures = SMALL_SERVINGS.map(({ serving, names, ml }) =>
     entry<P>({ kind: "serving", serving: { serving, names, volumeMl: {}, measureMl: ml } }, names),
   );
   const measureByName = new Map(measures.flatMap((candidate) => candidate.scored.map((name) => [name, candidate] as const)));
-  const vocabulary: Entry<P>[] = [
-    ...catalogue.map((drink) => entry<P>({ kind: "drink", drink }, catalogueNames(drink, options.names?.(drink) ?? []))),
+  const extras: Entry<P>[] = [];
+  const drinkEntries = [...catalogue, ...learnedImports].map((drink, index) => {
+    const names = namesFor(drink);
+    if (useIndex && index < coreOrderEntries.length && names.length === 0) return coreOrderEntries[index]!;
+    const candidate = entry<P>({ kind: "drink", drink }, catalogueNames(drink, names));
+    extras.push(candidate);
+    return candidate;
+  });
+  const localEntries = [
     ...presets.map((c) => entry<P>({ kind: "preset", preset: c.value }, c.names)),
     ...SERVING_WORDS.map((serving) => entry<P>({ kind: "serving", serving }, serving.names)),
     ...measures,
   ];
-  const exactNames = new Set(vocabulary.flatMap((candidate) => candidate.scored));
-  const maxNameWords = Math.max(4, ...Array.from(exactNames, (name) => name.split(" ").length));
+  const vocabulary = [...drinkEntries, ...localEntries];
+  const exactNames = new Map<string, Entry<P>[]>();
+  for (const candidate of [...extras, ...localEntries]) {
+    for (const name of candidate.scored) {
+      const matches = exactNames.get(name);
+      if (matches) matches.push(candidate);
+      else exactNames.set(name, [candidate]);
+    }
+  }
+  const maxNameWords = Math.max(useIndex ? indexedNameWordLimit : 4, ...Array.from(exactNames.keys(), name => name.split(" ").length));
   const words = tokenize(text);
   const groupOfPreset = (preset: { value: P } | null): DrinkGroup | null => (preset && options.presetGroup ? options.presetGroup(preset.value) : null);
   const compatible = (a: DrinkGroup | null, b: DrinkGroup) => a === null || a === b;
@@ -170,10 +203,34 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
 
   // Longest phrase first: "grand verre de vin" before "verre", "castel rouge" before "rouge".
   const matchAt = (start: number): { entry: Entry<P>; span: number; guess: boolean; phrase: string } | null => {
-    const word = words[start]!;
+    const word = words[start];
+    if (word === undefined) return null;
     const measure = measureByName.get(word);
     // An exact measure starts a serving, even when the following drink is misspelled.
     if (measure) return { entry: measure, span: 1, guess: false, phrase: word };
+    if (useIndex) {
+      for (let span = Math.min(maxNameWords, words.length - start); span >= 1; span--) {
+        const slice = words.slice(start, start + span);
+        const last = slice[span - 1]!;
+        if (span === 1 && boundary(word)) continue;
+        if (isNumber(last) && UNITS.has(words[start + span] ?? "")) continue;
+        const phrase = slice.join(" ");
+        const query = normalise(phrase);
+        const indexed = exactCatalogueNames(query)
+          .map(drink => entry<P>({ kind: "drink", drink }, catalogueNames(drink)));
+        const candidates = [
+          ...indexed.filter(match => match.kind === "drink" && !isImportedDrink(match.drink.id)),
+          ...(exactNames.get(query) ?? []),
+          ...indexed.filter(match => match.kind === "drink" && isImportedDrink(match.drink.id)),
+        ];
+        for (const match of candidates) {
+          const validNumbers = slice.every(token => isNumber(token))
+            ? match.numericNames.has(phrase)
+            : slice.every(token => !isNumber(token) || match.words.has(token));
+          if (validNumbers) return { entry: match, span, guess: false, phrase };
+        }
+      }
+    }
     for (let span = Math.min(maxNameWords, words.length - start); span >= 1; span--) {
       const slice = words.slice(start, start + span);
       const phrase = slice.join(" ");
@@ -312,8 +369,8 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
       i += 1;
       continue;
     }
-    const found = matchAt(i);
     const spelled = Object.hasOwn(NUMBER_WORDS, word) ? NUMBER_WORDS[word] : undefined;
+    const found = trailingMeasure && (isNumber(word) || spelled !== undefined) ? null : matchAt(i);
     if (!found && spelled !== undefined) {
       // "pinte à 8": the French "à" folds to "a", which is not "a pint" here.
       if (!(hasItem() && isNumber(next)) && next !== undefined) {
@@ -351,6 +408,22 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
         continue;
       }
       const whole = Number.isInteger(value);
+      // "25 d’une Ruby" gives the volume of the named drink. The article is not its quantity.
+      if (next !== undefined && VOLUME_LINKS.has(next)) {
+        const afterLink = words[i + 2];
+        const drinkStart = afterLink !== undefined && VOLUME_ARTICLES.has(afterLink) ? i + 3 : i + 2;
+        if (value > 0 && value * 10 <= MAX_VOLUME_ML && matchAt(drinkStart)?.entry.kind === "drink") {
+          if (whole && value <= MAX_QUANTITY) {
+            if (hasItem() || line.serving?.measureMl !== undefined) flush();
+            line.quantity = value;
+          } else {
+            if (line.drink || line.volumeMl !== null) flush();
+            line.volumeMl = Math.round(value * 10);
+          }
+          i = drinkStart;
+          continue;
+        }
+      }
       const beforeItem = next !== undefined && matchAt(i + 1) !== null;
       if (whole && value >= 1 && value <= MAX_QUANTITY && beforeItem) {
         // "2 castel"; after a drink, "pinte 2 shots" starts the next one.
