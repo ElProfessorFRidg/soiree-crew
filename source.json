@@ -863,16 +863,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -885,6 +885,28 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.20",
+          "buildVersion": "316",
+          "marketingVersion": "0.2.20 Preview (316)",
+          "date": "2026-11-23T20:07:09Z",
+          "localizedDescription": "• Bump dependabot/fetch-metadata from 2 to 3\n• Gate merges on the route the build took, not on the ios jobs\n• Do not count server deployment files as app changes\n• Upload OTA assets in a few batches instead of one request per file\n• Let CI-only changes ride along with an OTA update\n• Add a /ipa PR command for a full Preview IPA on demand\n• Read releases from a file when picking the IPA to patch\n• Route each change to OTA or a new IPA and say why\n• Self-host Expo OTA updates instead of EAS\n• Bump the other-patches group with 3 updates (#32)\n• Document Dependabot auto-merge safeguards and settings\n• Reserve short IPA versions without collisions\n• Automate OTA and IPA routing, versioning and release news\n• Add opt-in Expo OTA updates for iOS releases",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.20-preview.30%2Bbuild.316/soiree-crew-unsigned.ipa",
+          "size": 23533200,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.17",
           "buildVersion": "311",
@@ -1700,26 +1722,37 @@
           ]
         }
       ],
-      "version": "0.2.17",
-      "versionDate": "2026-11-23T18:01:38Z",
-      "versionDescription": "• Upload OTA assets in a few batches instead of one request per file\n• Let CI-only changes ride along with an OTA update\n• Add a /ipa PR command for a full Preview IPA on demand\n• Read releases from a file when picking the IPA to patch\n• Route each change to OTA or a new IPA and say why\n• Self-host Expo OTA updates instead of EAS\n• Bump the other-patches group with 3 updates (#32)\n• Document Dependabot auto-merge safeguards and settings\n• Reserve short IPA versions without collisions\n• Automate OTA and IPA routing, versioning and release news\n• Add opt-in Expo OTA updates for iOS releases",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.17-preview.28%2Bbuild.311/soiree-crew-unsigned.ipa",
+      "version": "0.2.20",
+      "versionDate": "2026-11-23T20:07:09Z",
+      "versionDescription": "• Bump dependabot/fetch-metadata from 2 to 3\n• Gate merges on the route the build took, not on the ios jobs\n• Do not count server deployment files as app changes\n• Upload OTA assets in a few batches instead of one request per file\n• Let CI-only changes ride along with an OTA update\n• Add a /ipa PR command for a full Preview IPA on demand\n• Read releases from a file when picking the IPA to patch\n• Route each change to OTA or a new IPA and say why\n• Self-host Expo OTA updates instead of EAS\n• Bump the other-patches group with 3 updates (#32)\n• Document Dependabot auto-merge safeguards and settings\n• Reserve short IPA versions without collisions\n• Automate OTA and IPA routing, versioning and release news\n• Add opt-in Expo OTA updates for iOS releases",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.20-preview.30%2Bbuild.316/soiree-crew-unsigned.ipa",
       "size": 23533200,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.17-preview.28%2Bbuild.311/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "preview-0.2.20-316",
+      "title": "Soirée Crew Preview 0.2.20 (316)",
+      "caption": "• Bump dependabot/fetch-metadata from 2 to 3\n• Gate merges on the route the build took, not on the ios jobs\n• Do not count server deployment files as app changes\n• Upload OTA assets in a few batches instead of one request per file\n• Let CI-only changes ride along with an OTA update\n• Add a /ipa PR command for a full Preview IPA on demand\n• Read releases from a file when picking the IPA to patch\n• Route each change to OTA or a new IPA and say why\n• Self-host Expo OTA updates instead of EAS\n• Bump the other-patches group with 3 updates (#32)\n• Document Dependabot auto-merge safeguards and settings\n• Reserve short IPA versions without collisions\n• Automate OTA and IPA routing, versioning and release news\n• Add opt-in Expo OTA updates for iOS releases",
+      "date": "2026-11-23T20:07:09Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.20-preview.30%2Bbuild.316/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.20-preview.30%2Bbuild.316/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
     {
       "identifier": "ota-v0.2.17-preview.28+build.311-iphone-45238650796.1",
       "title": "Soirée Crew Preview 0.2.17 · OTA",
@@ -1922,17 +1955,6 @@
       "tintColor": "F4B33D",
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.15%2Bbuild.270/iphone/banner.png",
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.9-preview.15%2Bbuild.270/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
-      "notify": false
-    },
-    {
-      "identifier": "preview-0.2.9-267",
-      "title": "Soirée Crew Preview 0.2.9 (267)",
-      "caption": "• Bump @noble/ciphers from 2.1.1 to 2.4.0",
-      "date": "2026-11-20T20:58:44Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9-preview.18%2Bbuild.267/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.9-preview.18%2Bbuild.267/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
     }
@@ -2299,6 +2321,13 @@
       "buildVersion": "2",
       "date": "2026-10-27T00:43:05Z",
       "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.20",
+      "buildVersion": "316",
+      "date": "2026-11-23T20:07:09Z",
+      "localizedDescription": "• Bump dependabot/fetch-metadata from 2 to 3\n• Gate merges on the route the build took, not on the ios jobs\n• Do not count server deployment files as app changes\n• Upload OTA assets in a few batches instead of one request per file\n• Let CI-only changes ride along with an OTA update\n• Add a /ipa PR command for a full Preview IPA on demand\n• Read releases from a file when picking the IPA to patch\n• Route each change to OTA or a new IPA and say why\n• Self-host Expo OTA updates instead of EAS\n• Bump the other-patches group with 3 updates (#32)\n• Document Dependabot auto-merge safeguards and settings\n• Reserve short IPA versions without collisions\n• Automate OTA and IPA routing, versioning and release news\n• Add opt-in Expo OTA updates for iOS releases"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
