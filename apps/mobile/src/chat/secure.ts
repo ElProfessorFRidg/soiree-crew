@@ -55,5 +55,5 @@ export async function removeSealed(name: string): Promise<void> {
 /** Every sealed chat item of one account, for sign-out and "delete my history". */
 export async function removeAllSealed(prefix: string): Promise<void> {
   const keys = (await AsyncStorage.getAllKeys()).filter((k) => k.startsWith(PREFIX + prefix));
-  if (keys.length) await AsyncStorage.multiRemove(keys);
+  if (keys.length) await AsyncStorage.removeMany(keys);
 }
