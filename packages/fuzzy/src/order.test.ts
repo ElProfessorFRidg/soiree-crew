@@ -57,6 +57,71 @@ describe("drink catalogue", () => {
 });
 
 describe("order parser with brands", () => {
+  it("distinguishes the blue 1664 bottle, the blueberry beer and 1664 variants", () => {
+    expect(parse("une 1664 bleue").map((line) => line.drink)).toEqual(["1664-blanc"]);
+    expect(parse("une biere bleu").map((line) => line.drink)).toEqual(["brasserie-du-mont-blanc-bleue"]);
+    expect(parse("une 1664").map((line) => line.drink)).toEqual(["1664"]);
+    expect(parse("deux 1664 fruits rouges")).toEqual([
+      { quantity: 2, preset: null, drink: "1664-fruits-rouges", volumeMl: null, abv: null },
+    ]);
+    expect(parse("une 1664 bleue sans alcool").map((line) => line.drink)).toEqual(["1664-blanc-zero"]);
+  });
+
+  it("recognises Spanish cañas with or without accents and respects the named beer", () => {
+    for (const input of ["dos cañas de Mahou Clásica", "dos canas de Mahou Clasica"]) {
+      expect(parse(input)).toEqual([
+        { quantity: 2, preset: null, drink: "mahou-clasica", volumeMl: 200, abv: null },
+      ]);
+    }
+    expect(parse("un tercio de Moritz")[0]).toMatchObject({ drink: "moritz-original", volumeMl: 330 });
+    const spanishPresets = [{ value: "demi", names: ["Caña"] }];
+    const lines = parseDrinkOrder("dos cañas de Mahou Clásica", spanishPresets, {
+      presetGroup: () => "beer",
+      presetVolume: () => 250,
+    });
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toMatchObject({ quantity: 2, drink: { id: "mahou-clasica" }, volumeMl: 200 });
+  });
+
+  it("keeps plural can measures attached to the requested beer", () => {
+    expect(parse("2 canettes de 8,6 black")).toEqual([
+      { quantity: 2, preset: null, drink: "bavaria-8-6-black", volumeMl: 500, abv: null },
+    ]);
+    expect(parse("une 8.6 ipa")[0]).toMatchObject({ drink: "bavaria-8-6-ipa" });
+  });
+
+  it("recognises Trois Rivières as a rum name whether its number is spelled or typed", () => {
+    for (const name of ["3 rivieres", "Trois Rivières", "rhum 3 rivieres"]) {
+      expect(parse(`deux bouchons de ${name}`)).toEqual([
+        { quantity: 2, preset: null, drink: "trois-rivieres", volumeMl: 10, abv: null },
+      ]);
+    }
+    expect(parse("trois bouchons de malibou")[0]).toMatchObject({ quantity: 3, drink: "malibu", volumeMl: 10 });
+    expect(parse("une gorgee de Trois Rivières Cuvée de l’Océan")[0]).toMatchObject({
+      quantity: 1, drink: "trois-rivieres-ocean", volumeMl: 15,
+    });
+    expect(parse("3 rivieres 55")[0]).toMatchObject({ quantity: 1, drink: "trois-rivieres-origines-55" });
+  });
+
+  it("recognises Saint James shorthand and keeps stated volumes", () => {
+    expect(parse("une gorgée de st james")[0]).toMatchObject({ drink: "saint-james-blanc-50", volumeMl: 15 });
+    expect(parse("st james 55")[0]).toMatchObject({ drink: "saint-james-blanc-55" });
+    expect(parse("st james fleur de canne")[0]).toMatchObject({ drink: "saint-james-fleur-de-canne" });
+    expect(parse("st james 40 ml")[0]).toMatchObject({ drink: "saint-james-blanc-50", volumeMl: 40 });
+  });
+
+  it("reads a cup of a named champagne as one drink", () => {
+    expect(parse("une coupe de Moët")).toEqual([
+      { quantity: 1, preset: null, drink: "moet-imperial-brut", volumeMl: 120, abv: null },
+    ]);
+    expect(parse("une coupe").map((line) => line.drink)).toEqual(["champagne"]);
+  });
+
+  it("distinguishes an Amaretto Sour cocktail from the named shot", () => {
+    expect(parse("un amaretto sour")[0]).toMatchObject({ drink: "amaretto-sour" });
+    expect(parse("un amaretto sour shot")[0]).toMatchObject({ drink: "amaretto-sour-shot" });
+  });
+
   it("resolves common mishearings of Leffe Ruby and Malibu", () => {
     expect(catalogueDrink("leffe-ruby")).toMatchObject({ volumeMl: 330, abv: 0.05 });
     for (const name of ["ruby", "rubis", "lèvre rubis", "levre ruby", "Leffe Rüby"]) {
