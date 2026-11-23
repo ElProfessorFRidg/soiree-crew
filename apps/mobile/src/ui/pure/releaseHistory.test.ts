@@ -31,3 +31,11 @@ it("keeps individual same-version builds and ignores malformed or mutable downlo
   expect(versionsFromSource(source, "preview").map((v) => v.build)).toEqual([125]);
   expect(versionsFromSource(null, "public")).toEqual([]);
 });
+
+it("lists OTA notes separately from IPA downloads and by channel", () => {
+  const ota = { id: "ota-tag", channel: "preview", date: "2026-11-15", build: 310, version: "0.2.310", notes: "Correction" };
+  const source = { otaChangelog: [ota], changelog: [{ bundleIdentifier: "app.soireecrew.mobile.preview", buildVersion: "310", version: "0.2.310", date: "2026-11-14" }] };
+  expect(changelogFromSource(source, "preview").map((entry) => entry.otaId)).toEqual(["ota-tag", undefined]);
+  expect(changelogFromSource(source, "public")).toEqual([]);
+  expect(versionsFromSource(source, "preview")).toEqual([]);
+});

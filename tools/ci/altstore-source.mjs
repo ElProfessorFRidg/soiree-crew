@@ -245,6 +245,28 @@ export function fromReleases(appJson, releases, media = {}, notes = {}, target =
       header: !!media.header,
     });
   }
+  if (source) {
+    const tags = new Map(named.map(({ release, parsed }) => [release.tag_name, parsed]));
+    source.otaChangelog = releases.flatMap((release) => {
+      const match = /^ota-(v\d+\.\d+\.\d+(?:-preview\.\d+)?\+build\.\d+)-(iphone|ipad)-(\d+\.\d+)$/.exec(release.tag_name ?? "");
+      const ipa = match ? tags.get(match[1]) : null;
+      if (!ipa || match[2] !== target || release.draft || !release.prerelease) return [];
+      return [{
+        id: release.tag_name, channel: ipa.channel, version: ipa.version, build: ipa.build,
+        date: release.published_at ?? release.created_at ?? "", notes: notesOf(release.body),
+      }];
+    }).sort((a, b) => b.date.localeCompare(a.date));
+    const otaNews = source.otaChangelog.map((update) => ({
+      identifier: update.id,
+      title: `Soirée Crew${update.channel === "preview" ? " Preview" : ""} ${update.version} · OTA`,
+      caption: update.notes,
+      date: update.date,
+      appID: appJson.expo.ios.bundleIdentifier + (update.channel === "preview" ? ".preview" : ""),
+      tintColor: TINT,
+      notify: false,
+    }));
+    source.news = [...source.news, ...otaNews].sort((a, b) => (b.date ?? "").localeCompare(a.date ?? "")).slice(0, KEEP_NEWS);
+  }
   return applyDistributionPolicy(source, policy);
 }
 
