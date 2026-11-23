@@ -18,5 +18,6 @@ export function latestIpaTag(releases, pr, openPrs = []) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const open = (process.env.OPEN_PRS ?? "").split(",").map((n) => n.trim()).filter(Boolean);
-  console.log(latestIpaTag(JSON.parse(readFileSync(0, "utf8")), process.env.PR_NUMBER, open));
+  // The releases JSON comes as a file path (build workflow) or on stdin.
+  console.log(latestIpaTag(JSON.parse(readFileSync(process.argv[2] ?? 0, "utf8")), process.env.PR_NUMBER, open));
 }
