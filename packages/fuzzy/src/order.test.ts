@@ -57,6 +57,26 @@ describe("drink catalogue", () => {
 });
 
 describe("order parser with brands", () => {
+  it("recognises Trois Rivières as a rum name whether its number is spelled or typed", () => {
+    for (const name of ["3 rivieres", "Trois Rivières", "rhum 3 rivieres"]) {
+      expect(parse(`deux bouchons de ${name}`)).toEqual([
+        { quantity: 2, preset: null, drink: "trois-rivieres", volumeMl: 10, abv: null },
+      ]);
+    }
+    expect(parse("trois bouchons de malibou")[0]).toMatchObject({ quantity: 3, drink: "malibu", volumeMl: 10 });
+    expect(parse("une gorgee de Trois Rivières Cuvée de l’Océan")[0]).toMatchObject({
+      quantity: 1, drink: "trois-rivieres-ocean", volumeMl: 15,
+    });
+    expect(parse("3 rivieres 55")[0]).toMatchObject({ quantity: 1, drink: "trois-rivieres-origines-55" });
+  });
+
+  it("recognises Saint James shorthand and keeps stated volumes", () => {
+    expect(parse("une gorgée de st james")[0]).toMatchObject({ drink: "saint-james-blanc-50", volumeMl: 15 });
+    expect(parse("st james 55")[0]).toMatchObject({ drink: "saint-james-blanc-55" });
+    expect(parse("st james fleur de canne")[0]).toMatchObject({ drink: "saint-james-fleur-de-canne" });
+    expect(parse("st james 40 ml")[0]).toMatchObject({ drink: "saint-james-blanc-50", volumeMl: 40 });
+  });
+
   it("reads a cup of a named champagne as one drink", () => {
     expect(parse("une coupe de Moët")).toEqual([
       { quantity: 1, preset: null, drink: "moet-imperial-brut", volumeMl: 120, abv: null },
