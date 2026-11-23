@@ -68,13 +68,17 @@ interface ServingWord {
   measureMl?: number;
 }
 
+const CANA: ServingWord = { serving: "demi", names: ["caña"], volumeMl: { beer: 200 } };
+
 /** Container words: they size the drink said with them, and mean nothing alone. */
 const SERVING_WORDS: readonly ServingWord[] = [
   { serving: "flash", names: ["flash"], volumeMl: { spirit: 200 } },
   { serving: "flask", names: ["flasque", "flask"], volumeMl: { spirit: 350 } },
-  { serving: "can", names: ["canette", "cannette", "can"], volumeMl: { beer: 330, cider: 330, cocktail: 330, soft: 330 } },
+  { serving: "can", names: ["canette", "canettes", "cannette", "cannettes", "can", "cans"], volumeMl: { beer: 330, cider: 330, cocktail: 330, soft: 330 } },
   { serving: "bottle", names: ["bouteille", "bottle", "teille"], volumeMl: { beer: 330, cider: 330, wine: 750, spirit: 700, soft: 500 } },
   { serving: "glass", names: ["verre", "glass"], volumeMl: { wine: 120, beer: 250, cider: 250, soft: 250 } },
+  // A plain "coupe" still means champagne. "Coupe de" introduces the wine by name.
+  { serving: "glass", names: ["coupe de"], volumeMl: { wine: 120 } },
   { serving: "largeGlass", names: ["grand verre", "large glass", "big glass"], volumeMl: { wine: 180, beer: 500, soft: 500 } },
   { serving: "double", names: ["double"], volumeMl: { spirit: 60 } },
   // A German "Kurzer" is the 2 cl measure.
@@ -84,6 +88,7 @@ const SERVING_WORDS: readonly ServingWord[] = [
   // A Bavarian "Halbe" is the half litre; a Spanish "tercio" the 33 cl bottle.
   { serving: "pint", names: ["pinte", "pint", "halbe"], volumeMl: { beer: 500, cider: 500 } },
   { serving: "bottle", names: ["tercio"], volumeMl: { beer: 330, cider: 330 } },
+  CANA,
   { serving: "shot", names: ["shot", "shooter", "chupito", "shottino", "cicchetto"], volumeMl: { spirit: 30 } },
 ];
 
@@ -157,6 +162,7 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
     ...measures,
   ];
   const exactNames = new Set(vocabulary.flatMap((candidate) => candidate.scored));
+  const maxNameWords = Math.max(4, ...Array.from(exactNames, (name) => name.split(" ").length));
   const words = tokenize(text);
   const groupOfPreset = (preset: { value: P } | null): DrinkGroup | null => (preset && options.presetGroup ? options.presetGroup(preset.value) : null);
   const compatible = (a: DrinkGroup | null, b: DrinkGroup) => a === null || a === b;
@@ -168,15 +174,19 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
     const measure = measureByName.get(word);
     // An exact measure starts a serving, even when the following drink is misspelled.
     if (measure) return { entry: measure, span: 1, guess: false, phrase: word };
-    for (let span = Math.min(4, words.length - start); span >= 1; span--) {
+    for (let span = Math.min(maxNameWords, words.length - start); span >= 1; span--) {
       const slice = words.slice(start, start + span);
       const phrase = slice.join(" ");
-      // Unless it is a name written in full: the German "Wodka-E" ends with the Italian "and".
-      if ((boundary(slice[0]!) || boundary(slice[span - 1]!)) && !(span > 1 && exactNames.has(normalise(phrase)))) continue;
-      const numericOnly = slice.every((w) => isNumber(w));
       const query = normalise(phrase);
-      // Everyday words can start an exact name, but "mal" alone does not mean Malibu.
-      if (isEverydayWord(slice[0]!) && !exactNames.has(query)) continue;
+      const exactPhrase = exactNames.has(query);
+      // Long names must be exact. A name can include a number word ("Trois Rivières") or a connector.
+      if (span > 4 && !exactPhrase) continue;
+      const last = slice[span - 1]!;
+      if ((boundary(slice[0]!) || boundary(last)) && !(span > 1 && exactPhrase)) continue;
+      // Leave an explicit volume intact even when its number could be part of a drink name.
+      if (isNumber(last) && UNITS.has(words[start + span] ?? "")) continue;
+      const numericOnly = slice.every((w) => isNumber(w));
+      if (isEverydayWord(slice[0]!) && !exactPhrase) continue;
       let best: Entry<P> | null = null;
       let bestScore = Number.POSITIVE_INFINITY;
       let bestExact = false;
@@ -192,8 +202,8 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
             if (s === null || (span === 1 && s >= 1 && name.includes(" "))) continue;
             if (s < score) score = s;
           }
-          // Two letters only count when exact: "la" is not La Chouffe.
-          if (span === 1 && phrase.length < 3 && score > 0) score = Number.POSITIVE_INFINITY;
+          // Short words must name the whole drink: the "j" in "j’ai" is not Rhum J.M.
+          if (span === 1 && phrase.length < 3 && !candidate.scored.includes(query)) score = Number.POSITIVE_INFINITY;
         }
         // On equal scores, a name said in full wins: "rouge" is red wine before Kasteel Rouge.
         const exact = candidate.scored.includes(query);
@@ -302,8 +312,9 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
       i += 1;
       continue;
     }
+    const found = matchAt(i);
     const spelled = Object.hasOwn(NUMBER_WORDS, word) ? NUMBER_WORDS[word] : undefined;
-    if (spelled !== undefined) {
+    if (!found && spelled !== undefined) {
       // "pinte à 8": the French "à" folds to "a", which is not "a pint" here.
       if (!(hasItem() && isNumber(next)) && next !== undefined) {
         if ((!trailingMeasure && hasItem()) || line.serving?.measureMl !== undefined) flush();
@@ -312,9 +323,12 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
       i += 1;
       continue;
     }
-    const found = matchAt(i);
     if (found) {
       place(found.entry);
+      // In Spanish the generic demi preset is also named caña. Keep its label and use the local pour.
+      if (found.entry.kind === "preset" && !line.serving && (found.phrase === "cana" || found.phrase === "canas")) {
+        line.serving = CANA;
+      }
       if (found.entry.kind !== "serving") {
         // The line now names this drink: remember how it was typed and whether it was a guess.
         if (found.entry.kind === "drink") line.typed = found.phrase;
