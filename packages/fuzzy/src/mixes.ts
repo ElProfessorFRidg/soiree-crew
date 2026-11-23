@@ -383,6 +383,22 @@ const COCKTAILS = mixed([
   { id: "citronnade", brand: "Citronnade", group: "soft", glass: "soft", parts: [[0, 250]], aliases: ["citronnade maison"], countries: ["FR"] },
   { id: "virgin-passion-martini", brand: "Virgin Passion Martini", group: "soft", glass: "cocktail", parts: [[0, 120]], aliases: ["pornstar sans alcool"], countries: ["FR", "GB"] },
   { id: "nojito-framboise", brand: "Virgin Mojito Framboise", group: "soft", glass: "cocktail", parts: [[0, 250]], aliases: ["mojito framboise sans alcool"], countries: ["FR"] },
+  { id: "naked-and-famous", brand: "Naked and Famous", group: "cocktail", glass: "cocktail", parts: [[45, 22.5], [43, 22.5], [11, 22.5], [0, 32.5]], aliases: [], countries: ["US", "FR"] },
+  { id: "blood-and-sand", brand: "Blood and Sand", group: "cocktail", glass: "cocktail", parts: [[40, 25], [16, 25], [24, 25], [0, 35]], aliases: [], countries: ["GB", "US", "FR"] },
+  { id: "rob-roy", brand: "Rob Roy", group: "cocktail", glass: "cocktail", parts: [[40, 50], [16, 20], [45, 2], [0, 18]], aliases: [], countries: ["US", "GB", "FR"] },
+  { id: "godfather-cocktail", brand: "Godfather", group: "cocktail", glass: "cocktail", parts: [[40, 50], [28, 20], [0, 15]], aliases: [], countries: ["US", "GB", "FR"] },
+  { id: "godmother-cocktail", brand: "Godmother", group: "cocktail", glass: "cocktail", parts: [[40, 50], [28, 20], [0, 15]], aliases: [], countries: ["US", "GB", "FR"] },
+  { id: "rusty-nail-cocktail", brand: "Rusty Nail Cocktail", group: "cocktail", glass: "cocktail", parts: [[40, 45], [40, 25], [0, 15]], aliases: [], countries: ["GB", "US", "FR"] },
+  { id: "matador-cocktail", brand: "Matador", group: "cocktail", glass: "cocktail", parts: [[40, 45], [0, 120]], aliases: [], countries: ["MX", "US"] },
+  { id: "hemingway-daiquiri", brand: "Hemingway Daiquiri", group: "cocktail", glass: "cocktail", parts: [[40, 60], [32, 15], [0, 55]], aliases: [], countries: ["CU", "US", "FR"] },
+  { id: "airmail-cocktail", brand: "Airmail", group: "cocktail", glass: "cocktail", parts: [[40, 45], [12, 60], [0, 30]], aliases: [], countries: ["US", "FR"] },
+  { id: "jack-rose-cocktail", brand: "Jack Rose", group: "cocktail", glass: "cocktail", parts: [[40, 45], [0, 45]], aliases: [], countries: ["US", "GB"] },
+  { id: "champagne-cocktail", brand: "Champagne Cocktail", group: "cocktail", glass: "cocktail", parts: [[12, 90], [40, 10], [45, 2]], aliases: [], countries: ["FR", "GB", "US"] },
+  { id: "floradora", brand: "Floradora", group: "cocktail", glass: "cocktail", parts: [[40, 50], [0, 125]], aliases: [], countries: ["US", "GB"] },
+  { id: "john-collins", brand: "John Collins", group: "cocktail", glass: "cocktail", parts: [[40, 45], [0, 105]], aliases: [], countries: ["GB", "US"] },
+  { id: "long-vodka", brand: "Long Vodka", group: "cocktail", glass: "cocktail", parts: [[40, 50], [45, 2], [0, 150]], aliases: [], countries: ["GB"] },
+  { id: "white-negroni", brand: "White Negroni", group: "cocktail", glass: "cocktail", parts: [[40, 45], [17, 25], [15, 25], [0, 15]], aliases: [], countries: ["FR", "GB", "US"] },
+  { id: "black-velvet", brand: "Black Velvet", group: "cocktail", glass: "cocktail", parts: [[4.2, 75], [12, 75]], aliases: [], countries: ["GB", "IE", "FR"] },
 ]);
 
 // Bottled and canned, strength from the label.
