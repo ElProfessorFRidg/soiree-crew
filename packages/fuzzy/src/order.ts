@@ -312,8 +312,8 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
       i += 1;
       continue;
     }
-    const found = matchAt(i);
     const spelled = Object.hasOwn(NUMBER_WORDS, word) ? NUMBER_WORDS[word] : undefined;
+    const found = trailingMeasure && (isNumber(word) || spelled !== undefined) ? null : matchAt(i);
     if (!found && spelled !== undefined) {
       // "pinte à 8": the French "à" folds to "a", which is not "a pint" here.
       if (!(hasItem() && isNumber(next)) && next !== undefined) {
