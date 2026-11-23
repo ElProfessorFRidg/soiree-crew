@@ -22,16 +22,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -44,6 +44,28 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.31",
+          "buildVersion": "329",
+          "marketingVersion": "0.2.31 (329)",
+          "date": "2026-11-23T22:26:56Z",
+          "localizedDescription": "• TypeScript 7, with the fixes it needs (#17)\n• Expand the catalogue and add a build-time name index (#29)\n• Bump @react-native-async-storage/async-storage (#16)\n• Bump vitest from 3.2.7 to 4.1.11 (#31)\n• Bump the other-minors group across 1 directory with 8 updates (#34)\n• Bump dependabot/fetch-metadata from 2 to 3 (#30)",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.31%2Bbuild.329/soiree-crew-unsigned.ipa",
+          "size": 25933720,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.19",
           "buildVersion": "315",
@@ -857,22 +879,22 @@
           "minOSVersion": "16.4"
         }
       ],
-      "version": "0.2.19",
-      "versionDate": "2026-11-23T20:08:26Z",
-      "versionDescription": "• Gate merges on the route the build took, not on the ios jobs\n• Do not count server deployment files as app changes\n• Upload OTA assets in a few batches instead of one request per file\n• Let CI-only changes ride along with an OTA update\n• Add a /ipa PR command for a full Preview IPA on demand\n• Read releases from a file when picking the IPA to patch\n• Route each change to OTA or a new IPA and say why\n• Self-host Expo OTA updates instead of EAS\n• Bump the other-patches group with 3 updates (#32)\n• Document Dependabot auto-merge safeguards and settings\n• Reserve short IPA versions without collisions\n• Automate OTA and IPA routing, versioning and release news\n• Add opt-in Expo OTA updates for iOS releases",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.19%2Bbuild.315/soiree-crew-unsigned.ipa",
-      "size": 23528594,
+      "version": "0.2.31",
+      "versionDate": "2026-11-23T22:26:56Z",
+      "versionDescription": "• TypeScript 7, with the fixes it needs (#17)\n• Expand the catalogue and add a build-time name index (#29)\n• Bump @react-native-async-storage/async-storage (#16)\n• Bump vitest from 3.2.7 to 4.1.11 (#31)\n• Bump the other-minors group across 1 directory with 8 updates (#34)\n• Bump dependabot/fetch-metadata from 2 to 3 (#30)",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.31%2Bbuild.329/soiree-crew-unsigned.ipa",
+      "size": 25933720,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.19%2Bbuild.315/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/10-limits.png"
       ]
     },
     {
@@ -1831,6 +1853,17 @@
   ],
   "news": [
     {
+      "identifier": "release-0.2.31-329",
+      "title": "Soirée Crew 0.2.31 (329)",
+      "caption": "• TypeScript 7, with the fixes it needs (#17)\n• Expand the catalogue and add a build-time name index (#29)\n• Bump @react-native-async-storage/async-storage (#16)\n• Bump vitest from 3.2.7 to 4.1.11 (#31)\n• Bump the other-minors group across 1 directory with 8 updates (#34)\n• Bump dependabot/fetch-metadata from 2 to 3 (#30)",
+      "date": "2026-11-23T22:26:56Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.31%2Bbuild.329/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile",
+      "notify": false
+    },
+    {
       "identifier": "preview-0.2.30-331",
       "title": "Soirée Crew Preview 0.2.30 (331)",
       "caption": "• Reorganise Settings: groups, icons, search, text size, gentler haptics\n• TypeScript 7, with the fixes it needs (#17)\n• Expand the catalogue and add a build-time name index (#29)\n• Bump @react-native-async-storage/async-storage (#16)\n• Bump vitest from 3.2.7 to 4.1.11 (#31)\n• Bump the other-minors group across 1 directory with 8 updates (#34)\n• Bump dependabot/fetch-metadata from 2 to 3 (#30)",
@@ -2034,17 +2067,6 @@
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.11-preview.25%2Bbuild.280/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
-    },
-    {
-      "identifier": "release-0.2.10-276",
-      "title": "Soirée Crew 0.2.10 (276)",
-      "caption": "• Expand drink selection and recognise sips and capfuls\n• Add Leffe Ruby and 111 more drinks to the catalogue\n• Regenerate lockfile after merge\n• Bump the expo-sdk group with 23 updates",
-      "date": "2026-11-23T08:00:20Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.10%2Bbuild.276/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile",
-      "notify": false
     }
   ],
   "otaChangelog": [
@@ -2067,6 +2089,13 @@
   ],
   "allowDowngrades": true,
   "changelog": [
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.2.31",
+      "buildVersion": "329",
+      "date": "2026-11-23T22:26:56Z",
+      "localizedDescription": "• TypeScript 7, with the fixes it needs (#17)\n• Expand the catalogue and add a build-time name index (#29)\n• Bump @react-native-async-storage/async-storage (#16)\n• Bump vitest from 3.2.7 to 4.1.11 (#31)\n• Bump the other-minors group across 1 directory with 8 updates (#34)\n• Bump dependabot/fetch-metadata from 2 to 3 (#30)"
+    },
     {
       "bundleIdentifier": "app.soireecrew.mobile",
       "version": "0.2.19",
