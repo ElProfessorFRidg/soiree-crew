@@ -23,52 +23,52 @@
       "category": "lifestyle",
       "screenshots": [
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/01-party.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/01-party.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/08-add-drink.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/08-add-drink.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/09-curve.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/09-curve.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/03-games.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/03-games.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/07-my-stats.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/07-my-stats.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/12-history.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/12-history.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/11-leaderboard.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/11-leaderboard.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/04-bars.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/04-bars.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/05-me.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/05-me.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/10-limits.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/10-limits.png",
           "width": 2064,
           "height": 2752
         }
@@ -84,6 +84,68 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.12",
+          "buildVersion": "302",
+          "marketingVersion": "0.2.12 (302)",
+          "date": "2026-11-23T15:48:20Z",
+          "localizedDescription": "• Queue safe Dependabot patches for protected auto-merge\n• Expand Dependabot security and version update coverage",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.12%2Bbuild.302/soiree-crew-ipad-unsigned.ipa",
+          "size": 22832681,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/01-party.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/08-add-drink.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/09-curve.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/03-games.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/07-my-stats.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/12-history.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/11-leaderboard.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/04-bars.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/05-me.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/10-limits.png",
+              "width": 2064,
+              "height": 2752
+            }
+          ]
+        },
         {
           "version": "0.2.11",
           "buildVersion": "290",
@@ -519,22 +581,22 @@
           ]
         }
       ],
-      "version": "0.2.11",
-      "versionDate": "2026-11-23T13:18:15Z",
-      "versionDescription": "• Retirer les derniers sous-textes superflus\n• Renouveler les autres phrases d’accueil en français\n• Fill gaps in 1664 and other French-market beer ranges\n• Add Spanish and international beers and expand Chouffe selection\n• Add 80 beers and recognise plural can measures\n• Add Trois Rivières, Saint James and other rum variants\n• Réécrire les huit vannes du matin en français\n• Expand regional drinks, champagne and alcohol-free choices\n• Rendre les phrases du matin plus drôles\n• Add 100 drinks to the bar catalogue\n• Alléger les textes de l’interface Soirée Crew",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.11%2Bbuild.290/soiree-crew-ipad-unsigned.ipa",
-      "size": 22832685,
+      "version": "0.2.12",
+      "versionDate": "2026-11-23T15:48:20Z",
+      "versionDescription": "• Queue safe Dependabot patches for protected auto-merge\n• Expand Dependabot security and version update coverage",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.12%2Bbuild.302/soiree-crew-ipad-unsigned.ipa",
+      "size": 22832681,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/10-limits.png"
       ]
     },
     {
@@ -2677,6 +2739,17 @@
   ],
   "news": [
     {
+      "identifier": "release-0.2.12-302",
+      "title": "Soirée Crew 0.2.12 (302)",
+      "caption": "• Queue safe Dependabot patches for protected auto-merge\n• Expand Dependabot security and version update coverage",
+      "date": "2026-11-23T15:48:20Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/ipad/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.12%2Bbuild.302/soiree-crew-ipad-unsigned.ipa",
+      "appID": "app.soireecrew.mobile",
+      "notify": false
+    },
+    {
       "identifier": "preview-0.2.12-298",
       "title": "Soirée Crew Preview 0.2.12 (298)",
       "caption": "• Expand indexed drink catalogue beyond 5,000 references\n• Add IBA cocktails and parse spoken centilitre measures\n• Import 2,861 beers and build an offline catalogue name index\n• Add 96 more catalogue references across six drink groups\n• Expand all six drink catalogue groups\n• Add 64 whiskies, vodkas, liqueurs and beers\n• Add 44 Belgian beers including Mouscron breweries",
@@ -2884,21 +2957,17 @@
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.20%2Bbuild.257/soiree-crew-ipad-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
-    },
-    {
-      "identifier": "preview-0.2.8-256",
-      "title": "Soirée Crew Preview 0.2.8 (256)",
-      "caption": "• Bump react-native-gesture-handler from 3.3.0 to 3.5.0",
-      "date": "2026-11-20T19:53:11Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.19%2Bbuild.256/ipad/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.19%2Bbuild.256/soiree-crew-ipad-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
-      "notify": false
     }
   ],
   "allowDowngrades": true,
   "changelog": [
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.2.12",
+      "buildVersion": "302",
+      "date": "2026-11-23T15:48:20Z",
+      "localizedDescription": "• Queue safe Dependabot patches for protected auto-merge\n• Expand Dependabot security and version update coverage"
+    },
     {
       "bundleIdentifier": "app.soireecrew.mobile",
       "version": "0.2.11",
