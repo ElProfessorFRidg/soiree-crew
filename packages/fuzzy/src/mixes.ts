@@ -399,6 +399,18 @@ const COCKTAILS = mixed([
   { id: "long-vodka", brand: "Long Vodka", group: "cocktail", glass: "cocktail", parts: [[40, 50], [45, 2], [0, 150]], aliases: [], countries: ["GB"] },
   { id: "white-negroni", brand: "White Negroni", group: "cocktail", glass: "cocktail", parts: [[40, 45], [17, 25], [15, 25], [0, 15]], aliases: [], countries: ["FR", "GB", "US"] },
   { id: "black-velvet", brand: "Black Velvet", group: "cocktail", glass: "cocktail", parts: [[4.2, 75], [12, 75]], aliases: [], countries: ["GB", "IE", "FR"] },
+  { id: "bamboo-cocktail", brand: "Bamboo", group: "cocktail", glass: "cocktail", parts: [[15, 45], [18, 45], [45, 2], [0, 15]], aliases: [], countries: ["JP", "US"] },
+  { id: "adonis-cocktail", brand: "Adonis", group: "cocktail", glass: "cocktail", parts: [[15, 45], [16, 45], [45, 2], [0, 15]], aliases: [], countries: ["US", "GB"] },
+  { id: "hanky-panky-cocktail", brand: "Hanky Panky", group: "cocktail", glass: "cocktail", parts: [[40, 45], [16, 45], [39, 5], [0, 15]], aliases: [], countries: ["GB", "FR"] },
+  { id: "bijou-cocktail", brand: "Bijou", group: "cocktail", glass: "cocktail", parts: [[40, 30], [55, 30], [16, 30], [0, 15]], aliases: [], countries: ["FR", "GB"] },
+  { id: "alaska-cocktail", brand: "Alaska Cocktail", group: "cocktail", glass: "cocktail", parts: [[40, 45], [43, 15], [45, 2], [0, 15]], aliases: [], countries: ["US", "GB"] },
+  { id: "french-connection", brand: "French Connection", group: "cocktail", glass: "cocktail", parts: [[40, 35], [28, 35], [0, 15]], aliases: [], countries: ["FR", "US"] },
+  { id: "toronto-cocktail", brand: "Toronto Cocktail", group: "cocktail", glass: "cocktail", parts: [[45, 60], [39, 7.5], [45, 2.5], [0, 25]], aliases: [], countries: ["CA", "US"] },
+  { id: "suffering-bastard", brand: "Suffering Bastard", group: "cocktail", glass: "cocktail", parts: [[40, 30], [40, 30], [45, 2], [0, 110]], aliases: [], countries: ["GB", "US"] },
+  { id: "saturn-cocktail", brand: "Saturn", group: "cocktail", glass: "cocktail", parts: [[40, 45], [0, 90]], aliases: [], countries: ["US", "GB"] },
+  { id: "queens-park-swizzle", brand: "Queen’s Park Swizzle", group: "cocktail", glass: "cocktail", parts: [[40, 60], [45, 2], [0, 90]], aliases: [], countries: ["TT", "US"] },
+  { id: "eastside-cocktail", brand: "Eastside", group: "cocktail", glass: "cocktail", parts: [[40, 50], [0, 70]], aliases: [], countries: ["US", "GB"] },
+  { id: "port-flip", brand: "Porto Flip", group: "cocktail", glass: "cocktail", parts: [[20, 45], [40, 15], [0, 25]], aliases: [], countries: ["PT", "FR", "GB"] },
 ]);
 
 // Bottled and canned, strength from the label.
