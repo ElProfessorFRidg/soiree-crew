@@ -1721,6 +1721,15 @@
   ],
   "news": [
     {
+      "identifier": "ota-v0.2.17-preview.28+build.311-iphone-45234232160.1",
+      "title": "Soirée Crew Preview 0.2.17 · OTA",
+      "caption": "• Do not count server deployment files as app changes",
+      "date": "2026-11-23T18:09:53Z",
+      "appID": "app.soireecrew.mobile.preview",
+      "tintColor": "F4B33D",
+      "notify": false
+    },
+    {
       "identifier": "preview-0.2.17-311",
       "title": "Soirée Crew Preview 0.2.17 (311)",
       "caption": "• Upload OTA assets in a few batches instead of one request per file\n• Let CI-only changes ride along with an OTA update\n• Add a /ipa PR command for a full Preview IPA on demand\n• Read releases from a file when picking the IPA to patch\n• Route each change to OTA or a new IPA and say why\n• Self-host Expo OTA updates instead of EAS\n• Bump the other-patches group with 3 updates (#32)\n• Document Dependabot auto-merge safeguards and settings\n• Reserve short IPA versions without collisions\n• Automate OTA and IPA routing, versioning and release news\n• Add opt-in Expo OTA updates for iOS releases",
@@ -1928,20 +1937,18 @@
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.9-preview.23%2Bbuild.269/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
-    },
-    {
-      "identifier": "release-0.2.9-265",
-      "title": "Soirée Crew 0.2.9 (265)",
-      "caption": "• Stop previous-account refresh chains and inbox flags after logout\n• Stop countdowns when the app loses foreground\n• Stop countdowns when the app loses foreground\n• Keep drawing arena usable on compact screens\n• Bump @noble/curves from 2.0.1 to 2.4.0\n• Prevent duplicate head-to-head round advancement\n• Prevent simultaneous curve starts and cancel stale countdowns\n• Verify delayed invitations and inbox responses cannot cross accounts\n• Reject stale invitations, notification and venue responses\n• Reject stale invitations, notification and venue responses\n• Reject stale invitations, notification and venue responses\n• Identify both opponents during head-to-head rounds\n• Identify both opponents during head-to-head rounds\n• Support accessible two-player highlight banners\n• Serialize category erasure and guard against session changes\n• Cover session guards for sign-out and account/server switching\n• Prevent stale optimistic rollbacks and SOS clears after sign-out\n• Ignore obsolete websocket events and preserve new socket on reconnect\n• Prevent stale radar and SOS responses crossing accounts\n• Isolate crew, party and live responses across session changes\n• Discard stale sync payloads after account changes\n• Add identity guard for in-flight authenticated responses\n• Cancel stale fuse resume when round state changes\n• Surface selected player on wheel and curve result\n• Surface selected player on wheel and curve result\n• Prevent concurrent Point Blank countdowns and stale callbacks\n• Make truth-or-dare resolution single-flight across taps and swipes\n• Prevent overlapping fuse resume timers and clear on unmount\n• Show active player in more game states\n• Show active player in more game states\n• Show active player in more game states\n• Identify active reader and driver across more mini-games\n• Identify active reader and driver across more mini-games\n• Identify active reader and driver across more mini-games\n• Highlight current player during gameplay\n• Highlight current player during gameplay\n• Highlight current player during gameplay\n• Add accessible animated active-turn banner to shared shell",
-      "date": "2026-11-20T20:47:52Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.9%2Bbuild.265/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile",
-      "notify": false
     }
   ],
-  "otaChangelog": [],
+  "otaChangelog": [
+    {
+      "id": "ota-v0.2.17-preview.28+build.311-iphone-45234232160.1",
+      "channel": "preview",
+      "version": "0.2.17",
+      "build": 311,
+      "date": "2026-11-23T18:09:53Z",
+      "notes": "• Do not count server deployment files as app changes"
+    }
+  ],
   "allowDowngrades": true,
   "changelog": [
     {
