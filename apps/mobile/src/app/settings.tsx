@@ -1,3 +1,4 @@
+import { isEmbeddedLaunch, isEnabled, updateId } from "expo-updates";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { StyleSheet, View, Platform } from "react-native";
@@ -103,6 +104,7 @@ function SettingsRoot() {
       </Panel>
       <Text variant="small" align="center">
         {i18n.t("settings.version", { version: currentVersion, build: currentBuild || "dev" })}
+        {isEnabled && !isEmbeddedLaunch && updateId ? ` · OTA ${updateId.slice(0, 8)}` : null}
       </Text>
       <Button variant="secondary" label={i18n.t("diagnostics.title")} onPress={() => router.push("/server-status")} />
     </>

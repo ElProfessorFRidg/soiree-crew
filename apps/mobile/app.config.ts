@@ -6,6 +6,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const build = Number.parseInt(process.env.BUILD_NUMBER ?? "1", 10);
   const target = process.env.CREW_IOS_TARGET ?? "universal";
   const preview = process.env.CREW_RELEASE_CHANNEL === "preview";
+  const channel = preview ? "preview" : "public";
+  const projectId = process.env.CREW_EXPO_PROJECT_ID?.trim();
+  const ota = Boolean(projectId && (target === "iphone" || target === "ipad"));
+  if (ota && !/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(projectId!)) {
+    throw new Error("CREW_EXPO_PROJECT_ID must be an Expo project UUID");
+  }
   const bundleIdentifier = `${config.ios?.bundleIdentifier ?? "app.soireecrew.mobile"}${preview ? ".preview" : ""}`;
   // docs/VERSIONING.md: CI names each release 0.1.1, 0.1.2...; app.json keeps the series for local builds.
   const version = process.env.APP_VERSION || config.version;
@@ -25,6 +31,17 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     scheme: preview ? "soireecrew-preview" : config.scheme,
     ...(plugins ? { plugins: plugins as ExpoConfig["plugins"] } : {}),
     ...(version ? { version } : {}),
+    ...(ota ? {
+      runtimeVersion: `crew-${channel}-${target}-${build}`,
+      updates: {
+        ...config.updates,
+        enabled: true,
+        url: `https://u.expo.dev/${projectId}`,
+        requestHeaders: { "expo-channel-name": `${channel}-${target}` },
+        checkAutomatically: "ON_LOAD",
+        fallbackToCacheTimeout: 0,
+      },
+    } : { updates: { ...config.updates, enabled: false } }),
     orientation: target === "iphone" ? "portrait" : "default",
     ios: {
       ...config.ios,
@@ -41,9 +58,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     // The public server the connect screen suggests; CI passes the repository variable CREW_SERVER_URL.
     extra: {
       ...config.extra,
+      ...(ota ? { eas: { projectId } } : {}),
       buildNumber: build,
       appVersion: version ?? null,
-      releaseChannel: preview ? "preview" : "public",
+      releaseChannel: channel,
       iosTarget: target,
       releasesApi: `https://api.github.com/repos/ElProfessorFRidg/soiree-crew/releases${preview ? "?per_page=100" : "/latest"}`,
       // AltStore / SideStore source, rewritten by every release on the altstore branch (docs/ALTSTORE.md).

@@ -1,0 +1,76 @@
+name: Expo OTA
+run-name: OTA ${{ inputs.release }} · ${{ inputs.target }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Exact GitHub IPA release tag (for example v0.2.12-preview.28+build.310)
+        required: true
+      target:
+        description: Device target of the installed IPA
+        type: choice
+        options: [iphone, ipad]
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: crew-ota-${{ inputs.release }}-${{ inputs.target }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main' || contains(inputs.release, '-preview.')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      RELEASE_TAG: ${{ inputs.release }}
+      CREW_IOS_TARGET: ${{ inputs.target }}
+      CREW_RELEASE_CHANNEL: ${{ contains(inputs.release, '-preview.') && 'preview' || 'public' }}
+      CREW_EXPO_PROJECT_ID: ${{ contains(inputs.release, '-preview.') && vars.CREW_EXPO_PREVIEW_PROJECT_ID || !contains(inputs.release, '-preview.') && vars.CREW_EXPO_PUBLIC_PROJECT_ID || '' }}
+      CREW_SERVER_URL: ${{ contains(inputs.release, '-preview.') && (vars.CREW_PREVIEW_SERVER_URL || vars.CREW_SERVER_URL) || vars.CREW_SERVER_URL }}
+      CREW_PUBLIC_SERVERS: ${{ vars.CREW_PUBLIC_SERVERS }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Verify target and compatible changes
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-preview\.[0-9]+)?\+build\.[0-9]+$ ]]
+          test -n "$CREW_EXPO_PROJECT_ID"
+          gh release download "$RELEASE_TAG" --pattern "ios-build-info-$CREW_IOS_TARGET.json" --dir "$RUNNER_TEMP"
+          node tools/ci/plan-ota.mjs "$RELEASE_TAG" "$CREW_IOS_TARGET" "$RUNNER_TEMP/ios-build-info-$CREW_IOS_TARGET.json" >> "$GITHUB_OUTPUT"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: '27.11.0'
+          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Publish iOS update
+        working-directory: apps/mobile
+        env:
+          APP_VERSION: ${{ steps.plan.outputs.version }}
+          BUILD_NUMBER: ${{ steps.plan.outputs.build }}
+          OTA_STREAM: ${{ steps.plan.outputs.stream }}
+          OTA_RUNTIME: ${{ steps.plan.outputs.runtime }}
+          OTA_ENV: ${{ contains(inputs.release, '-preview.') && 'preview' || 'production' }}
+        run: |
+          pnpm exec expo config --type public --json | node -e '
+            const c = JSON.parse(require("node:fs").readFileSync(0, "utf8"));
+            if (c.runtimeVersion !== process.env.OTA_RUNTIME ||
+                c.updates?.requestHeaders?.["expo-channel-name"] !== process.env.OTA_STREAM) {
+              throw new Error("The update config does not match the selected IPA");
+            }
+          '
+          eas update --channel "$OTA_STREAM" --environment "$OTA_ENV" --platform ios --message "Soirée Crew ${GITHUB_SHA::12}" --non-interactive

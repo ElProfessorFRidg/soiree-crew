@@ -75,6 +75,7 @@ jobs:
       CREW_IOS_TARGET: ${{ matrix.target }}
       CREW_RELEASE_CHANNEL: ${{ github.event_name == 'pull_request' && 'preview' || 'public' }}
       IPA_FILE: ${{ matrix.file }}
+      CREW_EXPO_PROJECT_ID: ${{ github.event_name != 'pull_request' && vars.CREW_EXPO_PUBLIC_PROJECT_ID || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && vars.CREW_EXPO_PREVIEW_PROJECT_ID || '' }}
       CREW_SERVER_URL: ${{ github.event_name == 'pull_request' && vars.CREW_PREVIEW_SERVER_URL || vars.CREW_SERVER_URL }}
       CREW_PUBLIC_SERVERS: ${{ vars.CREW_PUBLIC_SERVERS }}
     steps:
