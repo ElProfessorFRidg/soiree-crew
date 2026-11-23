@@ -57,6 +57,11 @@ describe("drink catalogue", () => {
 });
 
 describe("order parser with brands", () => {
+  it("distinguishes an Amaretto Sour cocktail from the named shot", () => {
+    expect(parse("un amaretto sour")[0]).toMatchObject({ drink: "amaretto-sour" });
+    expect(parse("un amaretto sour shot")[0]).toMatchObject({ drink: "amaretto-sour-shot" });
+  });
+
   it("resolves common mishearings of Leffe Ruby and Malibu", () => {
     expect(catalogueDrink("leffe-ruby")).toMatchObject({ volumeMl: 330, abv: 0.05 });
     for (const name of ["ruby", "rubis", "lèvre rubis", "levre ruby", "Leffe Rüby"]) {

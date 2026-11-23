@@ -176,6 +176,31 @@ const SPIRITS = rows("spirit", [
   ["zubrowka-biala", "Żubrówka Biała", 40, 40, "shot", ["zubrowka blanche"], ["PL", "FR"]],
   ["jagermeister-manifest", "Jägermeister Manifest", 38, 40, "shot", ["jager manifest"], ["DE", "FR", "GB"]],
   ["grey-goose-la-poire", "Grey Goose La Poire", 40, 40, "shot", ["grey goose poire"], ["FR", "US", "GB"]],
+  ["grand-marnier-cordon-rouge", "Grand Marnier Cordon Rouge", 40, 40, "shot", ["grand marnier"], ["FR", "GB", "US"]],
+  ["st-germain", "St-Germain", 20, 40, "shot", ["saint germain", "st germain"], ["FR", "GB", "US"]],
+  ["chambord", "Chambord", 16.5, 30, "shot", ["liqueur chambord"], ["FR", "GB", "US"]],
+  ["midori", "Midori", 20, 30, "shot", ["midori melon"], ["JP", "AU", "US", "FR"]],
+  ["luxardo-maraschino", "Luxardo Maraschino", 32, 30, "shot", ["maraschino"], ["IT", "GB", "US"]],
+  ["galliano-autentico", "Galliano L’Autentico", 42.3, 30, "shot", ["galliano"], ["IT", "GB", "US"]],
+  ["marie-brizard-anisette", "Marie Brizard Anisette", 25, 30, "shot", ["anisette marie brizard"], ["FR", "ES"]],
+  ["giffard-menthe-pastille", "Giffard Menthe-Pastille", 24, 30, "shot", ["menthe pastille"], ["FR"]],
+  ["giffard-blue-curacao", "Giffard Curaçao Bleu", 25, 30, "shot", ["curacao bleu", "blue curacao"], ["FR"]],
+  ["pastis-henri-bardouin", "Pastis Henri Bardouin", 45, 20, "shot", ["henri bardouin", "pastis bardouin"], ["FR"]],
+  ["absinthe-pontarlier-emile-pernot", "Absinthe La Pontissalienne", 56, 25, "shot", ["la pontissalienne"], ["FR"]],
+  ["marie-brizard-parfait-amour", "Marie Brizard Parfait Amour", 25, 30, "shot", ["parfait amour"], ["FR"]],
+  ["suze-saveur-dautrefois", "Suze Saveur d’Autrefois", 20, 40, "shot", ["suze autrefois"], ["FR"]],
+  ["fernet-vallet", "Fernet-Vallet", 35, 40, "shot", [], ["MX", "US"]],
+  ["pisco-barsol-quebranta", "Barsol Primero Quebranta", 41.3, 40, "shot", ["barsol", "pisco barsol"], ["PE", "US", "FR"]],
+  ["leblon-cachaca", "Leblon Cachaça", 40, 40, "shot", ["leblon"], ["BR", "FR", "US"]],
+  ["cachaca-51", "Cachaça 51", 40, 40, "shot", ["cachaca 51", "pirassununga 51"], ["BR", "PT"]],
+  ["rhum-jm-blanc", "Rhum J.M Blanc 50°", 50, 40, "shot", ["rhum jm", "jm blanc"], ["FR"]],
+  ["sipsmith-london-dry", "Sipsmith London Dry", 41.6, 40, "shot", ["sipsmith"], ["GB", "FR"]],
+  ["bombay-bramble", "Bombay Bramble", 37.5, 40, "shot", [], ["GB", "FR"]],
+  ["aberlour-12", "Aberlour 12 ans", 40, 40, "shot", ["aberlour 12"], ["GB", "FR"]],
+  ["glenlivet-12", "The Glenlivet 12", 40, 40, "shot", ["glenlivet 12"], ["GB", "FR", "US"]],
+  ["singleton-dufftown-12", "The Singleton of Dufftown 12", 40, 40, "shot", ["singleton dufftown"], ["GB", "FR"]],
+  ["johnnie-walker-double-black", "Johnnie Walker Double Black", 40, 40, "shot", ["jw double black"], ["GB", "FR", "US"]],
+  ["buchanans-deluxe-12", "Buchanan’s Deluxe 12", 40, 40, "shot", ["buchanans 12"], ["GB", "MX", "US"]],
 ]);
 
 const APERITIFS = rows("wine", [
@@ -216,6 +241,16 @@ const APERITIFS = rows("wine", [
   ["cremant-alsace", "Crémant d’Alsace", 12, 120, "wine", ["cremant alsace"], ["FR", "DE"]],
   ["clairette-de-die", "Clairette de Die", 7.5, 120, "wine", ["clairette"], ["FR"]],
   ["muscat-de-beaumes-de-venise", "Muscat de Beaumes-de-Venise", 15, 75, "wine", ["beaumes de venise"], ["FR"]],
+  ["floc-de-gascogne", "Floc de Gascogne", 17, 75, "wine", ["floc gascogne"], ["FR"]],
+  ["macvin-du-jura", "Macvin du Jura", 17, 75, "wine", ["macvin"], ["FR"]],
+  ["vin-jaune", "Vin jaune du Jura", 14, 75, "wine", ["vin jaune"], ["FR"]],
+  ["blanquette-de-limoux", "Blanquette de Limoux", 12, 120, "wine", ["blanquette limoux"], ["FR"]],
+  ["asti-spumante", "Asti Spumante", 7.5, 120, "wine", ["asti"], ["IT", "FR", "GB"]],
+  ["moscato-dasti", "Moscato d’Asti", 5.5, 120, "wine", ["moscato asti"], ["IT", "FR", "US"]],
+  ["txakoli", "Txakoli", 11, 120, "wine", ["txakolina", "chakoli"], ["ES", "FR"]],
+  ["lillet-blanc", "Lillet Blanc", 17, 75, "wine", [], ["FR", "DE", "GB"]],
+  ["cocchi-americano", "Cocchi Americano", 16.5, 75, "wine", ["cocchi americano bianco"], ["IT", "GB", "US"]],
+  ["cap-corse-mattei-rouge", "Cap Corse Mattei Rouge", 16, 75, "wine", ["cap corse rouge"], ["FR"]],
 ]);
 
 const BEERS = rows("beer", [
@@ -387,6 +422,23 @@ const BEERS = rows("beer", [
   ["bush-de-noel", "Bush de Noël", 12, 330, "bottle", [], ["BE", "FR"]],
   ["deus-brut-des-flandres", "DeuS Brut des Flandres", 11.5, 250, "bottle", ["deus"], ["BE", "FR"]],
   ["victoria-strong-blond", "Victoria Strong Blond", 8.5, 330, "bottle", ["biere victoria"], ["BE", "FR"]],
+  ["mont-des-cats", "Mont des Cats", 7.6, 330, "bottle", ["mont des cats trappiste"], ["FR", "BE"]],
+  ["saison-dupont", "Saison Dupont", 6.5, 330, "bottle", [], ["BE", "FR", "GB"]],
+  ["maredsous-blonde", "Maredsous Blonde", 6, 330, "bottle", ["maredsous 6"], ["BE", "FR"]],
+  ["maredsous-brune", "Maredsous Brune", 8, 330, "bottle", ["maredsous 8"], ["BE", "FR"]],
+  ["maredsous-tripel", "Maredsous Tripel", 10, 330, "bottle", ["maredsous 10", "maredsous triple"], ["BE", "FR"]],
+  ["st-feuillien-blonde", "St-Feuillien Blonde", 7.5, 330, "bottle", ["saint feuillien blonde"], ["BE", "FR"]],
+  ["st-feuillien-triple", "St-Feuillien Triple", 8.5, 330, "bottle", ["saint feuillien triple"], ["BE", "FR"]],
+  ["st-bernardus-wit", "St. Bernardus Wit", 5.5, 330, "bottle", ["st bernardus blanche"], ["BE", "FR"]],
+  ["blanche-de-namur", "Blanche de Namur", 4.5, 330, "bottle", [], ["BE", "FR"]],
+  ["floreffe-blonde", "Floreffe Blonde", 6.3, 330, "bottle", [], ["BE", "FR"]],
+  ["leffe-rituel-9", "Leffe Rituel 9", 9, 330, "bottle", ["leffe rituel"], ["BE", "FR"]],
+  ["duvel-666", "Duvel 6,66", 6.66, 330, "bottle", ["duvel 666"], ["BE", "FR", "NL"]],
+  ["cornet-oaked", "Cornet Oaked", 8.5, 330, "bottle", ["cornet"], ["BE", "FR"]],
+  ["gordon-finest-gold", "Gordon Finest Gold", 10, 500, "can", ["gordon gold"], ["BE", "FR"]],
+  ["guinness-foreign-extra-stout", "Guinness Foreign Extra Stout", 7.5, 330, "bottle", ["guinness foreign extra"], ["IE", "GB", "FR"]],
+  ["heineken-silver", "Heineken Silver", 4, 330, "bottle", [], ["NL", "FR", "GB"]],
+  ["vedett-extra-blond", "Vedett Extra Blond", 5.2, 330, "bottle", ["vedett extra blonde"], ["BE", "FR"]],
 ]);
 
 const CIDERS = rows("cider", [
@@ -407,6 +459,9 @@ const CIDERS = rows("cider", [
   ["angry-orchard-crisp-apple", "Angry Orchard Crisp Apple", 5, 355, "bottle", ["angry orchard"], ["US"]],
   ["ace-pineapple", "ACE Pineapple", 5, 355, "can", ["ace pineapple cider"], ["US"]],
   ["ecusson-rose", "Écusson Rosé", 3, 250, "cider", ["ecusson rose"], ["FR"]],
+  ["thatchers-katy", "Thatchers Katy", 7.4, 500, "bottle", [], ["GB"]],
+  ["kerisac-cidre-doux", "Kerisac Cidre Doux", 2.5, 250, "cider", ["kerisac doux"], ["FR"]],
+  ["val-de-rance-doux", "Val de Rance Doux", 2, 250, "cider", ["val de rance doux"], ["FR"]],
 ]);
 
 const SELTZERS = rows("cocktail", [
@@ -471,6 +526,20 @@ const SOFTS = rows("soft", [
   ["jupiler-zero", "Jupiler 0.0", 0, 250, "can", ["jupiler zero"], ["BE", "FR"]],
   ["bud-zero", "Budweiser Zero", 0, 330, "can", ["bud zero"], ["US", "GB", "FR"]],
   ["carlsberg-zero", "Carlsberg 0.0", 0, 330, "can", ["carlsberg zero"], ["DK", "FR", "GB"]],
+  ["evian", "Évian", 0, 500, "bottle", ["eau evian"], ["FR", "GB", "US"]],
+  ["vittel", "Vittel", 0, 500, "bottle", ["eau vittel"], ["FR", "DE"]],
+  ["volvic", "Volvic", 0, 500, "bottle", ["eau volvic"], ["FR", "GB", "DE"]],
+  ["badoit", "Badoit", 0, 330, "bottle", ["eau badoit"], ["FR", "BE"]],
+  ["san-pellegrino-eau", "S.Pellegrino", 0, 500, "bottle", ["san pellegrino eau"], ["IT", "FR", "GB"]],
+  ["quezac", "Quézac", 0, 500, "bottle", ["eau quezac"], ["FR"]],
+  ["oasis-pomme-cassis-framboise", "Oasis Pomme Cassis Framboise", 0, 330, "can", ["oasis pomme cassis"], ["FR", "BE"]],
+  ["fanta-citron", "Fanta Citron", 0, 330, "can", ["fanta lemon"], ["FR", "GB", "ES"]],
+  ["ocean-spray-cranberry", "Ocean Spray Cranberry", 0, 250, "soft", ["jus cranberry", "jus de cranberry"], ["FR", "GB", "US"]],
+  ["granini-abricot", "Granini Abricot", 0, 250, "bottle", ["jus abricot", "jus d abricot"], ["FR", "DE"]],
+  ["gini-citron", "Gini Citron", 0, 330, "can", ["gini"], ["FR"]],
+  ["fritz-kola", "Fritz-Kola", 0, 330, "bottle", ["fritz cola"], ["DE", "FR"]],
+  ["mezzo-mix", "Mezzo Mix", 0, 330, "can", [], ["DE", "AT"]],
+  ["fever-tree-mediterranean-tonic", "Fever-Tree Mediterranean Tonic", 0, 200, "bottle", ["fever tree tonic", "tonic mediterraneen"], ["GB", "FR", "ES"]],
 ]);
 
 export const MORE_DRINKS: readonly CatalogueDrink[] = [...SPIRITS, ...APERITIFS, ...BEERS, ...CIDERS, ...SELTZERS, ...SOFTS];

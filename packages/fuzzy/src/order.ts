@@ -192,8 +192,8 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
             if (s === null || (span === 1 && s >= 1 && name.includes(" "))) continue;
             if (s < score) score = s;
           }
-          // Two letters only count when exact: "la" is not La Chouffe.
-          if (span === 1 && phrase.length < 3 && score > 0) score = Number.POSITIVE_INFINITY;
+          // Short words must name the whole drink: the "j" in "j’ai" is not Rhum J.M.
+          if (span === 1 && phrase.length < 3 && !candidate.scored.includes(query)) score = Number.POSITIVE_INFINITY;
         }
         // On equal scores, a name said in full wins: "rouge" is red wine before Kasteel Rouge.
         const exact = candidate.scored.includes(query);
