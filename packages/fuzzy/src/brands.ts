@@ -201,6 +201,31 @@ const SPIRITS = rows("spirit", [
   ["singleton-dufftown-12", "The Singleton of Dufftown 12", 40, 40, "shot", ["singleton dufftown"], ["GB", "FR"]],
   ["johnnie-walker-double-black", "Johnnie Walker Double Black", 40, 40, "shot", ["jw double black"], ["GB", "FR", "US"]],
   ["buchanans-deluxe-12", "Buchanan’s Deluxe 12", 40, 40, "shot", ["buchanans 12"], ["GB", "MX", "US"]],
+  ["boulard-calvados-vsop", "Calvados Boulard VSOP", 40, 40, "shot", ["boulard vsop"], ["FR", "GB", "US"]],
+  ["busnel-calvados-vsop", "Calvados Busnel VSOP", 40, 40, "shot", ["busnel vsop"], ["FR", "GB"]],
+  ["janneau-vsop", "Janneau Grand Armagnac VSOP", 40, 40, "shot", ["janneau"], ["FR", "GB"]],
+  ["martell-vs", "Martell VS", 40, 40, "shot", ["martell"], ["FR", "GB", "US"]],
+  ["camus-vsop", "Camus VSOP", 40, 40, "shot", ["camus"], ["FR", "GB", "US"]],
+  ["gautier-vs", "Cognac Gautier VS", 40, 40, "shot", ["gautier vs"], ["FR", "GB"]],
+  ["patron-reposado", "Patrón Reposado", 40, 40, "shot", ["patron reposado"], ["US", "MX", "FR"]],
+  ["don-julio-reposado", "Don Julio Reposado", 40, 40, "shot", [], ["US", "MX", "FR"]],
+  ["casamigos-blanco", "Casamigos Blanco", 40, 40, "shot", ["casamigos blanco tequila"], ["US", "MX", "GB"]],
+  ["suntory-toki", "Suntory Toki", 43, 40, "shot", ["toki whisky"], ["JP", "US", "FR"]],
+  ["hibiki-japanese-harmony", "Hibiki Japanese Harmony", 43, 40, "shot", ["hibiki"], ["JP", "GB", "FR"]],
+  ["yamazaki-12", "Yamazaki 12", 43, 40, "shot", ["yamazaki douze"], ["JP", "GB", "FR"]],
+  ["bushmills-original", "Bushmills Original", 40, 40, "shot", ["bushmills"], ["IE", "GB", "FR"]],
+  ["tullamore-dew", "Tullamore D.E.W.", 40, 40, "shot", ["tullamore"], ["IE", "GB", "FR"]],
+  ["bulleit-rye", "Bulleit Rye", 45, 40, "shot", [], ["US", "GB", "FR"]],
+  ["jack-daniels-tennessee-honey", "Jack Daniel’s Tennessee Honey", 35, 40, "shot", ["jack honey", "jd honey"], ["US", "GB", "FR"]],
+  ["jim-beam-honey", "Jim Beam Honey", 35, 40, "shot", [], ["US", "GB", "FR"]],
+  ["planteray-oftd", "Planteray O.F.T.D.", 69, 40, "shot", ["planteray oftd"], ["FR", "GB", "US"]],
+  ["havana-club-especial", "Havana Club Especial", 40, 40, "shot", ["havana especial"], ["FR", "ES", "GB"]],
+  ["dillon-blanc", "Rhum Dillon Blanc 50°", 50, 40, "shot", ["dillon blanc", "rhum dillon"], ["FR"]],
+  ["neisson-blanc", "Rhum Neisson Blanc 50°", 50, 40, "shot", ["neisson blanc"], ["FR"]],
+  ["pere-labat-59", "Père Labat Blanc 59°", 59, 40, "shot", ["pere labat", "pere labat blanc"], ["FR"]],
+  ["saint-james-blanc-50", "Saint James Blanc 50°", 50, 40, "shot", ["rhum saint james", "saint james blanc"], ["FR"]],
+  ["tanqueray-ten", "Tanqueray No. Ten", 47.3, 40, "shot", ["tanqueray ten"], ["GB", "FR", "US"]],
+  ["malfy-rosa", "Malfy Gin Rosa", 41, 40, "shot", ["malfy rosa"], ["IT", "GB", "FR"]],
 ]);
 
 const APERITIFS = rows("wine", [
@@ -251,6 +276,17 @@ const APERITIFS = rows("wine", [
   ["lillet-blanc", "Lillet Blanc", 17, 75, "wine", [], ["FR", "DE", "GB"]],
   ["cocchi-americano", "Cocchi Americano", 16.5, 75, "wine", ["cocchi americano bianco"], ["IT", "GB", "US"]],
   ["cap-corse-mattei-rouge", "Cap Corse Mattei Rouge", 16, 75, "wine", ["cap corse rouge"], ["FR"]],
+  ["moet-imperial-brut", "Moët & Chandon Brut Impérial", 12, 120, "wine", ["moet", "moet imperial"], ["FR", "GB", "US"]],
+  ["veuve-clicquot-yellow-label", "Veuve Clicquot Brut Carte Jaune", 12, 120, "wine", ["veuve clicquot", "carte jaune"], ["FR", "GB", "US"]],
+  ["mumm-cordon-rouge", "Mumm Cordon Rouge", 12, 120, "wine", ["mumm", "champagne mumm"], ["FR", "GB", "US"]],
+  ["laurent-perrier-la-cuvee", "Laurent-Perrier La Cuvée", 12, 120, "wine", ["laurent perrier"], ["FR", "GB", "US"]],
+  ["taittinger-brut-reserve", "Taittinger Brut Réserve", 12.5, 120, "wine", ["taittinger"], ["FR", "GB", "US"]],
+  ["bollinger-special-cuvee", "Bollinger Special Cuvée", 12, 120, "wine", ["bollinger"], ["FR", "GB", "US"]],
+  ["nicolas-feuillatte-reserve-exclusive", "Nicolas Feuillatte Réserve Exclusive Brut", 12, 120, "wine", ["nicolas feuillatte"], ["FR", "GB", "US"]],
+  ["champagne-pommery-brut-royal", "Pommery Brut Royal", 12.5, 120, "wine", ["pommery"], ["FR", "GB"]],
+  ["chouchen-melmor", "Chouchen Melmor", 13, 75, "wine", ["chouchen", "hydromel breton"], ["FR"], [75, 750]],
+  ["freixenet-cordon-negro", "Freixenet Cordón Negro", 11.5, 120, "wine", ["freixenet", "cordon negro"], ["ES", "FR", "GB"]],
+  ["codorniu-clasico-brut", "Codorníu Clásico Brut", 11.5, 120, "wine", ["codorniu"], ["ES", "FR", "GB"]],
 ]);
 
 const BEERS = rows("beer", [
@@ -439,6 +475,19 @@ const BEERS = rows("beer", [
   ["guinness-foreign-extra-stout", "Guinness Foreign Extra Stout", 7.5, 330, "bottle", ["guinness foreign extra"], ["IE", "GB", "FR"]],
   ["heineken-silver", "Heineken Silver", 4, 330, "bottle", [], ["NL", "FR", "GB"]],
   ["vedett-extra-blond", "Vedett Extra Blond", 5.2, 330, "bottle", ["vedett extra blonde"], ["BE", "FR"]],
+  ["biere-du-demon", "Bière du Démon", 12, 250, "bottle", ["biere du demon"], ["FR"]],
+  ["pietra-bionda", "Pietra Bionda", 5.5, 330, "bottle", ["pietra blonde"], ["FR"]],
+  ["colomba", "Colomba", 5, 330, "bottle", ["colomba blanche"], ["FR"]],
+  ["page-24-blonde", "Page 24 Réserve Hildegarde Blonde", 6.9, 330, "bottle", ["page 24 blonde"], ["FR"]],
+  ["brasserie-du-mont-blanc-blanche", "Mont Blanc La Blanche", 4.7, 330, "bottle", ["mont blanc blanche", "blanche du mont blanc"], ["FR"]],
+  ["brasserie-du-mont-blanc-rousse", "Mont Blanc La Rousse", 6.5, 330, "bottle", ["mont blanc rousse", "rousse du mont blanc"], ["FR"]],
+  ["brasserie-du-mont-blanc-bleue", "Mont Blanc La Bleue", 5.8, 330, "bottle", ["mont blanc bleue", "bleue du mont blanc"], ["FR"]],
+  ["chimay-doree", "Chimay Dorée", 4.8, 330, "bottle", ["chimay gold"], ["BE", "FR"]],
+  ["petrus-aged-pale", "Petrus Aged Pale", 7.3, 330, "bottle", ["petrus pale"], ["BE", "GB", "US"]],
+  ["de-koninck-bolleke", "De Koninck Bolleke", 5.2, 330, "bottle", ["bolleke"], ["BE", "NL"]],
+  ["brugse-zot-dubbel", "Brugse Zot Dubbel", 7.5, 330, "bottle", ["brugse zot brune"], ["BE", "NL", "FR"]],
+  ["hoegaarden-rosee", "Hoegaarden Rosée", 3, 250, "bottle", ["hoegaarden rose"], ["BE", "FR"]],
+  ["estrella-galicia-1906", "1906 Reserva Especial", 6.5, 330, "bottle", ["estrella galicia 1906"], ["ES"]],
 ]);
 
 const CIDERS = rows("cider", [
@@ -462,6 +511,8 @@ const CIDERS = rows("cider", [
   ["thatchers-katy", "Thatchers Katy", 7.4, 500, "bottle", [], ["GB"]],
   ["kerisac-cidre-doux", "Kerisac Cidre Doux", 2.5, 250, "cider", ["kerisac doux"], ["FR"]],
   ["val-de-rance-doux", "Val de Rance Doux", 2, 250, "cider", ["val de rance doux"], ["FR"]],
+  ["kerisac-poire", "Poiré Kerisac", 3, 250, "cider", ["poire kerisac", "cidre poire kerisac"], ["FR"], [250, 750]],
+  ["ecusson-doux", "Écusson Doux Bio", 2.5, 330, "bottle", ["ecusson doux"], ["FR"], [330, 750]],
 ]);
 
 const SELTZERS = rows("cocktail", [
@@ -540,6 +591,16 @@ const SOFTS = rows("soft", [
   ["fritz-kola", "Fritz-Kola", 0, 330, "bottle", ["fritz cola"], ["DE", "FR"]],
   ["mezzo-mix", "Mezzo Mix", 0, 330, "can", [], ["DE", "AT"]],
   ["fever-tree-mediterranean-tonic", "Fever-Tree Mediterranean Tonic", 0, 200, "bottle", ["fever tree tonic", "tonic mediterraneen"], ["GB", "FR", "ES"]],
+  ["san-bitter", "Sanbittèr Rosso", 0, 100, "bottle", ["sanbitter", "san bitter"], ["IT", "FR"]],
+  ["fanta-exotic", "Fanta Exotic", 0, 330, "can", ["fanta exotique"], ["DE", "NL", "BE"]],
+  ["capri-sun-multivitamin", "Capri-Sun Multivitamin", 0, 200, "soft", ["capri sun multivitamine"], ["FR", "DE", "GB"]],
+  ["jarritos-mandarine", "Jarritos Mandarina", 0, 370, "bottle", ["jarritos mandarine"], ["MX", "US", "FR"]],
+  ["jarritos-tamarind", "Jarritos Tamarindo", 0, 370, "bottle", ["jarritos tamarin"], ["MX", "US", "FR"]],
+  ["guarana-antarctica", "Guaraná Antarctica", 0, 350, "can", ["guarana"], ["BR", "PT", "FR"]],
+  ["ginger-ale-bundaberg", "Bundaberg Ginger Beer", 0, 375, "bottle", ["ginger beer bundaberg"], ["AU", "GB", "FR"]],
+  ["pago-tomate", "Pago Tomate", 0, 200, "bottle", ["pago jus tomate"], ["FR"]],
+  ["orangina-zero", "Orangina Sans Sucres", 0, 330, "can", ["orangina zero"], ["FR", "BE"]],
+  ["free-damm", "Free Damm 0.0", 0, 330, "can", ["free damm", "damm sans alcool"], ["ES"]],
 ]);
 
 export const MORE_DRINKS: readonly CatalogueDrink[] = [...SPIRITS, ...APERITIFS, ...BEERS, ...CIDERS, ...SELTZERS, ...SOFTS];

@@ -57,6 +57,13 @@ describe("drink catalogue", () => {
 });
 
 describe("order parser with brands", () => {
+  it("reads a cup of a named champagne as one drink", () => {
+    expect(parse("une coupe de Moët")).toEqual([
+      { quantity: 1, preset: null, drink: "moet-imperial-brut", volumeMl: 120, abv: null },
+    ]);
+    expect(parse("une coupe").map((line) => line.drink)).toEqual(["champagne"]);
+  });
+
   it("distinguishes an Amaretto Sour cocktail from the named shot", () => {
     expect(parse("un amaretto sour")[0]).toMatchObject({ drink: "amaretto-sour" });
     expect(parse("un amaretto sour shot")[0]).toMatchObject({ drink: "amaretto-sour-shot" });

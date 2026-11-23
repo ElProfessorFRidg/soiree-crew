@@ -75,6 +75,8 @@ const SERVING_WORDS: readonly ServingWord[] = [
   { serving: "can", names: ["canette", "cannette", "can"], volumeMl: { beer: 330, cider: 330, cocktail: 330, soft: 330 } },
   { serving: "bottle", names: ["bouteille", "bottle", "teille"], volumeMl: { beer: 330, cider: 330, wine: 750, spirit: 700, soft: 500 } },
   { serving: "glass", names: ["verre", "glass"], volumeMl: { wine: 120, beer: 250, cider: 250, soft: 250 } },
+  // A plain "coupe" still means champagne. "Coupe de" introduces the wine by name.
+  { serving: "glass", names: ["coupe de"], volumeMl: { wine: 120 } },
   { serving: "largeGlass", names: ["grand verre", "large glass", "big glass"], volumeMl: { wine: 180, beer: 500, soft: 500 } },
   { serving: "double", names: ["double"], volumeMl: { spirit: 60 } },
   // A German "Kurzer" is the 2 cl measure.
