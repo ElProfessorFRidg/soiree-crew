@@ -24,7 +24,7 @@ export const es: GameMessages = {
     title: "Cartas de la crew",
     open: "Cartas de la crew",
     needCrew: "Únete a una crew para escribir vuestras cartas.",
-    intro: "Vuestras bromas, historias y preguntas. El admin las aprueba antes de que salgan en partida.",
+    intro: "La administración aprueba las cartas antes de que aparezcan en partida.",
     game: "Para qué juego",
     level: "Nivel",
     text: "La carta",
@@ -104,7 +104,6 @@ export const es: GameMessages = {
   setup: {
     rulesPosition: "Regla {index} de {count}",
     nextRule: "Siguiente",
-    rulesHint: "El botón ? te las vuelve a enseñar en plena partida.",
     playersLabel: "Participantes, por orden",
     addPlaceholder: "Nombre",
     addPlayer: "Añadir a la partida",

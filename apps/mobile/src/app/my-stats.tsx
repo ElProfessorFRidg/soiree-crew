@@ -154,7 +154,7 @@ export default function MyStatsScreen() {
       <Panel>
         <Row title={i18n.t("wrapped.title")} trailing={<Icon name="chev" color={theme.textMuted} />} onPress={() => router.push("/wrapped")} last />
       </Panel>
-      <Text variant="small">{mine.nights ? i18n.t("myStats.filteredNote") : i18n.t("myStats.note")}</Text>
+      {!mine.nights ? <Text variant="small">{i18n.t("myStats.note")}</Text> : null}
     </Screen>
   );
 }

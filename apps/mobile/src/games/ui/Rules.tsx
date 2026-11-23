@@ -35,9 +35,6 @@ export function RuleCards({ gameId }: { gameId: GameId }) {
       </Text>
       {shown.length > 1 ? (
         <View style={styles.footer}>
-          <Text variant="small" color={palette.light.textMuted} style={styles.flex}>
-            {g.t("setup.rulesHint")}
-          </Text>
           <Button
             label={g.t("setup.nextRule")}
             height={40}
@@ -73,8 +70,7 @@ const styles = StyleSheet.create({
   card: { borderRadius: radius.card, padding: 18, gap: 14, minHeight: 150, justifyContent: "space-between" },
   rule: { fontSize: 18, lineHeight: 25, fontFamily: "Archivo-Semibold" },
   bigRule: { fontSize: 21, lineHeight: 28 },
-  footer: { flexDirection: "row", alignItems: "center", gap: 10 },
-  flex: { flex: 1 },
+  footer: { alignItems: "flex-end" },
   list: { gap: 8 },
   item: { borderRadius: radius.tile, padding: 14 },
 });
