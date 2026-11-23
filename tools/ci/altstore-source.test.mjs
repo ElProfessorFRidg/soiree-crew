@@ -139,3 +139,21 @@ describe("what each version shows", () => {
     expect(notesOf(["Version 1.0.0, build 3 of abc.", "", "- feat(a,b): z", "- AltStore source: link"].join("\n"))).toBe("• Z");
   });
 });
+
+it("adds OTA changes to the correct device's news without adding an installer", () => {
+  const assets = [{ name: "soiree-crew-unsigned.ipa", size: 100 }, { name: "soiree-crew-ipad-unsigned.ipa", size: 200 }];
+  const tag = "v0.2.310-preview.28+build.310";
+  const correction = {
+    tag_name: `ota-${tag}-iphone-1234.1`,
+    prerelease: true,
+    published_at: "2026-11-15T00:00:00Z",
+    body: "- fix: Corriger les titres",
+  };
+  const releases = [{ tag_name: tag, prerelease: true, assets, published_at: "2026-11-14T00:00:00Z" }, correction];
+  const phone = fromReleases(appJson, releases);
+  expect(phone.apps[0].versions).toHaveLength(1);
+  expect(phone.otaChangelog).toMatchObject([{ build: 310, channel: "preview", notes: "• Corriger les titres" }]);
+  expect(phone.news[0]).toMatchObject({ identifier: correction.tag_name, appID: "app.soireecrew.mobile.preview" });
+  expect(phone.news[0].url).toBeUndefined();
+  expect(fromReleases(appJson, releases, {}, {}, "ipad").otaChangelog).toEqual([]);
+});

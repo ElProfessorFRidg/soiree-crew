@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 
 it("validates distinct native iPad and iPhone targets, rotation and complete payloads", () => {
   const result = spawnSync("python3", ["-c", `
-import runpy, tempfile, plistlib
+import os, runpy, tempfile, plistlib
 from pathlib import Path
 inspect = runpy.run_path('tools/ci/check-ios-app.py')['inspect_app']
 with tempfile.TemporaryDirectory() as folder:
@@ -45,6 +45,35 @@ with tempfile.TemporaryDirectory() as folder:
     info['CFBundleIdentifier'] = 'app.soireecrew.mobile.preview'
     save()
     assert inspect(app, 'iphone', 'preview')['channel'] == 'preview'
+    info.update(CFBundleShortVersionString='0.2.12', CFBundleVersion='310')
+    save()
+    os.environ['CREW_OTA_URL'] = 'https://ota.example.com'
+    certificate = Path('apps/mobile/certs/ota-certificate.pem').read_text()
+    expo = {
+        'EXUpdatesEnabled': True, 'EXUpdatesURL': 'https://ota.example.com/manifest',
+        'EXUpdatesRequestHeaders': {'expo-channel-name': 'preview-iphone'},
+        'EXUpdatesRuntimeVersion': 'crew-preview-iphone-310',
+        'EXUpdatesCheckOnLaunch': 'ALWAYS', 'EXUpdatesLaunchWaitMs': 0,
+        'EXUpdatesCodeSigningCertificate': certificate,
+        'EXUpdatesCodeSigningMetadata': {'keyid': 'main', 'alg': 'rsa-v1_5-sha256'},
+    }
+    (app / 'Expo.plist').write_bytes(plistlib.dumps(expo))
+    assert inspect(app, 'iphone', 'preview')['updates']['runtime'] == 'crew-preview-iphone-310'
+    unsigned = {k: v for k, v in expo.items() if not k.startswith('EXUpdatesCodeSigning')}
+    (app / 'Expo.plist').write_bytes(plistlib.dumps(unsigned))
+    try:
+        inspect(app, 'iphone', 'preview')
+        raise AssertionError('IPA without the update signing certificate accepted')
+    except ValueError:
+        pass
+    expo['EXUpdatesRequestHeaders']['expo-channel-name'] = 'public-iphone'
+    (app / 'Expo.plist').write_bytes(plistlib.dumps(expo))
+    try:
+        inspect(app, 'iphone', 'preview')
+        raise AssertionError('Public OTA channel accepted in Preview')
+    except ValueError:
+        pass
+    del os.environ['CREW_OTA_URL']
     info['CFBundleIdentifier'] = 'app.soireecrew.mobile'
     info['UIDeviceFamily'] = [2]
     info['UISupportedInterfaceOrientations~ipad'] = ['UIInterfaceOrientationPortrait', 'UIInterfaceOrientationLandscapeLeft', 'UIInterfaceOrientationLandscapeRight']
