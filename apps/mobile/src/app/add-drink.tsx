@@ -568,7 +568,7 @@ function QuickType({ presets, consumedAt, food, houseAbv, unit, onDone }: QuickT
         onChangeText={changeText}
         autoCorrect={false}
         returnKeyType="done"
-        hint={text.trim() && !suggestions.length ? i18n.t("addDrink.quickNone") : i18n.t("addDrink.quickHint")}
+        hint={text.trim() && !suggestions.length ? i18n.t("addDrink.quickNone") : undefined}
       />
       {fromAi && (ai.venue || ai.iPay || ai.minutesAgo) ? (
         <Text variant="small">

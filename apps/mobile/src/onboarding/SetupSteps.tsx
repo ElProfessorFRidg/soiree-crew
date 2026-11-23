@@ -30,7 +30,6 @@ export function RegionStep() {
   return (
     <>
       <Text variant="h1">{i18n.t("journey.regionTitle")}</Text>
-      <Text muted>{i18n.t("journey.regionWhy")}</Text>
       <Panel>
         <Row title={i18n.t("journey.regionCountry")} subtitle={i18n.t(`countries.${preferences.legalCountry}` as "countries.FR")} leading={<Icon name="flag" color={theme.textMuted} />} />
         <Row title={i18n.t("journey.regionLanguage")} subtitle={i18n.t(`languages.${preferences.language}`)} leading={<Icon name="chat" color={theme.textMuted} />} />

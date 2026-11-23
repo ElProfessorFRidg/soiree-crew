@@ -35,7 +35,6 @@ export default function NoticesScreen() {
 
   return (
     <Screen back title={i18n.t("people.notices")} withToasts onRefresh={async () => load()}>
-      <Text variant="small">{i18n.t("people.noticesIntro")}</Text>
       {!view ? <SkeletonRows /> : null}
       {view?.bannedUntil ? (
         <Panel tint="danger">
