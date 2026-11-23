@@ -23,52 +23,52 @@
       "category": "lifestyle",
       "screenshots": [
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/01-party.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/01-party.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/08-add-drink.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/08-add-drink.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/09-curve.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/09-curve.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/03-games.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/03-games.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/07-my-stats.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/07-my-stats.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/12-history.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/12-history.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/11-leaderboard.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/11-leaderboard.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/04-bars.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/04-bars.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/05-me.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/05-me.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/10-limits.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/10-limits.png",
           "width": 2064,
           "height": 2752
         }
@@ -84,6 +84,68 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.10",
+          "buildVersion": "276",
+          "marketingVersion": "0.2.10 (276)",
+          "date": "2026-11-23T08:00:20Z",
+          "localizedDescription": "• Expand drink selection and recognise sips and capfuls\n• Add Leffe Ruby and 111 more drinks to the catalogue\n• Regenerate lockfile after merge\n• Bump the expo-sdk group with 23 updates",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.10%2Bbuild.276/soiree-crew-ipad-unsigned.ipa",
+          "size": 22819444,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/01-party.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/08-add-drink.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/09-curve.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/03-games.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/07-my-stats.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/12-history.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/11-leaderboard.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/04-bars.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/05-me.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/10-limits.png",
+              "width": 2064,
+              "height": 2752
+            }
+          ]
+        },
         {
           "version": "0.2.9",
           "buildVersion": "265",
@@ -395,22 +457,22 @@
           ]
         }
       ],
-      "version": "0.2.9",
-      "versionDate": "2026-11-20T20:47:52Z",
-      "versionDescription": "• Stop previous-account refresh chains and inbox flags after logout\n• Stop countdowns when the app loses foreground\n• Stop countdowns when the app loses foreground\n• Keep drawing arena usable on compact screens\n• Bump @noble/curves from 2.0.1 to 2.4.0\n• Prevent duplicate head-to-head round advancement\n• Prevent simultaneous curve starts and cancel stale countdowns\n• Verify delayed invitations and inbox responses cannot cross accounts\n• Reject stale invitations, notification and venue responses\n• Reject stale invitations, notification and venue responses\n• Reject stale invitations, notification and venue responses\n• Identify both opponents during head-to-head rounds\n• Identify both opponents during head-to-head rounds\n• Support accessible two-player highlight banners\n• Serialize category erasure and guard against session changes\n• Cover session guards for sign-out and account/server switching\n• Prevent stale optimistic rollbacks and SOS clears after sign-out\n• Ignore obsolete websocket events and preserve new socket on reconnect\n• Prevent stale radar and SOS responses crossing accounts\n• Isolate crew, party and live responses across session changes\n• Discard stale sync payloads after account changes\n• Add identity guard for in-flight authenticated responses\n• Cancel stale fuse resume when round state changes\n• Surface selected player on wheel and curve result\n• Surface selected player on wheel and curve result\n• Prevent concurrent Point Blank countdowns and stale callbacks\n• Make truth-or-dare resolution single-flight across taps and swipes\n• Prevent overlapping fuse resume timers and clear on unmount\n• Show active player in more game states\n• Show active player in more game states\n• Show active player in more game states\n• Identify active reader and driver across more mini-games\n• Identify active reader and driver across more mini-games\n• Identify active reader and driver across more mini-games\n• Highlight current player during gameplay\n• Highlight current player during gameplay\n• Highlight current player during gameplay\n• Add accessible animated active-turn banner to shared shell",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.9%2Bbuild.265/soiree-crew-ipad-unsigned.ipa",
-      "size": 22748727,
+      "version": "0.2.10",
+      "versionDate": "2026-11-23T08:00:20Z",
+      "versionDescription": "• Expand drink selection and recognise sips and capfuls\n• Add Leffe Ruby and 111 more drinks to the catalogue\n• Regenerate lockfile after merge\n• Bump the expo-sdk group with 23 updates",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.10%2Bbuild.276/soiree-crew-ipad-unsigned.ipa",
+      "size": 22819444,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.9%2Bbuild.265/ipad/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/10-limits.png"
       ]
     },
     {
@@ -2181,6 +2243,17 @@
   ],
   "news": [
     {
+      "identifier": "release-0.2.10-276",
+      "title": "Soirée Crew 0.2.10 (276)",
+      "caption": "• Expand drink selection and recognise sips and capfuls\n• Add Leffe Ruby and 111 more drinks to the catalogue\n• Regenerate lockfile after merge\n• Bump the expo-sdk group with 23 updates",
+      "date": "2026-11-23T08:00:20Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.10%2Bbuild.276/ipad/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.10%2Bbuild.276/soiree-crew-ipad-unsigned.ipa",
+      "appID": "app.soireecrew.mobile",
+      "notify": false
+    },
+    {
       "identifier": "preview-0.2.10-275",
       "title": "Soirée Crew Preview 0.2.10 (275)",
       "caption": "• Bump the other-patches group across 1 directory with 9 updates\n• Expand drink selection and recognise sips and capfuls\n• Add Leffe Ruby and 111 more drinks to the catalogue",
@@ -2388,21 +2461,17 @@
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.11%2Bbuild.222/soiree-crew-ipad-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
-    },
-    {
-      "identifier": "preview-0.2.8-176",
-      "title": "Soirée Crew Preview 0.2.8 (176)",
-      "caption": "• Use OnStartObserving for the onToken event\n• Restore CI on the live-activity lifecycle branch\n• Route unauthenticated deep links to onboarding\n• Execute deep-link action before navigating away\n• Surface ActivityKit outcomes in server JSON logs\n• Privacy-safe structured ActivityKit scheduler delivery logs\n• Prevent orphaned Live Activities after async creation races\n• Schedule first remote refresh after one minute\n• Refresh APNs Live Activity snapshots every minute instead of ten\n• Publish authenticated ActivityKit snapshots for automatic server updates\n• Run ActivityKit push scheduler each minute and stop on shutdown\n• Automatically dispatch due encrypted ActivityKit updates via APNs\n• Authenticated encrypted Live Activity snapshot scheduling\n• Encrypted scheduled ActivityKit state and due-time index\n• Replay registration on login changes and deduplicate concurrent token requests\n• Declare local ActivityKit Expo module for autolinking\n• Start every new Live Activity with native pushType token\n• Expose push-enabled ActivityKit creation to JavaScript\n• Request Live Activities with pushType token natively\n• Preserve automatic token replay behavior\n• Register native ActivityKit push tokens on launch and resume\n• Observe existing and rotating ActivityKit push tokens natively\n• Scaffold local Expo ActivityKit token observer module\n• Scaffold local Expo ActivityKit token observer module\n• Scaffold local Expo ActivityKit token observer module\n• Explain legacy token re-registration requirement\n• Use keyed token lookup to avoid offline token correlation\n• Retain stable token lookup hashes across encryption upgrade\n• Remove legacy plaintext ActivityKit tokens safely\n• AES-256-GCM seal ActivityKit tokens with server DATA_KEY\n• Store encrypted ActivityKit tokens instead of plaintext\n• Reject ActivityKit token ownership conflicts explicitly\n• Expose ActivityKit sender through existing push lifecycle\n• Authenticated rate-limited ActivityKit token registration and revocation\n• Session-scoped expiring ActivityKit token registration\n• Avoid TextEncoder dependency in React Native runtime\n• Authenticated bounded HTTP2 ActivityKit push transport\n• Resolve temporal-dead-zone error and bound forecast payload\n• Decode compact 2-minute BAC samples with correct localized precision\n• Preserve selected BAC unit and decimal precision in offline forecast",
-      "date": "2026-11-18T23:10:30Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.8-preview.10%2Bbuild.176/ipad/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.8-preview.10%2Bbuild.176/soiree-crew-ipad-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
-      "notify": false
     }
   ],
   "allowDowngrades": true,
   "changelog": [
+    {
+      "bundleIdentifier": "app.soireecrew.mobile",
+      "version": "0.2.10",
+      "buildVersion": "276",
+      "date": "2026-11-23T08:00:20Z",
+      "localizedDescription": "• Expand drink selection and recognise sips and capfuls\n• Add Leffe Ruby and 111 more drinks to the catalogue\n• Regenerate lockfile after merge\n• Bump the expo-sdk group with 23 updates"
+    },
     {
       "bundleIdentifier": "app.soireecrew.mobile",
       "version": "0.2.9",
