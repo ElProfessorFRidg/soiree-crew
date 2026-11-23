@@ -260,8 +260,8 @@ importers:
   packages/mls:
     dependencies:
       '@noble/ciphers':
-        specifier: 2.1.1
-        version: 2.1.1
+        specifier: 2.4.0
+        version: 2.4.0
       '@noble/curves':
         specifier: 2.4.0
         version: 2.4.0
@@ -270,7 +270,7 @@ importers:
         version: 2.0.1
       ts-mls:
         specifier: 1.6.4
-        version: 1.6.4(@noble/ciphers@2.1.1)(@noble/curves@2.4.0)
+        version: 1.6.4(@noble/ciphers@2.4.0)(@noble/curves@2.4.0)
 
   packages/money: {}
 
@@ -1133,8 +1133,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@noble/ciphers@2.1.1':
-    resolution: {integrity: sha512-bysYuiVfhxNJuldNXlFEitTVdNnYUc+XNJZd7Qm2a5j1vZHgY+fazadNFWFaMK/2vye0JVlxV3gHmC0WDfAOQw==}
+  '@noble/ciphers@2.4.0':
+    resolution: {integrity: sha512-AnjFn0Jv92laAkvMrghlFZq4qQCIN/4DxFV/eooqtC2YTjB7kBeLMS2T9KJX4Dn+ZVXLOwK0lSgqDtx9gvxtiw==}
     engines: {node: '>= 20.19.0'}
 
   '@noble/curves@2.4.0':
@@ -5195,7 +5195,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.3
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  '@noble/ciphers@2.1.1': {}
+  '@noble/ciphers@2.4.0': {}
 
   '@noble/curves@2.4.0':
     dependencies:
@@ -8057,10 +8057,10 @@ snapshots:
 
   tr46@0.0.3: {}
 
-  ts-mls@1.6.4(@noble/ciphers@2.1.1)(@noble/curves@2.4.0):
+  ts-mls@1.6.4(@noble/ciphers@2.4.0)(@noble/curves@2.4.0):
     dependencies:
       '@hpke/core': 1.9.0
-      '@noble/ciphers': 2.1.1
+      '@noble/ciphers': 2.4.0
     optionalDependencies:
       '@noble/curves': 2.4.0
 
