@@ -59,6 +59,7 @@ jobs:
       version: ${{ steps.next.outputs.version }}
       ota_base: ${{ steps.route.outputs.release }}
       skip_ipa: ${{ steps.route.outputs.skip_ipa }}
+      route: ${{ steps.route.outputs.route }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -534,3 +535,32 @@ jobs:
     with:
       screenshots: true
       release_tag: ${{ needs.release.outputs.tag }}
+
+  # The check the main ruleset requires (with `checks`). The ios jobs only report when an IPA is
+  # built, so an OTA or checks-only change could never merge if they were required. This gate is
+  # green only when the change shipped the way the route decided: a new IPA built and launched,
+  # an OTA update published, or checks only. Dependency updates always take the IPA route.
+  build-gate:
+    if: always()
+    needs: [checks, version, ota, ios, ios-launch]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the route was carried out
+        env:
+          ROUTE: ${{ needs.version.outputs.route || 'ipa' }}
+          CHECKS: ${{ needs.checks.result }}
+          VERSION: ${{ needs.version.result }}
+          OTA: ${{ needs.ota.result }}
+          IOS: ${{ needs.ios.result }}
+          LAUNCH: ${{ needs.ios-launch.result }}
+        run: |
+          echo "route=$ROUTE checks=$CHECKS version=$VERSION ota=$OTA ios=$IOS ios-launch=$LAUNCH"
+          fail() { echo "::error::$1"; exit 1; }
+          [[ "$CHECKS" == success && "$VERSION" == success ]] || fail "checks=$CHECKS, version=$VERSION"
+          case "$ROUTE" in
+            ipa) [[ "$IOS" == success && "$LAUNCH" == success ]] || fail "New IPA route: ios=$IOS, ios-launch=$LAUNCH" ;;
+            ota) [[ "$OTA" == success ]] || fail "OTA route: ota=$OTA" ;;
+            checks) ;;
+            *) fail "Unknown route $ROUTE" ;;
+          esac
+          echo "### Build gate: $ROUTE route carried out" >> "$GITHUB_STEP_SUMMARY"
