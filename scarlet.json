@@ -731,6 +731,27 @@
       "name": "Soirée Crew Preview",
       "version": "0.2.11",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.11-preview.25%2Bbuild.285/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "• Renouveler les autres phrases d’accueil en français\n• Réécrire les huit vannes du matin en français\n• Rendre les phrases du matin plus drôles\n• Alléger les textes de l’interface Soirée Crew",
+      "bundleID": "app.soireecrew.mobile.preview",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11-preview.25%2Bbuild.285/iphone/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew Preview 0.2.11",
+      "version": "0.2.11",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.11-preview.27%2Bbuild.284/soiree-crew-unsigned.ipa",
       "category": "Other",
       "description": "• Fill gaps in 1664 and other French-market beer ranges\n• Add Spanish and international beers and expand Chouffe selection\n• Add 80 beers and recognise plural can measures\n• Add Trois Rivières, Saint James and other rum variants\n• Expand regional drinks, champagne and alcohol-free choices\n• Add 100 drinks to the bar catalogue",
