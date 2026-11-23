@@ -29,6 +29,8 @@ yarn-error.*
 # macOS
 .DS_Store
 *.pem
+# Public certificate that verifies OTA updates (docs/OTA.md); the private key stays in GitHub secrets.
+!certs/ota-certificate.pem
 
 # local env files
 .env*.local

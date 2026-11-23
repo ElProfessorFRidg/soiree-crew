@@ -1,7 +1,7 @@
 import { Linking, Platform } from "react-native";
 import { useAppStore } from "@/state/store";
 import { extraNumber, extraString } from "./extra";
-import { updateFromReleases, type ReleaseChannel } from "@/ui/pure/releaseHistory";
+import { updateFromReleases, versionsFromSource, type ReleaseChannel } from "@/ui/pure/releaseHistory";
 
 const DAY_MS = 86_400_000;
 
@@ -59,7 +59,12 @@ export async function checkForUpdate(force = false, minGapMs = DAY_MS): Promise<
   }
   const res = await fetch(extra.releasesApi, { headers: { accept: "application/vnd.github+json" } });
   if (!res.ok) return "unavailable";
-  const release = updateFromReleases(await res.json(), releaseChannel, downloadTarget);
+  let release = updateFromReleases(await res.json(), releaseChannel, downloadTarget);
+  if (!release && Platform.OS === "ios" && altstoreSource) {
+    const source = await fetch(altstoreSource, { cache: "no-cache" });
+    if (!source.ok) return "unavailable";
+    release = versionsFromSource(await source.json(), releaseChannel)[0] ?? null;
+  }
   const newer = release !== null && release.build > currentBuild;
   useAppStore.setState({ updateCheckedAt: Date.now(), latestRelease: newer ? release : null });
   return newer ? "newer" : "latest";
