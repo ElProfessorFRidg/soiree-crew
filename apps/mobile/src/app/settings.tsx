@@ -134,7 +134,7 @@ export default function SettingsScreen() {
 
   return (
     <Screen back title={section ? i18n.t(`settings.sections.${section}`) : i18n.t("settings.title")} withToasts>
-      {!section ? <><SettingsRoot /><Panel><Row title={i18n.t("updates.changelog")} subtitle={i18n.t("updates.changelogHint")} trailing={<Icon name="chev" color={theme.textMuted} />} onPress={() => router.push("/versions")} last /></Panel></> : null}
+      {!section ? <><SettingsRoot /><Panel><Row title={i18n.t("updates.changelog")} trailing={<Icon name="chev" color={theme.textMuted} />} onPress={() => router.push("/versions")} last /></Panel></> : null}
       {section === "region" ? (
         <>
           <RegionRules />
@@ -540,7 +540,6 @@ function MotionScale() {
           setScale(s);
         }}
       />
-      <Text variant="small">{i18n.t("settings.motionScaleHint")}</Text>
     </Section>
   );
 }
