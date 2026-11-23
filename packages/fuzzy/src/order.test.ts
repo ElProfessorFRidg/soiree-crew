@@ -57,6 +57,16 @@ describe("drink catalogue", () => {
 });
 
 describe("order parser with brands", () => {
+  it("distinguishes the blue 1664 bottle, the blueberry beer and 1664 variants", () => {
+    expect(parse("une 1664 bleue").map((line) => line.drink)).toEqual(["1664-blanc"]);
+    expect(parse("une biere bleu").map((line) => line.drink)).toEqual(["brasserie-du-mont-blanc-bleue"]);
+    expect(parse("une 1664").map((line) => line.drink)).toEqual(["1664"]);
+    expect(parse("deux 1664 fruits rouges")).toEqual([
+      { quantity: 2, preset: null, drink: "1664-fruits-rouges", volumeMl: null, abv: null },
+    ]);
+    expect(parse("une 1664 bleue sans alcool").map((line) => line.drink)).toEqual(["1664-blanc-zero"]);
+  });
+
   it("recognises Spanish cañas with or without accents and respects the named beer", () => {
     for (const input of ["dos cañas de Mahou Clásica", "dos canas de Mahou Clasica"]) {
       expect(parse(input)).toEqual([
