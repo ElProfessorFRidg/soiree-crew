@@ -1,5 +1,7 @@
 """Validate each native device target before packing its IPA."""
+import hashlib
 import json
+import os
 import plistlib
 import sys
 from pathlib import Path
@@ -30,10 +32,36 @@ def inspect_app(path, target="iphone", channel=None):
         raise ValueError("Missing or incorrect Objective-C scene delegate name")
     if info.get("CrewStartupDiagnosticsVersion") != 1:
         raise ValueError("Missing native startup diagnostics")
+    updates = None
+    ota_url = os.environ.get("CREW_OTA_URL", "").strip().rstrip("/")
+    if ota_url:
+        version, build = info["CFBundleShortVersionString"], info["CFBundleVersion"]
+        runtime = f"crew-{channel}-{target}-{build}"
+        stream = f"{channel}-{target}"
+        with (app / "Expo.plist").open("rb") as source:
+            config = plistlib.load(source)
+        certificate = Path(__file__).resolve().parents[2] / "apps/mobile/certs/ota-certificate.pem"
+        expected_certificate = certificate.read_text().strip() if certificate.is_file() else None
+        if (config.get("EXUpdatesEnabled") is not True
+                or config.get("EXUpdatesURL") != f"{ota_url}/manifest"
+                or config.get("EXUpdatesRequestHeaders", {}).get("expo-channel-name") != stream
+                or config.get("EXUpdatesRuntimeVersion") != runtime
+                or config.get("EXUpdatesCheckOnLaunch") != "ALWAYS"
+                or config.get("EXUpdatesLaunchWaitMs") != 0
+                or config.get("EXUpdatesHasEmbeddedUpdate", True) is not True):
+            raise ValueError(f"Wrong Expo Updates configuration for {stream}")
+        # Unsigned updates must never be accepted: the IPA carries the repository certificate.
+        if (not expected_certificate
+                or (config.get("EXUpdatesCodeSigningCertificate") or "").strip() != expected_certificate
+                or config.get("EXUpdatesCodeSigningMetadata") != {"keyid": "main", "alg": "rsa-v1_5-sha256"}):
+            raise ValueError(f"Missing or wrong update signing certificate for {stream}")
+        extras = "\0".join(os.environ.get(key, "") for key in ("CREW_SERVER_URL", "CREW_PUBLIC_SERVERS"))
+        updates = {"otaUrl": ota_url, "runtime": runtime, "stream": stream, "version": version,
+                   "build": build, "serverConfig": hashlib.sha256(extras.encode()).hexdigest()}
     return {"bundleIdentifier": info["CFBundleIdentifier"], "minimumOSVersion": info["MinimumOSVersion"],
             "deviceFamily": info["UIDeviceFamily"], "target": target, "channel": channel,
             "ipadMode": "native tablet" if 2 in info["UIDeviceFamily"] else "iPhone",
-            "orientations": orientations, "sceneDelegate": "SceneDelegate", "startupDiagnostics": 1}
+            "orientations": orientations, "sceneDelegate": "SceneDelegate", "startupDiagnostics": 1, "updates": updates}
 
 
 if __name__ == "__main__":

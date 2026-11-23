@@ -1,0 +1,34 @@
+name: IPA command
+
+# A "/ipa" comment on a PR builds its Preview IPA even when an OTA update would do (docs/OTA.md).
+# IPAs that are needed anyway start on their own; this is for asking for one by hand.
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  actions: write
+  issues: write
+  pull-requests: read
+
+jobs:
+  ipa:
+    if: >-
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '/ipa') &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Start the Preview IPA build of this PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.issue.number }}
+          COMMENT: ${{ github.event.comment.id }}
+        run: |
+          react() { gh api -X POST "repos/$GITHUB_REPOSITORY/issues/comments/$COMMENT/reactions" -f content="$1" > /dev/null; }
+          # Forks never get a Preview build with the repository's secrets.
+          BRANCH=$(gh pr view "$PR" -R "$GITHUB_REPOSITORY" --json headRefName,isCrossRepository,state \
+            --jq 'if .isCrossRepository or .state != "OPEN" then "" else .headRefName end')
+          if [[ -z "$BRANCH" ]]; then react confused; echo "PR #$PR is closed or comes from a fork."; exit 1; fi
+          gh workflow run build.yml -R "$GITHUB_REPOSITORY" --ref "$BRANCH" -f force_ipa=true -f pr="$PR"
+          react rocket
