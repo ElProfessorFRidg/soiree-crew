@@ -1,5 +1,5 @@
 import { Platform } from "react-native";
-import { isEnabled, reloadAsync, useUpdates } from "expo-updates";
+import { channel, isEnabled, reloadAsync, useUpdates } from "expo-updates";
 import { useT } from "@/i18n";
 import { Button } from "@/ui/Button";
 import { Text } from "@/ui/Text";
@@ -17,6 +17,7 @@ export function UpdateStatus() {
         {i18n.t("updates.installed", { version: currentVersion, build: currentBuild || "dev" })}
         {revision ? ` · ${i18n.t("updates.otaRevision", { revision })}` : null}
       </Text>
+      {Platform.OS === "ios" && !revision ? <Text variant="small" align="center">{isEnabled ? i18n.t("updates.otaIdle", { channel: channel ?? "?" }) : i18n.t("updates.otaOff")}</Text> : null}
       {isEnabled && isDownloading ? <Text variant="small" align="center">{i18n.t("updates.otaDownloading")}</Text> : null}
       {isEnabled && isUpdatePending ? (
         <Button
