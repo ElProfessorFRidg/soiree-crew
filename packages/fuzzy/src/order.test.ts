@@ -57,6 +57,25 @@ describe("drink catalogue", () => {
 });
 
 describe("order parser with brands", () => {
+  it("reads pintes, demis, and compact or spoken centilitre measures", () => {
+    expect(parse("2 pintes de ruby et un demi de kasteel")).toEqual([
+      { quantity: 2, preset: "m-pint", drink: "leffe-ruby", volumeMl: 500, abv: null },
+      { quantity: 1, preset: "m-demi", drink: "kasteel-rouge", volumeMl: 250, abv: null },
+    ]);
+    for (const input of ["25 d’une ruby", "25 de ruby", "25centilitres de ruby", "25 c.l. de ruby"]) {
+      expect(parse(input), input).toEqual([
+        { quantity: 1, preset: null, drink: "leffe-ruby", volumeMl: 250, abv: null },
+      ]);
+    }
+    expect(parse("37,5 d'une leffe blonde")[0]).toMatchObject({ drink: "leffe-blonde", volumeMl: 375 });
+    expect(parse("une pinte de ruby puis 25 d'une leffe blonde")).toHaveLength(2);
+    expect(parse("2 de ruby")[0]).toMatchObject({ quantity: 2, drink: "leffe-ruby", volumeMl: null });
+    expect(parse("2,5 d’un soho litchi")[0]).toMatchObject({ drink: "soho-lychee", volumeMl: 25 });
+    expect(parse("25 d’une")).toEqual([]);
+    expect(parse("25 de hocus pocus")[0]).toMatchObject({ drink: "openbeerdb-1", volumeMl: 250 });
+    expect(parse("25 d'un old cuban")[0]).toMatchObject({ drink: "old-cuban", volumeMl: 250 });
+  });
+
   it("recognises Belgian blue beers and Mouscron beers by their spoken names", () => {
     for (const [input, id] of [
       ["biere bleue belge", "bleue-de-soignies"],

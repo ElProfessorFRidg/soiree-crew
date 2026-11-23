@@ -7,3 +7,10 @@ Each row contains the original ID, a display name qualified by the brewery when 
 ## Index maintenance
 
 Run `pnpm catalogue:index` after editing catalogue names or replacing the data snapshot. The app bundles the sorted name indexes for exact and prefix lookups and works offline. `pnpm check` checks that both artefacts are current. `openbeerdb-index.json` is an index of the extracted OpenBeerDB data and is distributed on the same terms. Imported entries match by exact name in the order parser and by prefix in catalogue search. Fuzzy matching remains enabled for the curated catalogue and locally learned names.
+
+## IBA cocktails
+
+The IBA-derived drink entries in `mixes.ts` use ingredient measures from
+[rasmusab/iba-cocktails](https://github.com/rasmusab/iba-cocktails/tree/main/iba-web)
+as reference data. See [MIT notice](./iba-cocktails-LICENSE.txt). Strengths and
+volumes are estimates based on example ingredient strengths and dilution.

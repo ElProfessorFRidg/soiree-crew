@@ -58,6 +58,8 @@ const UNITS = new Map<string, number>(Object.entries({ cl: 10, ml: 1, l: 1000, c
 const PERCENT = new Set(["%", "pourcent", "percent", "degre", "degres", "deg", "grad", "градус", "градуса", "градусов"]);
 /** Sizes said as a bare number of centilitres: "33 despe", "kro 50". */
 const CENTILITRE_SIZES = new Set([20, 25, 33, 35, 44, 50, 75, 100]);
+const VOLUME_LINKS = new Set(["de", "d", "du", "des", "of"]);
+const VOLUME_ARTICLES = new Set(["un", "une", "la", "le", "l", "a", "an", "the"]);
 const MAX_QUANTITY = 12;
 /** The server refuses more in one drink. */
 const MAX_VOLUME_ML = 3000;
@@ -108,7 +110,8 @@ export function tokenize(text: string): string[] {
     .replace(/[̀-ͯ]/g, "")
     .replace(/(\d)[.,](\d)/g, "$1.$2")
     .replace(/[%°]/g, " % ")
-    .replace(/(\d)(cl|ml|l)(?!\p{L})/gu, "$1 $2")
+    .replace(/(\d)\s*([cm])\s*\.\s*l\b/gu, "$1 $2l")
+    .replace(/(\d)(centilitres?|millilitres?|cl|ml|l)(?!\p{L})/gu, "$1 $2")
     .replace(/[^\p{L}\p{N}.% ]+/gu, " ")
     .split(" ")
     .map((word) => word.replace(/^\.+|\.+$/g, ""))
@@ -200,7 +203,8 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
 
   // Longest phrase first: "grand verre de vin" before "verre", "castel rouge" before "rouge".
   const matchAt = (start: number): { entry: Entry<P>; span: number; guess: boolean; phrase: string } | null => {
-    const word = words[start]!;
+    const word = words[start];
+    if (word === undefined) return null;
     const measure = measureByName.get(word);
     // An exact measure starts a serving, even when the following drink is misspelled.
     if (measure) return { entry: measure, span: 1, guess: false, phrase: word };
@@ -404,6 +408,22 @@ export function parseDrinkOrder<P>(text: string, presets: readonly Candidate<P>[
         continue;
       }
       const whole = Number.isInteger(value);
+      // "25 d’une Ruby" gives the volume of the named drink. The article is not its quantity.
+      if (next !== undefined && VOLUME_LINKS.has(next)) {
+        const afterLink = words[i + 2];
+        const drinkStart = afterLink !== undefined && VOLUME_ARTICLES.has(afterLink) ? i + 3 : i + 2;
+        if (value > 0 && value * 10 <= MAX_VOLUME_ML && matchAt(drinkStart)?.entry.kind === "drink") {
+          if (whole && value <= MAX_QUANTITY) {
+            if (hasItem() || line.serving?.measureMl !== undefined) flush();
+            line.quantity = value;
+          } else {
+            if (line.drink || line.volumeMl !== null) flush();
+            line.volumeMl = Math.round(value * 10);
+          }
+          i = drinkStart;
+          continue;
+        }
+      }
       const beforeItem = next !== undefined && matchAt(i + 1) !== null;
       if (whole && value >= 1 && value <= MAX_QUANTITY && beforeItem) {
         // "2 castel"; after a drink, "pinte 2 shots" starts the next one.
