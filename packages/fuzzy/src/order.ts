@@ -72,7 +72,7 @@ interface ServingWord {
 const SERVING_WORDS: readonly ServingWord[] = [
   { serving: "flash", names: ["flash"], volumeMl: { spirit: 200 } },
   { serving: "flask", names: ["flasque", "flask"], volumeMl: { spirit: 350 } },
-  { serving: "can", names: ["canette", "cannette", "can"], volumeMl: { beer: 330, cider: 330, cocktail: 330, soft: 330 } },
+  { serving: "can", names: ["canette", "canettes", "cannette", "cannettes", "can", "cans"], volumeMl: { beer: 330, cider: 330, cocktail: 330, soft: 330 } },
   { serving: "bottle", names: ["bouteille", "bottle", "teille"], volumeMl: { beer: 330, cider: 330, wine: 750, spirit: 700, soft: 500 } },
   { serving: "glass", names: ["verre", "glass"], volumeMl: { wine: 120, beer: 250, cider: 250, soft: 250 } },
   // A plain "coupe" still means champagne. "Coupe de" introduces the wine by name.

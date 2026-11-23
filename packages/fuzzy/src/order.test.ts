@@ -57,6 +57,13 @@ describe("drink catalogue", () => {
 });
 
 describe("order parser with brands", () => {
+  it("keeps plural can measures attached to the requested beer", () => {
+    expect(parse("2 canettes de 8,6 black")).toEqual([
+      { quantity: 2, preset: null, drink: "bavaria-8-6-black", volumeMl: 500, abv: null },
+    ]);
+    expect(parse("une 8.6 ipa")[0]).toMatchObject({ drink: "bavaria-8-6-ipa" });
+  });
+
   it("recognises Trois Rivières as a rum name whether its number is spelled or typed", () => {
     for (const name of ["3 rivieres", "Trois Rivières", "rhum 3 rivieres"]) {
       expect(parse(`deux bouchons de ${name}`)).toEqual([
