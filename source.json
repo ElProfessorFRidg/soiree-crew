@@ -1985,6 +1985,15 @@
   ],
   "news": [
     {
+      "identifier": "ota-v0.2.37-preview.38+build.339-iphone-45414954503.1",
+      "title": "Soirée Crew Preview 0.2.37 · OTA",
+      "caption": "• Clarify OTA channels and surface Preview installation",
+      "date": "2026-11-24T14:38:10Z",
+      "appID": "app.soireecrew.mobile.preview",
+      "tintColor": "F4B33D",
+      "notify": false
+    },
+    {
       "identifier": "preview-0.2.37-339",
       "title": "Soirée Crew Preview 0.2.37 (339)",
       "caption": "• Avoid repeating installed version in status header\n• Refine OTA update and release history UX\n• Refine OTA update and release history UX\n• Refine OTA update and release history UX\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
@@ -2184,20 +2193,17 @@
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.12-preview.32%2Bbuild.305/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
-    },
-    {
-      "identifier": "preview-0.2.12-303",
-      "title": "Soirée Crew Preview 0.2.12 (303)",
-      "caption": "• Bump dependabot/fetch-metadata from 2 to 3\n• Document Dependabot auto-merge safeguards and settings",
-      "date": "2026-11-23T15:56:22Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.30%2Bbuild.303/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.12-preview.30%2Bbuild.303/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
-      "notify": false
     }
   ],
   "otaChangelog": [
+    {
+      "id": "ota-v0.2.37-preview.38+build.339-iphone-45414954503.1",
+      "channel": "preview",
+      "version": "0.2.37",
+      "build": 339,
+      "date": "2026-11-24T14:38:10Z",
+      "notes": "• Clarify OTA channels and surface Preview installation"
+    },
     {
       "id": "ota-v0.2.34+build.334-iphone-45370661273.1",
       "channel": "public",
