@@ -3607,6 +3607,15 @@
   ],
   "news": [
     {
+      "identifier": "ota-v0.2.34+build.334-ipad-45361764484.1",
+      "title": "Soirée Crew 0.2.34 · OTA",
+      "caption": "• Show the OTA state in Settings (#35)",
+      "date": "2026-11-24T09:11:07Z",
+      "appID": "app.soireecrew.mobile",
+      "tintColor": "F4B33D",
+      "notify": false
+    },
+    {
       "identifier": "preview-0.2.35-335",
       "title": "Soirée Crew Preview 0.2.35 (335)",
       "caption": "• Allow slow iOS simulator runs and replace launch artifacts on retry\n• Show the OTA state in Settings even before a fix arrives\n• TypeScript 7, with the fixes it needs",
@@ -3810,20 +3819,17 @@
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.12-preview.28%2Bbuild.291/soiree-crew-ipad-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
-    },
-    {
-      "identifier": "release-0.2.11-290",
-      "title": "Soirée Crew 0.2.11 (290)",
-      "caption": "• Retirer les derniers sous-textes superflus\n• Renouveler les autres phrases d’accueil en français\n• Fill gaps in 1664 and other French-market beer ranges\n• Add Spanish and international beers and expand Chouffe selection\n• Add 80 beers and recognise plural can measures\n• Add Trois Rivières, Saint James and other rum variants\n• Réécrire les huit vannes du matin en français\n• Expand regional drinks, champagne and alcohol-free choices\n• Rendre les phrases du matin plus drôles\n• Add 100 drinks to the bar catalogue\n• Alléger les textes de l’interface Soirée Crew",
-      "date": "2026-11-23T13:18:15Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.11%2Bbuild.290/ipad/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.11%2Bbuild.290/soiree-crew-ipad-unsigned.ipa",
-      "appID": "app.soireecrew.mobile",
-      "notify": false
     }
   ],
   "otaChangelog": [
+    {
+      "id": "ota-v0.2.34+build.334-ipad-45361764484.1",
+      "channel": "public",
+      "version": "0.2.34",
+      "build": 334,
+      "date": "2026-11-24T09:11:07Z",
+      "notes": "• Show the OTA state in Settings (#35)"
+    },
     {
       "id": "ota-v0.2.17-preview.28+build.311-ipad-45238650796.1",
       "channel": "preview",
