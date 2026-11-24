@@ -556,6 +556,9 @@ export default function SettingsScreen() {
         <>
           <Section title={i18n.t("settings.aboutTitle")} icon="x:cloudDown">
             <UpdateStatus />
+            <CheckNow />
+          </Section>
+          <Panel>
             <SwitchRow
               label={i18n.t("updates.check")}
               hint={i18n.t("updates.checkHint", { version: currentVersion })}
@@ -565,9 +568,7 @@ export default function SettingsScreen() {
                 if (on) void checkForUpdate(true).catch(() => undefined);
               }}
             />
-            <CheckNow />
-            <CheckNow />
-          </Section>
+          </Panel>
           <Panel>
             <Row title={i18n.t("updates.changelog")} leading={<Icon name="x:film" color={theme.textMuted} />} trailing={<Icon name="chev" color={theme.textMuted} />} onPress={() => router.push("/versions")} />
             <Row title={i18n.t("diagnostics.title")} leading={<Icon name="x:info" color={theme.textMuted} />} trailing={<Icon name="chev" color={theme.textMuted} />} onPress={() => router.push("/server-status")} last />
@@ -641,12 +642,10 @@ function CheckNow() {
     <Button
       label={i18n.t("updates.checkNow")}
       icon="x:refresh"
-      variant="secondary"
-      height={40}
-      fontSize={14}
-      style={styles.small}
+      variant="primary"
       loading={busy}
       onPress={() => {
+        if (busy) return;
         setBusy(true);
         const ota = isEnabled
           ? checkForUpdateAsync().then(async (available) => {
