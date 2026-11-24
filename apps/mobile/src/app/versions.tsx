@@ -41,14 +41,14 @@ export default function VersionsScreen() {
     : changelogFromSource(source, channel).map((version) => ({ ...version, kind: "changes" as const }));
   return (
     <Screen back title={i18n.t("updates.changelog")} withToasts onRefresh={load}>
-      <UpdateStatus />
+      <Panel><UpdateStatus /></Panel>
       {canDownload ? <Segmented accessibilityLabel={i18n.t("updates.changelog")} value={mode} items={[
         { value: "changes", label: i18n.t("updates.changelog") },
         { value: "downloads", label: i18n.t("updates.downloads") },
       ]} onChange={(value) => { setMode(value); setShown(10); }} /> : null}
       <Segmented accessibilityLabel={i18n.t("updates.channel")} value={channel} items={(["public", "preview"] as const).map((value) => ({ value, label: i18n.t(`updates.${value}`) }))} onChange={(value) => { setChannel(value); setShown(10); }} />
       {showDownloads ? <Text variant="small">{i18n.t("updates.historyHint")}</Text> : null}
-      {loading ? <ActivityIndicator color={theme.amber} /> : null}
+      {loading && source === null ? <ActivityIndicator color={theme.amber} /> : null}
       {failed ? <Panel><Text>{i18n.t("updates.historyFailed")}</Text><Button variant="secondary" label={i18n.t("common.retry")} onPress={() => void load()} /></Panel> : null}
       {!loading && !failed && versions.length === 0 ? <Text>{i18n.t("updates.historyEmpty")}</Text> : null}
       {versions.slice(0, shown).map((version) => (
@@ -57,8 +57,14 @@ export default function VersionsScreen() {
             <Text variant="h2" style={styles.title}>{version.version}</Text>
             <Tag label={version.kind === "changes" && version.otaId ? "OTA" : `IPA #${version.build}`} />
           </View>
-          <Text variant="small">{[version.date && new Date(version.date).toLocaleDateString(i18n.locale), version.kind === "download" && version.size > 0 && `${(version.size / 1048576).toLocaleString(i18n.locale, { maximumFractionDigits: 1 })} MB`, version.kind === "download" && version.minOS && i18n.t("updates.minimumOS", { version: version.minOS })].filter(Boolean).join(" · ")}</Text>
-          {version.notes ? <Text>{version.notes}</Text> : null}
+          <Text variant="small">{[version.date && Number.isFinite(Date.parse(version.date)) && new Date(version.date).toLocaleDateString(i18n.locale, { day: "numeric", month: "long", year: "numeric" }), version.kind === "download" && version.size > 0 && `${(version.size / 1048576).toLocaleString(i18n.locale, { maximumFractionDigits: 1 })} MB`, version.kind === "download" && version.minOS && i18n.t("updates.minimumOS", { version: version.minOS })].filter(Boolean).join(" · ")}</Text>
+          {version.notes.trim() ? (
+            <View style={[styles.notes, { borderTopColor: theme.handle }]}>
+              {version.notes.trim().split(/\r?\n/).filter((line) => line.trim()).map((line, index) => (
+                <Text key={index}>{line.trim()}</Text>
+              ))}
+            </View>
+          ) : null}
           {version.kind === "download" ? <Button label={i18n.t("updates.download")} accessibilityLabel={`${i18n.t("updates.download")} ${version.version} (${version.build})`} icon="arrowdn" variant="secondary" onPress={() => void Linking.openURL(version.url).catch(() => showToast({ tone: "danger", message: i18n.t("updates.unavailable") }))} /> : null}
         </Panel>
       ))}
@@ -66,4 +72,4 @@ export default function VersionsScreen() {
     </Screen>
   );
 }
-const styles = StyleSheet.create({ heading: { flexDirection: "row", alignItems: "center", gap: 12 }, title: { flex: 1 } });
+const styles = StyleSheet.create({ heading: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 8 }, title: { flexGrow: 1, flexShrink: 1 }, notes: { borderTopWidth: StyleSheet.hairlineWidth, paddingTop: 12, gap: 8 } });
