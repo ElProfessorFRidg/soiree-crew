@@ -1985,6 +1985,15 @@
   ],
   "news": [
     {
+      "identifier": "ota-v0.2.34+build.334-iphone-45493902029.1",
+      "title": "Soirée Crew 0.2.34 · OTA",
+      "caption": "• Update settings and changelog UX (OTA) (#38)",
+      "date": "2026-11-24T21:48:33Z",
+      "appID": "app.soireecrew.mobile",
+      "tintColor": "F4B33D",
+      "notify": false
+    },
+    {
       "identifier": "ota-v0.2.37-preview.38+build.339-iphone-45414954503.1",
       "title": "Soirée Crew Preview 0.2.37 · OTA",
       "caption": "• Clarify OTA channels and surface Preview installation",
@@ -2182,20 +2191,17 @@
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.15-preview.28%2Bbuild.308/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
-    },
-    {
-      "identifier": "preview-0.2.12-305",
-      "title": "Soirée Crew Preview 0.2.12 (305)",
-      "caption": "• Bump the other-patches group with 3 updates\n• Document Dependabot auto-merge safeguards and settings",
-      "date": "2026-11-23T16:14:01Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.32%2Bbuild.305/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.12-preview.32%2Bbuild.305/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
-      "notify": false
     }
   ],
   "otaChangelog": [
+    {
+      "id": "ota-v0.2.34+build.334-iphone-45493902029.1",
+      "channel": "public",
+      "version": "0.2.34",
+      "build": 334,
+      "date": "2026-11-24T21:48:33Z",
+      "notes": "• Update settings and changelog UX (OTA) (#38)"
+    },
     {
       "id": "ota-v0.2.37-preview.38+build.339-iphone-45414954503.1",
       "channel": "preview",
