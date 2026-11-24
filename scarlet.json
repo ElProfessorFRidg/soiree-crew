@@ -813,6 +813,27 @@
     },
     {
       "name": "Soirée Crew Preview",
+      "version": "0.2.32",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.32-preview.37%2Bbuild.332/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "• Bump vitest from 4.1.11 to 5.1.0",
+      "bundleID": "app.soireecrew.mobile.preview",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.32-preview.37%2Bbuild.332/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.32-preview.37%2Bbuild.332/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.32-preview.37%2Bbuild.332/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.32-preview.37%2Bbuild.332/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.32-preview.37%2Bbuild.332/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.32-preview.37%2Bbuild.332/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.32-preview.37%2Bbuild.332/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.32-preview.37%2Bbuild.332/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.32-preview.37%2Bbuild.332/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.32-preview.37%2Bbuild.332/iphone/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew Preview 0.2.30",
       "version": "0.2.30",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.30-preview.36%2Bbuild.331/soiree-crew-unsigned.ipa",
