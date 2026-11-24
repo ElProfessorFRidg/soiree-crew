@@ -1551,6 +1551,8 @@ export const it: Messages = {
     preview: "Preview",
     channel: "Canale",
     otaRevision: "Aggiornamento OTA {revision}",
+    otaIdle: "OTA attivo · nessuna correzione ricevuta ({channel})",
+    otaOff: "OTA non attivo in questo IPA",
     otaDownloading: "Download dell'aggiornamento…",
     otaApply: "Riavvia per applicare",
     otaRestart: "Riavvia",

@@ -1576,6 +1576,8 @@ export const ru: Messages = {
     preview: "Preview",
     channel: "Канал",
     otaRevision: "Обновление OTA {revision}",
+    otaIdle: "OTA включён · исправлений пока нет ({channel})",
+    otaOff: "OTA не включён в этом IPA",
     otaDownloading: "Загрузка обновления…",
     otaApply: "Перезапустить для установки",
     otaRestart: "Перезапустить",
