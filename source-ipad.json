@@ -3669,6 +3669,15 @@
   ],
   "news": [
     {
+      "identifier": "ota-v0.2.34+build.334-ipad-45370661273.1",
+      "title": "Soirée Crew 0.2.34 · OTA",
+      "caption": "• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)",
+      "date": "2026-11-24T10:06:45Z",
+      "appID": "app.soireecrew.mobile",
+      "tintColor": "F4B33D",
+      "notify": false
+    },
+    {
       "identifier": "preview-0.2.36-337",
       "title": "Soirée Crew Preview 0.2.36 (337)",
       "caption": "• Show the OTA state in Settings (#35)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics",
@@ -3870,20 +3879,17 @@
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.12%2Bbuild.302/soiree-crew-ipad-unsigned.ipa",
       "appID": "app.soireecrew.mobile",
       "notify": false
-    },
-    {
-      "identifier": "preview-0.2.12-298",
-      "title": "Soirée Crew Preview 0.2.12 (298)",
-      "caption": "• Expand indexed drink catalogue beyond 5,000 references\n• Add IBA cocktails and parse spoken centilitre measures\n• Import 2,861 beers and build an offline catalogue name index\n• Add 96 more catalogue references across six drink groups\n• Expand all six drink catalogue groups\n• Add 64 whiskies, vodkas, liqueurs and beers\n• Add 44 Belgian beers including Mouscron breweries",
-      "date": "2026-11-23T15:33:20Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.29%2Bbuild.298/ipad/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.12-preview.29%2Bbuild.298/soiree-crew-ipad-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
-      "notify": false
     }
   ],
   "otaChangelog": [
+    {
+      "id": "ota-v0.2.34+build.334-ipad-45370661273.1",
+      "channel": "public",
+      "version": "0.2.34",
+      "build": 334,
+      "date": "2026-11-24T10:06:45Z",
+      "notes": "• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)"
+    },
     {
       "id": "ota-v0.2.34+build.334-ipad-45361764484.1",
       "channel": "public",
