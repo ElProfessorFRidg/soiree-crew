@@ -1536,6 +1536,8 @@ export const fr = {
     preview: "Preview",
     channel: "Canal",
     otaRevision: "Correctif OTA {revision}",
+    otaIdle: "OTA actif · aucun correctif reçu ({channel})",
+    otaOff: "OTA non activé dans cet IPA",
     otaDownloading: "Téléchargement du correctif…",
     otaApply: "Redémarrer pour appliquer",
     otaRestart: "Redémarrer",
