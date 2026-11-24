@@ -929,16 +929,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -951,6 +951,28 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.37",
+          "buildVersion": "339",
+          "marketingVersion": "0.2.37 Preview (339)",
+          "date": "2026-11-24T14:01:31Z",
+          "localizedDescription": "• Avoid repeating installed version in status header\n• Refine OTA update and release history UX\n• Refine OTA update and release history UX\n• Refine OTA update and release history UX\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.37-preview.38%2Bbuild.339/soiree-crew-unsigned.ipa",
+          "size": 25946843,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.36",
           "buildVersion": "337",
@@ -1942,26 +1964,37 @@
           ]
         }
       ],
-      "version": "0.2.36",
-      "versionDate": "2026-11-24T10:01:11Z",
-      "versionDescription": "• Show the OTA state in Settings (#35)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.36-preview.36%2Bbuild.337/soiree-crew-unsigned.ipa",
-      "size": 25946298,
+      "version": "0.2.37",
+      "versionDate": "2026-11-24T14:01:31Z",
+      "versionDescription": "• Avoid repeating installed version in status header\n• Refine OTA update and release history UX\n• Refine OTA update and release history UX\n• Refine OTA update and release history UX\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.37-preview.38%2Bbuild.339/soiree-crew-unsigned.ipa",
+      "size": 25946843,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "preview-0.2.37-339",
+      "title": "Soirée Crew Preview 0.2.37 (339)",
+      "caption": "• Avoid repeating installed version in status header\n• Refine OTA update and release history UX\n• Refine OTA update and release history UX\n• Refine OTA update and release history UX\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+      "date": "2026-11-24T14:01:31Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.37-preview.38%2Bbuild.339/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
     {
       "identifier": "ota-v0.2.34+build.334-iphone-45370661273.1",
       "title": "Soirée Crew 0.2.34 · OTA",
@@ -2161,17 +2194,6 @@
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12-preview.30%2Bbuild.303/iphone/banner.png",
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.12-preview.30%2Bbuild.303/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
-      "notify": false
-    },
-    {
-      "identifier": "release-0.2.12-302",
-      "title": "Soirée Crew 0.2.12 (302)",
-      "caption": "• Queue safe Dependabot patches for protected auto-merge\n• Expand Dependabot security and version update coverage",
-      "date": "2026-11-23T15:48:20Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.12%2Bbuild.302/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.12%2Bbuild.302/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile",
       "notify": false
     }
   ],
@@ -2574,6 +2596,13 @@
       "buildVersion": "2",
       "date": "2026-10-27T00:43:05Z",
       "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.37",
+      "buildVersion": "339",
+      "date": "2026-11-24T14:01:31Z",
+      "localizedDescription": "• Avoid repeating installed version in status header\n• Refine OTA update and release history UX\n• Refine OTA update and release history UX\n• Refine OTA update and release history UX\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
