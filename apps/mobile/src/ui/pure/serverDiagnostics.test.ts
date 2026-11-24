@@ -15,6 +15,7 @@ const id = "36cb8f7d-4981-4244-80c0-5d8fba3dd073";
 let count = 0;
 let session: ServerSession;
 const response = (body: unknown, status = 200, headers: Record<string, string> = {}) => new Response(JSON.stringify(body), { status, headers });
+const build = { version: "test", build: 121, channel: "preview", target: "ipad" };
 const publicOK = () => ({ code: "SC_OK", httpStatus: 200, durationMs: 3, native: true, contractValid: true });
 const catalog = () => ({ generatedAt: Date.now(), apiVersion: 1, revision: "a".repeat(40), readiness: { state: "ready", code: "SC_OK", checkedAt: Date.now(), durationMs: 1 }, services: { ai: false, appleSignIn: false, iosPush: false, androidPush: false }, routes: [
   { method: "GET", path: "/v1/me", state: "available", access: "account" },
@@ -50,9 +51,23 @@ describe("connection error evidence", () => {
     expect(error).toMatchObject({ diagnostic: { code: "SC_DB_02", requestId: ref } });
     const history = recentNetworkDiagnostics(session.url, session.userId);
     const report: ServerDiagnosticReport = { server: session.url, at: Date.now(), checks: [], operator: null, authorized: false, native: true, complete: true };
-    const copy = formatServerDiagnostic(report, { version: "test", build: 121, channel: "preview", target: "ipad" }, history);
+    const copy = formatServerDiagnostic(report, build, history);
     expect(copy).toContain("SC_DB_02"); expect(copy).toContain(ref);
     for (const secret of [session.token, session.username, session.displayName, id, "private-user-id", "private-query"]) expect(copy).not.toContain(secret);
+  });
+  it("exports a diagnostic before checks run, including an invalid configuration without the raw address", () => {
+    const copy = formatServerDiagnostic(null, build, [], { server: null, issue: "SC_CFG_02" });
+    expect(copy).toContain("Run: not-run");
+    expect(copy).toContain("Issue: SC_CFG_02");
+    expect(copy).toContain("Server: none");
+  });
+  it("publishes a copyable report before the first response and includes native evidence after failure", async () => {
+    native.probe.mockResolvedValueOnce({ ...publicOK(), code: "SC_DNS_01", httpStatus: 0, nativeErrorCode: -1003, timings: { dnsMs: 2 }, contractValid: false });
+    const progress = vi.fn();
+    const pending = inspectServer(session.url, null, () => true, progress);
+    expect(progress.mock.calls[0]?.[0]).toMatchObject({ complete: false, checks: [1, 2, 3].map(() => ({ state: "not-run" })) });
+    const copy = formatServerDiagnostic(await pending, build);
+    for (const detail of ["SC_DNS_01", "source=native", "NSURL=-1003", "dnsMs=2"]) expect(copy).toContain(detail);
   });
   it("preserves native DNS evidence and does not describe an HTTP 500 as offline", async () => {
     native.probe.mockResolvedValueOnce({ ...publicOK(), code: "SC_DNS_01", httpStatus: 0, nativeErrorCode: -1003, contractValid: false });
@@ -137,7 +152,7 @@ describe("operator diagnostic runner", () => {
     let active = true; const progress = vi.fn();
     const pending = inspectServer(session.url, session, () => active, progress);
     active = false; release(publicOK()); await pending;
-    expect(progress).not.toHaveBeenCalled(); expect(fetcher).not.toHaveBeenCalled();
+    expect(progress).toHaveBeenCalledTimes(1); expect(fetcher).not.toHaveBeenCalled();
   });
   it("refuses malformed or foreign URLs in the operator catalog", () => {
     const raw = catalog();

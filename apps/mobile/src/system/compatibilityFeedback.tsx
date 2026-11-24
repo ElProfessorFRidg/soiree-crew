@@ -1,10 +1,12 @@
 import { useEffect } from "react";
+import { router } from "expo-router";
 import { Linking, Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FullWindowOverlay } from "react-native-screens";
 import { useT } from "@/i18n";
 import { takeCompatibilityNotices, useCompatibilityEvents } from "@/server/compatibilityEvents";
 import { compatibilityCode, type CompatibilityNotice } from "@/ui/pure/apiCompatibility";
+import { diagnosticFeatureLabel } from "@/ui/pure/diagnosticCodes";
 import { showToast, ToastHost, useToastVisible } from "@/ui/Toast";
 import { checkForUpdate, currentVersion, installLatest, openInAltStore } from "./updates";
 
@@ -27,8 +29,11 @@ export function useCompatibilityFeedback(): void {
     for (const notice of takeCompatibilityNotices()) {
       const action = notice.webUrl || notice.reason === "update_required"
         ? { label: i18n.t(notice.webUrl ? "updates.openWeb" : Platform.OS === "web" ? "updates.reload" : "updates.install"), onPress: () => void open(notice) }
-        : undefined;
-      showToast({ channel: "compatibility", tone: "danger", message: i18n.t(`serverCodes.${compatibilityCode(notice.reason)}`), durationMs: 12_000, action });
+        : { label: i18n.t("diagnostics.openLog"), onPress: () => router.push({ pathname: "/diagnostic-log", params: { server: notice.origin ?? "" } }) };
+      const label = diagnosticFeatureLabel(notice.feature);
+      const feature = label ? i18n.t(label) : `${notice.method} ${notice.feature === "api" ? i18n.t("diagnostics.apiFeature") : notice.feature}`;
+      const code = notice.code === "SC_API_01" ? "api_response_incompatible" : compatibilityCode(notice.reason);
+      showToast({ channel: "compatibility", tone: "danger", message: `${feature} · ${i18n.t(`serverCodes.${code}`)} (${notice.code} / HTTP ${notice.status})`, durationMs: 12_000, action });
     }
   }, [pending, i18n]);
 }
