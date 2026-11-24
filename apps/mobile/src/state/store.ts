@@ -70,6 +70,10 @@ export interface AppState {
   soundsOn: boolean;
   /** MOT-15: vibrations, on by default, switched separately from sounds. */
   hapticsOn: boolean;
+  /** Settings > Look: soft keeps every vibration to one light tap. */
+  hapticsSoft: boolean;
+  /** Settings > Look: text size multiplier, 1 is the designed size. */
+  textScale: number;
   /** QOL-24: "Économie de batterie", on by default: eco mode in Low Power Mode or on a low battery (power/eco.ts). */
   ecoOn: boolean;
   /** QOL-24: "Économie de données": lighter photos sent, the crew's loaded on a tap (photos/saver.tsx). This phone only. */
@@ -191,6 +195,8 @@ export const useAppStore = create<AppState>()(
       barHave: [],
       soundsOn: false,
       hapticsOn: true,
+      hapticsSoft: false,
+      textScale: 1,
       ecoOn: true,
       dataSaver: false,
       themeChoice: "auto",
