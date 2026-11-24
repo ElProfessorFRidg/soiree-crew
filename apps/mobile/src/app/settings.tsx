@@ -2,7 +2,7 @@ import { checkForUpdateAsync, fetchUpdateAsync, isEnabled } from "expo-updates";
 import { UpdateStatus } from "@/system/UpdateStatus";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { StyleSheet, View, Platform } from "react-native";
+import { Platform, StyleSheet, TextInput, View } from "react-native";
 import { getMotionScale, setMotionScale } from "@crew/design-tokens";
 import type { UnitSystem } from "@crew/units";
 import { useT } from "@/i18n";
@@ -17,6 +17,7 @@ import { useTheme } from "@/theme";
 import { Chip, Panel, Row, Segmented, Switch } from "@/ui/controls";
 import { Icon, type AnyIconName } from "@/ui/Icon";
 import { Screen } from "@/ui/Screen";
+import { inputText } from "@/ui/inputText";
 import type { ThemeChoice } from "@/theme/choice";
 import { Stepper } from "@/ui/Stepper";
 import { Text } from "@/ui/Text";
@@ -36,6 +37,7 @@ import { MAPS_APPS, MAPS_NAMES, mapsAppOf, type MapsApp } from "@/venues/directi
 
 const CURRENCIES = ["EUR", "USD", "GBP", "CHF", "CAD", "AUD"] as const;
 const WATER_STEPS = [30, 45, 60, 90] as const;
+const TEXT_SCALES = [0.9, 1, 1.15, 1.3] as const;
 
 function SwitchRow({ label, hint, value, onChange }: { label: string; hint?: string; value: boolean; onChange: (on: boolean) => void }) {
   return (
@@ -49,34 +51,84 @@ function SwitchRow({ label, hint, value, onChange }: { label: string; hint?: str
   );
 }
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+function Section({ title, icon, children }: { title: string; icon?: AnyIconName; children: ReactNode }) {
+  const theme = useTheme();
   return (
     <>
-      <Text variant="label">{title}</Text>
+      <View style={styles.sectionTitle}>
+        {icon ? <Icon name={icon} size={16} color={theme.textMuted} /> : null}
+        <Text variant="label">{title}</Text>
+      </View>
       <Panel>{children}</Panel>
     </>
   );
 }
 
 
-type SettingsSection = "region" | "notifications" | "security" | "appearance";
-const SECTIONS: { id: SettingsSection; icon: AnyIconName }[] = [
-  { id: "region", icon: "flag" },
-  { id: "notifications", icon: "bell" },
-  { id: "security", icon: "lock" },
-  { id: "appearance", icon: "eye" },
+type SettingsSection = "region" | "appearance" | "notifications" | "security" | "data" | "crews" | "about";
+const SECTION_ICONS: Record<SettingsSection, AnyIconName> = {
+  region: "x:globe",
+  appearance: "x:palette",
+  notifications: "bell",
+  security: "shield",
+  data: "x:database",
+  crews: "users",
+  about: "x:info",
+};
+const GROUPS: { title: "preferences" | "safety" | "crew" | "help"; items: SettingsSection[] }[] = [
+  { title: "preferences", items: ["region", "appearance", "notifications"] },
+  { title: "safety", items: ["security", "data"] },
+  { title: "crew", items: ["crews"] },
+  { title: "help", items: ["about"] },
+];
+/** One line per setting, so the search box can find it: the label key and the screen it lives on. */
+const SEARCH: { label: string; section: SettingsSection }[] = [
+  { label: "settings.unitSystem", section: "region" },
+  { label: "settings.currency", section: "region" },
+  { label: "settings.timeFormat", section: "region" },
+  { label: "settings.dayBoundary", section: "region" },
+  { label: "settings.themeLabel", section: "appearance" },
+  { label: "settings.textSize", section: "appearance" },
+  { label: "settings.eco", section: "appearance" },
+  { label: "settings.sounds", section: "appearance" },
+  { label: "settings.haptics", section: "appearance" },
+  { label: "settings.hapticsSoft", section: "appearance" },
+  { label: "appIcon.section", section: "appearance" },
+  { label: "settings.notifications", section: "notifications" },
+  { label: "settings.lockNumbers", section: "notifications" },
+  { label: "settings.nudges", section: "notifications" },
+  { label: "settings.outing", section: "notifications" },
+  { label: "settings.crewDetect", section: "notifications" },
+  { label: "settings.water", section: "notifications" },
+  { label: "settings.limit", section: "notifications" },
+  { label: "settings.recap", section: "notifications" },
+  { label: "settings.nightExtras", section: "notifications" },
+  { label: "settings.quiet", section: "notifications" },
+  { label: "settings.driveAlert", section: "security" },
+  { label: "settings.dataSaver", section: "data" },
+  { label: "settings.mapsApp", section: "data" },
+  { label: "settings.inLeaderboard", section: "crews" },
+  { label: "settings.inTerritory", section: "crews" },
+  { label: "people.viewAs", section: "crews" },
+  { label: "updates.check", section: "about" },
+  { label: "updates.checkNow", section: "about" },
+  { label: "updates.changelog", section: "about" },
 ];
 
-/** Reglages board, screen 1: one list, each line opens its own screen. */
+/** Reglages board, screen 1: a search box, then the categories in groups, each line opens its own screen. */
 function SettingsRoot() {
   const i18n = useT();
   const theme = useTheme();
   const preferences = useAppStore((state) => state.preferences);
+  const [query, setQuery] = useState("");
   const summary: Record<SettingsSection, string> = {
     region: `${i18n.t(`languages.${preferences.language}`)}, ${i18n.t(`countries.${preferences.legalCountry}` as "countries.FR")}, ${i18n.t(`units.${preferences.bacUnit}`)}`,
+    appearance: i18n.t("settings.appearanceSummary"),
     notifications: i18n.t("settings.notificationsSummary"),
     security: i18n.t("settings.securitySummary"),
-    appearance: i18n.t("settings.appearanceSummary"),
+    data: i18n.t("settings.dataSummary"),
+    crews: i18n.t("settings.crewsSummary"),
+    about: i18n.t("settings.aboutSummary"),
   };
   const link = (title: string, icon: AnyIconName, onPress: () => void, subtitle?: string, last?: boolean) => (
     <Row
@@ -89,26 +141,60 @@ function SettingsRoot() {
       last={last}
     />
   );
+  const open = (id: SettingsSection) => router.push({ pathname: "/settings", params: { section: id } });
+  const needle = query.trim().toLocaleLowerCase(i18n.language);
+  const found = needle
+    ? SEARCH.filter((entry) => i18n.t(entry.label as "settings.title").toLocaleLowerCase(i18n.language).includes(needle))
+    : [];
   return (
     <>
       <UpdateNotice />
-      <Panel>
-        {SECTIONS.map((s, index) =>
-          link(i18n.t(`settings.sections.${s.id}`), s.icon, () => router.push({ pathname: "/settings", params: { section: s.id } }), summary[s.id], index === SECTIONS.length - 1),
-        )}
-      </Panel>
-      <Panel>
-        {link(i18n.t("settings.guardrails"), "x:target", () => router.push("/limits"))}
-        {link(i18n.t("people.edit"), "user", () => router.push("/edit-profile"))}
-        {link(i18n.t("settings.drinks"), "glass", () => router.push("/add-drink"))}
-        {link(i18n.t("privacy.open"), "shield", () => router.push("/privacy"), undefined, true)}
-      </Panel>
-      <UpdateStatus />
-      <Button variant="secondary" label={i18n.t("diagnostics.title")} onPress={() => router.push("/server-status")} />
+      <TextInput
+        value={query}
+        onChangeText={setQuery}
+        placeholder={i18n.t("settings.search")}
+        placeholderTextColor={theme.textMuted}
+        accessibilityLabel={i18n.t("settings.search")}
+        autoCorrect={false}
+        autoCapitalize="none"
+        clearButtonMode="while-editing"
+        returnKeyType="search"
+        style={[styles.search, inputText({}), { color: theme.text, backgroundColor: theme.inputBg, borderColor: theme.inputBorder }]}
+      />
+      {needle ? (
+        found.length ? (
+          <Panel>
+            {found.map((entry, index) =>
+              link(i18n.t(entry.label as "settings.title"), SECTION_ICONS[entry.section], () => open(entry.section), i18n.t(`settings.sections.${entry.section}`), index === found.length - 1),
+            )}
+          </Panel>
+        ) : (
+          <Text variant="small" align="center">{i18n.t("settings.searchNone")}</Text>
+        )
+      ) : (
+        <>
+          {GROUPS.map((group) => (
+            <View key={group.title} style={styles.group}>
+              <Text variant="label">{i18n.t(`settings.groups.${group.title}`)}</Text>
+              <Panel>
+                {group.items.map((id, index) => link(i18n.t(`settings.sections.${id}`), SECTION_ICONS[id], () => open(id), summary[id], index === group.items.length - 1))}
+              </Panel>
+            </View>
+          ))}
+          <View style={styles.group}>
+            <Text variant="label">{i18n.t("settings.groups.shortcuts")}</Text>
+            <Panel>
+              {link(i18n.t("people.edit"), "user", () => router.push("/edit-profile"))}
+              {link(i18n.t("settings.guardrails"), "x:target", () => router.push("/limits"))}
+              {link(i18n.t("settings.drinks"), "glass", () => router.push("/add-drink"))}
+              {link(i18n.t("privacy.open"), "lock", () => router.push("/privacy"), undefined, true)}
+            </Panel>
+          </View>
+        </>
+      )}
     </>
   );
 }
-
 /** PREF-03: every setting by hand. Each change is instant, stored on the server and synced (PREF-01). */
 export default function SettingsScreen() {
   const i18n = useT();
@@ -119,6 +205,8 @@ export default function SettingsScreen() {
   const checkUpdates = useAppStore((state) => state.checkUpdates);
   const soundsOn = useAppStore((state) => state.soundsOn);
   const hapticsOn = useAppStore((state) => state.hapticsOn);
+  const hapticsSoft = useAppStore((state) => state.hapticsSoft);
+  const textScale = useAppStore((state) => state.textScale);
   const lockScreenNumbers = useAppStore((state) => state.lockScreenNumbers);
   const themeChoice = useAppStore((state) => state.themeChoice);
   const ecoOn = useAppStore((state) => state.ecoOn);
@@ -134,11 +222,11 @@ export default function SettingsScreen() {
 
   return (
     <Screen back title={section ? i18n.t(`settings.sections.${section}`) : i18n.t("settings.title")} withToasts>
-      {!section ? <><SettingsRoot /><Panel><Row title={i18n.t("updates.changelog")} trailing={<Icon name="chev" color={theme.textMuted} />} onPress={() => router.push("/versions")} last /></Panel></> : null}
+      {!section ? <SettingsRoot /> : null}
       {section === "region" ? (
         <>
           <RegionRules />
-          <Section title={i18n.t("settings.formats")}>
+          <Section title={i18n.t("settings.formats")} icon="x:sliders">
             <Text variant="label">{i18n.t("settings.unitSystem")}</Text>
             <Segmented<UnitSystem>
               accessibilityLabel={i18n.t("settings.unitSystem")}
@@ -156,19 +244,6 @@ export default function SettingsScreen() {
                 <Chip key={code} label={code} selected={code === preferences.currency} onPress={() => setPreferences({ currency: code })} />
               ))}
             </View>
-            <Text variant="label">{i18n.t("settings.themeLabel")}</Text>
-            <Segmented<ThemeChoice>
-              accessibilityLabel={i18n.t("settings.themeLabel")}
-              value={themeChoice}
-              items={[
-                { value: "auto", label: i18n.t("settings.themeAuto") },
-                { value: "dark", label: i18n.t("settings.themeDark") },
-                { value: "light", label: i18n.t("settings.themeLight") },
-              ]}
-              onChange={(choice) => useAppStore.setState({ themeChoice: choice })}
-            />
-            <SwitchRow label={i18n.t("settings.eco")} hint={i18n.t("settings.ecoHint")} value={ecoOn} onChange={(on) => useAppStore.setState({ ecoOn: on })} />
-            <SwitchRow label={i18n.t("settings.dataSaver")} hint={i18n.t("settings.dataSaverHint")} value={dataSaver} onChange={(on) => useAppStore.setState({ dataSaver: on })} />
             <Text variant="label">{i18n.t("settings.timeFormat")}</Text>
             <Segmented<"phone" | "h23" | "h12">
               accessibilityLabel={i18n.t("settings.timeFormat")}
@@ -197,16 +272,6 @@ export default function SettingsScreen() {
             <Text variant="small">{i18n.t("settings.dayBoundaryHint", { time: hour(preferences.dayBoundaryHour) })}</Text>
             <WeekStartRow />
           </Section>
-          {/* QOL-18: chosen once, used by every Directions button. */}
-          <Section title={i18n.t("settings.mapsApp")}>
-            <Segmented<MapsApp>
-              accessibilityLabel={i18n.t("settings.mapsApp")}
-              value={mapsAppOf(preferences.mapsApp)}
-              items={MAPS_APPS.map((value) => ({ value, label: MAPS_NAMES[value] }))}
-              onChange={(mapsApp) => setPreferences({ mapsApp })}
-            />
-            <Text variant="small">{i18n.t("settings.mapsAppHint")}</Text>
-          </Section>
 
           <Text variant="small">{i18n.t("settings.savedEverywhere")}</Text>
         </>
@@ -233,16 +298,6 @@ export default function SettingsScreen() {
                 void refreshReminders().catch(() => undefined);
               }}
             />
-            <SwitchRow
-              label={i18n.t("updates.check")}
-              hint={i18n.t("updates.checkHint", { version: currentVersion })}
-              value={checkUpdates}
-              onChange={(on) => {
-                useAppStore.setState({ checkUpdates: on, ...(on ? {} : { latestRelease: null }) });
-                if (on) void checkForUpdate(true).catch(() => undefined);
-              }}
-            />
-            <CheckNow />
             {/* Reminders are local notifications: a browser tab cannot send them (reminders.ts). */}
             {Platform.OS === "web" ? (
               <Text variant="small">{i18n.t("settings.remindersAppOnly")}</Text>
@@ -367,7 +422,29 @@ export default function SettingsScreen() {
       ) : null}
       {section === "appearance" ? (
         <>
-          <Section title={i18n.t("appIcon.section")}>
+          <Section title={i18n.t("settings.themeLabel")} icon="x:palette">
+            <Segmented<ThemeChoice>
+              accessibilityLabel={i18n.t("settings.themeLabel")}
+              value={themeChoice}
+              items={[
+                { value: "auto", label: i18n.t("settings.themeAuto") },
+                { value: "dark", label: i18n.t("settings.themeDark") },
+                { value: "light", label: i18n.t("settings.themeLight") },
+              ]}
+              onChange={(choice) => useAppStore.setState({ themeChoice: choice })}
+            />
+            <SwitchRow label={i18n.t("settings.eco")} hint={i18n.t("settings.ecoHint")} value={ecoOn} onChange={(on) => useAppStore.setState({ ecoOn: on })} />
+          </Section>
+          <Section title={i18n.t("settings.textSize")} icon="x:textsize">
+            <Segmented<number>
+              accessibilityLabel={i18n.t("settings.textSize")}
+              value={textScale}
+              items={TEXT_SCALES.map((value) => ({ value, label: i18n.t(`settings.textScale.${String(value).replace(".", "_")}` as "settings.title") }))}
+              onChange={(value) => useAppStore.setState({ textScale: value })}
+            />
+            <Text variant="small">{i18n.t("settings.textSizeHint")}</Text>
+          </Section>
+          <Section title={i18n.t("settings.soundAndTouch")} icon="x:volume">
             <SwitchRow
               label={i18n.t("settings.sounds")}
               hint={i18n.t("settings.soundsHint")}
@@ -385,9 +462,25 @@ export default function SettingsScreen() {
                 if (on) haptic.confirmed();
               }}
             />
+            <SwitchRow
+              label={i18n.t("settings.hapticsSoft")}
+              hint={i18n.t("settings.hapticsSoftHint")}
+              value={hapticsSoft}
+              onChange={(on) => {
+                useAppStore.setState({ hapticsSoft: on });
+                if (hapticsOn) haptic.confirmed();
+              }}
+            />
+          </Section>
+          <Section title={i18n.t("appIcon.section")} icon="x:sparkle">
             <AppIconPicker />
           </Section>
 
+          {__DEV__ ? <MotionScale /> : null}
+        </>
+      ) : null}
+      {section === "crews" ? (
+        <>
           {crews.length ? (
             <Section title={i18n.t("settings.crews")}>
               {crews.map((crew, index) => (
@@ -438,7 +531,47 @@ export default function SettingsScreen() {
             onPress={() => router.push({ pathname: "/profile", params: { id: "me", as: "stranger" } })}
             last
           />
-          {__DEV__ ? <MotionScale /> : null}
+        </>
+      ) : null}
+      {section === "data" ? (
+        <>
+          <Section title={i18n.t("settings.dataTitle")} icon="x:database">
+            <SwitchRow label={i18n.t("settings.dataSaver")} hint={i18n.t("settings.dataSaverHint")} value={dataSaver} onChange={(on) => useAppStore.setState({ dataSaver: on })} />
+          </Section>
+          <Section title={i18n.t("settings.mapsApp")} icon="x:map">
+            <Segmented<MapsApp>
+              accessibilityLabel={i18n.t("settings.mapsApp")}
+              value={mapsAppOf(preferences.mapsApp)}
+              items={MAPS_APPS.map((value) => ({ value, label: MAPS_NAMES[value] }))}
+              onChange={(mapsApp) => setPreferences({ mapsApp })}
+            />
+            <Text variant="small">{i18n.t("settings.mapsAppHint")}</Text>
+          </Section>
+          <Panel>
+            <Row title={i18n.t("privacy.open")} leading={<Icon name="lock" color={theme.textMuted} />} trailing={<Icon name="chev" color={theme.textMuted} />} onPress={() => router.push("/privacy")} last />
+          </Panel>
+        </>
+      ) : null}
+      {section === "about" ? (
+        <>
+          <Section title={i18n.t("settings.aboutTitle")} icon="x:cloudDown">
+            <UpdateStatus />
+            <SwitchRow
+              label={i18n.t("updates.check")}
+              hint={i18n.t("updates.checkHint", { version: currentVersion })}
+              value={checkUpdates}
+              onChange={(on) => {
+                useAppStore.setState({ checkUpdates: on, ...(on ? {} : { latestRelease: null }) });
+                if (on) void checkForUpdate(true).catch(() => undefined);
+              }}
+            />
+            <CheckNow />
+            <CheckNow />
+          </Section>
+          <Panel>
+            <Row title={i18n.t("updates.changelog")} leading={<Icon name="x:film" color={theme.textMuted} />} trailing={<Icon name="chev" color={theme.textMuted} />} onPress={() => router.push("/versions")} />
+            <Row title={i18n.t("diagnostics.title")} leading={<Icon name="x:info" color={theme.textMuted} />} trailing={<Icon name="chev" color={theme.textMuted} />} onPress={() => router.push("/server-status")} last />
+          </Panel>
         </>
       ) : null}
       {section === "security" && Platform.OS !== "web" ? <DriveAlertSection /> : null}
@@ -485,6 +618,9 @@ function DriveAlertSection() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
+  search: { borderWidth: 1, borderRadius: 14, paddingHorizontal: 14, minHeight: 46 },
+  group: { gap: 6 },
+  sectionTitle: { flexDirection: "row", alignItems: "center", gap: 6 },
   // A small pill under the switch, not a full-width call to action.
   small: { alignSelf: "flex-start", paddingHorizontal: 14 },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
