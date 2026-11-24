@@ -41,36 +41,15 @@ function sceneDelegate(source) {
     options connectionOptions: UIScene.ConnectionOptions
   ) {
     if let windowScene = scene as? UIWindowScene { CrewStartupDiagnostics.shared.connect(windowScene) }
-    // A launch argument only, used by CI to prove the watchdog works without JavaScript.
+    // A launch argument only, used by CI to check the startup log without JavaScript.
     if ProcessInfo.processInfo.arguments.contains("-crewStartupTestNoJS") {
       CrewStartupDiagnostics.shared.testingWithoutJavaScript()
       return
     }
-    // Let UIKit draw the native status before potentially slow React/native module initialization.
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
-      self?.connectReact(scene, session: session, options: connectionOptions)
-    }
-  }
-
-  private func connectReact(_ scene: UIScene, session: UISceneSession, options: UIScene.ConnectionOptions) {
     CrewStartupDiagnostics.shared.startingReact()
     super.scene(scene, willConnectTo: session, options: options)
   }
 `);
-}
-
-function splashStoryboard(source) {
-  if (source.includes('id="CrewStartupLabel"')) return source;
-  source = replaceOnce(source, "                        </subviews>", `                            <label id="CrewStartupLabel" text="SC00 · Ouverture de Soirée Crew…" textAlignment="center" numberOfLines="2" translatesAutoresizingMaskIntoConstraints="NO">
-                                <rect key="frame" x="24" y="510" width="345" height="40"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <color key="textColor" white="0.85" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            </label>
-                        </subviews>`);
-  return replaceOnce(source, "                        </constraints>", `                            <constraint firstItem="CrewStartupLabel" firstAttribute="top" secondItem="EXPO-SplashScreen" secondAttribute="bottom" constant="24" id="CrewStartupTop"/>
-                            <constraint firstItem="CrewStartupLabel" firstAttribute="leading" secondItem="EXPO-ContainerView" secondAttribute="leading" constant="24" id="CrewStartupLeading"/>
-                            <constraint firstItem="EXPO-ContainerView" firstAttribute="trailing" secondItem="CrewStartupLabel" secondAttribute="trailing" constant="24" id="CrewStartupTrailing"/>
-                        </constraints>`);
 }
 
 module.exports = function withStartupDiagnostics(config) {
@@ -90,11 +69,9 @@ module.exports = function withStartupDiagnostics(config) {
     fs.writeFileSync(delegatePath, appDelegate(fs.readFileSync(delegatePath, "utf8"), monitor));
     const scene = path.join(folder, "SceneDelegate.swift");
     fs.writeFileSync(scene, sceneDelegate(fs.readFileSync(scene, "utf8")));
-    const splash = path.join(folder, "SplashScreen.storyboard");
-    fs.writeFileSync(splash, splashStoryboard(fs.readFileSync(splash, "utf8")));
     return config;
   }]);
 };
 
 // Test the transformations without generating or building an Xcode project.
-module.exports.transforms = { appDelegate, sceneDelegate, splashStoryboard };
+module.exports.transforms = { appDelegate, sceneDelegate };

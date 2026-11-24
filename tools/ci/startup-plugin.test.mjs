@@ -26,22 +26,16 @@ describe("native startup plugin", () => {
     expect(updated).not.toContain("// monitor one");
     expect(updated.match(/configurationForConnecting/g)).toHaveLength(1);
   });
-  it("draws native UI before React and preserves the superclass cold-start URL handling", () => {
+  it("logs native milestones before React and preserves the superclass cold-start URL handling", () => {
     const output = transforms.sceneDelegate(scene);
-    expect(output.indexOf("shared.connect(windowScene)")).toBeLessThan(output.indexOf("connectReact(scene"));
+    expect(output.indexOf("shared.connect(windowScene)")).toBeLessThan(output.indexOf("shared.startingReact()"));
     expect(output).toContain("super.scene(scene, willConnectTo: session, options: options)");
+    expect(output).not.toContain("asyncAfter");
     expect(output).toContain('arguments.contains("-crewStartupTestNoJS")');
     expect(transforms.sceneDelegate(output)).toBe(output);
   });
   it("fails visibly when an SDK changes the template instead of silently removing the guard", () => {
     expect(() => transforms.appDelegate("class NewDelegate {}", "")).toThrow("native template changed");
     expect(() => transforms.sceneDelegate("class NewScene {} ")).toThrow("native template changed");
-  });
-  it("adds a static launch status, including before the native watchdog can draw", () => {
-    const source = '                        <subviews>\n                        </subviews>\n                        <constraints>\n                        </constraints>';
-    const output = transforms.splashStoryboard(source);
-    expect(output).toContain("SC00");
-    expect(output).toContain('id="CrewStartupTop"');
-    expect(transforms.splashStoryboard(output)).toBe(output);
   });
 });
