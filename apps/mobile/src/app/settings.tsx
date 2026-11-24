@@ -1,7 +1,7 @@
 import { checkForUpdateAsync, fetchUpdateAsync, isEnabled } from "expo-updates";
 import { UpdateStatus } from "@/system/UpdateStatus";
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Platform, StyleSheet, TextInput, View } from "react-native";
 import { getMotionScale, setMotionScale } from "@crew/design-tokens";
 import type { UnitSystem } from "@crew/units";
@@ -556,6 +556,9 @@ export default function SettingsScreen() {
         <>
           <Section title={i18n.t("settings.aboutTitle")} icon="x:cloudDown">
             <UpdateStatus />
+            <CheckNow />
+          </Section>
+          <Panel>
             <SwitchRow
               label={i18n.t("updates.check")}
               hint={i18n.t("updates.checkHint", { version: currentVersion })}
@@ -565,9 +568,7 @@ export default function SettingsScreen() {
                 if (on) void checkForUpdate(true).catch(() => undefined);
               }}
             />
-            <CheckNow />
-            <CheckNow />
-          </Section>
+          </Panel>
           <Panel>
             <Row title={i18n.t("updates.changelog")} leading={<Icon name="x:film" color={theme.textMuted} />} trailing={<Icon name="chev" color={theme.textMuted} />} onPress={() => router.push("/versions")} />
             <Row title={i18n.t("diagnostics.title")} leading={<Icon name="x:info" color={theme.textMuted} />} trailing={<Icon name="chev" color={theme.textMuted} />} onPress={() => router.push("/server-status")} last />
@@ -621,8 +622,6 @@ const styles = StyleSheet.create({
   search: { borderWidth: 1, borderRadius: 14, paddingHorizontal: 14, minHeight: 46 },
   group: { gap: 6 },
   sectionTitle: { flexDirection: "row", alignItems: "center", gap: 6 },
-  // A small pill under the switch, not a full-width call to action.
-  small: { alignSelf: "flex-start", paddingHorizontal: 14 },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   switchRow: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 54 },
   pair: { flexDirection: "row", gap: 12 },
@@ -631,22 +630,21 @@ const styles = StyleSheet.create({
 
 const SCALES = [0.1, 0.25, 1, 2, 10] as const;
 
-/** MOT-14, dev builds only: slows or speeds every animation for the frame-by-frame review. */
 /** O-12: ask GitHub now, and say the answer: up to date, or the newer version (the banner offers it). */
 function CheckNow() {
   const i18n = useT();
   const [busy, setBusy] = useState(false);
+  const checking = useRef(false);
   if (Platform.OS === "web") return null;
   return (
     <Button
       label={i18n.t("updates.checkNow")}
       icon="x:refresh"
-      variant="secondary"
-      height={40}
-      fontSize={14}
-      style={styles.small}
+      variant="primary"
       loading={busy}
       onPress={() => {
+        if (checking.current) return;
+        checking.current = true;
         setBusy(true);
         const ota = isEnabled
           ? checkForUpdateAsync().then(async (available) => {
@@ -664,12 +662,16 @@ function CheckNow() {
             else if (result === "latest" && otaResult.status === "fulfilled") showToast({ message: i18n.t("updates.upToDate", { version: currentVersion }) });
             else showToast({ tone: "danger", message: i18n.t("updates.unavailable") });
           })
-          .finally(() => setBusy(false));
+          .finally(() => {
+            checking.current = false;
+            setBusy(false);
+          });
       }}
     />
   );
 }
 
+/** MOT-14, dev builds only: slows or speeds every animation for the frame-by-frame review. */
 function MotionScale() {
   const i18n = useT();
   const [scale, setScale] = useState(getMotionScale());
