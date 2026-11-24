@@ -13,8 +13,7 @@ export function UpdateStatus() {
   return (
     <>
       <View style={{ gap: 4 }}>
-        <Text variant="h2">{currentVersion}</Text>
-        <Text variant="small">{Platform.OS === "ios" ? "IPA · " : null}{i18n.t("updates.installed", { version: currentVersion, build: currentBuild || "dev" })}</Text>
+        <Text variant="h2">{i18n.t("updates.installed", { version: currentVersion, build: currentBuild || "dev" })}</Text>
         {revision ? <Text variant="small">{i18n.t("updates.otaRevision", { revision })}</Text> : null}
       </View>
       {Platform.OS === "ios" && !revision ? <Text variant="small">{isEnabled ? i18n.t("updates.otaIdle", { channel: channel ?? "?" }) : i18n.t("updates.otaOff")}</Text> : null}
