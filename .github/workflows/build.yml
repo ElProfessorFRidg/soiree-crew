@@ -338,7 +338,8 @@ jobs:
     # A crash at startup fails the run, with the app log and crash report as an artifact.
     needs: ios
     runs-on: macos-26
-    timeout-minutes: 25
+    # Simulator boot and screenshots can be slow on shared macOS runners.
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -485,6 +486,7 @@ jobs:
           path: launch
           if-no-files-found: ignore
           retention-days: 14
+          overwrite: true
 
   release:
     # Every build of main becomes the latest release, so these links never change:
