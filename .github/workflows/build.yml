@@ -211,7 +211,26 @@ jobs:
       # Native and the native modules), the CocoaPods cache saves the pod downloads.
       - name: Install ccache
         run: brew install ccache
-      - uses: actions/cache@v6
+      # The shared compile cache on our own server (docs/CACHE.md): every PR reads what main compiled, and only
+      # main writes. Off until the CREW_CACHE_URL variable and the CREW_CACHE_PASSWORD secret exist; forks and
+      # Dependabot runs have no secrets and keep the local cache alone.
+      - name: Use the shared compile cache
+        if: vars.CREW_CACHE_URL != ''
+        env:
+          CACHE_PASSWORD: ${{ secrets.CREW_CACHE_PASSWORD }}
+          CACHE_URL: ${{ vars.CREW_CACHE_URL }}
+          MODE: ${{ github.ref == 'refs/heads/main' && 'read-write' || 'read-only' }}
+        run: |
+          [ -n "$CACHE_PASSWORD" ] || exit 0
+          echo "::add-mask::$CACHE_PASSWORD"
+          mode=""
+          [ "$MODE" = read-only ] && mode="|read-only"
+          echo "CCACHE_REMOTE_STORAGE=https://ci:$CACHE_PASSWORD@${CACHE_URL#https://}|layout=bazel|connect-timeout=3000|operation-timeout=10000$mode" >> "$GITHUB_ENV"
+      # GitHub keeps a cache per branch: a PR cannot read another PR's, only main's. So PRs only read
+      # (restore, falling back to the newest main cache) and main alone writes, once per run. Saving from
+      # every PR filled the 10 GB quota with copies and pushed main's cache out.
+      - uses: actions/cache/restore@v6
+        id: native-cache
         with:
           path: |
             ~/Library/Caches/ccache
@@ -229,7 +248,8 @@ jobs:
         run: npx expo prebuild --platform ios --clean
       # ExpoModulesJSI is the slowest piece to compile. Its build script reuses a slice whose
       # recorded source hash (sources, paths, Swift and Xcode versions) still matches.
-      - uses: actions/cache@v6
+      - uses: actions/cache/restore@v6
+        id: jsi-cache
         with:
           path: apps/mobile/ios/build/Build/Products/ExpoModulesJSI.xcframework
           key: expo-modules-jsi-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}
@@ -257,6 +277,20 @@ jobs:
             }
           tail -n 20 xcodebuild.log
           ccache --show-stats || true
+      - name: Save the native build cache (main only)
+        if: github.ref == 'refs/heads/main' && success()
+        uses: actions/cache/save@v6
+        with:
+          path: |
+            ~/Library/Caches/ccache
+            ~/Library/Caches/CocoaPods
+          key: ios-build-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}-${{ matrix.target }}-${{ github.run_id }}
+      - name: Save the ExpoModulesJSI slice (main only)
+        if: github.ref == 'refs/heads/main' && success() && steps.jsi-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: apps/mobile/ios/build/Build/Products/ExpoModulesJSI.xcframework
+          key: expo-modules-jsi-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
