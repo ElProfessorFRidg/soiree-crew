@@ -6,7 +6,7 @@ RUN corepack enable
 # store itself is a BuildKit cache shared by every build on the host (API, web and each PR preview), so a
 # package one of them downloaded is never fetched again.
 COPY pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-RUN --mount=type=cache,id=crew-pnpm-store,target=/pnpm-store pnpm fetch --store-dir /pnpm-store
+RUN --mount=type=cache,id=crew-pnpm-store,target=/pnpm-store pnpm fetch --store-dir /pnpm-store --config.strict-dep-builds=false
 COPY package.json ./
 COPY packages ./packages
 COPY apps/server ./apps/server
