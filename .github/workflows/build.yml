@@ -293,6 +293,8 @@ jobs:
           # An empty shell of an app must never be packed and released again.
           test -f "$APP/Info.plist" && test -f "$APP/main.jsbundle" || { echo "::error::The built app is incomplete"; exit 1; }
           python3 ../../../tools/ci/check-ios-app.py "$APP" "$CREW_IOS_TARGET" "$CREW_RELEASE_CHANNEL" > "../../../ios-build-info-$CREW_IOS_TARGET.json"
+          node ../../../tools/ci/native-build-inventory.mjs . > "$RUNNER_TEMP/native-inventory.json"
+          python3 -c 'import json,sys; p=sys.argv[1]; d=json.load(open(p)); d["nativeInventory"]=json.load(open(sys.argv[2])); open(p,"w").write(json.dumps(d,indent=2))' "../../../ios-build-info-$CREW_IOS_TARGET.json" "$RUNNER_TEMP/native-inventory.json"
           mkdir -p Payload
           cp -R "$APP" Payload/
           zip -qry "../../../$IPA_FILE" Payload

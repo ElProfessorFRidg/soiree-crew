@@ -92,3 +92,6 @@ Optional repository variable `CREW_PREVIEW_URL_TEMPLATE` (e.g. `https://pr-{pr}.
 
 ### Publication serialization
 Deploy the complete deploy/ota directory (server.mjs and publication.mjs) together. A single OTA server process serializes stream writes and rejects older numbered CI publications. Identical manifest content reuses the current ID without a new changelog. This is not a distributed lock; run only one writer replica. Deploy server before relying on the new behavior.
+
+### Native inventory
+New IPA metadata includes a generated native project hash, resolved CocoaPods lock hash, native pod inventory and Xcode version. This is audit evidence, not yet an exhaustive ABI proof or a replacement for conservative routing. Native import detection is available as a tested helper, not yet a capability-based authorization rule.
