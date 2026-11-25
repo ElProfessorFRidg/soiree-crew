@@ -2,7 +2,8 @@ import { expect, it } from "vitest";
 import { latestIpaTag } from "./select-ota-base.mjs";
 
 const ipa = (tag_name, prerelease) => ({
-  tag_name, prerelease, assets: ["iphone", "ipad"].map((target) => ({ name: `ios-build-info-${target}.json` })),
+  tag_name, prerelease, draft: false,
+  assets: ["ios-build-info-iphone.json", "ios-build-info-ipad.json", "soiree-crew-unsigned.ipa", "soiree-crew-ipad-unsigned.ipa"].map(name => ({ name, state: "uploaded", size: 100 })),
 });
 
 const releases = [

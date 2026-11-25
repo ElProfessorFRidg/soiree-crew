@@ -98,3 +98,6 @@ New IPA metadata includes a generated native project hash, resolved CocoaPods lo
 
 ### Per-PR API origin
 When CREW_PREVIEW_URL_TEMPLATE is set, the IPA builder, planner and OTA exporter all resolve the same HTTPS origin from the PR number. Existing binaries with a different recorded server configuration require a new IPA. This changes the suggested server, not an existing authenticated account's selected server.
+
+### Release selection integrity
+Only non-draft releases with both uploaded, nonempty IPA binaries and both uploaded, nonempty metadata files are eligible. An incomplete newest release is an infrastructure error (do not silently target an older IPA). Incomplete historical releases are excluded. Duplicate build identities within a channel, including across preview PRs, fail closed. This verifies GitHub release inventory, not binary contents or ABI compatibility.
