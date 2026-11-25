@@ -80,3 +80,6 @@ OTA release notes are published on GitHub, AltStore and the What's new screen. T
 The shared change-impact classifier filters documentation, tests, server files and explicitly non-shipping tools. Unknown build inputs and dependency resolution changes remain conservative until native fingerprint metadata is available. GitHub release lookup failures fail the planner rather than forcing a native build. Native compilation starts after required checks.
 
 Dependency routing compares the resolved pnpm mobile graph (including workspace links and transitives). Unchanged mobile graph: checks; reviewed pure-JS dependency changes: OTA; unknown changes: IPA. Preview runtimes are isolated by PR. Planner infrastructure failures do not trigger native builds. OTA receipts identify the exact update and compatible IPA.
+
+### Independent OTA smoke tests
+The OTA publisher records an update receipt. A separate workflow_run check on the default branch downloads the exact compatible IPA, verifies its embedded stream/runtime, launches it in the simulator, restarts after download and checks the app's persisted seenOtaUpdateId. It is intentionally not part of build-gate. Superseded updates are explicitly reported as not tested. It requires a real published update and is not a physical-device test.

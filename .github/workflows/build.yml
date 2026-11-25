@@ -3,11 +3,6 @@ name: Build
 on:
   push:
     branches: [main]
-    # Nothing in these changes the app: no rebuild. The AltStore source has its own workflow.
-    paths-ignore:
-      - "**/*.md"
-      - "docs/**"
-      - "research/**"
   pull_request:
   workflow_dispatch:
     inputs:
@@ -64,14 +59,16 @@ jobs:
         with:
           node-version: 22
       - name: Install lockfile analyzer
-        run: python3 -m pip install --user --break-system-packages PyYAML==6.0.2
+        run: |
+          python3 -m pip install --user --break-system-packages PyYAML==6.0.2
+          python3 tools/ci/dependency-impact-test.py
       - name: Select OTA or native build
         id: route
         if: ${{ !inputs.force_ipa && !inputs.android }}
         env:
           GH_TOKEN: ${{ github.token }}
           OTA_AUTHORIZED: ${{ secrets.OTA_PUBLISH_TOKEN != '' && secrets.OTA_SIGNING_KEY != '' }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr }}
           CHANGE_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
           OTA_ALLOWED: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
           CREW_OTA_URL: ${{ vars.CREW_OTA_URL }}

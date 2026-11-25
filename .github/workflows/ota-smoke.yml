@@ -1,0 +1,129 @@
+name: OTA compatibility smoke
+on:
+  workflow_run:
+    workflows: [Build, Expo OTA]
+    types: [completed]
+permissions:
+  actions: read
+  contents: read
+jobs:
+  discover:
+    if: github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    outputs:
+      targets: ${{ steps.receipts.outputs.targets }}
+    steps:
+      - id: receipts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN: ${{ github.event.workflow_run.id }}
+        run: |
+          targets=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN/artifacts?per_page=100" --jq '[.artifacts[] | select(.expired == false) | .name | select(. == "ota-receipt-iphone" or . == "ota-receipt-ipad") | sub("^ota-receipt-"; "")] | unique | @json')
+          echo "targets=$targets" >> "$GITHUB_OUTPUT"
+  smoke:
+    needs: discover
+    if: needs.discover.outputs.targets != '[]' && needs.discover.outputs.targets != ''
+    runs-on: macos-26
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(needs.discover.outputs.targets) }}
+    env:
+      TARGET: ${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "26.6"
+      - uses: actions/download-artifact@v8
+        with:
+          name: ota-receipt-${{ matrix.target }}
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          path: receipt
+      - name: Download exact compatible IPA
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p smoke
+          python3 - <<'PY'
+          import json, os, re
+          r = json.load(open("receipt/ota-receipt.json"))
+          assert r["target"] == os.environ["TARGET"]
+          m = re.fullmatch(r"v\d+\.\d+\.\d+(-preview\.\d+)?\+build\.(\d+)", r["tag"])
+          assert m and re.fullmatch(r"[0-9a-fA-F-]{36}", r["id"])
+          stream = ("preview" if m[1] else "public") + "-" + r["target"]
+          assert r["stream"] == stream and r["runtime"] == "crew-" + stream + "-" + m[2]
+          with open(os.environ["GITHUB_ENV"],"a") as f:
+              for k in ("tag","id","runtime","stream"):
+                  f.write(k.upper()+"="+r[k]+"\n")
+          PY
+          FILE=soiree-crew-unsigned.ipa
+          if [[ "$TARGET" == ipad ]]; then FILE=soiree-crew-ipad-unsigned.ipa; fi
+          gh release download "$TAG" --pattern "$FILE"
+          unzip -q "$FILE" -d sim
+          APP=$(ls -d sim/Payload/*.app | head -n 1)
+          python3 tools/ci/check-ios-app.py "$APP" "$TARGET"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :EXUpdatesRuntimeVersion' "$APP/Expo.plist")" = "$RUNTIME"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :EXUpdatesRequestHeaders:expo-channel-name' "$APP/Expo.plist")" = "$STREAM"
+          URL=$(/usr/libexec/PlistBuddy -c 'Print :EXUpdatesURL' "$APP/Expo.plist")
+          # A newer publication may supersede this receipt. Do not report a false pass.
+          CURRENT=$(curl --fail --silent --show-error --max-time 30 -H 'expo-platform: ios' -H 'expo-protocol-version: 1' -H "expo-runtime-version: $RUNTIME" -H "expo-channel-name: $STREAM" "$URL" | jq -r '.id')
+          if [[ "$CURRENT" != "$ID" ]]; then
+            echo "::notice::Update superseded before smoke test; not tested."
+            echo "SUPERSEDED=true" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          python3 tools/ci/ios-device-to-simulator.py "$APP"
+          for f in "$APP"/Frameworks/*.framework "$APP"/Frameworks/*.dylib "$APP"/PlugIns/*.appex/Frameworks/*.framework; do
+            if [ -e "$f" ]; then codesign --force --sign - --timestamp=none "$f"; fi
+          done
+          for f in "$APP"/PlugIns/*.appex; do
+            if [ -e "$f" ]; then codesign --force --sign - --timestamp=none "$f"; fi
+          done
+          codesign --force --sign - --timestamp=none "$APP"
+          echo "APP=$APP" >> "$GITHUB_ENV"
+      - name: Launch, download OTA, restart and verify active update
+        if: env.SUPERSEDED != 'true'
+        run: |
+          FAMILY=iPhone
+          if [[ "$TARGET" == ipad ]]; then FAMILY=iPad; fi
+          export FAMILY
+          DEVICE=$(xcrun simctl list devices available -j | python3 -c 'import json,sys,os; d=json.load(sys.stdin)["devices"]; print(next(x["udid"] for k,v in sorted(d.items(), reverse=True) if "iOS" in k for x in v if x["name"].startswith(os.environ["FAMILY"])))')
+          BUNDLE=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")
+          echo "DEVICE=$DEVICE" >> "$GITHUB_ENV"
+          xcrun simctl boot "$DEVICE"
+          xcrun simctl bootstatus "$DEVICE" -b
+          xcrun simctl install "$DEVICE" "$APP"
+          xcrun simctl launch "$DEVICE" "$BUNDLE"
+          for attempt in 1 2 3 4 5; do
+            sleep 30
+            xcrun simctl terminate "$DEVICE" "$BUNDLE" || true
+            xcrun simctl launch "$DEVICE" "$BUNDLE"
+            sleep 15
+            DATA=$(xcrun simctl get_app_container "$DEVICE" "$BUNDLE" data)
+            if python3 tools/ci/ota-smoke-check.py "$DATA" "$ID"; then
+              sleep 20
+              xcrun simctl spawn "$DEVICE" launchctl list | grep -F "$BUNDLE"
+              echo "Verified active OTA $ID on $TAG ($TARGET)" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+          done
+          echo "::error::The expected OTA was not observed as running."
+          exit 1
+      - name: Collect diagnostics
+        if: always() && env.DEVICE != ''
+        run: |
+          xcrun simctl io "$DEVICE" screenshot smoke/screen.png || true
+          xcrun simctl spawn "$DEVICE" log show --last 10m --style compact --predicate "process CONTAINS 'Soir' OR eventMessage CONTAINS 'ExpoUpdates'" > smoke/app.log || true
+          cp ~/Library/Logs/DiagnosticReports/*.ips smoke/ 2>/dev/null || true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ota-smoke-${{ matrix.target }}
+          path: smoke
+          if-no-files-found: ignore

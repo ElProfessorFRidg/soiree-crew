@@ -82,6 +82,19 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - if: ${{ !inputs.automatic }}
         run: pnpm check
+      - name: Reject superseded automatic publication
+        if: ${{ inputs.automatic && github.event_name != 'workflow_dispatch' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [[ -n "$PR" ]]; then
+            test "$(gh pr view "$PR" --json headRefOid --jq .headRefOid)" = "$PR_HEAD"
+            [[ "$RELEASE_TAG" == *"-preview.$PR+build."* ]]
+          else
+            test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)" = "$GITHUB_SHA"
+          fi
       - name: Publish iOS update
         id: publish_update
         working-directory: apps/mobile
