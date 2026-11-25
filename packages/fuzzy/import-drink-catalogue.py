@@ -4,6 +4,7 @@ import argparse
 import csv
 import gzip
 import json
+import math
 import re
 import unicodedata
 from collections import Counter
@@ -23,13 +24,16 @@ DEFAULT_ML = {"beer": 330, "wine": 125, "spirit": 40, "cocktail": 150, "cider": 
 MAX_ABV = {"beer": 16, "wine": 22, "spirit": 80, "cocktail": 40, "cider": 12, "soft": 0}
 PACKAGE = re.compile(r"\b(\d+(?:[.,]\d+)?)\s*(ml|cl|l|litres?|liters?|fl\s*oz)\b", re.I)
 MULTIPACK_VOLUME = re.compile(r"\b\d+\s*[x×]\s*" + PACKAGE.pattern.removeprefix(r"\b"), re.I)
+EXCLUDED_PRODUCTS = {"00000766", "3036810230341", "5012427091405", "9008700168892"}
+NON_DRINK_NAME = re.compile(r"\b(?:vinegar|vinaigre|essig|aceto|vinagre|barbecue glaze|bbq sauce|cooking sauce|plant protein|protein powder|whey protein|shampoo|mouthwash|perfume|dog food|cat food|hand sanitizer)\b", re.I)
 INVALID_SOFT = ("concentrate", "powder", "syrup", "kombucha", "fermented", "vinegar", "tea-bags",
                 "pet-", "baby-", "instant-", "beverage-preparations", "condensed")
 
 
 def number(value):
     try:
-        return float((value or "").replace(",", "."))
+        result = float((value or "").replace(",", "."))
+        return result if math.isfinite(result) else None
     except ValueError:
         return None
 
@@ -95,7 +99,7 @@ def products(stream):
         group = group_for(category, abv)
         if group is None or not 0 <= (abv or 0) <= MAX_ABV[group]:
             continue
-        if "alcohol" in row[errors] or not re.fullmatch(r"\d{8,14}", row[code]):
+        if row[code] in EXCLUDED_PRODUCTS or "alcohol" in row[errors] or not re.fullmatch(r"\d{8,14}", row[code]):
             continue
         label = clean(PACKAGE.sub("", MULTIPACK_VOLUME.sub("", row[name]))).strip(" ,.-–")
         maker = clean(row[brand].split(",")[0])
@@ -108,7 +112,7 @@ def products(stream):
             continue
         if maker and len(maker) <= 36 and f" {brand_key} " not in f" {label_key} ":
             label = f"{maker} {label}"
-        if len(label) > 85 or len(key(label)) < 3:
+        if len(label) > 85 or len(key(label)) < 3 or NON_DRINK_NAME.search(label):
             continue
         package = package_volume(row[quantity])
         volume = DEFAULT_ML[group]
@@ -118,7 +122,10 @@ def products(stream):
             continue
         if group == "soft":
             volume = package
-        yield [row[code], label, volume, round(abv or 0, 2), group], bool(maker), package is not None
+        strength = round(abv or 0, 2)
+        if group != "soft" and strength <= 0:
+            continue
+        yield [row[code], label, volume, strength, group], bool(maker), package is not None
 
 
 def olcc_products(stream, month):

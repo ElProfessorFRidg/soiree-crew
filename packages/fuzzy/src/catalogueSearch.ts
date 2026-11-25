@@ -1,4 +1,4 @@
-import { catalogueDrink, CORE_DRINK_CATALOGUE, type CatalogueDrink } from "./catalogue";
+import { catalogueDrink, CORE_DRINK_CATALOGUE, type DrinkGroup, type CatalogueDrink } from "./catalogue";
 import trackCaffeineRows from "./data/trackcaffeine-index.json";
 import barAssistantRows from "./data/bar-assistant-index.json";
 import openFoodFactsRows from "./data/openfoodfacts-index.json";
@@ -69,11 +69,27 @@ function correctionIndex(): Map<string, Set<string>> {
   return index;
 }
 
-/** Search curated names and retrieve a bounded set of plausible imported names. */
-export function catalogueSearchCandidates(query: string): readonly CatalogueDrink[] {
+/**
+ * Curated entries are the default popularity tier, not measured sales.
+ * Short prefixes avoid the large imported indexes; exact imported names remain reachable.
+ * Longer prefixes are bounded per source after applying the optional group filter.
+ */
+export function catalogueSearchCandidates(query: string, group?: DrinkGroup): readonly CatalogueDrink[] {
   const name = normalise(query);
-  const imported = new Set(importedIndexes.flatMap(index => matchingDrinkIds(index, name, true)));
-  if (name.length >= MIN_TYPO_QUERY && name.length <= 90 && imported.size < MAX_CORRECTIONS) {
+  if (!name) return group ? CORE_DRINK_CATALOGUE.filter(drink => drink.group === group) : CORE_DRINK_CATALOGUE;
+  const accept = (id: string) => !group || catalogueDrink(id)?.group === group;
+  const popular = name.length <= 2
+    ? [...matchingDrinkIds(coreIndex, name, true, Infinity, accept).map(id => catalogueDrink(id)!), ...CORE_DRINK_CATALOGUE.filter(drink => drink.generic && (!group || drink.group === group))]
+    : CORE_DRINK_CATALOGUE.filter(drink => !group || drink.group === group);
+  const exact = importedIndexes.flatMap(index => matchingDrinkIds(index, name, false, Infinity, accept));
+  const prefixes = name.length < 3 ? [] : importedIndexes.flatMap(index => matchingDrinkIds(index, name, true, 32, accept));
+  const result = new Map(popular.map(drink => [drink.id, drink]));
+  for (const id of [...exact, ...prefixes]) {
+    if (result.has(id)) continue;
+    const drink = catalogueDrink(id);
+    if (drink) result.set(id, drink);
+  }
+  if (name.length >= MIN_TYPO_QUERY && name.length <= 90 && result.size - popular.length < MAX_CORRECTIONS) {
     const prefix = name.slice(0, PREFIX_LENGTH);
     const corrections = new Set(deletionKeys(prefix).flatMap(key => [...(correctionIndex().get(key) ?? [])]));
     const ranked = [...corrections].flatMap(candidate => {
@@ -85,15 +101,15 @@ export function catalogueSearchCandidates(query: string): readonly CatalogueDrin
     const matches = new Map<string, number>();
     for (const { candidate } of ranked.slice(0, MAX_CORRECTIONS)) {
       for (const index of importedIndexes) {
-        for (const id of matchingDrinkIds(index, candidate, true, MAX_CORRECTIONS)) {
-          if (imported.has(id) || matches.has(id)) continue;
+        for (const id of matchingDrinkIds(index, candidate, true, MAX_CORRECTIONS, accept)) {
+          if (result.has(id) || matches.has(id)) continue;
           const brand = normalise(catalogueDrink(id)!.brand ?? "");
           const score = scoreNormalised(name, brand) ?? (editedPrefix(name, brand) ? 1 : null);
           if (score !== null && score <= 1.5) matches.set(id, score);
         }
       }
     }
-    for (const [id] of [...matches].sort((a, b) => a[1] - b[1]).slice(0, MAX_CORRECTIONS)) imported.add(id);
+    for (const [id] of [...matches].sort((a, b) => a[1] - b[1]).slice(0, MAX_CORRECTIONS)) result.set(id, catalogueDrink(id)!);
   }
-  return imported.size ? [...CORE_DRINK_CATALOGUE, ...Array.from(imported, id => catalogueDrink(id)!)] : CORE_DRINK_CATALOGUE;
+  return [...result.values()];
 }

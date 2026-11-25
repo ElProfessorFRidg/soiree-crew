@@ -4,7 +4,7 @@ import {
   countryRank,
   localName,
   normalise,
-  DRINK_CATALOGUE,
+  CORE_DRINK_CATALOGUE,
   catalogueSearchCandidates,
   catalogueTypoScore,
   SHELF_ORDER,
@@ -70,7 +70,7 @@ function searchScore(query: string, drink: CatalogueDrink, i18n: Translator): nu
 
 /** The group's brands, those known in the user's country first (the shelf's order otherwise). */
 export function brandsOf(group: DrinkGroup, country?: string | null): CatalogueDrink[] {
-  return DRINK_CATALOGUE.filter((drink) => drink.group === group)
+  return CORE_DRINK_CATALOGUE.filter((drink) => drink.group === group)
     .map((drink, index) => ({ drink, index: SHELF_ORDER.get(drink.id) ?? index, rank: countryRank(drink, country) }))
     .sort((a, b) => a.rank - b.rank || a.index - b.index)
     .map((hit) => hit.drink);
@@ -79,13 +79,24 @@ export function brandsOf(group: DrinkGroup, country?: string | null): CatalogueD
 /** Brands of the group whose name or nickname is close to what was typed, typos forgiven. */
 export function filterBrands(brands: readonly CatalogueDrink[], query: string, i18n: Translator): CatalogueDrink[] {
   if (!query.trim()) return [...brands];
-  const candidates = new Set(catalogueSearchCandidates(query));
+  const candidates = new Set(catalogueSearchCandidates(query).map(drink => drink.id));
   return brands
-    .filter((drink) => candidates.has(drink))
+    .filter((drink) => candidates.has(drink.id))
     .map((drink) => ({ drink, score: searchScore(query, drink, i18n) }))
     .filter((hit) => Number.isFinite(hit.score) && hit.score <= MAX_SCORE)
     .sort((a, b) => a.score - b.score)
     .map((hit) => hit.drink);
+}
+
+/** Search the full indexed group without constructing or sorting the entire group shelf. */
+export function searchGroupBrands(group: DrinkGroup, query: string, i18n: Translator, country?: string | null): CatalogueDrink[] {
+  if (!normalise(query)) return brandsOf(group, country);
+  const bonus = habitBonus();
+  return catalogueSearchCandidates(query, group)
+    .map(drink => ({ drink, score: searchScore(query, drink, i18n), bonus: bonus(drink), rank: countryRank(drink, country) }))
+    .filter(hit => Number.isFinite(hit.score) && hit.score <= MAX_SCORE)
+    .sort((a, b) => a.score - b.score || b.bonus - a.bonus || a.rank - b.rank)
+    .slice(0, 80).map(hit => hit.drink);
 }
 
 /** How far a name may be from what was typed: a word of slips, or one real typo per short word. */
@@ -195,9 +206,10 @@ export function searchCatalogue(query: string, i18n: Translator, limit = 6, coun
   const popular = new Map<string, number>();
   for (const id of popularIds) if (!popular.has(id)) popular.set(id, popular.size);
   const rank = (drink: CatalogueDrink) => popular.get(drink.id) ?? popular.size;
-  return catalogueSearchCandidates(query).map((drink) => ({ drink, score: searchScore(query, drink, i18n) + countryRank(drink, country) * 0.3 }))
+  const bonus = habitBonus();
+  return catalogueSearchCandidates(query).map((drink) => ({ drink, score: searchScore(query, drink, i18n), bonus: bonus(drink), countryRank: countryRank(drink, country) }))
     .filter((hit) => Number.isFinite(hit.score) && hit.score <= MAX_SCORE)
-    .sort((a, b) => a.score - b.score || rank(a.drink) - rank(b.drink))
+    .sort((a, b) => a.score - b.score || rank(a.drink) - rank(b.drink) || b.bonus - a.bonus || a.countryRank - b.countryRank)
     .slice(0, limit)
     .map((hit) => hit.drink);
 }

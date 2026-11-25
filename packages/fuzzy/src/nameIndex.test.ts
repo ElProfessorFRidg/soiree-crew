@@ -1,8 +1,32 @@
 import { describe, expect, it } from "vitest";
-import { DRINK_CATALOGUE, catalogueSearchCandidates, parseDrinkOrder, type CatalogueDrink } from "./index";
+import { getDrinkCatalogue, CORE_DRINK_CATALOGUE, CATALOGUE_COUNT, catalogueDrink, exactCatalogueNames, catalogueSearchCandidates, parseDrinkOrder, type CatalogueDrink } from "./index";
 import { buildNameIndex, matchingDrinkIds } from "./nameIndex";
 
+const DRINK_CATALOGUE = getDrinkCatalogue();
+
 describe("drink name index", () => {
+  it("keeps short suggestions curated and bounds rare prefix expansion", () => {
+    const core = new Set(CORE_DRINK_CATALOGUE.map(drink => drink.id));
+    expect(catalogueSearchCandidates("co").some(drink => drink.id === "coca-cola")).toBe(true);
+    expect(catalogueSearchCandidates("co").filter(drink => !core.has(drink.id)).map(drink => drink.id))
+      .toEqual(exactCatalogueNames("co").filter(drink => !core.has(drink.id)).map(drink => drink.id));
+    const results = catalogueSearchCandidates("coca", "soft");
+    expect(results.every(drink => drink.group === "soft")).toBe(true);
+    expect(results.filter(drink => !core.has(drink.id)).length).toBeLessThanOrEqual(6 * 32 + exactCatalogueNames("coca").length);
+  });
+  it("resolves every stable ID from the compact catalogue and excludes reviewed non-beverages", () => {
+    expect(CATALOGUE_COUNT).toBe(DRINK_CATALOGUE.length);
+    expect(new Set(DRINK_CATALOGUE.map(drink => drink.id)).size).toBe(DRINK_CATALOGUE.length);
+    for (const drink of DRINK_CATALOGUE) {
+      const resolved = catalogueDrink(drink.id);
+      if (!resolved || resolved.brand !== drink.brand || resolved.abv !== drink.abv || resolved.volumeMl !== drink.volumeMl || resolved.group !== drink.group) {
+        throw new Error(`Unresolvable catalogue ID: ${drink.id}`);
+      }
+    }
+    for (const id of ["00000766", "3036810230341", "5012427091405", "9008700168892"]) {
+      expect(catalogueDrink(`openfoodfacts-${id}`)).toBeUndefined();
+    }
+  });
   it("looks up indexed names and prefixes with 10,000 records", () => {
     const input = Array.from({ length: 10_000 }, (_, index): CatalogueDrink => ({
       group: "beer", abv: 0.05, volumeMl: 330, glass: "bottle",
@@ -34,8 +58,8 @@ describe("drink name index", () => {
       { drink: { id: "openfoodfacts-4009228250477", abv: 0 }, volumeMl: 250 },
     ]);
   });
-  it("indexes at least 10,000 drinks across all families and keeps source strengths", () => {
-    expect(DRINK_CATALOGUE.length).toBeGreaterThanOrEqual(10_000);
+  it("indexes the complete audited snapshot across all families and keeps source strengths", () => {
+    expect(DRINK_CATALOGUE.length).toBeGreaterThanOrEqual(44_487);
     expect(new Set(DRINK_CATALOGUE.map(drink => drink.group)).size).toBe(6);
     expect(catalogueSearchCandidates("folonari italia").map(drink => drink.id))
       .toContain("openfoodfacts-8000160633997");

@@ -4,14 +4,16 @@
  */
 
 export { adjacentKeys, bestScore, editDistance, isEverydayWord, jaroWinkler, matchScore, normalise, scoreNormalised, search, soundOf, typoDistance, wordScore, type Candidate } from "./match";
-export { catalogueSearchCandidates, catalogueTypoScore } from "./catalogueSearch";
+export { catalogueSearchCandidates, catalogueTypoScore, exactCatalogueNames } from "./catalogueSearch";
 export { parseDrinkOrder, parseOrder, tokenize, type OrderLine, type OrderOptions } from "./order";
 export {
   catalogueDrink,
   catalogueNames,
   comboOf,
   countryRank,
-  DRINK_CATALOGUE,
+  CORE_DRINK_CATALOGUE,
+  CATALOGUE_COUNT,
+  getDrinkCatalogue,
   GROUP_SPECS,
   localName,
   SHELF_ORDER,
