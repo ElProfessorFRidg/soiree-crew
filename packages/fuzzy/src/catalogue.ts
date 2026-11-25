@@ -275,46 +275,57 @@ const productGlass: Readonly<Record<DrinkGroup, GlassName>> = {
   soft: "soft",
 };
 
-function importedProducts(source: string, rows: readonly ProductRow[]): CatalogueDrink[] {
-  return rows.map(([code, brand, volumeMl, abv, group]) => ({
-    id: `${source}-${code}`,
-    brand,
-    group,
-    volumeMl,
-    abv: abv / 100,
-    glass: productGlass[group],
-    aliases: [],
-  }));
+const EMPTY_IMPORTED_ALIASES: readonly string[] = Object.freeze([] as string[]);
+
+function importedProduct(source: string, [code, brand, volumeMl, abv, group]: ProductRow): CatalogueDrink {
+  return { id: `${source}-${code}`, brand, group, volumeMl, abv: abv / 100,
+    glass: productGlass[group], aliases: EMPTY_IMPORTED_ALIASES };
 }
 
-export const OPEN_FOOD_FACTS_PRODUCTS = importedProducts(
-  "openfoodfacts", openFoodFactsProducts as unknown as readonly ProductRow[],
-);
+const productRows = openFoodFactsProducts as unknown as readonly ProductRow[];
+const liquorRows = olccRows as unknown as readonly ProductRow[];
 
-export const OLCC_CATALOGUE = importedProducts(
-  "olcc", olccRows as unknown as readonly ProductRow[],
-);
+/** Full source materialization is reserved for index generation and explicit catalogue audits. */
+export function openFoodFactsCatalogue(): CatalogueDrink[] {
+  return productRows.map(row => importedProduct("openfoodfacts", row));
+}
+export function olccCatalogue(): CatalogueDrink[] {
+  return liquorRows.map(row => importedProduct("olcc", row));
+}
 
-const importedCatalogue = [
-  ...OPEN_BEER_CATALOGUE, ...BAR_ASSISTANT_CATALOGUE, ...OPEN_FOOD_FACTS_CATALOGUE,
-  ...TRACK_CAFFEINE_CATALOGUE, ...OPEN_FOOD_FACTS_PRODUCTS, ...OLCC_CATALOGUE,
+const legacyCatalogue = [
+  ...CORE_DRINK_CATALOGUE, ...OPEN_BEER_CATALOGUE, ...BAR_ASSISTANT_CATALOGUE,
+  ...OPEN_FOOD_FACTS_CATALOGUE, ...TRACK_CAFFEINE_CATALOGUE,
 ];
-const importedIds = new Set(importedCatalogue.map(drink => drink.id));
+const coreIds = new Set(CORE_DRINK_CATALOGUE.map(drink => drink.id));
+const legacyById = new Map(legacyCatalogue.map(drink => [drink.id, drink]));
+
+/** Large imports are stored as compact source rows. Materialize only the requested product. */
+function productByCode(rows: readonly ProductRow[], source: string, code: string): CatalogueDrink | undefined {
+  let lo = 0, hi = rows.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1;
+    if (rows[mid]![0] < code) lo = mid + 1;
+    else hi = mid;
+  }
+  const row = rows[lo];
+  return row?.[0] === code ? importedProduct(source, row) : undefined;
+}
 
 export function isImportedDrink(id: string): boolean {
-  return importedIds.has(id);
+  return !coreIds.has(id) && catalogueDrink(id) !== undefined;
 }
 
-export const DRINK_CATALOGUE: readonly CatalogueDrink[] = [...CORE_DRINK_CATALOGUE, ...importedCatalogue];
+/** Explicit full snapshot for audits and tooling; ordinary app searches never need this array. */
+export function getDrinkCatalogue(): CatalogueDrink[] {
+  return [...legacyCatalogue, ...openFoodFactsCatalogue(), ...olccCatalogue()];
+}
 
-const catalogueById = new Map(DRINK_CATALOGUE.map((drink) => [drink.id, drink]));
+export const CATALOGUE_COUNT = legacyCatalogue.length + productRows.length + liquorRows.length;
 
-/**
- * The order of the add sheet's brand chips: the French list, then the mixes and shots (the shot
- * glass shows TGV and B-52 before the seventy bottles), then the other brands.
- */
+/** Shelf order is curated; rare imported products are surfaced through the search indexes. */
 export const SHELF_ORDER: ReadonlyMap<string, number> = new Map(
-  [...FIRST_LIST.map((d) => d.id), ...MIXES_AND_SHOTS.map((d) => d.id), ...MORE_DRINKS.map((d) => d.id), ...importedCatalogue.map((d) => d.id)].map((id, index) => [id, index]),
+  [...FIRST_LIST, ...MIXES_AND_SHOTS, ...MORE_DRINKS].map((drink, index) => [drink.id, index]),
 );
 
 /** Names a size chip or a typed word can carry. The app translates them. */
@@ -450,11 +461,14 @@ export function shownNames(drink: CatalogueDrink): ShownName[] {
   return [...own, ...(drink.names ?? []).map((n) => ({ name: n.name, short: n.short ?? n.name }))];
 }
 
-export function catalogueDrink(id: string, catalogue: readonly CatalogueDrink[] = DRINK_CATALOGUE): CatalogueDrink | undefined {
-  return catalogue === DRINK_CATALOGUE ? catalogueById.get(id) : catalogue.find((drink) => drink.id === id);
+export function catalogueDrink(id: string, catalogue?: readonly CatalogueDrink[]): CatalogueDrink | undefined {
+  if (catalogue) return catalogue.find(drink => drink.id === id);
+  return legacyById.get(id)
+    ?? (id.startsWith("openfoodfacts-") ? productByCode(productRows, "openfoodfacts", id.slice("openfoodfacts-".length))
+      : id.startsWith("olcc-") ? productByCode(liquorRows, "olcc", id.slice("olcc-".length)) : undefined);
 }
 
 /** The combo made of these two drinks, in either order: Poliakov and Red Bull make one drink. */
-export function comboOf(a: CatalogueDrink, b: CatalogueDrink, catalogue: readonly CatalogueDrink[] = DRINK_CATALOGUE): CatalogueDrink | undefined {
+export function comboOf(a: CatalogueDrink, b: CatalogueDrink, catalogue: readonly CatalogueDrink[] = CORE_DRINK_CATALOGUE): CatalogueDrink | undefined {
   return catalogue.find((drink) => drink.combo && drink.combo.parts.includes(a.id) && drink.combo.parts.includes(b.id) && a.id !== b.id);
 }
