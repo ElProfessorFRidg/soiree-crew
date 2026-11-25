@@ -834,6 +834,27 @@
     },
     {
       "name": "Soirée Crew Preview",
+      "version": "0.2.53",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.53-preview.43%2Bbuild.367/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "• Verify release asset digests and require successful native publication\n• Document the preview readiness contract\n• Require the full deployed preview revision\n• Verify preview revision against readiness response\n• Report the deployed commit on the readiness route\n• Reject incomplete IPA releases and ambiguous runtimes with verified tests\n• Use a newer publication sequence for rollback\n• Exercise native import routing against Git history\n• Route newly required native imports to IPA\n• Compare native imports with the IPA baseline\n• Durable cross-process publication transactions with verified HTTP regression tests\n• Resolve consistent per-PR preview API origin for IPA and OTA\n• Capture generated native project and capability inventory per IPA\n• Serialize stream writes and deduplicate identical manifests\n• Verify configured Coolify preview readiness and OTA signing key\n• Distribute OTA to individually verified historical IPA runtimes\n• Add independent OTA-on-IPA simulator smoke checks and routing regression tests\n• Resolve mobile dependency graph and isolate preview runtime routing\n• Centralize OTA impact routing and avoid unnecessary native builds\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+      "bundleID": "app.soireecrew.mobile.preview",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/iphone/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew Preview 0.2.51",
       "version": "0.2.51",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.51-preview.39%2Bbuild.350/soiree-crew-unsigned.ipa",
