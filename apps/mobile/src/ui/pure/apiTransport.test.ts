@@ -70,9 +70,9 @@ describe("client feature failures", () => {
     await expect(api("/v1/places")).resolves.toEqual({ places: [] });
   });
   it("reports an HTML API response and preserves ordinary missing-resource errors", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(new Response('<!doctype html><title>Proxy</title>', { status: 200 })).mockResolvedValueOnce(new Response('{"error":"not_found"}', { status: 404 })));
-    await expect(api("/v1/html-feature")).rejects.toMatchObject({ failure: { code: "api_response_incompatible", compatibility: { reason: "server_outdated" } } });
-    takeCompatibilityNotices();
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(new Response('<!doctype html><title>Proxy</title>', { status: 200, headers: { 'content-type': 'text/html' } })).mockResolvedValueOnce(new Response('{"error":"not_found"}', { status: 404 })));
+    await expect(api("/v1/users/private-id/profile?secret=1")).rejects.toMatchObject({ failure: { code: "api_response_incompatible", compatibility: { reason: "server_outdated" } } });
+    expect(takeCompatibilityNotices()).toMatchObject([{ feature: "/v1/users/:id/profile", method: "GET", code: "SC_API_01", status: 200 }]);
     await expect(api("/v1/places/missing")).rejects.toMatchObject({ failure: { status: 404, code: "not_found" } });
     expect(takeCompatibilityNotices()).toHaveLength(0);
   });
@@ -105,7 +105,7 @@ describe("client feature failures", () => {
     expect(fetcher).not.toHaveBeenCalled();
   });
   it("keeps emergency requests retryable after an incompatible proxy response", async () => {
-    const fetcher = vi.fn().mockResolvedValueOnce(new Response('<!doctype html><title>Proxy</title>', { status: 200 })).mockResolvedValueOnce(new Response('{"ok":true}', { status: 201 }));
+    const fetcher = vi.fn().mockResolvedValueOnce(new Response('<!doctype html><title>Proxy</title>', { status: 200, headers: { 'content-type': 'text/html' } })).mockResolvedValueOnce(new Response('{"ok":true}', { status: 201 }));
     vi.stubGlobal("fetch", fetcher);
     await expect(api("/v1/sos", { method: "POST", body: {} })).rejects.toMatchObject({ failure: { compatibility: { reason: "server_outdated" } } });
     await expect(api("/v1/sos", { method: "POST", body: {} })).resolves.toEqual({ ok: true });
