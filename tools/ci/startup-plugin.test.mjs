@@ -29,7 +29,7 @@ describe("native startup plugin", () => {
   it("logs native milestones before React and preserves the superclass cold-start URL handling", () => {
     const output = transforms.sceneDelegate(scene);
     expect(output.indexOf("shared.connect(windowScene)")).toBeLessThan(output.indexOf("shared.startingReact()"));
-    expect(output).toContain("super.scene(scene, willConnectTo: session, options: options)");
+    expect(output).toContain("super.scene(scene, willConnectTo: session, options: connectionOptions)");
     expect(output).not.toContain("asyncAfter");
     expect(output).toContain('arguments.contains("-crewStartupTestNoJS")');
     expect(transforms.sceneDelegate(output)).toBe(output);
