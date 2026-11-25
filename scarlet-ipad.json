@@ -237,6 +237,27 @@
     },
     {
       "name": "Soirée Crew Preview",
+      "version": "0.2.51",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.51-preview.39%2Bbuild.350/soiree-crew-ipad-unsigned.ipa",
+      "category": "Other",
+      "description": "• Assert generated Swift forwards the declared argument\n• Forward SceneDelegate connectionOptions correctly\n• Bump vitest (#40)\n• Improve diagnostics and move startup details to logs\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+      "bundleID": "app.soireecrew.mobile.preview",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/ipad/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/ipad/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/ipad/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/ipad/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/ipad/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/ipad/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/ipad/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/ipad/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/ipad/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/ipad/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew Preview 0.2.46",
       "version": "0.2.46",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.46-preview.41%2Bbuild.351/soiree-crew-ipad-unsigned.ipa",

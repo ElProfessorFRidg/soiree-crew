@@ -952,6 +952,28 @@
       },
       "versions": [
         {
+          "version": "0.2.51",
+          "buildVersion": "350",
+          "marketingVersion": "0.2.51 Preview (350)",
+          "date": "2026-11-25T14:46:56Z",
+          "localizedDescription": "• Assert generated Swift forwards the declared argument\n• Forward SceneDelegate connectionOptions correctly\n• Bump vitest (#40)\n• Improve diagnostics and move startup details to logs\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.51-preview.39%2Bbuild.350/soiree-crew-unsigned.ipa",
+          "size": 25941882,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/iphone/10-limits.png"
+          ]
+        },
+        {
           "version": "0.2.46",
           "buildVersion": "351",
           "marketingVersion": "0.2.46 Preview (351)",
@@ -2118,11 +2140,11 @@
           ]
         }
       ],
-      "version": "0.2.46",
-      "versionDate": "2026-11-25T14:13:00Z",
-      "versionDescription": "• Exclude non-beverages and reject invalid imported strengths\n• Build new IPAs for drink catalogue and discovery changes\n• Import branded drinks across all catalogue families\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.46-preview.41%2Bbuild.351/soiree-crew-unsigned.ipa",
-      "size": 28213506,
+      "version": "0.2.51",
+      "versionDate": "2026-11-25T14:46:56Z",
+      "versionDescription": "• Assert generated Swift forwards the declared argument\n• Forward SceneDelegate connectionOptions correctly\n• Bump vitest (#40)\n• Improve diagnostics and move startup details to logs\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.51-preview.39%2Bbuild.350/soiree-crew-unsigned.ipa",
+      "size": 25941882,
       "screenshotURLs": [
         "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.46-preview.41%2Bbuild.351/iphone/01-party.png",
         "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.46-preview.41%2Bbuild.351/iphone/08-add-drink.png",
@@ -2138,6 +2160,17 @@
     }
   ],
   "news": [
+    {
+      "identifier": "preview-0.2.51-350",
+      "title": "Soirée Crew Preview 0.2.51 (350)",
+      "caption": "• Assert generated Swift forwards the declared argument\n• Forward SceneDelegate connectionOptions correctly\n• Bump vitest (#40)\n• Improve diagnostics and move startup details to logs\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+      "date": "2026-11-25T14:46:56Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.51-preview.39%2Bbuild.350/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.51-preview.39%2Bbuild.350/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
     {
       "identifier": "preview-0.2.46-351",
       "title": "Soirée Crew Preview 0.2.46 (351)",
@@ -2336,17 +2369,6 @@
       "tintColor": "F4B33D",
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.30-preview.36%2Bbuild.331/iphone/banner.png",
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.30-preview.36%2Bbuild.331/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
-      "notify": false
-    },
-    {
-      "identifier": "preview-0.2.28-328",
-      "title": "Soirée Crew Preview 0.2.28 (328)",
-      "caption": "• TypeScript 7, with the fixes it needs\n• Expand the catalogue and add a build-time name index (#29)\n• Bump @react-native-async-storage/async-storage (#16)\n• Bump vitest from 3.2.7 to 4.1.11 (#31)\n• Bump the other-minors group across 1 directory with 8 updates (#34)\n• Bump dependabot/fetch-metadata from 2 to 3 (#30)",
-      "date": "2026-11-23T21:51:55Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.28-preview.17%2Bbuild.328/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.28-preview.17%2Bbuild.328/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
     }
@@ -2766,6 +2788,13 @@
       "buildVersion": "2",
       "date": "2026-10-27T00:43:05Z",
       "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.51",
+      "buildVersion": "350",
+      "date": "2026-11-25T14:46:56Z",
+      "localizedDescription": "• Assert generated Swift forwards the declared argument\n• Forward SceneDelegate connectionOptions correctly\n• Bump vitest (#40)\n• Improve diagnostics and move startup details to logs\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
