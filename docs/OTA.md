@@ -17,7 +17,7 @@ On every push to a PR or to `main`, the **Build** workflow picks the route and r
 
 1. **Checks only** when nothing that ships in the app changed (server, docs).
 2. **OTA update** when the change only touches the app's JS and assets compared with the IPA the phones run:
-   - Preview: the newest preview IPA among the PRs still open, since the Preview app holds whichever one was installed last;
+   - Preview: the newest preview IPA of the current PR; install that PR's IPA before testing its OTA;
    - public: the newest public IPA.
 3. **New IPA** otherwise, with the reason: native code, dependencies, configuration, the certificate, or no IPA with OTA yet.
 
@@ -74,3 +74,27 @@ OTA release notes are published on GitHub, AltStore and the What's new screen. T
 1. Generate a new pair: `openssl req -x509 -newkey rsa:2048 -nodes -keyout key.pem -out apps/mobile/certs/ota-certificate.pem -days 3650 -subj "/CN=Soiree Crew OTA" -addext "keyUsage=critical,digitalSignature" -addext "extendedKeyUsage=critical,codeSigning"`.
 2. Store `key.pem` in the `OTA_SIGNING_KEY` secret, then delete the local file.
 3. Ship new IPAs. Installed IPAs only trust the certificate they were built with.
+
+## Impact routing
+
+The shared change-impact classifier filters documentation, tests, server files and explicitly non-shipping tools. Unknown build inputs and dependency resolution changes remain conservative until native fingerprint metadata is available. GitHub release lookup failures fail the planner rather than forcing a native build. Native compilation starts after required checks.
+
+Dependency routing compares the resolved pnpm mobile graph (including workspace links and transitives). Unchanged mobile graph: checks; reviewed pure-JS dependency changes: OTA; unknown changes: IPA. Preview runtimes are isolated by PR. Planner infrastructure failures do not trigger native builds. OTA receipts identify the exact update and compatible IPA.
+
+### Independent OTA smoke tests
+The OTA publisher records an update receipt. A separate workflow_run check on the default branch downloads the exact compatible IPA, verifies its embedded stream/runtime, launches it in the simulator, restarts after download and checks the app's persisted seenOtaUpdateId. It is intentionally not part of build-gate. Superseded updates are explicitly reported as not tested. It requires a real published update and is not a physical-device test.
+
+### Compatible IPA history
+Automatic OTA checks the newest IPA first, then up to CREW_OTA_HISTORY_LIMIT recent releases (default 5, max 20). Each target is checked against its exact release tag and configuration. Only verified targets receive signed manifests. Min/max are descriptive; the exact allowlist is authoritative and may contain gaps. Preview history stays within the same PR.
+
+### Coolify preview readiness
+Optional repository variable `CREW_PREVIEW_URL_TEMPLATE` (e.g. `https://pr-{pr}.preview.example.com`) enables a fail-closed readiness check before automatic preview OTA publication. The preview must report `ok: true` on `/v1/ready` and the exact PR head SHA as `sourceCommit` on `/v1/info`. Configure the actual Coolify preview domain and SOURCE_COMMIT injection before enabling. This check does not create, restart, or keep alive a Coolify deployment. Without configuration, CI explicitly reports that preview availability was not verified.
+
+### Publication serialization
+Deploy the complete deploy/ota directory (server.mjs and publication.mjs) together. Publication uses an atomic per-stream directory lock shared by all writers on the same local Linux filesystem, fsync and atomic rename. Unreadable state fails closed. Identical manifest content reuses the current ID without a new changelog; a higher deduplicated sequence still fences stale publications. A crashed writer may leave an orphaned `.lock` directory: stop all writers, verify the state and remove only the empty orphaned lock before restarting. Never remove locks while writers are active. Separate volumes and network filesystems are not supported. Deploy server before relying on the new behavior. Run `node --test tools/ci/ota-publication-http.integration.mjs` for the HTTP integration suite.
+
+### Native inventory
+New IPA metadata includes a generated native project hash, resolved CocoaPods lock hash, native pod inventory and Xcode version. This is audit evidence, not yet an exhaustive ABI proof or a replacement for conservative routing. Native import detection is available as a tested helper, not yet a capability-based authorization rule.
+
+### Per-PR API origin
+When CREW_PREVIEW_URL_TEMPLATE is set, the IPA builder, planner and OTA exporter all resolve the same HTTPS origin from the PR number. Existing binaries with a different recorded server configuration require a new IPA. This changes the suggested server, not an existing authenticated account's selected server.
