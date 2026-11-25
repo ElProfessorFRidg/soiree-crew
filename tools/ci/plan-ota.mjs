@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { classify, changedPaths } from "./change-impact.mjs";
 
+export class IncompatibleUpdate extends Error {}
 const tagPattern = /^v(\d+\.\d+\.\d+)(?:-preview\.\d+)?\+build\.(\d+)$/;
 
 export function planUpdate({ tag, target, info, otaUrl, serverUrl = "", publicServers = "", paths }) {
@@ -18,14 +19,14 @@ export function planUpdate({ tag, target, info, otaUrl, serverUrl = "", publicSe
       info.updates?.otaUrl !== otaUrl || info.updates.runtime !== runtime ||
       info.updates.stream !== stream || info.updates.version !== version ||
       info.updates.build !== build || info.updates.serverConfig !== serverConfig) {
-    throw new Error("Expo Updates and the current configuration must match the selected IPA");
+    throw new IncompatibleUpdate("Expo Updates and the current configuration must match the selected IPA");
   }
   // CI orchestration and server deployment files do not ship in the app: the checks above already compare the update
   // configuration with the IPA, so workflow and CI tool changes alone do not need a new binary.
   const native = paths.filter(path => classify(path) === "ipa");
   if (native.length) {
     const list = native.slice(0, 15).map((path) => `\n- ${path}`).join("") + (native.length > 15 ? `\n- … ${native.length - 15} more` : "");
-    throw new Error(`Changes outside the mobile JS and assets require a new IPA:${list}`);
+    throw new IncompatibleUpdate(`Changes outside the mobile JS and assets require a new IPA:${list}`);
   }
   return { version, build, stream, runtime };
 }
@@ -45,6 +46,6 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   } catch (error) {
     // The build workflow shows this reason on the PR (tools/ci/report-route.mjs).
     console.error(error.message);
-    process.exit(1);
+    process.exit(error instanceof IncompatibleUpdate ? 2 : 1);
   }
 }

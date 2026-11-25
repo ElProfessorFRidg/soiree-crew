@@ -17,7 +17,7 @@ On every push to a PR or to `main`, the **Build** workflow picks the route and r
 
 1. **Checks only** when nothing that ships in the app changed (server, docs).
 2. **OTA update** when the change only touches the app's JS and assets compared with the IPA the phones run:
-   - Preview: the newest preview IPA among the PRs still open, since the Preview app holds whichever one was installed last;
+   - Preview: the newest preview IPA of the current PR; install that PR's IPA before testing its OTA;
    - public: the newest public IPA.
 3. **New IPA** otherwise, with the reason: native code, dependencies, configuration, the certificate, or no IPA with OTA yet.
 
@@ -78,3 +78,5 @@ OTA release notes are published on GitHub, AltStore and the What's new screen. T
 ## Impact routing
 
 The shared change-impact classifier filters documentation, tests, server files and explicitly non-shipping tools. Unknown build inputs and dependency resolution changes remain conservative until native fingerprint metadata is available. GitHub release lookup failures fail the planner rather than forcing a native build. Native compilation starts after required checks.
+
+Dependency routing compares the resolved pnpm mobile graph (including workspace links and transitives). Unchanged mobile graph: checks; reviewed pure-JS dependency changes: OTA; unknown changes: IPA. Preview runtimes are isolated by PR. Planner infrastructure failures do not trigger native builds. OTA receipts identify the exact update and compatible IPA.

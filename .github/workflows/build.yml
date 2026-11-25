@@ -63,6 +63,8 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
+      - name: Install lockfile analyzer
+        run: python3 -m pip install --user --break-system-packages PyYAML==6.0.2
       - name: Select OTA or native build
         id: route
         if: ${{ !inputs.force_ipa && !inputs.android }}
@@ -83,7 +85,8 @@ jobs:
             { printf '### %s\n\n' "$2"; if [[ -n "${3:-}" ]]; then printf '%s\n' "$3"; fi; } >> "$GITHUB_STEP_SUMMARY"
           }
           if [[ "$CHANGE_BASE" =~ ^[a-f0-9]{40}$ ]] && git cat-file -e "$CHANGE_BASE^{commit}"; then
-            if [[ "$(node tools/ci/change-impact.mjs "$CHANGE_BASE")" == checks ]]; then
+            IMPACT=$(node tools/ci/change-impact.mjs "$CHANGE_BASE")
+            if [[ "$IMPACT" == checks ]]; then
               echo 'skip_ipa=true' >> "$GITHUB_OUTPUT"
               decide checks 'No mobile changes: checks only.'
               exit 0
@@ -94,11 +97,7 @@ jobs:
             decide ipa 'New IPA: OTA updates are not configured (CREW_OTA_URL, OTA_PUBLISH_TOKEN, OTA_SIGNING_KEY).'
             exit 0
           fi
-          # Preview: the Preview app runs the newest preview IPA of any open PR, so that is the one to patch.
-          if [[ -n "$PR_NUMBER" ]]; then
-            OPEN_PRS=$(gh pr list --state open --limit 200 --json number --jq 'map(.number) | join(",")') || OPEN_PRS=""
-            export OPEN_PRS
-          fi
+          # A PR only updates its own preview runtime; other PRs cannot overwrite it.
           RELEASES="$RUNNER_TEMP/releases.json"
           if ! gh api --paginate --slurp "repos/${GITHUB_REPOSITORY}/releases?per_page=100" | jq 'add // []' > "$RELEASES"; then
             echo '::error::Unable to read GitHub releases; retry the workflow.'
@@ -108,20 +107,27 @@ jobs:
             cat "$RUNNER_TEMP/select.err" >&2
             exit 1
           fi
-          echo "Releases: $(jq length "$RELEASES"), open PRs: ${OPEN_PRS:-none}, IPA to patch: ${TAG:-none}"
+          echo "Releases: $(jq length "$RELEASES"), IPA to patch: ${TAG:-none}"
           if [[ -z "$TAG" ]]; then
-            if [[ -n "$PR_NUMBER" ]]; then KIND='preview IPA of an open PR'; else KIND='public IPA'; fi
+            if [[ -n "$PR_NUMBER" ]]; then KIND='preview IPA of this PR'; else KIND='public IPA'; fi
             decide ipa "New IPA: no $KIND with OTA updates to patch yet."
             exit 0
           fi
           for TARGET in iphone ipad; do
             INFO="ios-build-info-$TARGET.json"
             if ! gh release download "$TAG" --pattern "$INFO" --dir "$RUNNER_TEMP" --clobber; then
-              decide ipa "New IPA: \`$TAG\` has no $INFO."
-              exit 0
+              echo "::error::Cannot download $INFO; retry rather than rebuild."
+              exit 1
             fi
-            if ! WHY=$(node tools/ci/plan-ota.mjs "$TAG" "$TARGET" "$RUNNER_TEMP/$INFO" 2>&1 >/dev/null); then
-              decide ipa "New IPA: this change cannot patch \`$TAG\` ($TARGET) over the air." "$WHY"
+            if WHY=$(node tools/ci/plan-ota.mjs "$TAG" "$TARGET" "$RUNNER_TEMP/$INFO" 2>&1 >/dev/null); then
+              :
+            else
+              STATUS=$?
+              if [[ "$STATUS" != 2 ]]; then
+                echo "::error::OTA planner failed: $WHY"
+                exit 1
+              fi
+              decide ipa "New IPA: incompatible runtime $TAG ($TARGET)." "$WHY"
               exit 0
             fi
           done
