@@ -11,10 +11,10 @@
 //   PORT                      default 3000
 import { createHash, timingSafeEqual, randomUUID } from "node:crypto";
 import { createReadStream, existsSync } from "node:fs";
-import { mkdir, readFile, rename, stat, writeFile } from "node:fs/promises";
+import { mkdir, rename, stat, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { join } from "node:path";
-import { serialize, contentIdentity, sequenceOf, older } from "./publication.mjs";
+import { readPublication, commitPublication, sequenceOf } from "./publication.mjs";
 
 const DATA = process.env.OTA_DATA ?? "/data";
 const PORT = Number(process.env.PORT ?? 3000);
@@ -57,11 +57,7 @@ async function writeAtomic(path, data) {
 }
 
 async function readStream(platform, channel, runtime) {
-  try {
-    return JSON.parse(await readFile(streamPath(platform, channel, runtime), "utf8"));
-  } catch {
-    return null;
-  }
+  return readPublication(streamPath(platform, channel, runtime));
 }
 
 function send(res, status, payload, headers = {}) {
@@ -180,30 +176,15 @@ async function publish(req, res) {
   }
   let sequence;
   try { sequence = sequenceOf(p); } catch { return send(res,400,"Invalid publication sequence"); }
-  return serialize(streamPath(p.platform,p.channel,p.runtimeVersion), async () => {
   const record = {
     sequence,
     kind: p.kind, id: parsed.id ?? `directive-${Date.now()}`, createdAt: parsed.createdAt ?? new Date().toISOString(),
     body: p.body, signature: p.signature, message: String(p.message ?? "").slice(0, 300), commit: String(p.commit ?? "").slice(0, 40),
     publishedAt: new Date().toISOString(),
   };
-  const stream = (await readStream(p.platform, p.channel, p.runtimeVersion)) ?? { history: [] };
-  const prior = stream.current;
-  if (prior?.sequence && (!sequence || older(sequence,prior.sequence))) return send(res,409,{error:"Superseded publication"});
-  if (p.kind === "manifest" && prior?.kind === "manifest" && contentIdentity(parsed) === contentIdentity(JSON.parse(prior.body))) {
-    if (sequence && sequence !== prior.sequence) {
-      stream.current = {...prior,sequence};
-      await writeAtomic(streamPath(p.platform,p.channel,p.runtimeVersion),JSON.stringify(stream));
-    }
-    return send(res,200,{id:prior.id,kind:prior.kind,deduplicated:true});
-  }
-  if (sequence && prior?.sequence === sequence) return send(res,409,{error:"Sequence already published with different content"});
-  stream.current = record;
-  stream.history = [record, ...(stream.history ?? [])].slice(0, HISTORY);
-  await writeAtomic(streamPath(p.platform, p.channel, p.runtimeVersion), JSON.stringify(stream));
-  log(`published ${p.kind} ${record.id} to ${p.platform}/${p.channel}/${p.runtimeVersion} (${record.commit})`);
-  return send(res, 201, { id: record.id, kind: record.kind });
-  });
+  const result = await commitPublication(streamPath(p.platform, p.channel, p.runtimeVersion), record, HISTORY);
+  if (result.status === 201) log(`published ${p.kind} ${record.id} to ${p.platform}/${p.channel}/${p.runtimeVersion} (${record.commit})`);
+  return send(res, result.status, result.body);
 }
 
 function log(message) {
@@ -237,4 +218,4 @@ const server = createServer(async (req, res) => {
 });
 
 if (TOKEN_HASH.length !== 32) log("warning: OTA_PUBLISH_TOKEN_SHA256 is missing, publishing is disabled");
-server.listen(PORT, () => log(`Expo Updates server on :${PORT}, data in ${DATA}`));
+server.listen(PORT, () => log(`Expo Updates server on :${server.address().port}, data in ${DATA}`));
