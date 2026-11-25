@@ -40,6 +40,8 @@ jobs:
         run: node --test tools/ci/ota-publication-http.integration.mjs
       - name: Test IPA release selection
         run: node --test tools/ci/select-ota-base.integration.mjs
+      - name: Test delivery integrity
+        run: node --test tools/ci/delivery-integrity.integration.mjs
       - run: pnpm lint:slop
       - name: Audit production dependencies (SEC-09, reported, not blocking)
         run: pnpm audit --prod --audit-level=high
@@ -133,12 +135,14 @@ jobs:
             [[ -n "$CANDIDATE" ]] || continue
             COUNT=$((COUNT+1))
             if (( COUNT > OTA_HISTORY_LIMIT )); then break; fi
+            jq --arg tag "$CANDIDATE" 'map(select(.tag_name == $tag)) | if length == 1 then .[0] else error("ambiguous release") end' "$RELEASES" > "$RUNNER_TEMP/candidate.json"
             for TARGET in iphone ipad; do
               INFO="ios-build-info-$TARGET.json"
               if ! gh release download "$CANDIDATE" --pattern "$INFO" --dir "$RUNNER_TEMP" --clobber; then
                 echo "::error::Cannot download $INFO for $CANDIDATE; retry rather than rebuild."
                 exit 1
               fi
+              node tools/ci/delivery-integrity.mjs assets "$RUNNER_TEMP/candidate.json" "$CANDIDATE" "$RUNNER_TEMP/$INFO"
               if WHY=$(node tools/ci/plan-ota.mjs "$CANDIDATE" "$TARGET" "$RUNNER_TEMP/$INFO" 2>&1 >/dev/null); then
                 jq --arg release "$CANDIDATE" --arg target "$TARGET" '. + [{release:$release,target:$target}]' "$MATRIX" > "$MATRIX.next"
                 mv "$MATRIX.next" "$MATRIX"
@@ -564,6 +568,17 @@ jobs:
           CREW_RELEASE_CHANNEL: ${{ (github.event_name == 'pull_request' || inputs.pr != '') && 'preview' || 'public' }}
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr }}
         run: node tools/ci/publish-release.mjs
+      - name: Verify published release assets and tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.publish.outputs.tag }}
+        run: |
+          test -n "$RELEASE_TAG"
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > "$RUNNER_TEMP/published.json"
+          node tools/ci/delivery-integrity.mjs assets "$RUNNER_TEMP/published.json" "$RELEASE_TAG" dist/*.ipa dist/ios-build-info-*.json
+          if [[ -f dist/soiree-crew.apk ]]; then node tools/ci/delivery-integrity.mjs assets "$RUNNER_TEMP/published.json" "$RELEASE_TAG" dist/soiree-crew.apk; fi
+          git fetch --no-tags origin "refs/tags/$RELEASE_TAG"
+          test "$(git rev-parse FETCH_HEAD^{commit})" = "$GITHUB_SHA"
 
   altstore:
     # docs/ALTSTORE.md: the source is rewritten from the published releases, with this build's screenshots.
@@ -584,9 +599,17 @@ jobs:
   # an OTA update published, or checks only.
   build-gate:
     if: always()
-    needs: [checks, version, ota, ios, ios-launch]
+    needs: [checks, version, ota, ios, ios-launch, release, android]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
       - name: Check the route was carried out
         env:
           ROUTE: ${{ needs.version.outputs.route || 'ipa' }}
@@ -595,14 +618,10 @@ jobs:
           OTA: ${{ needs.ota.result }}
           IOS: ${{ needs.ios.result }}
           LAUNCH: ${{ needs.ios-launch.result }}
+          RELEASE: ${{ needs.release.result }}
+          ANDROID: ${{ needs.android.result }}
+          PUBLICATION_REQUIRED: ${{ (github.event_name != 'pull_request' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || inputs.pr != '' }}
+          ANDROID_REQUIRED: ${{ github.event_name == 'workflow_dispatch' && inputs.android }}
         run: |
-          echo "route=$ROUTE checks=$CHECKS version=$VERSION ota=$OTA ios=$IOS ios-launch=$LAUNCH"
-          fail() { echo "::error::$1"; exit 1; }
-          [[ "$CHECKS" == success && "$VERSION" == success ]] || fail "checks=$CHECKS, version=$VERSION"
-          case "$ROUTE" in
-            ipa) [[ "$IOS" == success && "$LAUNCH" == success ]] || fail "New IPA route: ios=$IOS, ios-launch=$LAUNCH" ;;
-            ota) [[ "$OTA" == success ]] || fail "OTA route: ota=$OTA" ;;
-            checks) ;;
-            *) fail "Unknown route $ROUTE" ;;
-          esac
+          node tools/ci/delivery-integrity.mjs gate
           echo "### Build gate: $ROUTE route carried out" >> "$GITHUB_STEP_SUMMARY"

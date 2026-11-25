@@ -101,3 +101,6 @@ When CREW_PREVIEW_URL_TEMPLATE is set, the IPA builder, planner and OTA exporter
 
 ### Release selection integrity
 Only non-draft releases with both uploaded, nonempty IPA binaries and both uploaded, nonempty metadata files are eligible. An incomplete newest release is an infrastructure error (do not silently target an older IPA). Incomplete historical releases are excluded. Duplicate build identities within a channel, including across preview PRs, fail closed. This verifies GitHub release inventory, not binary contents or ABI compatibility.
+
+### Delivery integrity gate
+The native gate requires successful release publication for trusted repository builds (forks remain artifact-only), checks requested Android builds, and rejects unexpected delivery jobs. The router and OTA publisher validate downloaded metadata against GitHub's SHA-256 asset digest. The release job compares the published IPA/metadata/APK asset digests against the tested local files and resolves the published tag to the workflow commit. A missing digest fails closed. These checks do not make GitHub release creation atomic or prevent an administrator from modifying a release later.

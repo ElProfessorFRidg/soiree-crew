@@ -85,6 +85,8 @@ jobs:
           [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-preview\.[0-9]+)?\+build\.[0-9]+$ ]]
           test -n "$CREW_OTA_URL"
           gh release download "$RELEASE_TAG" --pattern "ios-build-info-$CREW_IOS_TARGET.json" --dir "$RUNNER_TEMP"
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > "$RUNNER_TEMP/release.json"
+          node tools/ci/delivery-integrity.mjs assets "$RUNNER_TEMP/release.json" "$RELEASE_TAG" "$RUNNER_TEMP/ios-build-info-$CREW_IOS_TARGET.json"
           node tools/ci/plan-ota.mjs "$RELEASE_TAG" "$CREW_IOS_TARGET" "$RUNNER_TEMP/ios-build-info-$CREW_IOS_TARGET.json" >> "$GITHUB_OUTPUT"
       - run: pnpm install --frozen-lockfile
       - if: ${{ !inputs.automatic }}
