@@ -10,6 +10,7 @@ import { drinkVolumeUnit, formatVolume, type VolumeUnit } from "@crew/units";
 import { Field } from "@/crew/Field";
 import { logDrink } from "@/drinks/actions";
 import {
+  catalogueLabel,
   GROUP_OF_KIND,
   genericAt,
   presetFromCatalogue,
@@ -21,6 +22,8 @@ import {
   withHousePint,
 } from "@/drinks/catalogue";
 import { CustomDrinkEditor } from "@/drinks/CustomDrinkEditor";
+import { trendDrinks, useDrinkTrends } from "@/drinks/DrinkTrends";
+import { Chip } from "@/ui/controls";
 import { DrinkThumb } from "@/drinks/DrinkThumb";
 import { readParts, recipeText } from "@/drinks/mixedGlass";
 import { moveCustomDrink, removeCustomDrink, restoreCustomDrink, saveCustomDrink, sortedCustomDrinks, type CustomDrinkDraft } from "@/drinks/customDrinks";
@@ -199,7 +202,7 @@ export default function AddDrinkSheet() {
           <IconButton icon="x" accessibilityLabel={i18n.t("common.close")} onPress={close} />
         </View>
 
-        <QuickType presets={[...customDrinks.map(presetFromCustom), ...presets]} consumedAt={consumedAt} food={food} houseAbv={houseAbv} unit={unit} onDone={close} />
+        <QuickType presets={[...customDrinks.map(presetFromCustom), ...presets]} consumedAt={consumedAt} food={food} houseAbv={houseAbv} unit={unit} venueId={here?.venueId ?? null} crewId={live?.party.crewId ?? null} onDone={close} />
 
         <View style={styles.grid} accessibilityRole="radiogroup">
           {presets.map((item, index) => {
@@ -456,6 +459,8 @@ const FR = createTranslator("fr");
 const EN = createTranslator("en");
 
 interface QuickTypeProps {
+  venueId: string | null;
+  crewId: string | null;
   presets: DrinkPreset[];
   consumedAt: number;
   food: FoodLevel;
@@ -468,9 +473,11 @@ interface QuickTypeProps {
  * ADP-05: type or dictate "2 castel", "pinte 8", "demi kro", "polia redbull" or "2 pintes et un shot";
  * typos, plurals and accents are fine. Each drink understood becomes a card with its own Add.
  */
-function QuickType({ presets, consumedAt, food, houseAbv, unit, onDone }: QuickTypeProps) {
+function QuickType({ presets, consumedAt, food, houseAbv, unit, venueId, crewId, onDone }: QuickTypeProps) {
   const i18n = useT();
   const hourCycle = useAppStore((state) => state.preferences.hourCycle);
+  const firstCrewId = useCrewData(state => state.crews[0]?.id ?? null);
+  const trends = useDrinkTrends(venueId, crewId ?? firstCrewId);
   const [text, setText] = useState("");
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [added, setAdded] = useState<string[]>([]);
@@ -514,7 +521,7 @@ function QuickType({ presets, consumedAt, food, houseAbv, unit, onDone }: QuickT
           const preset = byId.get(id);
           return preset ? [{ preset: withHousePint(preset, houseAbv), quantity: 1 }] : [];
         }),
-        ...searchCatalogue(text, i18n, 3, useAppStore.getState().preferences.legalCountry).map((drink) => ({
+        ...searchCatalogue(text, i18n, 3, useAppStore.getState().preferences.legalCountry, trends?.map(trend => trend.drinkId)).map((drink) => ({
           preset: presetFromCatalogue(drink, i18n),
           quantity: 1,
           guess: true,
@@ -526,7 +533,7 @@ function QuickType({ presets, consumedAt, food, houseAbv, unit, onDone }: QuickT
       found = [];
     }
     return found.map((item, index) => ({ key: `${index}:${item.preset.id}:${item.preset.volumeMl}:${item.preset.abv}`, ...item }));
-  }, [fromAi, ai, lines, text, presets, i18n, houseAbv]);
+  }, [fromAi, ai, lines, text, presets, i18n, houseAbv, trends]);
 
   const shown = suggestions.filter((s) => !added.includes(s.key)).map((s) => ({ ...s, quantity: quantities[s.key] ?? s.quantity }));
 
@@ -570,6 +577,17 @@ function QuickType({ presets, consumedAt, food, houseAbv, unit, onDone }: QuickT
         returnKeyType="done"
         hint={text.trim() && !suggestions.length ? i18n.t("addDrink.quickNone") : undefined}
       />
+      {!text.trim() && trends?.length ? (
+        <>
+          <Text variant="label">{i18n.t("addDrink.quickTrends")}</Text>
+          <View style={styles.trendChips}>
+            {trendDrinks(trends).slice(0, 4).map(drink => {
+              const name = catalogueLabel(drink, i18n);
+              return <Chip key={drink.id} label={name} onPress={() => changeText(name)} />;
+            })}
+          </View>
+        </>
+      ) : null}
       {fromAi && (ai.venue || ai.iPay || ai.minutesAgo) ? (
         <Text variant="small">
           {[
@@ -605,6 +623,7 @@ function QuickType({ presets, consumedAt, food, houseAbv, unit, onDone }: QuickT
 const styles = StyleSheet.create({
   footer: { width: "100%", maxWidth: 760, alignSelf: "center", paddingHorizontal: space.screenX, paddingTop: 12, borderTopWidth: 1 },
   quick: { gap: 10 },
+  trendChips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   sheet: { flex: 1 },
   content: { width: "100%", maxWidth: 760, alignSelf: "center", paddingHorizontal: space.screenX, paddingTop: 20, gap: 16 },
   title: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
