@@ -74,3 +74,7 @@ OTA release notes are published on GitHub, AltStore and the What's new screen. T
 1. Generate a new pair: `openssl req -x509 -newkey rsa:2048 -nodes -keyout key.pem -out apps/mobile/certs/ota-certificate.pem -days 3650 -subj "/CN=Soiree Crew OTA" -addext "keyUsage=critical,digitalSignature" -addext "extendedKeyUsage=critical,codeSigning"`.
 2. Store `key.pem` in the `OTA_SIGNING_KEY` secret, then delete the local file.
 3. Ship new IPAs. Installed IPAs only trust the certificate they were built with.
+
+## Impact routing
+
+The shared change-impact classifier filters documentation, tests, server files and explicitly non-shipping tools. Unknown build inputs and dependency resolution changes remain conservative until native fingerprint metadata is available. GitHub release lookup failures fail the planner rather than forcing a native build. Native compilation starts after required checks.

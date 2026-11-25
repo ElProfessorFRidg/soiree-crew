@@ -8,10 +8,6 @@ on:
       - "**/*.md"
       - "docs/**"
       - "research/**"
-      - "tools/ci/altstore-source*.mjs"
-      - "tools/ci/altstore-images.py"
-      - "apps/mobile/store/release-notes.json"
-      - ".github/workflows/altstore.yml"
   pull_request:
   workflow_dispatch:
     inputs:
@@ -87,7 +83,7 @@ jobs:
             { printf '### %s\n\n' "$2"; if [[ -n "${3:-}" ]]; then printf '%s\n' "$3"; fi; } >> "$GITHUB_STEP_SUMMARY"
           }
           if [[ "$CHANGE_BASE" =~ ^[a-f0-9]{40}$ ]] && git cat-file -e "$CHANGE_BASE^{commit}"; then
-            if git diff --quiet --no-renames "$CHANGE_BASE" HEAD -- . ':!apps/server/**' ':!docs/**' ':!research/**' ':!*.md' ':!apps/mobile/store/release-notes.json'; then
+            if [[ "$(node tools/ci/change-impact.mjs "$CHANGE_BASE")" == checks ]]; then
               echo 'skip_ipa=true' >> "$GITHUB_OUTPUT"
               decide checks 'No mobile changes: checks only.'
               exit 0
@@ -105,12 +101,12 @@ jobs:
           fi
           RELEASES="$RUNNER_TEMP/releases.json"
           if ! gh api --paginate --slurp "repos/${GITHUB_REPOSITORY}/releases?per_page=100" | jq 'add // []' > "$RELEASES"; then
-            decide ipa 'New IPA: the GitHub releases could not be read.'
-            exit 0
+            echo '::error::Unable to read GitHub releases; retry the workflow.'
+            exit 1
           fi
           if ! TAG=$(node tools/ci/select-ota-base.mjs "$RELEASES" 2>"$RUNNER_TEMP/select.err"); then
-            decide ipa 'New IPA: the IPA to patch could not be selected.' "$(cat "$RUNNER_TEMP/select.err")"
-            exit 0
+            cat "$RUNNER_TEMP/select.err" >&2
+            exit 1
           fi
           echo "Releases: $(jq length "$RELEASES"), open PRs: ${OPEN_PRS:-none}, IPA to patch: ${TAG:-none}"
           if [[ -z "$TAG" ]]; then
@@ -163,7 +159,7 @@ jobs:
 
   ios:
     # Unsigned IPA: sign it on your side with your sideloading tool (ADR 0001).
-    needs: version
+    needs: [version, checks]
     if: needs.version.outputs.ota_base == '' && needs.version.outputs.skip_ipa != 'true'
     runs-on: macos-26
     timeout-minutes: 60
@@ -541,7 +537,7 @@ jobs:
   # The check the main ruleset requires (with `checks`). The ios jobs only report when an IPA is
   # built, so an OTA or checks-only change could never merge if they were required. This gate is
   # green only when the change shipped the way the route decided: a new IPA built and launched,
-  # an OTA update published, or checks only. Dependency updates always take the IPA route.
+  # an OTA update published, or checks only.
   build-gate:
     if: always()
     needs: [checks, version, ota, ios, ios-launch]
