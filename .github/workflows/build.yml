@@ -211,7 +211,11 @@ jobs:
       # Native and the native modules), the CocoaPods cache saves the pod downloads.
       - name: Install ccache
         run: brew install ccache
-      - uses: actions/cache@v6
+      # GitHub keeps a cache per branch: a PR cannot read another PR's, only main's. So PRs only read
+      # (restore, falling back to the newest main cache) and main alone writes, once per run. Saving from
+      # every PR filled the 10 GB quota with copies and pushed main's cache out.
+      - uses: actions/cache/restore@v6
+        id: native-cache
         with:
           path: |
             ~/Library/Caches/ccache
@@ -229,7 +233,8 @@ jobs:
         run: npx expo prebuild --platform ios --clean
       # ExpoModulesJSI is the slowest piece to compile. Its build script reuses a slice whose
       # recorded source hash (sources, paths, Swift and Xcode versions) still matches.
-      - uses: actions/cache@v6
+      - uses: actions/cache/restore@v6
+        id: jsi-cache
         with:
           path: apps/mobile/ios/build/Build/Products/ExpoModulesJSI.xcframework
           key: expo-modules-jsi-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}
@@ -257,6 +262,20 @@ jobs:
             }
           tail -n 20 xcodebuild.log
           ccache --show-stats || true
+      - name: Save the native build cache (main only)
+        if: github.ref == 'refs/heads/main' && success()
+        uses: actions/cache/save@v6
+        with:
+          path: |
+            ~/Library/Caches/ccache
+            ~/Library/Caches/CocoaPods
+          key: ios-build-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}-${{ matrix.target }}-${{ github.run_id }}
+      - name: Save the ExpoModulesJSI slice (main only)
+        if: github.ref == 'refs/heads/main' && success() && steps.jsi-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: apps/mobile/ios/build/Build/Products/ExpoModulesJSI.xcframework
+          key: expo-modules-jsi-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
