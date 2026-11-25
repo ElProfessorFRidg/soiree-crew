@@ -61,7 +61,7 @@ async function main() {
   const channel = env("OTA_STREAM");
   const runtimeVersion = env("OTA_RUNTIME");
   const platform = process.env.OTA_PLATFORM ?? "ios";
-  const common = { platform, channel, runtimeVersion, message: process.env.OTA_MESSAGE ?? "", commit: process.env.GITHUB_SHA ?? "" };
+  const common = { platform, channel, runtimeVersion, message: process.env.OTA_MESSAGE ?? "", commit: process.env.GITHUB_SHA ?? "", ...(process.env.GITHUB_RUN_ID && process.env.GITHUB_RUN_ATTEMPT ? {sequence: `${process.env.GITHUB_RUN_ID}.${process.env.GITHUB_RUN_ATTEMPT}`} : {}) };
 
   if (process.env.OTA_ROLLBACK === "true") {
     const body = JSON.stringify({ type: "rollBackToEmbedded", parameters: { commitTime: new Date().toISOString() } });
@@ -96,11 +96,14 @@ async function main() {
   }
   await flush();
   const body = JSON.stringify(manifest);
-  await call("POST", `${baseUrl}/publish`, token, JSON.stringify({ ...common, kind: "manifest", body, signature: sign(body, key), assets: uploads.map((u) => u.hex) }));
-  console.log(`Published update ${manifest.id} to ${channel} (${runtimeVersion}), ${uploads.length} files`);
+  const response = await call("POST", `${baseUrl}/publish`, token, JSON.stringify({ ...common, kind: "manifest", body, signature: sign(body, key), assets: uploads.map((u) => u.hex) }));
+  const result = await response.json();
+  const publishedId = result.id;
+  if (!publishedId) throw new Error("Missing publication receipt");
+  console.log(`Published update ${publishedId} to ${channel} (${runtimeVersion}), ${uploads.length} files`);
   if (process.env.GITHUB_OUTPUT) {
     const { appendFileSync } = await import("node:fs");
-    appendFileSync(process.env.GITHUB_OUTPUT, `update_id=${manifest.id}\n`);
+    appendFileSync(process.env.GITHUB_OUTPUT, `update_id=${publishedId}\ndeduplicated=${result.deduplicated === true}\n`);
   }
 }
 

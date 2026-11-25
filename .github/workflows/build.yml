@@ -3,15 +3,6 @@ name: Build
 on:
   push:
     branches: [main]
-    # Nothing in these changes the app: no rebuild. The AltStore source has its own workflow.
-    paths-ignore:
-      - "**/*.md"
-      - "docs/**"
-      - "research/**"
-      - "tools/ci/altstore-source*.mjs"
-      - "tools/ci/altstore-images.py"
-      - "apps/mobile/store/release-notes.json"
-      - ".github/workflows/altstore.yml"
   pull_request:
   workflow_dispatch:
     inputs:
@@ -52,12 +43,15 @@ jobs:
 
   version:
     runs-on: ubuntu-latest
+    env:
+      CREW_SERVER_URL: ${{ (github.event_name == 'pull_request' || inputs.pr != '') && vars.CREW_PREVIEW_SERVER_URL || vars.CREW_SERVER_URL }}
     permissions:
       contents: write
       pull-requests: write
     outputs:
       version: ${{ steps.next.outputs.version }}
       ota_base: ${{ steps.route.outputs.release }}
+      ota_matrix: ${{ steps.route.outputs.matrix }}
       skip_ipa: ${{ steps.route.outputs.skip_ipa }}
       route: ${{ steps.route.outputs.route }}
     steps:
@@ -67,18 +61,27 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
+      - name: Install lockfile analyzer
+        run: |
+          python3 -m pip install --user --break-system-packages PyYAML==6.0.2
+          python3 tools/ci/dependency-impact-test.py
+      - name: Resolve PR server origin
+        env:
+          PREVIEW_PR: ${{ github.event.pull_request.number || inputs.pr }}
+          CREW_PREVIEW_URL_TEMPLATE: ${{ vars.CREW_PREVIEW_URL_TEMPLATE }}
+        run: node tools/ci/resolve-preview-origin.mjs
       - name: Select OTA or native build
         id: route
         if: ${{ !inputs.force_ipa && !inputs.android }}
         env:
           GH_TOKEN: ${{ github.token }}
           OTA_AUTHORIZED: ${{ secrets.OTA_PUBLISH_TOKEN != '' && secrets.OTA_SIGNING_KEY != '' }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr }}
           CHANGE_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
           OTA_ALLOWED: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
           CREW_OTA_URL: ${{ vars.CREW_OTA_URL }}
-          CREW_SERVER_URL: ${{ github.event_name == 'pull_request' && vars.CREW_PREVIEW_SERVER_URL || vars.CREW_SERVER_URL }}
           CREW_PUBLIC_SERVERS: ${{ vars.CREW_PUBLIC_SERVERS }}
+          OTA_HISTORY_LIMIT: ${{ vars.CREW_OTA_HISTORY_LIMIT || '5' }}
         # Every outcome records why (route + reason): the summary and the PR comment show it.
         run: |
           decide() {
@@ -87,7 +90,8 @@ jobs:
             { printf '### %s\n\n' "$2"; if [[ -n "${3:-}" ]]; then printf '%s\n' "$3"; fi; } >> "$GITHUB_STEP_SUMMARY"
           }
           if [[ "$CHANGE_BASE" =~ ^[a-f0-9]{40}$ ]] && git cat-file -e "$CHANGE_BASE^{commit}"; then
-            if git diff --quiet --no-renames "$CHANGE_BASE" HEAD -- . ':!apps/server/**' ':!docs/**' ':!research/**' ':!*.md' ':!apps/mobile/store/release-notes.json'; then
+            IMPACT=$(node tools/ci/change-impact.mjs "$CHANGE_BASE")
+            if [[ "$IMPACT" == checks ]]; then
               echo 'skip_ipa=true' >> "$GITHUB_OUTPUT"
               decide checks 'No mobile changes: checks only.'
               exit 0
@@ -98,39 +102,60 @@ jobs:
             decide ipa 'New IPA: OTA updates are not configured (CREW_OTA_URL, OTA_PUBLISH_TOKEN, OTA_SIGNING_KEY).'
             exit 0
           fi
-          # Preview: the Preview app runs the newest preview IPA of any open PR, so that is the one to patch.
-          if [[ -n "$PR_NUMBER" ]]; then
-            OPEN_PRS=$(gh pr list --state open --limit 200 --json number --jq 'map(.number) | join(",")') || OPEN_PRS=""
-            export OPEN_PRS
-          fi
+          # A PR only updates its own preview runtime; other PRs cannot overwrite it.
           RELEASES="$RUNNER_TEMP/releases.json"
           if ! gh api --paginate --slurp "repos/${GITHUB_REPOSITORY}/releases?per_page=100" | jq 'add // []' > "$RELEASES"; then
-            decide ipa 'New IPA: the GitHub releases could not be read.'
-            exit 0
+            echo '::error::Unable to read GitHub releases; retry the workflow.'
+            exit 1
           fi
           if ! TAG=$(node tools/ci/select-ota-base.mjs "$RELEASES" 2>"$RUNNER_TEMP/select.err"); then
-            decide ipa 'New IPA: the IPA to patch could not be selected.' "$(cat "$RUNNER_TEMP/select.err")"
-            exit 0
+            cat "$RUNNER_TEMP/select.err" >&2
+            exit 1
           fi
-          echo "Releases: $(jq length "$RELEASES"), open PRs: ${OPEN_PRS:-none}, IPA to patch: ${TAG:-none}"
+          echo "Releases: $(jq length "$RELEASES"), IPA to patch: ${TAG:-none}"
           if [[ -z "$TAG" ]]; then
-            if [[ -n "$PR_NUMBER" ]]; then KIND='preview IPA of an open PR'; else KIND='public IPA'; fi
+            if [[ -n "$PR_NUMBER" ]]; then KIND='preview IPA of this PR'; else KIND='public IPA'; fi
             decide ipa "New IPA: no $KIND with OTA updates to patch yet."
             exit 0
           fi
-          for TARGET in iphone ipad; do
-            INFO="ios-build-info-$TARGET.json"
-            if ! gh release download "$TAG" --pattern "$INFO" --dir "$RUNNER_TEMP" --clobber; then
-              decide ipa "New IPA: \`$TAG\` has no $INFO."
-              exit 0
-            fi
-            if ! WHY=$(node tools/ci/plan-ota.mjs "$TAG" "$TARGET" "$RUNNER_TEMP/$INFO" 2>&1 >/dev/null); then
-              decide ipa "New IPA: this change cannot patch \`$TAG\` ($TARGET) over the air." "$WHY"
-              exit 0
-            fi
-          done
+          # The newest IPA must be compatible before selecting OTA. Older compatible
+          # builds are additional recipients, never a substitute for a new required IPA.
+          [[ "$OTA_HISTORY_LIMIT" =~ ^([1-9]|1[0-9]|20)$ ]] || { echo "::error::Invalid OTA history limit"; exit 1; }
+          ALL_CANDIDATES=1 node tools/ci/select-ota-base.mjs "$RELEASES" > "$RUNNER_TEMP/candidates"
+          MATRIX="$RUNNER_TEMP/ota-matrix.json"
+          echo '[]' > "$MATRIX"
+          COUNT=0
+          while IFS= read -r CANDIDATE; do
+            [[ -n "$CANDIDATE" ]] || continue
+            COUNT=$((COUNT+1))
+            if (( COUNT > OTA_HISTORY_LIMIT )); then break; fi
+            for TARGET in iphone ipad; do
+              INFO="ios-build-info-$TARGET.json"
+              if ! gh release download "$CANDIDATE" --pattern "$INFO" --dir "$RUNNER_TEMP" --clobber; then
+                echo "::error::Cannot download $INFO for $CANDIDATE; retry rather than rebuild."
+                exit 1
+              fi
+              if WHY=$(node tools/ci/plan-ota.mjs "$CANDIDATE" "$TARGET" "$RUNNER_TEMP/$INFO" 2>&1 >/dev/null); then
+                jq --arg release "$CANDIDATE" --arg target "$TARGET" '. + [{release:$release,target:$target}]' "$MATRIX" > "$MATRIX.next"
+                mv "$MATRIX.next" "$MATRIX"
+              else
+                STATUS=$?
+                if [[ "$STATUS" != 2 ]]; then
+                  echo "::error::OTA planner failed: $WHY"
+                  exit 1
+                fi
+                if [[ "$CANDIDATE" == "$TAG" ]]; then
+                  decide ipa "New IPA: incompatible newest runtime $TAG ($TARGET)." "$WHY"
+                  exit 0
+                fi
+                printf 'Excluded older runtime %s (%s): %s\n' "$CANDIDATE" "$TARGET" "$WHY"
+              fi
+            done
+          done < "$RUNNER_TEMP/candidates"
           printf 'release=%s\n' "$TAG" >> "$GITHUB_OUTPUT"
-          decide ota "OTA update on top of \`$TAG\` (iPhone and iPad)."
+          printf 'matrix=%s\n' "$(jq -c . "$MATRIX")" >> "$GITHUB_OUTPUT"
+          RANGE=$(node tools/ci/ota-compatibility.mjs "$MATRIX")
+          decide ota "OTA: verified compatible runtimes for $TAG and eligible older IPAs." "$RANGE"
       - name: Reserve the native version
         id: next
         if: steps.route.outputs.release == '' && steps.route.outputs.skip_ipa != 'true'
@@ -150,20 +175,24 @@ jobs:
   ota:
     needs: [checks, version]
     if: needs.version.outputs.ota_base != ''
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.version.outputs.ota_matrix || '[]') }}
     uses: ./.github/workflows/ota.yml
     permissions:
       contents: write
       actions: read
     with:
-      release: ${{ needs.version.outputs.ota_base }}
-      target: both
+      release: ${{ matrix.release }}
+      target: ${{ matrix.target }}
     secrets:
       OTA_PUBLISH_TOKEN: ${{ secrets.OTA_PUBLISH_TOKEN }}
       OTA_SIGNING_KEY: ${{ secrets.OTA_SIGNING_KEY }}
 
   ios:
     # Unsigned IPA: sign it on your side with your sideloading tool (ADR 0001).
-    needs: version
+    needs: [version, checks]
     if: needs.version.outputs.ota_base == '' && needs.version.outputs.skip_ipa != 'true'
     runs-on: macos-26
     timeout-minutes: 60
@@ -220,6 +249,11 @@ jobs:
           restore-keys: |
             ios-build-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}-
             ios-build-xcode26.6-
+      - name: Resolve PR server origin
+        env:
+          PREVIEW_PR: ${{ github.event.pull_request.number || inputs.pr }}
+          CREW_PREVIEW_URL_TEMPLATE: ${{ vars.CREW_PREVIEW_URL_TEMPLATE }}
+        run: node tools/ci/resolve-preview-origin.mjs
       - name: Generate the native project
         working-directory: apps/mobile
         env:
@@ -270,6 +304,8 @@ jobs:
           # An empty shell of an app must never be packed and released again.
           test -f "$APP/Info.plist" && test -f "$APP/main.jsbundle" || { echo "::error::The built app is incomplete"; exit 1; }
           python3 ../../../tools/ci/check-ios-app.py "$APP" "$CREW_IOS_TARGET" "$CREW_RELEASE_CHANNEL" > "../../../ios-build-info-$CREW_IOS_TARGET.json"
+          node ../../../tools/ci/native-build-inventory.mjs . > "$RUNNER_TEMP/native-inventory.json"
+          python3 -c 'import json,sys; p=sys.argv[1]; d=json.load(open(p)); d["nativeInventory"]=json.load(open(sys.argv[2])); open(p,"w").write(json.dumps(d,indent=2))' "../../../ios-build-info-$CREW_IOS_TARGET.json" "$RUNNER_TEMP/native-inventory.json"
           mkdir -p Payload
           cp -R "$APP" Payload/
           zip -qry "../../../$IPA_FILE" Payload
@@ -541,7 +577,7 @@ jobs:
   # The check the main ruleset requires (with `checks`). The ios jobs only report when an IPA is
   # built, so an OTA or checks-only change could never merge if they were required. This gate is
   # green only when the change shipped the way the route decided: a new IPA built and launched,
-  # an OTA update published, or checks only. Dependency updates always take the IPA route.
+  # an OTA update published, or checks only.
   build-gate:
     if: always()
     needs: [checks, version, ota, ios, ios-launch]
