@@ -7,8 +7,15 @@ RUN corepack enable
 #    dependencies change and never for a code change. The pnpm store is a BuildKit cache shared by every
 #    build on the host (API, web and each PR preview): a package one build downloaded is not fetched again.
 COPY pnpm-lock.yaml pnpm-workspace.yaml .npmrc package.json ./
-RUN --mount=type=bind,source=.,target=/ctx \
-    cd /ctx && find packages apps -maxdepth 3 -name package.json -not -path '*/node_modules/*' | tar -cf - -T - | tar -xf - -C /app
+COPY packages/bac/package.json ./packages/bac/
+COPY packages/design-tokens/package.json ./packages/design-tokens/
+COPY packages/fuzzy/package.json ./packages/fuzzy/
+COPY packages/games/package.json ./packages/games/
+COPY packages/mls/package.json ./packages/mls/
+COPY packages/money/package.json ./packages/money/
+COPY packages/territory/package.json ./packages/territory/
+COPY packages/units/package.json ./packages/units/
+COPY apps/server/package.json ./apps/server/
 RUN --mount=type=cache,id=crew-pnpm-store,target=/pnpm-store \
     pnpm fetch --store-dir /pnpm-store --config.strict-dep-builds=false
 # The workspace lists the mobile app too: only the server and its packages are installed.
