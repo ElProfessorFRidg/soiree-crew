@@ -37,7 +37,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: crew-ota-${{ inputs.release }}
+  group: crew-ota-${{ inputs.release }}-${{ inputs.target }}
   cancel-in-progress: false
 
 jobs:
@@ -132,7 +132,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: ${{ inputs.rollback != true }}
         with:
-          name: ota-receipt-${{ matrix.target }}
+          name: ota-receipt-${{ inputs.release }}-${{ matrix.target }}
           path: ota-receipt.json
           if-no-files-found: error
       - name: Publish changelog entry

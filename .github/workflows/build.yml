@@ -49,6 +49,7 @@ jobs:
     outputs:
       version: ${{ steps.next.outputs.version }}
       ota_base: ${{ steps.route.outputs.release }}
+      ota_matrix: ${{ steps.route.outputs.matrix }}
       skip_ipa: ${{ steps.route.outputs.skip_ipa }}
       route: ${{ steps.route.outputs.route }}
     steps:
@@ -74,6 +75,7 @@ jobs:
           CREW_OTA_URL: ${{ vars.CREW_OTA_URL }}
           CREW_SERVER_URL: ${{ github.event_name == 'pull_request' && vars.CREW_PREVIEW_SERVER_URL || vars.CREW_SERVER_URL }}
           CREW_PUBLIC_SERVERS: ${{ vars.CREW_PUBLIC_SERVERS }}
+          OTA_HISTORY_LIMIT: ${{ vars.CREW_OTA_HISTORY_LIMIT || '5' }}
         # Every outcome records why (route + reason): the summary and the PR comment show it.
         run: |
           decide() {
@@ -110,26 +112,44 @@ jobs:
             decide ipa "New IPA: no $KIND with OTA updates to patch yet."
             exit 0
           fi
-          for TARGET in iphone ipad; do
-            INFO="ios-build-info-$TARGET.json"
-            if ! gh release download "$TAG" --pattern "$INFO" --dir "$RUNNER_TEMP" --clobber; then
-              echo "::error::Cannot download $INFO; retry rather than rebuild."
-              exit 1
-            fi
-            if WHY=$(node tools/ci/plan-ota.mjs "$TAG" "$TARGET" "$RUNNER_TEMP/$INFO" 2>&1 >/dev/null); then
-              :
-            else
-              STATUS=$?
-              if [[ "$STATUS" != 2 ]]; then
-                echo "::error::OTA planner failed: $WHY"
+          # The newest IPA must be compatible before selecting OTA. Older compatible
+          # builds are additional recipients, never a substitute for a new required IPA.
+          [[ "$OTA_HISTORY_LIMIT" =~ ^([1-9]|1[0-9]|20)$ ]] || { echo "::error::Invalid OTA history limit"; exit 1; }
+          ALL_CANDIDATES=1 node tools/ci/select-ota-base.mjs "$RELEASES" > "$RUNNER_TEMP/candidates"
+          MATRIX="$RUNNER_TEMP/ota-matrix.json"
+          echo '[]' > "$MATRIX"
+          COUNT=0
+          while IFS= read -r CANDIDATE; do
+            [[ -n "$CANDIDATE" ]] || continue
+            COUNT=$((COUNT+1))
+            if (( COUNT > OTA_HISTORY_LIMIT )); then break; fi
+            for TARGET in iphone ipad; do
+              INFO="ios-build-info-$TARGET.json"
+              if ! gh release download "$CANDIDATE" --pattern "$INFO" --dir "$RUNNER_TEMP" --clobber; then
+                echo "::error::Cannot download $INFO for $CANDIDATE; retry rather than rebuild."
                 exit 1
               fi
-              decide ipa "New IPA: incompatible runtime $TAG ($TARGET)." "$WHY"
-              exit 0
-            fi
-          done
+              if WHY=$(node tools/ci/plan-ota.mjs "$CANDIDATE" "$TARGET" "$RUNNER_TEMP/$INFO" 2>&1 >/dev/null); then
+                jq --arg release "$CANDIDATE" --arg target "$TARGET" '. + [{release:$release,target:$target}]' "$MATRIX" > "$MATRIX.next"
+                mv "$MATRIX.next" "$MATRIX"
+              else
+                STATUS=$?
+                if [[ "$STATUS" != 2 ]]; then
+                  echo "::error::OTA planner failed: $WHY"
+                  exit 1
+                fi
+                if [[ "$CANDIDATE" == "$TAG" ]]; then
+                  decide ipa "New IPA: incompatible newest runtime $TAG ($TARGET)." "$WHY"
+                  exit 0
+                fi
+                printf 'Excluded older runtime %s (%s): %s\n' "$CANDIDATE" "$TARGET" "$WHY"
+              fi
+            done
+          done < "$RUNNER_TEMP/candidates"
           printf 'release=%s\n' "$TAG" >> "$GITHUB_OUTPUT"
-          decide ota "OTA update on top of \`$TAG\` (iPhone and iPad)."
+          printf 'matrix=%s\n' "$(jq -c . "$MATRIX")" >> "$GITHUB_OUTPUT"
+          RANGE=$(node tools/ci/ota-compatibility.mjs "$MATRIX")
+          decide ota "OTA: verified compatible runtimes for $TAG and eligible older IPAs." "$RANGE"
       - name: Reserve the native version
         id: next
         if: steps.route.outputs.release == '' && steps.route.outputs.skip_ipa != 'true'
@@ -149,13 +169,17 @@ jobs:
   ota:
     needs: [checks, version]
     if: needs.version.outputs.ota_base != ''
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.version.outputs.ota_matrix || '[]') }}
     uses: ./.github/workflows/ota.yml
     permissions:
       contents: write
       actions: read
     with:
-      release: ${{ needs.version.outputs.ota_base }}
-      target: both
+      release: ${{ matrix.release }}
+      target: ${{ matrix.target }}
     secrets:
       OTA_PUBLISH_TOKEN: ${{ secrets.OTA_PUBLISH_TOKEN }}
       OTA_SIGNING_KEY: ${{ secrets.OTA_SIGNING_KEY }}

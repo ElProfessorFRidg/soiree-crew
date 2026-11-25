@@ -18,7 +18,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RUN: ${{ github.event.workflow_run.id }}
         run: |
-          targets=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN/artifacts?per_page=100" --jq '[.artifacts[] | select(.expired == false) | .name | select(. == "ota-receipt-iphone" or . == "ota-receipt-ipad") | sub("^ota-receipt-"; "")] | unique | @json')
+          targets=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN/artifacts?per_page=100" --jq '[.artifacts[] | select(.expired == false) | .name | select(test("^ota-receipt-v[0-9]+\\.[0-9]+\\.[0-9]+(-preview\\.[0-9]+)?\\+build\\.[0-9]+-(iphone|ipad)$")) | {artifact:.,target:(split("-")|last)}] | unique | @json')
           echo "targets=$targets" >> "$GITHUB_OUTPUT"
   smoke:
     needs: discover
@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: ${{ fromJSON(needs.discover.outputs.targets) }}
+        include: ${{ fromJSON(needs.discover.outputs.targets) }}
     env:
       TARGET: ${{ matrix.target }}
     steps:
@@ -41,7 +41,7 @@ jobs:
           xcode-version: "26.6"
       - uses: actions/download-artifact@v8
         with:
-          name: ota-receipt-${{ matrix.target }}
+          name: ${{ matrix.artifact }}
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
           path: receipt
@@ -124,6 +124,6 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: ota-smoke-${{ matrix.target }}
+          name: smoke-${{ matrix.artifact }}
           path: smoke
           if-no-files-found: ignore

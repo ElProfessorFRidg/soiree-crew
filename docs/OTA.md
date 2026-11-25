@@ -83,3 +83,6 @@ Dependency routing compares the resolved pnpm mobile graph (including workspace 
 
 ### Independent OTA smoke tests
 The OTA publisher records an update receipt. A separate workflow_run check on the default branch downloads the exact compatible IPA, verifies its embedded stream/runtime, launches it in the simulator, restarts after download and checks the app's persisted seenOtaUpdateId. It is intentionally not part of build-gate. Superseded updates are explicitly reported as not tested. It requires a real published update and is not a physical-device test.
+
+### Compatible IPA history
+Automatic OTA checks the newest IPA first, then up to CREW_OTA_HISTORY_LIMIT recent releases (default 5, max 20). Each target is checked against its exact release tag and configuration. Only verified targets receive signed manifests. Min/max are descriptive; the exact allowlist is authoritative and may contain gaps. Preview history stays within the same PR.
