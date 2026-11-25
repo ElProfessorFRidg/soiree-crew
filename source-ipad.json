@@ -796,52 +796,52 @@
       "category": "lifestyle",
       "screenshots": [
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/01-party.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/01-party.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/08-add-drink.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/08-add-drink.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/09-curve.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/09-curve.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/03-games.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/03-games.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/07-my-stats.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/07-my-stats.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/12-history.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/12-history.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/11-leaderboard.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/11-leaderboard.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/04-bars.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/04-bars.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/05-me.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/05-me.png",
           "width": 2064,
           "height": 2752
         },
         {
-          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/10-limits.png",
+          "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/10-limits.png",
           "width": 2064,
           "height": 2752
         }
@@ -857,6 +857,68 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.54",
+          "buildVersion": "369",
+          "marketingVersion": "0.2.54 Preview (369)",
+          "date": "2026-11-25T16:21:44Z",
+          "localizedDescription": "• Revert \"Build new IPAs for drink catalogue and discovery changes\"\n• Use compact on-demand records and curated bounded search\n• Exclude non-beverages and reject invalid imported strengths\n• Build new IPAs for drink catalogue and discovery changes\n• Build new IPAs for drink catalogue and discovery changes\n• Search drink typos dynamically and add crew drink trends\n• Import branded drinks across all catalogue families\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.54-preview.42%2Bbuild.369/soiree-crew-ipad-unsigned.ipa",
+          "size": 28218170,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/01-party.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/08-add-drink.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/09-curve.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/03-games.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/07-my-stats.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/12-history.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/11-leaderboard.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/04-bars.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/05-me.png",
+              "width": 2064,
+              "height": 2752
+            },
+            {
+              "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/10-limits.png",
+              "width": 2064,
+              "height": 2752
+            }
+          ]
+        },
         {
           "version": "0.2.53",
           "buildVersion": "367",
@@ -4268,26 +4330,37 @@
           ]
         }
       ],
-      "version": "0.2.53",
-      "versionDate": "2026-11-25T15:40:21Z",
-      "versionDescription": "• Verify release asset digests and require successful native publication\n• Document the preview readiness contract\n• Require the full deployed preview revision\n• Verify preview revision against readiness response\n• Report the deployed commit on the readiness route\n• Reject incomplete IPA releases and ambiguous runtimes with verified tests\n• Use a newer publication sequence for rollback\n• Exercise native import routing against Git history\n• Route newly required native imports to IPA\n• Compare native imports with the IPA baseline\n• Durable cross-process publication transactions with verified HTTP regression tests\n• Resolve consistent per-PR preview API origin for IPA and OTA\n• Capture generated native project and capability inventory per IPA\n• Serialize stream writes and deduplicate identical manifests\n• Verify configured Coolify preview readiness and OTA signing key\n• Distribute OTA to individually verified historical IPA runtimes\n• Add independent OTA-on-IPA simulator smoke checks and routing regression tests\n• Resolve mobile dependency graph and isolate preview runtime routing\n• Centralize OTA impact routing and avoid unnecessary native builds\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.53-preview.43%2Bbuild.367/soiree-crew-ipad-unsigned.ipa",
-      "size": 25946609,
+      "version": "0.2.54",
+      "versionDate": "2026-11-25T16:21:44Z",
+      "versionDescription": "• Revert \"Build new IPAs for drink catalogue and discovery changes\"\n• Use compact on-demand records and curated bounded search\n• Exclude non-beverages and reject invalid imported strengths\n• Build new IPAs for drink catalogue and discovery changes\n• Build new IPAs for drink catalogue and discovery changes\n• Search drink typos dynamically and add crew drink trends\n• Import branded drinks across all catalogue families\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.54-preview.42%2Bbuild.369/soiree-crew-ipad-unsigned.ipa",
+      "size": 28218170,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.53-preview.43%2Bbuild.367/ipad/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "preview-0.2.54-369",
+      "title": "Soirée Crew Preview 0.2.54 (369)",
+      "caption": "• Revert \"Build new IPAs for drink catalogue and discovery changes\"\n• Use compact on-demand records and curated bounded search\n• Exclude non-beverages and reject invalid imported strengths\n• Build new IPAs for drink catalogue and discovery changes\n• Build new IPAs for drink catalogue and discovery changes\n• Search drink typos dynamically and add crew drink trends\n• Import branded drinks across all catalogue families\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+      "date": "2026-11-25T16:21:44Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.54-preview.42%2Bbuild.369/ipad/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.54-preview.42%2Bbuild.369/soiree-crew-ipad-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
     {
       "identifier": "preview-0.2.53-367",
       "title": "Soirée Crew Preview 0.2.53 (367)",
@@ -4488,17 +4561,6 @@
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.32-preview.37%2Bbuild.332/soiree-crew-ipad-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
       "notify": false
-    },
-    {
-      "identifier": "release-0.2.31-329",
-      "title": "Soirée Crew 0.2.31 (329)",
-      "caption": "• TypeScript 7, with the fixes it needs (#17)\n• Expand the catalogue and add a build-time name index (#29)\n• Bump @react-native-async-storage/async-storage (#16)\n• Bump vitest from 3.2.7 to 4.1.11 (#31)\n• Bump the other-minors group across 1 directory with 8 updates (#34)\n• Bump dependabot/fetch-metadata from 2 to 3 (#30)",
-      "date": "2026-11-23T22:26:56Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.31%2Bbuild.329/ipad/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.31%2Bbuild.329/soiree-crew-ipad-unsigned.ipa",
-      "appID": "app.soireecrew.mobile",
-      "notify": false
     }
   ],
   "otaChangelog": [
@@ -4629,6 +4691,13 @@
       "buildVersion": "117",
       "date": "2026-11-16T06:34:05Z",
       "localizedDescription": "• Keep AltStore history optional and explain API compatibility changes\n• Publish separate public and Preview apps in AltStore, retain downloadable history and refine screen spacing\n• Keep compact dashboard sections in normal flow and bound the drink form on iPad\n• Build a native iPad interface with adaptive navigation, dashboard, map panes and game grids\n• Keep server configuration available while bundling native apps\n• Reserve a separate network budget for signed photo galleries\n• Add guest public browsing, bounded caches, shared-network quotas and iPad IPA checks\n• Fix stale map responses, removed crew selection and web screen remounts\n• Improve the bars map and social venue discovery\n• Bars map: my position dot and locate button; tapped bar shows ranking, my nights and photos\n• Button: no vertical padding, all buttons keep the same height; short labels fit on one line\n• Revert Button vertical padding: all buttons keep the same height, short labels fit on one line\n• Button: vertical padding so a two-line label is not tight against the border\n• Shorter label for withdrawing the health consent so it stays on one line\n• No-account dot: pink instead of cyan, which the anti-slop lint (D-09) refuses\n• Moi tab: a cyan dot while there is no account\n• Every screen needs the arrival flow first: direct URLs redirect to onboarding\n• Moi: guests get a row to create or open an account\n• Web: screen blocks rise in once, then drop their animated style\n• Web: no rise-in animation on screen blocks, it left blank holes after scrolling\n• Guests can create or open an account; sign-out asks to confirm and needs a password\n• Fix onboarding progress row overlapping the step title\n• Let guests into the app after onboarding: age is optional\n• Preview deployment"
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.54",
+      "buildVersion": "369",
+      "date": "2026-11-25T16:21:44Z",
+      "localizedDescription": "• Revert \"Build new IPAs for drink catalogue and discovery changes\"\n• Use compact on-demand records and curated bounded search\n• Exclude non-beverages and reject invalid imported strengths\n• Build new IPAs for drink catalogue and discovery changes\n• Build new IPAs for drink catalogue and discovery changes\n• Search drink typos dynamically and add crew drink trends\n• Import branded drinks across all catalogue families\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
