@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
 import { radius } from "@crew/design-tokens";
 import { formatMoney } from "@crew/money";
+import { VenueDrinkTrends } from "@/drinks/DrinkTrends";
 import { Field } from "@/crew/Field";
 import { useT } from "@/i18n";
 import { formatClock } from "@/i18n/format";
@@ -273,6 +274,8 @@ export default function VenueScreen() {
           ))}
         </View>
       ) : null}
+
+      {page.venue.kind === "bar" || page.venue.kind === "club" ? <VenueDrinkTrends key={page.venue.id} venueId={page.venue.id} /> : null}
 
       {page.latestNights.length ? (
         <View>

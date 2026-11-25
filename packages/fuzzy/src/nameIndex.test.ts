@@ -70,4 +70,13 @@ describe("drink name index", () => {
       { drink: { id: "olcc-99901306837", abv: 0.045, volumeMl: 355 }, guess: false },
     ]);
   });
+  it.each([
+    ["folnoari italia", "openfoodfacts-8000160633997"],
+    ["folonari itlaia", "openfoodfacts-8000160633997"],
+    ["ucky one lemonade peach", "olcc-99901306837"],
+    ["luckyx one lemonade peach", "olcc-99901306837"],
+    ["starbucks caffe lat", "trackcaffeine-starbucks-caff-latte-grande"],
+  ])("finds an imported drink when searching for %s", (query, id) => {
+    expect(catalogueSearchCandidates(query).map(drink => drink.id)).toContain(id);
+  });
 });
