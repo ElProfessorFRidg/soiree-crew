@@ -24,8 +24,7 @@ describe("drink name index", () => {
     ]);
   });
 
-  it("keeps at least 5,000 drinks and indexes the new sources for search and logging", () => {
-    expect(DRINK_CATALOGUE.length).toBeGreaterThanOrEqual(5_000);
+  it("indexes the original cocktail and soft drink imports", () => {
     expect(catalogueSearchCandidates("starbucks caffè lat").map(drink => drink.id))
       .toContain("trackcaffeine-starbucks-caff-latte-grande");
     expect(parseDrinkOrder("un Irish Maid", [])).toMatchObject([
@@ -33,6 +32,18 @@ describe("drink name index", () => {
     ]);
     expect(parseDrinkOrder("25 cl d’Afri Cola", [])).toMatchObject([
       { drink: { id: "openfoodfacts-4009228250477", abv: 0 }, volumeMl: 250 },
+    ]);
+  });
+  it("indexes at least 10,000 drinks across all families and keeps source strengths", () => {
+    expect(DRINK_CATALOGUE.length).toBeGreaterThanOrEqual(10_000);
+    expect(new Set(DRINK_CATALOGUE.map(drink => drink.group)).size).toBe(6);
+    expect(catalogueSearchCandidates("folonari italia").map(drink => drink.id))
+      .toContain("openfoodfacts-8000160633997");
+    expect(parseDrinkOrder("15 cl Folonari Italia Garganega Pinot Grigio", [])).toMatchObject([
+      { drink: { id: "openfoodfacts-8000160633997", abv: 0.12 }, volumeMl: 150, guess: false },
+    ]);
+    expect(parseDrinkOrder("Lucky One Lemonade Peach", [])).toMatchObject([
+      { drink: { id: "olcc-99901306837", abv: 0.045, volumeMl: 355 }, guess: false },
     ]);
   });
 });

@@ -10,6 +10,8 @@ import { MIXES_AND_SHOTS } from "./mixes";
 import barAssistantRows from "./data/bar-assistant.json";
 import trackCaffeineRows from "./data/trackcaffeine-drinks.json";
 import openFoodFactsRows from "./data/openfoodfacts-drinks.json";
+import openFoodFactsProducts from "./data/openfoodfacts-products.json";
+import olccRows from "./data/olcc-drinks.json";
 import openBeerRows from "./data/openbeerdb.json";
 
 export type DrinkGroup = "beer" | "wine" | "spirit" | "cocktail" | "cider" | "soft";
@@ -262,7 +264,41 @@ export const TRACK_CAFFEINE_CATALOGUE = importedSoftDrinks(
   "trackcaffeine", trackCaffeineRows as unknown as readonly SoftDrinkRow[],
 );
 
-const importedCatalogue = [...OPEN_BEER_CATALOGUE, ...BAR_ASSISTANT_CATALOGUE, ...OPEN_FOOD_FACTS_CATALOGUE, ...TRACK_CAFFEINE_CATALOGUE];
+type ProductRow = readonly [code: string, name: string, volumeMl: number, abv: number, group: DrinkGroup];
+
+const productGlass: Readonly<Record<DrinkGroup, GlassName>> = {
+  beer: "bottle",
+  wine: "wine",
+  spirit: "shot",
+  cocktail: "cocktail",
+  cider: "cider",
+  soft: "soft",
+};
+
+function importedProducts(source: string, rows: readonly ProductRow[]): CatalogueDrink[] {
+  return rows.map(([code, brand, volumeMl, abv, group]) => ({
+    id: `${source}-${code}`,
+    brand,
+    group,
+    volumeMl,
+    abv: abv / 100,
+    glass: productGlass[group],
+    aliases: [],
+  }));
+}
+
+export const OPEN_FOOD_FACTS_PRODUCTS = importedProducts(
+  "openfoodfacts", openFoodFactsProducts as unknown as readonly ProductRow[],
+);
+
+export const OLCC_CATALOGUE = importedProducts(
+  "olcc", olccRows as unknown as readonly ProductRow[],
+);
+
+const importedCatalogue = [
+  ...OPEN_BEER_CATALOGUE, ...BAR_ASSISTANT_CATALOGUE, ...OPEN_FOOD_FACTS_CATALOGUE,
+  ...TRACK_CAFFEINE_CATALOGUE, ...OPEN_FOOD_FACTS_PRODUCTS, ...OLCC_CATALOGUE,
+];
 const importedIds = new Set(importedCatalogue.map(drink => drink.id));
 
 export function isImportedDrink(id: string): boolean {

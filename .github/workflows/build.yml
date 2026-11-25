@@ -92,6 +92,14 @@ jobs:
               decide checks 'No mobile changes: checks only.'
               exit 0
             fi
+            # Ship catalogue snapshots and drink discovery changes in the embedded iOS bundle.
+            if ! git diff --quiet --no-renames "$CHANGE_BASE" HEAD -- \
+              ':(glob)packages/fuzzy/src/data/*.json' \
+              packages/fuzzy/src/catalogueSearch.ts \
+              apps/mobile/src/drinks/DrinkTrends.tsx; then
+              decide ipa 'New IPA: the drink catalogue, search, or trends changed.'
+              exit 0
+            fi
           fi
           if [[ "$OTA_ALLOWED" != true ]]; then decide ipa 'New IPA: OTA updates are off for pull requests from forks.'; exit 0; fi
           if [[ "$OTA_AUTHORIZED" != true || -z "$CREW_OTA_URL" ]]; then
