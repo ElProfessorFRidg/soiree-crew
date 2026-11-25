@@ -2,18 +2,25 @@
 FROM node:22-alpine
 WORKDIR /app
 RUN corepack enable
-# Packages come first and only depend on the lockfile: this layer survives every change to the code. The
-# store itself is a BuildKit cache shared by every build on the host (API, web and each PR preview), so a
-# package one of them downloaded is never fetched again.
-COPY pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-RUN --mount=type=cache,id=crew-pnpm-store,target=/pnpm-store pnpm fetch --store-dir /pnpm-store --config.strict-dep-builds=false
-COPY package.json ./
+
+# 1. Packages. Only the lockfile and the package.json files go in, so these layers are rebuilt when the
+#    dependencies change and never for a code change. The pnpm store is a BuildKit cache shared by every
+#    build on the host (API, web and each PR preview): a package one build downloaded is not fetched again.
+COPY pnpm-lock.yaml pnpm-workspace.yaml .npmrc package.json ./
+RUN --mount=type=bind,source=.,target=/ctx \
+    cd /ctx && find packages apps -maxdepth 3 -name package.json -not -path '*/node_modules/*' | tar -cf - -T - | tar -xf - -C /app
+RUN --mount=type=cache,id=crew-pnpm-store,target=/pnpm-store \
+    pnpm fetch --store-dir /pnpm-store --config.strict-dep-builds=false
+# The workspace lists the mobile app too: only the server and its packages are installed.
+RUN --mount=type=cache,id=crew-pnpm-store,target=/pnpm-store \
+    CI=true pnpm install --prefer-offline --frozen-lockfile --store-dir /pnpm-store --filter @crew/server... --prod=false
+
+# 2. Code.
 COPY packages ./packages
 COPY apps/server ./apps/server
 # Push text comes from the app's catalogues (O-38): the server writes no copy of its own.
 COPY apps/mobile/src/i18n ./apps/mobile/src/i18n
-# The workspace lists the mobile app too: only the server and its packages are installed.
-RUN --mount=type=cache,id=crew-pnpm-store,target=/pnpm-store CI=true pnpm install --prefer-offline --frozen-lockfile --store-dir /pnpm-store --filter @crew/server... --prod=false
+
 # Photos, chat files and backups live on a volume mounted at /data, writable by the app user.
 RUN mkdir -p /data/uploads && chown -R node:node /data /app/apps/server
 ENV NODE_ENV=production PORT=8787 UPLOAD_DIR=/data/uploads
