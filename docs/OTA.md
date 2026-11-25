@@ -86,3 +86,6 @@ The OTA publisher records an update receipt. A separate workflow_run check on th
 
 ### Compatible IPA history
 Automatic OTA checks the newest IPA first, then up to CREW_OTA_HISTORY_LIMIT recent releases (default 5, max 20). Each target is checked against its exact release tag and configuration. Only verified targets receive signed manifests. Min/max are descriptive; the exact allowlist is authoritative and may contain gaps. Preview history stays within the same PR.
+
+### Coolify preview readiness
+Optional repository variable `CREW_PREVIEW_URL_TEMPLATE` (e.g. `https://pr-{pr}.preview.example.com`) enables a fail-closed readiness check before automatic preview OTA publication. The preview must report `ok: true` on `/v1/ready` and the exact PR head SHA as `sourceCommit` on `/v1/info`. Configure the actual Coolify preview domain and SOURCE_COMMIT injection before enabling. This check does not create, restart, or keep alive a Coolify deployment. Without configuration, CI explicitly reports that preview availability was not verified.

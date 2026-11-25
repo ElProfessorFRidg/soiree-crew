@@ -82,6 +82,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - if: ${{ !inputs.automatic }}
         run: pnpm check
+      - name: Verify Coolify preview readiness (when configured)
+        if: ${{ contains(inputs.release, '-preview.') && inputs.automatic }}
+        env:
+          CREW_PREVIEW_URL_TEMPLATE: ${{ vars.CREW_PREVIEW_URL_TEMPLATE }}
+          PREVIEW_PR: ${{ github.event.pull_request.number }}
+          PREVIEW_SHA: ${{ github.event.pull_request.head.sha }}
+        run: node tools/ci/preview-gate.mjs
       - name: Reject superseded automatic publication
         if: ${{ inputs.automatic && github.event_name != 'workflow_dispatch' }}
         env:
@@ -114,6 +121,13 @@ jobs:
                 c.updates?.requestHeaders?.["expo-channel-name"] !== process.env.OTA_STREAM) {
               throw new Error("The update config does not match the selected IPA");
             }
+          '
+          node --input-type=module -e '
+            import {createSign,createVerify} from "node:crypto";
+            import {readFileSync} from "node:fs";
+            const c="crew-ota-signing-key-check";
+            const s=createSign("RSA-SHA256").update(c).sign(process.env.OTA_SIGNING_KEY);
+            if(!createVerify("RSA-SHA256").update(c).verify(readFileSync("certs/ota-certificate.pem"),s)) throw new Error("Signing key does not match embedded certificate");
           '
           # Self-hosted update server (docs/OTA.md): export here, sign here, upload the result.
           rm -rf dist

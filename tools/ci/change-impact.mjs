@@ -6,7 +6,7 @@ export function classify(path) {
   if (/^apps\/mobile\/(?:native|modules|plugins|certs)\//.test(path) && !/\.md$/i.test(path)) return "ipa";
   if (/\.md$/i.test(path) || /^(docs|research|apps\/server|deploy)\//.test(path) ||
       /^\.github\/(?!actions\/|workflows\/(?:build|ota)\.yml$)/.test(path) ||
-      /^tools\/ci\/(?:plan-ota|select-ota-base|report-route|change-impact|publish-ota)(?:\.test)?\.mjs$/.test(path) ||
+      /^tools\/ci\/(?:plan-ota|select-ota-base|report-route|change-impact|publish-ota|ota-compatibility|preview-gate)(?:\.test)?\.mjs$/.test(path) ||
       /(?:^|\/)(?:__tests__|tests)\//.test(path) || /\.(?:test|spec)\.[cm]?[jt]sx?$/.test(path) ||
       /^apps\/mobile\/store\/release-notes\.json$/.test(path)) return "checks";
   if (/^(?:apps\/mobile|packages\/(?:bac|design-tokens|fuzzy|games|mls|money|territory|units))\/src\/.+\.(?:[jt]sx?|json|png|jpe?g|webp|svg|gif|avif|ttf|otf|mp3|wav|m4a|aac|ogg)$/i.test(path)) return "ota";
