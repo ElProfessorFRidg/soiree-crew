@@ -2,13 +2,18 @@
 FROM node:22-alpine
 WORKDIR /app
 RUN corepack enable
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json .npmrc ./
+# Packages come first and only depend on the lockfile: this layer survives every change to the code. The
+# store itself is a BuildKit cache shared by every build on the host (API, web and each PR preview), so a
+# package one of them downloaded is never fetched again.
+COPY pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+RUN --mount=type=cache,id=crew-pnpm-store,target=/pnpm-store pnpm fetch --store-dir /pnpm-store
+COPY package.json ./
 COPY packages ./packages
 COPY apps/server ./apps/server
 # Push text comes from the app's catalogues (O-38): the server writes no copy of its own.
 COPY apps/mobile/src/i18n ./apps/mobile/src/i18n
 # The workspace lists the mobile app too: only the server and its packages are installed.
-RUN pnpm install --frozen-lockfile --filter @crew/server... --prod=false
+RUN --mount=type=cache,id=crew-pnpm-store,target=/pnpm-store pnpm install --offline --frozen-lockfile --store-dir /pnpm-store --filter @crew/server... --prod=false
 # Photos, chat files and backups live on a volume mounted at /data, writable by the app user.
 RUN mkdir -p /data/uploads && chown -R node:node /data /app/apps/server
 ENV NODE_ENV=production PORT=8787 UPLOAD_DIR=/data/uploads
