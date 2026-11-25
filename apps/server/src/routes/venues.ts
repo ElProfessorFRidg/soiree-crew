@@ -1,5 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
+import { catalogueDrink } from "@crew/fuzzy/src/catalogue";
+import { currentDrinkRecommendation, drinkTrends } from "../drinkTrends";
 import { challengers, seasonBounds, territoryTitles } from "@crew/territory";
 import { AC_CONFIG, distanceMeters, evaluateCheckIn, fixHash } from "../anticheat";
 import { assertCrewMember, HttpError, requireUser, type Context } from "../context";
@@ -93,6 +95,42 @@ async function notifyCrew(ctx: Context, crewId: string): Promise<void> {
 export function venueRoutes(app: FastifyInstance, ctx: Context, secret: string): void {
   // AC-08: a real night is a handful of check-ins; a script sending hundreds is stopped here.
   const checkIns = new RateLimiter(30, 60 * 60_000, ctx.now);
+  app.get<{ Params: { id: string } }>("/v1/crews/:id/drink-trends", async (request) => {
+    const user = requireUser(request);
+    await assertCrewMember(ctx, request.params.id, user.id);
+    return { trends: await drinkTrends(ctx, request.params.id, null) };
+  });
+
+  app.get<{ Params: { id: string } }>("/v1/venues/:id/drink-trends", async (request) => {
+    const user = requireUser(request);
+    const venue = await venueForMember(ctx, request.params.id, user.id);
+    if (venue.kind !== "bar" && venue.kind !== "club") throw new HttpError(404, "not_found");
+    const [trends, crewTrends, mine] = await Promise.all([
+      drinkTrends(ctx, venue.crew_id, venue.id),
+      drinkTrends(ctx, venue.crew_id, null),
+      currentDrinkRecommendation(ctx, venue.id, user.id),
+    ]);
+    return { trends, crewTrends, myDrinkId: mine[0]?.drink_id ?? null };
+  });
+
+  app.put<{ Params: { id: string } }>("/v1/venues/:id/drink-recommendation", async (request) => {
+    const user = requireUser(request);
+    const venue = await venueForMember(ctx, request.params.id, user.id);
+    if (venue.kind !== "bar" && venue.kind !== "club") throw new HttpError(404, "not_found");
+    const { drinkId } = z.object({ drinkId: z.string().max(128).nullable() }).parse(request.body);
+    if (drinkId === null) {
+      await ctx.db.query("delete from drink_recommendations where venue_id = $1 and user_id = $2", [venue.id, user.id]);
+    } else {
+      if (!catalogueDrink(drinkId)) throw new HttpError(404, "not_found");
+      await ctx.db.query(
+        `insert into drink_recommendations (venue_id, user_id, drink_id, updated_at) values ($1, $2, $3, $4)
+         on conflict (venue_id, user_id) do update set drink_id = excluded.drink_id, updated_at = excluded.updated_at`,
+        [venue.id, user.id, drinkId, ctx.now()],
+      );
+    }
+    return { ok: true };
+  });
+
   /** TER-06: venues ruled and titles, per member who plays the territory game. */
   app.get<{ Params: { id: string } }>("/v1/crews/:id/titles", async (request) => {
     const user = requireUser(request);

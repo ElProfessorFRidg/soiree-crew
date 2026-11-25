@@ -289,3 +289,33 @@ describe("house pint strength", () => {
     expect(cleared.housePint).toBeNull();
   });
 });
+
+describe("drink trends", () => {
+  it("counts recent recommendations per bar and distinct crew members without exposing voters", async () => {
+    const [jade, malik, other] = [await account("jade"), await account("malik"), await account("other")];
+    const crewId = await crewOf(jade, malik);
+    const zinc = await addVenue(jade, crewId, { name: "Le Zinc" });
+    const quai = await addVenue(jade, crewId, { name: "Le Quai", ...QUAI });
+    const id = "openbeerdb-1";
+    const set = (user: User, venue: string, drinkId: string | null) => app.inject({
+      method: "PUT", url: `/v1/venues/${venue}/drink-recommendation`, headers: user.auth, payload: { drinkId },
+    });
+    const read = (user: User, venue: string) => app.inject({
+      method: "GET", url: `/v1/venues/${venue}/drink-trends`, headers: user.auth,
+    });
+
+    expect((await set(other, zinc.id, id)).statusCode).toBe(404);
+    expect((await read(other, zinc.id)).statusCode).toBe(404);
+    expect((await set(jade, zinc.id, "unknown")).statusCode).toBe(404);
+    expect((await set(jade, zinc.id, id)).statusCode).toBe(200);
+    expect((await set(jade, quai.id, id)).statusCode).toBe(200);
+    expect((await set(malik, quai.id, id)).statusCode).toBe(200);
+    expect((await read(malik, zinc.id)).json()).toEqual({
+      trends: [{ drinkId: id, votes: 1 }], crewTrends: [{ drinkId: id, votes: 2 }], myDrinkId: null,
+    });
+    expect((await set(jade, zinc.id, null)).statusCode).toBe(200);
+    expect((await read(malik, zinc.id)).json().trends).toEqual([]);
+    clock += 31 * 24 * 60 * MIN;
+    expect((await read(malik, quai.id)).json()).toEqual({ trends: [], crewTrends: [], myDrinkId: null });
+  });
+});
