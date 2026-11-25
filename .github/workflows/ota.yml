@@ -37,7 +37,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: crew-ota-${{ inputs.release }}
+  group: crew-ota-${{ inputs.release }}-${{ inputs.target }}
   cancel-in-progress: false
 
 jobs:
@@ -68,6 +68,15 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+      - name: Install lockfile analyzer
+        run: python3 -m pip install --user --break-system-packages PyYAML==6.0.2
+      - name: Resolve PR server origin
+        env:
+          CREW_PREVIEW_URL_TEMPLATE: ${{ vars.CREW_PREVIEW_URL_TEMPLATE }}
+        run: |
+          if [[ "$RELEASE_TAG" =~ -preview\.([0-9]+)\+build\. ]]; then
+            PREVIEW_PR="${BASH_REMATCH[1]}" node tools/ci/resolve-preview-origin.mjs
+          fi
       - name: Verify target and compatible changes
         id: plan
         env:
@@ -76,11 +85,34 @@ jobs:
           [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-preview\.[0-9]+)?\+build\.[0-9]+$ ]]
           test -n "$CREW_OTA_URL"
           gh release download "$RELEASE_TAG" --pattern "ios-build-info-$CREW_IOS_TARGET.json" --dir "$RUNNER_TEMP"
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > "$RUNNER_TEMP/release.json"
+          node tools/ci/delivery-integrity.mjs assets "$RUNNER_TEMP/release.json" "$RELEASE_TAG" "$RUNNER_TEMP/ios-build-info-$CREW_IOS_TARGET.json"
           node tools/ci/plan-ota.mjs "$RELEASE_TAG" "$CREW_IOS_TARGET" "$RUNNER_TEMP/ios-build-info-$CREW_IOS_TARGET.json" >> "$GITHUB_OUTPUT"
       - run: pnpm install --frozen-lockfile
       - if: ${{ !inputs.automatic }}
         run: pnpm check
+      - name: Verify Coolify preview readiness (when configured)
+        if: ${{ contains(inputs.release, '-preview.') && inputs.automatic }}
+        env:
+          CREW_PREVIEW_URL_TEMPLATE: ${{ vars.CREW_PREVIEW_URL_TEMPLATE }}
+          PREVIEW_PR: ${{ github.event.pull_request.number }}
+          PREVIEW_SHA: ${{ github.event.pull_request.head.sha }}
+        run: node tools/ci/preview-gate.mjs
+      - name: Reject superseded automatic publication
+        if: ${{ inputs.automatic && github.event_name != 'workflow_dispatch' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [[ -n "$PR" ]]; then
+            test "$(gh pr view "$PR" --json headRefOid --jq .headRefOid)" = "$PR_HEAD"
+            [[ "$RELEASE_TAG" == *"-preview.$PR+build."* ]]
+          else
+            test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)" = "$GITHUB_SHA"
+          fi
       - name: Publish iOS update
+        id: publish_update
         working-directory: apps/mobile
         env:
           APP_VERSION: ${{ steps.plan.outputs.version }}
@@ -99,14 +131,35 @@ jobs:
               throw new Error("The update config does not match the selected IPA");
             }
           '
+          node --input-type=module -e '
+            import {createSign,createVerify} from "node:crypto";
+            import {readFileSync} from "node:fs";
+            const c="crew-ota-signing-key-check";
+            const s=createSign("RSA-SHA256").update(c).sign(process.env.OTA_SIGNING_KEY);
+            if(!createVerify("RSA-SHA256").update(c).verify(readFileSync("certs/ota-certificate.pem"),s)) throw new Error("Signing key does not match embedded certificate");
+          '
           # Self-hosted update server (docs/OTA.md): export here, sign here, upload the result.
           rm -rf dist
           pnpm exec expo export --platform ios --output-dir dist
           pnpm exec expo config --type public --json > dist/expoConfig.json
           OTA_DIST=dist node ../../tools/ci/publish-ota.mjs
 
-      - name: Publish changelog entry
+      - name: Record OTA receipt
         if: ${{ inputs.rollback != true }}
+        env:
+          UPDATE_ID: ${{ steps.publish_update.outputs.update_id }}
+          OTA_RUNTIME: ${{ steps.plan.outputs.runtime }}
+          OTA_STREAM: ${{ steps.plan.outputs.stream }}
+        run: |
+          jq -n --arg tag "$RELEASE_TAG" --arg target "$CREW_IOS_TARGET" --arg id "$UPDATE_ID" --arg runtime "$OTA_RUNTIME" --arg stream "$OTA_STREAM" '{tag:$tag,target:$target,id:$id,runtime:$runtime,stream:$stream}' > ota-receipt.json
+      - uses: actions/upload-artifact@v7
+        if: ${{ inputs.rollback != true }}
+        with:
+          name: ota-receipt-${{ inputs.release }}-${{ matrix.target }}
+          path: ota-receipt.json
+          if-no-files-found: error
+      - name: Publish changelog entry
+        if: ${{ inputs.rollback != true && steps.publish_update.outputs.deduplicated != 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -115,7 +168,7 @@ jobs:
           git log "refs/tags/${PREVIOUS:-$RELEASE_TAG}..HEAD" --no-merges --pretty=format:'- %s' -25 > "$NOTES"
           if [[ ! -s "$NOTES" ]]; then printf '%s\n' '- Correctif compatible avec cette version.' > "$NOTES"; fi
           NOTE_TAG="ota-${RELEASE_TAG}-${CREW_IOS_TARGET}-${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}"
-          gh release create "$NOTE_TAG" --target "$GITHUB_SHA" --prerelease --latest=false --title "Soirée Crew · Correctif OTA ($CREW_IOS_TARGET)" --notes-file "$NOTES"
+          gh release create "$NOTE_TAG" --target "$GITHUB_SHA" --prerelease --latest=false --title "Soirée Crew · ${CREW_RELEASE_CHANNEL} · OTA ${RELEASE_TAG} · ${CREW_IOS_TARGET}" --notes-file "$NOTES"
 
   altstore:
     needs: publish
