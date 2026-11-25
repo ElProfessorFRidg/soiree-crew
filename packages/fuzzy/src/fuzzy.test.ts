@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { adjacentKeys, countryRank, jaroWinkler, parseDrinkOrder, soundOf, DRINK_CATALOGUE, editDistance, matchScore, normalise, parseOrder, search, sizesFor, strengthFits } from "./index";
+import { adjacentKeys, countryRank, jaroWinkler, parseDrinkOrder, soundOf, getDrinkCatalogue, editDistance, matchScore, normalise, parseOrder, search, sizesFor, strengthFits } from "./index";
 
 // parseOrder is the brand-aware parser restricted to generic drinks; these cases predate the brands.
 
@@ -11,6 +11,8 @@ const drinks = [
   { value: "cocktail", names: ["Cocktail"] },
   { value: "spritz", names: ["Spritz maison"] },
 ];
+
+const DRINK_CATALOGUE = getDrinkCatalogue();
 
 describe("fuzzy input (ADP-05)", () => {
   it("ignores accents, case and punctuation", () => {
