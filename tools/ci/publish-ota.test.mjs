@@ -35,7 +35,7 @@ const parts = (text, contentType) => {
 const publish = (extra = {}) => spawnSync(process.execPath, ["tools/ci/publish-ota.mjs"], {
   encoding: "utf8",
   env: { ...process.env, CREW_OTA_URL: base, OTA_PUBLISH_TOKEN: token, OTA_SIGNING_KEY: keyPem, OTA_STREAM: "preview-iphone",
-    OTA_RUNTIME: "crew-preview-iphone-310", OTA_DIST: dist, GITHUB_SHA: "a".repeat(40), GITHUB_OUTPUT: "", ...extra },
+    OTA_RUNTIME: "crew-preview-iphone-310", OTA_DIST: dist, GITHUB_SHA: "a".repeat(40), GITHUB_OUTPUT: "", GITHUB_RUN_ID: "100", GITHUB_RUN_ATTEMPT: "1", ...extra },
 });
 
 beforeAll(async () => {
@@ -108,7 +108,9 @@ it("rejects a tampered upload and can roll back to the embedded bundle", async (
     body: JSON.stringify({ files: [{ hex, data: Buffer.from("fake").toString("base64") }] }),
   });
   expect(batch.status).toBe(422);
-  expect(publish({ OTA_ROLLBACK: "true" }).status).toBe(0);
+  const rollback = publish({ OTA_ROLLBACK: "true", GITHUB_RUN_ID: "101" });
+  expect(rollback.stderr).toBe("");
+  expect(rollback.status).toBe(0);
   const res = await fetch(`${base}/manifest`, { headers: { ...headers, accept: "multipart/mixed" } });
   const { directive } = parts(await res.text(), res.headers.get("content-type"));
   expect(JSON.parse(directive.body).type).toBe("rollBackToEmbedded");

@@ -39,7 +39,7 @@ it.each([
 });
 
 it("lets CI and server deployment changes ride along with an OTA update", () => {
-  expect(() => planUpdate({ ...preview, paths: [".github/workflows/build.yml", "tools/ci/report-route.mjs", "deploy/ota/server.mjs", "apps/mobile/src/i18n/fr.ts"] })).not.toThrow();
+  expect(() => planUpdate({ ...preview, paths: [".github/workflows/altstore.yml", "tools/ci/report-route.mjs", "deploy/ota/server.mjs", "apps/mobile/src/i18n/fr.ts"] })).not.toThrow();
 });
 
 it("rejects another device, build, channel, update server or server configuration", () => {

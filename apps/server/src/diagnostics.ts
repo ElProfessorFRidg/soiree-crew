@@ -70,7 +70,11 @@ export function diagnosticRoutes(app: FastifyInstance, ctx: Context, routes: Map
   app.get("/v1/ready", async (_request, reply) => {
     const result = await monitor.check();
     if (result.state !== "ready") reply.status(503).header("retry-after", "5").header("x-crew-diagnostic-code", result.code);
-    return { ok: result.state === "ready" };
+    const revision = ctx.serverRevision;
+    const sourceCommit = ctx.serverInfo?.public === false && revision && /^[a-f0-9]{40}$/i.test(revision)
+      ? revision.toLowerCase() : undefined;
+    if (sourceCommit) reply.header("cache-control", "no-store");
+    return { ok: result.state === "ready", ...(sourceCommit ? { sourceCommit } : {}) };
   });
 
   app.get("/v1/operator/diagnostics", async (request) => {
