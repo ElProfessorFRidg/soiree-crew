@@ -89,3 +89,6 @@ Automatic OTA checks the newest IPA first, then up to CREW_OTA_HISTORY_LIMIT rec
 
 ### Coolify preview readiness
 Optional repository variable `CREW_PREVIEW_URL_TEMPLATE` (e.g. `https://pr-{pr}.preview.example.com`) enables a fail-closed readiness check before automatic preview OTA publication. The preview must report `ok: true` on `/v1/ready` and the exact PR head SHA as `sourceCommit` on `/v1/info`. Configure the actual Coolify preview domain and SOURCE_COMMIT injection before enabling. This check does not create, restart, or keep alive a Coolify deployment. Without configuration, CI explicitly reports that preview availability was not verified.
+
+### Publication serialization
+Deploy the complete deploy/ota directory (server.mjs and publication.mjs) together. A single OTA server process serializes stream writes and rejects older numbered CI publications. Identical manifest content reuses the current ID without a new changelog. This is not a distributed lock; run only one writer replica. Deploy server before relying on the new behavior.

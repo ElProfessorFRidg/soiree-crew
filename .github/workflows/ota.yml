@@ -150,7 +150,7 @@ jobs:
           path: ota-receipt.json
           if-no-files-found: error
       - name: Publish changelog entry
-        if: ${{ inputs.rollback != true }}
+        if: ${{ inputs.rollback != true && steps.publish_update.outputs.deduplicated != 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
