@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { classify, changedPaths } from "./change-impact.mjs";
+import { newNativeRequirements } from "./native-imports.mjs";
 
 export class IncompatibleUpdate extends Error {}
 const tagPattern = /^v(\d+\.\d+\.\d+)(?:-preview\.\d+)?\+build\.(\d+)$/;
@@ -42,6 +43,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       otaUrl: process.env.CREW_OTA_URL?.trim().replace(/\/+$/, ""), serverUrl: process.env.CREW_SERVER_URL,
       publicServers: process.env.CREW_PUBLIC_SERVERS,
     });
+    const requirements = newNativeRequirements(baseline);
+    if (requirements.length) {
+      throw new IncompatibleUpdate(`Native imports absent from the IPA baseline: ${requirements.join(", ")}`);
+    }
     for (const [key, value] of Object.entries(plan)) console.log(`${key}=${value}`);
   } catch (error) {
     // The build workflow shows this reason on the PR (tools/ci/report-route.mjs).
