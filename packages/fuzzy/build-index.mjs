@@ -17,16 +17,16 @@ registerHooks({
   },
 });
 
-const { CORE_DRINK_CATALOGUE, OPEN_BEER_CATALOGUE, BAR_ASSISTANT_CATALOGUE, OPEN_FOOD_FACTS_CATALOGUE, OPEN_FOOD_FACTS_PRODUCTS, TRACK_CAFFEINE_CATALOGUE, OLCC_CATALOGUE } = await import("./src/catalogue.ts");
+const { CORE_DRINK_CATALOGUE, OPEN_BEER_CATALOGUE, BAR_ASSISTANT_CATALOGUE, OPEN_FOOD_FACTS_CATALOGUE, openFoodFactsCatalogue, TRACK_CAFFEINE_CATALOGUE, olccCatalogue } = await import("./src/catalogue.ts");
 const { buildNameIndex } = await import("./src/nameIndex.ts");
 for (const [filename, catalogue] of [
   ["core-index.json", CORE_DRINK_CATALOGUE],
   ["openbeerdb-index.json", OPEN_BEER_CATALOGUE],
   ["bar-assistant-index.json", BAR_ASSISTANT_CATALOGUE],
   ["openfoodfacts-index.json", OPEN_FOOD_FACTS_CATALOGUE],
-  ["openfoodfacts-products-index.json", OPEN_FOOD_FACTS_PRODUCTS],
+  ["openfoodfacts-products-index.json", openFoodFactsCatalogue()],
   ["trackcaffeine-index.json", TRACK_CAFFEINE_CATALOGUE],
-  ["olcc-index.json", OLCC_CATALOGUE],
+  ["olcc-index.json", olccCatalogue()],
 ]) {
   const url = new URL(`./src/data/${filename}`, import.meta.url);
   const content = "[\n" + buildNameIndex(catalogue).map(row => JSON.stringify(row)).join(",\n") + "\n]\n";

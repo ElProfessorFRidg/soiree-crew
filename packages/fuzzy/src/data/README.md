@@ -40,3 +40,7 @@ python3 packages/fuzzy/import-drink-catalogue.py en.openfoodfacts.org.products.c
 python3 packages/fuzzy/import-drink-catalogue.py olcc.csv --olcc-month 2026-11
 pnpm catalogue:index
 ```
+
+## Quality and discovery
+
+The curated catalogue is the default popularity tier (not measured sales). For one or two characters, only curated prefixes and exact imported names are expanded. Longer searches use bounded source indexes, and the optional group filter is applied before the prefix cap. Four reviewed non-beverage Open Food Facts codes are excluded by the importer and source snapshots. Source alcohol strengths and serving sizes are estimates: verify the label when logging. Large imports remain in compact source rows; individual products are materialized on demand using binary lookup by stable source code. Full catalogue materialization is reserved for audits and build tooling.

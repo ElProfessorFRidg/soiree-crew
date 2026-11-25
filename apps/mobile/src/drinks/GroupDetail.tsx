@@ -10,7 +10,7 @@ import { useTheme } from "@/theme";
 import { Chip, Switch } from "@/ui/controls";
 import { Text } from "@/ui/Text";
 import { useAppStore } from "@/state/store";
-import { brandsOf, catalogueLabel, filterBrands, sizeOptions, strengthOptions } from "./catalogue";
+import { brandsOf, catalogueLabel, searchGroupBrands, sizeOptions, strengthOptions } from "./catalogue";
 import { sizeText, strengthText } from "./display";
 import { inputText } from "@/ui/inputText";
 
@@ -46,7 +46,7 @@ export function GroupDetail({ group, choice, unit, houseAbv, onChange }: Props) 
   const country = useAppStore((state) => state.preferences.legalCountry);
   const [brandQuery, setBrandQuery] = useState("");
   const all = useMemo(() => brandsOf(group, country), [group, country]);
-  const brands = useMemo(() => filterBrands(all, brandQuery, i18n), [all, brandQuery, i18n]);
+  const brands = useMemo(() => brandQuery.trim() ? searchGroupBrands(group, brandQuery, i18n, country) : all, [all, group, brandQuery, i18n, country]);
   const sizes = sizeOptions(group, country, choice.volumeMl, brand?.volumeMl ?? 0, ...(brand?.sizes ?? []));
   const strengths = strengthOptions(group, choice.abv, brand?.abv ?? 0, group === "beer" ? (houseAbv ?? 0) : 0);
 
@@ -69,7 +69,7 @@ export function GroupDetail({ group, choice, unit, houseAbv, onChange }: Props) 
         <View style={styles.block}>
           <Text variant="label">{i18n.t("drinkCatalogue.brand")}</Text>
           {/* Dozens of beers: typing a few letters narrows the row, typos and neighbour keys forgiven. */}
-          {all.length > 8 ? (
+          {all.length ? (
             <TextInput
               value={brandQuery}
               onChangeText={setBrandQuery}

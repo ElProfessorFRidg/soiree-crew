@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { catalogueDrink, DRINK_CATALOGUE, GROUP_SPECS, localName, SHELF_ORDER, shownNames, strengthFits, type DrinkGroup } from "./catalogue";
+import { catalogueDrink, getDrinkCatalogue, GROUP_SPECS, localName, SHELF_ORDER, shownNames, strengthFits, type DrinkGroup } from "./catalogue";
 import { strengthOf } from "./mixes";
 import { parseDrinkOrder, tokenize } from "./order";
 
@@ -21,6 +21,8 @@ const parse = (text: string) =>
     presetVolume: (id) => byId.get(id)!.volumeMl,
     presetGroup: (id) => byId.get(id)!.group as DrinkGroup,
   }).map((line) => ({ quantity: line.quantity, preset: line.preset, drink: line.drink?.id ?? null, volumeMl: line.volumeMl, abv: line.abv }));
+
+const DRINK_CATALOGUE = getDrinkCatalogue();
 
 describe("drink catalogue", () => {
   it("has the strengths printed on French labels", () => {
