@@ -43,6 +43,8 @@ jobs:
 
   version:
     runs-on: ubuntu-latest
+    env:
+      CREW_SERVER_URL: ${{ (github.event_name == 'pull_request' || inputs.pr != '') && vars.CREW_PREVIEW_SERVER_URL || vars.CREW_SERVER_URL }}
     permissions:
       contents: write
       pull-requests: write
@@ -63,6 +65,11 @@ jobs:
         run: |
           python3 -m pip install --user --break-system-packages PyYAML==6.0.2
           python3 tools/ci/dependency-impact-test.py
+      - name: Resolve PR server origin
+        env:
+          PREVIEW_PR: ${{ github.event.pull_request.number || inputs.pr }}
+          CREW_PREVIEW_URL_TEMPLATE: ${{ vars.CREW_PREVIEW_URL_TEMPLATE }}
+        run: node tools/ci/resolve-preview-origin.mjs
       - name: Select OTA or native build
         id: route
         if: ${{ !inputs.force_ipa && !inputs.android }}
@@ -73,7 +80,6 @@ jobs:
           CHANGE_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
           OTA_ALLOWED: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
           CREW_OTA_URL: ${{ vars.CREW_OTA_URL }}
-          CREW_SERVER_URL: ${{ github.event_name == 'pull_request' && vars.CREW_PREVIEW_SERVER_URL || vars.CREW_SERVER_URL }}
           CREW_PUBLIC_SERVERS: ${{ vars.CREW_PUBLIC_SERVERS }}
           OTA_HISTORY_LIMIT: ${{ vars.CREW_OTA_HISTORY_LIMIT || '5' }}
         # Every outcome records why (route + reason): the summary and the PR comment show it.
@@ -243,6 +249,11 @@ jobs:
           restore-keys: |
             ios-build-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}-
             ios-build-xcode26.6-
+      - name: Resolve PR server origin
+        env:
+          PREVIEW_PR: ${{ github.event.pull_request.number || inputs.pr }}
+          CREW_PREVIEW_URL_TEMPLATE: ${{ vars.CREW_PREVIEW_URL_TEMPLATE }}
+        run: node tools/ci/resolve-preview-origin.mjs
       - name: Generate the native project
         working-directory: apps/mobile
         env:

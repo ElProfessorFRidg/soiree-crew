@@ -95,3 +95,6 @@ Deploy the complete deploy/ota directory (server.mjs and publication.mjs) togeth
 
 ### Native inventory
 New IPA metadata includes a generated native project hash, resolved CocoaPods lock hash, native pod inventory and Xcode version. This is audit evidence, not yet an exhaustive ABI proof or a replacement for conservative routing. Native import detection is available as a tested helper, not yet a capability-based authorization rule.
+
+### Per-PR API origin
+When CREW_PREVIEW_URL_TEMPLATE is set, the IPA builder, planner and OTA exporter all resolve the same HTTPS origin from the PR number. Existing binaries with a different recorded server configuration require a new IPA. This changes the suggested server, not an existing authenticated account's selected server.

@@ -70,6 +70,13 @@ jobs:
           cache: pnpm
       - name: Install lockfile analyzer
         run: python3 -m pip install --user --break-system-packages PyYAML==6.0.2
+      - name: Resolve PR server origin
+        env:
+          CREW_PREVIEW_URL_TEMPLATE: ${{ vars.CREW_PREVIEW_URL_TEMPLATE }}
+        run: |
+          if [[ "$RELEASE_TAG" =~ -preview\.([0-9]+)\+build\. ]]; then
+            PREVIEW_PR="${BASH_REMATCH[1]}" node tools/ci/resolve-preview-origin.mjs
+          fi
       - name: Verify target and compatible changes
         id: plan
         env:
