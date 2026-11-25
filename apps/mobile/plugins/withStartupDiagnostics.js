@@ -47,7 +47,7 @@ function sceneDelegate(source) {
       return
     }
     CrewStartupDiagnostics.shared.startingReact()
-    super.scene(scene, willConnectTo: session, options: options)
+    super.scene(scene, willConnectTo: session, options: connectionOptions)
   }
 `);
 }
