@@ -1,4 +1,3 @@
-import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 export function previewOrigin(template, pr) {
   if (!/^[1-9]\d*$/.test(String(pr)) || !template.includes("{pr}")) throw new Error("Missing per-PR preview URL template");
@@ -8,14 +7,14 @@ export function previewOrigin(template, pr) {
 }
 export async function verifyPreview({ template, pr, sha, fetcher = fetch }) {
   const origin = previewOrigin(template,pr);
+  if (!/^[a-f0-9]{40}$/.test(sha ?? "")) throw new Error("Missing exact expected preview commit");
   for (const path of ["/v1/ready","/v1/info"]) {
     const res = await fetcher(origin+path,{redirect:"error",signal:AbortSignal.timeout(10000)});
     if (!res.ok) throw new Error("Preview not ready: "+path);
     const data = await res.json();
-    if (path.endsWith("/ready") && data.ok !== true) throw new Error("Preview database not ready");
-    if (path.endsWith("/info")) {
-      const revision = data.sourceCommit ?? data.source_commit ?? data.diagnostics?.sourceCommit;
-      if (revision !== sha) throw new Error("Preview commit does not match the OTA commit");
+    if (path === "/v1/ready") {
+      if (data.ok !== true) throw new Error("Preview database not ready");
+      if (data.sourceCommit !== sha) throw new Error("Preview commit does not match the OTA commit");
     }
   }
   return origin;
