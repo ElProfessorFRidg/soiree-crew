@@ -201,6 +201,9 @@ importers:
       '@crew/bac':
         specifier: workspace:*
         version: link:../../packages/bac
+      '@crew/fuzzy':
+        specifier: workspace:*
+        version: link:../../packages/fuzzy
       '@crew/games':
         specifier: workspace:*
         version: link:../../packages/games
