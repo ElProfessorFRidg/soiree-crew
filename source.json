@@ -929,16 +929,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -951,6 +951,28 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.58",
+          "buildVersion": "372",
+          "marketingVersion": "0.2.58 Preview (372)",
+          "date": "2026-11-26T05:48:58Z",
+          "localizedDescription": "• Bump the other-patches group with 2 updates\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.58-preview.45%2Bbuild.372/soiree-crew-unsigned.ipa",
+          "size": 25946564,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.57",
           "buildVersion": "371",
@@ -2206,26 +2228,37 @@
           ]
         }
       ],
-      "version": "0.2.57",
-      "versionDate": "2026-11-25T17:43:00Z",
-      "versionDescription": "• CI: optional shared compile cache on the VPS (off until configured), docs\n• Server image: copy the manifests one by one so code changes keep the install layer\n• Server image: install from manifests only, so code changes skip the install layer\n• Server image: prefer the shared store, fall back to the network\n• Server image: install over the fetched store without a TTY prompt\n• Server image: do not fail pnpm fetch on ignored build scripts\n• CI: restore-only PR caches, retry GitHub release calls, shared pnpm cache in the server image\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.57-preview.44%2Bbuild.371/soiree-crew-unsigned.ipa",
-      "size": 25946563,
+      "version": "0.2.58",
+      "versionDate": "2026-11-26T05:48:58Z",
+      "versionDescription": "• Bump the other-patches group with 2 updates\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.58-preview.45%2Bbuild.372/soiree-crew-unsigned.ipa",
+      "size": 25946564,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.57-preview.44%2Bbuild.371/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "preview-0.2.58-372",
+      "title": "Soirée Crew Preview 0.2.58 (372)",
+      "caption": "• Bump the other-patches group with 2 updates\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+      "date": "2026-11-26T05:48:58Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.58-preview.45%2Bbuild.372/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
     {
       "identifier": "preview-0.2.57-371",
       "title": "Soirée Crew Preview 0.2.57 (371)",
@@ -2425,17 +2458,6 @@
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.34%2Bbuild.334/iphone/banner.png",
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.34%2Bbuild.334/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile",
-      "notify": false
-    },
-    {
-      "identifier": "preview-0.2.33-333",
-      "title": "Soirée Crew Preview 0.2.33 (333)",
-      "caption": "• Allow slow iOS simulator runs and replace launch artifacts on retry\n• Show the OTA state in Settings even before a fix arrives\n• TypeScript 7, with the fixes it needs",
-      "date": "2026-11-24T07:51:09Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.33-preview.35%2Bbuild.333/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.33-preview.35%2Bbuild.333/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
       "notify": false
     }
   ],
@@ -2854,6 +2876,13 @@
       "buildVersion": "2",
       "date": "2026-10-27T00:43:05Z",
       "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.58",
+      "buildVersion": "372",
+      "date": "2026-11-26T05:48:58Z",
+      "localizedDescription": "• Bump the other-patches group with 2 updates\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
