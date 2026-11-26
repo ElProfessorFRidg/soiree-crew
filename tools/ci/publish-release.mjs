@@ -69,13 +69,13 @@ export function reconcileRelease(api, plan, expected) {
 }
 
 export function retryableReleaseError(error) {
-  const detail = String(error.stderr ?? error.message ?? "");
+  const detail = [error.stderr, error.message].filter(Boolean).join("\n");
   return /HTTP (?:408|409|429|5\d\d)\b|HTTP 422:.*(?:already_exists|already exists)|(?:ECONNRESET|ETIMEDOUT|unexpected EOF|connection reset|TLS handshake timeout|temporary failure)/i.test(detail) || error.code === "ETIMEDOUT";
 }
 
 export function githubReleaseApi(repo, plan, notesFile) {
   const endpoint = "repos/" + repo + "/releases";
-  const gh = (...args) => execFileSync("gh", args, { encoding: "utf8", timeout: 180000, stdio: ["ignore", "pipe", "pipe"] });
+  const gh = (...args) => execFileSync("gh", args, { encoding: "utf8", timeout: 180000, maxBuffer: 32 * 1024 * 1024, stdio: ["ignore", "pipe", "pipe"] });
   const json = (...args) => JSON.parse(gh("api", ...args));
   const pages = path => json("--paginate", "--slurp", path + "?per_page=100").flat();
   const checkTag = () => {
@@ -126,7 +126,9 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
     const data = readFileSync(path);
     return { path, name: basename(path), size: data.length, digest: "sha256:" + createHash("sha256").update(data).digest("hex") };
   });
-  retrying(() => reconcileRelease(githubReleaseApi(env.GITHUB_REPOSITORY, identity, "release-notes.md"), identity, expected),
-    { shouldRetry: retryableReleaseError });
+  retrying(attempt => {
+    if (attempt) console.log("Retrying release reconciliation (attempt " + (attempt + 1) + ")");
+    return reconcileRelease(githubReleaseApi(env.GITHUB_REPOSITORY, identity, "release-notes.md"), identity, expected);
+  }, { shouldRetry: retryableReleaseError });
   appendFileSync(env.GITHUB_OUTPUT, "tag=" + plan.tag + "\n");
 }
