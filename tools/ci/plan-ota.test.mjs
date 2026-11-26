@@ -54,3 +54,14 @@ it("rejects another device, build, channel, update server or server configuratio
     expect(() => planUpdate({ ...preview, ...changes })).toThrow("must match the selected IPA");
   }
 });
+
+it("attributes inherited native differences without relaxing compatibility", () => {
+  const swift = "apps/mobile/native/startup/CrewStartupDiagnostics.swift";
+  const plugin = "apps/mobile/plugins/withStartupDiagnostics.js";
+  const settings = "apps/mobile/src/app/settings.tsx";
+  expect(() => planUpdate({ ...preview, paths: [swift, plugin, settings], changePaths: [settings] }))
+    .toThrow("Changed by this PR/push: none");
+  expect(() => planUpdate({ ...preview, paths: [swift, plugin, settings], changePaths: [swift, settings] }))
+    .toThrow("Changed by this PR/push:\n- " + swift + "\nAlready present in the event base, different from the IPA:\n- " + plugin);
+  expect(() => planUpdate({ ...preview, paths: [settings], changePaths: [settings] })).not.toThrow();
+});
