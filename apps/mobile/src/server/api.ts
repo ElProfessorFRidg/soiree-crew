@@ -46,9 +46,14 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
   const started = Date.now();
   let attempted = false;
   let response: Response | undefined;
+  const origin = serverOrigin(baseUrl);
+  const feature = diagnosticFeature(path);
+  const method = options.method ?? "GET";
   const fail = (failure: ApiFailure) => {
     const error = new ApiError(failure, { code: response?.headers?.get("x-crew-diagnostic-code") ?? undefined, requestId: response?.headers?.get("x-crew-request-id") ?? undefined });
-    recordNetworkDiagnostic({ at: Date.now(), server: serverOrigin(baseUrl), accountId: session?.userId ?? null, feature: diagnosticFeature(path), method: options.method ?? "GET", code: error.diagnostic.code, requestId: error.diagnostic.requestId, durationMs: Date.now() - started, attempted, ...(failure.kind === "http" ? { status: failure.status } : {}) });
+    const contentType = response?.headers?.get("content-type")?.toLowerCase().split(";")[0]?.trim();
+    const format = contentType === "text/html" ? "html" : contentType === "application/json" || contentType?.endsWith("+json") ? "json" : contentType ? "other" : undefined;
+    recordNetworkDiagnostic({ at: Date.now(), server: origin, accountId: session?.userId ?? null, feature, method, code: error.diagnostic.code, requestId: error.diagnostic.requestId, durationMs: Date.now() - started, attempted, format, ...(failure.kind === "http" ? { status: failure.status, reason: failure.compatibility?.reason } : {}) });
     return error;
   };
   if (!baseUrl) throw fail({ kind: "configuration" });
@@ -111,7 +116,6 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
   const compatibility = decodeCompatibility(data, response.status, path, options.method)
     ?? (data === undefined && (response.ok || response.status === 404) ? { reason: "server_outdated" as const, apiVersion: 1 } : undefined);
   if (compatibility) {
-    reportCompatibility(baseUrl, compatibility);
     const delay = compatibility.reason === "feature_unavailable" ? Math.max(30_000, retryAfterMs(response.headers.get("retry-after"))) : 5 * 60_000;
     const failure = { kind: "http" as const, status: response.status, code: data === undefined ? "api_response_incompatible" : code, compatibility, retryAfterMs: delay };
     // Safety actions can be retried immediately if a proxy briefly returns an HTML page.
@@ -119,7 +123,9 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
       if (incompatible.size >= 100) incompatible.delete(incompatible.keys().next().value!);
       incompatible.set(featureKey, { until: Date.now() + delay, failure });
     }
-    throw fail(failure);
+    const error = fail(failure);
+    reportCompatibility({ ...compatibility, origin, feature, method, code: error.diagnostic.code, status: response.status });
+    throw error;
   }
   if (!response.ok) throw fail({ kind: "http", status: response.status, code });
   incompatible.delete(featureKey);

@@ -571,7 +571,8 @@ export default function SettingsScreen() {
           </Panel>
           <Panel>
             <Row title={i18n.t("updates.changelog")} leading={<Icon name="x:film" color={theme.textMuted} />} trailing={<Icon name="chev" color={theme.textMuted} />} onPress={() => router.push("/versions")} />
-            <Row title={i18n.t("diagnostics.title")} leading={<Icon name="x:info" color={theme.textMuted} />} trailing={<Icon name="chev" color={theme.textMuted} />} onPress={() => router.push("/server-status")} last />
+            <Row title={i18n.t("diagnostics.title")} leading={<Icon name="x:info" color={theme.textMuted} />} trailing={<Icon name="chev" color={theme.textMuted} />} onPress={() => router.push("/server-status")} />
+            <Row title={i18n.t("diagnostics.journal")} leading={<Icon name="x:info" color={theme.textMuted} />} trailing={<Icon name="chev" color={theme.textMuted} />} onPress={() => router.push("/diagnostic-log")} last />
           </Panel>
         </>
       ) : null}
