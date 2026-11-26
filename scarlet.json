@@ -6,6 +6,27 @@
   "Other": [
     {
       "name": "Soirée Crew",
+      "version": "0.2.64",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.64%2Bbuild.380/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "• Améliorer les diagnostics et ajouter un journal local (#39)\n• Bump the other-patches group with 2 updates (#45)\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+      "bundleID": "app.soireecrew.mobile",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.64%2Bbuild.380/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.64%2Bbuild.380/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.64%2Bbuild.380/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.64%2Bbuild.380/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.64%2Bbuild.380/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.64%2Bbuild.380/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.64%2Bbuild.380/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.64%2Bbuild.380/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.64%2Bbuild.380/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.64%2Bbuild.380/iphone/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew 0.2.34",
       "version": "0.2.34",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.34%2Bbuild.334/soiree-crew-unsigned.ipa",
