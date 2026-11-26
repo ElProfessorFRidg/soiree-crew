@@ -41,14 +41,52 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-          cache: pnpm
+          package-manager-cache: false
+      - name: Locate pnpm store
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@v6
+        id: pnpm-cache
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-v2-${{ runner.os }}-${{ runner.arch }}-
       - run: pnpm install --frozen-lockfile
+      - uses: actions/cache/save@v6
+        if: github.ref == 'refs/heads/main' && steps.pnpm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ steps.pnpm-cache.outputs.cache-primary-key }}
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm lint:slop
       - name: Audit production dependencies (SEC-09, reported, not blocking)
         run: pnpm audit --prod --audit-level=high
         continue-on-error: true
+
+  server-image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Determine whether the image needs testing
+        id: changed
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [[ "$BASE" =~ ^[a-f0-9]{40}$ ]] && git cat-file -e "$BASE^{commit}" && git diff --quiet "$BASE" HEAD -- apps/server apps/mobile/src/i18n packages pnpm-lock.yaml pnpm-workspace.yaml package.json .npmrc .github/workflows/build.yml tools/ci/check-server-image.sh; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Validate cold and warm server builds
+        if: steps.changed.outputs.run == 'true'
+        run: bash tools/ci/check-server-image.sh
 
   version:
     runs-on: ubuntu-latest
@@ -205,34 +243,44 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      # Build caches kept between runs: ccache serves the C, C++ and Objective-C compiles (React
-      # Native and the native modules), the CocoaPods cache saves the pod downloads.
-      - name: Install ccache
-        run: brew install ccache
-      - uses: actions/cache@v6
+          package-manager-cache: false
+      - name: Locate pnpm store
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@v6
+        id: pnpm-cache
         with:
-          path: |
-            ~/Library/Caches/ccache
-            ~/Library/Caches/CocoaPods
-          key: ios-build-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}-${{ matrix.target }}-${{ github.run_id }}
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-v2-${{ runner.os }}-${{ runner.arch }}-
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/cache/save@v6
+        if: github.ref == 'refs/heads/main' && steps.pnpm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ steps.pnpm-cache.outputs.cache-primary-key }}
+      # CocoaPods downloads, restored from main's newest cache. ccache was tried and measured here: with React Native
+      # and the Expo modules prebuilt, Xcode makes no C or C++ compiler call it could serve (docs/CACHE.md).
+      - uses: actions/cache/restore@v6
+        id: native-cache
+        with:
+          path: ~/Library/Caches/CocoaPods
+          key: ios-build-v3-xcode26.6-${{ matrix.target }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.run_id }}
           restore-keys: |
-            ios-build-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}-
-            ios-build-xcode26.6-
+            ios-build-v3-xcode26.6-${{ matrix.target }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            ios-build-v3-xcode26.6-${{ matrix.target }}-
       - name: Generate the native project
         working-directory: apps/mobile
         env:
           BUILD_NUMBER: ${{ github.run_number }}
-          # React Native wires ccache into every pod when this is set at pod install.
-          USE_CCACHE: "1"
         run: npx expo prebuild --platform ios --clean
       # ExpoModulesJSI is the slowest piece to compile. Its build script reuses a slice whose
       # recorded source hash (sources, paths, Swift and Xcode versions) still matches.
-      - uses: actions/cache@v6
+      - uses: actions/cache/restore@v6
+        id: jsi-cache
         with:
           path: apps/mobile/ios/build/Build/Products/ExpoModulesJSI.xcframework
-          key: expo-modules-jsi-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}
+          key: expo-modules-jsi-v2-xcode26.6-${{ matrix.target }}-${{ hashFiles('pnpm-lock.yaml') }}
       - name: Build the app without signing
         working-directory: apps/mobile/ios
         run: |
@@ -256,7 +304,18 @@ jobs:
               exit 1
             }
           tail -n 20 xcodebuild.log
-          ccache --show-stats || true
+      - name: Save the CocoaPods cache (main only)
+        if: github.ref == 'refs/heads/main' && success() && steps.native-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/Library/Caches/CocoaPods
+          key: ${{ steps.native-cache.outputs.cache-primary-key }}
+      - name: Save the ExpoModulesJSI slice (main only)
+        if: github.ref == 'refs/heads/main' && success() && steps.jsi-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: apps/mobile/ios/build/Build/Products/ExpoModulesJSI.xcframework
+          key: expo-modules-jsi-v2-xcode26.6-${{ matrix.target }}-${{ hashFiles('pnpm-lock.yaml') }}
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
@@ -282,6 +341,23 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  prune-build-caches:
+    needs: [checks, ios, android, ota]
+    if: always() && github.ref == 'refs/heads/main' && needs.checks.result == 'success' && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    concurrency:
+      group: crew-prune-build-caches
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+      - name: Retain two recent caches per family
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node tools/ci/prune-build-caches.mjs
+
   android:
     # iOS only for now: the APK is built on demand (Run workflow, "Also build the Android APK").
     if: github.event_name == 'workflow_dispatch' && inputs.android
@@ -303,8 +379,22 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-          cache: pnpm
+          package-manager-cache: false
+      - name: Locate pnpm store
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@v6
+        id: pnpm-cache
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-v2-${{ runner.os }}-${{ runner.arch }}-
       - run: pnpm install --frozen-lockfile
+      - uses: actions/cache/save@v6
+        if: github.ref == 'refs/heads/main' && steps.pnpm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ steps.pnpm-cache.outputs.cache-primary-key }}
       - name: Generate the native project
         working-directory: apps/mobile
         env:
@@ -492,11 +582,14 @@ jobs:
     # Every build of main becomes the latest release, so these links never change:
     # https://github.com/<owner>/soiree-crew/releases/latest/download/soiree-crew-unsigned.ipa
     # https://github.com/<owner>/soiree-crew/releases/latest/download/soiree-crew.apk
-    needs: [version, checks, ios, ios-launch, android]
+    needs: [version, checks, ios, ios-launch, android, server-image]
     # The APK job is usually skipped; the release goes out with what was built.
     # Only repository-owned PR branches may publish previews. Forks keep read-only build artifacts.
-    if: always() && needs.checks.result == 'success' && needs.ios.result == 'success' && needs.ios-launch.result == 'success' && ((github.event_name != 'pull_request' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || inputs.pr != '')
+    if: always() && needs.checks.result == 'success' && needs.server-image.result == 'success' && needs.ios.result == 'success' && needs.ios-launch.result == 'success' && (needs.android.result == 'success' || needs.android.result == 'skipped') && ((github.event_name != 'pull_request' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || inputs.pr != '')
     runs-on: ubuntu-latest
+    concurrency:
+      group: crew-release-${{ github.run_number }}
+      cancel-in-progress: false
     outputs:
       tag: ${{ steps.publish.outputs.tag }}
     permissions:
@@ -523,6 +616,7 @@ jobs:
           APP_VERSION: ${{ needs.version.outputs.version }}
           CREW_RELEASE_CHANNEL: ${{ (github.event_name == 'pull_request' || inputs.pr != '') && 'preview' || 'public' }}
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr }}
+          RELEASE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: node tools/ci/publish-release.mjs
 
   altstore:
@@ -540,11 +634,11 @@ jobs:
 
   # The check the main ruleset requires (with `checks`). The ios jobs only report when an IPA is
   # built, so an OTA or checks-only change could never merge if they were required. This gate is
-  # green only when the change shipped the way the route decided: a new IPA built and launched,
+  # green only when the change shipped the way the route decided: a new IPA built, launched and published when authorized,
   # an OTA update published, or checks only. Dependency updates always take the IPA route.
   build-gate:
     if: always()
-    needs: [checks, version, ota, ios, ios-launch]
+    needs: [checks, version, ota, ios, ios-launch, android, server-image, release, altstore]
     runs-on: ubuntu-latest
     steps:
       - name: Check the route was carried out
@@ -555,12 +649,24 @@ jobs:
           OTA: ${{ needs.ota.result }}
           IOS: ${{ needs.ios.result }}
           LAUNCH: ${{ needs.ios-launch.result }}
+          ANDROID: ${{ needs.android.result }}
+          SERVER: ${{ needs.server-image.result }}
+          RELEASE: ${{ needs.release.result }}
+          ALTSTORE: ${{ needs.altstore.result }}
+          EXPECT_RELEASE: ${{ (github.event_name != 'pull_request' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || inputs.pr != '' }}
+          EXPECT_ANDROID: ${{ github.event_name == 'workflow_dispatch' && inputs.android }}
         run: |
           echo "route=$ROUTE checks=$CHECKS version=$VERSION ota=$OTA ios=$IOS ios-launch=$LAUNCH"
           fail() { echo "::error::$1"; exit 1; }
-          [[ "$CHECKS" == success && "$VERSION" == success ]] || fail "checks=$CHECKS, version=$VERSION"
+          [[ "$CHECKS" == success && "$VERSION" == success && "$SERVER" == success ]] || fail "checks=$CHECKS, version=$VERSION, server-image=$SERVER"
           case "$ROUTE" in
-            ipa) [[ "$IOS" == success && "$LAUNCH" == success ]] || fail "New IPA route: ios=$IOS, ios-launch=$LAUNCH" ;;
+            ipa)
+              [[ "$IOS" == success && "$LAUNCH" == success ]] || fail "New IPA route: ios=$IOS, ios-launch=$LAUNCH"
+              if [[ "$EXPECT_ANDROID" == true ]]; then [[ "$ANDROID" == success ]] || fail "Android: $ANDROID"; fi
+              if [[ "$EXPECT_RELEASE" == true ]]; then
+                [[ "$RELEASE" == success && "$ALTSTORE" == success ]] || fail "Release: $RELEASE, AltStore: $ALTSTORE"
+              fi
+              ;;
             ota) [[ "$OTA" == success ]] || fail "OTA route: ota=$OTA" ;;
             checks) ;;
             *) fail "Unknown route $ROUTE" ;;
