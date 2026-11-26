@@ -36,7 +36,7 @@ expect "black hole (timeouts bound the wait)" no CACHE_URL=https://203.0.113.1 C
 # A real compile: the first run is a miss that gets stored, the second one starts with an empty local cache
 # and must be served by the server.
 work=$(mktemp -d)
-printf 'int crew_remote_cache_test(void) { return %s; }\n' "$RANDOM$RANDOM" > "$work/t.c"
+printf 'int crew_remote_cache_test(void) { return %s; }\n' "$RANDOM" > "$work/t.c"
 helper=$(command -v ccache-storage-https)
 host=${CACHE_URL#https://}
 remote="https://ci:$WRITE_PASSWORD@$host helper=$helper @layout=bazel request-timeout=5s data-timeout=3s"

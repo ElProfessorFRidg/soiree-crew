@@ -79,7 +79,7 @@ jobs:
         env:
           BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
-          if [[ "$BASE" =~ ^[a-f0-9]{40}$ ]] && git cat-file -e "$BASE^{commit}" && git diff --quiet "$BASE" HEAD -- apps/server packages pnpm-lock.yaml pnpm-workspace.yaml package.json .npmrc .github/workflows/build.yml tools/ci/check-server-image.sh; then
+          if [[ "$BASE" =~ ^[a-f0-9]{40}$ ]] && git cat-file -e "$BASE^{commit}" && git diff --quiet "$BASE" HEAD -- apps/server apps/mobile/src/i18n packages pnpm-lock.yaml pnpm-workspace.yaml package.json .npmrc .github/workflows/build.yml tools/ci/check-server-image.sh; then
             echo "run=false" >> "$GITHUB_OUTPUT"
           else
             echo "run=true" >> "$GITHUB_OUTPUT"

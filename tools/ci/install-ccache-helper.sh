@@ -20,10 +20,12 @@ if ! echo "$sha256  $dir/$name.tar.gz" | shasum -a 256 -c - >/dev/null 2>&1; the
   echo "::warning::ccache HTTPS helper checksum mismatch; the remote cache stays off"
   exit 0
 fi
-tar -xzf "$dir/$name.tar.gz" -C "$dir"
-install -m 755 "$dir/$name/ccache-storage-http" "$dir/ccache-storage-http"
 # The same program serves both schemes; ccache picks the helper by URL scheme.
-install -m 755 "$dir/$name/ccache-storage-http" "$dir/ccache-storage-https"
+if ! { tar -xzf "$dir/$name.tar.gz" -C "$dir" &&
+       install -m 755 "$dir/$name/ccache-storage-http" "$dir/ccache-storage-http" &&
+       install -m 755 "$dir/$name/ccache-storage-http" "$dir/ccache-storage-https"; }; then
+  echo "::warning::Unexpected ccache HTTPS helper archive layout; the remote cache stays off"
+  exit 0
+fi
 echo "$dir" >> "$GITHUB_PATH"
-"$dir/ccache-storage-https" --version >/dev/null 2>&1 || true
 echo "ccache HTTPS helper $version installed ($platform)"

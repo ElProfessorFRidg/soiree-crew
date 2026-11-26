@@ -9,3 +9,7 @@ it("keeps two newest per cache family and never touches PR or unrelated caches",
     c(10,"pnpm-store-v2-Linux-X64-a"),c(11,"pnpm-store-v2-Linux-X64-b"),c(12,"pnpm-store-v2-Linux-X64-c")
   ]).sort((a,b)=>a-b)).toEqual([1,7,10]);
 });
+it("also prunes the oldest key shape, which has no target", () => {
+  const c = (id, key) => ({ id, key, ref: "refs/heads/main", created_at: new Date(id * 1000).toISOString() });
+  expect(staleCacheIds([c(21, "ios-build-xcode26.6-1"), c(22, "ios-build-xcode26.6-2"), c(23, "ios-build-xcode26.6-3")])).toEqual([21]);
+});

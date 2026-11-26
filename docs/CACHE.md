@@ -1,60 +1,84 @@
-# Build caches and release recovery
+# Build caches
 
-This runbook covers the GitHub Actions build/OTA workflows and the Coolify server Dockerfile. It does not assert that the external VPS is configured or that any measured speedup is guaranteed.
+Four caches work together. Each has one writer and a clear way to be rebuilt or thrown away.
 
-## 1. Cache inventory
+| Cache | What it holds | Who writes | Who reads | Where |
+|---|---|---|---|---|
+| pnpm store | downloaded npm packages | `main` | every run | GitHub Actions cache |
+| Native build cache | ccache objects and CocoaPods downloads | `main` | every iOS build | GitHub Actions cache |
+| ExpoModulesJSI slice | one precompiled framework | `main` | every iOS build | GitHub Actions cache |
+| Shared compile cache | the same ccache objects, shared by all branches | `main` only | every iOS build | our VPS (`crew-cache`) |
+| BuildKit store | server image layers, pnpm store for the image | any build on the VPS | any build on the VPS | VPS Docker |
 
-| Cache | Scope | Writers | Retention / key |
-| --- | --- | --- | --- |
-| pnpm store (GitHub) | OS + architecture + lockfile | main | two recent entries per family |
-| ccache + CocoaPods (GitHub) | Xcode + device + lockfile + run | main | two recent entries per device |
-| ExpoModulesJSI (GitHub) | Xcode + device + exact lockfile | main | two recent entries per device |
-| Optional remote ccache | Dedicated HTTPS backend | protected main only | external VPS capacity/eviction |
-| Docker pnpm store | BuildKit worker | builds on that worker | external builder GC |
+## Why only `main` writes
 
-PRs restore the GitHub caches without saving them. GitHub's own branch isolation and eviction still apply. Same-device native fallbacks are preferred; the JSI slice is exact-key only. Old legacy families may be retained separately. A main-only cleanup job runs after successful build/check jobs; unrelated and PR-scoped caches are never deleted by this script.
+GitHub keeps one cache namespace per branch. A pull request can read the caches of `main` and its own, never another PR's. Before this policy every PR run saved its own copy, so the repository held 10.9 GB against a 10 GB quota (9.8 GB of it from PR branches) and `main`'s caches were evicted first. Now PRs only **restore** (`actions/cache/restore`) and `main` **saves** (`actions/cache/save`), once per run. The `prune-build-caches` job then keeps the two newest caches of each family on `main` (`tools/ci/prune-build-caches.mjs`, tested in `prune-build-caches.test.mjs`). It only touches caches of `main` whose key matches a known family, so caches of any other feature are never deleted.
 
-Local ccache is capped at 500 MB and checks compiler contents. The CI uses a separate probe directory, checks a real repeat compilation, resets statistics, then reports Xcode's own calls. A zero-call warning means no proven acceleration. Swift and prebuilt binaries are not accelerated by ccache.
+Keys carry the tool version (`xcode26.6`), the target (`iphone`/`ipad`) and the lockfile hash, so a dependency change or an Xcode bump never restores an incompatible cache. Bump the `-v2-` part of a key to invalidate a whole family by hand.
 
-## 2. Remote cache: disabled until explicitly approved
+## The shared compile cache
 
-Keep CREW_CACHE_ENABLED unset or false until the following infrastructure checks are done. Local caching works independently.
+`ccache` serves the C, C++ and Objective-C compiles of React Native and the native modules. GitHub's per-branch cache cannot share them between PRs, so the iOS builds also use one server.
 
-1. In repository Settings > Environments, create crew-cache-main and restrict deployment branches to exactly main. Do not use a broad wildcard. Put CREW_CACHE_WRITE_PASSWORD **only** in that environment, never in repository/organization secrets available to PRs. Remove and rotate any old CREW_CACHE_PASSWORD.
-2. Create crew-cache-preview with a distinct CREW_CACHE_READ_PASSWORD. Never put the writer password in this environment.
-3. On the VPS, enforce authentication and method authorization server-side: ci can read/write; ci-read can only GET (and HEAD if needed). Deny PUT, POST, PATCH, DELETE and other methods for the reader. Do not expose the backend port outside its reverse proxy. Use valid TLS, a bounded cache volume and a private upstream. Disable Bazel action-cache payload validation if necessary for ccache's opaque entries.
-4. Verify on a disposable cache namespace: unauthenticated requests fail; writer PUT/GET succeeds; reader GET succeeds but PUT/DELETE fail; writer can remove the test object. Never test on an existing production object. Verify no redirect to another origin and no credentials in proxy logs. Rotate secrets after any suspected disclosure.
-5. Set CREW_CACHE_URL to the verified HTTPS endpoint. Set CREW_CACHE_ENABLED=true only after these checks. A missing helper or credential causes a warning and local-only fallback. The ccache 4.14 HTTPS helper (ccache-storage-https) must be installed on the runner; the workflow detects it, does not silently install an unpinned binary. Configuration uses helper=, @layout=bazel and explicit timeouts. Main additionally checks a read-after-write round trip. Do not count probe hits as build hits.
+```
+iOS runner (macOS)                                         VPS 57.128.183.60
+ccache ──helper──▶ ccache-storage-https ──HTTPS──▶ Traefik ──▶ bazel-remote (10 GB, LRU, zstd)
+          GET/HEAD: account ci-read or ci                      only reachable through Traefik
+          PUT:      account ci only
+```
 
-If the VPS fails, set CREW_CACHE_ENABLED=false immediately; no app code or releases need changing. Client-side read-only is defense in depth, not authorization. A PR with access to the reader secret must still be unable to write at the reverse proxy.
+- **Server**: `https://cache.crew.57.128.183.60.sslip.io`. `bazel-remote` in Docker, defined in `deploy/cache/compose.yml`, installed in `/srv/crew-cache`. It has no accounts of its own and is not published on any port: Traefik is the only way in.
+- **Permissions are enforced by the server, not by the client.** Two Traefik routers split the methods: `GET`/`HEAD` accept the read account or the write account, `PUT` accepts the write account only, every other method has no route. A workflow that edits its own `CCACHE_REMOTE_STORAGE` or drops `read-only` still cannot write with the read credential (it gets `401`). Checked live: read account `PUT` → 401, write account `PUT` → 200, `DELETE`/`POST` → no route.
+- **Credentials live in GitHub environments** (Settings → Environments):
 
-References: https://ccache.dev/manual/4.14.html and https://ccache.dev/storage-helpers.html.
+  | Environment | Who can use it | Secret |
+  |---|---|---|
+  | `crew-cache-main` | deployment branch `main` only | `CREW_CACHE_WRITE_PASSWORD` |
+  | `crew-cache-preview` | any branch | `CREW_CACHE_READ_PASSWORD` |
 
-## 3. Docker image
+  The `ios` job picks the environment from the ref (`build.yml`). A pull request that points its job at `crew-cache-main` is refused by the environment's branch rule before any step runs. There is no repository-level cache secret. `CREW_CACHE_READ_PASSWORD` also exists as a **Dependabot** secret, because Dependabot runs cannot read environment secrets. Fork runs have no secrets at all.
+- **Repository variables**: `CREW_CACHE_URL` (the URL above) and `CREW_CACHE_ENABLED` (`true`/`false`). Setting `CREW_CACHE_ENABLED` to `false` is the off switch: builds then use the local cache only.
+- **HTTPS helper**: Homebrew's `ccache` has no HTTPS backend (the built-in HTTP one is plain text and deprecated). `tools/ci/install-ccache-helper.sh` installs the official `ccache-storage-http-go` release, pinned to a version and checked against its SHA-256 before it is unpacked. The same program serves `http` and `https`, so it is installed under both names.
+- **Always falls back**: `tools/ci/configure-ccache.sh` runs a probe compile against the server before enabling it. Any problem (no credential, wrong password, read account asked to write, server down, certificate mismatch, plain `http://`, timeout, no helper) prints a warning and leaves the local cache alone. A build never fails because of the cache. Timeouts are 5 s per request and 3 s per transfer.
+- **No credential in logs**: the URL and the encoded password are masked, GitHub masks secrets by itself, and the credentials are never part of a cache key or artifact. The password is hex, so it needs no percent-encoding.
+- **CrowdSec**: a cache miss is an ordinary `404`, which the `http-probing` scenario counts against the caller (this banned the CI runner once, and once an administrator). `/etc/crowdsec/parsers/s02-enrich/crew-cache-whitelist.yaml` ignores only `GET`/`HEAD` of `/ac/<64 hexadecimal digits>`. Traefik logs in the common format here, which has no Host field, so the rule is the shape of the request; other probes, and a malformed `/ac/zz`, still count. After editing any parser **restart** CrowdSec (`systemctl restart crowdsec`; a reload does not load new parsers) and check with `cscli explain --file line.log --type traefik`.
 
-The server copies workspace manifests and the lockfile before installing; code-only changes retain the dependency layer. The pnpm BuildKit mount uses sharing=locked to serialize access to the same worker store. A cold build still needs network access. The host's build cache and garbage collection are not controlled by this repository.
+### Prove it works
 
-The server-image CI job tests relevant changes using an isolated BuildKit builder: a cold build, a code-only warm rebuild (asserts the install layer was cached), then starts the image using a disposable data key, verifies /v1/ready and checks non-root execution. It never uses the production database or credentials. The build gate requires this job to succeed.
+```
+# On any Linux with ccache >= 4.13, clang, node, and ccache-storage-https on PATH:
+CACHE_URL=https://cache.crew.57.128.183.60.sslip.io READ_PASSWORD=... WRITE_PASSWORD=... bash tools/ci/test-remote-cache.sh
+```
 
-Manual reproduction: from repository root, run bash tools/ci/check-server-image.sh with a disposable GITHUB_RUN_ID and GITHUB_RUN_ATTEMPT and Docker Buildx available. The script temporarily appends a comment to a server source file and restores it on exit; use a clean checkout. For a concurrency benchmark, build two distinct image tags against the same disposable builder and compare wall time, cache hits and disk usage. Do not clear the production builder cache merely to benchmark.
+It runs `configure-ccache.sh` for nine situations (right and wrong credentials, wrong role, no credential, server down, certificate mismatch, plain HTTP, black hole), then a real compile that must be stored on the server and served back to an empty local cache. Last run: ccache 4.14.3, helper 0.10.1, clang 19, against the live server: all passed.
 
-## 4. Release transaction and recovery
+### Operate it
 
-1. Validate tag, channel, version and commit identity.
-2. Locate or create a draft for that exact tag.
-3. Compare each existing asset's name, byte size and SHA-256 against the downloaded CI artifact. Reject unexpected, duplicate or corrupted assets. An empty starter asset in a draft is the only automatically removable asset.
-4. Upload missing files without clobbering, re-list and verify all assets.
-5. Publish the draft; preview releases never become public latest. Verify the tag points to the expected commit.
-6. Only then expose the tag to the downstream AltStore job.
+- **Rotate a password**: generate two bcrypt lines (`docker run --rm httpd:2-alpine htpasswd -nbB ci-read PASSWORD | sed 's/\$/$$/g'`), export `CACHE_READ_HASH` and `CACHE_WRITE_HASH`, `docker compose up -d --force-recreate` in `/srv/crew-cache`, then update the three GitHub secrets (without a trailing newline: `printf %s "$PW" | gh secret set ...`).
+- **Empty it**: `docker compose down && rm -rf /srv/crew-cache/data/* && docker compose up -d`. Builds simply start cold.
+- **Update it**: `docker compose pull && docker compose up -d`. Check `docker logs crew-cache` and run the test above.
+- **Stop using it**: set `CREW_CACHE_ENABLED=false`. Nothing else needs to change.
+- **Size**: `du -sh /srv/crew-cache/data`; the 10 GB cap (`--max_size`) evicts the least recently used objects.
 
-A failed or lost response can be retried without replacing valid assets. Published releases are verified without modification. Authentication/identity/integrity failures stop immediately; transient HTTP/network errors use bounded backoff. Same-run publication jobs are serialized. If an immutable published release is incomplete or corrupted, do not delete it automatically: investigate and create a new release with a fresh version/build.
+## Docker builds on the VPS
 
-The required build-gate now waits for server-image and, on an authorized IPA route, release and AltStore as well as compilation and simulator checks. Fork PRs are not expected to publish. Android is required only when explicitly requested.
+All Coolify builds run on one BuildKit daemon, so identical layers are shared already. `apps/server/Dockerfile` adds two things:
 
-## 5. Verification and rollback
+1. The lockfile and the `package.json` of every workspace package are copied first, then `pnpm fetch` and `pnpm install` run, and only then the code is copied. A code change therefore keeps the install layer.
+2. The pnpm store is a BuildKit cache mount (`crew-pnpm-store`, `sharing=locked`), shared by every build on that worker: a package one build downloaded is not fetched again.
 
-- On a PR: inspect checks, server-image, both iOS builds/launch jobs, release, AltStore and build-gate. On OTA/checks-only routes inspect the expected route rather than requiring skipped jobs.
-- On main: verify cache save/prune results and the public release; a PR cannot exercise main-only writes or the prune job.
-- Inspect actual ccache hit/miss counters and compare cold/warm wall times before claiming gains.
-- A safe rollback for remote storage is the feature flag; for a code regression revert the relevant commit through a new PR. Never disable the required build gate to merge a broken build.
-- The VPS setup, remote helper availability and production cache permissions require independent operational verification; a green preview alone is insufficient.
+When you add or remove a workspace package, add or remove its `COPY .../package.json` line. `tools/ci/server-image-manifests.test.mjs` fails the `checks` job if you forget (the install would otherwise succeed and the server would fail at run time).
+
+`tools/ci/check-server-image.sh` (job `server-image`, run when the server, its packages, the lockfile or the check itself changed) builds on a fresh builder and checks, on the built images rather than the build log: a cold build works; a code-only change reuses the install; a change to the dependency inputs does not; the run-time dependencies resolve; the API answers `/v1/ready` as a non-root user. Everything it creates (builder, images, container) is removed on success, failure or interruption. Run on the VPS: 4 min 39 s in total.
+
+The VPS timer `vps-cleanup` runs hourly: at 04:00 it drops build cache older than three days (the pnpm cache mount included), and at any hour it drops all of it once the disk is 80 % full. The next build then starts cold and refills it. The cache is bounded by age, not by size.
+
+## GitHub release
+
+`tools/ci/publish-release.mjs` creates the release as a draft, uploads the files by release id, verifies each one (state, size, SHA-256), then publishes. It can be re-run at any point and never overwrites a valid asset or changes a published release. Checked against the real API with a throwaway preview release (created and deleted by the test): fresh create; re-run on a published release leaves it untouched; different IPA under the same tag is refused; an interrupted draft is completed; a draft holding a different file is left unpublished; duplicate drafts and a tag on another commit are refused. The preview release never became `latest`.
+
+## Limits
+
+- The remote cache is only measured end to end on a macOS runner by the build itself (the step prints ccache statistics and warns when Xcode produced no cacheable call). Everything else was run with the same ccache, helper and server on Linux.
+- A pull request build cannot warm the shared cache. The first build after a merge to `main` fills it.
+- The signing key and publish token of the OTA server are repository secrets, so a workflow in a branch of this repository can read them. They are not covered by the environment split above.
