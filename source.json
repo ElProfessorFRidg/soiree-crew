@@ -929,16 +929,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -951,6 +951,28 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.61",
+          "buildVersion": "375",
+          "marketingVersion": "0.2.61 Preview (375)",
+          "date": "2026-11-26T10:20:42Z",
+          "localizedDescription": "• Bump the other-patches group with 2 updates (#45)\n• Assert generated Swift forwards the declared argument\n• Forward SceneDelegate connectionOptions correctly\n• Bump vitest (#40)\n• Improve diagnostics and move startup details to logs\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.61-preview.39%2Bbuild.375/soiree-crew-unsigned.ipa",
+          "size": 25941880,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.58",
           "buildVersion": "372",
@@ -2228,26 +2250,37 @@
           ]
         }
       ],
-      "version": "0.2.58",
-      "versionDate": "2026-11-26T05:48:58Z",
-      "versionDescription": "• Bump the other-patches group with 2 updates\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.58-preview.45%2Bbuild.372/soiree-crew-unsigned.ipa",
-      "size": 25946564,
+      "version": "0.2.61",
+      "versionDate": "2026-11-26T10:20:42Z",
+      "versionDescription": "• Bump the other-patches group with 2 updates (#45)\n• Assert generated Swift forwards the declared argument\n• Forward SceneDelegate connectionOptions correctly\n• Bump vitest (#40)\n• Improve diagnostics and move startup details to logs\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.61-preview.39%2Bbuild.375/soiree-crew-unsigned.ipa",
+      "size": 25941880,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.58-preview.45%2Bbuild.372/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "preview-0.2.61-375",
+      "title": "Soirée Crew Preview 0.2.61 (375)",
+      "caption": "• Bump the other-patches group with 2 updates (#45)\n• Assert generated Swift forwards the declared argument\n• Forward SceneDelegate connectionOptions correctly\n• Bump vitest (#40)\n• Improve diagnostics and move startup details to logs\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+      "date": "2026-11-26T10:20:42Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.61-preview.39%2Bbuild.375/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.61-preview.39%2Bbuild.375/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
     {
       "identifier": "preview-0.2.58-372",
       "title": "Soirée Crew Preview 0.2.58 (372)",
@@ -2447,17 +2480,6 @@
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.35-preview.35%2Bbuild.335/iphone/banner.png",
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.35-preview.35%2Bbuild.335/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
-      "notify": false
-    },
-    {
-      "identifier": "release-0.2.34-334",
-      "title": "Soirée Crew 0.2.34 (334)",
-      "caption": "• Bump vitest from 4.1.11 to 5.1.0 (#37)",
-      "date": "2026-11-24T08:02:01Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.34%2Bbuild.334/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.34%2Bbuild.334/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile",
       "notify": false
     }
   ],
@@ -2876,6 +2898,13 @@
       "buildVersion": "2",
       "date": "2026-10-27T00:43:05Z",
       "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.61",
+      "buildVersion": "375",
+      "date": "2026-11-26T10:20:42Z",
+      "localizedDescription": "• Bump the other-patches group with 2 updates (#45)\n• Assert generated Swift forwards the declared argument\n• Forward SceneDelegate connectionOptions correctly\n• Bump vitest (#40)\n• Improve diagnostics and move startup details to logs\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
