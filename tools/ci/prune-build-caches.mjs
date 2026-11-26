@@ -7,7 +7,7 @@ export function staleCacheIds(caches, keep = 2) {
   const families = new Map();
   for (const c of caches) {
     if (c.ref !== "refs/heads/main" || !Number.isSafeInteger(c.id) || typeof c.key !== "string" || !Number.isFinite(Date.parse(c.created_at))) continue;
-    const native = /^ios-build-v2-xcode26\.6-(iphone|ipad)-/.exec(c.key) ??
+    const native = /^ios-build-v[23]-xcode26\.6-(iphone|ipad)-/.exec(c.key) ??
       /^ios-build-xcode26\.6-[a-f0-9]+-(iphone|ipad)-/.exec(c.key) ??
       (/^ios-build-xcode26\.6-/.test(c.key) ? ["", "legacy"] : null);
     const jsi = /^expo-modules-jsi-v2-xcode26\.6-(iphone|ipad)-/.exec(c.key);

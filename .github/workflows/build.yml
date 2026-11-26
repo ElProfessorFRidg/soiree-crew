@@ -204,8 +204,6 @@ jobs:
     needs: version
     if: needs.version.outputs.ota_base == '' && needs.version.outputs.skip_ipa != 'true'
     runs-on: macos-26
-    # The write credential exists only in the main-restricted environment, never in repository secrets.
-    environment: ${{ github.ref == 'refs/heads/main' && 'crew-cache-main' || 'crew-cache-preview' }}
     timeout-minutes: 60
     strategy:
       fail-fast: false
@@ -261,54 +259,20 @@ jobs:
         with:
           path: ${{ steps.pnpm-store.outputs.path }}
           key: ${{ steps.pnpm-cache.outputs.cache-primary-key }}
-      # Build caches kept between runs: ccache serves the C, C++ and Objective-C compiles (React
-      # Native and the native modules), the CocoaPods cache saves the pod downloads.
-      - name: Install ccache
-        run: brew install ccache
-      # Homebrew's ccache has no HTTPS storage backend (the built-in HTTP one is plain-text only and deprecated).
-      # The official helper is a separate program: pinned release, checksum verified before it is ever run.
-      - name: Install the ccache HTTPS helper
-        if: vars.CREW_CACHE_ENABLED == 'true' && vars.CREW_CACHE_URL != ''
-        run: bash tools/ci/install-ccache-helper.sh
-      - name: Configure ccache
-        run: |
-          echo "CCACHE_DIR=$HOME/Library/Caches/ccache" >> "$GITHUB_ENV"
-          echo "CCACHE_MAXSIZE=500M" >> "$GITHUB_ENV"
-          echo "CCACHE_COMPILERCHECK=content" >> "$GITHUB_ENV"
-          ccache --version
-      - name: Use protected remote cache (main)
-        if: github.ref == 'refs/heads/main' && vars.CREW_CACHE_ENABLED == 'true' && vars.CREW_CACHE_URL != ''
-        env:
-          CACHE_URL: ${{ vars.CREW_CACHE_URL }}
-          CACHE_PASSWORD: ${{ secrets.CREW_CACHE_WRITE_PASSWORD }}
-          CACHE_USER: ci
-          MODE: read-write
-        run: bash tools/ci/configure-ccache.sh
-      - name: Use read-only remote cache (preview)
-        if: github.ref != 'refs/heads/main' && vars.CREW_CACHE_ENABLED == 'true' && vars.CREW_CACHE_URL != ''
-        env:
-          CACHE_URL: ${{ vars.CREW_CACHE_URL }}
-          CACHE_PASSWORD: ${{ secrets.CREW_CACHE_READ_PASSWORD }}
-          CACHE_USER: ci-read
-          MODE: read-only
-        run: bash tools/ci/configure-ccache.sh
+      # CocoaPods downloads, restored from main's newest cache. ccache was tried and measured here: with React Native
+      # and the Expo modules prebuilt, Xcode makes no C or C++ compiler call it could serve (docs/CACHE.md).
       - uses: actions/cache/restore@v6
         id: native-cache
         with:
-          path: |
-            ~/Library/Caches/ccache
-            ~/Library/Caches/CocoaPods
-          key: ios-build-v2-xcode26.6-${{ matrix.target }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.run_id }}
+          path: ~/Library/Caches/CocoaPods
+          key: ios-build-v3-xcode26.6-${{ matrix.target }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.run_id }}
           restore-keys: |
-            ios-build-v2-xcode26.6-${{ matrix.target }}-${{ hashFiles('pnpm-lock.yaml') }}-
-            ios-build-v2-xcode26.6-${{ matrix.target }}-
-            ios-build-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}-${{ matrix.target }}-
+            ios-build-v3-xcode26.6-${{ matrix.target }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            ios-build-v3-xcode26.6-${{ matrix.target }}-
       - name: Generate the native project
         working-directory: apps/mobile
         env:
           BUILD_NUMBER: ${{ github.run_number }}
-          # React Native wires ccache into every pod when this is set at pod install.
-          USE_CCACHE: "1"
         run: npx expo prebuild --platform ios --clean
       # ExpoModulesJSI is the slowest piece to compile. Its build script reuses a slice whose
       # recorded source hash (sources, paths, Swift and Xcode versions) still matches.
@@ -317,8 +281,6 @@ jobs:
         with:
           path: apps/mobile/ios/build/Build/Products/ExpoModulesJSI.xcframework
           key: expo-modules-jsi-v2-xcode26.6-${{ matrix.target }}-${{ hashFiles('pnpm-lock.yaml') }}
-      - name: Verify local compiler cache
-        run: bash tools/ci/check-ccache.sh
       - name: Build the app without signing
         working-directory: apps/mobile/ios
         run: |
@@ -334,7 +296,6 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            CLANG_ENABLE_EXPLICIT_MODULES=NO \
             COMPILER_INDEX_STORE_ENABLE=NO \
             > xcodebuild.log 2>&1 || {
               # The real error is usually far above the summary: every error line first, then the end.
@@ -343,15 +304,11 @@ jobs:
               exit 1
             }
           tail -n 20 xcodebuild.log
-          ccache --show-stats
-          ccache --print-stats | awk -F '\t' '$1 ~ /^(direct_cache_hit|preprocessed_cache_hit|cache_miss)$/ { n += $2 } END { if (!n) print "::warning::Xcode produced no cacheable ccache calls; no native-cache speedup established" }'
-      - name: Save the native build cache (main only)
+      - name: Save the CocoaPods cache (main only)
         if: github.ref == 'refs/heads/main' && success() && steps.native-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v6
         with:
-          path: |
-            ~/Library/Caches/ccache
-            ~/Library/Caches/CocoaPods
+          path: ~/Library/Caches/CocoaPods
           key: ${{ steps.native-cache.outputs.cache-primary-key }}
       - name: Save the ExpoModulesJSI slice (main only)
         if: github.ref == 'refs/heads/main' && success() && steps.jsi-cache.outputs.cache-hit != 'true'
