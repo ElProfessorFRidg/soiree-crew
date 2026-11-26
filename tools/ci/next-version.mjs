@@ -42,7 +42,13 @@ function versionForRun(version, run, reserve) {
     git(["-c", "user.name=github-actions[bot]", "-c", "user.email=41898282+github-actions[bot]@users.noreply.github.com",
       "tag", "--annotate", tag, "--message", `build-${run}`, anchor]);
     try {
-      git(["push", "origin", `refs/tags/${tag}:refs/tags/${tag}`]);
+      // checkout may persist the default Actions credential. For this write only,
+      // use the step's GH_TOKEN through gh's credential helper, without logging it.
+      const auth = process.env.GH_TOKEN ? [
+        "-c", "http.extraHeader=", "-c", "http.https://github.com/.extraheader=",
+        "-c", "credential.helper=", "-c", "credential.helper=!gh auth git-credential",
+      ] : [];
+      git([...auth, "push", "origin", `refs/tags/${tag}:refs/tags/${tag}`]);
       return next.version;
     } catch (error) {
       git(["tag", "--delete", tag]);
