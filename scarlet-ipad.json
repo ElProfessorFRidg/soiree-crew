@@ -278,6 +278,27 @@
       ]
     },
     {
+      "name": "Soirée Crew Preview 0.2.59",
+      "version": "0.2.59",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.59-preview.43%2Bbuild.373/soiree-crew-ipad-unsigned.ipa",
+      "category": "Other",
+      "description": "• Bump the other-patches group with 2 updates (#45)\n• Verify release asset digests and require successful native publication\n• Document the preview readiness contract\n• Require the full deployed preview revision\n• Verify preview revision against readiness response\n• Report the deployed commit on the readiness route\n• Reject incomplete IPA releases and ambiguous runtimes with verified tests\n• Use a newer publication sequence for rollback\n• Exercise native import routing against Git history\n• Route newly required native imports to IPA\n• Compare native imports with the IPA baseline\n• Durable cross-process publication transactions with verified HTTP regression tests\n• Resolve consistent per-PR preview API origin for IPA and OTA\n• Capture generated native project and capability inventory per IPA\n• Serialize stream writes and deduplicate identical manifests\n• Verify configured Coolify preview readiness and OTA signing key\n• Distribute OTA to individually verified historical IPA runtimes\n• Add independent OTA-on-IPA simulator smoke checks and routing regression tests\n• Resolve mobile dependency graph and isolate preview runtime routing\n• Centralize OTA impact routing and avoid unnecessary native builds\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+      "bundleID": "app.soireecrew.mobile.preview",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/ipad/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/ipad/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/ipad/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/ipad/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/ipad/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/ipad/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/ipad/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/ipad/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/ipad/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/ipad/10-limits.png"
+      ]
+    },
+    {
       "name": "Soirée Crew Preview 0.2.58",
       "version": "0.2.58",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",

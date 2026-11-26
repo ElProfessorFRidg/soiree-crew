@@ -996,6 +996,28 @@
           ]
         },
         {
+          "version": "0.2.59",
+          "buildVersion": "373",
+          "marketingVersion": "0.2.59 Preview (373)",
+          "date": "2026-11-26T10:40:39Z",
+          "localizedDescription": "• Bump the other-patches group with 2 updates (#45)\n• Verify release asset digests and require successful native publication\n• Document the preview readiness contract\n• Require the full deployed preview revision\n• Verify preview revision against readiness response\n• Report the deployed commit on the readiness route\n• Reject incomplete IPA releases and ambiguous runtimes with verified tests\n• Use a newer publication sequence for rollback\n• Exercise native import routing against Git history\n• Route newly required native imports to IPA\n• Compare native imports with the IPA baseline\n• Durable cross-process publication transactions with verified HTTP regression tests\n• Resolve consistent per-PR preview API origin for IPA and OTA\n• Capture generated native project and capability inventory per IPA\n• Serialize stream writes and deduplicate identical manifests\n• Verify configured Coolify preview readiness and OTA signing key\n• Distribute OTA to individually verified historical IPA runtimes\n• Add independent OTA-on-IPA simulator smoke checks and routing regression tests\n• Resolve mobile dependency graph and isolate preview runtime routing\n• Centralize OTA impact routing and avoid unnecessary native builds\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.59-preview.43%2Bbuild.373/soiree-crew-unsigned.ipa",
+          "size": 25946558,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/iphone/10-limits.png"
+          ]
+        },
+        {
           "version": "0.2.58",
           "buildVersion": "372",
           "marketingVersion": "0.2.58 Preview (372)",
@@ -2293,6 +2315,17 @@
   ],
   "news": [
     {
+      "identifier": "preview-0.2.59-373",
+      "title": "Soirée Crew Preview 0.2.59 (373)",
+      "caption": "• Bump the other-patches group with 2 updates (#45)\n• Verify release asset digests and require successful native publication\n• Document the preview readiness contract\n• Require the full deployed preview revision\n• Verify preview revision against readiness response\n• Report the deployed commit on the readiness route\n• Reject incomplete IPA releases and ambiguous runtimes with verified tests\n• Use a newer publication sequence for rollback\n• Exercise native import routing against Git history\n• Route newly required native imports to IPA\n• Compare native imports with the IPA baseline\n• Durable cross-process publication transactions with verified HTTP regression tests\n• Resolve consistent per-PR preview API origin for IPA and OTA\n• Capture generated native project and capability inventory per IPA\n• Serialize stream writes and deduplicate identical manifests\n• Verify configured Coolify preview readiness and OTA signing key\n• Distribute OTA to individually verified historical IPA runtimes\n• Add independent OTA-on-IPA simulator smoke checks and routing regression tests\n• Resolve mobile dependency graph and isolate preview runtime routing\n• Centralize OTA impact routing and avoid unnecessary native builds\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+      "date": "2026-11-26T10:40:39Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.59-preview.43%2Bbuild.373/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.59-preview.43%2Bbuild.373/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
+    {
       "identifier": "preview-0.2.60-374",
       "title": "Soirée Crew Preview 0.2.60 (374)",
       "caption": "• Bump the other-patches group with 2 updates (#45)\n• Revert \"Build new IPAs for drink catalogue and discovery changes\"\n• Use compact on-demand records and curated bounded search\n• Exclude non-beverages and reject invalid imported strengths\n• Build new IPAs for drink catalogue and discovery changes\n• Import branded drinks across all catalogue families\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
@@ -2493,15 +2526,6 @@
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.36-preview.36%2Bbuild.337/iphone/banner.png",
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.36-preview.36%2Bbuild.337/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
-      "notify": false
-    },
-    {
-      "identifier": "ota-v0.2.34+build.334-iphone-45361764484.1",
-      "title": "Soirée Crew 0.2.34 · OTA",
-      "caption": "• Show the OTA state in Settings (#35)",
-      "date": "2026-11-24T09:11:14Z",
-      "appID": "app.soireecrew.mobile",
-      "tintColor": "F4B33D",
       "notify": false
     }
   ],
@@ -2934,6 +2958,13 @@
       "buildVersion": "374",
       "date": "2026-11-26T10:35:32Z",
       "localizedDescription": "• Bump the other-patches group with 2 updates (#45)\n• Revert \"Build new IPAs for drink catalogue and discovery changes\"\n• Use compact on-demand records and curated bounded search\n• Exclude non-beverages and reject invalid imported strengths\n• Build new IPAs for drink catalogue and discovery changes\n• Import branded drinks across all catalogue families\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)"
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.59",
+      "buildVersion": "373",
+      "date": "2026-11-26T10:40:39Z",
+      "localizedDescription": "• Bump the other-patches group with 2 updates (#45)\n• Verify release asset digests and require successful native publication\n• Document the preview readiness contract\n• Require the full deployed preview revision\n• Verify preview revision against readiness response\n• Report the deployed commit on the readiness route\n• Reject incomplete IPA releases and ambiguous runtimes with verified tests\n• Use a newer publication sequence for rollback\n• Exercise native import routing against Git history\n• Route newly required native imports to IPA\n• Compare native imports with the IPA baseline\n• Durable cross-process publication transactions with verified HTTP regression tests\n• Resolve consistent per-PR preview API origin for IPA and OTA\n• Capture generated native project and capability inventory per IPA\n• Serialize stream writes and deduplicate identical manifests\n• Verify configured Coolify preview readiness and OTA signing key\n• Distribute OTA to individually verified historical IPA runtimes\n• Add independent OTA-on-IPA simulator smoke checks and routing regression tests\n• Resolve mobile dependency graph and isolate preview runtime routing\n• Centralize OTA impact routing and avoid unnecessary native builds\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
