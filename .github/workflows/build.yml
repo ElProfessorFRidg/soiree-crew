@@ -169,6 +169,7 @@ jobs:
         if: steps.route.outputs.release == '' && steps.route.outputs.skip_ipa != 'true'
         env:
           RESERVE_VERSION: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+          GH_TOKEN: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && secrets.CREW_WORKFLOW_TOKEN || github.token }}
         run: node tools/ci/next-version.mjs >> "$GITHUB_OUTPUT"
       - name: Tell the PR how this change reaches the phones
         if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository || inputs.pr != ''
@@ -563,7 +564,7 @@ jobs:
       - name: Publish the release
         id: publish
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.CREW_WORKFLOW_TOKEN || github.token }}
           APP_VERSION: ${{ needs.version.outputs.version }}
           CREW_RELEASE_CHANNEL: ${{ (github.event_name == 'pull_request' || inputs.pr != '') && 'preview' || 'public' }}
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr }}
