@@ -854,6 +854,27 @@
       ]
     },
     {
+      "name": "Soirée Crew Preview 0.2.60",
+      "version": "0.2.60",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.60-preview.41%2Bbuild.374/soiree-crew-unsigned.ipa",
+      "category": "Other",
+      "description": "• Bump the other-patches group with 2 updates (#45)\n• Revert \"Build new IPAs for drink catalogue and discovery changes\"\n• Use compact on-demand records and curated bounded search\n• Exclude non-beverages and reject invalid imported strengths\n• Build new IPAs for drink catalogue and discovery changes\n• Import branded drinks across all catalogue families\n• Bump vitest (#40)\n• Update settings and changelog UX (OTA) (#38)\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
+      "bundleID": "app.soireecrew.mobile.preview",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.60-preview.41%2Bbuild.374/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.60-preview.41%2Bbuild.374/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.60-preview.41%2Bbuild.374/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.60-preview.41%2Bbuild.374/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.60-preview.41%2Bbuild.374/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.60-preview.41%2Bbuild.374/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.60-preview.41%2Bbuild.374/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.60-preview.41%2Bbuild.374/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.60-preview.41%2Bbuild.374/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.60-preview.41%2Bbuild.374/iphone/10-limits.png"
+      ]
+    },
+    {
       "name": "Soirée Crew Preview 0.2.58",
       "version": "0.2.58",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
