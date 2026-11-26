@@ -97,8 +97,17 @@ export function githubReleaseApi(repo, plan, notesFile) {
     createDraft() {
       const sha = checkTag();
       if (sha && sha !== plan.sha) throw new Error("Existing tag SHA mismatch");
-      return json("--method", "POST", endpoint, "-f", "tag_name=" + plan.tag, "-f", "target_commitish=" + plan.sha,
+      try {
+        return json("--method", "POST", endpoint, "-f", "tag_name=" + plan.tag, "-f", "target_commitish=" + plan.sha,
         "-f", "name=" + plan.title, "-F", "body=@" + notesFile, "-F", "draft=true", "-F", "prerelease=" + plan.preview, "-f", "make_latest=false");
+      } catch (error) {
+        // GitHub answers 403 when the target commit touches workflow files and is no longer the tip of a branch or of the PR's merge ref:
+        // the run was superseded by a newer push. Say so instead of leaving a bare permission error.
+        if (/Resource not accessible by integration/.test(String(error.stderr ?? error.message))) {
+          throw new Error("GitHub refused to create the release at " + plan.sha + " (403). This run was probably superseded by a newer commit, or the PR's merge ref moved: re-run on the latest commit. Nothing was published.", { cause: error });
+        }
+        throw error;
+      }
     },
     assets(id) { return pages(endpoint + "/" + id + "/assets"); },
     removeIncomplete(id) { gh("api", "--method", "DELETE", endpoint + "/assets/" + id); },
