@@ -387,10 +387,12 @@ export default function SettingsScreen() {
                   />
                 ))}
                 <Text variant="label">{i18n.t("settings.quiet")}</Text>
-                <View style={styles.pair}>
+                <View style={styles.quietHours}>
                   <View style={styles.flex}>
                     <Text variant="small">{i18n.t("settings.quietFrom")}</Text>
                     <Stepper
+                      editable={false}
+                      size={32}
                       value={preferences.quietFromHour}
                       min={0}
                       max={23}
@@ -403,6 +405,8 @@ export default function SettingsScreen() {
                   <View style={styles.flex}>
                     <Text variant="small">{i18n.t("settings.quietTo")}</Text>
                     <Stepper
+                      editable={false}
+                      size={32}
                       value={preferences.quietToHour}
                       min={0}
                       max={23}
@@ -625,7 +629,7 @@ const styles = StyleSheet.create({
   sectionTitle: { flexDirection: "row", alignItems: "center", gap: 6 },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   switchRow: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 54 },
-  pair: { flexDirection: "row", gap: 12 },
+  quietHours: { gap: 16 },
   crew: { gap: 4, paddingVertical: 8 },
 });
 
