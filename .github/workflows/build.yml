@@ -616,6 +616,7 @@ jobs:
           APP_VERSION: ${{ needs.version.outputs.version }}
           CREW_RELEASE_CHANNEL: ${{ (github.event_name == 'pull_request' || inputs.pr != '') && 'preview' || 'public' }}
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr }}
+          RELEASE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: node tools/ci/publish-release.mjs
 
   altstore:

@@ -115,7 +115,10 @@ export function githubReleaseApi(repo, plan, notesFile) {
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   const env = process.env;
-  const plan = releasePlan({ version: env.APP_VERSION, build: env.GITHUB_RUN_NUMBER, channel: env.CREW_RELEASE_CHANNEL, pr: env.PR_NUMBER, sha: env.GITHUB_SHA });
+  // A pull_request run builds GitHub's synthetic merge commit, which GitHub will not use as a release target for a
+  // token without workflow permission; the release is anchored to the pull request's own head commit instead.
+  const releaseSha = env.RELEASE_SHA || env.GITHUB_SHA;
+  const plan = releasePlan({ version: env.APP_VERSION, build: env.GITHUB_RUN_NUMBER, channel: env.CREW_RELEASE_CHANNEL, pr: env.PR_NUMBER, sha: releaseSha });
   const tags = execFileSync("git", ["tag", "--list"], { encoding: "utf8" }).trim().split("\n");
   const previous = tags.filter((tag) => releaseOfTag(tag)?.channel === "public").sort((a, b) => releaseOfTag(b).build - releaseOfTag(a).build)[0];
   const changes = execFileSync("git", ["log", previous ? `${previous}..HEAD` : "HEAD", "--no-merges", "--pretty=format:- %s", "-40"], { encoding: "utf8" });
@@ -125,7 +128,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
   const files = ["soiree-crew-unsigned.ipa", "soiree-crew-ipad-unsigned.ipa", "ios-build-info-iphone.json", "ios-build-info-ipad.json"].map((name) => `dist/${name}`);
   for (const file of files) if (!existsSync(file)) throw new Error(`Missing release payload: ${file}`);
   if (existsSync("dist/soiree-crew.apk")) files.push("dist/soiree-crew.apk");
-  const identity = { ...plan, sha: env.GITHUB_SHA, preview: env.CREW_RELEASE_CHANNEL === "preview" };
+  const identity = { ...plan, sha: releaseSha, preview: env.CREW_RELEASE_CHANNEL === "preview" };
   const expected = files.map(path => {
     const data = readFileSync(path);
     return { path, name: basename(path), size: data.length, digest: "sha256:" + createHash("sha256").update(data).digest("hex") };
