@@ -35,10 +35,20 @@ function versionForRun(version, run, reserve) {
 
     const tag = `${prefix}${next.version}`;
     if (reservations.some((entry) => entry.tag === tag)) continue;
+    // Reservation tags are counters, not release provenance. Anchor them to an
+    // existing main commit rather than a synthetic PR merge containing workflow edits.
+    git(["fetch", "--no-tags", "origin", "refs/heads/main"]);
+    const anchor = git(["rev-parse", "--verify", "FETCH_HEAD^{commit}"]);
     git(["-c", "user.name=github-actions[bot]", "-c", "user.email=41898282+github-actions[bot]@users.noreply.github.com",
-      "tag", "--annotate", tag, "--message", `build-${run}`]);
+      "tag", "--annotate", tag, "--message", `build-${run}`, anchor]);
     try {
-      git(["push", "origin", `refs/tags/${tag}:refs/tags/${tag}`]);
+      // checkout may persist the default Actions credential. For this write only,
+      // use the step's GH_TOKEN through gh's credential helper, without logging it.
+      const auth = process.env.GH_TOKEN ? [
+        "-c", "http.extraHeader=", "-c", "http.https://github.com/.extraheader=",
+        "-c", "credential.helper=", "-c", "credential.helper=!gh auth git-credential",
+      ] : [];
+      git([...auth, "push", "origin", `refs/tags/${tag}:refs/tags/${tag}`]);
       return next.version;
     } catch (error) {
       git(["tag", "--delete", tag]);
