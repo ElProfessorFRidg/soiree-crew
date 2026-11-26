@@ -265,6 +265,11 @@ jobs:
       # Native and the native modules), the CocoaPods cache saves the pod downloads.
       - name: Install ccache
         run: brew install ccache
+      # Homebrew's ccache has no HTTPS storage backend (the built-in HTTP one is plain-text only and deprecated).
+      # The official helper is a separate program: pinned release, checksum verified before it is ever run.
+      - name: Install the ccache HTTPS helper
+        if: vars.CREW_CACHE_ENABLED == 'true' && vars.CREW_CACHE_URL != ''
+        run: bash tools/ci/install-ccache-helper.sh
       - name: Configure ccache
         run: |
           echo "CCACHE_DIR=$HOME/Library/Caches/ccache" >> "$GITHUB_ENV"
@@ -626,7 +631,7 @@ jobs:
     if: always() && needs.checks.result == 'success' && needs.server-image.result == 'success' && needs.ios.result == 'success' && needs.ios-launch.result == 'success' && (needs.android.result == 'success' || needs.android.result == 'skipped') && ((github.event_name != 'pull_request' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || inputs.pr != '')
     runs-on: ubuntu-latest
     concurrency:
-      group: crew-release-${{ github.run_id }}
+      group: crew-release-${{ github.run_number }}
       cancel-in-progress: false
     outputs:
       tag: ${{ steps.publish.outputs.tag }}

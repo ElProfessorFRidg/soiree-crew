@@ -1,0 +1,47 @@
+# Shared compile cache for the iOS CI (docs/CACHE.md). Lives on the VPS in /srv/crew-cache.
+# Start it with:  CACHE_READ_HASH='...' CACHE_WRITE_HASH='...' docker compose up -d
+# where the hashes are htpasswd bcrypt lines with every "$" doubled:
+#   docker run --rm httpd:2-alpine htpasswd -nbB ci-read "$READ_PASSWORD" | sed 's/\$/$$/g'
+#   docker run --rm httpd:2-alpine htpasswd -nbB ci      "$WRITE_PASSWORD" | sed 's/\$/$$/g'
+#
+# bazel-remote has no accounts of its own and is reachable only through Traefik, which decides who may do what:
+#   GET and HEAD -> the read account or the write account
+#   PUT          -> the write account only
+#   any other method has no route (a request for it never reaches the cache)
+services:
+  crew-cache:
+    image: buchgr/bazel-remote-cache:latest
+    container_name: crew-cache
+    restart: unless-stopped
+    user: "65534:65534"
+    # ccache stores opaque blobs under /ac/, which the server would reject as malformed action results.
+    command: ["--dir=/data", "--max_size=10", "--http_address=0.0.0.0:8080", "--grpc_port=0", "--disable_http_ac_validation", "--storage_mode=zstd"]
+    volumes:
+      - /srv/crew-cache/data:/data
+    networks: [coolify]
+    mem_limit: 512m
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=coolify
+      - traefik.http.services.crew-cache.loadbalancer.server.port=8080
+      - traefik.http.routers.crew-cache-http.entrypoints=http
+      - traefik.http.routers.crew-cache-http.middlewares=redirect-to-https
+      - traefik.http.routers.crew-cache-http.rule=Host(`cache.crew.57.128.183.60.sslip.io`)
+      - traefik.http.middlewares.crew-cache-read-auth.basicauth.users=${CACHE_READ_HASH},${CACHE_WRITE_HASH}
+      - traefik.http.middlewares.crew-cache-write-auth.basicauth.users=${CACHE_WRITE_HASH}
+      - traefik.http.middlewares.crew-cache-limit.buffering.maxRequestBodyBytes=67108864
+      - traefik.http.routers.crew-cache-read.entrypoints=https
+      - traefik.http.routers.crew-cache-read.rule=Host(`cache.crew.57.128.183.60.sslip.io`) && (Method(`GET`) || Method(`HEAD`))
+      - traefik.http.routers.crew-cache-read.middlewares=crew-cache-read-auth
+      - traefik.http.routers.crew-cache-read.service=crew-cache
+      - traefik.http.routers.crew-cache-read.tls=true
+      - traefik.http.routers.crew-cache-read.tls.certresolver=letsencrypt
+      - traefik.http.routers.crew-cache-write.entrypoints=https
+      - traefik.http.routers.crew-cache-write.rule=Host(`cache.crew.57.128.183.60.sslip.io`) && Method(`PUT`)
+      - traefik.http.routers.crew-cache-write.middlewares=crew-cache-write-auth,crew-cache-limit
+      - traefik.http.routers.crew-cache-write.service=crew-cache
+      - traefik.http.routers.crew-cache-write.tls=true
+      - traefik.http.routers.crew-cache-write.tls.certresolver=letsencrypt
+networks:
+  coolify:
+    external: true

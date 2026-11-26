@@ -48,7 +48,7 @@ export function reconcileRelease(api, plan, expected) {
         return true;
       }
       if (asset.state !== "uploaded" || asset.size !== file.size || asset.digest !== file.digest)
-        throw new Error("Release asset mismatch: " + file.name);
+        throw new Error("Release asset mismatch: " + file.name + " is already on " + plan.tag + " with different content (state " + asset.state + ", size " + asset.size + " vs " + file.size + "). A release is never rewritten: push a new commit to get a new build number.");
       return false;
     });
     for (const id of incomplete) api.removeIncomplete(id);
@@ -102,7 +102,11 @@ export function githubReleaseApi(repo, plan, notesFile) {
     },
     assets(id) { return pages(endpoint + "/" + id + "/assets"); },
     removeIncomplete(id) { gh("api", "--method", "DELETE", endpoint + "/assets/" + id); },
-    upload(_id, file) { gh("release", "upload", plan.tag, file.path, "--repo", repo); },
+    // Uploads go to the release id, not the tag: a draft has no tag lookup. The name is fixed by us, never by the file system.
+    upload(id, file) {
+      execFileSync("gh", ["api", "--method", "POST", "https://uploads.github.com/repos/" + repo + "/releases/" + id + "/assets?name=" + encodeURIComponent(file.name),
+        "-H", "Content-Type: application/octet-stream", "--input", file.path], { encoding: "utf8", timeout: 900000, maxBuffer: 32 * 1024 * 1024, stdio: ["ignore", "pipe", "pipe"] });
+    },
     publish(id) {
       return json("--method", "PATCH", endpoint + "/" + id, "-F", "draft=false", "-f", "make_latest=" + !plan.preview);
     },
