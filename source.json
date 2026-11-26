@@ -951,16 +951,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -973,6 +973,28 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.69",
+          "buildVersion": "387",
+          "marketingVersion": "0.2.69 Preview (387)",
+          "date": "2026-11-26T20:24:08Z",
+          "localizedDescription": "• CI: explain a refused release target, remove the probe, correct the notes\n• CI: anchor PR preview releases to the pull request head commit; temporary release-permission probe\n• CI: drop ccache (measured: Xcode makes no cacheable compiler call), keep restore-only PR caches; document the findings\n• Anchor version reservation tags to published main\n• CI: review fixes (helper archive layout guard, prune buffer and legacy keys, image filter covers i18n) and rewritten cache docs\n• CI: HTTPS helper for ccache, server-side read/write split, live release test hooks, image checks on real builders\n• Validate compiler caching, bound cache retention and recover releases safely\n• CI: optional shared compile cache on the VPS (off until configured), docs\n• Server image: copy the manifests one by one so code changes keep the install layer\n• Server image: install from manifests only, so code changes skip the install layer\n• Server image: prefer the shared store, fall back to the network\n• Server image: install over the fetched store without a TTY prompt\n• Server image: do not fail pnpm fetch on ignored build scripts\n• CI: restore-only PR caches, retry GitHub release calls, shared pnpm cache in the server image",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.69-preview.44%2Bbuild.387/soiree-crew-unsigned.ipa",
+          "size": 25941878,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.66",
           "buildVersion": "385",
@@ -2338,26 +2360,37 @@
           ]
         }
       ],
-      "version": "0.2.66",
-      "versionDate": "2026-11-26T14:12:19Z",
-      "versionDescription": "• CI: drop ccache (measured: Xcode makes no cacheable compiler call), keep restore-only PR caches; document the findings\n• Anchor version reservation tags to published main\n• CI: review fixes (helper archive layout guard, prune buffer and legacy keys, image filter covers i18n) and rewritten cache docs\n• CI: HTTPS helper for ccache, server-side read/write split, live release test hooks, image checks on real builders\n• Validate compiler caching, bound cache retention and recover releases safely\n• CI: optional shared compile cache on the VPS (off until configured), docs\n• Server image: copy the manifests one by one so code changes keep the install layer\n• Server image: install from manifests only, so code changes skip the install layer\n• Server image: prefer the shared store, fall back to the network\n• Server image: install over the fetched store without a TTY prompt\n• Server image: do not fail pnpm fetch on ignored build scripts\n• CI: restore-only PR caches, retry GitHub release calls, shared pnpm cache in the server image",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.66-preview.44%2Bbuild.385/soiree-crew-unsigned.ipa",
-      "size": 25946703,
+      "version": "0.2.69",
+      "versionDate": "2026-11-26T20:24:08Z",
+      "versionDescription": "• CI: explain a refused release target, remove the probe, correct the notes\n• CI: anchor PR preview releases to the pull request head commit; temporary release-permission probe\n• CI: drop ccache (measured: Xcode makes no cacheable compiler call), keep restore-only PR caches; document the findings\n• Anchor version reservation tags to published main\n• CI: review fixes (helper archive layout guard, prune buffer and legacy keys, image filter covers i18n) and rewritten cache docs\n• CI: HTTPS helper for ccache, server-side read/write split, live release test hooks, image checks on real builders\n• Validate compiler caching, bound cache retention and recover releases safely\n• CI: optional shared compile cache on the VPS (off until configured), docs\n• Server image: copy the manifests one by one so code changes keep the install layer\n• Server image: install from manifests only, so code changes skip the install layer\n• Server image: prefer the shared store, fall back to the network\n• Server image: install over the fetched store without a TTY prompt\n• Server image: do not fail pnpm fetch on ignored build scripts\n• CI: restore-only PR caches, retry GitHub release calls, shared pnpm cache in the server image",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.69-preview.44%2Bbuild.387/soiree-crew-unsigned.ipa",
+      "size": 25941878,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.66-preview.44%2Bbuild.385/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "preview-0.2.69-387",
+      "title": "Soirée Crew Preview 0.2.69 (387)",
+      "caption": "• CI: explain a refused release target, remove the probe, correct the notes\n• CI: anchor PR preview releases to the pull request head commit; temporary release-permission probe\n• CI: drop ccache (measured: Xcode makes no cacheable compiler call), keep restore-only PR caches; document the findings\n• Anchor version reservation tags to published main\n• CI: review fixes (helper archive layout guard, prune buffer and legacy keys, image filter covers i18n) and rewritten cache docs\n• CI: HTTPS helper for ccache, server-side read/write split, live release test hooks, image checks on real builders\n• Validate compiler caching, bound cache retention and recover releases safely\n• CI: optional shared compile cache on the VPS (off until configured), docs\n• Server image: copy the manifests one by one so code changes keep the install layer\n• Server image: install from manifests only, so code changes skip the install layer\n• Server image: prefer the shared store, fall back to the network\n• Server image: install over the fetched store without a TTY prompt\n• Server image: do not fail pnpm fetch on ignored build scripts\n• CI: restore-only PR caches, retry GitHub release calls, shared pnpm cache in the server image",
+      "date": "2026-11-26T20:24:08Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.69-preview.44%2Bbuild.387/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
     {
       "identifier": "preview-0.2.66-385",
       "title": "Soirée Crew Preview 0.2.66 (385)",
@@ -2561,17 +2594,6 @@
       "date": "2026-11-24T14:38:10Z",
       "appID": "app.soireecrew.mobile.preview",
       "tintColor": "F4B33D",
-      "notify": false
-    },
-    {
-      "identifier": "preview-0.2.37-339",
-      "title": "Soirée Crew Preview 0.2.37 (339)",
-      "caption": "• Avoid repeating installed version in status header\n• Refine OTA update and release history UX\n• Refine OTA update and release history UX\n• Refine OTA update and release history UX\n• Reorganise Settings: groups, icons, search, text size, gentler haptics (#36)\n• Show the OTA state in Settings (#35)",
-      "date": "2026-11-24T14:01:31Z",
-      "tintColor": "F4B33D",
-      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.37-preview.38%2Bbuild.339/iphone/banner.png",
-      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.37-preview.38%2Bbuild.339/soiree-crew-unsigned.ipa",
-      "appID": "app.soireecrew.mobile.preview",
       "notify": false
     }
   ],
@@ -2997,6 +3019,13 @@
       "buildVersion": "2",
       "date": "2026-10-27T00:43:05Z",
       "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.69",
+      "buildVersion": "387",
+      "date": "2026-11-26T20:24:08Z",
+      "localizedDescription": "• CI: explain a refused release target, remove the probe, correct the notes\n• CI: anchor PR preview releases to the pull request head commit; temporary release-permission probe\n• CI: drop ccache (measured: Xcode makes no cacheable compiler call), keep restore-only PR caches; document the findings\n• Anchor version reservation tags to published main\n• CI: review fixes (helper archive layout guard, prune buffer and legacy keys, image filter covers i18n) and rewritten cache docs\n• CI: HTTPS helper for ccache, server-side read/write split, live release test hooks, image checks on real builders\n• Validate compiler caching, bound cache retention and recover releases safely\n• CI: optional shared compile cache on the VPS (off until configured), docs\n• Server image: copy the manifests one by one so code changes keep the install layer\n• Server image: install from manifests only, so code changes skip the install layer\n• Server image: prefer the shared store, fall back to the network\n• Server image: install over the fetched store without a TTY prompt\n• Server image: do not fail pnpm fetch on ignored build scripts\n• CI: restore-only PR caches, retry GitHub release calls, shared pnpm cache in the server image"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",

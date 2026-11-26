@@ -258,6 +258,27 @@
     },
     {
       "name": "Soirée Crew Preview",
+      "version": "0.2.69",
+      "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
+      "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.69-preview.44%2Bbuild.387/soiree-crew-ipad-unsigned.ipa",
+      "category": "Other",
+      "description": "• CI: explain a refused release target, remove the probe, correct the notes\n• CI: anchor PR preview releases to the pull request head commit; temporary release-permission probe\n• CI: drop ccache (measured: Xcode makes no cacheable compiler call), keep restore-only PR caches; document the findings\n• Anchor version reservation tags to published main\n• CI: review fixes (helper archive layout guard, prune buffer and legacy keys, image filter covers i18n) and rewritten cache docs\n• CI: HTTPS helper for ccache, server-side read/write split, live release test hooks, image checks on real builders\n• Validate compiler caching, bound cache retention and recover releases safely\n• CI: optional shared compile cache on the VPS (off until configured), docs\n• Server image: copy the manifests one by one so code changes keep the install layer\n• Server image: install from manifests only, so code changes skip the install layer\n• Server image: prefer the shared store, fall back to the network\n• Server image: install over the fetched store without a TTY prompt\n• Server image: do not fail pnpm fetch on ignored build scripts\n• CI: restore-only PR caches, retry GitHub release calls, shared pnpm cache in the server image",
+      "bundleID": "app.soireecrew.mobile.preview",
+      "screenshots": [
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/ipad/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/ipad/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/ipad/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/ipad/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/ipad/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/ipad/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/ipad/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/ipad/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/ipad/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.69-preview.44%2Bbuild.387/ipad/10-limits.png"
+      ]
+    },
+    {
+      "name": "Soirée Crew Preview 0.2.66",
       "version": "0.2.66",
       "icon": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/icon.png",
       "down": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.66-preview.44%2Bbuild.385/soiree-crew-ipad-unsigned.ipa",
