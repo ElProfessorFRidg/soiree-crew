@@ -82,3 +82,7 @@ The VPS timer `vps-cleanup` runs hourly: at 04:00 it drops build cache older tha
 - The remote cache is only measured end to end on a macOS runner by the build itself (the step prints ccache statistics and warns when Xcode produced no cacheable call). Everything else was run with the same ccache, helper and server on Linux.
 - A pull request build cannot warm the shared cache. The first build after a merge to `main` fills it.
 - The signing key and publish token of the OTA server are repository secrets, so a workflow in a branch of this repository can read them. They are not covered by the environment split above.
+
+## Native version reservations
+
+`crew-version/vX.Y.Z` annotated tags reserve unique native versions. Their annotation identifies the Build run (`build-N`), not the source revision. New reservation tags point to a fetched, already-published `main` commit instead of the temporary PR merge commit. This avoids GitHub's workflow-file permission rejection without expanding token scopes. Existing reservations remain valid, and reruns reuse their own version. The actual release tag still identifies the build source commit; never substitute the reservation anchor for release provenance.

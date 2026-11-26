@@ -21,7 +21,15 @@ export function versionAllocation(version, run, tags, reservations) {
   return { version: `${series}.${highest + 1}`, reserved: false };
 }
 
-function versionForRun(version, run, reserve) {
+export function versionForRun(version, run, reserve) {
+  // Reservations are counters, not release provenance. Anchor them to a commit already
+  // published on main: a synthetic PR merge may contain workflow changes and cannot
+  // be tagged with GITHUB_TOKEN (which has no workflows:write permission).
+  let anchor;
+  if (reserve) {
+    git(["fetch", "--no-tags", "origin", "refs/heads/main"]);
+    anchor = git(["rev-parse", "FETCH_HEAD^{commit}"]);
+  }
   for (let attempt = 0; attempt < 10; attempt++) {
     git(["fetch", "--no-tags", "origin", "refs/tags/crew-version/*:refs/tags/crew-version/*"], { stdio: ["ignore", "pipe", "inherit"] });
     const tags = git(["ls-remote", "--tags", "--refs", "origin"]).split("\n").map((line) => line.split("\trefs/tags/")[1]);
@@ -36,7 +44,7 @@ function versionForRun(version, run, reserve) {
     const tag = `${prefix}${next.version}`;
     if (reservations.some((entry) => entry.tag === tag)) continue;
     git(["-c", "user.name=github-actions[bot]", "-c", "user.email=41898282+github-actions[bot]@users.noreply.github.com",
-      "tag", "--annotate", tag, "--message", `build-${run}`]);
+      "tag", "--annotate", tag, "--message", `build-${run}`, anchor]);
     try {
       git(["push", "origin", `refs/tags/${tag}:refs/tags/${tag}`]);
       return next.version;
