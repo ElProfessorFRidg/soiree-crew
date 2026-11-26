@@ -1,4 +1,4 @@
-// Keep this before Router and its imports: a native UIKit watchdog can then locate a startup hang.
+// Keep this before Router and its imports: the native startup log can then locate a startup hang.
 const { reportStartup } = require("./src/system/startupReport");
 reportStartup("entry", "ready");
 try {

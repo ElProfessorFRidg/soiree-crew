@@ -4,6 +4,7 @@ import type { ServerSession } from "./session";
 import { normaliseServerUrl } from "./session";
 import { safeDiagnosticCode, safeRequestId, serverOrigin } from "@/ui/pure/diagnosticCodes";
 import type { NetworkDiagnostic } from "./diagnosticLog";
+import { recordPublicProbe } from "./diagnosticLog";
 import { retryAfterMs } from "@/ui/pure/requestCooldown";
 
 export interface DiagnosticCheck {
@@ -140,6 +141,7 @@ export async function inspectServer(base: string, session: ServerSession | null,
   const report: ServerDiagnosticReport = { server: base, at: Date.now(), checks: publicEndpoints.map((path) => ({ id: path.split("/").pop()!, path, source: hasNativeNetworkProbe ? "native" : "fetch", state: "not-run", code: "SC_NOT_RUN", httpStatus: 0, durationMs: 0 })), operator: null, authorized: false, native: hasNativeNetworkProbe, complete: false };
   const publish = () => { if (current()) progress({ ...report, checks: [...report.checks] }); };
   const finish = () => { report.complete = true; publish(); return report; };
+  publish();
   let limited = false;
   for (const path of publicEndpoints) {
     if (!current() || limited) break;
@@ -147,7 +149,9 @@ export async function inspectServer(base: string, session: ServerSession | null,
     if (!current()) return report;
     if (result.httpStatus === 429) { limited = true; blockedUntil.set(base, Date.now() + Math.max(30, result.retryAfterSeconds ?? 30) * 1000); }
     const { retryAfterSeconds: _retry, contractValid: _contract, native: _native, ...details } = result;
-    report.checks[publicEndpoints.indexOf(path)] = { ...details, id: path.split("/").pop()!, path, source: result.native ? "native" : "fetch", state: path === "/v1/ready" && result.httpStatus === 404 ? "unsupported" : result.code === "SC_OK" ? "ok" : "failed" };
+    const check: DiagnosticCheck = { ...details, id: path.split("/").pop()!, path, source: result.native ? "native" : "fetch", state: path === "/v1/ready" && result.httpStatus === 404 ? "unsupported" : result.code === "SC_OK" ? "ok" : "failed" };
+    report.checks[publicEndpoints.indexOf(path)] = check;
+    recordPublicProbe(base, path, `${check.state} · ${formatDiagnosticCheck(check)}`);
     publish();
     if (result.httpStatus === 0 && result.code !== "SC_OK" && !report.checks.some((check) => check.httpStatus > 0)) break;
   }
@@ -188,18 +192,39 @@ export async function inspectServer(base: string, session: ServerSession | null,
   return current() ? finish() : report;
 }
 
-export function formatServerDiagnostic(report: ServerDiagnosticReport, build: { version: string; build: number; channel: string | null; target: string | null }, history: NetworkDiagnostic[] = []): string {
-  const lines = ["SC_NETWORK_DIAGNOSTIC v1", `App: ${build.version} (${build.build}) ${build.channel ?? "unknown"} ${build.target ?? "unknown"}`, `Server: ${serverOrigin(report.server) ?? "invalid"}`, `At: ${new Date(report.at).toISOString()}`, `Run: ${report.complete ? "complete" : "in-progress"}; transport: ${report.native ? "native" : "fetch (DNS/TLS cause may be unavailable)"}`];
-  for (const check of report.checks) {
-    lines.push(`${check.path}: ${check.state} ${check.code} HTTP=${check.httpStatus || "none"} ${check.durationMs}ms${check.requestId ? ` ref=${safeRequestId(check.requestId) ?? "invalid"}` : ""}${typeof check.nativeErrorCode === "number" ? ` NSURL=${check.nativeErrorCode}` : ""}`);
-    for (const key of ["dnsMs", "tcpMs", "tlsMs", "firstByteMs"]) if (finite(check.timings?.[key])) lines.push(`  ${key}=${check.timings![key]}`);
-  }
-  if (report.operator && report.authorized) {
+export function formatDiagnosticCheck(check: DiagnosticCheck): string {
+  const timings = ["dnsMs", "tcpMs", "tlsMs", "firstByteMs"].flatMap((key) => {
+    const value = check.timings?.[key];
+    return finite(value) ? [`${key}=${value}`] : [];
+  });
+  return [safeDiagnosticCode(check.code) ?? "SC_UNKNOWN", `source=${check.source}`,
+    `HTTP=${check.httpStatus || "none"}`, `${check.durationMs}ms`,
+    ...(safeRequestId(check.requestId) ? [`ref=${check.requestId}`] : []),
+    ...(Number.isInteger(check.nativeErrorCode) ? [`NSURL=${check.nativeErrorCode}`] : []),
+    ...timings].join(" · ");
+}
+
+export function formatNetworkFailure(entry: NetworkDiagnostic): string {
+  return `${new Date(entry.at).toISOString()} ${entry.method} ${entry.feature} ${entry.code} HTTP=${entry.status ?? "none"} ${entry.durationMs}ms attempted=${entry.attempted}${entry.format ? ` response=${entry.format}` : ""}${entry.reason ? ` reason=${entry.reason}` : ""}${safeRequestId(entry.requestId) ? ` ref=${entry.requestId}` : ""}`;
+}
+
+export function formatServerDiagnostic(
+  report: ServerDiagnosticReport | null,
+  build: { version: string; build: number; channel: string | null; target: string | null },
+  history: NetworkDiagnostic[] = [],
+  context: { server?: string | null; issue?: string; localLog?: readonly string[] } = {},
+): string {
+  const server = serverOrigin(report?.server ?? context.server);
+  const lines = ["SC_NETWORK_DIAGNOSTIC v1", `App: ${build.version} (${build.build}) ${build.channel ?? "unknown"} ${build.target ?? "unknown"}`, `Server: ${server ?? "none"}`, `At: ${new Date(report?.at ?? Date.now()).toISOString()}`, `Run: ${report ? report.complete ? "complete" : "in-progress" : "not-run"}; transport: ${(report?.native ?? hasNativeNetworkProbe) ? "native" : "fetch (DNS/TLS cause may be unavailable)"}`];
+  if (safeDiagnosticCode(context.issue)) lines.push(`Issue: ${context.issue}`);
+  for (const check of report?.checks ?? []) lines.push(`${check.path}: ${check.state} · ${formatDiagnosticCheck(check)}`);
+  if (report?.operator && report.authorized) {
     lines.push(`Server API=${report.operator.apiVersion}; revision=${report.operator.revision ?? "unknown"}; readiness=${report.operator.readiness.code}`);
     const executed = new Set(report.checks.filter((check) => check.source === "api").map((check) => `GET ${check.path}`));
     lines.push(`Registered routes=${report.operator.routes.length}; not executed=${report.operator.routes.filter((route) => !executed.has(`${route.method} ${route.path}`)).length}`);
     for (const route of report.operator.routes.filter((route) => route.state !== "available").slice(0, 40)) lines.push(`${route.method} ${route.path}: configured=${route.state}`);
   }
-  for (const entry of history.filter((entry) => entry.server === report.server).slice(-12)) lines.push(`Recent: ${entry.method} ${entry.feature} ${entry.code} HTTP=${entry.status ?? "none"} ${entry.durationMs}ms attempted=${entry.attempted}${entry.requestId ? ` ref=${safeRequestId(entry.requestId) ?? "invalid"}` : ""}`);
+  for (const entry of history.filter((entry) => entry.server === server).slice(-12)) lines.push(`Recent: ${formatNetworkFailure(entry)}`);
+  for (const entry of context.localLog ?? []) lines.push(`Local: ${entry}`);
   return lines.join("\n").slice(0, 20000);
 }
