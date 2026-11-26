@@ -41,8 +41,22 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-          cache: pnpm
+          package-manager-cache: false
+      - name: Locate pnpm store
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@v6
+        id: pnpm-cache
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-v2-${{ runner.os }}-${{ runner.arch }}-
       - run: pnpm install --frozen-lockfile
+      - uses: actions/cache/save@v6
+        if: github.ref == 'refs/heads/main' && steps.pnpm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ steps.pnpm-cache.outputs.cache-primary-key }}
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm lint:slop
@@ -205,21 +219,51 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-          cache: pnpm
+          package-manager-cache: false
+      - name: Locate pnpm store
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@v6
+        id: pnpm-cache
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-v2-${{ runner.os }}-${{ runner.arch }}-
       - run: pnpm install --frozen-lockfile
+      - uses: actions/cache/save@v6
+        if: github.ref == 'refs/heads/main' && steps.pnpm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ steps.pnpm-cache.outputs.cache-primary-key }}
       # Build caches kept between runs: ccache serves the C, C++ and Objective-C compiles (React
       # Native and the native modules), the CocoaPods cache saves the pod downloads.
       - name: Install ccache
         run: brew install ccache
-      - uses: actions/cache@v6
+      - name: Configure ccache
+        run: |
+          echo "CCACHE_DIR=$HOME/Library/Caches/ccache" >> "$GITHUB_ENV"
+          echo "CCACHE_MAXSIZE=500M" >> "$GITHUB_ENV"
+          echo "CCACHE_COMPILERCHECK=content" >> "$GITHUB_ENV"
+          ccache --version
+      - name: Use the shared compile cache (optional)
+        if: vars.CREW_CACHE_URL != ''
+        env:
+          CACHE_URL: ${{ vars.CREW_CACHE_URL }}
+          CACHE_PASSWORD: ${{ github.ref == 'refs/heads/main' && secrets.CREW_CACHE_PASSWORD || secrets.CREW_CACHE_READ_PASSWORD }}
+          CACHE_USER: ${{ github.ref == 'refs/heads/main' && 'ci' || 'ci-read' }}
+          MODE: ${{ github.ref == 'refs/heads/main' && 'read-write' || 'read-only' }}
+        run: bash tools/ci/configure-ccache.sh
+      - uses: actions/cache/restore@v6
+        id: native-cache
         with:
           path: |
             ~/Library/Caches/ccache
             ~/Library/Caches/CocoaPods
-          key: ios-build-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}-${{ matrix.target }}-${{ github.run_id }}
+          key: ios-build-v2-xcode26.6-${{ matrix.target }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.run_id }}
           restore-keys: |
-            ios-build-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}-
-            ios-build-xcode26.6-
+            ios-build-v2-xcode26.6-${{ matrix.target }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            ios-build-v2-xcode26.6-${{ matrix.target }}-
+            ios-build-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}-${{ matrix.target }}-
       - name: Generate the native project
         working-directory: apps/mobile
         env:
@@ -229,10 +273,13 @@ jobs:
         run: npx expo prebuild --platform ios --clean
       # ExpoModulesJSI is the slowest piece to compile. Its build script reuses a slice whose
       # recorded source hash (sources, paths, Swift and Xcode versions) still matches.
-      - uses: actions/cache@v6
+      - uses: actions/cache/restore@v6
+        id: jsi-cache
         with:
           path: apps/mobile/ios/build/Build/Products/ExpoModulesJSI.xcframework
-          key: expo-modules-jsi-xcode26.6-${{ hashFiles('pnpm-lock.yaml') }}
+          key: expo-modules-jsi-v2-xcode26.6-${{ matrix.target }}-${{ hashFiles('pnpm-lock.yaml') }}
+      - name: Verify local compiler cache
+        run: bash tools/ci/check-ccache.sh
       - name: Build the app without signing
         working-directory: apps/mobile/ios
         run: |
@@ -248,6 +295,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
+            CLANG_ENABLE_EXPLICIT_MODULES=NO \
             COMPILER_INDEX_STORE_ENABLE=NO \
             > xcodebuild.log 2>&1 || {
               # The real error is usually far above the summary: every error line first, then the end.
@@ -256,7 +304,22 @@ jobs:
               exit 1
             }
           tail -n 20 xcodebuild.log
-          ccache --show-stats || true
+          ccache --show-stats
+          ccache --print-stats | awk -F '\t' '$1 ~ /^(direct_cache_hit|preprocessed_cache_hit|cache_miss)$/ { n += $2 } END { if (!n) print "::warning::Xcode produced no cacheable ccache calls; no native-cache speedup established" }'
+      - name: Save the native build cache (main only)
+        if: github.ref == 'refs/heads/main' && success() && steps.native-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: |
+            ~/Library/Caches/ccache
+            ~/Library/Caches/CocoaPods
+          key: ${{ steps.native-cache.outputs.cache-primary-key }}
+      - name: Save the ExpoModulesJSI slice (main only)
+        if: github.ref == 'refs/heads/main' && success() && steps.jsi-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: apps/mobile/ios/build/Build/Products/ExpoModulesJSI.xcframework
+          key: expo-modules-jsi-v2-xcode26.6-${{ matrix.target }}-${{ hashFiles('pnpm-lock.yaml') }}
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
@@ -282,6 +345,23 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  prune-build-caches:
+    needs: [ios]
+    if: github.ref == 'refs/heads/main' && needs.ios.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    concurrency:
+      group: crew-prune-build-caches
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+      - name: Retain two recent caches per family
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node tools/ci/prune-build-caches.mjs
+
   android:
     # iOS only for now: the APK is built on demand (Run workflow, "Also build the Android APK").
     if: github.event_name == 'workflow_dispatch' && inputs.android
@@ -303,8 +383,22 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-          cache: pnpm
+          package-manager-cache: false
+      - name: Locate pnpm store
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@v6
+        id: pnpm-cache
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-v2-${{ runner.os }}-${{ runner.arch }}-
       - run: pnpm install --frozen-lockfile
+      - uses: actions/cache/save@v6
+        if: github.ref == 'refs/heads/main' && steps.pnpm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ steps.pnpm-cache.outputs.cache-primary-key }}
       - name: Generate the native project
         working-directory: apps/mobile
         env:
@@ -497,6 +591,9 @@ jobs:
     # Only repository-owned PR branches may publish previews. Forks keep read-only build artifacts.
     if: always() && needs.checks.result == 'success' && needs.ios.result == 'success' && needs.ios-launch.result == 'success' && ((github.event_name != 'pull_request' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || inputs.pr != '')
     runs-on: ubuntu-latest
+    concurrency:
+      group: crew-release-${{ github.run_id }}
+      cancel-in-progress: false
     outputs:
       tag: ${{ steps.publish.outputs.tag }}
     permissions:

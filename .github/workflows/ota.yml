@@ -67,7 +67,16 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-          cache: pnpm
+          package-manager-cache: false
+      - name: Locate pnpm store
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@v6
+        id: pnpm-cache
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-v2-${{ runner.os }}-${{ runner.arch }}-
       - name: Verify target and compatible changes
         id: plan
         env:
@@ -78,6 +87,11 @@ jobs:
           gh release download "$RELEASE_TAG" --pattern "ios-build-info-$CREW_IOS_TARGET.json" --dir "$RUNNER_TEMP"
           node tools/ci/plan-ota.mjs "$RELEASE_TAG" "$CREW_IOS_TARGET" "$RUNNER_TEMP/ios-build-info-$CREW_IOS_TARGET.json" >> "$GITHUB_OUTPUT"
       - run: pnpm install --frozen-lockfile
+      - uses: actions/cache/save@v6
+        if: github.ref == 'refs/heads/main' && steps.pnpm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ steps.pnpm-cache.outputs.cache-primary-key }}
       - if: ${{ !inputs.automatic }}
         run: pnpm check
       - name: Publish iOS update
