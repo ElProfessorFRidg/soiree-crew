@@ -26,3 +26,21 @@ volumes are estimates based on example ingredient strengths and dilution.
 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The export is a
 filtered and deduplicated subset, with brand prefixes added where needed.
 The catalogue does not import caffeine amounts.
+
+## Packaged drinks and spirits
+
+`openfoodfacts-products.json` comes from the [Open Food Facts bulk TSV export](https://world.openfoodfacts.org/data), downloaded on 25 November 2026. The extracted database and its generated index use the same ODbL 1.0 and Database Contents License terms as the earlier Open Food Facts snapshot. A product ID is its barcode and links back to the product page. The catalogue uses the source's alcohol by volume field and explicit beverage categories. Bottled wines and spirits default to a 125 ml glass and a 40 ml pour respectively. Other products use a labelled individual size where suitable, with editable default servings when necessary. Concentrates and other preparations are excluded from the soft-drink import.
+
+`olcc-drinks.json` contains product names, item codes, drink categories and alcohol strengths from the November 2026 [Oregon Liquor and Cannabis Commission (OLCC) Monthly Pricing dataset](https://data.oregon.gov/stories/s/OLCC-Monthly-Pricing/k34n-79ti). It excludes assorted and gift packs and omits all prices. The source's US proof divided by two is the ABV percentage. The app uses a 40 ml spirit pour and the individual container volume for ready-to-drink cocktails when supplied.
+
+Rebuild the snapshots with Python 3.9 or later and refresh the indexes from the repository root.
+
+```sh
+python3 packages/fuzzy/import-drink-catalogue.py en.openfoodfacts.org.products.csv.gz
+python3 packages/fuzzy/import-drink-catalogue.py olcc.csv --olcc-month 2026-11
+pnpm catalogue:index
+```
+
+## Quality and discovery
+
+The curated catalogue is the default popularity tier (not measured sales). For one or two characters, only curated prefixes and exact imported names are expanded. Longer searches use bounded source indexes, and the optional group filter is applied before the prefix cap. Four reviewed non-beverage Open Food Facts codes are excluded by the importer and source snapshots. Source alcohol strengths and serving sizes are estimates: verify the label when logging. Large imports remain in compact source rows; individual products are materialized on demand using binary lookup by stable source code. Full catalogue materialization is reserved for audits and build tooling.

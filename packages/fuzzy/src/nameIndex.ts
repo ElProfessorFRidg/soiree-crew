@@ -21,13 +21,13 @@ function lowerBound(index: NameIndex, name: string): number {
   return lo;
 }
 
-export function matchingDrinkIds(index: NameIndex, name: string, prefix = false, limit = Infinity): string[] {
+export function matchingDrinkIds(index: NameIndex, name: string, prefix = false, limit = Infinity, accept: (id: string) => boolean = () => true): string[] {
   if (!name || limit <= 0) return [];
   const ids = new Set<string>();
   for (let i = lowerBound(index, name); i < index.length && ids.size < limit; i++) {
     const [key, id] = index[i]!;
     if (prefix ? !key.startsWith(name) : key !== name) break;
-    ids.add(id);
+    if (accept(id)) ids.add(id);
   }
   return [...ids];
 }

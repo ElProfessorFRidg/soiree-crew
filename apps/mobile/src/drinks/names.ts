@@ -1,4 +1,4 @@
-import { catalogueDrink, DRINK_CATALOGUE, shownNames, type ShownName } from "@crew/fuzzy";
+import { catalogueDrink, CORE_DRINK_CATALOGUE, exactCatalogueNames, normalise, shownNames, type ShownName } from "@crew/fuzzy";
 import { CATALOGUE_PREFIX } from "./presets";
 
 /**
@@ -25,7 +25,7 @@ let fullNames: Map<string, ShownName> | null = null;
 function byFullName(): Map<string, ShownName> {
   if (!fullNames) {
     fullNames = new Map();
-    for (const drink of DRINK_CATALOGUE) for (const shown of shownNames(drink)) if (!fullNames.has(fold(shown.name))) fullNames.set(fold(shown.name), shown);
+    for (const drink of CORE_DRINK_CATALOGUE) for (const shown of shownNames(drink)) if (!fullNames.has(fold(shown.name))) fullNames.set(fold(shown.name), shown);
   }
   return fullNames;
 }
@@ -41,7 +41,9 @@ export function catalogueName(drink: NamedDrink): ShownName | null {
   const presetId = drink.presetId ?? drink.id ?? "";
   const own = presetId.startsWith(CATALOGUE_PREFIX) ? catalogueDrink(presetId.slice(CATALOGUE_PREFIX.length)) : undefined;
   const mine = own ? shownNames(own).find((shown) => fold(shown.name) === name || fold(shown.short) === name) : undefined;
-  return mine ?? byFullName().get(name) ?? null;
+  const curated = mine ?? byFullName().get(name);
+  if (curated) return curated;
+  return exactCatalogueNames(normalise(name)).flatMap(shownNames).find(shown => fold(shown.name) === name) ?? null;
 }
 
 /** A custom drink's name as shown in full, old catalogue names brought up to date. */
