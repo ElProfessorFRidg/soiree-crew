@@ -951,16 +951,16 @@
       "tintColor": "F4B33D",
       "category": "lifestyle",
       "screenshots": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/10-limits.png"
       ],
       "appPermissions": {
         "entitlements": [],
@@ -973,6 +973,28 @@
         }
       },
       "versions": [
+        {
+          "version": "0.2.72",
+          "buildVersion": "394",
+          "marketingVersion": "0.2.72 Preview (394)",
+          "date": "2026-11-27T05:53:07Z",
+          "localizedDescription": "• Bump the other-patches group with 4 updates",
+          "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.72-preview.47%2Bbuild.394/soiree-crew-unsigned.ipa",
+          "size": 25941882,
+          "minOSVersion": "16.4",
+          "screenshots": [
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/01-party.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/08-add-drink.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/09-curve.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/03-games.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/07-my-stats.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/12-history.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/11-leaderboard.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/04-bars.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/05-me.png",
+            "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/10-limits.png"
+          ]
+        },
         {
           "version": "0.2.70",
           "buildVersion": "388",
@@ -2382,26 +2404,37 @@
           ]
         }
       ],
-      "version": "0.2.70",
-      "versionDate": "2026-11-26T20:41:35Z",
-      "versionDescription": "• Give quiet hours steppers full width",
-      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.70-preview.46%2Bbuild.388/soiree-crew-unsigned.ipa",
-      "size": 25941782,
+      "version": "0.2.72",
+      "versionDate": "2026-11-27T05:53:07Z",
+      "versionDescription": "• Bump the other-patches group with 4 updates",
+      "downloadURL": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.72-preview.47%2Bbuild.394/soiree-crew-unsigned.ipa",
+      "size": 25941882,
       "screenshotURLs": [
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/01-party.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/08-add-drink.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/09-curve.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/03-games.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/07-my-stats.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/12-history.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/11-leaderboard.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/04-bars.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/05-me.png",
-        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.70-preview.46%2Bbuild.388/iphone/10-limits.png"
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/01-party.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/08-add-drink.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/09-curve.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/03-games.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/07-my-stats.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/12-history.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/11-leaderboard.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/04-bars.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/05-me.png",
+        "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/10-limits.png"
       ]
     }
   ],
   "news": [
+    {
+      "identifier": "preview-0.2.72-394",
+      "title": "Soirée Crew Preview 0.2.72 (394)",
+      "caption": "• Bump the other-patches group with 4 updates",
+      "date": "2026-11-27T05:53:07Z",
+      "tintColor": "F4B33D",
+      "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.72-preview.47%2Bbuild.394/iphone/banner.png",
+      "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.72-preview.47%2Bbuild.394/soiree-crew-unsigned.ipa",
+      "appID": "app.soireecrew.mobile.preview",
+      "notify": false
+    },
     {
       "identifier": "preview-0.2.70-388",
       "title": "Soirée Crew Preview 0.2.70 (388)",
@@ -2609,15 +2642,6 @@
       "imageURL": "https://raw.githubusercontent.com/ElProfessorFRidg/soiree-crew/altstore/screens/v0.2.39-preview.40%2Bbuild.343/iphone/banner.png",
       "url": "https://github.com/ElProfessorFRidg/soiree-crew/releases/download/v0.2.39-preview.40%2Bbuild.343/soiree-crew-unsigned.ipa",
       "appID": "app.soireecrew.mobile.preview",
-      "notify": false
-    },
-    {
-      "identifier": "ota-v0.2.34+build.334-iphone-45493902029.1",
-      "title": "Soirée Crew 0.2.34 · OTA",
-      "caption": "• Update settings and changelog UX (OTA) (#38)",
-      "date": "2026-11-24T21:48:33Z",
-      "appID": "app.soireecrew.mobile",
-      "tintColor": "F4B33D",
       "notify": false
     }
   ],
@@ -3043,6 +3067,13 @@
       "buildVersion": "2",
       "date": "2026-10-27T00:43:05Z",
       "localizedDescription": ""
+    },
+    {
+      "bundleIdentifier": "app.soireecrew.mobile.preview",
+      "version": "0.2.72",
+      "buildVersion": "394",
+      "date": "2026-11-27T05:53:07Z",
+      "localizedDescription": "• Bump the other-patches group with 4 updates"
     },
     {
       "bundleIdentifier": "app.soireecrew.mobile.preview",
